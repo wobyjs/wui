@@ -1,15 +1,5 @@
-# voby-tooltip
+# voby-vui
 
-<img width="250px" src="https://media.giphy.com/media/Rd6sPjQFVHOSwe9rbW/giphy.gif" />
-
-A **powerful** and **elegant** alternative for all your tooltips and menu needs.
-
-- **Different Types** - For every use context: Choose between _Hoverable_, _Static_ &amp; _Alert_ tooltips.
-- **Fully Customizable** - Easily change default settings via props
-- **Reliable Positioning** - Align your tooltip to your
-target element with ease
-- Tailwind CSS
-- React Hooks
 
 ## DEMO
 
@@ -20,7 +10,7 @@ Check out the [documentation &amp; demo](https://github.com/wongchichong/voby-vu
 ### NPM
 
 ```bash
-pnpm install voby-tooltip
+pnpm install voby-vui
 ```
 
 ## Usage
