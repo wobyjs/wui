@@ -1,6 +1,5 @@
-import { tw } from 'voby-styled'
-import { $, $$, Observable, useMemo, useEffect, type JSX, ObservableMaybe, } from 'voby'
-
+import { tw } from 'woby-styled'
+import { $, $$, Observable, useMemo, useEffect, ObservableMaybe, type JSX } from 'woby'
 
 //https://codepen.io/robstinson/pen/bGwpNMV
 //dark mode text-gray-400 bg-gray-900
@@ -17,7 +16,7 @@ export const SideBar = <T extends HTMLElement = HTMLDivElement>({ children, clas
         $$(contentRef).style.transition = 'margin-left .5s'
     })
 
-    return [<div class="h-full w-0 fixed z-[1000] bg-[#111] overflow-x-hidden transition-[0.5s] left-0 top-0" style={{ width }}>
+    return [<div class="h-full w-0 fixed overflow-x-hidden transition-[0.5s] left-0 top-0" style={{ width }}>
         {children}
     </div>,
     <div class={['absolute h-full w-full z-[999] bg-[#000] opacity-50', () => $$(disableBackground) && $$(open) ? 'visible' : 'hidden']} onClick={() => open(p => !p)}

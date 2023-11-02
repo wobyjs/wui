@@ -7,15 +7,17 @@ import { Avatar } from '../src/lib/Avatar'
 import { Badge } from '../src/lib/Badge'
 import { Appbar } from '../src/lib/Appbar'
 import { Toolbar } from '../src/lib/Toolbar'
-import { Button } from '../src/lib/Button'
+import { Button, variant } from '../src/lib/Button'
 import { Fab } from '../src/lib/Fab'
 import * as spreset from '../src/lib/Switch.effect'
 
-import { render, $ } from 'voby'
+import { render, $, $$, useEffect, type JSX } from 'woby'
 import '../dist/output.css'
 import { Collapse } from '../src/lib/Collapse'
 import { Checkbox } from '../src/lib/Checkbox'
 import { SideBar, MenuText, MenuItem } from '../src/lib/SideBar'
+import { NumberField } from '../src/lib/NumberField'
+import { ToggleButton } from '../src/lib/ToggleButton'
 
 const FaceIcon = <svg class="text-[rgb(97,97,97)] select-none w-[1em] h-[1em] inline-block fill-current shrink-0 transition-[fill] duration-200 ease-in-out delay-[0ms] text-2xl ml-[5px] -mr-1.5" focusable="false" aria-hidden="true" viewBox="0 0 24 24" data-testid="FaceIcon">
     <path d="M9 11.75c-.69 0-1.25.56-1.25 1.25s.56 1.25 1.25 1.25 1.25-.56 1.25-1.25-.56-1.25-1.25-1.25zm6 0c-.69 0-1.25.56-1.25 1.25s.56 1.25 1.25 1.25 1.25-.56 1.25-1.25-.56-1.25-1.25-1.25zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8 0-.29.02-.58.05-.86 2.36-1.05 4.23-2.98 5.21-5.37C11.07 8.33 14.05 10 17.42 10c.78 0 1.53-.09 2.25-.26.21.71.33 1.47.33 2.26 0 4.41-3.59 8-8 8z"></path>
@@ -61,7 +63,22 @@ const MessagesIcon = (props: JSX.SVGAttributes<SVGElement>) => <svg class="w-6 h
     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
 </svg>
 
+const number = $(0)
+const text1 = $('abc')
+
+useEffect(() => {
+    console.log($$(number))
+})
+
+
+useEffect(() => {
+    console.log($$(text1))
+})
+
+
+
 const App = () => <>
+
     <SideBar class='' open={menu} width='10rem' disableBackground contentRef={main}>
         {/* <a href="#" class='no-underline text-[25px] text-[#818181] block transition-[0.3s] pl-8 pr-2 py-2 hover:text-[#f1f1f1] '>About</a>
         <a href="#" class='no-underline text-[25px] text-[#818181] block transition-[0.3s] pl-8 pr-2 py-2 hover:text-[#f1f1f1] '>Services</a>
@@ -137,38 +154,42 @@ const App = () => <>
             </Toolbar>
         </Appbar>
         <div class='pt-[60px]'>
-            <Fab class='w-9 h-8'>
-                <svg class="select-none w-[1em] h-[1em] inline-block fill-current shrink-0 text-2xl [transition:fill_200ms_cubic-bezier(0.4,0,0.2,1)0ms]" focusable="false" aria-hidden="true" viewBox="0 0 24 24" data-testid="AddIcon"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path></svg>
-            </Fab>
-            <Fab class='w-12 h-12'>
-                <svg class="select-none w-[1em] h-[1em] inline-block fill-current shrink-0 text-2xl [transition:fill_200ms_cubic-bezier(0.4,0,0.2,1)0ms]" focusable="false" aria-hidden="true" viewBox="0 0 24 24" data-testid="AddIcon"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path></svg>
-            </Fab>
-            <Badge>
-                <svg class="select-none w-[1em] h-[1em] inline-block fill-current shrink-0 text-2xl [transition:fill_200ms_cubic-bezier(0.4,0,0.2,1)0ms]" focusable="false" aria-hidden="true" viewBox="0 0 24 24">
-                    <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"></path></svg>
-            </Badge>
+            <div class='[@media(min-width:768px)]:w-[750px] mx-auto px-[15px]'>
 
-            <Badge badgeContent="9+">
-                <svg class="select-none w-[1em] h-[1em] inline-block fill-current shrink-0 text-2xl [transition:fill_200ms_cubic-bezier(0.4,0,0.2,1)0ms]" focusable="false" aria-hidden="true" viewBox="0 0 24 24">
-                    <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"></path></svg>
-            </Badge>
+                <Fab class='w-9 h-8'>
+                    <svg class="select-none w-[1em] h-[1em] inline-block fill-[black] shrink-0 text-2xl [transition:fill_200ms_cubic-bezier(0.4,0,0.2,1)0ms]" focusable="false" aria-hidden="true" viewBox="0 0 24 24" data-testid="AddIcon"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path></svg>
+                </Fab>
+                <Fab class='w-12 h-12'>
+                    <svg class="select-none w-[1em] h-[1em] inline-block fill-[black] shrink-0 text-2xl [transition:fill_200ms_cubic-bezier(0.4,0,0.2,1)0ms]" focusable="false" aria-hidden="true" viewBox="0 0 24 24" data-testid="AddIcon"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path></svg>
+                </Fab>
 
-            <Badge badgeContent="99+">
-                <svg class="select-none w-[1em] h-[1em] inline-block fill-current shrink-0 text-2xl [transition:fill_200ms_cubic-bezier(0.4,0,0.2,1)0ms]" focusable="false" aria-hidden="true" viewBox="0 0 24 24">
-                    <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"></path></svg>
-            </Badge>
+                <Badge>
+                    <svg class="select-none w-[1em] h-[1em] inline-block fill-current shrink-0 text-2xl [transition:fill_200ms_cubic-bezier(0.4,0,0.2,1)0ms]" focusable="false" aria-hidden="true" viewBox="0 0 24 24">
+                        <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"></path></svg>
+                </Badge>
 
-            <Badge badgeContent="99+" anchorOrigin={{ vertical: 'bottom' }}>
-                <svg class="select-none w-[1em] h-[1em] inline-block fill-current shrink-0 text-2xl [transition:fill_200ms_cubic-bezier(0.4,0,0.2,1)0ms]" focusable="false" aria-hidden="true" viewBox="0 0 24 24" data-testid="MailIcon"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"></path></svg>
-            </Badge>
+                <Badge badgeContent="9+">
+                    <svg class="select-none w-[1em] h-[1em] inline-block fill-current shrink-0 text-2xl [transition:fill_200ms_cubic-bezier(0.4,0,0.2,1)0ms]" focusable="false" aria-hidden="true" viewBox="0 0 24 24">
+                        <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"></path></svg>
+                </Badge>
 
-            <Badge badgeContent="99+" anchorOrigin={{ horizontal: 'left' }}>
-                <svg class="select-none w-[1em] h-[1em] inline-block fill-current shrink-0 text-2xl [transition:fill_200ms_cubic-bezier(0.4,0,0.2,1)0ms]" focusable="false" aria-hidden="true" viewBox="0 0 24 24" data-testid="MailIcon"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"></path></svg>
-            </Badge>
+                <Badge badgeContent="99+">
+                    <svg class="select-none w-[1em] h-[1em] inline-block fill-current shrink-0 text-2xl [transition:fill_200ms_cubic-bezier(0.4,0,0.2,1)0ms]" focusable="false" aria-hidden="true" viewBox="0 0 24 24">
+                        <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"></path></svg>
+                </Badge>
 
-            <Badge badgeContent="99+" anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}>
-                <svg class="select-none w-[1em] h-[1em] inline-block fill-current shrink-0 text-2xl [transition:fill_200ms_cubic-bezier(0.4,0,0.2,1)0ms]" focusable="false" aria-hidden="true" viewBox="0 0 24 24" data-testid="MailIcon"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"></path></svg>
-            </Badge>
+                <Badge badgeContent="99+" anchorOrigin={{ vertical: 'bottom' }}>
+                    <svg class="select-none w-[1em] h-[1em] inline-block fill-current shrink-0 text-2xl [transition:fill_200ms_cubic-bezier(0.4,0,0.2,1)0ms]" focusable="false" aria-hidden="true" viewBox="0 0 24 24" data-testid="MailIcon"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"></path></svg>
+                </Badge>
+
+                <Badge badgeContent="99+" anchorOrigin={{ horizontal: 'left' }}>
+                    <svg class="select-none w-[1em] h-[1em] inline-block fill-current shrink-0 text-2xl [transition:fill_200ms_cubic-bezier(0.4,0,0.2,1)0ms]" focusable="false" aria-hidden="true" viewBox="0 0 24 24" data-testid="MailIcon"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"></path></svg>
+                </Badge>
+
+                <Badge badgeContent="99+" anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}>
+                    <svg class="select-none w-[1em] h-[1em] inline-block fill-current shrink-0 text-2xl [transition:fill_200ms_cubic-bezier(0.4,0,0.2,1)0ms]" focusable="false" aria-hidden="true" viewBox="0 0 24 24" data-testid="MailIcon"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"></path></svg>
+                </Badge>
+            </div>
 
             <div class='[@media(min-width:768px)]:w-[750px] mx-auto px-[15px]'>
                 <div class='w-full relative flex justify-center bg-white border m-auto p-6 rounded-[12px_12px_0_0] border-l-0 border-r border-solid border-[#E5EAF2] [outline:0]'>
@@ -194,6 +215,13 @@ const App = () => <>
                     <Avatar alt="Travis Howard" src="https://mui.com/static/images/avatar/3.jpg" />
                     <Avatar class='w-[56px] h-[56px]' alt="Cindy Baker" src="https://mui.com/static/images/avatar/3.jpg" />
                 </div>
+
+
+                <br />
+                <NumberField min={5} max={10} value={number} class="[&_input]:w-[5rem] [&_button]:w-[2rem] [&_button]:text-[130%] [&_button]:leading-[0] [&_button]:font-bold h-[2rem]" />
+                <br />
+
+
                 <Checkbox><h1 class='inline-block'>h1 check</h1></Checkbox>
                 <br />
 
@@ -224,40 +252,40 @@ const App = () => <>
 
                 <div class={row}>
                     <h2><i>Border effects</i></h2>
-                    <TextField class='inline-block w-[27.33%] mt-[20px] mr-3' effect={preset.effect1} placeholder={'effect1'} />
-                    <TextField class='inline-block w-[27.33%] mt-[20px] mr-3' effect={preset.effect2} placeholder={'effect2'} />
-                    <TextField class='inline-block w-[27.33%] mt-[20px] mr-3' effect={preset.effect3} placeholder={'effect3'} />
-                    <TextField class='inline-block w-[27.33%] mt-[20px] mr-3' effect={preset.effect4} placeholder={'effect4'} />
-                    <TextField class='inline-block w-[27.33%] mt-[20px] mr-3' effect={preset.effect5} placeholder={'effect5'} />
-                    <TextField class='inline-block w-[27.33%] mt-[20px] mr-3' effect={preset.effect6} placeholder={'effect6'} />
-                    <TextField class='inline-block w-[27.33%] mt-[20px] mr-3' effect={preset.effect7} placeholder={'effect7'} />
-                    <TextField class='inline-block w-[27.33%] mt-[20px] mr-3' effect={preset.effect8} placeholder={'effect8'} />
-                    <TextField class='inline-block w-[27.33%] mt-[20px] mr-3' effect={preset.effect9} placeholder={'effect9'} />
+                    <TextField class='inline-block w-[27.33%] mt-[20px] mr-3' effect={[preset.effect1, 'w-full']} placeholder={'effect1'} value={text1} />
+                    <TextField class='inline-block w-[27.33%] mt-[20px] mr-3' effect={[preset.effect2, 'w-full']} placeholder={'effect2'} />
+                    <TextField class='inline-block w-[27.33%] mt-[20px] mr-3' effect={[preset.effect3, 'w-full']} placeholder={'effect3'} />
+                    <TextField class='inline-block w-[27.33%] mt-[20px] mr-3' effect={[preset.effect4, 'w-full']} placeholder={'effect4'} />
+                    <TextField class='inline-block w-[27.33%] mt-[20px] mr-3' effect={[preset.effect5, 'w-full']} placeholder={'effect5'} />
+                    <TextField class='inline-block w-[27.33%] mt-[20px] mr-3' effect={[preset.effect6, 'w-full']} placeholder={'effect6'} />
+                    <TextField class='inline-block w-[27.33%] mt-[20px] mr-3' effect={[preset.effect7, 'w-full']} placeholder={'effect7'} />
+                    <TextField class='inline-block w-[27.33%] mt-[20px] mr-3' effect={[preset.effect8, 'w-full']} placeholder={'effect8'} />
+                    <TextField class='inline-block w-[27.33%] mt-[20px] mr-3' effect={[preset.effect9, 'w-full']} placeholder={'effect9'} />
                 </div>
                 <div class={row}>
                     <h2><i>Background Effects</i></h2>
-                    <TextField class='inline-block w-[27.33%] mt-[20px] mr-3' effect={[preset.effect10, '[&~span]:opacity-[unset] [&:focus~span]:bg-[#000] [&~span]:bg-[#e7a8a8]']} placeholder={'effect10'} />
-                    <TextField class='inline-block w-[27.33%] mt-[20px] mr-3' effect={[preset.effect11, 'border-[#F00]']} placeholder={'effect11'} />
-                    <TextField class='inline-block w-[27.33%] mt-[20px] mr-3' effect={preset.effect12} placeholder={'effect12'} />
-                    <TextField class='inline-block w-[27.33%] mt-[20px] mr-3' effect={preset.effect13} placeholder={'effect13'} />
-                    <TextField class='inline-block w-[27.33%] mt-[20px] mr-3' effect={preset.effect14} placeholder={'effect14'} />
-                    <TextField class='inline-block w-[27.33%] mt-[20px] mr-3' effect={preset.effect15} placeholder={'effect15'} />
+                    <TextField class='inline-block w-[27.33%] mt-[20px] mr-3' effect={[preset.effect10, 'w-full', '[&~span]:opacity-[unset] [&:focus~span]:bg-[#000] [&~span]:bg-[#e7a8a8]']} placeholder={'effect10'} />
+                    <TextField class='inline-block w-[27.33%] mt-[20px] mr-3' effect={[preset.effect11, 'w-full', 'border-[#F00]']} placeholder={'effect11'} />
+                    <TextField class='inline-block w-[27.33%] mt-[20px] mr-3' effect={[preset.effect12, 'w-full']} placeholder={'effect12'} />
+                    <TextField class='inline-block w-[27.33%] mt-[20px] mr-3' effect={[preset.effect13, 'w-full']} placeholder={'effect13'} />
+                    <TextField class='inline-block w-[27.33%] mt-[20px] mr-3' effect={[preset.effect14, 'w-full']} placeholder={'effect14'} />
+                    <TextField class='inline-block w-[27.33%] mt-[20px] mr-3' effect={[preset.effect15, 'w-full']} placeholder={'effect15'} />
                 </div>
                 <div class={row}>
                     <h2><i>Input with Label Effects</i></h2>
-                    <TextField class='inline-block w-[27.33%] mt-[20px] mr-3' effect={[preset.effect16, '[&~label]:text-[red] [&:focus~label]:text-[red] [&:not(:placeholder-shown)~label]:text-[red]']} placeholder={''}><label>effect16</label></TextField>
-                    <TextField class='inline-block w-[27.33%] mt-[20px] mr-3' effect={preset.effect17} placeholder={''}><label>effect17</label></TextField>
-                    <TextField class='inline-block w-[27.33%] mt-[20px] mr-3' effect={preset.effect18} placeholder={''}><label>effect18</label></TextField>
-                    <TextField class='inline-block w-[27.33%] mt-[20px] mr-3' effect={preset.effect19} placeholder={''}><label>effect19</label></TextField>
-                    <TextField class='inline-block w-[27.33%] mt-[20px] mr-3' effect={[preset.effect20, '[&~span]:before:bg-[red] [&~span]:after:bg-[red] [&~span_i]:before:bg-[red] [&~span_i]:after:bg-[red]']} placeholder={''}><label>effect20</label></TextField>
-                    <TextField class='inline-block w-[27.33%] mt-[20px] mr-3' effect={preset.effect21} placeholder={''}><label>effect21</label></TextField>
-                    <TextField class='inline-block w-[27.33%] mt-[20px] mr-3' effect={preset.effect22} placeholder={''}><label>effect22</label></TextField>
-                    <TextField class='inline-block w-[27.33%] mt-[20px] mr-3' effect={preset.effect23} placeholder={''}><label>effect23</label></TextField>
-                    <TextField class='inline-block w-[27.33%] mt-[20px] mr-3' effect={preset.effect24} placeholder={''}><label>effect24</label></TextField>
+                    <TextField class='inline-block w-[27.33%] mt-[20px] mr-3' effect={[preset.effect16, 'w-full', '[&~label]:text-[red] [&:focus~label]:text-[red] [&:not(:placeholder-shown)~label]:text-[red]']} placeholder={''}><label>effect16</label></TextField>
+                    <TextField class='inline-block w-[27.33%] mt-[20px] mr-3' effect={[preset.effect17, 'w-full']} placeholder={''}><label>effect17</label></TextField>
+                    <TextField class='inline-block w-[27.33%] mt-[20px] mr-3' effect={[preset.effect18, 'w-full']} placeholder={''}><label>effect18</label></TextField>
+                    <TextField class='inline-block w-[27.33%] mt-[20px] mr-3' effect={[preset.effect19, 'w-full']} placeholder={''}><label>effect19</label></TextField>
+                    <TextField class='inline-block w-[27.33%] mt-[20px] mr-3' effect={[preset.effect20, 'w-full', '[&~span]:before:bg-[red] [&~span]:after:bg-[red] [&~span_i]:before:bg-[red] [&~span_i]:after:bg-[red]']} placeholder={''}><label>effect20</label></TextField>
+                    <TextField class='inline-block w-[27.33%] mt-[20px] mr-3' effect={[preset.effect21, 'w-full']} placeholder={''}><label>effect21</label></TextField>
+                    <TextField class='inline-block w-[27.33%] mt-[20px] mr-3' effect={[preset.effect22, 'w-full']} placeholder={''}><label>effect22</label></TextField>
+                    <TextField class='inline-block w-[27.33%] mt-[20px] mr-3' effect={[preset.effect23, 'w-full']} placeholder={''}><label>effect23</label></TextField>
+                    <TextField class='inline-block w-[27.33%] mt-[20px] mr-3' effect={[preset.effect24, 'w-full']} placeholder={''}><label>effect24</label></TextField>
 
-                    <TextField class='inline-block w-[27.33%] mt-[20px] mr-3' effect={preset.effect19a} placeholder={''}><label>effect19a</label></TextField>
-                    <TextField class='inline-block w-[27.33%] mt-[20px] mr-3' effect={preset.effect20a} placeholder={''}><label>effect20a</label></TextField>
-                    <TextField class='inline-block w-[27.33%] mt-[20px] mr-3' effect={preset.effect21a} placeholder={''}><label>effect21a</label></TextField>
+                    <TextField class='inline-block w-[27.33%] mt-[20px] mr-3' effect={[preset.effect19a, 'w-full']} placeholder={''}><label>effect19a</label></TextField>
+                    <TextField class='inline-block w-[27.33%] mt-[20px] mr-3' effect={[preset.effect20a, 'w-full']} placeholder={''}><label>effect20a</label></TextField>
+                    <TextField class='inline-block w-[27.33%] mt-[20px] mr-3' effect={[preset.effect21a, 'w-full']} placeholder={''}><label>effect21a</label></TextField>
 
                 </div>
 
@@ -276,6 +304,18 @@ const App = () => <>
                     <div class='inline-block w-[27.33%] mt-[30px] mr-3 elevation-20'>elevation=20</div>
                     <div class='inline-block w-[27.33%] mt-[30px] mr-3 elevation-24'>elevation=24</div>
                 </div>
+
+                <br />
+                <br />
+                <div class='block'>
+                    <Button class={variant.outlined}>Outlined</Button>
+                    <Button class={variant.contained}>contained</Button>
+                    <Button class={variant.text}>text</Button>
+                    <Button class={variant.icon}>
+                        <svg focusable='false' viewBox='0 0 24 24' width='1.5rem' height='1.5rem'>
+                            <path d='M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z'></path></svg>
+                    </Button>
+                </div>
                 <h1>IconButton</h1>
                 <div>
                     <IconButton onClick={() => alert('clicked')} >
@@ -293,7 +333,25 @@ const App = () => <>
                         <svg focusable='false' viewBox='0 0 24 24'><path d='M11 9h2V6h3V4h-3V1h-2v3H8v2h3v3zm-4 9c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2zm-9.83-3.25.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.86-7.01L19.42 4h-.01l-1.1 2-2.76 5H8.53l-.13-.27L6.16 6l-.95-2-.94-2H1v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.13 0-.25-.11-.25-.25z'></path></svg>
                     </IconButton>
                 </div>
-
+                <h1>ToggleButton</h1>
+                <div>
+                    <ToggleButton class='px-3 font-bold'>Web</ToggleButton>
+                    <ToggleButton class='px-3 font-bold'>Android</ToggleButton>
+                    <ToggleButton class='px-3 font-bold'>IOS</ToggleButton>
+                </div>
+                <div>
+                    <ToggleButton class='h-7 w-7'>
+                        <svg focusable='false' viewBox='0 0 24 24'>
+                            <path d='M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z'></path></svg>
+                    </ToggleButton>
+                    <ToggleButton class='h-7 w-7'>
+                        <svg focusable='false' viewBox='0 0 24 24'>
+                            <path d='m22 5.72-4.6-3.86-1.29 1.53 4.6 3.86L22 5.72zM7.88 3.39 6.6 1.86 2 5.71l1.29 1.53 4.59-3.85zM12.5 8H11v6l4.75 2.85.75-1.23-4-2.37V8zM12 4c-4.97 0-9 4.03-9 9s4.02 9 9 9c4.97 0 9-4.03 9-9s-4.03-9-9-9zm0 16c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z'></path></svg>
+                    </ToggleButton>
+                    <ToggleButton class='h-7 w-7'>
+                        <svg focusable='false' viewBox='0 0 24 24'><path d='M11 9h2V6h3V4h-3V1h-2v3H8v2h3v3zm-4 9c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2zm-9.83-3.25.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.86-7.01L19.42 4h-.01l-1.1 2-2.76 5H8.53l-.13-.27L6.16 6l-.95-2-.94-2H1v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.13 0-.25-.11-.25-.25z'></path></svg>
+                    </ToggleButton>
+                </div>
                 <div id='app-cover'>
                     <div class='table-row'>
                         <div class='table-cell relative w-[200px] h-[50px] box-border'><Switch class={[buttonr, spreset.effect1, `

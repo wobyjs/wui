@@ -1,5 +1,5 @@
-import { } from 'voby/dist/types/jsx/types'
-import { $, $$, Observable, ObservableMaybe, isObservable, useEffect, useMemo } from 'voby'
+import type { JSX } from 'woby/jsx-runtime'
+import { $, $$, Observable, ObservableMaybe, isObservable, useEffect, useMemo } from 'woby'
 
 export const Badge = ({ className, children, badgeContent, anchorOrigin: { vertical = 'top', horizontal = 'right' } = {}, badgeClass = `bg-[rgb(156,39,176)]`, open: op, ...props }:
     JSX.VoidHTMLAttributes<HTMLDivElement> & {

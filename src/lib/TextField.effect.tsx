@@ -1,5 +1,5 @@
-import { } from 'voby/dist/types/jsx/types'
-import { keyframes, tw, css } from 'voby-styled'
+import type { JSX } from 'woby/jsx-runtime'
+import { keyframes, tw, css } from 'woby-styled'
 
 //https://codepen.io/maheshambure21/pen/EozKKy
 
@@ -49,7 +49,7 @@ export const effect7 = `${outline7}
 [&~span]:after:content-[''] [&~span]:after:absolute [&~span]:after:w-0 [&~span]:after:h-0.5 [&~span]:after:bg-[#4caf50] [&~span]:after:duration-[0.4s] [&~span]:after:left-2/4 [&~span]:after:top-0
 [&~span]:after:top-auto [&~span]:after:bottom-0
 [&~span_i]:before:content-[''] [&~span_i]:before:absolute [&~span_i]:before:w-0.5 [&~span_i]:before:h-0 [&~span_i]:before:bg-[#4caf50] [&~span_i]:before:duration-[0.6s] [&~span_i]:before:left-0 [&~span_i]:before:top-2/4
-[&~span_i]:after:content-[''] [&~span_i]:after:absolute [&~span_i]:after:w-0.5 [&~span_i]:after:h-0 [&~span_i]:after:bg-[#4caf50] [&~span_i]:after:duration-[0.6s] [&~span_i]:after:left-0 [&~span_i]:after:top-2/4
+[&~span_i]:after:content-[''] [&~span_i]:after:absolute [&~span_i]:after:w-0.5 [&~span_i]:after:h-0 [&~span_i]:after:bg-[#4caf50] [&~span_i]:after:duration-[0.6s]  [&~span_i]:after:top-2/4
 [&~span_i]:after:left-auto [&~span_i]:after:right-0
 [&:focus~span]:before:w-full [&:focus~span]:before:duration-[0.4s] [&:focus~span]:before:left-0
 [&:focus~span]:after:w-full [&:focus~span]:after:duration-[0.4s] [&:focus~span]:after:left-0
@@ -61,7 +61,7 @@ export const effect8 = `${outline7}
 [&~span]:after:content-[''] [&~span]:after:absolute [&~span]:after:w-0 [&~span]:after:h-0.5 [&~span]:after:bg-[#4caf50] [&~span]:after:duration-[0.3s] [&~span]:after:left-0 [&~span]:after:top-0
 [&~span]:after:left-auto [&~span]:after:right-0 [&~span]:after:top-auto [&~span]:after:bottom-0
 [&~span_i]:before:content-[''] [&~span_i]:before:absolute [&~span_i]:before:w-0.5 [&~span_i]:before:h-0 [&~span_i]:before:bg-[#4caf50] [&~span_i]:before:duration-[0.4s] [&~span_i]:before:left-0 [&~span_i]:before:top-0
-[&~span_i]:after:content-[''] [&~span_i]:after:absolute [&~span_i]:after:w-0.5 [&~span_i]:after:h-0 [&~span_i]:after:bg-[#4caf50] [&~span_i]:after:duration-[0.4s] [&~span_i]:after:left-0 [&~span_i]:after:top-0
+[&~span_i]:after:content-[''] [&~span_i]:after:absolute [&~span_i]:after:w-0.5 [&~span_i]:after:h-0 [&~span_i]:after:bg-[#4caf50] [&~span_i]:after:duration-[0.4s]  [&~span_i]:after:top-0
 [&~span_i]:after:left-auto [&~span_i]:after:right-0 [&~span_i]:after:top-auto [&~span_i]:after:bottom-0
 [&:focus~span]:before:w-full [&:focus~span]:before:duration-[0.3s]
 [&:focus~span]:after:w-full [&:focus~span]:after:duration-[0.3s]
@@ -74,7 +74,7 @@ export const effect9 = `${outline7}
 [&~span]:after:delay-[0.6s] [&~span]:after:left-0 [&~span]:after:right-auto [&~span]:after:top-auto [&~span]:after:bottom-0
 [&~span_i]:before:content-[""] [&~span_i]:before:absolute [&~span_i]:before:w-0.5 [&~span_i]:before:h-0 [&~span_i]:before:bg-[#4caf50] [&~span_i]:before:duration-[0.2s] [&~span_i]:before:left-0 [&~span_i]:before:top-0
 [&~span_i]:before:delay-[0.8s]
-[&~span_i]:after:content-[""] [&~span_i]:after:absolute [&~span_i]:after:w-0.5 [&~span_i]:after:h-0 [&~span_i]:after:bg-[#4caf50] [&~span_i]:after:duration-[0.2s] [&~span_i]:after:left-0 [&~span_i]:after:top-0
+[&~span_i]:after:content-[""] [&~span_i]:after:absolute [&~span_i]:after:w-0.5 [&~span_i]:after:h-0 [&~span_i]:after:bg-[#4caf50] [&~span_i]:after:duration-[0.2s]  [&~span_i]:after:top-0
 [&~span_i]:after:delay-[0.4s] [&~span_i]:after:left-auto [&~span_i]:after:right-0 [&~span_i]:after:top-auto [&~span_i]:after:bottom-0
 [&:focus~span]:before:w-full [&:focus~span]:before:duration-[0.2s] [&:focus~span]:before:delay-[0.6s]
 [&:focus~span]:after:w-full [&:focus~span]:after:duration-[0.2s]
@@ -160,10 +160,10 @@ export const effect18 = `${underline16}
 const box19 = `focus:[outline:none] border duration-[0.4s] px-3.5 py-[7px] border-solid border-[#ccc] bg-transparent`
 export const effect19 = `${box19}
 [&~span]:before:content-[''] [&~span]:before:absolute [&~span]:before:w-0 [&~span]:before:h-0.5 [&~span]:before:bg-[#4caf50] [&~span]:before:duration-[0.4s] [&~span]:before:left-2/4 [&~span]:before:-top-px
-[&~span]:after:content-[''] [&~span]:after:absolute [&~span]:after:w-0 [&~span]:after:h-0.5 [&~span]:after:bg-[#4caf50] [&~span]:after:duration-[0.4s] [&~span]:after:left-2/4 [&~span]:after:-top-px
+[&~span]:after:content-[''] [&~span]:after:absolute [&~span]:after:w-0 [&~span]:after:h-0.5 [&~span]:after:bg-[#4caf50] [&~span]:after:duration-[0.4s] [&~span]:after:left-2/4 
 [&~span]:after:top-auto [&~span]:after:bottom-0
 [&~span_i]:before:content-[''] [&~span_i]:before:absolute [&~span_i]:before:w-0.5 [&~span_i]:before:h-0 [&~span_i]:before:bg-[#4caf50] [&~span_i]:before:duration-[0.6s] [&~span_i]:before:left-0 [&~span_i]:before:top-2/4
-[&~span_i]:after:content-[''] [&~span_i]:after:absolute [&~span_i]:after:w-0.5 [&~span_i]:after:h-0 [&~span_i]:after:bg-[#4caf50] [&~span_i]:after:duration-[0.6s] [&~span_i]:after:left-0 [&~span_i]:after:top-2/4
+[&~span_i]:after:content-[''] [&~span_i]:after:absolute [&~span_i]:after:w-0.5 [&~span_i]:after:h-0 [&~span_i]:after:bg-[#4caf50] [&~span_i]:after:duration-[0.6s]  [&~span_i]:after:top-2/4
 [&~span_i]:after:left-auto [&~span_i]:after:right-0
 [&:focus~span]:before:w-full [&:focus~span]:before:duration-[0.4s] [&:focus~span]:before:left-0
 [&:focus~span]:after:w-full [&:focus~span]:after:duration-[0.4s] [&:focus~span]:after:left-0
@@ -184,7 +184,7 @@ export const effect20 = `${box19}
 [&~span]:after:content-[''] [&~span]:after:absolute [&~span]:after:w-0 [&~span]:after:h-0.5 [&~span]:after:bg-[#4caf50] [&~span]:after:duration-[0.3s] [&~span]:after:left-0 [&~span]:after:top-0
 [&~span]:after:left-auto [&~span]:after:right-0 [&~span]:after:top-auto [&~span]:after:bottom-0
 [&~span_i]:before:content-[''] [&~span_i]:before:absolute [&~span_i]:before:w-0.5 [&~span_i]:before:h-0 [&~span_i]:before:bg-[#4caf50] [&~span_i]:before:duration-[0.4s] [&~span_i]:before:left-0 [&~span_i]:before:top-0
-[&~span_i]:after:content-[''] [&~span_i]:after:absolute [&~span_i]:after:w-0.5 [&~span_i]:after:h-0 [&~span_i]:after:bg-[#4caf50] [&~span_i]:after:duration-[0.4s] [&~span_i]:after:left-0 [&~span_i]:after:top-0
+[&~span_i]:after:content-[''] [&~span_i]:after:absolute [&~span_i]:after:w-0.5 [&~span_i]:after:h-0 [&~span_i]:after:bg-[#4caf50] [&~span_i]:after:duration-[0.4s]  [&~span_i]:after:top-0
 [&~span_i]:after:left-auto [&~span_i]:after:right-0 [&~span_i]:after:top-auto [&~span_i]:after:bottom-0
 [&:focus~span]:before:w-full [&:focus~span]:before:duration-[0.3s]
 [&:focus~span]:after:w-full [&:focus~span]:after:duration-[0.3s]
@@ -204,7 +204,7 @@ export const effect21 = `${box19}
 [&~span]:after:content-[''] [&~span]:after:absolute [&~span]:after:w-0 [&~span]:after:h-0.5 [&~span]:after:bg-[#4caf50] [&~span]:after:duration-[0.2s] [&~span]:after:delay-[0.2s] [&~span]:after:right-0 [&~span]:after:top-0
 [&~span]:after:delay-[0.6s] [&~span]:after:left-0 [&~span]:after:right-auto [&~span]:after:top-auto [&~span]:after:bottom-0
 [&~span_i]:before:content-[''] [&~span_i]:before:absolute [&~span_i]:before:w-0.5 [&~span_i]:before:h-0 [&~span_i]:before:bg-[#4caf50] [&~span_i]:before:duration-[0.2s] [&~span_i]:before:left-0 [&~span_i]:before:top-0
-[&~span_i]:after:content-[''] [&~span_i]:after:absolute [&~span_i]:after:w-0.5 [&~span_i]:after:h-0 [&~span_i]:after:bg-[#4caf50] [&~span_i]:after:duration-[0.2s] [&~span_i]:after:left-0 [&~span_i]:after:top-0
+[&~span_i]:after:content-[''] [&~span_i]:after:absolute [&~span_i]:after:w-0.5 [&~span_i]:after:h-0 [&~span_i]:after:bg-[#4caf50] [&~span_i]:after:duration-[0.2s]  [&~span_i]:after:top-0
 [&~span_i]:after:delay-[0.4s] [&~span_i]:after:left-auto [&~span_i]:after:right-0 [&~span_i]:after:top-auto [&~span_i]:after:bottom-0
 [&:focus~span]:before:w-full [&:focus~span]:before:duration-[0.2s] [&:focus~span]:before:delay-[0.6s]
 [&:focus~span]:after:w-full [&:focus~span]:after:duration-[0.2s] 
@@ -265,10 +265,10 @@ const hpLabel = `[&:not(:placeholder-shown)~label]:top-[-12px] [&:not(:placehold
 
 export const effect19a = `${box19}
 [&~span]:before:content-[''] [&~span]:before:absolute [&~span]:before:w-0 [&~span]:before:h-0.5 [&~span]:before:bg-[#4caf50] [&~span]:before:duration-[0.4s] [&~span]:before:left-2/4 [&~span]:before:-top-px
-[&~span]:after:content-[''] [&~span]:after:absolute [&~span]:after:w-0 [&~span]:after:h-0.5 [&~span]:after:bg-[#4caf50] [&~span]:after:duration-[0.4s] [&~span]:after:left-2/4 [&~span]:after:-top-px
+[&~span]:after:content-[''] [&~span]:after:absolute [&~span]:after:w-0 [&~span]:after:h-0.5 [&~span]:after:bg-[#4caf50] [&~span]:after:duration-[0.4s] [&~span]:after:left-2/4 
 [&~span]:after:top-auto [&~span]:after:bottom-0
 [&~span_i]:before:content-[''] [&~span_i]:before:absolute [&~span_i]:before:w-0.5 [&~span_i]:before:h-0 [&~span_i]:before:bg-[#4caf50] [&~span_i]:before:duration-[0.6s] [&~span_i]:before:left-0 [&~span_i]:before:top-2/4
-[&~span_i]:after:content-[''] [&~span_i]:after:absolute [&~span_i]:after:w-0.5 [&~span_i]:after:h-0 [&~span_i]:after:bg-[#4caf50] [&~span_i]:after:duration-[0.6s] [&~span_i]:after:left-0 [&~span_i]:after:top-2/4
+[&~span_i]:after:content-[''] [&~span_i]:after:absolute [&~span_i]:after:w-0.5 [&~span_i]:after:h-0 [&~span_i]:after:bg-[#4caf50] [&~span_i]:after:duration-[0.6s]  [&~span_i]:after:top-2/4
 [&~span_i]:after:left-auto [&~span_i]:after:right-0
 [&:focus~span]:before:w-full [&:focus~span]:before:duration-[0.4s] [&:focus~span]:before:left-0
 [&:focus~span]:after:w-full [&:focus~span]:after:duration-[0.4s] [&:focus~span]:after:left-0
@@ -288,7 +288,7 @@ export const effect20a = `${box19}
 [&~span]:after:content-[''] [&~span]:after:absolute [&~span]:after:w-0 [&~span]:after:h-0.5 [&~span]:after:bg-[#4caf50] [&~span]:after:duration-[0.3s] [&~span]:after:left-0 [&~span]:after:top-0
 [&~span]:after:left-auto [&~span]:after:right-0 [&~span]:after:top-auto [&~span]:after:bottom-0
 [&~span_i]:before:content-[''] [&~span_i]:before:absolute [&~span_i]:before:w-0.5 [&~span_i]:before:h-0 [&~span_i]:before:bg-[#4caf50] [&~span_i]:before:duration-[0.4s] [&~span_i]:before:left-0 [&~span_i]:before:top-0
-[&~span_i]:after:content-[''] [&~span_i]:after:absolute [&~span_i]:after:w-0.5 [&~span_i]:after:h-0 [&~span_i]:after:bg-[#4caf50] [&~span_i]:after:duration-[0.4s] [&~span_i]:after:left-0 [&~span_i]:after:top-0
+[&~span_i]:after:content-[''] [&~span_i]:after:absolute [&~span_i]:after:w-0.5 [&~span_i]:after:h-0 [&~span_i]:after:bg-[#4caf50] [&~span_i]:after:duration-[0.4s]  [&~span_i]:after:top-0
 [&~span_i]:after:left-auto [&~span_i]:after:right-0 [&~span_i]:after:top-auto [&~span_i]:after:bottom-0
 [&:focus~span]:before:w-full [&:focus~span]:before:duration-[0.3s]
 [&:focus~span]:after:w-full [&:focus~span]:after:duration-[0.3s]
@@ -308,7 +308,7 @@ export const effect21a = `${box19}
 [&~span]:after:content-[''] [&~span]:after:absolute [&~span]:after:w-0 [&~span]:after:h-0.5 [&~span]:after:bg-[#4caf50] [&~span]:after:duration-[0.2s] [&~span]:after:delay-[0.2s] [&~span]:after:right-0 [&~span]:after:top-0
 [&~span]:after:delay-[0.6s] [&~span]:after:left-0 [&~span]:after:right-auto [&~span]:after:top-auto [&~span]:after:bottom-0
 [&~span_i]:before:content-[''] [&~span_i]:before:absolute [&~span_i]:before:w-0.5 [&~span_i]:before:h-0 [&~span_i]:before:bg-[#4caf50] [&~span_i]:before:duration-[0.2s] [&~span_i]:before:left-0 [&~span_i]:before:top-0
-[&~span_i]:after:content-[''] [&~span_i]:after:absolute [&~span_i]:after:w-0.5 [&~span_i]:after:h-0 [&~span_i]:after:bg-[#4caf50] [&~span_i]:after:duration-[0.2s] [&~span_i]:after:left-0 [&~span_i]:after:top-0
+[&~span_i]:after:content-[''] [&~span_i]:after:absolute [&~span_i]:after:w-0.5 [&~span_i]:after:h-0 [&~span_i]:after:bg-[#4caf50] [&~span_i]:after:duration-[0.2s]  [&~span_i]:after:top-0
 [&~span_i]:after:delay-[0.4s] [&~span_i]:after:left-auto [&~span_i]:after:right-0 [&~span_i]:after:top-auto [&~span_i]:after:bottom-0
 [&:focus~span]:before:w-full [&:focus~span]:before:duration-[0.2s] [&:focus~span]:before:delay-[0.6s]
 [&:focus~span]:after:w-full [&:focus~span]:after:duration-[0.2s] 

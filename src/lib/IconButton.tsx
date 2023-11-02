@@ -1,5 +1,5 @@
-import { tw } from 'voby-styled'
-import { } from 'voby/dist/types/jsx/types'
+import { tw } from 'woby-styled'
+import type { JSX } from 'woby/jsx-runtime'
 
 /** color: [&_svg]:fill-current */
 export const IconButton = tw('button')`inline-flex items-center justify-center relative box-border bg-transparent cursor-pointer select-none align-middle appearance-none no-underline text-center flex-[0_0_auto] text-2xl overflow-visible text-[rgba(0,0,0,0.54)] transition-[background-color] duration ease-in-out delay-[0ms] m-0 p-2 rounded-[50%] border-0

@@ -1,6 +1,6 @@
-import { } from 'voby/dist/types/jsx/types'
+import type { JSX } from 'woby/jsx-runtime'
 import { nanoid } from 'nanoid'
-import { ObservableMaybe, $$, useMemo } from 'voby'
+import { ObservableMaybe, $$, useMemo } from 'woby'
 
 type LabelPosition = 'left' | 'right' | 'bottom' | 'top'
 

@@ -1,5 +1,5 @@
-import { tw } from 'voby-styled'
-// import { } from 'voby/dist/types/jsx/types'
+import { tw } from 'woby-styled'
+// ,type JSX } from 'woby'
 
 // const preset = {
 //     0: `bg-white transition-shadow duration-300 ease-in-out delay-[0ms] rounded shadow-none`,

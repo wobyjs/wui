@@ -1,4 +1,6 @@
 import { nanoid } from 'nanoid'
+import { type JSX } from 'woby/jsx-runtime'
+
 // https://codepen.io/alvarotrigo/pen/oNoJePo
 
 
