@@ -1,4 +1,4 @@
-# woby-vui
+# woby-wui
 
 A combo of UIs based on MUI.
 
@@ -6,14 +6,14 @@ You might not need this library if you familiar with the technique of copying st
 
 ## DEMO
 
-Check out the [documentation &amp; demo](https://github.com/wongchichong/woby-vui/) pages to see all use cases.
+Check out the [documentation &amp; demo](https://github.com/wongchichong/woby-wui/) pages to see all use cases.
 
 ## Installation
 
 ### NPM
 
 ```bash
-pnpm install woby-vui
+pnpm install woby-wui
 ```
 ## Usage
 

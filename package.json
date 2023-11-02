@@ -1,5 +1,5 @@
 {
-    "name": "woby-vui",
+    "name": "woby-wui",
     "version": "1.0.2",
     "description": "A powerful tooltip and menu component library for voby.",
     "main": "./dist/index.cjs.js",
