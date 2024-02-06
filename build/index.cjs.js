@@ -44,7 +44,7 @@ const isObject$1 = (value) => {
 const isSymbol = (value) => {
   return typeof value === "symbol";
 };
-const noop = () => {
+const noop$1 = () => {
   return;
 };
 const nope = () => {
@@ -555,7 +555,7 @@ function context(symbolOrContext, fn) {
   if (isSymbol(symbolOrContext)) {
     return OWNER.context[symbolOrContext];
   } else {
-    return new Context(symbolOrContext).wrap(fn || noop);
+    return new Context(symbolOrContext).wrap(fn || noop$1);
   }
 }
 class Scheduler2 {
@@ -1069,6 +1069,9 @@ const STORE_TRAPS = {
     const equals = node.equals || is;
     const hadProperty = key in target2;
     const descriptorPrev = Reflect.getOwnPropertyDescriptor(target2, key);
+    if ("value" in descriptor && isStore(descriptor.value)) {
+      descriptor = { ...descriptor, value: getTarget(descriptor.value) };
+    }
     if (descriptorPrev && isEqualDescriptor(descriptorPrev, descriptor, equals))
       return true;
     const defined = Reflect.defineProperty(target2, key, descriptor);
@@ -1284,7 +1287,7 @@ const store = (value, options2) => {
   return getStore(value, options2);
 };
 store.on = (target2, listener) => {
-  const targets = castArray$1(target2);
+  const targets = isStore(target2) ? [target2] : castArray$1(target2);
   const selectors = targets.filter(isFunction$1);
   const nodes = targets.filter(isStore).map(getNodeFromStore);
   StoreListenersRegular.active += 1;
@@ -1314,7 +1317,7 @@ store.on = (target2, listener) => {
 };
 store._onRoots = (target2, listener) => {
   if (!isStore(target2))
-    return noop;
+    return noop$1;
   const node = getNodeFromStore(target2);
   if (node.parents)
     throw new Error("Only top-level stores are supported");
@@ -1521,6 +1524,12 @@ const diff = (parent, before, after, nextSibling) => {
   if (before === after)
     return;
   if (before instanceof Node) {
+    if (after instanceof Node) {
+      if (before.parentNode === parent) {
+        parent.replaceChild(after, before);
+        return;
+      }
+    }
     beforeDummyWrapper[0] = before;
     before = beforeDummyWrapper;
   }
@@ -1550,9 +1559,8 @@ const diff = (parent, before, after, nextSibling) => {
       while (aStart < aEnd) {
         if (!map || !map.has(before[aStart])) {
           removable = before[aStart];
-          try {
+          if (removable.parentNode === parent) {
             parent.removeChild(removable);
-          } catch {
           }
         }
         aStart++;
@@ -1605,9 +1613,8 @@ const diff = (parent, before, after, nextSibling) => {
           aStart++;
       } else {
         removable = before[aStart++];
-        try {
+        if (removable.parentNode === parent) {
           parent.removeChild(removable);
-        } catch {
         }
       }
     }
@@ -1733,6 +1740,23 @@ const resolveClass = (classes, resolved = {}) => {
       if (!isActive)
         continue;
       resolved[key] = true;
+    }
+  }
+  return resolved;
+};
+const resolveStyle = (styles, resolved = {}) => {
+  if (isString(styles)) {
+    return styles;
+  } else if (isFunction(styles)) {
+    return resolveStyle(styles(), resolved);
+  } else if (isArray(styles)) {
+    styles.forEach((style) => {
+      resolveStyle(style, resolved);
+    });
+  } else if (styles) {
+    for (const key in styles) {
+      const value = styles[key];
+      resolved[key] = get(value);
     }
   }
   return resolved;
@@ -2224,10 +2248,10 @@ const setStylesStatic = (element, object, objectPrev) => {
   }
 };
 const setStyles = (element, object) => {
-  if (isFunction(object) && isFunctionReactive(object)) {
+  if (isFunction(object) || isArray(object)) {
     let objectPrev;
     useRenderEffect$1(() => {
-      const objectNext = object();
+      const objectNext = resolveStyle(object);
       setStylesStatic(element, objectNext, objectPrev);
       objectPrev = objectNext;
     });
@@ -2265,6 +2289,8 @@ const setTemplateAccessor = (element, key, value) => {
   }
 };
 const setProp = (element, key, value) => {
+  if (value === void 0)
+    return;
   if (isTemplateAccessor(value)) {
     setTemplateAccessor(element, key, value);
   } else if (key === "children") {
@@ -2295,7 +2321,7 @@ const setProps = (element, object) => {
   }
 };
 const createElement = (component, props, ..._children) => {
-  const { ...rest } = props;
+  const { ...rest } = props ?? {};
   if (isFunction(component)) {
     const props2 = rest;
     return wrapElement$1(() => {
@@ -2328,6 +2354,47 @@ function jsx(component, props, ...children) {
     Object.assign(props, { children });
   return wrapCloneElement(creatElement(component, props, props == null ? void 0 : props.key), component, props);
 }
+var n = function(t2, s, r, e) {
+  var u;
+  s[0] = 0;
+  for (var h = 1; h < s.length; h++) {
+    var p = s[h++], a = s[h] ? (s[0] |= p ? 1 : 2, r[s[h++]]) : s[++h];
+    3 === p ? e[0] = a : 4 === p ? e[1] = Object.assign(e[1] || {}, a) : 5 === p ? (e[1] = e[1] || {})[s[++h]] = a : 6 === p ? e[1][s[++h]] += a + "" : p ? (u = t2.apply(a, n(t2, a, r, ["", null])), e.push(u), a[0] ? s[0] |= 2 : (s[h - 2] = 0, s[h] = u)) : e.push(a);
+  }
+  return e;
+}, t = /* @__PURE__ */ new Map();
+function htm(s) {
+  var r = t.get(this);
+  return r || (r = /* @__PURE__ */ new Map(), t.set(this, r)), (r = n(this, r.get(s) || (r.set(s, r = function(n2) {
+    for (var t2, s2, r2 = 1, e = "", u = "", h = [0], p = function(n3) {
+      1 === r2 && (n3 || (e = e.replace(/^\s*\n\s*|\s*\n\s*$/g, ""))) ? h.push(0, n3, e) : 3 === r2 && (n3 || e) ? (h.push(3, n3, e), r2 = 2) : 2 === r2 && "..." === e && n3 ? h.push(4, n3, 0) : 2 === r2 && e && !n3 ? h.push(5, 0, true, e) : r2 >= 5 && ((e || !n3 && 5 === r2) && (h.push(r2, 0, e, s2), r2 = 6), n3 && (h.push(r2, n3, 0, s2), r2 = 6)), e = "";
+    }, a = 0; a < n2.length; a++) {
+      a && (1 === r2 && p(), p(a));
+      for (var l = 0; l < n2[a].length; l++)
+        t2 = n2[a][l], 1 === r2 ? "<" === t2 ? (p(), h = [h], r2 = 3) : e += t2 : 4 === r2 ? "--" === e && ">" === t2 ? (r2 = 1, e = "") : e = t2 + e[0] : u ? t2 === u ? u = "" : e += t2 : '"' === t2 || "'" === t2 ? u = t2 : ">" === t2 ? (p(), r2 = 1) : r2 && ("=" === t2 ? (r2 = 5, s2 = e, e = "") : "/" === t2 && (r2 < 5 || ">" === n2[a][l + 1]) ? (p(), 3 === r2 && (h = h[0]), r2 = h, (h = h[0]).push(2, 0, r2), r2 = 0) : " " === t2 || "	" === t2 || "\n" === t2 || "\r" === t2 ? (p(), r2 = 2) : e += t2), 3 === r2 && "!--" === e && (r2 = 4, h = h[0]);
+    }
+    return p(), h;
+  }(s)), r), arguments, [])).length > 1 ? r : r[0];
+}
+const render = (child, parent) => {
+  if (!parent || !(parent instanceof HTMLElement))
+    throw new Error("Invalid parent node");
+  parent.textContent = "";
+  return root((dispose) => {
+    setChild(parent, child);
+    return () => {
+      dispose();
+      parent.textContent = "";
+    };
+  });
+};
+const render$1 = render;
+var _a, _b;
+!!((_b = (_a = globalThis.CDATASection) == null ? void 0 : _a.toString) == null ? void 0 : _b.call(_a).match(/^\s*function\s+CDATASection\s*\(\s*\)\s*\{\s*\[native code\]\s*\}\s*$/));
+const registry = {};
+const h2 = (type, props, ...children) => creatElement(registry[type] || type, props, ...children);
+const register = (components) => void assign(registry, components);
+assign(htm.bind(h2), { register });
 const underlineOnly = `focus:[outline:none] px-0 py-[7px] border-b-[#ccc] border-0 border-b border-solid`;
 const effect1$1 = `${underlineOnly} 
 [&~span]:absolute [&~span]:w-0 [&~span]:h-0.5 [&~span]:bg-[#4caf50] [&~span]:duration-[0.4s] [&~span]:left-0 [&~span]:bottom-0
@@ -2367,7 +2434,7 @@ const effect7$1 = `${outline7}
 [&~span]:after:content-[''] [&~span]:after:absolute [&~span]:after:w-0 [&~span]:after:h-0.5 [&~span]:after:bg-[#4caf50] [&~span]:after:duration-[0.4s] [&~span]:after:left-2/4 [&~span]:after:top-0
 [&~span]:after:top-auto [&~span]:after:bottom-0
 [&~span_i]:before:content-[''] [&~span_i]:before:absolute [&~span_i]:before:w-0.5 [&~span_i]:before:h-0 [&~span_i]:before:bg-[#4caf50] [&~span_i]:before:duration-[0.6s] [&~span_i]:before:left-0 [&~span_i]:before:top-2/4
-[&~span_i]:after:content-[''] [&~span_i]:after:absolute [&~span_i]:after:w-0.5 [&~span_i]:after:h-0 [&~span_i]:after:bg-[#4caf50] [&~span_i]:after:duration-[0.6s] [&~span_i]:after:left-0 [&~span_i]:after:top-2/4
+[&~span_i]:after:content-[''] [&~span_i]:after:absolute [&~span_i]:after:w-0.5 [&~span_i]:after:h-0 [&~span_i]:after:bg-[#4caf50] [&~span_i]:after:duration-[0.6s]  [&~span_i]:after:top-2/4
 [&~span_i]:after:left-auto [&~span_i]:after:right-0
 [&:focus~span]:before:w-full [&:focus~span]:before:duration-[0.4s] [&:focus~span]:before:left-0
 [&:focus~span]:after:w-full [&:focus~span]:after:duration-[0.4s] [&:focus~span]:after:left-0
@@ -2379,7 +2446,7 @@ const effect8$1 = `${outline7}
 [&~span]:after:content-[''] [&~span]:after:absolute [&~span]:after:w-0 [&~span]:after:h-0.5 [&~span]:after:bg-[#4caf50] [&~span]:after:duration-[0.3s] [&~span]:after:left-0 [&~span]:after:top-0
 [&~span]:after:left-auto [&~span]:after:right-0 [&~span]:after:top-auto [&~span]:after:bottom-0
 [&~span_i]:before:content-[''] [&~span_i]:before:absolute [&~span_i]:before:w-0.5 [&~span_i]:before:h-0 [&~span_i]:before:bg-[#4caf50] [&~span_i]:before:duration-[0.4s] [&~span_i]:before:left-0 [&~span_i]:before:top-0
-[&~span_i]:after:content-[''] [&~span_i]:after:absolute [&~span_i]:after:w-0.5 [&~span_i]:after:h-0 [&~span_i]:after:bg-[#4caf50] [&~span_i]:after:duration-[0.4s] [&~span_i]:after:left-0 [&~span_i]:after:top-0
+[&~span_i]:after:content-[''] [&~span_i]:after:absolute [&~span_i]:after:w-0.5 [&~span_i]:after:h-0 [&~span_i]:after:bg-[#4caf50] [&~span_i]:after:duration-[0.4s]  [&~span_i]:after:top-0
 [&~span_i]:after:left-auto [&~span_i]:after:right-0 [&~span_i]:after:top-auto [&~span_i]:after:bottom-0
 [&:focus~span]:before:w-full [&:focus~span]:before:duration-[0.3s]
 [&:focus~span]:after:w-full [&:focus~span]:after:duration-[0.3s]
@@ -2392,7 +2459,7 @@ const effect9$1 = `${outline7}
 [&~span]:after:delay-[0.6s] [&~span]:after:left-0 [&~span]:after:right-auto [&~span]:after:top-auto [&~span]:after:bottom-0
 [&~span_i]:before:content-[""] [&~span_i]:before:absolute [&~span_i]:before:w-0.5 [&~span_i]:before:h-0 [&~span_i]:before:bg-[#4caf50] [&~span_i]:before:duration-[0.2s] [&~span_i]:before:left-0 [&~span_i]:before:top-0
 [&~span_i]:before:delay-[0.8s]
-[&~span_i]:after:content-[""] [&~span_i]:after:absolute [&~span_i]:after:w-0.5 [&~span_i]:after:h-0 [&~span_i]:after:bg-[#4caf50] [&~span_i]:after:duration-[0.2s] [&~span_i]:after:left-0 [&~span_i]:after:top-0
+[&~span_i]:after:content-[""] [&~span_i]:after:absolute [&~span_i]:after:w-0.5 [&~span_i]:after:h-0 [&~span_i]:after:bg-[#4caf50] [&~span_i]:after:duration-[0.2s]  [&~span_i]:after:top-0
 [&~span_i]:after:delay-[0.4s] [&~span_i]:after:left-auto [&~span_i]:after:right-0 [&~span_i]:after:top-auto [&~span_i]:after:bottom-0
 [&:focus~span]:before:w-full [&:focus~span]:before:duration-[0.2s] [&:focus~span]:before:delay-[0.6s]
 [&:focus~span]:after:w-full [&:focus~span]:after:duration-[0.2s]
@@ -2468,10 +2535,10 @@ const effect18$1 = `${underline16}
 const box19 = `focus:[outline:none] border duration-[0.4s] px-3.5 py-[7px] border-solid border-[#ccc] bg-transparent`;
 const effect19 = `${box19}
 [&~span]:before:content-[''] [&~span]:before:absolute [&~span]:before:w-0 [&~span]:before:h-0.5 [&~span]:before:bg-[#4caf50] [&~span]:before:duration-[0.4s] [&~span]:before:left-2/4 [&~span]:before:-top-px
-[&~span]:after:content-[''] [&~span]:after:absolute [&~span]:after:w-0 [&~span]:after:h-0.5 [&~span]:after:bg-[#4caf50] [&~span]:after:duration-[0.4s] [&~span]:after:left-2/4 [&~span]:after:-top-px
+[&~span]:after:content-[''] [&~span]:after:absolute [&~span]:after:w-0 [&~span]:after:h-0.5 [&~span]:after:bg-[#4caf50] [&~span]:after:duration-[0.4s] [&~span]:after:left-2/4 
 [&~span]:after:top-auto [&~span]:after:bottom-0
 [&~span_i]:before:content-[''] [&~span_i]:before:absolute [&~span_i]:before:w-0.5 [&~span_i]:before:h-0 [&~span_i]:before:bg-[#4caf50] [&~span_i]:before:duration-[0.6s] [&~span_i]:before:left-0 [&~span_i]:before:top-2/4
-[&~span_i]:after:content-[''] [&~span_i]:after:absolute [&~span_i]:after:w-0.5 [&~span_i]:after:h-0 [&~span_i]:after:bg-[#4caf50] [&~span_i]:after:duration-[0.6s] [&~span_i]:after:left-0 [&~span_i]:after:top-2/4
+[&~span_i]:after:content-[''] [&~span_i]:after:absolute [&~span_i]:after:w-0.5 [&~span_i]:after:h-0 [&~span_i]:after:bg-[#4caf50] [&~span_i]:after:duration-[0.6s]  [&~span_i]:after:top-2/4
 [&~span_i]:after:left-auto [&~span_i]:after:right-0
 [&:focus~span]:before:w-full [&:focus~span]:before:duration-[0.4s] [&:focus~span]:before:left-0
 [&:focus~span]:after:w-full [&:focus~span]:after:duration-[0.4s] [&:focus~span]:after:left-0
@@ -2491,7 +2558,7 @@ const effect20 = `${box19}
 [&~span]:after:content-[''] [&~span]:after:absolute [&~span]:after:w-0 [&~span]:after:h-0.5 [&~span]:after:bg-[#4caf50] [&~span]:after:duration-[0.3s] [&~span]:after:left-0 [&~span]:after:top-0
 [&~span]:after:left-auto [&~span]:after:right-0 [&~span]:after:top-auto [&~span]:after:bottom-0
 [&~span_i]:before:content-[''] [&~span_i]:before:absolute [&~span_i]:before:w-0.5 [&~span_i]:before:h-0 [&~span_i]:before:bg-[#4caf50] [&~span_i]:before:duration-[0.4s] [&~span_i]:before:left-0 [&~span_i]:before:top-0
-[&~span_i]:after:content-[''] [&~span_i]:after:absolute [&~span_i]:after:w-0.5 [&~span_i]:after:h-0 [&~span_i]:after:bg-[#4caf50] [&~span_i]:after:duration-[0.4s] [&~span_i]:after:left-0 [&~span_i]:after:top-0
+[&~span_i]:after:content-[''] [&~span_i]:after:absolute [&~span_i]:after:w-0.5 [&~span_i]:after:h-0 [&~span_i]:after:bg-[#4caf50] [&~span_i]:after:duration-[0.4s]  [&~span_i]:after:top-0
 [&~span_i]:after:left-auto [&~span_i]:after:right-0 [&~span_i]:after:top-auto [&~span_i]:after:bottom-0
 [&:focus~span]:before:w-full [&:focus~span]:before:duration-[0.3s]
 [&:focus~span]:after:w-full [&:focus~span]:after:duration-[0.3s]
@@ -2510,7 +2577,7 @@ const effect21 = `${box19}
 [&~span]:after:content-[''] [&~span]:after:absolute [&~span]:after:w-0 [&~span]:after:h-0.5 [&~span]:after:bg-[#4caf50] [&~span]:after:duration-[0.2s] [&~span]:after:delay-[0.2s] [&~span]:after:right-0 [&~span]:after:top-0
 [&~span]:after:delay-[0.6s] [&~span]:after:left-0 [&~span]:after:right-auto [&~span]:after:top-auto [&~span]:after:bottom-0
 [&~span_i]:before:content-[''] [&~span_i]:before:absolute [&~span_i]:before:w-0.5 [&~span_i]:before:h-0 [&~span_i]:before:bg-[#4caf50] [&~span_i]:before:duration-[0.2s] [&~span_i]:before:left-0 [&~span_i]:before:top-0
-[&~span_i]:after:content-[''] [&~span_i]:after:absolute [&~span_i]:after:w-0.5 [&~span_i]:after:h-0 [&~span_i]:after:bg-[#4caf50] [&~span_i]:after:duration-[0.2s] [&~span_i]:after:left-0 [&~span_i]:after:top-0
+[&~span_i]:after:content-[''] [&~span_i]:after:absolute [&~span_i]:after:w-0.5 [&~span_i]:after:h-0 [&~span_i]:after:bg-[#4caf50] [&~span_i]:after:duration-[0.2s]  [&~span_i]:after:top-0
 [&~span_i]:after:delay-[0.4s] [&~span_i]:after:left-auto [&~span_i]:after:right-0 [&~span_i]:after:top-auto [&~span_i]:after:bottom-0
 [&:focus~span]:before:w-full [&:focus~span]:before:duration-[0.2s] [&:focus~span]:before:delay-[0.6s]
 [&:focus~span]:after:w-full [&:focus~span]:after:duration-[0.2s] 
@@ -2567,10 +2634,10 @@ const hLabel = `[&:focus~label]:top-[-12px] [&:focus~label]:text-xs [&:focus~lab
 const hpLabel = `[&:not(:placeholder-shown)~label]:top-[-12px] [&:not(:placeholder-shown)~label]:text-xs [&:not(:placeholder-shown)~label]:text-[#4caf50] [&:not(:placeholder-shown)~label]:duration-[0.3s] [&:not(:placeholder-shown)~label]:left-[7px] [&:not(:placeholder-shown)~label]:bg-[white] [&:not(:placeholder-shown)~label]:w-fit [&:not(:placeholder-shown)~label]:z-10 [&:not(:placeholder-shown)~label]:p-[2px]`;
 const effect19a = `${box19}
 [&~span]:before:content-[''] [&~span]:before:absolute [&~span]:before:w-0 [&~span]:before:h-0.5 [&~span]:before:bg-[#4caf50] [&~span]:before:duration-[0.4s] [&~span]:before:left-2/4 [&~span]:before:-top-px
-[&~span]:after:content-[''] [&~span]:after:absolute [&~span]:after:w-0 [&~span]:after:h-0.5 [&~span]:after:bg-[#4caf50] [&~span]:after:duration-[0.4s] [&~span]:after:left-2/4 [&~span]:after:-top-px
+[&~span]:after:content-[''] [&~span]:after:absolute [&~span]:after:w-0 [&~span]:after:h-0.5 [&~span]:after:bg-[#4caf50] [&~span]:after:duration-[0.4s] [&~span]:after:left-2/4 
 [&~span]:after:top-auto [&~span]:after:bottom-0
 [&~span_i]:before:content-[''] [&~span_i]:before:absolute [&~span_i]:before:w-0.5 [&~span_i]:before:h-0 [&~span_i]:before:bg-[#4caf50] [&~span_i]:before:duration-[0.6s] [&~span_i]:before:left-0 [&~span_i]:before:top-2/4
-[&~span_i]:after:content-[''] [&~span_i]:after:absolute [&~span_i]:after:w-0.5 [&~span_i]:after:h-0 [&~span_i]:after:bg-[#4caf50] [&~span_i]:after:duration-[0.6s] [&~span_i]:after:left-0 [&~span_i]:after:top-2/4
+[&~span_i]:after:content-[''] [&~span_i]:after:absolute [&~span_i]:after:w-0.5 [&~span_i]:after:h-0 [&~span_i]:after:bg-[#4caf50] [&~span_i]:after:duration-[0.6s]  [&~span_i]:after:top-2/4
 [&~span_i]:after:left-auto [&~span_i]:after:right-0
 [&:focus~span]:before:w-full [&:focus~span]:before:duration-[0.4s] [&:focus~span]:before:left-0
 [&:focus~span]:after:w-full [&:focus~span]:after:duration-[0.4s] [&:focus~span]:after:left-0
@@ -2589,7 +2656,7 @@ const effect20a = `${box19}
 [&~span]:after:content-[''] [&~span]:after:absolute [&~span]:after:w-0 [&~span]:after:h-0.5 [&~span]:after:bg-[#4caf50] [&~span]:after:duration-[0.3s] [&~span]:after:left-0 [&~span]:after:top-0
 [&~span]:after:left-auto [&~span]:after:right-0 [&~span]:after:top-auto [&~span]:after:bottom-0
 [&~span_i]:before:content-[''] [&~span_i]:before:absolute [&~span_i]:before:w-0.5 [&~span_i]:before:h-0 [&~span_i]:before:bg-[#4caf50] [&~span_i]:before:duration-[0.4s] [&~span_i]:before:left-0 [&~span_i]:before:top-0
-[&~span_i]:after:content-[''] [&~span_i]:after:absolute [&~span_i]:after:w-0.5 [&~span_i]:after:h-0 [&~span_i]:after:bg-[#4caf50] [&~span_i]:after:duration-[0.4s] [&~span_i]:after:left-0 [&~span_i]:after:top-0
+[&~span_i]:after:content-[''] [&~span_i]:after:absolute [&~span_i]:after:w-0.5 [&~span_i]:after:h-0 [&~span_i]:after:bg-[#4caf50] [&~span_i]:after:duration-[0.4s]  [&~span_i]:after:top-0
 [&~span_i]:after:left-auto [&~span_i]:after:right-0 [&~span_i]:after:top-auto [&~span_i]:after:bottom-0
 [&:focus~span]:before:w-full [&:focus~span]:before:duration-[0.3s]
 [&:focus~span]:after:w-full [&:focus~span]:after:duration-[0.3s]
@@ -2608,7 +2675,7 @@ const effect21a = `${box19}
 [&~span]:after:content-[''] [&~span]:after:absolute [&~span]:after:w-0 [&~span]:after:h-0.5 [&~span]:after:bg-[#4caf50] [&~span]:after:duration-[0.2s] [&~span]:after:delay-[0.2s] [&~span]:after:right-0 [&~span]:after:top-0
 [&~span]:after:delay-[0.6s] [&~span]:after:left-0 [&~span]:after:right-auto [&~span]:after:top-auto [&~span]:after:bottom-0
 [&~span_i]:before:content-[''] [&~span_i]:before:absolute [&~span_i]:before:w-0.5 [&~span_i]:before:h-0 [&~span_i]:before:bg-[#4caf50] [&~span_i]:before:duration-[0.2s] [&~span_i]:before:left-0 [&~span_i]:before:top-0
-[&~span_i]:after:content-[''] [&~span_i]:after:absolute [&~span_i]:after:w-0.5 [&~span_i]:after:h-0 [&~span_i]:after:bg-[#4caf50] [&~span_i]:after:duration-[0.2s] [&~span_i]:after:left-0 [&~span_i]:after:top-0
+[&~span_i]:after:content-[''] [&~span_i]:after:absolute [&~span_i]:after:w-0.5 [&~span_i]:after:h-0 [&~span_i]:after:bg-[#4caf50] [&~span_i]:after:duration-[0.2s]  [&~span_i]:after:top-0
 [&~span_i]:after:delay-[0.4s] [&~span_i]:after:left-auto [&~span_i]:after:right-0 [&~span_i]:after:top-auto [&~span_i]:after:bottom-0
 [&:focus~span]:before:w-full [&:focus~span]:before:duration-[0.2s] [&:focus~span]:before:delay-[0.6s]
 [&:focus~span]:after:w-full [&:focus~span]:after:duration-[0.2s] 
@@ -2628,47 +2695,19 @@ ${hpLabel}
 [&~span_i]:before:delay-[0.8s]
 [&:focus~span_i]:before:delay-0
 `;
-var n = function(t2, s, r, e) {
-  var u;
-  s[0] = 0;
-  for (var h2 = 1; h2 < s.length; h2++) {
-    var p = s[h2++], a = s[h2] ? (s[0] |= p ? 1 : 2, r[s[h2++]]) : s[++h2];
-    3 === p ? e[0] = a : 4 === p ? e[1] = Object.assign(e[1] || {}, a) : 5 === p ? (e[1] = e[1] || {})[s[++h2]] = a : 6 === p ? e[1][s[++h2]] += a + "" : p ? (u = t2.apply(a, n(t2, a, r, ["", null])), e.push(u), a[0] ? s[0] |= 2 : (s[h2 - 2] = 0, s[h2] = u)) : e.push(a);
+let nanoid = (size = 21) => crypto.getRandomValues(new Uint8Array(size)).reduce((id, byte) => {
+  byte &= 63;
+  if (byte < 36) {
+    id += byte.toString(36);
+  } else if (byte < 62) {
+    id += (byte - 26).toString(36).toUpperCase();
+  } else if (byte > 62) {
+    id += "-";
+  } else {
+    id += "_";
   }
-  return e;
-}, t = /* @__PURE__ */ new Map();
-function htm(s) {
-  var r = t.get(this);
-  return r || (r = /* @__PURE__ */ new Map(), t.set(this, r)), (r = n(this, r.get(s) || (r.set(s, r = function(n2) {
-    for (var t2, s2, r2 = 1, e = "", u = "", h2 = [0], p = function(n3) {
-      1 === r2 && (n3 || (e = e.replace(/^\s*\n\s*|\s*\n\s*$/g, ""))) ? h2.push(0, n3, e) : 3 === r2 && (n3 || e) ? (h2.push(3, n3, e), r2 = 2) : 2 === r2 && "..." === e && n3 ? h2.push(4, n3, 0) : 2 === r2 && e && !n3 ? h2.push(5, 0, true, e) : r2 >= 5 && ((e || !n3 && 5 === r2) && (h2.push(r2, 0, e, s2), r2 = 6), n3 && (h2.push(r2, n3, 0, s2), r2 = 6)), e = "";
-    }, a = 0; a < n2.length; a++) {
-      a && (1 === r2 && p(), p(a));
-      for (var l = 0; l < n2[a].length; l++)
-        t2 = n2[a][l], 1 === r2 ? "<" === t2 ? (p(), h2 = [h2], r2 = 3) : e += t2 : 4 === r2 ? "--" === e && ">" === t2 ? (r2 = 1, e = "") : e = t2 + e[0] : u ? t2 === u ? u = "" : e += t2 : '"' === t2 || "'" === t2 ? u = t2 : ">" === t2 ? (p(), r2 = 1) : r2 && ("=" === t2 ? (r2 = 5, s2 = e, e = "") : "/" === t2 && (r2 < 5 || ">" === n2[a][l + 1]) ? (p(), 3 === r2 && (h2 = h2[0]), r2 = h2, (h2 = h2[0]).push(2, 0, r2), r2 = 0) : " " === t2 || "	" === t2 || "\n" === t2 || "\r" === t2 ? (p(), r2 = 2) : e += t2), 3 === r2 && "!--" === e && (r2 = 4, h2 = h2[0]);
-    }
-    return p(), h2;
-  }(s)), r), arguments, [])).length > 1 ? r : r[0];
-}
-const render = (child, parent) => {
-  if (!parent || !(parent instanceof HTMLElement))
-    throw new Error("Invalid parent node");
-  parent.textContent = "";
-  return root((dispose) => {
-    setChild(parent, child);
-    return () => {
-      dispose();
-      parent.textContent = "";
-    };
-  });
-};
-const render$1 = render;
-var _a, _b;
-!!((_b = (_a = globalThis.CDATASection) == null ? void 0 : _a.toString) == null ? void 0 : _b.call(_a).match(/^\s*function\s+CDATASection\s*\(\s*\)\s*\{\s*\[native code\]\s*\}\s*$/));
-const registry = {};
-const h = (type, props, ...children) => creatElement(registry[type] || type, props, ...children);
-const register = (components) => void assign(registry, components);
-assign(htm.bind(h), { register });
+  return id;
+}, "");
 const isTemp = (s) => !!s.raw;
 const extract = (C, props, classNames) => {
   const { className, ...p } = props;
@@ -2688,10 +2727,24 @@ function style$1(comp) {
   return { comp, tw: tw2 };
 }
 const tw = style$1().tw;
-const TextField = ({ className, children, effect: effect25, type = "text", placeholder = "Placeholder Text", ...props }) => {
-  const { class: cls, ...ps } = props;
+const TextField = ({ className, class: cls, children, effect: effect25, reactive, type = "text", placeholder = "Placeholder Text", ...props }) => {
+  const { onChange, onKeyUp, ...ps } = props;
   return /* @__PURE__ */ jsx("div", { class: [className ?? cls ?? "m-[20px]", "relative"], children: [
-    /* @__PURE__ */ jsx("input", { class: effect25 ?? effect19a, ...{ ...ps, type, placeholder } }),
+    /* @__PURE__ */ jsx(
+      "input",
+      {
+        class: effect25 ?? effect19a,
+        ...{ ...ps, type, placeholder },
+        onChange: (e) => {
+          var _a2;
+          return !get(reactive) && isObservable(ps.value) ? ((_a2 = ps.value) == null ? void 0 : _a2.call(ps, e.target.value), onChange == null ? void 0 : onChange(e)) : void 0;
+        },
+        onKeyUp: (e) => {
+          var _a2;
+          return !get(reactive) && isObservable(ps.value) ? ((_a2 = ps.value) == null ? void 0 : _a2.call(ps, e.target.value), onKeyUp == null ? void 0 : onKeyUp(e)) : void 0;
+        }
+      }
+    ),
     children,
     /* @__PURE__ */ jsx("span", { children: /* @__PURE__ */ jsx("i", {}) })
   ] });
@@ -2730,27 +2783,27 @@ const Chip = ({ avatar, deleteIcon = DeleteIcon, onDelete, children, ...props })
     }, children: deleteIcon }) : null
   ] });
 };
-let nanoid = (size = 21) => crypto.getRandomValues(new Uint8Array(size)).reduce((id, byte) => {
-  byte &= 63;
-  if (byte < 36) {
-    id += byte.toString(36);
-  } else if (byte < 62) {
-    id += (byte - 26).toString(36).toUpperCase();
-  } else if (byte > 62) {
-    id += "-";
-  } else {
-    id += "_";
-  }
-  return id;
-}, "");
-const Switch = ({ off = "OFF", on = "ON", ...props }) => {
+const Switch = ({ off = "OFF", on = "ON", checked, ...props }) => {
   const id = props.id ?? nanoid(8);
   return /* @__PURE__ */ jsx(Fragment$1, { children: /* @__PURE__ */ jsx("div", { ...props, children: [
-    /* @__PURE__ */ jsx("input", { id, type: "checkbox" }),
+    /* @__PURE__ */ jsx("input", { id, type: "checkbox", checked: get(checked), onChange: (v) => isObservable(checked) && checked(v.target.checked) }),
     /* @__PURE__ */ jsx("div", { "data-tg-on": on, "data-tg-off": off, children: /* @__PURE__ */ jsx("span", { "data-tg-on": on, "data-tg-off": off }) }),
     /* @__PURE__ */ jsx("span", {}),
     /* @__PURE__ */ jsx("label", { for: id, "data-tg-on": on, "data-tg-off": off })
   ] }) });
+};
+const useEnumSwitch = (e, t2, f) => {
+  const v = observable(get(e) === t2);
+  effect(() => {
+    v(get(e) === get(t2));
+  });
+  effect(() => {
+    if (get(v))
+      e(get(t2));
+    else
+      e(get(f));
+  });
+  return v;
 };
 const Avatar = ({ className = "w-10 h-10 bg-[rgb(189,189,189)]", src, alt, children, ...props }) => {
   const cls = props.class;
@@ -2759,10 +2812,13 @@ const Avatar = ({ className = "w-10 h-10 bg-[rgb(189,189,189)]", src, alt, child
   return /* @__PURE__ */ jsx("div", { class: ["relative flex items-center justify-center shrink-0  text-xl leading-none overflow-hidden select-none text-white m-0 rounded-[50%]", cls ?? className], children: child });
 };
 const Badge = ({ className, children, badgeContent, anchorOrigin: { vertical = "top", horizontal = "right" } = {}, badgeClass = `bg-[rgb(156,39,176)]`, open: op, ...props }) => {
-  const empty = memo(() => badgeContent ? "min-w-[20px] h-5 rounded-[10px] px-1" : "min-w-[8px] h-2 rounded px-0");
+  const empty = memo(
+    () => get(badgeContent) ? "min-w-[20px] h-5 rounded-[10px] px-1" : "hidden"
+    /* min-w-[8px] h-2 rounded px-0  */
+  );
   const pos = memo(() => {
-    const [v, h2] = [get(vertical), get(horizontal)];
-    return v === "top" ? h2 === "right" ? `translate-x-2/4 -translate-y-2/4 origin-[100%_0%]` : `-translate-x-2/4 -translate-y-2/4 origin-[0%_0%]` : h2 === "right" ? `translate-x-2/4 translate-y-2/4 origin-[100%_100%]` : `-translate-x-2/4 translate-y-2/4 origin-[0%_100%]`;
+    const [v, h] = [get(vertical), get(horizontal)];
+    return v === "top" ? h === "right" ? `translate-x-2/4 -translate-y-2/4 origin-[100%_0%]` : `-translate-x-2/4 -translate-y-2/4 origin-[0%_0%]` : h === "right" ? `translate-x-2/4 translate-y-2/4 origin-[100%_100%]` : `-translate-x-2/4 translate-y-2/4 origin-[0%_100%]`;
   });
   return /* @__PURE__ */ jsx("span", { class: "relative inline-flex align-middle shrink-0 m-4", children: [
     children,
@@ -2770,7 +2826,7 @@ const Badge = ({ className, children, badgeContent, anchorOrigin: { vertical = "
         [transition:transform_225ms_cubic-bezier(0.4,0,0.2,1)0ms`, empty, pos, badgeClass], children: badgeContent })
   ] });
 };
-const Appbar = tw("header")`shadow-[rgba(0,0,0,0.2)_0px_2px_4px_-1px,rgba(0,0,0,0.14)_0px_4px_5px_0px,rgba(0,0,0,0.12)_0px_1px_10px_0px] flex flex-col w-full box-border shrink-0 fixed z-[1100] bg-[rgb(25,118,210)] text-white left-auto top-0
+const Appbar = tw("header")`shadow-[rgba(0,0,0,0.2)_0px_2px_4px_-1px,rgba(0,0,0,0.14)_0px_4px_5px_0px,rgba(0,0,0,0.12)_0px_1px_10px_0px] [@media_screen]:flex [@media_screen]:flex-col w-full box-border shrink-0 fixed z-[1100] bg-[rgb(25,118,210)] text-white left-auto top-0
     [transition:box-shadow_300ms_cubic-bezier(0.4,0,0.2,1)0ms]`;
 const Toolbar = tw("div")`[@media(min-width:600px)]:h-min-[64px]
 [@media(min-width:0px)]:h-min-[48px]
@@ -2779,32 +2835,32 @@ const Toolbar = tw("div")`[@media(min-width:600px)]:h-min-[64px]
 `;
 const variant = {
   text: `inline-flex items-center justify-center relative box-border bg-transparent cursor-pointer select-none align-middle no-underline 
-            text-inherit font-medium text-sm leading-[1.75] tracking-[0.02857em] uppercase min-w-[64px] rounded text-[#1976d2] m-0 px-2 py-1.5 p-0
+            font-medium text-sm leading-[1.75] tracking-[0.02857em] uppercase min-w-[64px] rounded text-[#1976d2] 
             rounded-none border-0 outline-0 font-sans
             [transition:background-color_250ms_cubic-bezier(0.4,0,0.2,1)0ms,box-shadow_250ms_cubic-bezier(0.4,0,0.2,1)0ms,border-color_250ms_cubic-bezier(0.4,0,0.2,1)0ms,color_250ms_cubic-bezier(0.4,0,0.2,1)0ms]
             hover:no-underline hover:bg-[rgba(25,118,210,0.04)]
             disabled:text-[rgba(0,0,0,0.26)] disabled:pointer-events-none disabled:cursor-default`,
-  contained: `inline-flex items-center justify-center relative box-border bg-transparent cursor-pointer select-none align-middle no-underline 
-            text-inherit font-medium text-sm leading-[1.75] tracking-[0.02857em] uppercase min-w-[64px] rounded text-white bg-[#1976d2] 
-            shadow-[0px_3px_1px_-2px_rgba(0,0,0,0.2),0px_2px_2px_0px_rgba(0,0,0,0.14),0px_1px_5px_0px_rgba(0,0,0,0.12)] m-0 px-4 py-1.5 p-0 
+  contained: `inline-flex items-center justify-center relative box-border cursor-pointer select-none align-middle no-underline 
+            font-medium text-sm leading-[1.75] tracking-[0.02857em] uppercase min-w-[64px] rounded text-white bg-[#1976d2] 
+            shadow-[0px_3px_1px_-2px_rgba(0,0,0,0.2),0px_2px_2px_0px_rgba(0,0,0,0.14),0px_1px_5px_0px_rgba(0,0,0,0.12)] 
             rounded-none border-0 outline-0 font-sans
             [transition:background-color_250ms_cubic-bezier(0.4,0,0.2,1)0ms,box-shadow_250ms_cubic-bezier(0.4,0,0.2,1)0ms,border-color_250ms_cubic-bezier(0.4,0,0.2,1)0ms,color_250ms_cubic-bezier(0.4,0,0.2,1)0ms]
             hover:no-underline hover:bg-[#1565c0] hover:shadow-[0px_2px_4px_-1px_rgba(0,0,0,0.2),0px_4px_5px_0px_rgba(0,0,0,0.14),0px_1px_10px_0px_rgba(0,0,0,0.12)]
             active:shadow-[0px_5px_5px_-3px_rgba(0,0,0,0.2),0px_8px_10px_1px_rgba(0,0,0,0.14),0px_3px_14px_2px_rgba(0,0,0,0.12)]
             disabled:text-[rgba(0,0,0,0.26)] disabled:shadow-none disabled:bg-[rgba(0,0,0,0.12)] disabled:pointer-events-none disabled:cursor-default`,
-  outlined: `inline-flex items-center justify-center relative box-border bg-transparent cursor-pointer select-none align-middle no-underline text-inherit font-medium 
-            text-sm leading-[1.75] tracking-[0.02857em] uppercase min-w-[64px] rounded border text-[#1976d2] m-0 px-[15px] py-[5px] p-0 rounded-none border-0 
+  outlined: `inline-flex items-center justify-center relative box-border bg-transparent cursor-pointer select-none align-middle no-underline font-medium 
+            text-sm leading-[1.75] tracking-[0.02857em] uppercase min-w-[64px] rounded border text-[#1976d2] rounded-none 
             border-solid border-[rgba(25,118,210,0.5)] font-sans
             [transition:background-color_250ms_cubic-bezier(0.4,0,0.2,1)0ms,box-shadow_250ms_cubic-bezier(0.4,0,0.2,1)0ms,border-color_250ms_cubic-bezier(0.4,0,0.2,1)0ms,color_250ms_cubic-bezier(0.4,0,0.2,1)0ms]
             hover:no-underline hover:bg-[rgba(25,118,210,0.04)] hover:border hover:border-solid hover:border-[#1976d2]
             disabled:text-[rgba(0,0,0,0.26)] disabled:border disabled:border-solid disabled:border-[rgba(0,0,0,0.12)] disabled:pointer-events-none disabled:cursor-default`,
-  icon: `inline-flex items-center justify-center relative box-border bg-transparent cursor-pointer select-none align-middle no-underline text-inherit text-center
-     flex-[0_0_auto] text-2xl overflow-visible text-[rgba(0,0,0,0.54)] transition-[background-color] duration ease-in-out delay-[0ms] m-0 p-0 p-2 rounded-none
+  icon: `inline-flex items-center justify-center relative box-border bg-transparent cursor-pointer select-none align-middle no-underline text-center
+     flex-[0_0_auto] text-2xl overflow-visible text-[rgba(0,0,0,0.54)] transition-[background-color] duration ease-in-out delay-[0ms] rounded-none
      rounded-[50%] border-0
      hover:bg-[rgba(0,0,0,0.04)]`
 };
 const Button = ({ children, className = variant.contained, ...props }) => /* @__PURE__ */ jsx("button", { class: className, ...props, children });
-const Fab = tw("button")`inline-flex items-center justify-center relative box-border cursor-pointer select-none align-middle appearance-none no-underline font-medium text-sm leading-[1.75] tracking-[0.02857em] uppercase min-h-[36px] min-w-0 z-[1050] shadow-[rgba(0,0,0,0.2)_0px_3px_5px_-1px,rgba(0,0,0,0.14)_0px_6px_10px_0px,rgba(0,0,0,0.12)_0px_1px_18px_0px] text-white bg-[rgb(156,39,176)] m-2 p-0 rounded-[50%] border-0
+const Fab = tw("button")`inline-flex items-center justify-center relative box-border cursor-pointer select-none align-middle appearance-none no-underline font-medium text-sm leading-[1.75] tracking-[0.02857em] uppercase min-h-[36px] min-w-0 z-[1050] shadow-[rgba(0,0,0,0.2)_0px_3px_5px_-1px,rgba(0,0,0,0.14)_0px_6px_10px_0px,rgba(0,0,0,0.12)_0px_1px_18px_0px] text-white m-2 p-0 rounded-[50%] border-0
 [transition:background-color_250ms_cubic-bezier(0.4,0,0.2,1)0ms,box-shadow_250ms_cubic-bezier(0.4,0,0.2,1)0ms,border-color_250ms_cubic-bezier(0.4,0,0.2,1)0ms]
       outline-none`;
 const yesKnot = `[&>div]:before:w-[2rem] [&>div]:before:h-[2rem] [&>div]:before:flex [&>div]:before:items-center [&>div]:before:justify-center`;
@@ -2813,47 +2869,50 @@ const divSpanDim = `[&>div>span]:w-[2rem] [&>div>span]:h-[2rem]`;
 const layer = `[&>span]:w-full [&>span]:bg-[#ebf7fc] [&>span]:[transition:0.3s_ease_all] [&>span]:z-[1]`;
 const effect1 = `
 ${layer}
-[&>div]:before:content-[attr(data-tg-on)] [&>div]:before:absolute [&>div]:before:text-white [&>div]:before:text-[10px] [&>div]:before:font-bold [&>div]:before:text-center
-[&>div]:before:leading-none [&>div]:before:bg-[#03a9f4] [&>div]:before:[transition:0.3s_cubic-bezier(0.18,0.89,0.35,1.15)_all] [&>div]:before:px-1 
+[&>div]:before:content-[attr(data-tg-off)] [&>div]:before:absolute [&>div]:before:text-white [&>div]:before:text-[10px] [&>div]:before:font-bold [&>div]:before:text-center
+[&>div]:before:leading-none [&>div]:before:bg-[#f44336] [&>div]:before:[transition:0.3s_cubic-bezier(0.18,0.89,0.35,1.15)_all] [&>div]:before:px-1 
 [&>div]:before:[&>div]:before:py-[9px] [&>div]:before:rounded-[50%] [&>div]:before:left-1 [&>div]:before:top-[2px]
 ${yesKnot}
-[&>input:checked+div]:before:content-[attr(data-tg-off)] [&>input:checked+div]:before:bg-[#f44336] [&>input:checked+div]:before:left-[42px]
-[&>input:checked~div]:bg-[#fcebeb]
+[&>input:checked+div]:before:content-[attr(data-tg-on)] [&>input:checked+div]:before:bg-[#03a9f4] [&>input:checked+div]:before:left-[42px]
+[&>input~div]:bg-[#fcebeb]
+[&>input:checked~div]:bg-[#ebfbfc]
 [&>div]:[transition:0.3s_ease_all]
 [&>span]:[transition:0.3s_ease_all]
 `;
 const effect2 = `
 ${layer}
-[&>div]:before:content-[attr(data-tg-on)] [&>div]:before:absolute [&>div]:before:text-white [&>div]:before:text-[10px] [&>div]:before:font-bold [&>div]:before:text-center 
-[&>div]:before:leading-none [&>div]:before:bg-[#03a9f4] [&>div]:before:[transition:0.3s_ease_all] [&>div]:before:px-1 [&>div]:before:py-[9px] 
+[&>div]:before:content-[attr(data-tg-off)] [&>div]:before:absolute [&>div]:before:text-white [&>div]:before:text-[10px] [&>div]:before:font-bold [&>div]:before:text-center 
+[&>div]:before:leading-none [&>div]:before:bg-[#f44336] [&>div]:before:[transition:0.3s_ease_all] [&>div]:before:px-1 [&>div]:before:py-[9px] 
 [&>div]:before:rounded-[50%] [&>div]:before:left-1 [&>div]:before:top-[2px]
 ${yesKnot}
-[&>div]:after:content-[attr(data-tg-off)] [&>div]:after:absolute [&>div]:after:text-white [&>div]:after:text-[10px] [&>div]:after:font-bold [&>div]:after:text-center 
+[&>div]:after:content-[attr(data-tg-on)] [&>div]:after:absolute [&>div]:after:text-white [&>div]:after:text-[10px] [&>div]:after:font-bold [&>div]:after:text-center 
 [&>div]:after:leading-none [&>div]:after:[transition:0.3s_ease_all] [&>div]:after:px-1 [&>div]:after:py-[9px] [&>div]:after:rounded-[50%]
 [&>div]:after:left-1 [&>div]:after:top-[2px]
 ${noKnot}
-[&>div]:before:content-[attr(data-tg-on)]
-[&>div]:after:bg-[#f44336] [&>div]:after:left-auto [&>div]:after:-right-8
+[&>div]:before:content-[attr(data-tg-off)]
+[&>div]:after:bg-[#03a9f4] [&>div]:after:left-auto [&>div]:after:-right-8
 [&>input:checked+div]:before:-left-8
 [&>input:checked+div]:after:right-1
-[&>input:checked~span]:bg-[#fcebeb]
+[&>input~span]:bg-[#fcebeb]
+[&>input:checked~span]:bg-[#ebfbfc]
 `;
 const effect3 = `
 ${layer}
-[&>div]:before:content-[attr(data-tg-on)] [&>div]:before:absolute [&>div]:before:text-white [&>div]:before:text-[10px] [&>div]:before:font-bold [&>div]:before:text-center
-[&>div]:before:leading-none [&>div]:before:bg-[#03a9f4] [&>div]:before:px-1 [&>div]:before:py-[9px] [&>div]:before:rounded-[50%] [&>div]:before:left-1
+[&>div]:before:content-[attr(data-tg-off)] [&>div]:before:absolute [&>div]:before:text-white [&>div]:before:text-[10px] [&>div]:before:font-bold [&>div]:before:text-center
+[&>div]:before:leading-none [&>div]:before:bg-[#f44336] [&>div]:before:px-1 [&>div]:before:py-[9px] [&>div]:before:rounded-[50%] [&>div]:before:left-1
 [&>div]:before:top-[2px]
 ${yesKnot}
 [&>div]:before:[transition:0.3s_ease_all,left_0.3s_cubic-bezier(0.18,0.89,0.35,1.15)]
 [&>input:active+div]:before:w-[46px] [&>input:active+div]:before:rounded-[100px]
 [&>input:checked:active+div]:before:ml-[-26px]
-[&>input:checked+div]:before:content-[attr(data-tg-off)] [&>input:checked+div]:before:bg-[#f44336] [&>input:checked+div]:before:left-[42px]
-[&>input:checked~span]:bg-[#fcebeb]
+[&>input:checked+div]:before:content-[attr(data-tg-on)] [&>input:checked+div]:before:bg-[#03a9f4] [&>input:checked+div]:before:left-[42px]
+[&>input~span]:bg-[#fcebeb]
+[&>input:checked~span]:bg-[#ebfbfc]
 `;
 const effect4 = `
 ${layer}
 [&>div]:before:absolute [&>div]:before:text-white [&>div]:before:text-[10px] [&>div]:before:font-bold [&>div]:before:text-center [&>div]:before:leading-none 
-[&>div]:before:bg-[#03a9f4] [&>div]:before:[transition:0.3s_cubic-bezier(0.18,0.89,0.35,1.15)_all] [&>div]:before:px-1 [&>div]:before:py-[9px] 
+[&>div]:before:bg-[#f44336] [&>div]:before:[transition:0.3s_cubic-bezier(0.18,0.89,0.35,1.15)_all] [&>div]:before:px-1 [&>div]:before:py-[9px] 
 [&>div]:before:rounded-[50%] [&>div]:before:left-1 [&>div]:before:top-[2px]
 ${yesKnot}
 [&>div]:[transition:0.3s_ease_all]
@@ -2861,13 +2920,14 @@ ${yesKnot}
 [&>div]:after:bg-[#03a9f4] [&>div]:after:[transition:0.3s_cubic-bezier(0.18,0.89,0.35,1.15)_all] [&>div]:after:py-[9px] [&>div]:after:rounded-[50%] 
 [&>div]:after:left-1
 ${noKnot}
-[&>div]:before:content-[attr(data-tg-on)]
-[&>div]:after:content-[attr(data-tg-off)]
-[&>div]:after:bg-[#f44336] [&>div]:after:left-auto [&>div]:after:right-1 [&>div]:after:-top-8
+[&>div]:before:content-[attr(data-tg-off)]
+[&>div]:after:content-[attr(data-tg-on)]
+[&>div]:after:bg-[#03a9f4] [&>div]:after:left-auto [&>div]:after:right-1 [&>div]:after:-top-8
 [&>input:checked+div]:before:-top-8
 [&>input:checked+div]:after:top-[2px]
 [&>input:checked+div]:div:-top-1
-[&>input:checked~span]:bg-[#fcebeb]
+[&>input~span]:bg-[#fcebeb]
+[&>input:checked~span]:bg-[#ebfbfc]
 `;
 const effect5 = `
 ${layer}
@@ -2878,15 +2938,17 @@ overflow-visible [perspective:60px]
 ${yesKnot}
 [&>div>span]:content-[''] [&>div>span]:absolute [&>div>span]:w-[2rem] [&>div>span]:h-[2rem] [&>div>span]:text-white [&>div>span]:text-[10px] [&>div>span]:font-bold 
 [&>div>span]:text-center [&>div>span]:leading-none [&>div>span]:[transition:0.3s_cubic-bezier(0.18,0.89,0.35,1.15)_all] [&>div>span]:px-1 [&>div>span]:py-[9px] [&>div>span]:rounded-[50%] [&>div>span]:left-1 [&>div>span]:top-[2px]
-[&>div]:before:bg-[#03a9f4]
-[&>div>span]:before:content-[attr(data-tg-on)]
+[&>div]:before:bg-[#f44336]
+[&>div>span]:before:content-[attr(data-tg-off)]
 [&>div]:before:origin-center [&>div]:before:[transform:rotateY(0)]
 [&>span]:origin-center [&>span]:[transform:rotateY(0)]
 [&>input:checked+div]:before:left-[42px]
 [&>input:checked+div>span]:left-[42px]
-[&>input:checked+div]:before:bg-[#f44336] [&>input:checked+div]:before:[transform:rotateY(180deg)]
-[&>input:checked+div>span]:before:content-[attr(data-tg-off)] [&>input:checked+div>span]:before:left-[42px] [&>input:checked+div>span]:before:pl-[5px]
-[&>input:checked~span]:bg-[#fcebeb] [&>input:checked~span]:[transform:rotateY(-180deg)]
+[&>input:checked+div]:before:bg-[#03a9f4] [&>input:checked+div]:before:[transform:rotateY(180deg)]
+[&>input:checked+div>span]:before:content-[attr(data-tg-on)] [&>input:checked+div>span]:before:left-[42px] [&>input:checked+div>span]:before:pl-[5px]
+[&>input~span]:bg-[#fcebeb]
+[&>input:checked~span]:bg-[#ebfbfc]
+[&>input:checked~span]:[transform:rotateY(-180deg)]
 [&>div]:[transition:0.3s_ease_all]
 [&>div]:before:[transition:0.3s_ease_all]
 [&>span]:[transition:0.3s_ease_all]
@@ -2894,16 +2956,18 @@ ${yesKnot}
 const effect6 = `
 ${layer}
 overflow-visible
-[&>div]:before:content-[attr(data-tg-on)] [&>div]:before:absolute [&>div]:before:text-white [&>div]:before:text-[10px] [&>div]:before:font-bold 
-[&>div]:before:text-center [&>div]:before:leading-none [&>div]:before:bg-[#03a9f4] [&>div]:before:px-1 [&>div]:before:py-[9px] [&>div]:before:rounded-[50%] 
+[&>div]:before:content-[attr(data-tg-off)] [&>div]:before:absolute [&>div]:before:text-white [&>div]:before:text-[10px] [&>div]:before:font-bold 
+[&>div]:before:text-center [&>div]:before:leading-none [&>div]:before:bg-[#f44336] [&>div]:before:px-1 [&>div]:before:py-[9px] [&>div]:before:rounded-[50%] 
 [&>div]:before:left-1 [&>div]:before:top-[2px]
 ${yesKnot}
 [&>span]:[transition:0.4s_cubic-bezier(0.18,0.89,0.35,1.15)_all] [&>span]:[transform:rotateZ(0)]
 [&>div]:[transition:0.4s_cubic-bezier(0.18,0.89,0.35,1.15)_all] [&>div]:[transform:rotateZ(0)]
 [&>div]:before:[transition:0.4s_cubic-bezier(0.18,0.89,0.35,1.15)_all] [&>div]:before:[transform:rotateZ(0)]
 [&>input:checked+div]:[transform:rotateZ(-180deg)]
-[&>input:checked+div]:before:content-[attr(data-tg-off)] [&>input:checked+div]:before:bg-[#f44336] [&>input:checked+div]:before:[transform:rotateZ(180deg)]
-[&>input:checked~span]:bg-[#fcebeb] [&>input:checked~span]:[transform:rotateZ(180deg)]
+[&>input:checked+div]:before:content-[attr(data-tg-on)] [&>input:checked+div]:before:bg-[#03a9f4] [&>input:checked+div]:before:[transform:rotateZ(180deg)]
+[&>input~span]:bg-[#fcebeb] 
+[&>input:checked~span]:bg-[#ebfbfc] 
+[&>input:checked~span]:[transform:rotateZ(180deg)]
 `;
 const effect7 = `
 ${layer}
@@ -2912,16 +2976,17 @@ ${yesKnot}
 [&>div]:after:absolute [&>div]:after:text-[10px] [&>div]:after:font-bold [&>div]:after:text-center [&>div]:after:leading-none [&>div]:after:px-1 [&>div]:after:py-[9px] [&>div]:after:rounded-[50%] [&>div]:after:top-[2px]
 ${noKnot}
 [&>div>span]:absolute [&>div>span]:w-[2rem] [&>div>span]:h-[2rem] [&>div>span]:text-[10px] [&>div>span]:font-bold [&>div>span]:text-center [&>div>span]:leading-none [&>div>span]:px-1 [&>div>span]:py-[9px] [&>div>span]:rounded-[50%] [&>div>span]:top-[2px]
-[&>div]:before:content-[attr(data-tg-on)] [&>div]:before:text-white [&>div]:before:opacity-100 [&>div]:before:left-1
-[&>div]:after:content-[attr(data-tg-off)] [&>div]:after:text-white [&>div]:after:text-left [&>div]:after:bg-[#f44336] [&>div]:after:opacity-0 [&>div]:after:px-[7px] [&>div]:after:py-[9px] [&>div]:after:left-[42px]
+[&>div]:before:content-[attr(data-tg-off)] [&>div]:before:text-white [&>div]:before:opacity-100 [&>div]:before:left-1
+[&>div]:after:content-[attr(data-tg-on)] [&>div]:after:text-white [&>div]:after:text-left [&>div]:after:bg-[#03a9f4] [&>div]:after:opacity-0 [&>div]:after:px-[7px] [&>div]:after:py-[9px] [&>div]:after:left-[42px]
 [&>div]:before:[transition:0.3s_ease_all] [&>div]:before:z-[2]
 [&>div]:after:[transition:0.3s_ease_all] [&>div]:after:z-[2]
-[&>div>span]:bg-[#03a9f4] [&>div>span]:[transition:0.2s_ease_all] [&>div>span]:z-[1] [&>div>span]:left-1
+[&>div>span]:bg-[#f44336] [&>div>span]:[transition:0.2s_ease_all] [&>div>span]:z-[1] [&>div>span]:left-1
 [&>input:checked+div]:before:opacity-0
 [&>input:checked+div]:after:opacity-100
 ${divSpanDim}
 [&>input:checked+div>span]:w-0.5 [&>input:checked+div>span]:h-0.5 [&>input:checked+div>span]:bg-white [&>input:checked+div>span]:p-[3px] [&>input:checked+div>span]:left-14 [&>input:checked+div>span]:top-3.5
-[&>input:checked~span]:bg-[#fcebeb]
+[&>input~span]:bg-[#fcebeb]
+[&>input:checked~span]:bg-[#ebfbfc]
 `;
 const effect8 = `
 ${layer}
@@ -2930,16 +2995,18 @@ ${yesKnot}
 [&>div]:after:absolute [&>div]:after:text-[10px] [&>div]:after:font-bold [&>div]:after:text-center [&>div]:after:leading-none [&>div]:after:[transition:0.3s_ease_all] [&>div]:after:px-1 [&>div]:after:py-[9px] [&>div]:after:rounded-[50%] [&>div]:after:top-[2px]
 ${noKnot}
 [&>div>span]:absolute [&>div>span]:w-[2rem] [&>div>span]:h-[2rem] [&>div>span]:text-[10px] [&>div>span]:font-bold [&>div>span]:text-center [&>div>span]:leading-none [&>div>span]:[transition:0.3s_ease_all] [&>div>span]:px-1 [&>div>span]:py-[9px] [&>div>span]:rounded-[50%] [&>div>span]:top-[2px]
-[&>div]:before:content-[attr(data-tg-on)] [&>div]:before:text-white [&>div]:before:left-1
-[&>div]:after:content-[attr(data-tg-off)] [&>div]:after:text-white [&>div]:after:bg-[#f44336] [&>div]:after:opacity-0 [&>div]:after:left-[42px]
+[&>div]:before:content-[attr(data-tg-off)] [&>div]:before:text-white [&>div]:before:left-1
+[&>div]:after:content-[attr(data-tg-on)] [&>div]:after:text-white [&>div]:after:bg-[#03a9f4] [&>div]:after:opacity-0 [&>div]:after:left-[42px]
 [&>div]:before:z-[2]
 [&>div]:after:z-[2]
-[&>div>span]:bg-[#03a9f4] [&>div>span]:z-[1] [&>div>span]:left-1
+[&>div>span]:bg-[#f44336] [&>div>span]:z-[1] [&>div>span]:left-1
 ${divSpanDim}
 
 [&>input:checked+div]:before:opacity-0
 [&>input:checked+div]:after:opacity-100
-[&>input:checked+div>span]:bg-[#fcebeb] [&>input:checked+div>span]:scale-[4]
+[&>input+div>span]:bg-[#f44336] 
+[&>input:checked+div>span]:bg-[#ebfbfc] 
+[&>input:checked+div>span]:scale-[4]
 `;
 const effect9 = `
 ${layer}
@@ -2947,17 +3014,18 @@ ${layer}
 ${yesKnot}
 [&>div]:after:absolute [&>div]:after:text-[10px] [&>div]:after:font-bold [&>div]:after:text-center [&>div]:after:leading-none [&>div]:after:[transition:0.4s_cubic-bezier(0.18,0.89,0.35,1.15)_all] [&>div]:after:px-1 [&>div]:after:py-[9px] [&>div]:after:rounded-[50%] [&>div]:after:top-[2px]
 [&>div>span]:absolute [&>div>span]:w-[2rem] [&>div>span]:h-[2rem] [&>div>span]:text-[10px] [&>div>span]:font-bold [&>div>span]:text-center [&>div>span]:leading-none [&>div>span]:[transition:0.4s_cubic-bezier(0.18,0.89,0.35,1.15)_all] [&>div>span]:px-1 [&>div>span]:py-[9px] [&>div>span]:rounded-[50%] [&>div>span]:top-[2px]
-[&>div]:before:content-[attr(data-tg-on)] [&>div]:before:left-1
-[&>div]:after:content-[attr(data-tg-off)] [&>div]:after:-right-6
+[&>div]:before:content-[attr(data-tg-off)] [&>div]:before:left-1
+[&>div]:after:content-[attr(data-tg-on)] [&>div]:after:-right-6
 [&>div]:before:text-white [&>div]:before:z-[2]
 [&>div]:after:text-white [&>div]:after:z-[2]
-[&>div>span]:bg-[#03a9f4] [&>div>span]:z-[1] [&>div>span]:left-1
+[&>div>span]:bg-[#f44336] [&>div>span]:z-[1] [&>div>span]:left-1
 ${divSpanDim}
 
 [&>input:checked+div]:before:-left-6
 [&>input:checked+div]:after:right-1
-[&>input:checked+div>span]:bg-[#f44336] [&>input:checked+div>span]:left-[42px]
-[&>input:checked~span]:bg-[#fcebeb]
+[&>input:checked+div>span]:bg-[#03a9f4] [&>input:checked+div>span]:left-[42px]
+[&>input~span]:bg-[#fcebeb]
+[&>input:checked~span]:bg-[#ebfbfc]
 `;
 const effect10 = `
 ${layer}
@@ -2965,14 +3033,15 @@ ${layer}
 ${yesKnot}
 [&>div]:after:absolute [&>div]:after:text-[10px] [&>div]:after:font-bold [&>div]:after:text-center [&>div]:after:leading-none [&>div]:after:[transition:0.3s_ease_all] [&>div]:after:px-1 [&>div]:after:py-[9px] [&>div]:after:rounded-sm [&>div]:after:top-[4px]
 [&>div>span]:absolute [&>div>span]:w-[2rem] [&>div>span]:h-[2rem] [&>div>span]:text-[10px] [&>div>span]:font-bold [&>div>span]:text-center [&>div>span]:leading-none [&>div>span]:[transition:0.3s_ease_all] [&>div>span]:px-1 [&>div>span]:py-[9px] [&>div>span]:rounded-sm [&>div>span]:top-[2px]
-[&>div]:before:content-[attr(data-tg-on)] [&>div]:before:bg-[#03a9f4] [&>div]:before:left-1 [&>div]:text-[white] 
-[&>div]:after:content-[attr(data-tg-off)] [&>div]:after:text-[#4e4e4e] [&>div]:after:right-1
+[&>div]:before:content-[attr(data-tg-off)] [&>div]:before:bg-[#f44336] [&>div]:before:left-1 [&>div]:text-[white] 
+[&>div]:after:content-[attr(data-tg-on)] [&>div]:after:text-[#4e4e4e] [&>div]:after:right-1
 [&>div>span]:inline-block [&>div>span]:text-white [&>div>span]:z-[1] [&>div>span]:left-1
 [&>input:checked+div>span]:text-[#4e4e4e]
-[&>input:checked+div]:before:bg-[#f44336] [&>input:checked+div]:before:left-[42px]
-[&>div>span]:before:content-[attr(data-tg-on)] [&>div]:before:z-[10] [&>input:checked+div]:before:content-[attr(data-tg-off)] [&>input:checked+div>span]:before:relative 
+[&>input:checked+div]:before:bg-[#03a9f4] [&>input:checked+div]:before:left-[42px]
+[&>div>span]:before:content-[attr(data-tg-off)] [&>div]:before:z-[10] [&>input:checked+div]:before:content-[attr(data-tg-on)] [&>input:checked+div>span]:before:relative 
 [&>input:checked+div]:after:text-white
-[&>input:checked~span]:bg-[#fcebeb]
+[&>input~span]:bg-[#fcebeb]
+[&>input:checked~span]:bg-[#ebfbfc]
 `;
 const effect11 = `
 ${layer}
@@ -2983,11 +3052,12 @@ overflow-visible
 [&>div>span]:absolute [&>div>span]:rounded-sm [&>div>span]:top-[2px]
 [&>div]:before:text-[#4e4e4e] [&>div]:before:text-[10px] [&>div]:before:font-bold [&>div]:before:text-center [&>div]:before:leading-none [&>div]:before:px-1 [&>div]:before:py-[9px]
 [&>div]:after:text-[#4e4e4e] [&>div]:after:text-[10px] [&>div]:after:font-bold [&>div]:after:text-center [&>div]:after:leading-none [&>div]:after:px-1 [&>div]:after:py-[9px]
-[&>div]:before:content-[attr(data-tg-on)] [&>div]:before:left-1
-[&>div]:after:content-[attr(data-tg-off)] [&>div]:after:right-1
-[&>div>span]:w-[2rem] [&>div>span]:h-[2rem] [&>div>span]:bg-[#03a9f4] [&>div>span]:origin-[0%_50%] [&>div>span]:[transition:0.6s_ease_all] [&>div>span]:z-[1] [&>div>span]:right-1 [&>div>span]:[transform:rotateY(0)]
-[&>input:checked+div>span]:bg-[#f44336] [&>input:checked+div>span]:[transform:rotateY(-180deg)]
-[&>input:checked~span]:bg-[#fcebeb]
+[&>div]:before:content-[attr(data-tg-off)] [&>div]:before:left-1
+[&>div]:after:content-[attr(data-tg-on)] [&>div]:after:right-1
+[&>div>span]:w-[2rem] [&>div>span]:h-[2rem] [&>div>span]:bg-[#f44336] [&>div>span]:origin-[0%_50%] [&>div>span]:[transition:0.6s_ease_all] [&>div>span]:z-[1] [&>div>span]:right-1 [&>div>span]:[transform:rotateY(0)]
+[&>input:checked+div>span]:bg-[#03a9f4] [&>input:checked+div>span]:[transform:rotateY(-180deg)]
+[&>input~span]:bg-[#fcebeb]
+[&>input:checked~span]:bg-[#ebfbfc]
 `;
 const effect12 = `
 ${layer}
@@ -2996,11 +3066,11 @@ ${layer}
 [&>div>span]:absolute [&>div>span]:text-[10px] [&>div>span]:font-bold [&>div>span]:text-center [&>div>span]:leading-none [&>div>span]:[transition:0.3s_ease_all] [&>div>span]:rounded-sm [&>div>span]:top-[2px]
 [&>div>span]:before:absolute [&>div>span]:before:text-[10px] [&>div>span]:before:font-bold [&>div>span]:before:text-center [&>div>span]:before:leading-none [&>div>span]:before:[transition:0.3s_ease_all] [&>div>span]:before:rounded-sm [&>div>span]:before:top-[2px]
 [&>div>span]:after:absolute [&>div>span]:after:text-[10px] [&>div>span]:after:font-bold [&>div>span]:after:text-center [&>div>span]:after:leading-none [&>div>span]:after:[transition:0.3s_ease_all] [&>div>span]:after:rounded-sm [&>div>span]:after:top-[2px]
-[&>div]:before:content-[attr(data-tg-on)] [&>div]:before:left-1
-[&>div]:after:content-[attr(data-tg-off)] [&>div]:after:right-1
+[&>div]:before:content-[attr(data-tg-off)] [&>div]:before:left-1
+[&>div]:after:content-[attr(data-tg-on)] [&>div]:after:right-1
 [&>div]:before:w-[27px] [&>div]:before:text-[#4e4e4e] [&>div]:before:z-[1] [&>div]:before:px-[3px] [&>div]:before:py-[9px]
 [&>div]:after:w-[27px] [&>div]:after:text-[#4e4e4e] [&>div]:after:z-[1] [&>div]:after:px-[3px] [&>div]:after:py-[9px]
-[&>div>span]:inline-block [&>div>span]:z-[2] [&>div>span]:before:bg-[#f44336] [&>div>span]:before:-left-7 [&>div>span]:after:right-[-42px] [&>div>span]:after:bg-[#03a9f4]
+[&>div>span]:inline-block [&>div>span]:z-[2] [&>div>span]:before:bg-[#03a9f4] [&>div>span]:before:-left-7 [&>div>span]:after:right-[-42px] [&>div>span]:after:bg-[#f44336]
 [&>div>span]:w-[2rem] [&>div>span]:h-[2rem] [&>div>span]:px-1 [&>div>span]:py-[9px]
 [&>div>span]:before:w--[2rem] [&>div>span]:before:h-[2rem] [&>div>span]:before:px-1 [&>div>span]:before:py-[9px]
 [&>div>span]:after:w-[2rem] [&>div>span]:after:h-[2rem] [&>div>span]:after:px-1 [&>div>span]:after:py-[9px]
@@ -3008,7 +3078,8 @@ ${layer}
 [&>div>span]:after:content-[''] [&>div>span]:after:top-0
 [&>input:checked+div>span]:before:left-1 [&>input:checked+div>span]:before:w-[2rem]
 [&>input:checked+div>span]:after:right-[-74px]
-[&>input:checked~span]:bg-[#fcebeb]
+[&>input~span]:bg-[#fcebeb]
+[&>input:checked~span]:bg-[#ebfbfc]
 `;
 const effect13 = `
 ${layer}
@@ -3017,11 +3088,12 @@ ${layer}
 [&>div>span]:absolute [&>div>span]:w-[2rem] [&>div>span]:h-[2rem] [&>div>span]:text-[10px] [&>div>span]:font-bold [&>div>span]:text-center [&>div>span]:leading-none [&>div>span]:[transition:0.3s_ease_all] [&>div>span]:px-1 [&>div>span]:py-[9px] [&>div>span]:rounded-sm [&>div>span]:top-[2px]
 [&>div]:before:text-[#4e4e4e] [&>div]:before:z-[1]
 [&>div]:after:text-[#4e4e4e] [&>div]:after:z-[1]
-[&>div]:before:content-[attr(data-tg-on)] [&>div]:before:left-1
-[&>div]:after:content-[attr(data-tg-off)] [&>div]:after:right-1
-[&>div>span]:w-[2rem] [&>div>span]:bg-[#03a9f4] [&>div>span]:z-[2] [&>div>span]:left-[37px]
-[&>input:checked+div>span]:bg-[#f44336] [&>input:checked+div>span]:left-1
-[&>input:checked~span]:bg-[#fcebeb]
+[&>div]:before:content-[attr(data-tg-off)] [&>div]:before:left-1
+[&>div]:after:content-[attr(data-tg-on)] [&>div]:after:right-1
+[&>div>span]:w-[2rem] [&>div>span]:bg-[#f44336] [&>div>span]:z-[2] [&>div>span]:left-[37px]
+[&>input:checked+div>span]:bg-[#03a9f4] [&>input:checked+div>span]:left-1
+[&>input~span]:bg-[#fcebeb]
+[&>input:checked~span]:bg-[#ebfbfc]
 `;
 const effect14 = `
 ${layer}
@@ -3031,15 +3103,16 @@ ${layer}
 [&>div>span]:after:absolute [&>div>span]:after:w-[2rem] [&>div>span]:after:h-[2rem] [&>div>span]:after:text-[10px] [&>div>span]:after:font-bold [&>div>span]:after:text-center [&>div>span]:after:leading-none [&>div>span]:after:[transition:0.3s_ease_all] [&>div>span]:after:px-1 [&>div>span]:after:py-[9px] [&>div>span]:after:rounded-sm [&>div>span]:after:top-[2px]
 [&>div]:before:text-[#4e4e4e] [&>div]:before:z-[1]
 [&>div]:after:text-[#4e4e4e] [&>div]:after:z-[1]
-[&>div]:before:content-[attr(data-tg-on)] [&>div]:before:left-1
-[&>div]:after:content-[attr(data-tg-off)] [&>div]:after:right-1
-[&>div>span]:block [&>div>span]:w-full [&>div>span]:h-full [&>div>span]:left-0 [&>div>span]:top-0 [&>div>span]:before:bg-[#f44336] [&>div>span]:before:left-1 [&>div>span]:before:-top-7 [&>div>span]:after:bg-[#03a9f4] [&>div>span]:after:left-[39px] [&>div>span]:after:top-[2px]
+[&>div]:before:content-[attr(data-tg-off)] [&>div]:before:left-1
+[&>div]:after:content-[attr(data-tg-on)] [&>div]:after:right-1
+[&>div>span]:block [&>div>span]:w-full [&>div>span]:h-full [&>div>span]:left-0 [&>div>span]:top-0 [&>div>span]:before:bg-[#03a9f4] [&>div>span]:before:left-1 [&>div>span]:before:-top-7 [&>div>span]:after:bg-[#f44336] [&>div>span]:after:left-[39px] [&>div>span]:after:top-[2px]
 [&>div>span]:before:content-[''] [&>div>span]:before:w-[2rem] [&>div>span]:before:z-[2]
 [&>div>span]:after:content-[''] [&>div>span]:after:w-[2rem] [&>div>span]:after:z-[2]
 [&>input:checked+div>span]:before:top-[2px]
 [&>input:checked+div>span]:after:-top-8
 [&>div>span]:before:-top-8
-[&>input:checked~span]:bg-[#fcebeb]
+[&>input~span]:bg-[#fcebeb]
+[&>input:checked~span]:bg-[#ebfbfc]
 `;
 const effect15 = `
 ${layer}
@@ -3047,46 +3120,50 @@ ${layer}
 ${yesKnot}
 [&>div]:after:absolute [&>div]:after:text-white [&>div]:after:text-[10px] [&>div]:after:font-bold [&>div]:after:text-center [&>div]:after:leading-none [&>div]:after:opacity-0 [&>div]:after:[transition:0.3s_cubic-bezier(0.18,0.89,0.35,1.15)_all] [&>div]:after:px-1 [&>div]:after:py-[9px] [&>div]:after:rounded-sm [&>div]:after:scale-100 [&>div]:after:top-[2px]
 ${noKnot}
-[&>div]:before:content-[attr(data-tg-on)] [&>div]:before:bg-[#03a9f4] [&>div]:before:left-1
-[&>div]:after:content-[attr(data-tg-off)] [&>div]:after:opacity-0 [&>div]:after:bg-[#f44336] [&>div]:after:scale-[4] [&>div]:after:right-1
+[&>div]:before:content-[attr(data-tg-off)] [&>div]:before:bg-[#f44336] [&>div]:before:left-1
+[&>div]:after:content-[attr(data-tg-on)] [&>div]:after:opacity-0 [&>div]:after:bg-[#03a9f4] [&>div]:after:scale-[4] [&>div]:after:right-1
 [&>input:checked+div]:before:opacity-0 [&>input:checked+div]:before:scale-[4]
 [&>input:checked+div]:after:opacity-100 [&>input:checked+div]:after:scale-100
-[&>input:checked~span]:bg-[#fcebeb]
+[&>input~span]:bg-[#fcebeb]
+[&>input:checked~span]:bg-[#ebfbfc]
 `;
 const effect16 = `
 ${layer}
-[&>div]:before:content-[attr(data-tg-on)] [&>div]:before:absolute [&>div]:before:text-white [&>div]:before:text-[10px] [&>div]:before:font-bold [&>div]:before:text-center [&>div]:before:leading-none [&>div]:before:bg-[#03a9f4] [&>div]:before:px-1 [&>div]:before:py-[9px] [&>div]:before:rounded-sm [&>div]:before:left-1 [&>div]:before:top-[2px] [&>div]:before:[transition:0.3s_ease_all,left_0.3s_cubic-bezier(0.18,0.89,0.35,1.15)]
+[&>div]:before:content-[attr(data-tg-off)] [&>div]:before:absolute [&>div]:before:text-white [&>div]:before:text-[10px] [&>div]:before:font-bold [&>div]:before:text-center [&>div]:before:leading-none [&>div]:before:bg-[#f44336] [&>div]:before:px-1 [&>div]:before:py-[9px] [&>div]:before:rounded-sm [&>div]:before:left-1 [&>div]:before:top-[2px] [&>div]:before:[transition:0.3s_ease_all,left_0.3s_cubic-bezier(0.18,0.89,0.35,1.15)]
 ${yesKnot}
 [&>input:active+div]:before:w-[46px]
 ${noKnot}
 [&>input:checked:active+div]:before:ml-[-26px]
-[&>input:checked+div]:before:content-[attr(data-tg-off)] [&>input:checked+div]:before:bg-[#f44336] [&>input:checked+div]:before:left-[42px]
-[&>input:checked~span]:bg-[#fcebeb]
+[&>input:checked+div]:before:content-[attr(data-tg-on)] [&>input:checked+div]:before:bg-[#03a9f4] [&>input:checked+div]:before:left-[42px]
+[&>input~span]:bg-[#fcebeb]
+[&>input:checked~span]:bg-[#ebfbfc]
 `;
 const effect17 = `
 ${layer}
-[&>div]:before:content-[attr(data-tg-on)] [&>div]:before:absolute [&>div]:before:text-white [&>div]:before:text-[10px] [&>div]:before:font-bold [&>div]:before:text-center [&>div]:before:leading-none [&>div]:before:px-1 [&>div]:before:py-[9px] [&>div]:before:left-1 [&>div]:before:top-[2px]
+[&>div]:before:content-[attr(data-tg-off)] [&>div]:before:absolute [&>div]:before:text-white [&>div]:before:text-[10px] [&>div]:before:font-bold [&>div]:before:text-center [&>div]:before:leading-none [&>div]:before:px-1 [&>div]:before:py-[9px] [&>div]:before:left-1 [&>div]:before:top-[2px]
 ${yesKnot}
-[&>div>span]:content-[attr(data-tg-on)] [&>div>span]:absolute [&>div>span]:w-[2rem] [&>div>span]:h-[2rem] [&>div>span]:text-white [&>div>span]:text-[10px] [&>div>span]:font-bold [&>div>span]:text-center [&>div>span]:leading-none [&>div>span]:px-1 [&>div>span]:py-[9px] [&>div>span]:left-1 [&>div>span]:top-[2px]
+[&>div>span]:content-[attr(data-tg-off)] [&>div>span]:absolute [&>div>span]:w-[2rem] [&>div>span]:h-[2rem] [&>div>span]:text-white [&>div>span]:text-[10px] [&>div>span]:font-bold [&>div>span]:text-center [&>div>span]:leading-none [&>div>span]:px-1 [&>div>span]:py-[9px] [&>div>span]:left-1 [&>div>span]:top-[2px]
 [&>div]:before:z-[2] [&>div]:before:[transition:0.3s_ease_all,left_0.5s_cubic-bezier(0.18,0.89,0.35,1.15)]
-[&>div>span]:bg-[#03a9f4] [&>div>span]:z-[1] [&>div>span]:rounded-sm [&>div>span]:[transition:0.3s_ease_all,left_0.3s_cubic-bezier(0.18,0.89,0.35,1.15)]
-[&>input:checked+div]:before:content-[attr(data-tg-off)] [&>input:checked+div]:before:left-[42px]
-[&>input:checked+div>span]:bg-[#f44336] [&>input:checked+div>span]:left-[42px]
-[&>input:checked~span]:bg-[#fcebeb]
+[&>div>span]:bg-[#f44336] [&>div>span]:z-[1] [&>div>span]:rounded-sm [&>div>span]:[transition:0.3s_ease_all,left_0.3s_cubic-bezier(0.18,0.89,0.35,1.15)]
+[&>input:checked+div]:before:content-[attr(data-tg-on)] [&>input:checked+div]:before:left-[42px]
+[&>input:checked+div>span]:bg-[#03a9f4] [&>input:checked+div>span]:left-[42px]
+[&>input~span]:bg-[#fcebeb]
+[&>input:checked~span]:bg-[#ebfbfc]
 `;
 const effect18 = `
 ${layer}
-[&>div]:before:content-[attr(data-tg-on)] [&>div]:before:absolute [&>div]:before:text-white [&>div]:before:text-[10px] [&>div]:before:font-bold [&>div]:before:text-center [&>div]:before:leading-none [&>div]:before:bg-[#03a9f4] [&>div]:before:rounded-sm [&>div]:before:left-1
-[&>div>span]:content-[attr(data-tg-on)] [&>div>span]:absolute [&>div>span]:text-white [&>div>span]:text-[10px] [&>div>span]:font-bold [&>div>span]:text-center [&>div>span]:leading-none [&>div>span]:bg-[#03a9f4] [&>div>span]:rounded-sm [&>div>span]:left-1 
+[&>div]:before:content-[attr(data-tg-off)] [&>div]:before:absolute [&>div]:before:text-white [&>div]:before:text-[10px] [&>div]:before:font-bold [&>div]:before:text-center [&>div]:before:leading-none [&>div]:before:rounded-sm [&>div]:before:left-1
+[&>div>span]:content-[attr(data-tg-off)] [&>div>span]:absolute [&>div>span]:text-white [&>div>span]:text-[10px] [&>div>span]:font-bold [&>div>span]:text-center [&>div>span]:leading-none [&>div>span]:bg-[#f44336] [&>div>span]:rounded-sm [&>div>span]:left-1 
 [&>div]:before:mt-[-5px] [&>div]:before:bg-transparent [&>div]:before:z-[2] [&>div]:before:left-2 [&>div]:before:top-[45%]
 [&>div>span]:w-[2rem] [&>div>span]:h-[2rem] [&>div>span]:z-[1] [&>div>span]:px-1 [&>div>span]:py-[9px] [&>div>span]:[transition:0.3s_ease_all,left_0.3s_cubic-bezier(0.18,0.89,0.35,1.15)]
-[&>input:active+div]:before:w-[46px] [&>input:active+div]:before:h-1 [&>input:active+div]:before:text-transparent [&>input:active+div]:before:bg-[#0095d8] [&>input:active+div]:before:[transition:0.3s_ease_all] [&>input:active+div]:before:overflow-hidden [&>input:active+div]:before:-mt-0.5 [&>input:active+div]:before:left-2.5
-[&>input:active+div>span]:w-[58px]
-[&>input:checked:active+div]:before:bg-[#d80000] [&>input:checked:active+div]:before:left-auto [&>input:checked:active+div]:before:right-2.5
+[&>input:active+div]:before:w-[46px] [&>input:active+div]:before:h-1 [&>input:active+div]:before:text-transparent [&>input:active+div]:before:bg-[#d80000] [&>input:active+div]:before:[transition:0.3s_ease_all] [&>input:active+div]:before:overflow-hidden [&>input:active+div]:before:-mt-0.5 [&>input:active+div]:before:left-2.5
+[&>input:active+div>span]:w-[68px]
+[&>input:checked:active+div]:before:bg-[#0095d8] [&>input:checked:active+div]:before:left-auto [&>input:checked:active+div]:before:right-2.5
 [&>input:checked:active+div>span]:ml-[-38px]
-[&>input:checked+div]:before:content-[attr(data-tg-off)] [&>input:checked+div]:before:left-[47px]
-[&>input:checked+div>span]:bg-[#f44336] [&>input:checked+div>span]:left-[42px]
-[&>input:checked~span]:bg-[#fcebeb]
+[&>input:checked+div]:before:content-[attr(data-tg-on)] [&>input:checked+div]:before:left-[47px]
+[&>input:checked+div>span]:bg-[#03a9f4] [&>input:checked+div>span]:left-[42px]
+[&>input~span]:bg-[#fcebeb]
+[&>input:checked~span]:bg-[#ebfbfc]
 `;
 const iinput = `
 ${layer}
@@ -3098,8 +3175,8 @@ ${layer}
 [&>input:checked~label]:after:left-2/4
 `;
 const ilabel = `
-[&>label]:after:content-[attr(data-tg-off)] [&>label]:after:flex [&>label]:after:justify-center [&>label]:after:align-center
-[&>input:checked~label]:after:content-[attr(data-tg-on)] [&>input:checked~label]:after:flex [&>input:checked~label]:after:justify-center [&>input:checked~label]:after:align-center
+[&>label]:after:content-[attr(data-tg-on)] [&>label]:after:flex [&>label]:after:justify-center [&>label]:after:align-center
+[&>input:checked~label]:after:content-[attr(data-tg-off)] [&>input:checked~label]:after:flex [&>input:checked~label]:after:justify-center [&>input:checked~label]:after:align-center
 `;
 const light = `mx-[2em] my-0 ${iinput}
 [&>label]:[transition:all_0.4s_ease] [&>label]:p-0.5 [&>label]:rounded-[2em] [&>label]:after:[transition:all_0.2s_ease] [&>label]:after:rounded-[50%] 
@@ -3123,10 +3200,10 @@ const skewed = `mx-[2em] my-0
 [&>label]:after:h-full
 [&>label]:before:h-full
 
-[&>label]:overflow-hidden [&>label]:skew-x-[-10deg] [&>label]:[transition:all_0.2s_ease] [&>label]:before:content-[attr(data-tg-off)] [&>label]:after:left-full [&>input:checked~label]:after:content-[attr(data-tg-on)] [&>label]:before:left-0 [&>label]:active:before:left-[-10%]
+[&>label]:overflow-hidden [&>label]:skew-x-[-10deg] [&>label]:[transition:all_0.2s_ease] [&>label]:before:content-[attr(data-tg-on)] [&>label]:after:left-full [&>input:checked~label]:after:content-[attr(data-tg-off)] [&>label]:before:left-0 [&>label]:active:before:left-[-10%]
 [&>label]:[backface-visibility:hidden] [&>label]:font-sans [&>label]:bg-[#888]
-[&>label]:after:skew-x-[10deg] [&>label]:after:inline-block [&>label]:after:[transition:all_0.2s_ease] [&>label]:after:w-full [&>label]:after:text-center [&>label]:after:absolute [&>label]:after:leading-[2em] [&>label]:after:font-[bold] [&>label]:after:text-white [&>label]:after:text-shadow:[0_1px_0_rgba(0,0,0,0.4)]
-[&>label]:before:skew-x-[10deg] [&>label]:before:inline-block [&>label]:before:[transition:all_0.2s_ease] [&>label]:before:w-full [&>label]:before:text-center [&>label]:before:absolute [&>label]:before:leading-[2em] [&>label]:before:font-[bold] [&>label]:before:text-white [&>label]:before:text-shadow:[0_1px_0_rgba(0,0,0,0.4)]
+[&>label]:after:skew-x-[10deg] [&>label]:after:inline-block [&>label]:after:[transition:all_0.2s_ease] [&>label]:after:w-full [&>label]:after:text-center [&>label]:after:absolute [&>label]:after:leading-[2em] [&>label]:after:font-bold [&>label]:after:text-white [&>label]:after:text-shadow:[0_1px_0_rgba(0,0,0,0.4)]
+[&>label]:before:skew-x-[10deg] [&>label]:before:inline-block [&>label]:before:[transition:all_0.2s_ease] [&>label]:before:w-full [&>label]:before:text-center [&>label]:before:absolute [&>label]:before:leading-[2em] [&>label]:before:font-bold [&>label]:before:text-white [&>label]:before:text-shadow:[0_1px_0_rgba(0,0,0,0.4)]
 [&>label]:active:bg-[#888]
 [&>input:checked~label]:bg-[#86d993]
 [&>input:checked~label]:before:left-full
@@ -3146,8 +3223,8 @@ const flip = `mx-[2em] my-0
 [&>label]:block [&>label]:w-[4em] [&>label]:h-[2em] [&>label]:relative [&>label]:cursor-pointer [&>label]:select-none [&>label]:[outline:0]
 [&>label]:before:h-full
 
-[&>label]:[transition:all_0.2s_ease] [&>label]:p-0.5 [&>label]:before:content-[attr(data-tg-off)] [&>label]:font-sans [&>label]:[perspective:100px]
-[&>label]:before:inline-block [&>label]:before:[transition:all_0.4s_ease] [&>label]:before:w-full [&>label]:before:text-center [&>label]:before:leading-[2em] [&>label]:before:font-[bold] [&>label]:before:text-white [&>label]:before:absolute [&>label]:before:rounded [&>label]:before:left-0 [&>label]:before:top-0 [&>label]:before:[backface-visibility:hidden]
+[&>label]:[transition:all_0.2s_ease] [&>label]:p-0.5 [&>label]:before:content-[attr(data-tg-on)] [&>label]:font-sans [&>label]:[perspective:100px]
+[&>label]:before:inline-block [&>label]:before:[transition:all_0.4s_ease] [&>label]:before:w-full [&>label]:before:text-center [&>label]:before:leading-[2em] [&>label]:before:font-bold [&>label]:before:text-white [&>label]:before:absolute [&>label]:before:rounded [&>label]:before:left-0 [&>label]:before:top-0 [&>label]:before:[backface-visibility:hidden]
 
 [&>label]:before:bg-[#ff3a19]
 [&>label]:active:before:[transform:rotateY(-20deg)]
@@ -3157,8 +3234,8 @@ const flip = `mx-[2em] my-0
 
 [&>label]:after:h-full
 [&>label]:after:bg-[#02c66f] [&>label]:after:[transform:rotateY(-180deg)]
-[&>label]:after:content-[attr(data-tg-on)]
-[&>label]:after:inline-block [&>label]:after:[transition:all_0.4s_ease] [&>label]:after:w-full [&>label]:after:text-center [&>label]:after:leading-[2em] [&>label]:after:font-[bold] [&>label]:after:text-white [&>label]:after:absolute [&>label]:after:rounded [&>label]:after:left-0 [&>label]:after:top-0 [&>label]:after:[backface-visibility:hidden]
+[&>label]:after:content-[attr(data-tg-off)]
+[&>label]:after:inline-block [&>label]:after:[transition:all_0.4s_ease] [&>label]:after:w-full [&>label]:after:text-center [&>label]:after:leading-[2em] [&>label]:after:font-bold [&>label]:after:text-white [&>label]:after:absolute [&>label]:after:rounded [&>label]:after:left-0 [&>label]:after:top-0 [&>label]:after:[backface-visibility:hidden]
 
 `;
 const output = "";
@@ -3181,7 +3258,7 @@ const Checkbox = ({ type, labelPosition = "left", children, ...props }) => {
   return /* @__PURE__ */ jsx(Fragment$1, { children: [
     before,
     line,
-    /* @__PURE__ */ jsx("input", { id, type: "checkbox", ...props }),
+    /* @__PURE__ */ jsx("input", { type: "checkbox", ...props }),
     line,
     after
   ] });
@@ -3195,7 +3272,7 @@ const SideBar = ({ children, className, contentRef, width: w = observable("300px
     get(contentRef).style.transition = "margin-left .5s";
   });
   return [
-    /* @__PURE__ */ jsx("div", { class: "h-full w-0 fixed z-[1000] bg-[#111] overflow-x-hidden transition-[0.5s] left-0 top-0", style: { width }, children }),
+    /* @__PURE__ */ jsx("div", { class: "h-full w-0 fixed overflow-x-hidden transition-[0.5s] left-0 top-0", style: { width }, children }),
     /* @__PURE__ */ jsx(
       "div",
       {
@@ -3211,6 +3288,64 @@ const SideBar = ({ children, className, contentRef, width: w = observable("300px
 };
 const MenuItem = tw("a")`flex items-center w-full h-12 px-3 mt-2 rounded hover:bg-gray-300 cursor-pointer`;
 const MenuText = tw("span")`ml-3 text-sm font-medium`;
+const btn = `
+bg-transparent items-center justify-center cursor-pointer relative m-0 border-[none] [outline:none] [-webkit-appearance:none]
+disabled:bg-[#d9dbda]
+`;
+const NumberField = ({ className, class: cls, children, onChange, noFix, onKeyUp, reactive, ...props }) => {
+  const inputRef = observable();
+  const { min, max, value, step } = props;
+  const error = () => get(value) < get(min) || get(value) > get(max);
+  const cantMin = () => get(value) <= get(min);
+  const cantMax = () => get(value) >= get(max);
+  effect(() => {
+    if (get(noFix))
+      return;
+    if (get(value) < get(min))
+      isObservable(value) && value(get(min));
+    if (get(value) > get(max))
+      isObservable(value) && value(get(max));
+  });
+  return /* @__PURE__ */ jsx("div", { class: ["number-input inline-flex border-2 border-solid border-[#ddd] box-border [&_*]:box-border", className, cls], children: [
+    /* @__PURE__ */ jsx("button", { class: btn, onClick: () => {
+      get(inputRef).stepDown();
+      isObservable(value) && (value == null ? void 0 : value(get(inputRef).value));
+    }, disabled: cantMin, children: "-" }),
+    /* @__PURE__ */ jsx(
+      "input",
+      {
+        ref: inputRef,
+        class: [
+          `quantity  [-webkit-appearance:textfield] [-moz-appearance:textfield] [appearance:textfield]
+        [&::-webkit-inner-spin-button]:[-webkit-appearance:none] [&::-webkit-outer-spin-button]:[-webkit-appearance:none]
+        text-center p-2 border-solid border-[0_2px]
+        `,
+          () => get(error) ? "text-[red]" : ""
+        ],
+        type: "number",
+        ...props,
+        onChange: (e) => !get(reactive) && isObservable(value) ? (value == null ? void 0 : value(e.target.value), onChange == null ? void 0 : onChange(e)) : void 0,
+        onKeyUp: (e) => !get(reactive) && isObservable(value) ? (value == null ? void 0 : value(e.target.value), onKeyUp == null ? void 0 : onKeyUp(e)) : void 0,
+        onWheel: (e) => {
+          e.preventDefault();
+          !get(reactive) && isObservable(value) ? value == null ? void 0 : value(Math.sign(e.deltaY) > 0 ? ++e.target.value : --e.target.value) : void 0;
+        }
+      }
+    ),
+    /* @__PURE__ */ jsx("button", { class: [btn, "plus"], onClick: () => {
+      get(inputRef).stepUp();
+      isObservable(value) && (value == null ? void 0 : value(get(inputRef).value));
+    }, disabled: cantMax, children: "+" })
+  ] });
+};
+const ToggleButton = ({ children, className, class: cls, onClass = "text-[#1976d2] bg-[rgba(25,118,210,0.08)] hover:bg-[rgba(25,118,210,0.12)]", offClass = "text-[rgba(0,0,0,0.54)] hover:no-underline hover:bg-[rgba(0,0,0,0.04)]", checked = observable(false), ...props }) => /* @__PURE__ */ jsx("button", { onClick: () => isObservable(checked) && checked((c) => !c), class: [
+  `rounded-tr-none rounded-br-none`,
+  `inline-flex items-center justify-center relative box-border cursor-pointer select-none align-middle leading-[1.75] tracking-[0.02857em] uppercase border m-0 border-[rgba(0,0,0,0.12)]`,
+  `[outline:0]`,
+  () => get(checked) ? onClass : offClass,
+  className,
+  cls
+], ...props, children });
 const FaceIcon = /* @__PURE__ */ jsx("svg", { class: "text-[rgb(97,97,97)] select-none w-[1em] h-[1em] inline-block fill-current shrink-0 transition-[fill] duration-200 ease-in-out delay-[0ms] text-2xl ml-[5px] -mr-1.5", focusable: "false", "aria-hidden": "true", viewBox: "0 0 24 24", "data-testid": "FaceIcon", children: /* @__PURE__ */ jsx("path", { d: "M9 11.75c-.69 0-1.25.56-1.25 1.25s.56 1.25 1.25 1.25 1.25-.56 1.25-1.25-.56-1.25-1.25-1.25zm6 0c-.69 0-1.25.56-1.25 1.25s.56 1.25 1.25 1.25 1.25-.56 1.25-1.25-.56-1.25-1.25-1.25zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8 0-.29.02-.58.05-.86 2.36-1.05 4.23-2.98 5.21-5.37C11.07 8.33 14.05 10 17.42 10c.78 0 1.53-.09 2.25-.26.21.71.33 1.47.33 2.26 0 4.41-3.59 8-8 8z" }) });
 const row = `mr-[-15px] ml-[-15px]`;
 const button_ = `relative w-[74px] h-9 overflow-hidden -mt-5 mb-0 mx-auto top-2/4
@@ -3232,6 +3367,26 @@ const DocsIcon = (props) => /* @__PURE__ */ jsx("svg", { class: "w-6 h-6 stroke-
 const ProductsIcon = (props) => /* @__PURE__ */ jsx("svg", { class: "w-6 h-6 stroke-current", xmlns: "http://www.w3.org/2000/svg", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor", ...props, children: /* @__PURE__ */ jsx("path", { "stroke-linecap": "round", "stroke-linejoin": "round", "stroke-width": "2", d: "M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" }) });
 const SettingsIcon = (props) => /* @__PURE__ */ jsx("svg", { class: "w-6 h-6 stroke-current", xmlns: "http://www.w3.org/2000/svg", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor", ...props, children: /* @__PURE__ */ jsx("path", { "stroke-linecap": "round", "stroke-linejoin": "round", "stroke-width": "2", d: "M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" }) });
 const MessagesIcon = (props) => /* @__PURE__ */ jsx("svg", { class: "w-6 h-6 stroke-current", xmlns: "http://www.w3.org/2000/svg", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor", children: /* @__PURE__ */ jsx("path", { "stroke-linecap": "round", "stroke-linejoin": "round", "stroke-width": "2", d: "M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" }) });
+const number = observable(0);
+const text1 = observable("abc");
+effect(() => {
+  console.log(get(number));
+});
+effect(() => {
+  console.log(get(text1));
+});
+var A = /* @__PURE__ */ ((A2) => {
+  A2[A2["a"] = 0] = "a";
+  A2[A2["b"] = 1] = "b";
+  return A2;
+})(A || {});
+const aa = observable(
+  0
+  /* a */
+);
+effect(() => {
+  console.log("useEnumSwitch", get(aa), A[get(aa)]);
+});
 const App = () => /* @__PURE__ */ jsx(Fragment$1, { children: [
   /* @__PURE__ */ jsx(SideBar, { class: "", open: menu, width: "10rem", disableBackground: true, contentRef: main, children: /* @__PURE__ */ jsx("div", { class: "flex flex-col items-center w-40 h-full overflow-hidden text-gray-700 bg-gray-100 rounded", children: [
     /* @__PURE__ */ jsx("a", { class: "flex items-center w-full px-3 mt-3", href: "#", children: [
@@ -3289,14 +3444,16 @@ const App = () => /* @__PURE__ */ jsx(Fragment$1, { children: [
       /* @__PURE__ */ jsx(Button, { children: "Login" })
     ] }) }),
     /* @__PURE__ */ jsx("div", { class: "pt-[60px]", children: [
-      /* @__PURE__ */ jsx(Fab, { class: "w-9 h-8", children: /* @__PURE__ */ jsx("svg", { class: "select-none w-[1em] h-[1em] inline-block fill-current shrink-0 text-2xl [transition:fill_200ms_cubic-bezier(0.4,0,0.2,1)0ms]", focusable: "false", "aria-hidden": "true", viewBox: "0 0 24 24", "data-testid": "AddIcon", children: /* @__PURE__ */ jsx("path", { d: "M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" }) }) }),
-      /* @__PURE__ */ jsx(Fab, { class: "w-12 h-12", children: /* @__PURE__ */ jsx("svg", { class: "select-none w-[1em] h-[1em] inline-block fill-current shrink-0 text-2xl [transition:fill_200ms_cubic-bezier(0.4,0,0.2,1)0ms]", focusable: "false", "aria-hidden": "true", viewBox: "0 0 24 24", "data-testid": "AddIcon", children: /* @__PURE__ */ jsx("path", { d: "M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" }) }) }),
-      /* @__PURE__ */ jsx(Badge, { children: /* @__PURE__ */ jsx("svg", { class: "select-none w-[1em] h-[1em] inline-block fill-current shrink-0 text-2xl [transition:fill_200ms_cubic-bezier(0.4,0,0.2,1)0ms]", focusable: "false", "aria-hidden": "true", viewBox: "0 0 24 24", children: /* @__PURE__ */ jsx("path", { d: "M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z" }) }) }),
-      /* @__PURE__ */ jsx(Badge, { badgeContent: "9+", children: /* @__PURE__ */ jsx("svg", { class: "select-none w-[1em] h-[1em] inline-block fill-current shrink-0 text-2xl [transition:fill_200ms_cubic-bezier(0.4,0,0.2,1)0ms]", focusable: "false", "aria-hidden": "true", viewBox: "0 0 24 24", children: /* @__PURE__ */ jsx("path", { d: "M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z" }) }) }),
-      /* @__PURE__ */ jsx(Badge, { badgeContent: "99+", children: /* @__PURE__ */ jsx("svg", { class: "select-none w-[1em] h-[1em] inline-block fill-current shrink-0 text-2xl [transition:fill_200ms_cubic-bezier(0.4,0,0.2,1)0ms]", focusable: "false", "aria-hidden": "true", viewBox: "0 0 24 24", children: /* @__PURE__ */ jsx("path", { d: "M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z" }) }) }),
-      /* @__PURE__ */ jsx(Badge, { badgeContent: "99+", anchorOrigin: { vertical: "bottom" }, children: /* @__PURE__ */ jsx("svg", { class: "select-none w-[1em] h-[1em] inline-block fill-current shrink-0 text-2xl [transition:fill_200ms_cubic-bezier(0.4,0,0.2,1)0ms]", focusable: "false", "aria-hidden": "true", viewBox: "0 0 24 24", "data-testid": "MailIcon", children: /* @__PURE__ */ jsx("path", { d: "M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z" }) }) }),
-      /* @__PURE__ */ jsx(Badge, { badgeContent: "99+", anchorOrigin: { horizontal: "left" }, children: /* @__PURE__ */ jsx("svg", { class: "select-none w-[1em] h-[1em] inline-block fill-current shrink-0 text-2xl [transition:fill_200ms_cubic-bezier(0.4,0,0.2,1)0ms]", focusable: "false", "aria-hidden": "true", viewBox: "0 0 24 24", "data-testid": "MailIcon", children: /* @__PURE__ */ jsx("path", { d: "M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z" }) }) }),
-      /* @__PURE__ */ jsx(Badge, { badgeContent: "99+", anchorOrigin: { vertical: "bottom", horizontal: "left" }, children: /* @__PURE__ */ jsx("svg", { class: "select-none w-[1em] h-[1em] inline-block fill-current shrink-0 text-2xl [transition:fill_200ms_cubic-bezier(0.4,0,0.2,1)0ms]", focusable: "false", "aria-hidden": "true", viewBox: "0 0 24 24", "data-testid": "MailIcon", children: /* @__PURE__ */ jsx("path", { d: "M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z" }) }) }),
+      /* @__PURE__ */ jsx("div", { class: "[@media(min-width:768px)]:w-[750px] mx-auto px-[15px]", children: [
+        /* @__PURE__ */ jsx(Fab, { class: "w-9 h-8", children: /* @__PURE__ */ jsx("svg", { class: "select-none w-[1em] h-[1em] inline-block fill-[black] shrink-0 text-2xl [transition:fill_200ms_cubic-bezier(0.4,0,0.2,1)0ms]", focusable: "false", "aria-hidden": "true", viewBox: "0 0 24 24", "data-testid": "AddIcon", children: /* @__PURE__ */ jsx("path", { d: "M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" }) }) }),
+        /* @__PURE__ */ jsx(Fab, { class: "w-12 h-12", children: /* @__PURE__ */ jsx("svg", { class: "select-none w-[1em] h-[1em] inline-block fill-[black] shrink-0 text-2xl [transition:fill_200ms_cubic-bezier(0.4,0,0.2,1)0ms]", focusable: "false", "aria-hidden": "true", viewBox: "0 0 24 24", "data-testid": "AddIcon", children: /* @__PURE__ */ jsx("path", { d: "M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" }) }) }),
+        /* @__PURE__ */ jsx(Badge, { children: /* @__PURE__ */ jsx("svg", { class: "select-none w-[1em] h-[1em] inline-block fill-current shrink-0 text-2xl [transition:fill_200ms_cubic-bezier(0.4,0,0.2,1)0ms]", focusable: "false", "aria-hidden": "true", viewBox: "0 0 24 24", children: /* @__PURE__ */ jsx("path", { d: "M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z" }) }) }),
+        /* @__PURE__ */ jsx(Badge, { badgeContent: "9+", children: /* @__PURE__ */ jsx("svg", { class: "select-none w-[1em] h-[1em] inline-block fill-current shrink-0 text-2xl [transition:fill_200ms_cubic-bezier(0.4,0,0.2,1)0ms]", focusable: "false", "aria-hidden": "true", viewBox: "0 0 24 24", children: /* @__PURE__ */ jsx("path", { d: "M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z" }) }) }),
+        /* @__PURE__ */ jsx(Badge, { badgeContent: "99+", children: /* @__PURE__ */ jsx("svg", { class: "select-none w-[1em] h-[1em] inline-block fill-current shrink-0 text-2xl [transition:fill_200ms_cubic-bezier(0.4,0,0.2,1)0ms]", focusable: "false", "aria-hidden": "true", viewBox: "0 0 24 24", children: /* @__PURE__ */ jsx("path", { d: "M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z" }) }) }),
+        /* @__PURE__ */ jsx(Badge, { badgeContent: "99+", anchorOrigin: { vertical: "bottom" }, children: /* @__PURE__ */ jsx("svg", { class: "select-none w-[1em] h-[1em] inline-block fill-current shrink-0 text-2xl [transition:fill_200ms_cubic-bezier(0.4,0,0.2,1)0ms]", focusable: "false", "aria-hidden": "true", viewBox: "0 0 24 24", "data-testid": "MailIcon", children: /* @__PURE__ */ jsx("path", { d: "M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z" }) }) }),
+        /* @__PURE__ */ jsx(Badge, { badgeContent: "99+", anchorOrigin: { horizontal: "left" }, children: /* @__PURE__ */ jsx("svg", { class: "select-none w-[1em] h-[1em] inline-block fill-current shrink-0 text-2xl [transition:fill_200ms_cubic-bezier(0.4,0,0.2,1)0ms]", focusable: "false", "aria-hidden": "true", viewBox: "0 0 24 24", "data-testid": "MailIcon", children: /* @__PURE__ */ jsx("path", { d: "M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z" }) }) }),
+        /* @__PURE__ */ jsx(Badge, { badgeContent: "99+", anchorOrigin: { vertical: "bottom", horizontal: "left" }, children: /* @__PURE__ */ jsx("svg", { class: "select-none w-[1em] h-[1em] inline-block fill-current shrink-0 text-2xl [transition:fill_200ms_cubic-bezier(0.4,0,0.2,1)0ms]", focusable: "false", "aria-hidden": "true", viewBox: "0 0 24 24", "data-testid": "MailIcon", children: /* @__PURE__ */ jsx("path", { d: "M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z" }) }) })
+      ] }),
       /* @__PURE__ */ jsx("div", { class: "[@media(min-width:768px)]:w-[750px] mx-auto px-[15px]", children: [
         /* @__PURE__ */ jsx("div", { class: "w-full relative flex justify-center bg-white border m-auto p-6 rounded-[12px_12px_0_0] border-l-0 border-r border-solid border-[#E5EAF2] [outline:0]", children: [
           /* @__PURE__ */ jsx(Avatar, { children: "H" }),
@@ -3318,6 +3475,9 @@ const App = () => /* @__PURE__ */ jsx(Fragment$1, { children: [
           /* @__PURE__ */ jsx(Avatar, { alt: "Travis Howard", src: "https://mui.com/static/images/avatar/3.jpg" }),
           /* @__PURE__ */ jsx(Avatar, { class: "w-[56px] h-[56px]", alt: "Cindy Baker", src: "https://mui.com/static/images/avatar/3.jpg" })
         ] }),
+        /* @__PURE__ */ jsx("br", {}),
+        /* @__PURE__ */ jsx(NumberField, { min: 5, max: 10, value: number, class: "[&_input]:w-[5rem] [&_button]:w-[2rem] [&_button]:text-[130%] [&_button]:leading-[0] [&_button]:font-bold h-[2rem]" }),
+        /* @__PURE__ */ jsx("br", {}),
         /* @__PURE__ */ jsx(Checkbox, { children: /* @__PURE__ */ jsx("h1", { class: "inline-block", children: "h1 check" }) }),
         /* @__PURE__ */ jsx("br", {}),
         /* @__PURE__ */ jsx(Chip, { avatar: FaceIcon, onDelete: () => alert("delete"), children: "Chip" }),
@@ -3344,39 +3504,39 @@ const App = () => /* @__PURE__ */ jsx(Fragment$1, { children: [
         /* @__PURE__ */ jsx("br", {}),
         /* @__PURE__ */ jsx("div", { class: row, children: [
           /* @__PURE__ */ jsx("h2", { children: /* @__PURE__ */ jsx("i", { children: "Border effects" }) }),
-          /* @__PURE__ */ jsx(TextField, { class: "inline-block w-[27.33%] mt-[20px] mr-3", effect: effect1$1, placeholder: "effect1" }),
-          /* @__PURE__ */ jsx(TextField, { class: "inline-block w-[27.33%] mt-[20px] mr-3", effect: effect2$1, placeholder: "effect2" }),
-          /* @__PURE__ */ jsx(TextField, { class: "inline-block w-[27.33%] mt-[20px] mr-3", effect: effect3$1, placeholder: "effect3" }),
-          /* @__PURE__ */ jsx(TextField, { class: "inline-block w-[27.33%] mt-[20px] mr-3", effect: effect4$1, placeholder: "effect4" }),
-          /* @__PURE__ */ jsx(TextField, { class: "inline-block w-[27.33%] mt-[20px] mr-3", effect: effect5$1, placeholder: "effect5" }),
-          /* @__PURE__ */ jsx(TextField, { class: "inline-block w-[27.33%] mt-[20px] mr-3", effect: effect6$1, placeholder: "effect6" }),
-          /* @__PURE__ */ jsx(TextField, { class: "inline-block w-[27.33%] mt-[20px] mr-3", effect: effect7$1, placeholder: "effect7" }),
-          /* @__PURE__ */ jsx(TextField, { class: "inline-block w-[27.33%] mt-[20px] mr-3", effect: effect8$1, placeholder: "effect8" }),
-          /* @__PURE__ */ jsx(TextField, { class: "inline-block w-[27.33%] mt-[20px] mr-3", effect: effect9$1, placeholder: "effect9" })
+          /* @__PURE__ */ jsx(TextField, { class: "inline-block w-[27.33%] mt-[20px] mr-3", effect: [effect1$1, "w-full"], placeholder: "effect1", value: text1 }),
+          /* @__PURE__ */ jsx(TextField, { class: "inline-block w-[27.33%] mt-[20px] mr-3", effect: [effect2$1, "w-full"], placeholder: "effect2" }),
+          /* @__PURE__ */ jsx(TextField, { class: "inline-block w-[27.33%] mt-[20px] mr-3", effect: [effect3$1, "w-full"], placeholder: "effect3" }),
+          /* @__PURE__ */ jsx(TextField, { class: "inline-block w-[27.33%] mt-[20px] mr-3", effect: [effect4$1, "w-full"], placeholder: "effect4" }),
+          /* @__PURE__ */ jsx(TextField, { class: "inline-block w-[27.33%] mt-[20px] mr-3", effect: [effect5$1, "w-full"], placeholder: "effect5" }),
+          /* @__PURE__ */ jsx(TextField, { class: "inline-block w-[27.33%] mt-[20px] mr-3", effect: [effect6$1, "w-full"], placeholder: "effect6" }),
+          /* @__PURE__ */ jsx(TextField, { class: "inline-block w-[27.33%] mt-[20px] mr-3", effect: [effect7$1, "w-full"], placeholder: "effect7" }),
+          /* @__PURE__ */ jsx(TextField, { class: "inline-block w-[27.33%] mt-[20px] mr-3", effect: [effect8$1, "w-full"], placeholder: "effect8" }),
+          /* @__PURE__ */ jsx(TextField, { class: "inline-block w-[27.33%] mt-[20px] mr-3", effect: [effect9$1, "w-full"], placeholder: "effect9" })
         ] }),
         /* @__PURE__ */ jsx("div", { class: row, children: [
           /* @__PURE__ */ jsx("h2", { children: /* @__PURE__ */ jsx("i", { children: "Background Effects" }) }),
-          /* @__PURE__ */ jsx(TextField, { class: "inline-block w-[27.33%] mt-[20px] mr-3", effect: [effect10$1, "[&~span]:opacity-[unset] [&:focus~span]:bg-[#000] [&~span]:bg-[#e7a8a8]"], placeholder: "effect10" }),
-          /* @__PURE__ */ jsx(TextField, { class: "inline-block w-[27.33%] mt-[20px] mr-3", effect: [effect11$1, "border-[#F00]"], placeholder: "effect11" }),
-          /* @__PURE__ */ jsx(TextField, { class: "inline-block w-[27.33%] mt-[20px] mr-3", effect: effect12$1, placeholder: "effect12" }),
-          /* @__PURE__ */ jsx(TextField, { class: "inline-block w-[27.33%] mt-[20px] mr-3", effect: effect13$1, placeholder: "effect13" }),
-          /* @__PURE__ */ jsx(TextField, { class: "inline-block w-[27.33%] mt-[20px] mr-3", effect: effect14$1, placeholder: "effect14" }),
-          /* @__PURE__ */ jsx(TextField, { class: "inline-block w-[27.33%] mt-[20px] mr-3", effect: effect15$1, placeholder: "effect15" })
+          /* @__PURE__ */ jsx(TextField, { class: "inline-block w-[27.33%] mt-[20px] mr-3", effect: [effect10$1, "w-full", "[&~span]:opacity-[unset] [&:focus~span]:bg-[#000] [&~span]:bg-[#e7a8a8]"], placeholder: "effect10" }),
+          /* @__PURE__ */ jsx(TextField, { class: "inline-block w-[27.33%] mt-[20px] mr-3", effect: [effect11$1, "w-full", "border-[#F00]"], placeholder: "effect11" }),
+          /* @__PURE__ */ jsx(TextField, { class: "inline-block w-[27.33%] mt-[20px] mr-3", effect: [effect12$1, "w-full"], placeholder: "effect12" }),
+          /* @__PURE__ */ jsx(TextField, { class: "inline-block w-[27.33%] mt-[20px] mr-3", effect: [effect13$1, "w-full"], placeholder: "effect13" }),
+          /* @__PURE__ */ jsx(TextField, { class: "inline-block w-[27.33%] mt-[20px] mr-3", effect: [effect14$1, "w-full"], placeholder: "effect14" }),
+          /* @__PURE__ */ jsx(TextField, { class: "inline-block w-[27.33%] mt-[20px] mr-3", effect: [effect15$1, "w-full"], placeholder: "effect15" })
         ] }),
         /* @__PURE__ */ jsx("div", { class: row, children: [
           /* @__PURE__ */ jsx("h2", { children: /* @__PURE__ */ jsx("i", { children: "Input with Label Effects" }) }),
-          /* @__PURE__ */ jsx(TextField, { class: "inline-block w-[27.33%] mt-[20px] mr-3", effect: [effect16$1, "[&~label]:text-[red] [&:focus~label]:text-[red] [&:not(:placeholder-shown)~label]:text-[red]"], placeholder: "", children: /* @__PURE__ */ jsx("label", { children: "effect16" }) }),
-          /* @__PURE__ */ jsx(TextField, { class: "inline-block w-[27.33%] mt-[20px] mr-3", effect: effect17$1, placeholder: "", children: /* @__PURE__ */ jsx("label", { children: "effect17" }) }),
-          /* @__PURE__ */ jsx(TextField, { class: "inline-block w-[27.33%] mt-[20px] mr-3", effect: effect18$1, placeholder: "", children: /* @__PURE__ */ jsx("label", { children: "effect18" }) }),
-          /* @__PURE__ */ jsx(TextField, { class: "inline-block w-[27.33%] mt-[20px] mr-3", effect: effect19, placeholder: "", children: /* @__PURE__ */ jsx("label", { children: "effect19" }) }),
-          /* @__PURE__ */ jsx(TextField, { class: "inline-block w-[27.33%] mt-[20px] mr-3", effect: [effect20, "[&~span]:before:bg-[red] [&~span]:after:bg-[red] [&~span_i]:before:bg-[red] [&~span_i]:after:bg-[red]"], placeholder: "", children: /* @__PURE__ */ jsx("label", { children: "effect20" }) }),
-          /* @__PURE__ */ jsx(TextField, { class: "inline-block w-[27.33%] mt-[20px] mr-3", effect: effect21, placeholder: "", children: /* @__PURE__ */ jsx("label", { children: "effect21" }) }),
-          /* @__PURE__ */ jsx(TextField, { class: "inline-block w-[27.33%] mt-[20px] mr-3", effect: effect22, placeholder: "", children: /* @__PURE__ */ jsx("label", { children: "effect22" }) }),
-          /* @__PURE__ */ jsx(TextField, { class: "inline-block w-[27.33%] mt-[20px] mr-3", effect: effect23, placeholder: "", children: /* @__PURE__ */ jsx("label", { children: "effect23" }) }),
-          /* @__PURE__ */ jsx(TextField, { class: "inline-block w-[27.33%] mt-[20px] mr-3", effect: effect24, placeholder: "", children: /* @__PURE__ */ jsx("label", { children: "effect24" }) }),
-          /* @__PURE__ */ jsx(TextField, { class: "inline-block w-[27.33%] mt-[20px] mr-3", effect: effect19a, placeholder: "", children: /* @__PURE__ */ jsx("label", { children: "effect19a" }) }),
-          /* @__PURE__ */ jsx(TextField, { class: "inline-block w-[27.33%] mt-[20px] mr-3", effect: effect20a, placeholder: "", children: /* @__PURE__ */ jsx("label", { children: "effect20a" }) }),
-          /* @__PURE__ */ jsx(TextField, { class: "inline-block w-[27.33%] mt-[20px] mr-3", effect: effect21a, placeholder: "", children: /* @__PURE__ */ jsx("label", { children: "effect21a" }) })
+          /* @__PURE__ */ jsx(TextField, { class: "inline-block w-[27.33%] mt-[20px] mr-3", effect: [effect16$1, "w-full", "[&~label]:text-[red] [&:focus~label]:text-[red] [&:not(:placeholder-shown)~label]:text-[red]"], placeholder: "", children: /* @__PURE__ */ jsx("label", { children: "effect16" }) }),
+          /* @__PURE__ */ jsx(TextField, { class: "inline-block w-[27.33%] mt-[20px] mr-3", effect: [effect17$1, "w-full"], placeholder: "", children: /* @__PURE__ */ jsx("label", { children: "effect17" }) }),
+          /* @__PURE__ */ jsx(TextField, { class: "inline-block w-[27.33%] mt-[20px] mr-3", effect: [effect18$1, "w-full"], placeholder: "", children: /* @__PURE__ */ jsx("label", { children: "effect18" }) }),
+          /* @__PURE__ */ jsx(TextField, { class: "inline-block w-[27.33%] mt-[20px] mr-3", effect: [effect19, "w-full"], placeholder: "", children: /* @__PURE__ */ jsx("label", { children: "effect19" }) }),
+          /* @__PURE__ */ jsx(TextField, { class: "inline-block w-[27.33%] mt-[20px] mr-3", effect: [effect20, "w-full", "[&~span]:before:bg-[red] [&~span]:after:bg-[red] [&~span_i]:before:bg-[red] [&~span_i]:after:bg-[red]"], placeholder: "", children: /* @__PURE__ */ jsx("label", { children: "effect20" }) }),
+          /* @__PURE__ */ jsx(TextField, { class: "inline-block w-[27.33%] mt-[20px] mr-3", effect: [effect21, "w-full"], placeholder: "", children: /* @__PURE__ */ jsx("label", { children: "effect21" }) }),
+          /* @__PURE__ */ jsx(TextField, { class: "inline-block w-[27.33%] mt-[20px] mr-3", effect: [effect22, "w-full"], placeholder: "", children: /* @__PURE__ */ jsx("label", { children: "effect22" }) }),
+          /* @__PURE__ */ jsx(TextField, { class: "inline-block w-[27.33%] mt-[20px] mr-3", effect: [effect23, "w-full"], placeholder: "", children: /* @__PURE__ */ jsx("label", { children: "effect23" }) }),
+          /* @__PURE__ */ jsx(TextField, { class: "inline-block w-[27.33%] mt-[20px] mr-3", effect: [effect24, "w-full"], placeholder: "", children: /* @__PURE__ */ jsx("label", { children: "effect24" }) }),
+          /* @__PURE__ */ jsx(TextField, { class: "inline-block w-[27.33%] mt-[20px] mr-3", effect: [effect19a, "w-full"], placeholder: "", children: /* @__PURE__ */ jsx("label", { children: "effect19a" }) }),
+          /* @__PURE__ */ jsx(TextField, { class: "inline-block w-[27.33%] mt-[20px] mr-3", effect: [effect20a, "w-full"], placeholder: "", children: /* @__PURE__ */ jsx("label", { children: "effect20a" }) }),
+          /* @__PURE__ */ jsx(TextField, { class: "inline-block w-[27.33%] mt-[20px] mr-3", effect: [effect21a, "w-full"], placeholder: "", children: /* @__PURE__ */ jsx("label", { children: "effect21a" }) })
         ] }),
         /* @__PURE__ */ jsx("h1", { children: "Paper" }),
         /* @__PURE__ */ jsx("div", { children: [
@@ -3393,6 +3553,14 @@ const App = () => /* @__PURE__ */ jsx(Fragment$1, { children: [
           /* @__PURE__ */ jsx("div", { class: "inline-block w-[27.33%] mt-[30px] mr-3 elevation-20", children: "elevation=20" }),
           /* @__PURE__ */ jsx("div", { class: "inline-block w-[27.33%] mt-[30px] mr-3 elevation-24", children: "elevation=24" })
         ] }),
+        /* @__PURE__ */ jsx("br", {}),
+        /* @__PURE__ */ jsx("br", {}),
+        /* @__PURE__ */ jsx("div", { class: "block", children: [
+          /* @__PURE__ */ jsx(Button, { class: variant.outlined, children: "Outlined" }),
+          /* @__PURE__ */ jsx(Button, { class: variant.contained, children: "contained" }),
+          /* @__PURE__ */ jsx(Button, { class: variant.text, children: "text" }),
+          /* @__PURE__ */ jsx(Button, { class: variant.icon, children: /* @__PURE__ */ jsx("svg", { focusable: "false", viewBox: "0 0 24 24", width: "1.5rem", height: "1.5rem", children: /* @__PURE__ */ jsx("path", { d: "M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" }) }) })
+        ] }),
         /* @__PURE__ */ jsx("h1", { children: "IconButton" }),
         /* @__PURE__ */ jsx("div", { children: [
           /* @__PURE__ */ jsx(IconButton, { onClick: () => alert("clicked"), children: /* @__PURE__ */ jsx("svg", { focusable: "false", viewBox: "0 0 24 24", children: /* @__PURE__ */ jsx("path", { d: "M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" }) }) }),
@@ -3400,7 +3568,24 @@ const App = () => /* @__PURE__ */ jsx(Fragment$1, { children: [
           /* @__PURE__ */ jsx(IconButton, { class: "[&_svg]:!fill-[#9C27B0]", children: /* @__PURE__ */ jsx("svg", { focusable: "false", viewBox: "0 0 24 24", children: /* @__PURE__ */ jsx("path", { d: "m22 5.72-4.6-3.86-1.29 1.53 4.6 3.86L22 5.72zM7.88 3.39 6.6 1.86 2 5.71l1.29 1.53 4.59-3.85zM12.5 8H11v6l4.75 2.85.75-1.23-4-2.37V8zM12 4c-4.97 0-9 4.03-9 9s4.02 9 9 9c4.97 0 9-4.03 9-9s-4.03-9-9-9zm0 16c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z" }) }) }),
           /* @__PURE__ */ jsx(IconButton, { class: "[&_svg]:!fill-[#1976D2]", children: /* @__PURE__ */ jsx("svg", { focusable: "false", viewBox: "0 0 24 24", children: /* @__PURE__ */ jsx("path", { d: "M11 9h2V6h3V4h-3V1h-2v3H8v2h3v3zm-4 9c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2zm-9.83-3.25.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.86-7.01L19.42 4h-.01l-1.1 2-2.76 5H8.53l-.13-.27L6.16 6l-.95-2-.94-2H1v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.13 0-.25-.11-.25-.25z" }) }) })
         ] }),
+        /* @__PURE__ */ jsx("h1", { children: "ToggleButton" }),
+        /* @__PURE__ */ jsx("div", { children: [
+          /* @__PURE__ */ jsx(ToggleButton, { class: "px-3 font-bold", children: "Web" }),
+          /* @__PURE__ */ jsx(ToggleButton, { class: "px-3 font-bold", children: "Android" }),
+          /* @__PURE__ */ jsx(ToggleButton, { class: "px-3 font-bold", children: "IOS" })
+        ] }),
+        /* @__PURE__ */ jsx("div", { children: [
+          /* @__PURE__ */ jsx(ToggleButton, { class: "h-7 w-7", children: /* @__PURE__ */ jsx("svg", { focusable: "false", viewBox: "0 0 24 24", children: /* @__PURE__ */ jsx("path", { d: "M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" }) }) }),
+          /* @__PURE__ */ jsx(ToggleButton, { class: "h-7 w-7", children: /* @__PURE__ */ jsx("svg", { focusable: "false", viewBox: "0 0 24 24", children: /* @__PURE__ */ jsx("path", { d: "m22 5.72-4.6-3.86-1.29 1.53 4.6 3.86L22 5.72zM7.88 3.39 6.6 1.86 2 5.71l1.29 1.53 4.59-3.85zM12.5 8H11v6l4.75 2.85.75-1.23-4-2.37V8zM12 4c-4.97 0-9 4.03-9 9s4.02 9 9 9c4.97 0 9-4.03 9-9s-4.03-9-9-9zm0 16c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z" }) }) }),
+          /* @__PURE__ */ jsx(ToggleButton, { class: "h-7 w-7", children: /* @__PURE__ */ jsx("svg", { focusable: "false", viewBox: "0 0 24 24", children: /* @__PURE__ */ jsx("path", { d: "M11 9h2V6h3V4h-3V1h-2v3H8v2h3v3zm-4 9c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2zm-9.83-3.25.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.86-7.01L19.42 4h-.01l-1.1 2-2.76 5H8.53l-.13-.27L6.16 6l-.95-2-.94-2H1v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.13 0-.25-.11-.25-.25z" }) }) })
+        ] }),
         /* @__PURE__ */ jsx("div", { id: "app-cover", children: [
+          /* @__PURE__ */ jsx(Switch, { class: [buttonr, effect2], checked: useEnumSwitch(
+            aa,
+            0,
+            1
+            /* b */
+          ) }),
           /* @__PURE__ */ jsx("div", { class: "table-row", children: [
             /* @__PURE__ */ jsx("div", { class: "table-cell relative w-[200px] h-[50px] box-border", children: /* @__PURE__ */ jsx(Switch, { class: [buttonr, effect1, `
                  [&>div]:before:content-['OK']
@@ -3408,34 +3593,34 @@ const App = () => /* @__PURE__ */ jsx(Fragment$1, { children: [
 [&>input:checked+div]:before:bg-[#46f436]
 [&>input:checked~div]:bg-[#f9fceb]
 [&>input:checked+div]:before:content-['KO']
-`] }) }),
-            /* @__PURE__ */ jsx("div", { class: "table-cell relative w-[200px] h-[50px] box-border", children: /* @__PURE__ */ jsx(Switch, { class: [buttonr, effect2] }) }),
-            /* @__PURE__ */ jsx("div", { class: "table-cell relative w-[200px] h-[50px] box-border", children: /* @__PURE__ */ jsx(Switch, { class: [buttonr, effect3] }) })
+`], checked: observable(false) }) }),
+            /* @__PURE__ */ jsx("div", { class: "table-cell relative w-[200px] h-[50px] box-border", children: /* @__PURE__ */ jsx(Switch, { class: [buttonr, effect2], checked: observable(false) }) }),
+            /* @__PURE__ */ jsx("div", { class: "table-cell relative w-[200px] h-[50px] box-border", children: /* @__PURE__ */ jsx(Switch, { class: [buttonr, effect3], checked: observable(false) }) })
           ] }),
           /* @__PURE__ */ jsx("div", { class: "table-row", children: [
-            /* @__PURE__ */ jsx("div", { class: "table-cell relative w-[200px] h-[50px] box-border", children: /* @__PURE__ */ jsx(Switch, { class: [buttonr, effect4] }) }),
-            /* @__PURE__ */ jsx("div", { class: "table-cell relative w-[200px] h-[50px] box-border", children: /* @__PURE__ */ jsx(Switch, { class: [buttonr, effect5] }) }),
-            /* @__PURE__ */ jsx("div", { class: "table-cell relative w-[200px] h-[50px] box-border", children: /* @__PURE__ */ jsx(Switch, { class: [buttonr, effect6] }) })
+            /* @__PURE__ */ jsx("div", { class: "table-cell relative w-[200px] h-[50px] box-border", children: /* @__PURE__ */ jsx(Switch, { class: [buttonr, effect4], checked: observable(false) }) }),
+            /* @__PURE__ */ jsx("div", { class: "table-cell relative w-[200px] h-[50px] box-border", children: /* @__PURE__ */ jsx(Switch, { class: [buttonr, effect5], checked: observable(false) }) }),
+            /* @__PURE__ */ jsx("div", { class: "table-cell relative w-[200px] h-[50px] box-border", children: /* @__PURE__ */ jsx(Switch, { class: [buttonr, effect6], checked: observable(false) }) })
           ] }),
           /* @__PURE__ */ jsx("div", { class: "table-row", children: [
-            /* @__PURE__ */ jsx("div", { class: "table-cell relative w-[200px] h-[50px] box-border", children: /* @__PURE__ */ jsx(Switch, { class: [buttonr, effect7] }) }),
-            /* @__PURE__ */ jsx("div", { class: "table-cell relative w-[200px] h-[50px] box-border", children: /* @__PURE__ */ jsx(Switch, { class: [buttonr, effect8] }) }),
-            /* @__PURE__ */ jsx("div", { class: "table-cell relative w-[200px] h-[50px] box-border", children: /* @__PURE__ */ jsx(Switch, { class: [buttonr, effect9] }) })
+            /* @__PURE__ */ jsx("div", { class: "table-cell relative w-[200px] h-[50px] box-border", children: /* @__PURE__ */ jsx(Switch, { class: [buttonr, effect7], checked: observable(false) }) }),
+            /* @__PURE__ */ jsx("div", { class: "table-cell relative w-[200px] h-[50px] box-border", children: /* @__PURE__ */ jsx(Switch, { class: [buttonr, effect8], checked: observable(false) }) }),
+            /* @__PURE__ */ jsx("div", { class: "table-cell relative w-[200px] h-[50px] box-border", children: /* @__PURE__ */ jsx(Switch, { class: [buttonr, effect9], checked: observable(false) }) })
           ] }),
           /* @__PURE__ */ jsx("div", { class: "table-row", children: [
-            /* @__PURE__ */ jsx("div", { class: "table-cell relative w-[200px] h-[50px] box-border", children: /* @__PURE__ */ jsx(Switch, { class: [button_, buttonb2, effect10] }) }),
-            /* @__PURE__ */ jsx("div", { class: "table-cell relative w-[200px] h-[50px] box-border", children: /* @__PURE__ */ jsx(Switch, { class: [button_, buttonb2, effect11] }) }),
-            /* @__PURE__ */ jsx("div", { class: "table-cell relative w-[200px] h-[50px] box-border", children: /* @__PURE__ */ jsx(Switch, { class: [button_, buttonb2, effect12] }) })
+            /* @__PURE__ */ jsx("div", { class: "table-cell relative w-[200px] h-[50px] box-border", children: /* @__PURE__ */ jsx(Switch, { class: [button_, buttonb2, effect10], checked: observable(false) }) }),
+            /* @__PURE__ */ jsx("div", { class: "table-cell relative w-[200px] h-[50px] box-border", children: /* @__PURE__ */ jsx(Switch, { class: [button_, buttonb2, effect11], checked: observable(false) }) }),
+            /* @__PURE__ */ jsx("div", { class: "table-cell relative w-[200px] h-[50px] box-border", children: /* @__PURE__ */ jsx(Switch, { class: [button_, buttonb2, effect12], checked: observable(false) }) })
           ] }),
           /* @__PURE__ */ jsx("div", { class: "table-row", children: [
-            /* @__PURE__ */ jsx("div", { class: "table-cell relative w-[200px] h-[50px] box-border", children: /* @__PURE__ */ jsx(Switch, { class: [button_, buttonb2, effect13] }) }),
-            /* @__PURE__ */ jsx("div", { class: "table-cell relative w-[200px] h-[50px] box-border", children: /* @__PURE__ */ jsx(Switch, { class: [button_, buttonb2, effect14] }) }),
-            /* @__PURE__ */ jsx("div", { class: "table-cell relative w-[200px] h-[50px] box-border", children: /* @__PURE__ */ jsx(Switch, { class: [button_, buttonb2, effect15] }) })
+            /* @__PURE__ */ jsx("div", { class: "table-cell relative w-[200px] h-[50px] box-border", children: /* @__PURE__ */ jsx(Switch, { class: [button_, buttonb2, effect13], checked: observable(false) }) }),
+            /* @__PURE__ */ jsx("div", { class: "table-cell relative w-[200px] h-[50px] box-border", children: /* @__PURE__ */ jsx(Switch, { class: [button_, buttonb2, effect14], checked: observable(false) }) }),
+            /* @__PURE__ */ jsx("div", { class: "table-cell relative w-[200px] h-[50px] box-border", children: /* @__PURE__ */ jsx(Switch, { class: [button_, buttonb2, effect15], checked: observable(false) }) })
           ] }),
           /* @__PURE__ */ jsx("div", { class: "table-row", children: [
-            /* @__PURE__ */ jsx("div", { class: "table-cell relative w-[200px] h-[50px] box-border", children: /* @__PURE__ */ jsx(Switch, { class: [button_, buttonb2, effect16] }) }),
-            /* @__PURE__ */ jsx("div", { class: "table-cell relative w-[200px] h-[50px] box-border", children: /* @__PURE__ */ jsx(Switch, { class: [button_, buttonb2, effect17] }) }),
-            /* @__PURE__ */ jsx("div", { class: "table-cell relative w-[200px] h-[50px] box-border", children: /* @__PURE__ */ jsx(Switch, { class: [button_, buttonb2, effect18] }) })
+            /* @__PURE__ */ jsx("div", { class: "table-cell relative w-[200px] h-[50px] box-border", children: /* @__PURE__ */ jsx(Switch, { class: [button_, buttonb2, effect16], checked: observable(false) }) }),
+            /* @__PURE__ */ jsx("div", { class: "table-cell relative w-[200px] h-[50px] box-border", children: /* @__PURE__ */ jsx(Switch, { class: [button_, buttonb2, effect17], checked: observable(false) }) }),
+            /* @__PURE__ */ jsx("div", { class: "table-cell relative w-[200px] h-[50px] box-border", children: /* @__PURE__ */ jsx(Switch, { class: [button_, buttonb2, effect18], checked: observable(false) }) })
           ] })
         ] }),
         /* @__PURE__ */ jsx("div", { class: "table-row", children: [
