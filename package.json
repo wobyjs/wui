@@ -1,6 +1,6 @@
 {
     "name": "woby-wui",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "description": "A powerful tooltip and menu component library for voby.",
     "main": "./dist/index.cjs.js",
     "module": "./dist/index.es.js",
@@ -30,21 +30,20 @@
     ],
     "license": "MIT",
     "peerDependencies": {
+        "nanoid": "^3.3.7",
         "woby": "workspace:../woby",
         "woby-styled": "workspace:../woby-styled"
     },
     "devDependencies": {
-        "tailwindcss": "^3.3.3",
+        "tailwindcss": "^3.4.1",
         "tailwindcss-elevation": "^2.0.0",
-        "vite": "^4.4.11",
-        "vite-plugin-dts": "^2.3.0",
-        "nanoid": "^3.3.6"
+        "vite": "^4.5.2",
+        "vite-plugin-dts": "^2.3.0"
     },
     "author": "Chi Chong <wongchichong@gmail.com>",
     "homepage": "https://github.com/wongchichong/woby-power-tooltip",
     "repository": {
         "type": "git",
         "url": "git@github.com:wongchichong/woby-power-tooltip.git"
-    },
-    "dependencies": {}
+    }
 }

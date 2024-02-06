@@ -1,6 +1,5 @@
-import type { JSX } from 'woby/jsx-runtime'
 import { nanoid } from 'nanoid'
-import { ObservableMaybe, $$, useMemo } from 'woby'
+import { ObservableMaybe, $$, useMemo, type JSX } from 'woby'
 
 type LabelPosition = 'left' | 'right' | 'bottom' | 'top'
 
@@ -12,7 +11,7 @@ export const Checkbox = ({ type, labelPosition = 'left', children, ...props }: J
 
     return <>
         {before}{line}
-        <input id={id} type='checkbox' {...props} />
+        <input type='checkbox' {...props} />
         {line}{after}
     </>
 }

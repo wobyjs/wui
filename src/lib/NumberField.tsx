@@ -31,7 +31,7 @@ export const NumberField = ({ className, class: cls, children, onChange, noFix, 
         <button class={btn} onClick={() => { $$(inputRef).stepDown(); isObservable(value) && value?.($$(inputRef).value) }} disabled={cantMin}>-</button>
         <input ref={inputRef} class={[`quantity  [-webkit-appearance:textfield] [-moz-appearance:textfield] [appearance:textfield]
         [&::-webkit-inner-spin-button]:[-webkit-appearance:none] [&::-webkit-outer-spin-button]:[-webkit-appearance:none]
-        text-center p-2 border-[solid] border-[0_2px]
+        text-center p-2 border-solid border-[0_2px]
         `,
             () => $$(error) ? 'text-[red]' : ''
         ]} type="number" {...props}

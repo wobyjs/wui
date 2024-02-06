@@ -1,4 +1,4 @@
-import type { JSX } from 'woby/jsx-runtime'
+import type { JSX } from 'woby'
 
 export const variant = {
     text: `inline-flex items-center justify-center relative box-border bg-transparent cursor-pointer select-none align-middle no-underline 

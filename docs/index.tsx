@@ -2,7 +2,7 @@ import { TextField } from '../src/lib/TextField'
 import * as preset from '../src/lib/TextField.effect'
 import { IconButton } from '../src/lib/IconButton'
 import { Chip } from '../src/lib/Chip'
-import { Switch } from '../src/lib/Switch'
+import { Switch, useEnumSwitch } from '../src/lib/Switch'
 import { Avatar } from '../src/lib/Avatar'
 import { Badge } from '../src/lib/Badge'
 import { Appbar } from '../src/lib/Appbar'
@@ -75,8 +75,15 @@ useEffect(() => {
     console.log($$(text1))
 })
 
+enum A {
+    a, b
+}
 
+const aa = $(A.a)
 
+useEffect(() => {
+    console.log('useEnumSwitch', $$(aa), A[$$(aa)])
+})
 const App = () => <>
 
     <SideBar class='' open={menu} width='10rem' disableBackground contentRef={main}>
@@ -353,6 +360,8 @@ const App = () => <>
                     </ToggleButton>
                 </div>
                 <div id='app-cover'>
+                    <Switch class={[buttonr, spreset.effect2]} checked={useEnumSwitch(aa, A.a, A.b)} />
+
                     <div class='table-row'>
                         <div class='table-cell relative w-[200px] h-[50px] box-border'><Switch class={[buttonr, spreset.effect1, `
                  [&>div]:before:content-['OK']
@@ -360,34 +369,34 @@ const App = () => <>
 [&>input:checked+div]:before:bg-[#46f436]
 [&>input:checked~div]:bg-[#f9fceb]
 [&>input:checked+div]:before:content-['KO']
-`]} /></div>
-                        <div class='table-cell relative w-[200px] h-[50px] box-border'><Switch class={[buttonr, spreset.effect2]} /></div>
-                        <div class='table-cell relative w-[200px] h-[50px] box-border'><Switch class={[buttonr, spreset.effect3]} /></div>
+`]} checked={$(false)} /></div>
+                        <div class='table-cell relative w-[200px] h-[50px] box-border'><Switch class={[buttonr, spreset.effect2]} checked={$(false)} /></div>
+                        <div class='table-cell relative w-[200px] h-[50px] box-border'><Switch class={[buttonr, spreset.effect3]} checked={$(false)} /></div>
                     </div>
                     <div class='table-row'>
-                        <div class='table-cell relative w-[200px] h-[50px] box-border'><Switch class={[buttonr, spreset.effect4]} /></div>
-                        <div class='table-cell relative w-[200px] h-[50px] box-border'><Switch class={[buttonr, spreset.effect5]} /></div>
-                        <div class='table-cell relative w-[200px] h-[50px] box-border'><Switch class={[buttonr, spreset.effect6]} /></div>
+                        <div class='table-cell relative w-[200px] h-[50px] box-border'><Switch class={[buttonr, spreset.effect4]} checked={$(false)} /></div>
+                        <div class='table-cell relative w-[200px] h-[50px] box-border'><Switch class={[buttonr, spreset.effect5]} checked={$(false)} /></div>
+                        <div class='table-cell relative w-[200px] h-[50px] box-border'><Switch class={[buttonr, spreset.effect6]} checked={$(false)} /></div>
                     </div>
                     <div class='table-row'>
-                        <div class='table-cell relative w-[200px] h-[50px] box-border'><Switch class={[buttonr, spreset.effect7]} /></div>
-                        <div class='table-cell relative w-[200px] h-[50px] box-border'><Switch class={[buttonr, spreset.effect8]} /></div>
-                        <div class='table-cell relative w-[200px] h-[50px] box-border'><Switch class={[buttonr, spreset.effect9]} /></div>
+                        <div class='table-cell relative w-[200px] h-[50px] box-border'><Switch class={[buttonr, spreset.effect7]} checked={$(false)} /></div>
+                        <div class='table-cell relative w-[200px] h-[50px] box-border'><Switch class={[buttonr, spreset.effect8]} checked={$(false)} /></div>
+                        <div class='table-cell relative w-[200px] h-[50px] box-border'><Switch class={[buttonr, spreset.effect9]} checked={$(false)} /></div>
                     </div>
                     <div class='table-row'>
-                        <div class='table-cell relative w-[200px] h-[50px] box-border'><Switch class={[button_, buttonb2, spreset.effect10]} /></div>
-                        <div class='table-cell relative w-[200px] h-[50px] box-border'><Switch class={[button_, buttonb2, spreset.effect11]} /></div>
-                        <div class='table-cell relative w-[200px] h-[50px] box-border'><Switch class={[button_, buttonb2, spreset.effect12]} /></div>
+                        <div class='table-cell relative w-[200px] h-[50px] box-border'><Switch class={[button_, buttonb2, spreset.effect10]} checked={$(false)} /></div>
+                        <div class='table-cell relative w-[200px] h-[50px] box-border'><Switch class={[button_, buttonb2, spreset.effect11]} checked={$(false)} /></div>
+                        <div class='table-cell relative w-[200px] h-[50px] box-border'><Switch class={[button_, buttonb2, spreset.effect12]} checked={$(false)} /></div>
                     </div>
                     <div class='table-row'>
-                        <div class='table-cell relative w-[200px] h-[50px] box-border'><Switch class={[button_, buttonb2, spreset.effect13]} /></div>
-                        <div class='table-cell relative w-[200px] h-[50px] box-border'><Switch class={[button_, buttonb2, spreset.effect14]} /></div>
-                        <div class='table-cell relative w-[200px] h-[50px] box-border'><Switch class={[button_, buttonb2, spreset.effect15]} /></div>
+                        <div class='table-cell relative w-[200px] h-[50px] box-border'><Switch class={[button_, buttonb2, spreset.effect13]} checked={$(false)} /></div>
+                        <div class='table-cell relative w-[200px] h-[50px] box-border'><Switch class={[button_, buttonb2, spreset.effect14]} checked={$(false)} /></div>
+                        <div class='table-cell relative w-[200px] h-[50px] box-border'><Switch class={[button_, buttonb2, spreset.effect15]} checked={$(false)} /></div>
                     </div>
                     <div class='table-row'>
-                        <div class='table-cell relative w-[200px] h-[50px] box-border'><Switch class={[button_, buttonb2, spreset.effect16]} /></div>
-                        <div class='table-cell relative w-[200px] h-[50px] box-border'><Switch class={[button_, buttonb2, spreset.effect17]} /></div>
-                        <div class='table-cell relative w-[200px] h-[50px] box-border'><Switch class={[button_, buttonb2, spreset.effect18]} /></div>
+                        <div class='table-cell relative w-[200px] h-[50px] box-border'><Switch class={[button_, buttonb2, spreset.effect16]} checked={$(false)} /></div>
+                        <div class='table-cell relative w-[200px] h-[50px] box-border'><Switch class={[button_, buttonb2, spreset.effect17]} checked={$(false)} /></div>
+                        <div class='table-cell relative w-[200px] h-[50px] box-border'><Switch class={[button_, buttonb2, spreset.effect18]} checked={$(false)} /></div>
                     </div>
                 </div>
 

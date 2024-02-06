@@ -1,6 +1,5 @@
 import { nanoid } from 'nanoid'
-import { type JSX } from 'woby/jsx-runtime'
-
+import { ObservableMaybe, useEffect, $, $$, isObservable, Observable, type JSX } from 'woby'
 // https://codepen.io/alvarotrigo/pen/oNoJePo
 
 
@@ -18,15 +17,28 @@ import { type JSX } from 'woby/jsx-runtime'
  * 
  * Some special case may need to see the output html tree node and modify classes as needed
  */
-export const Switch = ({ off = 'OFF', on = 'ON', ...props }: JSX.VoidHTMLAttributes<HTMLDivElement> & { id?: string, on?: string, off?: string }) => {
+export const Switch = ({ off = 'OFF', on = 'ON', checked, ...props }: JSX.VoidHTMLAttributes<HTMLDivElement> & { id?: string, on?: string, off?: string, checked: ObservableMaybe<boolean> }) => {
     const id = props.id ?? nanoid(8)
 
     return <>
         <div {...props}>
-            <input id={id} type="checkbox" />
+            <input id={id} type="checkbox" checked={$$(checked)} /* onChange={v => checked(v.target.checked)} */ onChange={v => isObservable(checked) && checked(v.target.checked)} />
             <div data-tg-on={on} data-tg-off={off}><span data-tg-on={on} data-tg-off={off}></span></div>
             <span></span>
             <label for={id} data-tg-on={on} data-tg-off={off}></label>
         </div>
     </>
+}
+
+
+export const useEnumSwitch = <T,>(e: Observable<T>, t: ObservableMaybe<T>, f: ObservableMaybe<T>) => {
+    const v = $($$(e) === t)
+
+    useEffect(() => { v($$(e) === $$(t)) })
+    useEffect(() => {
+        if ($$(v)) e($$(t))
+        else e($$(f))
+    })
+
+    return v
 }

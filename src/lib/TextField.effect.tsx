@@ -1,6 +1,3 @@
-import type { JSX } from 'woby/jsx-runtime'
-import { keyframes, tw, css } from 'woby-styled'
-
 //https://codepen.io/maheshambure21/pen/EozKKy
 
 /* necessary to give position: relative to parent. */

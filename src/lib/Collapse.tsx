@@ -1,5 +1,4 @@
-import type { JSX } from 'woby/jsx-runtime'
-import { $, $$, ObservableMaybe, isObservable, useEffect, useMemo } from 'woby'
+import { $, $$, ObservableMaybe, isObservable, useEffect, useMemo, type JSX } from 'woby'
 
 export const Collapse = ({ className, children, open: op, ...props }: JSX.VoidHTMLAttributes<HTMLDivElement> & { children?: JSX.Child, open?: ObservableMaybe<boolean> }): JSX.Element => {
     const { class: cls, ...ps } = props

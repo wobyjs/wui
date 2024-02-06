@@ -1,5 +1,4 @@
-import type { JSX } from 'woby/jsx-runtime'
-import { $, $$, Observable, ObservableMaybe, isObservable, useEffect, useMemo } from 'woby'
+import { $, $$, Observable, ObservableMaybe, isObservable, useEffect, useMemo, type JSX } from 'woby'
 
 export const Badge = ({ className, children, badgeContent, anchorOrigin: { vertical = 'top', horizontal = 'right' } = {}, badgeClass = `bg-[rgb(156,39,176)]`, open: op, ...props }:
     JSX.VoidHTMLAttributes<HTMLDivElement> & {
@@ -8,7 +7,7 @@ export const Badge = ({ className, children, badgeContent, anchorOrigin: { verti
         badgeContent?: JSX.Children
     }): JSX.Element => {
     const { class: cls, ...ps } = props
-    const empty = useMemo(() => badgeContent ? 'min-w-[20px] h-5 rounded-[10px] px-1' : 'min-w-[8px] h-2 rounded px-0')
+    const empty = useMemo(() => $$(badgeContent) ? 'min-w-[20px] h-5 rounded-[10px] px-1' : 'hidden' /* min-w-[8px] h-2 rounded px-0  */)
 
     const pos = useMemo(() => {
         const [v, h] = [$$(vertical), $$(horizontal)]

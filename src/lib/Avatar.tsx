@@ -1,5 +1,4 @@
-import type { JSX } from 'woby/jsx-runtime'
-import { $, $$, useMemo } from 'woby'
+import { $, $$, useMemo, type JSX } from 'woby'
 
 export const Avatar = ({ className = 'w-10 h-10 bg-[rgb(189,189,189)]', src, alt, children, ...props }: JSX.HTMLAttributes<HTMLDivElement> & JSX.ImgHTMLAttributes<HTMLImageElement>): JSX.Child => {
     // const { className, ...p } = props
