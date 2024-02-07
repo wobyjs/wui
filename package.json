@@ -1,6 +1,6 @@
 {
     "name": "woby-wui",
-    "version": "1.0.3",
+    "version": "1.0.5",
     "description": "A powerful tooltip and menu component library for voby.",
     "main": "./dist/index.cjs.js",
     "module": "./dist/index.es.js",
@@ -31,8 +31,8 @@
     "license": "MIT",
     "peerDependencies": {
         "nanoid": "^3.3.7",
-        "woby": "workspace:../woby",
-        "woby-styled": "workspace:../woby-styled"
+        "woby": "workspace:^",
+        "woby-styled": "workspace:^"
     },
     "devDependencies": {
         "tailwindcss": "^3.4.1",
