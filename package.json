@@ -9,8 +9,8 @@
     "scripts": {
         "git": "git add . && git commit -m \"Bump version\" && git push",
         "bump": "pnpm version patch",
-        "publish": "pnpm publish",
-        "release": "run-s -c git bump publish",
+        "npmjs": "pnpm publish",
+        "release": "run-s -c git bump npmjs",
         "css:watch": "tailwindcss -i ./src/input.css -o ./dist/output.css --watch",
         "css": "tailwindcss -i ./src/input.css -o ./dist/output.css",
         "declaration": "tsc --build --force --declaration --emitDeclarationOnly --declarationMap  --verbose",
@@ -50,6 +50,6 @@
         "url": "git@github.com:wongchichong/woby-power-tooltip.git"
     },
     "dependencies": {
-        "typescript": "5.4.4"
+        "typescript": "5.4.5"
     }
 }
