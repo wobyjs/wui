@@ -1,4 +1,7 @@
 import { tw } from 'woby-styled'
+//@ts-ignore
+import { Observable, ObservableMaybe, type JSX } from 'woby'
+
 // ,type JSX } from 'woby'
 
 // const preset = {

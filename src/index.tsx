@@ -1,4 +1,4 @@
-import '../../dist/output.css'
+import '../dist/output.css'
 export * from './Button'
 export * from './IconButton'
 export * from './Collapse'

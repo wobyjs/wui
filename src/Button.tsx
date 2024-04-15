@@ -1,4 +1,5 @@
-import type { JSX } from 'woby'
+//@ts-ignore
+import { Observable, ObservableMaybe, type JSX } from 'woby'
 
 export const variant = {
     text: `inline-flex items-center justify-center relative box-border bg-transparent cursor-pointer select-none align-middle no-underline 

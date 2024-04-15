@@ -1,4 +1,6 @@
-import { $, $$, useMemo, useEffect, ObservableMaybe, type JSX, isObservable } from 'woby'
+import { $, $$, useMemo, useEffect, isObservable } from 'woby'
+//@ts-ignore
+import { Observable, ObservableMaybe, type JSX } from 'woby'
 
 
 const btn = `

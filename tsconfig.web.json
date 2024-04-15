@@ -53,9 +53,7 @@
     },
     "exclude": [
         "node_modules",
-        "tailwind.*.*",
-        "vite.*.*ts",
-        "dist*",
-        "docs"
+        "vite.config.ts",
+        "dist*"
     ]
 }

@@ -1,4 +1,7 @@
-import { $, $$, useMemo, type JSX } from 'woby'
+import { $, $$, useMemo } from 'woby'
+//@ts-ignore
+import { Observable, ObservableMaybe, type JSX } from 'woby'
+
 
 export const Avatar = ({ className = 'w-10 h-10 bg-[rgb(189,189,189)]', src, alt, children, ...props }: JSX.HTMLAttributes<HTMLDivElement> & JSX.ImgHTMLAttributes<HTMLImageElement>): JSX.Child => {
     // const { className, ...p } = props

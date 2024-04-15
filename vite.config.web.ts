@@ -7,7 +7,7 @@ const config = defineConfig({
         lib: {
             entry: ["index.html"],
             name: "woby-wui",
-            formats: ['cjs', 'es', 'umd'],
+            formats: [/*'cjs', '*/'es'/*, 'umd'*/],
             fileName: (format: string, entryName: string) => `${entryName}.${format}.js`
         },
         outDir: './build',
