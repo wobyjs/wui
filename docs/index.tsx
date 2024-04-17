@@ -1,24 +1,25 @@
-import { TextField } from '../src/lib/TextField'
-import * as preset from '../src/lib/TextField.effect'
-import { IconButton } from '../src/lib/IconButton'
-import { Chip } from '../src/lib/Chip'
-import { Switch, useEnumSwitch } from '../src/lib/Switch'
-import { Avatar } from '../src/lib/Avatar'
-import { Badge } from '../src/lib/Badge'
-import { Appbar } from '../src/lib/Appbar'
-import { Toolbar } from '../src/lib/Toolbar'
-import { Button, variant } from '../src/lib/Button'
-import { Fab } from '../src/lib/Fab'
-import * as spreset from '../src/lib/Switch.effect'
+import { TextField } from '../src/TextField'
+import * as preset from '../src/TextField.effect'
+import { IconButton } from '../src/IconButton'
+import { Chip } from '../src/Chip'
+import { Switch, useEnumSwitch } from '../src/Switch'
+import { Avatar } from '../src/Avatar'
+import { Badge } from '../src/Badge'
+import { Appbar } from '../src/Appbar'
+import { Toolbar } from '../src/Toolbar'
+import { Button, variant } from '../src/Button'
+import { Fab } from '../src/Fab'
+import * as spreset from '../src/Switch.effect'
 
 import { render, $, $$, useEffect, type JSX } from 'woby'
-import '../dist/output.css'
-import { Collapse } from '../src/lib/Collapse'
-import { Checkbox } from '../src/lib/Checkbox'
-import { SideBar, MenuText, MenuItem } from '../src/lib/SideBar'
-import { NumberField } from '../src/lib/NumberField'
-import { ToggleButton } from '../src/lib/ToggleButton'
-
+import "../dist/output.css"
+import { Collapse } from '../src/Collapse'
+import { Checkbox } from '../src/Checkbox'
+import { SideBar, MenuText, MenuItem } from '../src/SideBar'
+import { NumberField } from '../src/NumberField'
+import { ToggleButton } from '../src/ToggleButton'
+import { Tabs, Tab } from "../src/Tabs"
+import { Wodal } from "woby-modal"
 const FaceIcon = <svg class="text-[rgb(97,97,97)] select-none w-[1em] h-[1em] inline-block fill-current shrink-0 transition-[fill] duration-200 ease-in-out delay-[0ms] text-2xl ml-[5px] -mr-1.5" focusable="false" aria-hidden="true" viewBox="0 0 24 24" data-testid="FaceIcon">
     <path d="M9 11.75c-.69 0-1.25.56-1.25 1.25s.56 1.25 1.25 1.25 1.25-.56 1.25-1.25-.56-1.25-1.25-1.25zm6 0c-.69 0-1.25.56-1.25 1.25s.56 1.25 1.25 1.25 1.25-.56 1.25-1.25-.56-1.25-1.25-1.25zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8 0-.29.02-.58.05-.86 2.36-1.05 4.23-2.98 5.21-5.37C11.07 8.33 14.05 10 17.42 10c.78 0 1.53-.09 2.25-.26.21.71.33 1.47.33 2.26 0 4.41-3.59 8-8 8z"></path>
 </svg>
@@ -84,6 +85,10 @@ const aa = $(A.a)
 useEffect(() => {
     console.log('useEnumSwitch', $$(aa), A[$$(aa)])
 })
+const previousTab = $([])
+const activeTab = $(["first tab", "second tab"])
+const activeTab2 = $([<div>next instance tab</div>, <div>next second tab</div>])
+
 const App = () => <>
 
     <SideBar class='' open={menu} width='10rem' disableBackground contentRef={main}>
@@ -161,6 +166,61 @@ const App = () => <>
             </Toolbar>
         </Appbar>
         <div class='pt-[60px]'>
+            <Wodal visible>
+                <Tabs activeTag={(name) =>
+                    <div
+                        className={() => `"bg-white text-black font-semibold list-none border-solid p-4`}>
+                        {name}
+                    </div>
+                }
+                    inactiveTag={(name) =>
+                        <div
+                            className={() => `"bg-white text-black list-none border-solid p-4`}>
+                            {name}
+                        </div>
+
+                    }>
+                    <Tab title={activeTab()[0]} >
+                        <table className={"table table-control"}>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <span>span child</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <input type={"color"} />
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </Tab>
+                    <Tab title={activeTab()[1]}>
+                        <div>second tab,1 child</div>
+                    </Tab>
+                </Tabs>
+            </Wodal>
+            <Tabs activeTag={(name) =>
+                <div
+                    className={() => `"bg-white text-red-500 font-semibold list-none border-solid p-4`}>
+                    {name}
+                </div>
+            }
+                inactiveTag={(name) =>
+                    <div
+                        className={() => `"bg-white text-red-500 list-none border-solid p-4`}>
+                        {name}
+                    </div>
+
+                }>
+                <Tab title={activeTab2()[0]} >
+                    <div>2nd instance of Tab</div>
+                </Tab>
+                <Tab title={activeTab2()[1]}>
+                    <div>second instance tab,1 child</div>
+                </Tab>
+            </Tabs>
             <div class='[@media(min-width:768px)]:w-[750px] mx-auto px-[15px]'>
 
                 <Fab class='w-9 h-8'>

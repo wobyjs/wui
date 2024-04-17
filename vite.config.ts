@@ -1,15 +1,12 @@
 import { defineConfig } from 'vite'
-import path from 'path'
-// import dts from 'vite-plugin-dts'
-import svgr from "vite-plugin-svgr"
 
 const config = defineConfig({
     build: {
         minify: false,
         lib: {
             entry: ["./src/index.tsx"],
-            name: "woby-list",
-            formats: [/*'cjs', '*/'es'/*, 'umd'*/],
+            name: "woby-wui",
+            formats: ['es'],
             fileName: (format: string, entryName: string) => `${entryName}.${format}.js`
         },
         sourcemap: true,
@@ -27,31 +24,7 @@ const config = defineConfig({
     esbuild: {
         jsx: 'automatic',
     },
-    plugins: [
-        // svgLoader({ defaultImport: 'component' }),
-        svgr({
-            // Set it to `true` to export React component as default.
-            // Notice that it will override the default behavior of Vite.
-            exportAsDefault: false,
-
-            // svgr options: https://react-svgr.com/docs/options/
-            svgrOptions: {
-                // ...
-            },
-
-            // esbuild options, to transform jsx to js
-            esbuildOptions: {
-                // ...
-            },
-
-            //  A minimatch pattern, or array of patterns, which specifies the files in the build the plugin should include. By default all svg files will be included.
-            include: "**/*.svg",
-
-            //  A minimatch pattern, or array of patterns, which specifies the files in the build the plugin should ignore. By default no files are ignored.
-            exclude: "",
-        }),
-        // dts({ entryRoot: './src/lib', outputDir: './dist/types' })
-    ],
+    plugins: [],
     resolve: {
         alias: {
             'woby/jsx-dev-runtime': 'woby',
