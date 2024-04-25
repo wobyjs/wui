@@ -65,7 +65,7 @@ const MessagesIcon = (props: JSX.SVGAttributes<SVGElement>) => <svg class="w-6 h
 
 const number = $(0)
 const text1 = $('abc')
-const text2 = $('abc')
+const text2 = $('change on enter')
 
 useEffect(() => { console.log($$(number)) })
 

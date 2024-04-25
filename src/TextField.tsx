@@ -6,6 +6,10 @@ import { ObservableMaybe, $$, $, type JSX, isObservable } from 'woby'
 //https://codepen.io/maheshambure21/pen/EozKKy
 
 /**
+ * @param reactive On = commit on enter, off(default) = commit on key up
+ * 
+ * 
+ * 
  * To change Line color, patch the following class into effect
  * 
  * top line: [&\~span]:before:bg-[#4caf50] 
