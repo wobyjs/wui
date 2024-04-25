@@ -28,13 +28,14 @@ import { ObservableMaybe, $$, $, type JSX, isObservable } from 'woby'
  * 
  * label text: [&\~label]:text-[red] [&:focus\~label]:text-[red] [&:not(:placeholder-shown)~label]:text-[red]
  */
-export const TextField = ({ className, class: cls, children, effect, reactive, type = 'text', placeholder = 'Placeholder Text', ...props }: JSX.InputHTMLAttributes<HTMLInputElement> & { children?: JSX.Child, effect?: JSX.Class, reactive?: ObservableMaybe<boolean> }): JSX.Element => {
+export const TextField = ({ className, class: cls, children, effect, reactive, type = 'text', placeholder = 'Placeholder Text', ...props }:
+    JSX.InputHTMLAttributes<HTMLInputElement> & { children?: JSX.Child, effect?: JSX.Class, reactive?: ObservableMaybe<boolean> }): JSX.Element => {
     const { onChange, onKeyUp, ...ps } = props
 
     return <div class={[(className ?? cls) ?? 'm-[20px]', 'relative']}>
         <input class={effect ?? effect19a}  {...{ ...ps, type, placeholder }}
             onChange={e => !$$(reactive) && isObservable(ps.value) ? (ps.value?.(e.target.value), onChange?.(e)) : undefined}
-            onKeyUp={e => !$$(reactive) && isObservable(ps.value) ? (ps.value?.(e.target.value), onKeyUp?.(e)) : undefined} />
+            onKeyUp={e => !$$(reactive) && isObservable(ps.value) ? (ps.value?.(e.target.value), onKeyUp?.(e)) : (e.key === 'Enter' && isObservable(ps.value) && ps.value(e.target.value), onKeyUp?.(e), onChange?.(e))} />
         {children}
         <span>
             <i></i>
