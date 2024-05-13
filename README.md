@@ -42,7 +42,6 @@ import { Fab } from '../src/lib/Fab'
 import * as spreset from '../src/lib/Switch.effect'
 
 import { render, $, $$, useEffect, type JSX } from 'woby'
-import '../dist/output.css'
 import { Collapse } from '../src/lib/Collapse'
 import { Checkbox } from '../src/lib/Checkbox'
 import { SideBar, MenuText, MenuItem } from '../src/lib/SideBar'
