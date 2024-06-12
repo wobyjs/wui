@@ -38,7 +38,7 @@ export const Tabs = (props: TabsProps) => {
 			>
 				<div
 					className={
-						"flex cursor-pointer p-8 rounded-tr-[100%] rounded-tl-[100%] border-solid border-2 border-black text-center text-[2rem]"
+						"flex justify-center cursor-pointer p-8 rounded-tr-[100%] rounded-tl-[100%] border-solid border-2 border-black text-center text-[2rem]"
 					}
 				>
 					{() =>
