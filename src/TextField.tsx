@@ -36,23 +36,10 @@ import { ObservableMaybe, $$, $, type JSX, isObservable } from "woby"
 type TextFieldProps = JSX.InputHTMLAttributes<HTMLInputElement> & {
 	children?: JSX.Child
 	effect?: JSX.Class
-	reactive?: ObservableMaybe<boolean>
+	assignOnEnter?: ObservableMaybe<boolean>
 }
 export const TextField = (props: TextFieldProps): JSX.Element => {
-	const {
-		className,
-		class: cls,
-		children,
-		effect,
-		reactive,
-		value,
-		type = "text",
-		placeholder = "Placeholder Text",
-		onChange,
-		onKeyUp,
-		size,
-		...otherProps
-	} = props
+	const { className, class: cls, children, effect, assignOnEnter, value, type = "text", placeholder = "Placeholder Text", onChange, onKeyUp, size, ...otherProps } = props
 
 	return (
 		<div class={[className ?? cls ?? "m-[20px]", "relative"]}>
@@ -61,12 +48,10 @@ export const TextField = (props: TextFieldProps): JSX.Element => {
 				value={value}
 				{...{ ...otherProps, type, placeholder }}
 				onChange={(e) => {
-					!$$(reactive) && isObservable(value) ? (value?.(e.target.value), onChange?.(e)) : undefined
+					!$$(assignOnEnter) && isObservable(value) ? (value?.(e.target.value), onChange?.(e)) : undefined
 				}}
 				onKeyUp={(e) => {
-					!$$(reactive) && isObservable(value)
-						? (value?.(e.target.value), onKeyUp?.(e))
-						: (e.key === "Enter" && isObservable(value) && value(e.target.value), onKeyUp?.(e))
+					!$$(assignOnEnter) && isObservable(value) ? (value?.(e.target.value), onKeyUp?.(e)) : (e.key === "Enter" && isObservable(value) && value(e.target.value), onKeyUp?.(e))
 				}}
 				size={size ?? "40"}
 			/>
@@ -75,9 +60,5 @@ export const TextField = (props: TextFieldProps): JSX.Element => {
 	)
 }
 
-export const StartAdornment = tw(
-	"div"
-)`flex h-[0.01em] max-h-[2em] items-center whitespace-nowrap text-[rgba(0,0,0,0.54)] mr-2`
-export const EndAdornment = tw(
-	"div"
-)`flex h-[0.01em] max-h-[2em] items-center whitespace-nowrap text-[rgba(0,0,0,0.54)] ml-2`
+export const StartAdornment = tw("div")`flex h-[0.01em] max-h-[2em] items-center whitespace-nowrap text-[rgba(0,0,0,0.54)] mr-2`
+export const EndAdornment = tw("div")`flex h-[0.01em] max-h-[2em] items-center whitespace-nowrap text-[rgba(0,0,0,0.54)] ml-2`

@@ -13,7 +13,7 @@ export const Checkbox = (props: CheckboxProps): JSX.Child => {
 	const before = useMemo(() =>
 		$$(labelPosition) === "left" || $$(labelPosition) === "top" ? (
 			<label
-				class="select-none"
+				className="pr-1.5 select-none "
 				for={id}
 			>
 				{children}
@@ -23,16 +23,14 @@ export const Checkbox = (props: CheckboxProps): JSX.Child => {
 	const after = useMemo(() =>
 		$$(labelPosition) === "right" || $$(labelPosition) === "bottom" ? (
 			<label
-				class="select-none"
+				className="select-none"
 				for={id}
 			>
 				{children}
 			</label>
 		) : null
 	)
-	const line = useMemo(() =>
-		$$(labelPosition) === "top" || $$(labelPosition) === "bottom" ? <br /> : null
-	)
+	const line = useMemo(() => ($$(labelPosition) === "top" || $$(labelPosition) === "bottom" ? <br /> : null))
 
 	return (
 		<>
