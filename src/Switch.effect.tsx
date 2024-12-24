@@ -5,7 +5,16 @@ const noKnot = `[&>div]:after:w-[2rem] [&>div]:after:h-[2rem] [&>div]:after:flex
 const divSpanDim = `[&>div>span]:w-[2rem] [&>div>span]:h-[2rem]`
 const layer = `[&>span]:w-full [&>span]:bg-[#ebf7fc] [&>span]:[transition:0.3s_ease_all] [&>span]:z-[1]`
 
+const button_ = `relative w-[74px] h-9 overflow-hidden -mt-5 mb-0 mx-auto top-2/4
+[&>span]:absolute [&>span]:inset-0
+[&>div]:absolute [&>div]:inset-0 [&>div]:z-[2]
+[&>input]:relative [&>input]:w-full [&>input]:h-full [&>input]:opacity-0 [&>input]:cursor-pointer [&>input]:z-[3] [&>input]:m-0 [&>input]:p-0
+
+`
+const buttonr = button_ + " rounded-[100px] [&>span]:rounded-[100px]"
+
 export const effect1 = `
+${buttonr}
 ${layer}
 [&>div]:before:content-[attr(data-tg-off)] [&>div]:before:absolute [&>div]:before:text-white [&>div]:before:text-[10px] [&>div]:before:font-bold [&>div]:before:text-center
 [&>div]:before:leading-none [&>div]:before:bg-[#f44336] [&>div]:before:[transition:0.3s_cubic-bezier(0.18,0.89,0.35,1.15)_all] [&>div]:before:px-1 

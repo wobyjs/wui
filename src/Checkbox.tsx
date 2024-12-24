@@ -1,5 +1,5 @@
 import { nanoid } from 'nanoid'
-import { ObservableMaybe, $$, useMemo, type JSX } from 'woby'
+import React, { ObservableMaybe, $$, useMemo, type JSX } from 'woby'
 
 type LabelPosition = 'left' | 'right' | 'bottom' | 'top'
 

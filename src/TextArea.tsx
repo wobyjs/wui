@@ -2,7 +2,6 @@
 import { effect19a } from './TextField.effect'
 import { tw } from 'woby-styled'
 import { ObservableMaybe, $$, $, type JSX, isObservable } from 'woby'
-import { EventHandler, TargetedEvent, TargetedInputEvent } from 'woby/dist/types/types'
 
 //https://codepen.io/maheshambure21/pen/EozKKy
 
@@ -33,12 +32,12 @@ import { EventHandler, TargetedEvent, TargetedInputEvent } from 'woby/dist/types
  * 
  * label text: [&\~label]:text-[red] [&:focus\~label]:text-[red] [&:not(:placeholder-shown)~label]:text-[red]
  */
-export const TextField = ({ className, class: cls, children, effect, reactive, type = 'text', placeholder = 'Placeholder Text', ...props }:
-    JSX.InputHTMLAttributes<HTMLInputElement> & { children?: JSX.Child, effect?: JSX.Class, reactive?: ObservableMaybe<boolean> }): JSX.Element => {
+export const TextArea = ({ className, class: cls, children, effect, reactive, type = 'text', placeholder = 'Placeholder Text', ...props }:
+    JSX.TextareaHTMLAttributes<HTMLTextAreaElement> & { children?: JSX.Child, effect?: JSX.Class, reactive?: ObservableMaybe<boolean> }): JSX.Element => {
     const { onChange, onKeyUp, ...ps } = props
 
     return <div class={[(className ?? cls) ?? 'm-[20px]', 'relative']}>
-        <input class={effect ?? effect19a}  {...{ ...ps, type, placeholder }}
+        <textarea class={effect ?? effect19a}  {...{ ...ps, type, placeholder }}
             onChange={e => !$$(reactive) && isObservable(ps.value) ? (ps.value?.(e.target.value), onChange?.(e)) : undefined}
             onKeyUp={e => !$$(reactive) && isObservable(ps.value) ? (ps.value?.(e.target.value), onKeyUp?.(e)) : (e.key === 'Enter' && isObservable(ps.value) && ps.value(e.target.value), onKeyUp?.(e), onChange?.(e))} />
         {children}
@@ -48,14 +47,3 @@ export const TextField = ({ className, class: cls, children, effect, reactive, t
     </div>
 }
 
-// const a: (ee: JSX.KeyboardEventHandler<HTMLInputElement>)=>void
-// const b: TargetedEvent<HTMLInputElement, FocusEvent> //TargetedInputEvent<HTMLInputElement>
-// const i: HTMLInputElement
-// const t: Omit<FocusEvent, 'currentTarget'> & { readonly currentTarget: HTMLInputElement; readonly target: HTMLInputElement; };
-
-// a(ee=>ee.target.value)
-// b.target
-// t.target.value
-
-export const StartAdornment = tw('div')`flex h-[0.01em] max-h-[2em] items-center whitespace-nowrap text-[rgba(0,0,0,0.54)] mr-2`
-export const EndAdornment = tw('div')`flex h-[0.01em] max-h-[2em] items-center whitespace-nowrap text-[rgba(0,0,0,0.54)] ml-2`

@@ -11,7 +11,8 @@ const config = defineConfig({
         },
         sourcemap: true,
         rollupOptions: {
-            external: ['woby', 'woby/jsx-runtime', 'oby', 'woby/jsx-runtime', 'nanoid',],
+            external: ['woby', 'woby/jsx-runtime', 'oby', 'woby/jsx-runtime', 'nanoid',
+                'woby-modal', 'use-woby', 'woby-styled',],
             output: {
                 globals: {
                     'nanoid': 'nanoid',

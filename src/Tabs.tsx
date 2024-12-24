@@ -1,7 +1,7 @@
-import { $, $$, ObservableMaybe, createContext, useContext, useEffect, type JSX } from "woby"
+import React, { $, $$, ObservableMaybe, createContext, useContext, useEffect, type JSX } from "woby"
 
 type TabsProps = {
-	children: JSX.Child[] | { key: string; label: JSX.Element; children: JSX.Element }
+	children: JSX.Child[] //| { key: string; label: JSX.Element; children: JSX.Element }
 	tabChanged?: (name: ObservableMaybe<JSX.Element>) => void
 	activeTag?: (name: ObservableMaybe<JSX.Element>) => JSX.Element
 	inactiveTag?: (name: ObservableMaybe<JSX.Element>) => JSX.Element
@@ -34,10 +34,10 @@ export const Tabs = (props: TabsProps) => {
 		<>
 			<TabContext.Provider
 				value={{ activeTab, tabTitles }}
-				children={undefined}
+			// children={undefined}
 			>
 				<div
-					className={
+					class={
 						"flex cursor-pointer p-8 rounded-tr-[100%] rounded-tl-[100%] border-solid border-2 border-black text-center text-[2rem]"
 					}
 				>
@@ -45,7 +45,7 @@ export const Tabs = (props: TabsProps) => {
 						tabTitles().map((item) => {
 							return (
 								<div
-									className={"border-solid border-black border-2 m-2"}
+									class={"border-solid border-black border-2 m-2"}
 									onClick={(e) => {
 										e.stopImmediatePropagation()
 										activeTab([item])
@@ -75,12 +75,12 @@ export const Tab = (props: TabProps) => {
 
 	return (
 		<div
-			className={[
+			class={[
 				() => (activeTab()[0] === title ? "flex" : "hidden"),
 				"flex-col text-[2rem] rounded-[2rem] p-4 shadow-inner gap-8",
 			]}
 		>
-			<div className="border-2 border-var(--text-color) flex justify-between flex-col items-center gap-16 bg-white rounded-2rem">
+			<div class="border-2 border-var(--text-color) flex justify-between flex-col items-center gap-16 bg-white rounded-2rem">
 				{children}
 			</div>
 		</div>
