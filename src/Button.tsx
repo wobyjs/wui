@@ -34,8 +34,11 @@ export const Button = (props: ButtonProps): JSX.Element => {
 
 	return (
 		<button
-			onClick={() => {
-				return isObservable(checked) && checked((c) => !c)
+			onClick={(e) => {
+				e.stopImmediatePropagation()
+				if (isObservable(checked)) {
+					checked(!$$(checked))
+				}
 			}}
 			disabled={disabled}
 			class={className}

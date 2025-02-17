@@ -31,13 +31,7 @@ export const NumberField = (props: NumberFieldProps): JSX.Element => {
 	})
 
 	return (
-		<div
-			class={[
-				"number-input inline-flex border-2 border-solid border-[#ddd] box-border [&_*]:box-border",
-				className,
-				cls,
-			]}
-		>
+		<div class={["number-input inline-flex border-2 border-solid border-[#ddd] box-border [&_*]:box-border", className, cls]}>
 			<button
 				class={btn}
 				onClick={(e) => {
@@ -64,20 +58,14 @@ export const NumberField = (props: NumberFieldProps): JSX.Element => {
 				value={value}
 				{...otherProps}
 				onChange={(e) => {
-					!$$(reactive) && isObservable(value)
-						? (value?.(e.target.valueAsNumber), onChange?.(e))
-						: onChange?.(e)
+					!$$(reactive) && isObservable(value) ? (value?.(e.target.valueAsNumber), onChange?.(e)) : onChange?.(e)
 				}}
 				onKeyUp={(e) => {
-					!$$(reactive) && isObservable(value)
-						? (value?.(e.target.valueAsNumber), onKeyUp?.(e))
-						: onKeyUp?.(e)
+					!$$(reactive) && isObservable(value) ? (value?.(e.target.valueAsNumber), onKeyUp?.(e)) : onKeyUp?.(e)
 				}}
 				onWheel={(e) => {
 					e.preventDefault()
-					!$$(reactive) && isObservable(value)
-						? value?.(Math.sign(e.deltaY) > 0 ? ++e.target.value : --e.target.value)
-						: undefined
+					!$$(reactive) && isObservable(value) ? value?.(Math.sign(e.deltaY) > 0 ? ++e.target.value : --e.target.value) : undefined
 				}}
 				disabled={disabled}
 			/>

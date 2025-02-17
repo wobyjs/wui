@@ -35,15 +35,16 @@
     "license": "MIT",
     "peerDependencies": {
         "nanoid": "^3.3.7",
-        "woby": "^0.58.0",
-        "woby-styled": "^1.0.8"
+        "woby": "workspace:../woby",
+        "woby-styled": "^1.0.8",
+        "woby-wheeler": "workspace:..\\woby-wheeler"
     },
     "devDependencies": {
         "tailwindcss": "^3.4.3",
         "tailwindcss-elevation": "^2.0.0",
         "vite": "5.2.10",
-        "woby": "^0.58.0",
-        "woby-styled": "^1.0.8"
+        "woby": "workspace:../woby",
+        "woby-styled": "^1.0.10"
     },
     "author": "Chi Chong <wongchichong@gmail.com>",
     "homepage": "https://github.com/wongchichong/woby-power-tooltip",
