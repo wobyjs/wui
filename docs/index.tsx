@@ -1,4 +1,5 @@
 import { TextField } from "../src/TextField"
+import { TextArea } from "../src/TextArea"
 import * as preset from "../src/TextField.effect"
 import { IconButton } from "../src/IconButton"
 import { Chip } from "../src/Chip"
@@ -11,13 +12,18 @@ import { Button, variant } from "../src/Button"
 import { Fab } from "../src/Fab"
 import * as spreset from "../src/Switch.effect"
 
+import * as React from 'woby'
 import { render, $, $$, useEffect, type JSX } from "woby"
 import "../dist/output.css"
 import { Collapse } from "../src/Collapse"
 import { Checkbox } from "../src/Checkbox"
 import { SideBar, MenuText, MenuItem } from "../src/SideBar"
 import { NumberField } from "../src/NumberField"
+import { Zoomable, Img } from "../src/Zoomable"
 import { ToggleButton } from "../src/ToggleButton"
+import { Tab, Tabs } from "../src/Tabs"
+import { Wodal } from 'woby-modal'
+import { useViewportSize } from 'use-woby'
 
 const FaceIcon = (
 	<svg
@@ -204,6 +210,8 @@ const previousTab = $([])
 const activeTab = $(["first tab", "second tab"])
 const activeTab2 = $([<div>next instance tab</div>, <div>next second tab</div>])
 
+const { height: vh, width: vw, offsetLeft: ol, offsetTop: ot, pageTop: pt, pageLeft: pl } = useViewportSize()
+
 const App = () => (
 	<>
 		<SideBar
@@ -314,11 +322,11 @@ const App = () => (
 				</Toolbar>
 			</Appbar>
 			<div class="pt-[60px]">
-				<Wodal visible>
+				{/* <Wodal visible>
 					<Tabs
 						activeTag={(name) => (
 							<div
-								className={() =>
+								class={() =>
 									`"bg-white text-black font-semibold list-none border-solid p-4`
 								}
 							>
@@ -327,14 +335,14 @@ const App = () => (
 						)}
 						inactiveTag={(name) => (
 							<div
-								className={() => `"bg-white text-black list-none border-solid p-4`}
+								class={() => `"bg-white text-black list-none border-solid p-4`}
 							>
 								{name}
 							</div>
 						)}
 					>
 						<Tab title={activeTab()[0]}>
-							<table className={"table table-control"}>
+							<table class={"table table-control"}>
 								<tbody>
 									<tr>
 										<td>
@@ -357,7 +365,7 @@ const App = () => (
 				<Tabs
 					activeTag={(name) => (
 						<div
-							className={() =>
+							class={() =>
 								`"bg-white text-red-500 font-semibold list-none border-solid p-4`
 							}
 						>
@@ -365,7 +373,7 @@ const App = () => (
 						</div>
 					)}
 					inactiveTag={(name) => (
-						<div className={() => `"bg-white text-red-500 list-none border-solid p-4`}>
+						<div class={() => `"bg-white text-red-500 list-none border-solid p-4`}>
 							{name}
 						</div>
 					)}
@@ -376,9 +384,9 @@ const App = () => (
 					<Tab title={activeTab2()[1]}>
 						<div>second instance tab,1 child</div>
 					</Tab>
-				</Tabs>
+				</Tabs> */}
 				<div class="[@media(min-width:768px)]:w-[750px] mx-auto px-[15px]">
-					<Fab class="w-9 h-8">
+					<Fab class="w-18 h-18" style={{ top: () => $$(pt) + $$(vh) - (80), left: () => $$(pl) }}>
 						<svg
 							class="select-none w-[1em] h-[1em] inline-block fill-[black] shrink-0 text-2xl [transition:fill_200ms_cubic-bezier(0.4,0,0.2,1)0ms]"
 							focusable="false"
@@ -389,8 +397,9 @@ const App = () => (
 							<path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path>
 						</svg>
 					</Fab>
-					<Fab class="w-12 h-12">
-						<svg
+					<Fab class="w-18 h-18" style={{ top: () => $$(pt) + (80), right: pl }}>
+						☰
+						{/* <svg
 							class="select-none w-[1em] h-[1em] inline-block fill-[black] shrink-0 text-2xl [transition:fill_200ms_cubic-bezier(0.4,0,0.2,1)0ms]"
 							focusable="false"
 							aria-hidden="true"
@@ -398,7 +407,7 @@ const App = () => (
 							data-testid="AddIcon"
 						>
 							<path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path>
-						</svg>
+						</svg> */}
 					</Fab>
 
 					<Badge>
@@ -527,8 +536,8 @@ const App = () => (
 
 					<br />
 					<NumberField
-						min={5}
-						max={10}
+						min={1}
+						max={9}
 						value={number}
 						class="[&_input]:w-[5rem] [&_button]:w-[2rem] [&_button]:text-[130%] [&_button]:leading-[0] [&_button]:font-bold h-[2rem]"
 					/>
@@ -556,14 +565,16 @@ const App = () => (
 
 					<br />
 
+
 					<button
-						class="p-2 elevation-3"
+						class="p-2 elevation-3 hover:bg-[gray] z-[10]"
 						onClick={() => {
-							open(!open())
+							open(!$$(open))
 						}}
 					>
 						Toggle Expand/Collapse
 					</button>
+					<div onClick={e => console.log('aaaa')}>aaaaa</div>
 					<Collapse open={open}>
 						<ul>
 							<li>Item</li>
@@ -771,6 +782,201 @@ const App = () => (
 						</TextField>
 					</div>
 
+					<br />
+					<br />
+					<br />
+					<h1>TextArea</h1>
+					<div class={row}>
+						<h2>
+							<i>Border effects</i>
+						</h2>
+						<TextArea
+							class="inline-block w-[27.33%] mt-[20px] mr-3"
+							effect={[preset.effect1, "w-full"]}
+							placeholder={"effect1"}
+							value={text1}
+						/>
+						<TextArea
+							class="inline-block w-[27.33%] mt-[20px] mr-3"
+							effect={[preset.effect2, "w-full"]}
+							placeholder={"effect2"}
+							value={text2}
+							reactive
+						/>
+						<TextArea
+							class="inline-block w-[27.33%] mt-[20px] mr-3"
+							effect={[preset.effect3, "w-full"]}
+							placeholder={"effect3"}
+						/>
+						<TextArea
+							class="inline-block w-[27.33%] mt-[20px] mr-3"
+							effect={[preset.effect4, "w-full"]}
+							placeholder={"effect4"}
+						/>
+						<TextArea
+							class="inline-block w-[27.33%] mt-[20px] mr-3"
+							effect={[preset.effect5, "w-full"]}
+							placeholder={"effect5"}
+						/>
+						<TextArea
+							class="inline-block w-[27.33%] mt-[20px] mr-3"
+							effect={[preset.effect6, "w-full"]}
+							placeholder={"effect6"}
+						/>
+						<TextArea
+							class="inline-block w-[27.33%] mt-[20px] mr-3"
+							effect={[preset.effect7, "w-full "]}
+							placeholder={"effect7"}
+						/>
+						<TextArea
+							class="inline-block w-[27.33%] mt-[20px] mr-3"
+							effect={[preset.effect8, "w-full"]}
+							placeholder={"effect8"}
+						/>
+						<TextArea
+							class="inline-block w-[27.33%] mt-[20px] mr-3"
+							effect={[preset.effect9, "w-full"]}
+							placeholder={"effect9"}
+						/>
+					</div>
+					<div class={row}>
+						<h2>
+							<i>Background Effects</i>
+						</h2>
+						<TextArea
+							class="inline-block w-[27.33%] mt-[20px] mr-3"
+							effect={[
+								preset.effect10,
+								"w-full",
+								"[&~span]:opacity-[unset] [&:focus~span]:bg-[#000] [&~span]:bg-[#e7a8a8]",
+							]}
+							placeholder={"effect10"}
+						/>
+						<TextArea
+							class="inline-block w-[27.33%] mt-[20px] mr-3"
+							effect={[preset.effect11, "w-full", "border-[#F00]"]}
+							placeholder={"effect11"}
+						/>
+						<TextArea
+							class="inline-block w-[27.33%] mt-[20px] mr-3"
+							effect={[preset.effect12, "w-full"]}
+							placeholder={"effect12"}
+						/>
+						<TextArea
+							class="inline-block w-[27.33%] mt-[20px] mr-3"
+							effect={[preset.effect13, "w-full"]}
+							placeholder={"effect13"}
+						/>
+						<TextArea
+							class="inline-block w-[27.33%] mt-[20px] mr-3"
+							effect={[preset.effect14, "w-full"]}
+							placeholder={"effect14"}
+						/>
+						<TextArea
+							class="inline-block w-[27.33%] mt-[20px] mr-3"
+							effect={[preset.effect15, "w-full"]}
+							placeholder={"effect15"}
+						/>
+					</div>
+					<div class={row}>
+						<h2>
+							<i>Input with Label Effects</i>
+						</h2>
+						<TextArea
+							class="inline-block w-[27.33%] mt-[20px] mr-3"
+							effect={[
+								preset.effect16,
+								"w-full",
+								"[&~label]:text-[red] [&:focus~label]:text-[red] [&:not(:placeholder-shown)~label]:text-[red]",
+							]}
+							placeholder={""}
+						>
+							<label>effect16</label>
+						</TextArea>
+						<TextArea
+							class="inline-block w-[27.33%] mt-[20px] mr-3"
+							effect={[preset.effect17, "w-full"]}
+							placeholder={""}
+						>
+							<label>effect17</label>
+						</TextArea>
+						<TextArea
+							class="inline-block w-[27.33%] mt-[20px] mr-3"
+							effect={[preset.effect18, "w-full"]}
+							placeholder={""}
+						>
+							<label>effect18</label>
+						</TextArea>
+						<TextArea
+							class="inline-block w-[27.33%] mt-[20px] mr-3"
+							effect={[preset.effect19, "w-full"]}
+							placeholder={""}
+						>
+							<label>effect19</label>
+						</TextArea>
+						<TextArea
+							class="inline-block w-[27.33%] mt-[20px] mr-3"
+							effect={[
+								preset.effect20,
+								"w-full",
+								"[&~span]:before:bg-[red] [&~span]:after:bg-[red] [&~span_i]:before:bg-[red] [&~span_i]:after:bg-[red]",
+							]}
+							placeholder={""}
+						>
+							<label>effect20</label>
+						</TextArea>
+						<TextArea
+							class="inline-block w-[27.33%] mt-[20px] mr-3"
+							effect={[preset.effect21, "w-full"]}
+							placeholder={""}
+						>
+							<label>effect21</label>
+						</TextArea>
+						<TextArea
+							class="inline-block w-[27.33%] mt-[20px] mr-3"
+							effect={[preset.effect22, "w-full"]}
+							placeholder={""}
+						>
+							<label>effect22</label>
+						</TextArea>
+						<TextArea
+							class="inline-block w-[27.33%] mt-[20px] mr-3"
+							effect={[preset.effect23, "w-full"]}
+							placeholder={""}
+						>
+							<label>effect23</label>
+						</TextArea>
+						<TextArea
+							class="inline-block w-[27.33%] mt-[20px] mr-3"
+							effect={[preset.effect24, "w-full"]}
+							placeholder={""}
+						>
+							<label>effect24</label>
+						</TextArea>
+
+						<TextArea
+							class="inline-block w-[27.33%] mt-[20px] mr-3"
+							effect={[preset.effect19a, "w-full"]}
+							placeholder={""}
+						>
+							<label>effect19a</label>
+						</TextArea>
+						<TextArea
+							class="inline-block w-[27.33%] mt-[20px] mr-3"
+							effect={[preset.effect20a, "w-full"]}
+							placeholder={""}
+						>
+							<label>effect20a</label>
+						</TextArea>
+						<TextArea
+							class="inline-block w-[27.33%] mt-[20px] mr-3"
+							effect={[preset.effect21a, "w-full"]}
+							placeholder={""}
+						>
+							<label>effect21a</label>
+						</TextArea>
+					</div>
+
 					<h1>Paper</h1>
 					<div>
 						<div class="inline-block w-[27.33%] mt-[30px] mr-3 elevation-1">
@@ -903,10 +1109,8 @@ const App = () => (
 
 						<div class="table-row">
 							<div class="table-cell relative w-[200px] h-[50px] box-border">
-								<Switch
-									class={[
-										buttonr,
-										spreset.effect1,
+								<Switch title='effect1'
+									class={[buttonr, spreset.effect1,
 										`
                  [&>div]:before:content-['OK']
 [&>div]:after:bg-[#82ec90]
@@ -919,13 +1123,13 @@ const App = () => (
 								/>
 							</div>
 							<div class="table-cell relative w-[200px] h-[50px] box-border">
-								<Switch
+								<Switch title='effect2'
 									class={[buttonr, spreset.effect2]}
 									checked={$(false)}
 								/>
 							</div>
 							<div class="table-cell relative w-[200px] h-[50px] box-border">
-								<Switch
+								<Switch title='effect3'
 									class={[buttonr, spreset.effect3]}
 									checked={$(false)}
 								/>
@@ -1106,6 +1310,9 @@ const App = () => (
 						/>
 					</div>
 				</div>
+				<Zoomable class='relative  border border-black w-[90%] h-[500px] overflow-hidden touch-none mx-auto'>
+					<Img src="https://picsum.photos/2560/1440?random" />
+				</Zoomable>
 			</div>
 		</div>
 	</>

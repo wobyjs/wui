@@ -1,4 +1,5 @@
-import { $, $$, useEffect, isObservable, ObservableMaybe, type JSX } from "woby"
+import { $, $$, useEffect, isObservable, useTimeout, useInterval, Observable, ObservableMaybe, type JSX } from 'woby'
+
 
 const btn = `
 bg-transparent items-center justify-center cursor-pointer relative m-0 border-[none] [outline:none] [-webkit-appearance:none]
@@ -22,33 +23,44 @@ export const NumberField = (props: NumberFieldProps): JSX.Element => {
 	const checkMinValue = () => $$(value) <= $$(min)
 	const checkMaxValue = () => $$(value) >= $$(max)
 
-	useEffect(() => {
-		if ($$(noMinMax)) return
+    let pvalue: number
+    const updated = () => {
+        if (pvalue === +$$(value)) return
+        if ($$(noFix) && $$(noRotate)) return
 
-		if ($$(value) < $$(min)) isObservable(value) && value($$(min))
+        if (+$$(value) < +$$(min))
+            isObservable(value) && value($$(noRotate) ? +$$(min) : +$$(max))
 
-		if ($$(value) > $$(max)) isObservable(value) && value($$(max))
-	})
+        if (+$$(value) > +$$(max))
+            isObservable(value) && value($$(noRotate) ? +$$(max) : +$$(min))
 
-	return (
-		<div class={["number-input inline-flex border-2 border-solid border-[#ddd] box-border [&_*]:box-border", className, cls]}>
-			<button
-				class={btn}
-				onClick={(e) => {
-					e.stopImmediatePropagation()
-					$$(inputRef).stepDown()
-					isObservable(value) && value?.($$(inputRef).valueAsNumber)
-					//@ts-ignore TODO
-					// onChange?.($$(inputRef))
-				}}
-				disabled={() => checkMinValue() || disabled}
-			>
-				-
-			</button>
-			<input
-				ref={inputRef}
-				class={[
-					`quantity  [-webkit-appearance:textfield] [-moz-appearance:textfield] [appearance:textfield]
+        pvalue = +$$(value)
+    }
+
+    useEffect(updated)
+
+    const dec = () => { !$$(reactive) && isObservable(value) ? value?.((+$$(inputRef).value as any) - +$$(step)) : undefined; updated() }
+    const inc = () => { !$$(reactive) && isObservable(value) ? value?.((+$$(inputRef).value as any) + +$$(step)) : undefined; updated() }
+
+    let interval: ReturnType<typeof useInterval>
+    let timeout: ReturnType<typeof useTimeout>
+
+    function startContinuousUpdate(isIncrement: boolean) {
+        // Update immediately on press
+        isIncrement ? inc() : dec()
+
+        // Start interval to continue updating while pressed
+        timeout = useTimeout(() => interval = useInterval(() => isIncrement ? inc() : dec(), 100), 200)
+    }
+
+    function stopUpdate() {
+        timeout?.()
+        interval?.()
+    }
+
+    return <div class={["number-input inline-flex border-2 border-solid border-[#ddd] box-border [&_*]:box-border", className, cls]}>
+        <button class={btn} onPointerDown={() => startContinuousUpdate(false)} onPointerUp={stopUpdate} onPointerLeave={stopUpdate} disabled={cantMin}>-</button>
+        <input ref={inputRef} class={[`quantity  [-webkit-appearance:textfield] [-moz-appearance:textfield] [appearance:textfield]
         [&::-webkit-inner-spin-button]:[-webkit-appearance:none] [&::-webkit-outer-spin-button]:[-webkit-appearance:none]
         text-center p-2 border-solid border-[0_2px]
         `,
