@@ -1,4 +1,5 @@
 import { defineConfig } from 'vite'
+import tailwindcss from '@tailwindcss/vite'
 import path from "path"
 
 const config = defineConfig({
@@ -17,6 +18,7 @@ const config = defineConfig({
         jsx: 'automatic',
     },
     plugins: [
+        tailwindcss(),
     ],
     resolve: {
         alias: {

@@ -12,11 +12,11 @@
         "npmjs": "pnpm publish",
         "release": "run-s -c git bump npmjs",
         "css:watch": "tailwindcss -i ./src/input.css -o ./dist/output.css --watch",
-        "css": "tailwindcss -i ./src/input.css -o ./dist/output.css",
+        "css11": "tailwindcss -i ./src/input.css -o ./dist/output.css",
         "declaration": "tsc --build --force --declaration --emitDeclarationOnly --declarationMap  --verbose",
         "declaration:watch": "tsc --build --force --declaration --emitDeclarationOnly --declarationMap  --verbose --watch",
         "watch": "run-p build:watch css:watch",
-        "build": "run-s css build:vite css declaration",
+        "build": "run-s build:vite declaration",
         "build:web": "vite build --config=vite.config.web.mts --force --mode production",
         "web": "vite preview --config=vite.config.web.mts --host",
         "dev:only": "vite --config=vite.config.web.mts --force --mode dev --host",
@@ -41,9 +41,10 @@
         "woby-styled": "workspace:../woby-styled"
     },
     "devDependencies": {
-        "tailwindcss": "^3.4.17",
+        "tailwindcss": "^4.0.15",
+        "@tailwindcss/vite": "^4.0.6",
         "tailwindcss-elevation": "^2.0.0",
-        "vite": "6.0.5"
+        "vite": "6.1.0"
     },
     "author": "Chi Chong <wongchichong@gmail.com>",
     "homepage": "https://github.com/wongchichong/woby-power-tooltip",
@@ -52,6 +53,6 @@
         "url": "git@github.com:wongchichong/woby-power-tooltip.git"
     },
     "dependencies": {
-        "typescript": "5.7.2"
+        "typescript": "5.7.3"
     }
 }

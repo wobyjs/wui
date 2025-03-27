@@ -1,4 +1,5 @@
 import { defineConfig } from 'vite'
+import tailwindcss from '@tailwindcss/vite'
 
 const config = defineConfig({
     build: {
@@ -25,7 +26,9 @@ const config = defineConfig({
     esbuild: {
         jsx: 'automatic',
     },
-    plugins: [],
+    plugins: [
+        tailwindcss(),
+    ],
     resolve: {
         alias: {
             'woby/jsx-dev-runtime': 'woby',
