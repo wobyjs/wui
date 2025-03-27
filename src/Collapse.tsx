@@ -1,16 +1,33 @@
-import { $, $$, ObservableMaybe, isObservable, useEffect, useMemo, type JSX } from 'woby'
+import { $, $$, ObservableMaybe, isObservable, useEffect, useMemo, type JSX } from "woby"
 
-export const Collapse = ({ className, children, open/* : op */, ...props }: JSX.VoidHTMLAttributes<HTMLDivElement> & { children?: JSX.Child, open?: ObservableMaybe<boolean> }): JSX.Element => {
-    const { class: cls, ...ps } = props
-    // const open = isObservable(op) ? op : $(op)
-    const ref = $<HTMLDivElement>()
+type CollapseProps = JSX.VoidHTMLAttributes<HTMLDivElement> & {
+	children?: JSX.Child
+	open?: ObservableMaybe<boolean>
+	background?: boolean
+}
+export const Collapse = (props: CollapseProps): JSX.Element => {
+	const { className, background = true, children, open: op, class: cls } = props
+	const open = isObservable(op) ? op : $(op)
+	const ref = $<HTMLDivElement>()
 
-    // const c = useMemo(() => ({ height: $$(open) ? $$(ref)?.clientHeight : 0 }))
+	const opened = useMemo(() => ($$(open) ? { height: "fit-content" } : { height: 0 }))
 
-    // useEffect(() => console.log('Collapse', $$(open), $$(ref)?.clientHeight, $$(c)))
-    return <div class={['bg-[#ccc] overflow-hidden ', cls ?? className, () => $$(open) ? '[transition:height_200ms_ease,visibility_0ms]' : 'hidden [transition:height_200ms_ease,visibility_0ms_200ms]']} /* style={c} */ {...props} >
-        <div class={'h-fit'} ref={ref}>
-            {children}
-        </div>
-    </div>
+	return (
+		<div
+			class={[
+				"overflow-hidden [transition:height_200ms]",
+				() => (background ? "bg-[#ccc]" : ""),
+				cls ?? className,
+			]}
+			style={opened}
+			{...props}
+		>
+			<div
+				class={"h-fit"}
+				ref={ref}
+			>
+				{children}
+			</div>
+		</div>
+	)
 }
