@@ -256,7 +256,7 @@ export const Wheel = ({ options, itemHeight: ih, visibleItemCount: vic, value: i
 
     useEffect(() => {
         document.addEventListener('pointermove', handleMove as any)
-        document.addEventListener('pointerup', e => { console.log('document touchend'); handleEnd(e) })
+        document.addEventListener('pointerup', e => handleEnd)
 
         return () => {
             document.removeEventListener('pointermove', handleMove as any)
@@ -283,11 +283,6 @@ export const Wheel = ({ options, itemHeight: ih, visibleItemCount: vic, value: i
 
     // <<< Snap to initial index *after* list is populated and layout is set >>>
     snapToIndex($$(selectedIndex), true)
-
-    useEffect(() => {
-        console.log('selected index:', $$(selectedIndex))
-
-    })
 
     const oriIndex = $(-1)
 

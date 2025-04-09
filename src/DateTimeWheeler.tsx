@@ -76,13 +76,6 @@ export const DateTimeWheeler = ({
         }
     })
 
-    useEffect(() => console.log('selectedYear', $$(selectedYear)))
-    useEffect(() => console.log('selectedMonth', $$(selectedMonth)))
-    useEffect(() => console.log('selectedDay', $$(selectedDay)))
-    useEffect(() => console.log('selectedHour', $$(selectedHour)))
-    useEffect(() => console.log('selectedMinute', $$(selectedMinute)))
-    useEffect(() => console.log('selectedSecond', $$(selectedSecond)))
-
     // --- Effect to Sync Internal State Changes -> Update MAIN controlledValue & Clamp Day ---
     useEffect(() => {
         const year = $$(selectedYear)
@@ -95,7 +88,6 @@ export const DateTimeWheeler = ({
         // Guard: Don't run if essential parts aren't set
         if (year === undefined || month === undefined || day === undefined || hour === undefined || minute === undefined || second === undefined) return
 
-        console.log('month changed.')
         // --- >>> DAY CLAMPING LOGIC <<< ---
         const daysInCurrentMonth = getDaysInMonth(year, month)
         if (day > daysInCurrentMonth) {
