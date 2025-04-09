@@ -32,4 +32,4 @@ export const ObjectEditor = () => {
 	}
 }
 
-Editors([...$$(Editors), ObjectEditor])
+Editors([...$$(Editors) as any, ObjectEditor])

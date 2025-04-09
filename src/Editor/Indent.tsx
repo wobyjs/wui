@@ -50,7 +50,7 @@ export const Indent = () => {
 
         applyIndent(editor)
 
-    }} title="Increase Font Size"><IndentIcon /></Button>
+    }} title="Indent"><IndentIcon /></Button>
 }
 
 export const Outdent = () => {
@@ -62,5 +62,5 @@ export const Outdent = () => {
 
         applyIndent(editor, true)
 
-    }} title="Increase Font Size"><OutdentIcon /></Button>
+    }} title="Outdent"><OutdentIcon /></Button>
 }

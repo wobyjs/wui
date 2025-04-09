@@ -11,7 +11,7 @@ export const DropDownEditor = () => {
 
 	const UI = (props: UIProps<ObservableMaybe<[]>>) => {
 		const { value, data, editorName } = props
-		
+
 		return (
 			<>
 				<DDEditor
@@ -31,4 +31,4 @@ export const DropDownEditor = () => {
 	}
 }
 
-Editors([...$$(Editors), DropDownEditor])
+Editors([...$$(Editors) as any, DropDownEditor])

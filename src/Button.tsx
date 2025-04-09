@@ -30,7 +30,7 @@ export const variant = {
 
 type ButtonProps = JSX.ButtonHTMLAttributes<HTMLButtonElement>
 export const Button = (props: ButtonProps): JSX.Element => {
-    const { children, className = variant.contained, class: cls, checked = $(false), disabled, ...otherProps } = props
+    const { children, class: cls = variant.contained, checked = $(false), disabled, ...otherProps } = props
 
     return (
         <button
@@ -41,7 +41,7 @@ export const Button = (props: ButtonProps): JSX.Element => {
                 }
             }}
             disabled={disabled}
-            class={[className, cls]}
+            class={cls}
             {...otherProps}
         >
             {children}

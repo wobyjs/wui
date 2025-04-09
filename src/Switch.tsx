@@ -1,5 +1,5 @@
 import { nanoid } from 'nanoid'
-import React, { ObservableMaybe, useEffect, $, $$, isObservable, Observable, type JSX, FunctionMaybe } from 'woby'
+import { ObservableMaybe, useEffect, $, $$, isObservable, Observable, type JSX, FunctionMaybe } from 'woby'
 // https://codepen.io/alvarotrigo/pen/oNoJePo
 
 

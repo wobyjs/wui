@@ -30,4 +30,4 @@ export const BooleanEditor = () => {
 	}
 }
 
-Editors([...$$(Editors), BooleanEditor])
+Editors([...$$(Editors) as any, BooleanEditor])

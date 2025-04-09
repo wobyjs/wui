@@ -16,7 +16,7 @@ export const ColorEditor = () => {
 	}
 
 	const UI = (props: UIProps<string>) => {
-		const { value,editorName } = props
+		const { value, editorName } = props
 
 		return (
 			//@ts-ignore
@@ -34,4 +34,4 @@ export const ColorEditor = () => {
 	}
 }
 
-Editors([...$$(Editors), ColorEditor])
+Editors([...$$(Editors) as any, ColorEditor])

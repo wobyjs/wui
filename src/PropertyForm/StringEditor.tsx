@@ -30,4 +30,4 @@ export const StringEditor = () => {
 	}
 }
 
-Editors([...$$(Editors), StringEditor])
+Editors([...$$(Editors) as any, StringEditor])

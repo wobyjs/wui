@@ -14,7 +14,8 @@ import * as spreset from "../src/Switch.effect"
 
 import * as React from 'woby'
 import { render, $, $$, useEffect, type JSX } from "woby"
-import "../dist/output.css"
+import "../dist/woby-wui.css"
+import './input.css'
 import { Collapse } from "../src/Collapse"
 import { Checkbox } from "../src/Checkbox"
 import { SideBar, MenuText, MenuItem } from "../src/SideBar"
@@ -24,6 +25,8 @@ import { ToggleButton } from "../src/ToggleButton"
 import { Tab, Tabs } from "../src/Tabs"
 import { Wodal } from 'woby-modal'
 import { useViewportSize } from 'use-woby'
+import { Wheel } from '../src/Wheel'
+import { DateTimeWheeler } from '../src/DateTimeWheeler'
 
 const FaceIcon = (
 	<svg
@@ -212,6 +215,18 @@ const activeTab2 = $([<div>next instance tab</div>, <div>next second tab</div>])
 
 const { height: vh, width: vw, offsetLeft: ol, offsetTop: ot, pageTop: pt, pageLeft: pl } = useViewportSize()
 
+const options = [ /* ... options ... */
+	{ value: 'apple', label: '🍎 Apple' }, { value: 'banana', label: '🍌 Banana' }, { value: 'orange', label: '🍊 Orange' }, { value: 'grape', label: '🍇 Grape' }, { value: 'strawberry', label: '🍓 Strawberry' }, { value: 'blueberry', label: '🫐 Blueberry' }, { value: 'mango', label: '🥭 Mango' }, { value: 'pineapple', label: '🍍 Pineapple' }, { value: 'kiwi', label: '🥝 Kiwi' }, { value: 'watermelon', label: '🍉 Watermelon' }, { value: 'peach', label: '🍑 Peach' }, { value: 'cherry', label: '🍒 Cherry' }
+]
+
+const visibleItemCount = $(5)
+const value = $('orange')
+
+
+const pickerType = $<DateTimePickerType>('datetime')
+const selectedDate = $(new Date()) // Observable state for the date
+
+
 const App = () => (
 	<>
 		<SideBar
@@ -321,6 +336,9 @@ const App = () => (
 					<Button>Login</Button>
 				</Toolbar>
 			</Appbar>
+
+
+
 			<div class="pt-[60px]">
 				{/* <Wodal visible>
 					<Tabs
@@ -385,6 +403,46 @@ const App = () => (
 						<div>second instance tab,1 child</div>
 					</Tab>
 				</Tabs> */}
+
+				<table class='relative top-[200]'><tbody><tr><td>
+				</td>
+					<Wheel {...{
+						options,
+						value,
+						visibleItemCount, // Initial count
+					}} class='w-[200px] border bg-white shadow-[0_4px_8px_rgba(0,0,0,0.1)] mb-2.5 rounded-lg border-solid border-[#ccc]' />
+					<td class='pl-10'>
+						<div class="controls">
+							<span>Visible Items: </span>
+							<Button class='w-[3rem] border-2' type="button" onClick={() => visibleItemCount($$(visibleItemCount) + 2)}>++</Button>&nbsp;
+							<Button class='w-[3rem] border-2' type="button" onClick={() => visibleItemCount($$(visibleItemCount) - 2)}>--</Button>
+						</div >
+
+
+						<Button id="setKiwiButton" type="button" onClick={() => value('kiwi')}>Set to Kiwi</Button>
+						<p>Selected Value: <strong>{value}</strong></p>
+					</td></tr>
+				</tbody>
+				</table>
+
+				<DateTimeWheeler
+					value={selectedDate}      // Pass date observable
+					// onChange removed
+					type={pickerType}
+				/>
+
+				{/* Display reacts directly to the observable */}
+				<div style={{ marginTop: '20px' }}>
+					Selected Value: {() => $$(selectedDate)?.toISOString() ?? 'None'}
+				</div>
+
+				<div style={{ marginTop: '10px', display: 'flex', gap: '10px' }}>
+					<button onClick={() => pickerType('date')}>Date</button>
+					<button onClick={() => pickerType('time')}>Time</button>
+					<button onClick={() => pickerType('datetime')}>Date & Time</button>
+					{/* Add more type buttons */}
+				</div>
+
 				<div class="[@media(min-width:768px)]:w-[750px] mx-auto px-[15px]">
 					<Fab class="w-18 h-18" style={{ top: () => $$(pt) + $$(vh) - (80), left: () => $$(pl) }}>
 						<svg

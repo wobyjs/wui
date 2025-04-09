@@ -60,7 +60,7 @@ export function changeEnumerable(json: object) {
 
 export const Editors = $<
 	(() => {
-		UI: JSX.Element
+		UI: (props: { data, editorName: string, value: any }) => JSX.Element,
 		renderCondition: (values: ObservableMaybe<any>, key?: string) => boolean
 	})[]
 >([])
@@ -130,8 +130,8 @@ export const PropertyForm = (props: PropertyFormProps) => {
 	return (
 		//@ts-ignore
 		<div>
-			<div className={["overflow-auto table-striped", () => (className ? className : "h-[300px]")]}>
-				<table className="w-100 table-striped table-bordered table-sm">
+			<div class={["overflow-auto table-striped", () => (className ? className : "h-[300px]")] as JSX.Class}>
+				<table class="w-100 table-striped table-bordered table-sm">
 					<tbody>{renderForm(obj, undefined, order)}</tbody>
 				</table>
 			</div>

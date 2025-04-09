@@ -24,7 +24,7 @@ export const ToggleButton = ({
 			() => ($$(checked) ? onClass : offClass),
 			className,
 			cls,
-		]}
+		] as any}
 		{...props}
 	>
 		{children}

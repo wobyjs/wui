@@ -24,4 +24,4 @@ export const NumberEditor = () => {
 	}
 }
 
-Editors([...$$(Editors), NumberEditor])
+Editors([...$$(Editors) as any, NumberEditor])

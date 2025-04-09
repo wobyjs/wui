@@ -1,11 +1,7 @@
-// ,type JSX } from 'woby'
 import { effect19a } from './TextField.effect'
 import { tw } from 'woby-styled'
 import { ObservableMaybe, $$, $, type JSX, isObservable } from 'woby'
 import { EventHandler, TargetedEvent, TargetedInputEvent } from 'woby/dist/types/types'
-import { effect19a } from "./TextField.effect"
-import { tw } from "woby-styled"
-import { ObservableMaybe, $$, $, type JSX, isObservable } from "woby"
 
 //https://codepen.io/maheshambure21/pen/EozKKy
 
@@ -57,7 +53,7 @@ export const TextField = (props: TextFieldProps): JSX.Element => {
 				onKeyUp={(e) => {
 					!$$(assignOnEnter) && isObservable(value) ? (value?.(e.target.value), onKeyUp?.(e)) : (e.key === "Enter" && isObservable(value) && value(e.target.value), onKeyUp?.(e))
 				}}
-				size={size ?? "40"}
+				size={size ?? 40}
 			/>
 			{children}
 		</div>
