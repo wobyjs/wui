@@ -22,8 +22,9 @@ const config = defineConfig({
     ],
     resolve: {
         alias: {
-            'woby/jsx-dev-runtime': 'woby',
-            'woby/jsx-runtime': 'woby',
+            'woby/jsx-dev-runtime': path.resolve('../woby/src/jsx'),
+            'woby/jsx-runtime': path.resolve('../woby/src/jsx'),
+            'woby': path.resolve('../woby/src'),
         }
     }
 })

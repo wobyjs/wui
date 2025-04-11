@@ -26,7 +26,7 @@ import { Tab, Tabs } from "../src/Tabs"
 import { Wodal } from 'woby-modal'
 import { useViewportSize } from 'use-woby'
 import { Wheel } from '../src/Wheel'
-import { DateTimeWheeler } from '../src/DateTimeWheeler'
+import { DateTimeWheeler, DateTimeWheelerType } from '../src/DateTimeWheeler'
 
 const FaceIcon = (
 	<svg
@@ -223,10 +223,10 @@ const visibleItemCount = $(5)
 const value = $('orange')
 
 
-const pickerType = $<DateTimePickerType>('datetime')
-const selectedDate = $(new Date()) // Observable state for the date
+const pickerType = $<DateTimeWheelerType>('datetime')
+const selectedDate = $<Date>(new Date()) // Observable state for the date
 
-
+useEffect(() => console.log('selectedDate', $$(selectedDate).toString()))
 const App = () => (
 	<>
 		<SideBar
@@ -426,22 +426,13 @@ const App = () => (
 				</table>
 
 				<DateTimeWheeler
+					title={d => <div class='text-center'>{() => d.toString()}</div>}
 					value={selectedDate}      // Pass date observable
 					// onChange removed
-					type={pickerType}
+					mode={pickerType}
+				// commitOnOk
 				/>
 
-				{/* Display reacts directly to the observable */}
-				<div style={{ marginTop: '20px' }}>
-					Selected Value: {() => $$(selectedDate)?.toISOString() ?? 'None'}
-				</div>
-
-				<div style={{ marginTop: '10px', display: 'flex', gap: '10px' }}>
-					<button onClick={() => pickerType('date')}>Date</button>
-					<button onClick={() => pickerType('time')}>Time</button>
-					<button onClick={() => pickerType('datetime')}>Date & Time</button>
-					{/* Add more type buttons */}
-				</div>
 
 				<div class="[@media(min-width:768px)]:w-[750px] mx-auto px-[15px]">
 					<Fab class="w-18 h-18" style={{ top: () => $$(pt) + $$(vh) - (80), left: () => $$(pl) }}>

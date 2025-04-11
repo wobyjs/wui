@@ -21,4 +21,6 @@ export * from './Tabs'
 export * from './Zoomable'
 export * from './Editor/Editor'
 export * from './Wheel'
+export * from './DateTimeWheeler'
+
 import './input.css'
