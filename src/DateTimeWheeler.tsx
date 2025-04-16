@@ -31,7 +31,7 @@ type DateTimeWheelerProps = {
     bottom?: ObservableMaybe<boolean>
     title?: (d: Date) => JSX.Element
     visible?: Observable<boolean>
-    commitOnOk?: ObservableMaybe<boolean>
+    ok?: ObservableMaybe<boolean>
 }
 
 export const DateTimeWheeler = ({
@@ -42,8 +42,9 @@ export const DateTimeWheeler = ({
     itemHeight = 36,
     itemCount = 5,
     yearRange: yearRangeProp,
-    divider, bottom, title, visible = $(true),
-    commitOnOk
+    divider, bottom, title,
+    visible = $(true),
+    ok
 }: DateTimeWheelerProps): JSX.Element => {
 
     const type = use(mode)
@@ -138,9 +139,17 @@ export const DateTimeWheeler = ({
 
             modDate(constrainedDate) // Update the external observable
 
-            if (!$$(commitOnOk))
+            if (!ok)
                 if (isObservable(oriDate))
                     oriDate($$(modDate))
+
+            if (!$$(ok)) return
+
+            if (isObservable(oriDate))
+                oriDate($$(modDate))
+
+            if (isObservable(ok))
+                ok(false)
         }
     })
 
