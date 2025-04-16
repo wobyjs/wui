@@ -1,4 +1,4 @@
-import { $, $$, ArrayMaybe, isObservable, Observable, ObservableMaybe, render, useEffect, useMemo } from 'woby'
+import { $, $$, ArrayMaybe, isObservable, Observable, ObservableMaybe, Portal, useEffect, useMemo } from 'woby'
 import { use } from 'use-woby'
 
 type WheelerProps = {
@@ -10,46 +10,56 @@ type WheelerProps = {
     header?: JSX.Element
     multiple?: ObservableMaybe<boolean>,
     ok?: ObservableMaybe<boolean>
+    visible?: ObservableMaybe<boolean>
+    bottom?: ObservableMaybe<boolean>
 }
 
-export const useArrayWheel = <T,>(data: ObservableMaybe<T[]>, options?: Partial<WheelerProps> & { all?: string }) => {
-    const { all } = options ?? {}
-    const checked = all ? $$(data).map(f => $(false)) : undefined
+// export const useArrayWheel = <T,>(data: ObservableMaybe<T[]>, options?: Partial<WheelerProps> & { all?: string }) => {
+//     const { all } = options ?? {}
+//     const checked = all ? $$(data).map(f => $(false)) : undefined
 
-    if (all) {
-        useEffect(() => {
-            if (typeof $$(checked[0]) === 'undefined') return
-            if ($$(checked[0]))
-                checked.forEach((c, i) => (i === 0) ? null : checked[i](true))
-            else
-                checked.forEach((c, i) => (i === 0) ? null : checked[i](false))
-        })
+//     if (all) {
+//         useEffect(() => {
+//             if (typeof $$(checked[0]) === 'undefined') return
+//             if ($$(checked[0]))
+//                 checked.forEach((c, i) => (i === 0) ? null : checked[i](true))
+//             else
+//                 checked.forEach((c, i) => (i === 0) ? null : checked[i](false))
+//         })
 
-        useEffect(() => {
-            const c = checked.slice(1)
-            const at = c.every(f => $$(f))
-            const af = c.every(f => !$$(f))
-            if (at) checked[0](true)
-            if (af) checked[0](false)
-            if (!at && !af) checked[0](undefined)
-        })
-    }
-    return {
-        data: [data], checked, value: [$()],
-        renderer: [r => r] as (((r: any) => any)[]) | undefined,
-        valuer: [r => r] as (((r: any) => any)[]) | undefined,
-        checkboxer: (all ? [r => checked[$$(data).indexOf(r)]] : null) as (((r: any) => Observable<boolean>)[]) | undefined,
-        checkbox: [$(true)] as (Observable<boolean>[]) | undefined,
-        noMask: true as boolean | undefined,
-        hideOnBackdrop: true as boolean | undefined,
-        rows: Math.min(6, data.length) as number | undefined,
-        open: $(false),
-        ...options ?? {}
-    }
-}
+//         useEffect(() => {
+//             const c = checked.slice(1)
+//             const at = c.every(f => $$(f))
+//             const af = c.every(f => !$$(f))
+//             if (at) checked[0](true)
+//             if (af) checked[0](false)
+//             if (!at && !af) checked[0](undefined)
+//         })
+//     }
+//     return {
+//         data: [data], checked, value: [$()],
+//         renderer: [r => r] as (((r: any) => any)[]) | undefined,
+//         valuer: [r => r] as (((r: any) => any)[]) | undefined,
+//         checkboxer: (all ? [r => checked[$$(data).indexOf(r)]] : null) as (((r: any) => Observable<boolean>)[]) | undefined,
+//         checkbox: [$(true)] as (Observable<boolean>[]) | undefined,
+//         noMask: true as boolean | undefined,
+//         hideOnBackdrop: true as boolean | undefined,
+//         rows: Math.min(6, data.length) as number | undefined,
+//         open: $(false),
+//         ...options ?? {}
+//     }
+// }
 
 
-export const Wheel = ({ options, itemHeight: ih, visibleItemCount: vic, value: oriValue, class: cls, header, ok, ...props }: WheelerProps) => {
+export const Wheel = ({ options, itemHeight: ih, visibleItemCount: vic, value: oriValue, class: cls, header, ok, visible = true, bottom, ...props }: WheelerProps) => {
+    // visible?: Observable<boolean>
+    // value?: ObservableMaybe<string | number>,
+    // class?: JSX.Class
+    // header?: JSX.Element
+    // bottom?: boolean
+    // }
+
+    // export const Wheel = ({ options, itemHeight: ih, visibleItemCount: vic, value: iv, class: cls, header, bottom, visible = $(false) }: MobilePickerProps) => {
 
     const itemHeight = use(ih, 36)
     const visibleItemCount = use(vic, 5)
@@ -520,34 +530,63 @@ export const Wheel = ({ options, itemHeight: ih, visibleItemCount: vic, value: o
     })
 
     // w-[200px] border bg-white shadow-[0_4px_8px_rgba(0,0,0,0.1)] mb-2.5 rounded-lg border-solid border-[#ccc]
-    return <><div class={['picker-widget', cls,]}>
-        {() => $$(header) ? <>
-            <div class={'font-bold text-center'}>{header}</div>
-            <div class="my-1 h-px w-full bg-gray-300 dark:bg-gray-600"></div></> : null}
-        <div ref={viewport}
-            onPointerDown={handleStart as any}
-            onPointerMove={handleMove as any}     /* {passive: false } */
-            onPointerUp={handleEnd}
-            onPointerCancel={handleEnd}
-            onWheel={handleWheel} /* {passive: false } */
-            class={['picker-viewport overflow-hidden relative touch-none cursor-grab overscroll-y-contain transition-[height] duration-[0.3s] ease-[ease-out]']}
-            style={{ height: () => `${$$(viewportHeight)}px` }}
-        >
-            <ul class='picker-list transition-transform duration-[0.3s] ease-[ease-out] m-0 p-0 list-none' ref={list}>
-                {() => [...populateList()]}
-            </ul>
-            {() => $$(multiple) ? null : <div class='picker-indicator absolute h-9 box-border pointer-events-none bg-[rgba(0,123,255,0.05)] border-y-[#007bff] border-t border-solid border-b inset-x-0' style={{
-                height: () => `${$$(itemHeight)}px`,
-                top: () => `${$$(indicatorTop) + $$($$(itemHeight)) / 2}px`, // Center line of indicator
-                transform: `translateY(-50%)`,
-            }}>
-            </div>}
+    return <>
+        {() => !$$(visible) ? null :
+            $$(bottom) ?
+                <Portal mount={document.body}>
+                    <div class={['picker-widget', cls, "fixed inset-x-0 bottom-0 w-full"]}>
+                        {() => $$(header) ? <>
+                            <div class={'font-bold text-center'}>{header}</div>
+                            <div class="my-1 h-px w-full bg-gray-300 dark:bg-gray-600"></div></> : null}
+                        <div ref={viewport}
+                            onPointerDown={handleStart as any}
+                            onPointerMove={handleMove as any}     /* {passive: false } */
+                            onPointerUp={handleEnd}
+                            onPointerCancel={handleEnd}
+                            onWheel={handleWheel} /* {passive: false } */
+                            class={['picker-viewport overflow-hidden relative touch-none cursor-grab overscroll-y-contain transition-[height] duration-[0.3s] ease-[ease-out]']}
+                            style={{ height: () => `${$$(viewportHeight)}px` }}
+                        >
+                            <ul class='picker-list transition-transform duration-[0.3s] ease-[ease-out] m-0 p-0 list-none' ref={list}>
+                                {() => [...populateList()]}
+                            </ul>
+                            <div class='picker-indicator absolute h-9 box-border pointer-events-none bg-[rgba(0,123,255,0.05)] border-y-[#007bff] border-t border-solid border-b inset-x-0' style={{
+                                height: () => `${$$(itemHeight)}px`,
+                                top: () => `${$$(indicatorTop) + $$($$(itemHeight)) / 2}px`, // Center line of indicator
+                                transform: `translateY(-50%)`,
+                            }}>
+                            </div>
 
-        </div>
-        {/* <div class="self-stretch w-px bg-gray-300 dark:bg-gray-600"></div> */}
-        {/* <div class="self-stretch border-l border-gray-300 dark:border-gray-600"></div> */}
-        {/* <div class="h-6 w-px bg-gray-300 dark:bg-gray-600"></div> */}
-    </div>
+                        </div>
+                    </div>
+                </Portal>
+                : <div class={['picker-widget', cls,]}>
+                    {() => $$(header) ? <>
+                        <div class={'font-bold text-center'}>{header}</div>
+                        <div class="my-1 h-px w-full bg-gray-300 dark:bg-gray-600"></div></> : null}
+                    <div ref={viewport}
+                        onPointerDown={handleStart as any}
+                        onPointerMove={handleMove as any}     /* {passive: false } */
+                        onPointerUp={handleEnd}
+                        onPointerCancel={handleEnd}
+                        onWheel={handleWheel} /* {passive: false } */
+                        class={['picker-viewport overflow-hidden relative touch-none cursor-grab overscroll-y-contain transition-[height] duration-[0.3s] ease-[ease-out]']}
+                        style={{ height: () => `${$$(viewportHeight)}px` }}
+                    >
+                        <ul class='picker-list transition-transform duration-[0.3s] ease-[ease-out] m-0 p-0 list-none' ref={list}>
+                            {() => [...populateList()]}
+                        </ul>
+
+                        {() => $$(multiple) ? null :
+                            <div class='picker-indicator absolute h-9 box-border pointer-events-none bg-[rgba(0,123,255,0.05)] border-y-[#007bff] border-t border-solid border-b inset-x-0' style={{
+                                height: () => `${$$(itemHeight)}px`,
+                                top: () => `${$$(indicatorTop) + $$($$(itemHeight)) / 2}px`, // Center line of indicator
+                                transform: `translateY(-50%)`,
+                            }}>
+                            </div>
+                        }
+                    </div>
+                </div>}
 
     </>
 }

@@ -10,6 +10,7 @@ const config = defineConfig({
             formats: ['es'],
             fileName: (format: string, entryName: string) => `${entryName}.${format}.js`
         },
+        emptyOutDir:false,
         sourcemap: true,
         rollupOptions: {
             external: ['woby', 'woby/jsx-runtime', 'oby', 'woby/jsx-runtime', 'nanoid',
