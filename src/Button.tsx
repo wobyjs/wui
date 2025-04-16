@@ -28,9 +28,11 @@ export const variant = {
      hover:bg-[rgba(0,0,0,0.04)]`,
 }
 
-type ButtonProps = JSX.ButtonHTMLAttributes<HTMLButtonElement>
+type ButtonProps = JSX.ButtonHTMLAttributes<HTMLButtonElement> & {
+    buttonType: "text" | "contained" | "outlined" | "icon"
+}
 export const Button = (props: ButtonProps): JSX.Element => {
-    const { children, class: cls = variant.contained, checked = $(false), disabled, ...otherProps } = props
+    const { children, class:cls, buttonType = "contained", checked = $(false), disabled, ...otherProps } = props
 
     return (
         <button
@@ -41,7 +43,7 @@ export const Button = (props: ButtonProps): JSX.Element => {
                 }
             }}
             disabled={disabled}
-            class={cls}
+            class={[variant[buttonType], cls]}
             {...otherProps}
         >
             {children}
