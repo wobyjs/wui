@@ -1,7 +1,7 @@
 import { $, $$, ArrayMaybe, isObservable, Observable, ObservableMaybe, Portal, useEffect, useMemo } from 'woby'
 import { use } from 'use-woby'
 
-type WheelerProps = {
+export type WheelerProps = {
     options: ObservableMaybe<any[]>,
     itemHeight?: ObservableMaybe<number>,
     visibleItemCount?: ObservableMaybe<number>,
@@ -11,7 +11,10 @@ type WheelerProps = {
     multiple?: ObservableMaybe<boolean>,
     ok?: ObservableMaybe<boolean>
     visible?: ObservableMaybe<boolean>
+
     bottom?: ObservableMaybe<boolean>
+    hideOnBlur?: ObservableMaybe<boolean>
+    commitOnBlur?: ObservableMaybe<boolean>
 }
 
 // export const useArrayWheel = <T,>(data: ObservableMaybe<T[]>, options?: Partial<WheelerProps> & { all?: string }) => {
@@ -51,15 +54,7 @@ type WheelerProps = {
 // }
 
 
-export const Wheel = ({ options, itemHeight: ih, visibleItemCount: vic, value: oriValue, class: cls, header, ok, visible = true, bottom, ...props }: WheelerProps) => {
-    // visible?: Observable<boolean>
-    // value?: ObservableMaybe<string | number>,
-    // class?: JSX.Class
-    // header?: JSX.Element
-    // bottom?: boolean
-    // }
-
-    // export const Wheel = ({ options, itemHeight: ih, visibleItemCount: vic, value: iv, class: cls, header, bottom, visible = $(false) }: MobilePickerProps) => {
+export const Wheeler = ({ options, itemHeight: ih, visibleItemCount: vic, value: oriValue, class: cls, header, ok, visible = true, bottom, hideOnBlur, commitOnBlur, ...props }: WheelerProps) => {
 
     const itemHeight = use(ih, 36)
     const visibleItemCount = use(vic, 5)
@@ -283,11 +278,11 @@ export const Wheel = ({ options, itemHeight: ih, visibleItemCount: vic, value: o
     function* populateList() {
         // Top padding
         for (let i = 0; i < $$(paddingItemCount); i++)
-            yield <li class={['picker-item is-padding invisible', pickerItemCls]} style={{ height: () => `${$$(itemHeight)}px` }}></li>
+            yield <li class={['wheeler-item is-padding invisible', pickerItemCls]} style={{ height: () => `${$$(itemHeight)}px` }}></li>
 
         // Actual items
         for (const [index, option] of $$(formattedOptions).entries())
-            yield <li class={['picker-item', pickerItemCls, $$(multiple) ? 'text-black' : 'text-[#555] opacity-60 ']} data-index={index} data-value={option.value}
+            yield <li class={['wheeler-item', pickerItemCls, $$(multiple) ? 'text-black' : 'text-[#555] opacity-60 ']} data-index={index} data-value={option.value}
                 style={{ height: () => `${$$(itemHeight)}px` }}>
                 {() => $$(multiple) ? () => {
                     const isChecked = $$(checkboxes)[option.label]
@@ -307,7 +302,7 @@ export const Wheel = ({ options, itemHeight: ih, visibleItemCount: vic, value: o
 
         // Bottom padding
         for (let i = 0; i < $$(paddingItemCount); i++)
-            yield < li class={['picker-item is-padding invisible', pickerItemCls]} style={{ height: `${$$(itemHeight)}px` }}></li>
+            yield < li class={['wheeler-item is-padding invisible', pickerItemCls]} style={{ height: `${$$(itemHeight)}px` }}></li>
     }
 
     function setTranslateY(y: number) {
@@ -361,7 +356,7 @@ export const Wheel = ({ options, itemHeight: ih, visibleItemCount: vic, value: o
 
         // Uses the potentially updated viewportHeight
         const centerViewportY = $$(viewportHeight) / 2
-        const listItems = $$(list).querySelectorAll('.picker-item:not(.is-padding)')
+        const listItems = $$(list).querySelectorAll('.wheeler-item:not(.is-padding)')
         listItems.forEach(item => {
             const itemRect = item.getBoundingClientRect()
             const viewportRect = $$(viewport).getBoundingClientRect()
@@ -427,7 +422,7 @@ export const Wheel = ({ options, itemHeight: ih, visibleItemCount: vic, value: o
         if ($$(rafId)) cancelAnimationFrame($$(rafId))
         if (!hasMoved) { // Click/Tap
             const targetElement = e.target as HTMLElement
-            const targetItem = targetElement.closest('.picker-item') as HTMLElement
+            const targetItem = targetElement.closest('.wheeler-item') as HTMLElement
             if (targetItem && !targetItem.classList.contains('is-padding')) {
                 const clickedIndex = parseInt(targetItem.dataset.index, 10)
                 if (!isNaN(clickedIndex) && clickedIndex >= 0 && clickedIndex < $$(formattedOptions).length) {
@@ -529,12 +524,20 @@ export const Wheel = ({ options, itemHeight: ih, visibleItemCount: vic, value: o
         }
     })
 
+    const _backdropTransEnd = () => {
+        if (!$$(visible)) {
+            // container().style.display = "none"
+            // closed(true)
+        }
+    }
+
     // w-[200px] border bg-white shadow-[0_4px_8px_rgba(0,0,0,0.1)] mb-2.5 rounded-lg border-solid border-[#ccc]
     return <>
         {() => !$$(visible) ? null :
             $$(bottom) ?
                 <Portal mount={document.body}>
-                    <div class={['picker-widget', cls, "fixed inset-x-0 bottom-0 w-full"]}>
+
+                    <div class={['wheeler-widget', cls, "fixed inset-x-0 bottom-0 w-full"]}>
                         {() => $$(header) ? <>
                             <div class={'font-bold text-center'}>{header}</div>
                             <div class="my-1 h-px w-full bg-gray-300 dark:bg-gray-600"></div></> : null}
@@ -544,13 +547,13 @@ export const Wheel = ({ options, itemHeight: ih, visibleItemCount: vic, value: o
                             onPointerUp={handleEnd}
                             onPointerCancel={handleEnd}
                             onWheel={handleWheel} /* {passive: false } */
-                            class={['picker-viewport overflow-hidden relative touch-none cursor-grab overscroll-y-contain transition-[height] duration-[0.3s] ease-[ease-out]']}
+                            class={['wheeler-viewport overflow-hidden relative touch-none cursor-grab overscroll-y-contain transition-[height] duration-[0.3s] ease-[ease-out]']}
                             style={{ height: () => `${$$(viewportHeight)}px` }}
                         >
-                            <ul class='picker-list transition-transform duration-[0.3s] ease-[ease-out] m-0 p-0 list-none' ref={list}>
+                            <ul class='wheeler-list transition-transform duration-[0.3s] ease-[ease-out] m-0 p-0 list-none' ref={list}>
                                 {() => [...populateList()]}
                             </ul>
-                            <div class='picker-indicator absolute h-9 box-border pointer-events-none bg-[rgba(0,123,255,0.05)] border-y-[#007bff] border-t border-solid border-b inset-x-0' style={{
+                            <div class='wheeler-indicator absolute h-9 box-border pointer-events-none bg-[rgba(0,123,255,0.05)] border-y-[#007bff] border-t border-solid border-b inset-x-0' style={{
                                 height: () => `${$$(itemHeight)}px`,
                                 top: () => `${$$(indicatorTop) + $$($$(itemHeight)) / 2}px`, // Center line of indicator
                                 transform: `translateY(-50%)`,
@@ -560,7 +563,7 @@ export const Wheel = ({ options, itemHeight: ih, visibleItemCount: vic, value: o
                         </div>
                     </div>
                 </Portal>
-                : <div class={['picker-widget', cls,]}>
+                : <div class={['wheeler-widget', cls,]}>
                     {() => $$(header) ? <>
                         <div class={'font-bold text-center'}>{header}</div>
                         <div class="my-1 h-px w-full bg-gray-300 dark:bg-gray-600"></div></> : null}
@@ -570,15 +573,15 @@ export const Wheel = ({ options, itemHeight: ih, visibleItemCount: vic, value: o
                         onPointerUp={handleEnd}
                         onPointerCancel={handleEnd}
                         onWheel={handleWheel} /* {passive: false } */
-                        class={['picker-viewport overflow-hidden relative touch-none cursor-grab overscroll-y-contain transition-[height] duration-[0.3s] ease-[ease-out]']}
+                        class={['wheeler-viewport overflow-hidden relative touch-none cursor-grab overscroll-y-contain transition-[height] duration-[0.3s] ease-[ease-out]']}
                         style={{ height: () => `${$$(viewportHeight)}px` }}
                     >
-                        <ul class='picker-list transition-transform duration-[0.3s] ease-[ease-out] m-0 p-0 list-none' ref={list}>
+                        <ul class='wheeler-list transition-transform duration-[0.3s] ease-[ease-out] m-0 p-0 list-none' ref={list}>
                             {() => [...populateList()]}
                         </ul>
 
                         {() => $$(multiple) ? null :
-                            <div class='picker-indicator absolute h-9 box-border pointer-events-none bg-[rgba(0,123,255,0.05)] border-y-[#007bff] border-t border-solid border-b inset-x-0' style={{
+                            <div class='wheeler-indicator absolute h-9 box-border pointer-events-none bg-[rgba(0,123,255,0.05)] border-y-[#007bff] border-t border-solid border-b inset-x-0' style={{
                                 height: () => `${$$(itemHeight)}px`,
                                 top: () => `${$$(indicatorTop) + $$($$(itemHeight)) / 2}px`, // Center line of indicator
                                 transform: `translateY(-50%)`,

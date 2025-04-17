@@ -20,7 +20,7 @@ export * from './ToggleButton'
 export * from './Tabs'
 export * from './Zoomable'
 export * from './Editor/Editor'
-export * from './Wheel'
+export * from './Wheeler'
 export * from './DateTimeWheeler'
 
 import './input.css'

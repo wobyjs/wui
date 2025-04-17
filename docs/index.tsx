@@ -25,7 +25,7 @@ import { ToggleButton } from "../src/ToggleButton"
 import { Tab, Tabs } from "../src/Tabs"
 import { Wodal } from 'woby-modal'
 import { useViewportSize } from 'use-woby'
-import { Wheel } from '../src/Wheel'
+import { Wheeler } from '../src/Wheeler'
 import { DateTimeWheeler, DateTimeWheelerType } from '../src/DateTimeWheeler'
 
 const FaceIcon = (
@@ -410,7 +410,7 @@ const App = () => (
 
 				<table class='relative top-[200]'><tbody><tr><td>
 				</td>
-					<Wheel {...{
+					<Wheeler {...{
 						options,
 						value,
 						visibleItemCount, // Initial count
