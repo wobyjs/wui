@@ -25,7 +25,7 @@ import { ToggleButton } from "../src/ToggleButton"
 import { Tab, Tabs } from "../src/Tabs"
 import { Wodal } from 'woby-modal'
 import { useViewportSize } from 'use-woby'
-import { Wheel } from '../src/Wheel'
+import { Wheeler } from '../src/Wheeler'
 import { DateTimeWheeler, DateTimeWheelerType } from '../src/DateTimeWheeler'
 
 const FaceIcon = (
@@ -225,8 +225,12 @@ const value = $('orange')
 
 const pickerType = $<DateTimeWheelerType>('datetime')
 const selectedDate = $<Date>(new Date()) // Observable state for the date
+const ok = $(false)
+const dateOk = $(false)
 
 useEffect(() => console.log('selectedDate', $$(selectedDate).toString()))
+useEffect(() => console.log('value', $$(value)))
+
 const App = () => (
 	<>
 		<SideBar
@@ -406,10 +410,12 @@ const App = () => (
 
 				<table class='relative top-[200]'><tbody><tr><td>
 				</td>
-					<Wheel {...{
+					<Wheeler {...{
 						options,
 						value,
 						visibleItemCount, // Initial count
+						multiple: true,
+						// ok,
 					}} class='w-[200px] border bg-white shadow-[0_4px_8px_rgba(0,0,0,0.1)] mb-2.5 rounded-lg border-solid border-[#ccc]' />
 					<td class='pl-10'>
 						<div class="controls">
@@ -418,9 +424,9 @@ const App = () => (
 							<Button class='w-[3rem] border-2' type="button" onClick={() => visibleItemCount($$(visibleItemCount) - 2)}>--</Button>
 						</div >
 
-
 						<Button id="setKiwiButton" type="button" onClick={() => value('kiwi')}>Set to Kiwi</Button>
-						<p>Selected Value: <strong>{value}</strong></p>
+						<p>Selected Value: <strong>{() => $$(value)?.join?.(' ')}</strong></p>
+						<Button onClick={() => ok(true)}>OK</Button>
 					</td></tr>
 				</tbody>
 				</table>
@@ -430,7 +436,7 @@ const App = () => (
 					value={selectedDate}      // Pass date observable
 					// onChange removed
 					mode={pickerType}
-				// commitOnOk
+					ok={dateOk}
 				/>
 
 

@@ -1,6 +1,6 @@
 import { $, $$, Observable, ObservableMaybe, useEffect, useMemo, untrack, Portal, type JSX, isObservable } from 'woby'
 import { use } from 'use-woby'
-import { Wheel } from './Wheel' // Adjust path
+import { Wheeler } from './Wheeler' // Adjust path
 import { Button, variant } from './Button'
 
 // --- Utilities (unchanged) ---
@@ -31,7 +31,7 @@ type DateTimeWheelerProps = {
     bottom?: ObservableMaybe<boolean>
     title?: (d: Date) => JSX.Element
     visible?: Observable<boolean>
-    commitOnOk?: ObservableMaybe<boolean>
+    ok?: ObservableMaybe<boolean>
 }
 
 export const DateTimeWheeler = ({
@@ -42,8 +42,9 @@ export const DateTimeWheeler = ({
     itemHeight = 36,
     itemCount = 5,
     yearRange: yearRangeProp,
-    divider, bottom, title, visible = $(true),
-    commitOnOk
+    divider, bottom, title,
+    visible = $(true),
+    ok
 }: DateTimeWheelerProps): JSX.Element => {
 
     const type = use(mode)
@@ -138,9 +139,17 @@ export const DateTimeWheeler = ({
 
             modDate(constrainedDate) // Update the external observable
 
-            if (!$$(commitOnOk))
+            if (!ok)
                 if (isObservable(oriDate))
                     oriDate($$(modDate))
+
+            if (!$$(ok)) return
+
+            if (isObservable(oriDate))
+                oriDate($$(modDate))
+
+            if (isObservable(ok))
+                ok(false)
         }
     })
 
@@ -218,12 +227,12 @@ export const DateTimeWheeler = ({
                     <Button class={[variant.contained, 'px-2']} onClick={() => { if (isObservable(oriDate)) oriDate($$(modDate)); visible(false) }}>OK</Button></div>
             </div>
             <div class={[dateTimeWheelerCls, '']}>
-                {() => $$(showYear) && <Wheel header='Year' options={yearOptions} value={selectedYear} itemHeight={itemHeight} visibleItemCount={itemCount} class={[wheelWrapperCls,]} />}
-                {() => $$(showMonth) && <Wheel header='Month' options={monthOptions} value={selectedMonth} itemHeight={itemHeight} visibleItemCount={itemCount} class={[wheelWrapperCls, br]} />}
-                {() => $$(showDay) && <Wheel header='Day' options={dayOptions} value={selectedDay} itemHeight={itemHeight} visibleItemCount={itemCount} class={[wheelWrapperCls, br]} />}
-                {() => $$(showHour) && <Wheel header='Hour' options={hourOptions} value={selectedHour} itemHeight={itemHeight} visibleItemCount={itemCount} class={[wheelWrapperCls, br]} />}
-                {() => $$(showMinute) && <Wheel header='Minute' options={minuteOptions} value={selectedMinute} itemHeight={itemHeight} visibleItemCount={itemCount} class={[wheelWrapperCls, br]} />}
-                {() => $$(showSecond) && <Wheel header='Second' options={secondOptions} value={selectedSecond} itemHeight={itemHeight} visibleItemCount={itemCount} class={[wheelWrapperCls, br]} />}
+                {() => $$(showYear) && <Wheeler header='Year' options={yearOptions} value={selectedYear} itemHeight={itemHeight} visibleItemCount={itemCount} class={[wheelWrapperCls,]} />}
+                {() => $$(showMonth) && <Wheeler header='Month' options={monthOptions} value={selectedMonth} itemHeight={itemHeight} visibleItemCount={itemCount} class={[wheelWrapperCls, br]} />}
+                {() => $$(showDay) && <Wheeler header='Day' options={dayOptions} value={selectedDay} itemHeight={itemHeight} visibleItemCount={itemCount} class={[wheelWrapperCls, br]} />}
+                {() => $$(showHour) && <Wheeler header='Hour' options={hourOptions} value={selectedHour} itemHeight={itemHeight} visibleItemCount={itemCount} class={[wheelWrapperCls, br]} />}
+                {() => $$(showMinute) && <Wheeler header='Minute' options={minuteOptions} value={selectedMinute} itemHeight={itemHeight} visibleItemCount={itemCount} class={[wheelWrapperCls, br]} />}
+                {() => $$(showSecond) && <Wheeler header='Second' options={secondOptions} value={selectedSecond} itemHeight={itemHeight} visibleItemCount={itemCount} class={[wheelWrapperCls, br]} />}
             </div>
         </div >
     </>)

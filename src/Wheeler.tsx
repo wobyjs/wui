@@ -1,28 +1,68 @@
-import { $, $$, Observable, ObservableMaybe, Portal, useEffect, useMemo } from 'woby'
+import { $, $$, ArrayMaybe, isObservable, Observable, ObservableMaybe, Portal, useEffect, useMemo } from 'woby'
 import { use } from 'use-woby'
 
-type MobilePickerProps = {
+export type WheelerProps = {
     options: ObservableMaybe<any[]>,
     itemHeight?: ObservableMaybe<number>,
     visibleItemCount?: ObservableMaybe<number>,
-    visible?: Observable<boolean>
-    value?: ObservableMaybe<string | number>,
+    value?: ObservableMaybe<ArrayMaybe<string | number>>,
     class?: JSX.Class
     header?: JSX.Element
-    bottom?: boolean
+    multiple?: ObservableMaybe<boolean>,
+    ok?: ObservableMaybe<boolean>
+    visible?: ObservableMaybe<boolean>
+
+    bottom?: ObservableMaybe<boolean>
+    hideOnBlur?: ObservableMaybe<boolean>
+    commitOnBlur?: ObservableMaybe<boolean>
 }
 
-export const Wheel = ({ options, itemHeight: ih, visibleItemCount: vic, value: iv, class: cls, header, bottom, visible = $(false) }: MobilePickerProps) => {
+// export const useArrayWheel = <T,>(data: ObservableMaybe<T[]>, options?: Partial<WheelerProps> & { all?: string }) => {
+//     const { all } = options ?? {}
+//     const checked = all ? $$(data).map(f => $(false)) : undefined
+
+//     if (all) {
+//         useEffect(() => {
+//             if (typeof $$(checked[0]) === 'undefined') return
+//             if ($$(checked[0]))
+//                 checked.forEach((c, i) => (i === 0) ? null : checked[i](true))
+//             else
+//                 checked.forEach((c, i) => (i === 0) ? null : checked[i](false))
+//         })
+
+//         useEffect(() => {
+//             const c = checked.slice(1)
+//             const at = c.every(f => $$(f))
+//             const af = c.every(f => !$$(f))
+//             if (at) checked[0](true)
+//             if (af) checked[0](false)
+//             if (!at && !af) checked[0](undefined)
+//         })
+//     }
+//     return {
+//         data: [data], checked, value: [$()],
+//         renderer: [r => r] as (((r: any) => any)[]) | undefined,
+//         valuer: [r => r] as (((r: any) => any)[]) | undefined,
+//         checkboxer: (all ? [r => checked[$$(data).indexOf(r)]] : null) as (((r: any) => Observable<boolean>)[]) | undefined,
+//         checkbox: [$(true)] as (Observable<boolean>[]) | undefined,
+//         noMask: true as boolean | undefined,
+//         hideOnBackdrop: true as boolean | undefined,
+//         rows: Math.min(6, data.length) as number | undefined,
+//         open: $(false),
+//         ...options ?? {}
+//     }
+// }
+
+
+export const Wheeler = ({ options, itemHeight: ih, visibleItemCount: vic, value: oriValue, class: cls, header, ok, visible = true, bottom, hideOnBlur, commitOnBlur, ...props }: WheelerProps) => {
 
     const itemHeight = use(ih, 36)
     const visibleItemCount = use(vic, 5)
-    const value = use(iv)
+    const value = $($$(oriValue))
 
     const CLICK_THRESHOLD_PX = 5
 
-    const formattedOptions = useMemo(() => $$(options).map(opt =>
-        typeof opt === 'object' && opt !== null ? opt : { value: opt, label: String(opt) }
-    ))
+    const checkboxes = $<Record<string, Observable<boolean>>>({})
 
     const paddingItemCount = $(0)
     let minTranslateY = 0
@@ -44,6 +84,157 @@ export const Wheel = ({ options, itemHeight: ih, visibleItemCount: vic, value: i
 
     const viewport = $<HTMLDivElement>()
     const list = $<HTMLUListElement>()
+    const multiple = use(props.multiple, false)
+
+    let preOptions, preFormattedOptions
+
+    const formattedOptions = useMemo(() => {
+        if (preOptions === $$(options)) return preFormattedOptions
+
+        const base = $$(options).map(opt =>
+            typeof opt === 'object' && opt !== null ? opt : { value: opt, label: String(opt) }
+        ) as { value: any, label: string }[]
+
+        const b2 = $$(multiple) ? [{ value: '__ALL__', label: 'All' }, ...base] : base
+
+        if ($$(multiple)) {
+            const r = {} as Record<string, Observable<boolean>>
+
+            b2.map(opt => r[opt.label] = $(false)) //init
+            checkboxes(r)
+
+            const vs = [...[$$(value)]].flat()
+            b2.forEach(opt => r[opt.label](vs.some(sv => sv === opt.value)))
+        }
+
+        preOptions = $$(options)
+
+        return preFormattedOptions = b2
+    })
+
+    const chkValues = () => {
+        const c = $$(checkboxes)
+
+        const vs = new Set([$$(value)].flat()) // current value set
+        const os = $$(formattedOptions)        // options list
+        const cb = $$(checkboxes)              // current checkbox state
+
+        const cbv = new Set(
+            Object.entries(cb)
+                .filter(([_, active]) => $$(active))
+                .map(([label]) => label)
+        )
+
+        // Values checked in checkbox but not in current value
+        const onlyInCheckbox = os
+            .filter(opt => $$(cb[opt.label]) && !vs.has(opt.value) && opt.label !== 'All')
+            .map(opt => opt.value)
+
+        // Values in current value but now unchecked
+        const onlyInValue = [...vs].filter(val => {
+            const opt = os.find(o => o.value === val)
+            return opt ? !$$(cbv.has(opt.label)) : true
+        })
+
+        return { onlyInCheckbox, onlyInValue }
+    }
+
+    useEffect(() => {
+        if (!ok) return
+
+        if (!$$(ok)) return
+
+        if (isObservable(oriValue))
+            oriValue($$(value))
+
+        if (isObservable(ok))
+            ok(false)
+    })
+
+    //values to chk
+    let preValues
+    let preCheckboxes
+    const value2chk = () => {
+        if (!$$(multiple)) return
+
+        const vv = $$(value)
+        if (preValues === vv) return
+
+        const { onlyInCheckbox, onlyInValue } = chkValues()
+
+        const os = $$(formattedOptions)
+        const c = $$(checkboxes)
+
+        for (const v of onlyInValue) {
+            const opt = os.find(o => o.value === v)
+            if (opt) c[opt.label](true)
+        }
+
+        for (const v of onlyInCheckbox) {
+            const opt = os.find(o => o.value === v)
+            if (opt) c[opt.label](false)
+        }
+
+        if (onlyInCheckbox.length > 0 || onlyInValue.length > 0) {
+            checkboxes({ ...c })
+            preCheckboxes = $$(checkboxes)
+        }
+
+        preValues = $$(value)
+    }
+    value2chk() //copy value to chk 1st
+    useEffect(value2chk)
+
+    //chkbox to values
+    const chk2value = (n: string) => {
+        if (!$$(multiple)) return
+
+        const c = $$(checkboxes)
+        // if (preCheckboxes === c) return
+
+        // console.log(n, 'checked', $$(c[n]))
+
+        if (n === 'All') {
+            const vv = $$(c[n])
+            Object.values(c).forEach(o => o(vv))
+        }
+        else if (Object.values(c).some(o => !$$(o)))
+            c['All'](false)
+
+        const { onlyInCheckbox, onlyInValue } = chkValues()
+
+        if (onlyInCheckbox.length === 0 && onlyInValue.length === 0) return
+
+        const vs = new Set([$$(value)].flat()) // current value set
+
+        // // Update value by removing `onlyInValue` and adding `onlyInCb`
+        for (const v of onlyInValue) vs.delete(v)
+        for (const v of onlyInCheckbox) vs.add(v)
+
+        // if (Array.isArray($$(value)))
+        //     ($$(value) as []).push(...vs)
+        // else
+
+        value([...vs])
+        if (!ok)
+            if (isObservable(oriValue))
+                oriValue($$(value))
+        // preCheckboxes = $$(checkboxes)
+    }
+
+
+    // For "All" handling
+    const isAllSelected = useMemo(() => {
+        const allValues = $$(formattedOptions).map(opt => opt.value)
+        return allValues.every(v => $$($$(checkboxes)[v]))
+    })
+
+    function toggleAll() {
+        const set = $$(checkboxes)
+        const b = $$(isAllSelected)
+        $$(formattedOptions).forEach(opt => set[opt.label](b))
+        // value([...newSet]) // notify external
+    }
 
     useEffect(() => {
         if (typeof $$(visibleItemCount) !== 'number' || $$(visibleItemCount) <= 0)
@@ -81,22 +272,37 @@ export const Wheel = ({ options, itemHeight: ih, visibleItemCount: vic, value: i
         return $$(indicatorTop) - (index + $$(paddingItemCount)) * $$(itemHeight)
     }
 
-    const pickerItemCls = 'apply h-9 flex items-center justify-center text-base text-[#555] box-border opacity-60 transition-opacity duration-[0.3s,transform] delay-[0.3s] select-none scale-90'
+    const pickerItemCls = 'apply h-9 flex items-center justify-center text-base box-border transition-opacity duration-[0.3s,transform] delay-[0.3s] select-none scale-90'
 
     // --- Populate List --- (Now uses the 'let' paddingItemCount)
     function* populateList() {
         // Top padding
         for (let i = 0; i < $$(paddingItemCount); i++)
-            yield <li class={['picker-item is-padding invisible', pickerItemCls]} style={{ height: () => `${$$(itemHeight)}px` }}></li>
+            yield <li class={['wheeler-item is-padding invisible', pickerItemCls]} style={{ height: () => `${$$(itemHeight)}px` }}></li>
 
         // Actual items
-        for (const [index, option] of $$(formattedOptions).entries()) {
-            yield <li class={['picker-item', pickerItemCls]} data-index={index} data-value={option.value}
-                style={{ height: () => `${$$(itemHeight)}px` }}>{option.label}</li>
-        }
+        for (const [index, option] of $$(formattedOptions).entries())
+            yield <li class={['wheeler-item', pickerItemCls, $$(multiple) ? 'text-black' : 'text-[#555] opacity-60 ']} data-index={index} data-value={option.value}
+                style={{ height: () => `${$$(itemHeight)}px` }}>
+                {() => $$(multiple) ? () => {
+                    const isChecked = $$(checkboxes)[option.label]
+
+                    // useEffect(() => {
+                    //     chk2value(option.label)
+
+                    //     console.log(option.label, 'checked', $$(isChecked))
+                    // })
+
+                    return <label class="flex items-center gap-2 px-2">
+                        <input onClick={e => { isChecked(!$$(isChecked)); chk2value(option.label) }} type="checkbox" checked={$$(isChecked)} readonly />
+                        <span>{option.label}</span>
+                    </label>
+                } : option.label}
+            </li>
+
         // Bottom padding
         for (let i = 0; i < $$(paddingItemCount); i++)
-            yield < li class={['picker-item is-padding invisible', pickerItemCls]} style={{ height: `${$$(itemHeight)}px` }}></li>
+            yield < li class={['wheeler-item is-padding invisible', pickerItemCls]} style={{ height: `${$$(itemHeight)}px` }}></li>
     }
 
     function setTranslateY(y: number) {
@@ -111,6 +317,7 @@ export const Wheel = ({ options, itemHeight: ih, visibleItemCount: vic, value: i
     let snapToIndexTimeout = 0
     function snapToIndex(index: number, immediate = false) {
         if (!$$(list)) return
+        if ($$(multiple)) return
 
         // Clamp index based on options length (doesn't change)
         const clampedIndex = Math.max(0, Math.min(index, $$(formattedOptions).length - 1))
@@ -145,9 +352,11 @@ export const Wheel = ({ options, itemHeight: ih, visibleItemCount: vic, value: i
 
 
     function updateItemStyles() {
+        if ($$(multiple)) return
+
         // Uses the potentially updated viewportHeight
         const centerViewportY = $$(viewportHeight) / 2
-        const listItems = $$(list).querySelectorAll('.picker-item:not(.is-padding)')
+        const listItems = $$(list).querySelectorAll('.wheeler-item:not(.is-padding)')
         listItems.forEach(item => {
             const itemRect = item.getBoundingClientRect()
             const viewportRect = $$(viewport).getBoundingClientRect()
@@ -206,13 +415,14 @@ export const Wheel = ({ options, itemHeight: ih, visibleItemCount: vic, value: i
     }
 
     function handleEnd(e: PointerEvent) { /* ... unchanged ... */
-        if (!isDragging) return
+        if (!isDragging)
+            return
         isDragging = false
         $$(viewport).style.cursor = 'grab'
         if ($$(rafId)) cancelAnimationFrame($$(rafId))
         if (!hasMoved) { // Click/Tap
             const targetElement = e.target as HTMLElement
-            const targetItem = targetElement.closest('.picker-item') as HTMLElement
+            const targetItem = targetElement.closest('.wheeler-item') as HTMLElement
             if (targetItem && !targetItem.classList.contains('is-padding')) {
                 const clickedIndex = parseInt(targetItem.dataset.index, 10)
                 if (!isNaN(clickedIndex) && clickedIndex >= 0 && clickedIndex < $$(formattedOptions).length) {
@@ -267,17 +477,20 @@ export const Wheel = ({ options, itemHeight: ih, visibleItemCount: vic, value: i
     })
 
     //update by value
-    const oriValue = $()
+    let preValue
     useEffect(() => {
-        // Find initial index
-        if ($$(value) === $$(oriValue)) return
+        if ($$(multiple)) return
 
-        oriValue($$(value))
+        if ($$(value) === preValue) return
+        preValue = $$(value)
+
+        // if ($$(multiple)) {
+        //     checkboxes(new Set(Array.isArray($$(value)) ? $$(value) : []))
+        // } else {
         const foundIndex = $$(formattedOptions).findIndex(opt => opt.value === $$(value))
-
         if ($$(selectedIndex) !== foundIndex) selectedIndex(foundIndex)
+        // }
     })
-
 
 
     // <<< Populate list *after* first layout calculation >>>
@@ -287,15 +500,22 @@ export const Wheel = ({ options, itemHeight: ih, visibleItemCount: vic, value: i
     snapToIndex($$(selectedIndex), true)
 
     const oriIndex = $(-1)
-
+    //update by index
     useEffect(() => {
+        if ($$(multiple)) return
+
         if ($$(oriIndex) === $$(selectedIndex))
             return
 
         oriIndex($$(selectedIndex))
 
-        if ($$(value) !== $$(formattedOptions)[$$(selectedIndex)].value)
+        if ($$(value) !== $$(formattedOptions)[$$(selectedIndex)].value) {
             value($$(formattedOptions)[$$(selectedIndex)].value)
+
+            if (!ok)
+                if (isObservable(oriValue))
+                    oriValue($$(value))
+        }
 
         if ($$(selectedIndex) >= 0 && $$(selectedIndex) < $$(formattedOptions).length) { snapToIndex($$(selectedIndex)) }
         else {
@@ -304,12 +524,20 @@ export const Wheel = ({ options, itemHeight: ih, visibleItemCount: vic, value: i
         }
     })
 
+    const _backdropTransEnd = () => {
+        if (!$$(visible)) {
+            // container().style.display = "none"
+            // closed(true)
+        }
+    }
+
     // w-[200px] border bg-white shadow-[0_4px_8px_rgba(0,0,0,0.1)] mb-2.5 rounded-lg border-solid border-[#ccc]
     return <>
         {() => !$$(visible) ? null :
             $$(bottom) ?
                 <Portal mount={document.body}>
-                    <div class={['picker-widget', cls, "fixed inset-x-0 bottom-0 w-full"]}>
+
+                    <div class={['wheeler-widget', cls, "fixed inset-x-0 bottom-0 w-full"]}>
                         {() => $$(header) ? <>
                             <div class={'font-bold text-center'}>{header}</div>
                             <div class="my-1 h-px w-full bg-gray-300 dark:bg-gray-600"></div></> : null}
@@ -319,13 +547,13 @@ export const Wheel = ({ options, itemHeight: ih, visibleItemCount: vic, value: i
                             onPointerUp={handleEnd}
                             onPointerCancel={handleEnd}
                             onWheel={handleWheel} /* {passive: false } */
-                            class={['picker-viewport overflow-hidden relative touch-none cursor-grab overscroll-y-contain transition-[height] duration-[0.3s] ease-[ease-out]']}
+                            class={['wheeler-viewport overflow-hidden relative touch-none cursor-grab overscroll-y-contain transition-[height] duration-[0.3s] ease-[ease-out]']}
                             style={{ height: () => `${$$(viewportHeight)}px` }}
                         >
-                            <ul class='picker-list transition-transform duration-[0.3s] ease-[ease-out] m-0 p-0 list-none' ref={list}>
+                            <ul class='wheeler-list transition-transform duration-[0.3s] ease-[ease-out] m-0 p-0 list-none' ref={list}>
                                 {() => [...populateList()]}
                             </ul>
-                            <div class='picker-indicator absolute h-9 box-border pointer-events-none bg-[rgba(0,123,255,0.05)] border-y-[#007bff] border-t border-solid border-b inset-x-0' style={{
+                            <div class='wheeler-indicator absolute h-9 box-border pointer-events-none bg-[rgba(0,123,255,0.05)] border-y-[#007bff] border-t border-solid border-b inset-x-0' style={{
                                 height: () => `${$$(itemHeight)}px`,
                                 top: () => `${$$(indicatorTop) + $$($$(itemHeight)) / 2}px`, // Center line of indicator
                                 transform: `translateY(-50%)`,
@@ -335,7 +563,7 @@ export const Wheel = ({ options, itemHeight: ih, visibleItemCount: vic, value: i
                         </div>
                     </div>
                 </Portal>
-                : <div class={['picker-widget', cls,]}>
+                : <div class={['wheeler-widget', cls,]}>
                     {() => $$(header) ? <>
                         <div class={'font-bold text-center'}>{header}</div>
                         <div class="my-1 h-px w-full bg-gray-300 dark:bg-gray-600"></div></> : null}
@@ -345,19 +573,21 @@ export const Wheel = ({ options, itemHeight: ih, visibleItemCount: vic, value: i
                         onPointerUp={handleEnd}
                         onPointerCancel={handleEnd}
                         onWheel={handleWheel} /* {passive: false } */
-                        class={['picker-viewport overflow-hidden relative touch-none cursor-grab overscroll-y-contain transition-[height] duration-[0.3s] ease-[ease-out]']}
+                        class={['wheeler-viewport overflow-hidden relative touch-none cursor-grab overscroll-y-contain transition-[height] duration-[0.3s] ease-[ease-out]']}
                         style={{ height: () => `${$$(viewportHeight)}px` }}
                     >
-                        <ul class='picker-list transition-transform duration-[0.3s] ease-[ease-out] m-0 p-0 list-none' ref={list}>
+                        <ul class='wheeler-list transition-transform duration-[0.3s] ease-[ease-out] m-0 p-0 list-none' ref={list}>
                             {() => [...populateList()]}
                         </ul>
-                        <div class='picker-indicator absolute h-9 box-border pointer-events-none bg-[rgba(0,123,255,0.05)] border-y-[#007bff] border-t border-solid border-b inset-x-0' style={{
-                            height: () => `${$$(itemHeight)}px`,
-                            top: () => `${$$(indicatorTop) + $$($$(itemHeight)) / 2}px`, // Center line of indicator
-                            transform: `translateY(-50%)`,
-                        }}>
-                        </div>
 
+                        {() => $$(multiple) ? null :
+                            <div class='wheeler-indicator absolute h-9 box-border pointer-events-none bg-[rgba(0,123,255,0.05)] border-y-[#007bff] border-t border-solid border-b inset-x-0' style={{
+                                height: () => `${$$(itemHeight)}px`,
+                                top: () => `${$$(indicatorTop) + $$($$(itemHeight)) / 2}px`, // Center line of indicator
+                                transform: `translateY(-50%)`,
+                            }}>
+                            </div>
+                        }
                     </div>
                 </div>}
 
