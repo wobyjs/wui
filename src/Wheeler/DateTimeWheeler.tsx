@@ -1,7 +1,7 @@
 import { $, $$, Observable, ObservableMaybe, useEffect, useMemo, untrack, Portal, type JSX, isObservable } from 'woby'
 import { use } from 'use-woby'
 import { Wheeler } from './Wheeler' // Adjust path
-import { Button, variant } from './Button'
+import { Button, variant } from '../Button'
 
 // --- Utilities (unchanged) ---
 const padZero = (num: number): string => (num < 10 ? '0' : '') + num

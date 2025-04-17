@@ -10,11 +10,12 @@ export type WheelerProps = {
     header?: JSX.Element
     multiple?: ObservableMaybe<boolean>,
     ok?: ObservableMaybe<boolean>
-    visible?: ObservableMaybe<boolean>
+    visible?: Observable<boolean>
 
     bottom?: ObservableMaybe<boolean>
     hideOnBlur?: ObservableMaybe<boolean>
     commitOnBlur?: ObservableMaybe<boolean>
+    mask?: boolean
 }
 
 // export const useArrayWheel = <T,>(data: ObservableMaybe<T[]>, options?: Partial<WheelerProps> & { all?: string }) => {
@@ -54,7 +55,19 @@ export type WheelerProps = {
 // }
 
 
-export const Wheeler = ({ options, itemHeight: ih, visibleItemCount: vic, value: oriValue, class: cls, header, ok, visible = true, bottom, hideOnBlur, commitOnBlur, ...props }: WheelerProps) => {
+export const Wheeler = (props: WheelerProps) => {
+    const { options,
+        itemHeight: ih,
+        visibleItemCount: vic,
+        value: oriValue,
+        class: cls,
+        header,
+        ok,
+        visible = $(true),
+        bottom,
+        mask,
+        hideOnBlur,
+        commitOnBlur } = props
 
     const itemHeight = use(ih, 36)
     const visibleItemCount = use(vic, 5)
@@ -536,8 +549,15 @@ export const Wheeler = ({ options, itemHeight: ih, visibleItemCount: vic, value:
         {() => !$$(visible) ? null :
             $$(bottom) ?
                 <Portal mount={document.body}>
-
-                    <div class={['wheeler-widget', cls, "fixed inset-x-0 bottom-0 w-full"]}>
+                    {() => $$(mask) ? <>
+                        <div
+                            class={['fixed inset-0 bg-black/50 h-full w-full z-[50] opacity-50']}
+                            onClick={() => {
+                                visible(false)
+                            }}
+                        />
+                    </> : null}
+                    <div class={['wheeler-widget z-[100]', cls, "fixed inset-x-0 bottom-0 w-full "]}>
                         {() => $$(header) ? <>
                             <div class={'font-bold text-center'}>{header}</div>
                             <div class="my-1 h-px w-full bg-gray-300 dark:bg-gray-600"></div></> : null}
@@ -563,33 +583,37 @@ export const Wheeler = ({ options, itemHeight: ih, visibleItemCount: vic, value:
                         </div>
                     </div>
                 </Portal>
-                : <div class={['wheeler-widget', cls,]}>
-                    {() => $$(header) ? <>
-                        <div class={'font-bold text-center'}>{header}</div>
-                        <div class="my-1 h-px w-full bg-gray-300 dark:bg-gray-600"></div></> : null}
-                    <div ref={viewport}
-                        onPointerDown={handleStart as any}
-                        onPointerMove={handleMove as any}     /* {passive: false } */
-                        onPointerUp={handleEnd}
-                        onPointerCancel={handleEnd}
-                        onWheel={handleWheel} /* {passive: false } */
-                        class={['wheeler-viewport overflow-hidden relative touch-none cursor-grab overscroll-y-contain transition-[height] duration-[0.3s] ease-[ease-out]']}
-                        style={{ height: () => `${$$(viewportHeight)}px` }}
-                    >
-                        <ul class='wheeler-list transition-transform duration-[0.3s] ease-[ease-out] m-0 p-0 list-none' ref={list}>
-                            {() => [...populateList()]}
-                        </ul>
+                :
+                <div>
+                    <div class={['wheeler-widget', cls,]}>
+                        {() => $$(header) ? <>
+                            <div class={'font-bold text-center'}>{header}</div>
+                            <div class="my-1 h-px w-full bg-gray-300 dark:bg-gray-600"></div></> : null}
+                        <div ref={viewport}
+                            onPointerDown={handleStart as any}
+                            onPointerMove={handleMove as any}     /* {passive: false } */
+                            onPointerUp={handleEnd}
+                            onPointerCancel={handleEnd}
+                            onWheel={handleWheel} /* {passive: false } */
+                            class={['wheeler-viewport overflow-hidden relative touch-none cursor-grab overscroll-y-contain transition-[height] duration-[0.3s] ease-[ease-out]']}
+                            style={{ height: () => `${$$(viewportHeight)}px` }}
+                        >
+                            <ul class='wheeler-list transition-transform duration-[0.3s] ease-[ease-out] m-0 p-0 list-none' ref={list}>
+                                {() => [...populateList()]}
+                            </ul>
 
-                        {() => $$(multiple) ? null :
-                            <div class='wheeler-indicator absolute h-9 box-border pointer-events-none bg-[rgba(0,123,255,0.05)] border-y-[#007bff] border-t border-solid border-b inset-x-0' style={{
-                                height: () => `${$$(itemHeight)}px`,
-                                top: () => `${$$(indicatorTop) + $$($$(itemHeight)) / 2}px`, // Center line of indicator
-                                transform: `translateY(-50%)`,
-                            }}>
-                            </div>
-                        }
+                            {() => $$(multiple) ? null :
+                                <div class='wheeler-indicator absolute h-9 box-border pointer-events-none bg-[rgba(0,123,255,0.05)] border-y-[#007bff] border-t border-solid border-b inset-x-0' style={{
+                                    height: () => `${$$(itemHeight)}px`,
+                                    top: () => `${$$(indicatorTop) + $$($$(itemHeight)) / 2}px`, // Center line of indicator
+                                    transform: `translateY(-50%)`,
+                                }}>
+                                </div>
+                            }
+                        </div>
                     </div>
-                </div>}
+                </div>
+        }
 
     </>
 }
