@@ -584,33 +584,31 @@ export const Wheeler = (props: WheelerProps) => {
                     </div>
                 </Portal>
                 :
-                <div>
-                    <div class={['wheeler-widget', cls,]}>
-                        {() => $$(header) ? <>
-                            <div class={'font-bold text-center'}>{header}</div>
-                            <div class="my-1 h-px w-full bg-gray-300 dark:bg-gray-600"></div></> : null}
-                        <div ref={viewport}
-                            onPointerDown={handleStart as any}
-                            onPointerMove={handleMove as any}     /* {passive: false } */
-                            onPointerUp={handleEnd}
-                            onPointerCancel={handleEnd}
-                            onWheel={handleWheel} /* {passive: false } */
-                            class={['wheeler-viewport overflow-hidden relative touch-none cursor-grab overscroll-y-contain transition-[height] duration-[0.3s] ease-[ease-out]']}
-                            style={{ height: () => `${$$(viewportHeight)}px` }}
-                        >
-                            <ul class='wheeler-list transition-transform duration-[0.3s] ease-[ease-out] m-0 p-0 list-none' ref={list}>
-                                {() => [...populateList()]}
-                            </ul>
+                <div class={['wheeler-widget', cls,]}>
+                    {() => $$(header) ? <>
+                        <div class={'font-bold text-center'}>{header}</div>
+                        <div class="my-1 h-px w-full bg-gray-300 dark:bg-gray-600"></div></> : null}
+                    <div ref={viewport}
+                        onPointerDown={handleStart as any}
+                        onPointerMove={handleMove as any}     /* {passive: false } */
+                        onPointerUp={handleEnd}
+                        onPointerCancel={handleEnd}
+                        onWheel={handleWheel} /* {passive: false } */
+                        class={['wheeler-viewport overflow-hidden relative touch-none cursor-grab overscroll-y-contain transition-[height] duration-[0.3s] ease-[ease-out]']}
+                        style={{ height: () => `${$$(viewportHeight)}px` }}
+                    >
+                        <ul class='wheeler-list transition-transform duration-[0.3s] ease-[ease-out] m-0 p-0 list-none' ref={list}>
+                            {() => [...populateList()]}
+                        </ul>
 
-                            {() => $$(multiple) ? null :
-                                <div class='wheeler-indicator absolute h-9 box-border pointer-events-none bg-[rgba(0,123,255,0.05)] border-y-[#007bff] border-t border-solid border-b inset-x-0' style={{
-                                    height: () => `${$$(itemHeight)}px`,
-                                    top: () => `${$$(indicatorTop) + $$($$(itemHeight)) / 2}px`, // Center line of indicator
-                                    transform: `translateY(-50%)`,
-                                }}>
-                                </div>
-                            }
-                        </div>
+                        {() => $$(multiple) ? null :
+                            <div class='wheeler-indicator absolute h-9 box-border pointer-events-none bg-[rgba(0,123,255,0.05)] border-y-[#007bff] border-t border-solid border-b inset-x-0' style={{
+                                height: () => `${$$(itemHeight)}px`,
+                                top: () => `${$$(indicatorTop) + $$($$(itemHeight)) / 2}px`, // Center line of indicator
+                                transform: `translateY(-50%)`,
+                            }}>
+                            </div>
+                        }
                     </div>
                 </div>
         }
