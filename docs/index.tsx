@@ -25,8 +25,8 @@ import { ToggleButton } from "../src/ToggleButton"
 import { Tab, Tabs } from "../src/Tabs"
 import { Wodal } from 'woby-modal'
 import { useViewportSize } from 'use-woby'
-import { Wheeler } from '../src/Wheeler'
-import { DateTimeWheeler, DateTimeWheelerType } from '../src/DateTimeWheeler'
+import { Wheeler } from '../src/Wheeler/Wheeler'
+import { DateTimeWheeler, DateTimeWheelerType } from '../src/Wheeler/DateTimeWheeler'
 
 const FaceIcon = (
 	<svg
@@ -414,7 +414,7 @@ const App = () => (
 						options,
 						value,
 						visibleItemCount, // Initial count
-						multiple: true,
+						all: 'All',
 						// ok,
 					}} class='w-[200px] border bg-white shadow-[0_4px_8px_rgba(0,0,0,0.1)] mb-2.5 rounded-lg border-solid border-[#ccc]' />
 					<td class='pl-10'>

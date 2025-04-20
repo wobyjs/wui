@@ -1,58 +1,6 @@
 import { $, $$, ArrayMaybe, isObservable, Observable, ObservableMaybe, Portal, useEffect, useMemo } from 'woby'
 import { use } from 'use-woby'
-
-export type WheelerProps = {
-    options: ObservableMaybe<any[]>,
-    itemHeight?: ObservableMaybe<number>,
-    visibleItemCount?: ObservableMaybe<number>,
-    value?: ObservableMaybe<ArrayMaybe<string | number>>,
-    class?: JSX.Class
-    header?: JSX.Element
-    multiple?: ObservableMaybe<boolean>,
-    ok?: ObservableMaybe<boolean>
-    visible?: Observable<boolean>
-
-    bottom?: ObservableMaybe<boolean>
-    hideOnBlur?: ObservableMaybe<boolean>
-    commitOnBlur?: ObservableMaybe<boolean>
-    mask?: boolean
-}
-
-// export const useArrayWheel = <T,>(data: ObservableMaybe<T[]>, options?: Partial<WheelerProps> & { all?: string }) => {
-//     const { all } = options ?? {}
-//     const checked = all ? $$(data).map(f => $(false)) : undefined
-
-//     if (all) {
-//         useEffect(() => {
-//             if (typeof $$(checked[0]) === 'undefined') return
-//             if ($$(checked[0]))
-//                 checked.forEach((c, i) => (i === 0) ? null : checked[i](true))
-//             else
-//                 checked.forEach((c, i) => (i === 0) ? null : checked[i](false))
-//         })
-
-//         useEffect(() => {
-//             const c = checked.slice(1)
-//             const at = c.every(f => $$(f))
-//             const af = c.every(f => !$$(f))
-//             if (at) checked[0](true)
-//             if (af) checked[0](false)
-//             if (!at && !af) checked[0](undefined)
-//         })
-//     }
-//     return {
-//         data: [data], checked, value: [$()],
-//         renderer: [r => r] as (((r: any) => any)[]) | undefined,
-//         valuer: [r => r] as (((r: any) => any)[]) | undefined,
-//         checkboxer: (all ? [r => checked[$$(data).indexOf(r)]] : null) as (((r: any) => Observable<boolean>)[]) | undefined,
-//         checkbox: [$(true)] as (Observable<boolean>[]) | undefined,
-//         noMask: true as boolean | undefined,
-//         hideOnBackdrop: true as boolean | undefined,
-//         rows: Math.min(6, data.length) as number | undefined,
-//         open: $(false),
-//         ...options ?? {}
-//     }
-// }
+import { WheelerProps, WheelItem } from './WheelerType'
 
 
 export const Wheeler = (props: WheelerProps) => {
@@ -65,6 +13,7 @@ export const Wheeler = (props: WheelerProps) => {
         ok,
         visible = $(true),
         bottom,
+        all,
         mask,
         hideOnBlur,
         commitOnBlur } = props
@@ -97,7 +46,7 @@ export const Wheeler = (props: WheelerProps) => {
 
     const viewport = $<HTMLDivElement>()
     const list = $<HTMLUListElement>()
-    const multiple = use(props.multiple, false)
+    const multiple = all
 
     let preOptions, preFormattedOptions
 
@@ -105,10 +54,10 @@ export const Wheeler = (props: WheelerProps) => {
         if (preOptions === $$(options)) return preFormattedOptions
 
         const base = $$(options).map(opt =>
-            typeof opt === 'object' && opt !== null ? opt : { value: opt, label: String(opt) }
-        ) as { value: any, label: string }[]
+            typeof opt === 'object' && opt !== null ? opt : { value: opt, label: String(opt), key1: String(opt) } as WheelItem
+        ) //as { value: any, label: string, key1: string }[]
 
-        const b2 = $$(multiple) ? [{ value: '__ALL__', label: 'All' }, ...base] : base
+        const b2 = $$(multiple) ? [{ value: $$(multiple), label: $$(multiple), key1: $$(multiple) } as WheelItem, ...base] : base
 
         if ($$(multiple)) {
             const r = {} as Record<string, Observable<boolean>>
@@ -140,7 +89,7 @@ export const Wheeler = (props: WheelerProps) => {
 
         // Values checked in checkbox but not in current value
         const onlyInCheckbox = os
-            .filter(opt => $$(cb[opt.label]) && !vs.has(opt.value) && opt.label !== 'All')
+            .filter(opt => $$(cb[opt.label]) && !vs.has(opt.value) && opt.label !== $$(multiple))
             .map(opt => opt.value)
 
         // Values in current value but now unchecked
@@ -207,12 +156,12 @@ export const Wheeler = (props: WheelerProps) => {
 
         // console.log(n, 'checked', $$(c[n]))
 
-        if (n === 'All') {
+        if (n === $$(multiple)) {
             const vv = $$(c[n])
             Object.values(c).forEach(o => o(vv))
         }
         else if (Object.values(c).some(o => !$$(o)))
-            c['All'](false)
+            c[$$(multiple)](false)
 
         const { onlyInCheckbox, onlyInValue } = chkValues()
 
