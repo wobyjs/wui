@@ -54,24 +54,51 @@ export const Wheeler = (props: WheelerProps) => {
         if (preOptions === $$(options)) return preFormattedOptions
 
         const base = $$(options).map(opt =>
-            typeof opt === 'object' && opt !== null ? opt : { value: opt, label: String(opt), key1: String(opt) } as WheelItem
+            typeof opt === 'object' && opt !== null ? opt : { value: opt, label: String(opt) } as WheelItem
         ) //as { value: any, label: string, key1: string }[]
 
-        const b2 = $$(multiple) ? [{ value: $$(multiple), label: $$(multiple), key1: $$(multiple) } as WheelItem, ...base] : base
+
+        // const b2 = $$(multiple) ? [{ value: $$(multiple), label: $$(multiple), component: () => $$(multiple) } as WheelItem, ...base] : base
 
         if ($$(multiple)) {
+            base.unshift({ value: $$(multiple), label: $$(multiple) })
+
             const r = {} as Record<string, Observable<boolean>>
 
-            b2.map(opt => r[opt.label] = $(false)) //init
+            base.map(opt => r[opt.label] = $(false)) //init
             checkboxes(r)
 
             const vs = [...[$$(value)]].flat()
-            b2.forEach(opt => r[opt.label](vs.some(sv => sv === opt.value)))
+            base.forEach(opt => r[opt.label](vs.some(sv => sv === opt.value)))
+
+            base.forEach((o, index) => o.component = o.component ? o.component : () => <li class={['wheeler-item', 'text-black']} data-index={index} data-value={o.value}
+                style={{ height: () => `${$$(itemHeight)}px` }}>
+                {() => {
+                    const isChecked = $$(checkboxes)[o.label]
+
+                    // useEffect(() => {
+                    //     chk2value(option.label)
+
+                    //     console.log(option.label, 'checked', $$(isChecked))
+                    // })
+
+                    return <label class="flex items-center gap-2 px-2">
+                        <input class='pl-2' onClick={e => { isChecked(!$$(isChecked)); chk2value(o.label) }} type="checkbox" checked={$$(isChecked)} readonly />
+                        <span class={['pl-5 w-full']} >{o.label}</span>
+                    </label>
+                }}
+            </li>)
+
+        }
+        else {
+            base.forEach((o, index) => o.component = o.component ? o.component : () => <li class={['wheeler-item', pickerItemCls, 'text-[#555] opacity-60 ']} data-index={index} data-value={o.value}
+                style={{ height: () => `${$$(itemHeight)}px` }}>{o.label}
+            </li>)
         }
 
         preOptions = $$(options)
 
-        return preFormattedOptions = b2
+        return preFormattedOptions = base
     })
 
     const chkValues = () => {
@@ -148,7 +175,7 @@ export const Wheeler = (props: WheelerProps) => {
     useEffect(value2chk)
 
     //chkbox to values
-    const chk2value = (n: string) => {
+    const chk2value = (n: string | number) => {
         if (!$$(multiple)) return
 
         const c = $$(checkboxes)
@@ -244,23 +271,7 @@ export const Wheeler = (props: WheelerProps) => {
 
         // Actual items
         for (const [index, option] of $$(formattedOptions).entries())
-            yield <li class={['wheeler-item', pickerItemCls, $$(multiple) ? 'text-black' : 'text-[#555] opacity-60 ']} data-index={index} data-value={option.value}
-                style={{ height: () => `${$$(itemHeight)}px` }}>
-                {() => $$(multiple) ? () => {
-                    const isChecked = $$(checkboxes)[option.label]
-
-                    // useEffect(() => {
-                    //     chk2value(option.label)
-
-                    //     console.log(option.label, 'checked', $$(isChecked))
-                    // })
-
-                    return <label class="flex items-center gap-2 px-2">
-                        <input onClick={e => { isChecked(!$$(isChecked)); chk2value(option.label) }} type="checkbox" checked={$$(isChecked)} readonly />
-                        <span>{option.label}</span>
-                    </label>
-                } : option.label}
-            </li>
+            yield <option.component />
 
         // Bottom padding
         for (let i = 0; i < $$(paddingItemCount); i++)
@@ -533,33 +544,31 @@ export const Wheeler = (props: WheelerProps) => {
                     </div>
                 </Portal>
                 :
-                <div>
-                    <div class={['wheeler-widget', cls,]}>
-                        {() => $$(header) ? <>
-                            <div class={'font-bold text-center'}>{header}</div>
-                            <div class="my-1 h-px w-full bg-gray-300 dark:bg-gray-600"></div></> : null}
-                        <div ref={viewport}
-                            onPointerDown={handleStart as any}
-                            onPointerMove={handleMove as any}     /* {passive: false } */
-                            onPointerUp={handleEnd}
-                            onPointerCancel={handleEnd}
-                            onWheel={handleWheel} /* {passive: false } */
-                            class={['wheeler-viewport overflow-hidden relative touch-none cursor-grab overscroll-y-contain transition-[height] duration-[0.3s] ease-[ease-out]']}
-                            style={{ height: () => `${$$(viewportHeight)}px` }}
-                        >
-                            <ul class='wheeler-list transition-transform duration-[0.3s] ease-[ease-out] m-0 p-0 list-none' ref={list}>
-                                {() => [...populateList()]}
-                            </ul>
+                <div class={['wheeler-widget', cls,]}>
+                    {() => $$(header) ? <>
+                        <div class={'font-bold text-center'}>{header}</div>
+                        <div class="my-1 h-px w-full bg-gray-300 dark:bg-gray-600"></div></> : null}
+                    <div ref={viewport}
+                        onPointerDown={handleStart as any}
+                        onPointerMove={handleMove as any}     /* {passive: false } */
+                        onPointerUp={handleEnd}
+                        onPointerCancel={handleEnd}
+                        onWheel={handleWheel} /* {passive: false } */
+                        class={['wheeler-viewport overflow-hidden relative touch-none cursor-grab overscroll-y-contain transition-[height] duration-[0.3s] ease-[ease-out]']}
+                        style={{ height: () => `${$$(viewportHeight)}px` }}
+                    >
+                        <ul class='wheeler-list transition-transform duration-[0.3s] ease-[ease-out] m-0 p-0 list-none' ref={list}>
+                            {() => [...populateList()]}
+                        </ul>
 
-                            {() => $$(multiple) ? null :
-                                <div class='wheeler-indicator absolute h-9 box-border pointer-events-none bg-[rgba(0,123,255,0.05)] border-y-[#007bff] border-t border-solid border-b inset-x-0' style={{
-                                    height: () => `${$$(itemHeight)}px`,
-                                    top: () => `${$$(indicatorTop) + $$($$(itemHeight)) / 2}px`, // Center line of indicator
-                                    transform: `translateY(-50%)`,
-                                }}>
-                                </div>
-                            }
-                        </div>
+                        {() => $$(multiple) ? null :
+                            <div class='wheeler-indicator absolute h-9 box-border pointer-events-none bg-[rgba(0,123,255,0.05)] border-y-[#007bff] border-t border-solid border-b inset-x-0' style={{
+                                height: () => `${$$(itemHeight)}px`,
+                                top: () => `${$$(indicatorTop) + $$($$(itemHeight)) / 2}px`, // Center line of indicator
+                                transform: `translateY(-50%)`,
+                            }}>
+                            </div>
+                        }
                     </div>
                 </div>
         }

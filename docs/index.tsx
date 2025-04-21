@@ -26,6 +26,7 @@ import { Tab, Tabs } from "../src/Tabs"
 import { Wodal } from 'woby-modal'
 import { useViewportSize } from 'use-woby'
 import { Wheeler } from '../src/Wheeler/Wheeler'
+import { MultiWheeler } from '../src/Wheeler/MultiWheeler'
 import { DateTimeWheeler, DateTimeWheelerType } from '../src/Wheeler/DateTimeWheeler'
 
 const FaceIcon = (
@@ -431,11 +432,19 @@ const App = () => (
 				</tbody>
 				</table>
 
-				<DateTimeWheeler
+				{/* <DateTimeWheeler
 					title={d => <div class='text-center'>{() => d.toString()}</div>}
 					value={selectedDate}      // Pass date observable
 					// onChange removed
 					mode={pickerType}
+					ok={dateOk}
+				/> */}
+				<MultiWheeler
+					options={[["a", "b"], [1, 2, 3], [0, 5, 87, 8, 9]]}
+					title={<div>test</div>}
+					value={[$("a"), $(1), $(0)]}      // Pass date observable
+					headers={["col1", "col2", "col3"]}
+					// onChange removed
 					ok={dateOk}
 				/>
 

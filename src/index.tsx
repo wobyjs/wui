@@ -23,6 +23,8 @@ export * from './Editor/Editor'
 export * from './Wheeler/Wheeler'
 export * from './Wheeler/WheelerType'
 export * from './Wheeler/DateTimeWheeler'
+export * from './Wheeler/Wheeler'
+export * from './Wheeler/MultiWheeler'
 
 export * from "./PropertyForm/BooleanEditor"
 export * from "./PropertyForm/ColorEditor"
