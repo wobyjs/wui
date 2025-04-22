@@ -32,6 +32,6 @@ export * from "./PropertyForm/NumberEditor"
 export * from "./PropertyForm/ObjectEditor"
 export * from "./PropertyForm/PropertyForm"
 export * from "./PropertyForm/StringEditor"
-export * from "./PropertyForm/propertyFormEditors/EditorProps"
+export * from "./PropertyForm/EditorProps"
 
 import './input.css'

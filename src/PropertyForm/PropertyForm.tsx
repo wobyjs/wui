@@ -82,6 +82,10 @@ export const PropertyForm = (props: PropertyFormProps) => {
 				return
 			}
 
+			if (key.includes("Obj") || key.startsWith("$")) {
+				return
+			}
+
 			const value = propertyData[key]
 			const optionName = Array.isArray(propertyData)
 				? null

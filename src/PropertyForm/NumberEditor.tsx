@@ -1,8 +1,9 @@
 /** @jsxImportSource woby */
 
 import { $$, ObservableMaybe, isObservable } from "woby"
-import { NumberEditor as NumEditor } from "./propertyFormEditors/NumberEditor"
 import { Editors, UIProps } from "./PropertyForm"
+import { NumberField } from "../NumberField"
+import { EditorProps } from "./EditorProps"
 
 export const NumberEditor = () => {
 	const renderCondition = (value: ObservableMaybe<string>) => {
@@ -15,6 +16,19 @@ export const NumberEditor = () => {
 		const { value } = props
 
 		return <NumEditor value={value} />
+	}
+
+	const NumEditor = (props: EditorProps) => {
+		const { value } = props
+
+		return (
+			<NumberField
+				noMinMax
+				value={value}
+				class="[&_input]:w-full [&_button]:w-[2rem] [&_button]:text-[130%] [&_button]:leading-[0] [&_button]:font-bold h-[2rem]"
+				disabled={!isObservable(value)}
+			></NumberField>
+		)
 	}
 
 	return {

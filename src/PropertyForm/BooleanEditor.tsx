@@ -1,8 +1,9 @@
 /** @jsxImportSource woby */
 
-import { $$, ObservableMaybe, isObservable } from "woby"
+import { $, $$, ObservableMaybe, isObservable } from "woby"
 import { Editors, UIProps } from "./PropertyForm"
-import { BooleanEditor as BoolEditor } from "./propertyFormEditors/BooleanEditor"
+import { Checkbox } from "../Checkbox"
+import { EditorProps } from "./EditorProps"
 
 export const BooleanEditor = () => {
 	const renderCondition = (value: ObservableMaybe<string>) => {
@@ -23,6 +24,22 @@ export const BooleanEditor = () => {
 		)
 	}
 
+	const BoolEditor = (props: EditorProps) => {
+		const { value, onChange } = props
+		const originalValue = $($$(value))
+	
+		return (
+			<Checkbox
+				checked={$$(value)}
+				disabled={!isObservable(value)}
+				onChange={(e) => {
+					originalValue((e.target as HTMLInputElement).value)
+					onChange?.(e)
+				}}
+			/>
+		)
+	}
+	
 	return {
 		UI,
 		renderCondition,

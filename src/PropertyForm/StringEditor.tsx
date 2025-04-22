@@ -1,8 +1,9 @@
 /** @jsxImportSource woby */
 
 import { $$, isObservable, ObservableMaybe } from "woby"
-import { StringEditor as StrEditor } from "./propertyFormEditors/StringEditor"
 import { Editors, UIProps } from "./PropertyForm"
+import { TextField } from "../TextField"
+import { EditorProps } from "./EditorProps"
 
 export const StringEditor = () => {
 	const renderCondition = (value: ObservableMaybe<string>, key) => {
@@ -19,7 +20,20 @@ export const StringEditor = () => {
 
 		return (
 			//@ts-ignore
-			<StrEditor value={value} />
+			<StringEditor value={value} />
+		)
+	}
+
+	const StringEditor = (props: EditorProps) => {
+		const { value } = props
+
+		return (
+			<TextField
+				className={""}
+				value={value}
+				assignOnEnter
+				disabled={!isObservable(value)}
+			></TextField>
 		)
 	}
 

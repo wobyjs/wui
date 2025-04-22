@@ -3,7 +3,6 @@
 import { $$, ObservableMaybe, isObservable } from "woby"
 import { Editors, PropertyForm, UIProps } from "./PropertyForm"
 
-
 export const ObjectEditor = () => {
 	const renderCondition = (value: ObservableMaybe<any>, key) => {
 		const isObject = isObservable(value) ? typeof $$(value) == "object" : typeof value == "object"
