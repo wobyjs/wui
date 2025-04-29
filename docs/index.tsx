@@ -26,6 +26,7 @@ import { Tab, Tabs } from "../src/Tabs"
 import { Wodal } from 'woby-modal'
 import { useViewportSize } from 'use-woby'
 import { Wheeler } from '../src/Wheeler/Wheeler'
+import { WheelerItem } from '../src/Wheeler/WheelerType'
 import { MultiWheeler } from '../src/Wheeler/MultiWheeler'
 import { DateTimeWheeler, DateTimeWheelerType } from '../src/Wheeler/DateTimeWheeler'
 
@@ -218,7 +219,7 @@ const { height: vh, width: vw, offsetLeft: ol, offsetTop: ot, pageTop: pt, pageL
 
 const options = [ /* ... options ... */
 	{ value: 'apple', label: '🍎 Apple' }, { value: 'banana', label: '🍌 Banana' }, { value: 'orange', label: '🍊 Orange' }, { value: 'grape', label: '🍇 Grape' }, { value: 'strawberry', label: '🍓 Strawberry' }, { value: 'blueberry', label: '🫐 Blueberry' }, { value: 'mango', label: '🥭 Mango' }, { value: 'pineapple', label: '🍍 Pineapple' }, { value: 'kiwi', label: '🥝 Kiwi' }, { value: 'watermelon', label: '🍉 Watermelon' }, { value: 'peach', label: '🍑 Peach' }, { value: 'cherry', label: '🍒 Cherry' }
-]
+] as WheelerItem<string>[]
 
 const visibleItemCount = $(5)
 const value = $('orange')

@@ -2,7 +2,7 @@ import { $, $$, Observable, ObservableMaybe, useEffect, useMemo, untrack, Portal
 import { use } from 'use-woby'
 import { Wheeler } from './Wheeler' // Adjust path
 import { Button, variant } from '../Button'
-import { WheelItem } from './WheelerType'
+import { WheelerItem } from './WheelerType'
 
 // --- Utilities (unchanged) ---
 const padZero = (num: number): string => (num < 10 ? '0' : '') + num
@@ -191,7 +191,7 @@ export const DateTimeWheeler = ({
             let disabled = false
             if (min && year === min.getFullYear() && month === min.getMonth() && d < min.getDate()) disabled = true
             if (max && year === max.getFullYear() && month === max.getMonth() && d > max.getDate()) disabled = true
-            if (!disabled) options.push({ value: d, label: d } as WheelItem)
+            if (!disabled) options.push({ value: d, label: d } as WheelerItem)
         } return options
     })
     const hourOptions = useMemo(() => Array.from({ length: 24 }, (_, h) => ({ value: h, label: padZero(h) })))

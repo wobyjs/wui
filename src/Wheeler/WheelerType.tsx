@@ -1,14 +1,14 @@
-import { $, $$, ArrayMaybe, isObservable, Observable, ObservableMaybe, Portal, useEffect, useMemo } from 'woby'
+import { $, $$, ArrayMaybe, isObservable, Observable, ObservableMaybe, ObservableReadonly, Portal, useEffect, useMemo } from 'woby'
 import { use } from 'use-woby'
 import { EnumType } from 'typescript'
 import { Nullable } from 'woby/dist/types/types'
 
-export type WheelItem = { value: any, label: string | number, component?: JSX.Element }
-export type WheelerProps = {
-    options: ObservableMaybe<WheelItem[]>,
+export type WheelerItem<T = unknown> = { value: T, label: string | number, component?: JSX.Element }
+export type WheelerProps<T = unknown> = {
+    options: ObservableMaybe<WheelerItem<T>[]>,
     itemHeight?: ObservableMaybe<number>,
     visibleItemCount?: ObservableMaybe<number>,
-    value?: ObservableMaybe<ArrayMaybe<string | number>>,
+    value?: ObservableMaybe<ArrayMaybe<WheelerItem<T>['value']>>,
     class?: JSX.Class
     header?: JSX.Element
     /** implicit for multiple */
@@ -43,30 +43,31 @@ export type ChangeProp<
     [P in K]: Optional extends true ? V | undefined : V
 }
 
-export const useArrayWheeler = <T extends string | number | symbol,>(data: ObservableMaybe<T[]>, options?: ChangeProp<WheelerProps, 'options', ObservableMaybe<any[]>, true>) => {
-    const a = options.options = $()
-
-    useEffect(() => {
-        a($$(data).reduce((acc, value) => {
-            acc[value] = value
-            return acc
-        }, {} as Record<T, T>) as any)
-    })
-
-    return options as WheelerProps
+export const useArrayOptions = <T,>(data: ObservableMaybe<T[]>) => {
+    return useMemo(() => $$(data).map(v => ({
+        label: v,
+        value: v,
+    }), {} as Record<string, T>) as any)
 }
 
-export const useEnumWheeler = <T extends EnumType,>(data: ObservableMaybe<T>, options?: ChangeProp<WheelerProps, 'options', ObservableMaybe<any[]>, true>) => {
-    const a = options.options = $()
+type Enum = { [key: string]: string | number }
 
-    useEffect(() => {
-        a(
-            Object.values(data).reduce((acc, value) => {
-                acc[value] = value
-                return acc
-            }, {} as Record<string, string>)
-        )
-    })
+export const useEnumOptions = <E extends Enum>(
+    enumObj: ObservableMaybe<E>
+): ObservableReadonly<WheelerItem<E[keyof E]>[]> =>
+    // When using numeric enums, TypeScript creates a reverse mapping.
+    // We filter the keys to exclude those numeric reverse keys.
+    useMemo(() => Object.keys($$(enumObj))
+        .filter(key => isNaN(Number(key)))
+        .map(key => ({
+            value: $$(enumObj)[key] as E[keyof E],
+            label: key,
+        })))
 
-    return options
-}
+
+export const useRecordOptions = <T, V>(
+    data: ObservableMaybe<Record<keyof T, ObservableMaybe<V>>>
+): ObservableReadonly<WheelerItem<ObservableMaybe<V>>[]> => useMemo(() => (Object.keys($$(data)) as (keyof T)[]).map((key) => ({
+    value: $$(data)[key],
+    label: key as string, // assuming the key is representable as a string or number
+})))

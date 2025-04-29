@@ -1,9 +1,9 @@
 import { $, $$, ArrayMaybe, isObservable, Observable, ObservableMaybe, Portal, useEffect, useMemo } from 'woby'
 import { use } from 'use-woby'
-import { WheelerProps, WheelItem } from './WheelerType'
+import { WheelerProps, WheelerItem } from './WheelerType'
 
 
-export const Wheeler = (props: WheelerProps) => {
+export const Wheeler = <T,>(props: WheelerProps<T>) => {
     const { options,
         itemHeight: ih,
         visibleItemCount: vic,
@@ -54,7 +54,7 @@ export const Wheeler = (props: WheelerProps) => {
         if (preOptions === $$(options)) return preFormattedOptions
 
         const base = $$(options).map(opt =>
-            typeof opt === 'object' && opt !== null ? opt : { value: opt, label: String(opt) } as WheelItem
+            typeof opt === 'object' && opt !== null ? opt : { value: opt, label: String(opt) } as WheelerItem
         ) //as { value: any, label: string, key1: string }[]
 
 
@@ -204,7 +204,7 @@ export const Wheeler = (props: WheelerProps) => {
         //     ($$(value) as []).push(...vs)
         // else
 
-        value([...vs])
+        value([...vs] as T[])
         if (!ok)
             if (isObservable(oriValue))
                 oriValue($$(value))
@@ -226,6 +226,8 @@ export const Wheeler = (props: WheelerProps) => {
     }
 
     useEffect(() => {
+        if (!$$(formattedOptions)) return
+
         if (typeof $$(visibleItemCount) !== 'number' || $$(visibleItemCount) <= 0)
             visibleItemCount(3)
 
@@ -270,8 +272,9 @@ export const Wheeler = (props: WheelerProps) => {
             yield <li class={['wheeler-item is-padding invisible', pickerItemCls]} style={{ height: () => `${$$(itemHeight)}px` }}></li>
 
         // Actual items
-        for (const [index, option] of $$(formattedOptions).entries())
-            yield <option.component />
+        if ($$(formattedOptions))
+            for (const [index, option] of $$(formattedOptions).entries())
+                yield <option.component />
 
         // Bottom padding
         for (let i = 0; i < $$(paddingItemCount); i++)
