@@ -1,25 +1,26 @@
-import { $, $$, ArrayMaybe, isObservable, Observable, ObservableMaybe, Portal, useEffect, useMemo } from 'woby'
-import { use } from 'use-woby'
+import { $, $$, isObservable, Observable, Portal, useEffect, useMemo } from 'woby'
+import { use, useClickAway } from 'use-woby'
 import { WheelerProps, WheelerItem } from './WheelerType'
 
+export const ActiveWheelers = $([])
 
 export const Wheeler = <T,>(props: WheelerProps<T>) => {
     const { options,
         itemHeight: ih,
-        visibleItemCount: vic,
+        itemCount: vic,
         value: oriValue,
         class: cls,
         header,
         ok,
         visible = $(true),
-        bottom,
-        all,
         mask,
-        hideOnBlur,
+        bottom = $$(mask),
+        all,
+        cancelOnBlur,
         commitOnBlur } = props
 
     const itemHeight = use(ih, 36)
-    const visibleItemCount = use(vic, 5)
+    const itemCount = use(vic, 5)
     const value = $($$(oriValue))
 
     const CLICK_THRESHOLD_PX = 5
@@ -228,15 +229,15 @@ export const Wheeler = <T,>(props: WheelerProps<T>) => {
     useEffect(() => {
         if (!$$(formattedOptions)) return
 
-        if (typeof $$(visibleItemCount) !== 'number' || $$(visibleItemCount) <= 0)
-            visibleItemCount(3)
+        if (typeof $$(itemCount) !== 'number' || $$(itemCount) <= 0)
+            itemCount(3)
 
-        if ($$(visibleItemCount) % 2 === 0) {
-            console.warn(`visibleItemCount (${$$(visibleItemCount)}) should be odd for symmetry. Adjusting to ${$$(visibleItemCount) + 1}.`)
-            visibleItemCount($$(visibleItemCount) + 1)
+        if ($$(itemCount) % 2 === 0) {
+            console.warn(`itemCount (${$$(itemCount)}) should be odd for symmetry. Adjusting to ${$$(itemCount) + 1}.`)
+            itemCount($$(itemCount) + 1)
         }
 
-        paddingItemCount(Math.floor($$(visibleItemCount) / 2))
+        paddingItemCount(Math.floor($$(itemCount) / 2))
 
 
         // Recalculate scroll boundaries based on new layout
@@ -245,10 +246,10 @@ export const Wheeler = <T,>(props: WheelerProps<T>) => {
         maxTranslateY = _getTargetYForIndexUnbound(0)
 
         snapToIndex($$(selectedIndex))
-        // console.log(`Layout Updated: count=${visibleItemCount}, h=${viewportHeight}, pad=${paddingItemCount}, minY=${minTranslateY}, maxY=${maxTranslateY}`);
+        // console.log(`Layout Updated: count=${itemCount}, h=${viewportHeight}, pad=${paddingItemCount}, minY=${minTranslateY}, maxY=${maxTranslateY}`);
     })
 
-    const viewportHeight = useMemo(() => $$(itemHeight) * $$(visibleItemCount))
+    const viewportHeight = useMemo(() => $$(itemHeight) * $$(itemCount))
     const indicatorTop = useMemo(() => ($$(viewportHeight) - $$(itemHeight)) / 2)
 
     // Internal helper to get target Y without index clamping, used for bounds calc
@@ -500,12 +501,44 @@ export const Wheeler = <T,>(props: WheelerProps<T>) => {
         }
     })
 
-    const _backdropTransEnd = () => {
-        if (!$$(visible)) {
-            // container().style.display = "none"
-            // closed(true)
+    // const _backdropTransEnd = () => {
+    //     if (!$$(visible)) {
+    //         // container().style.display = "none"
+    //         // closed(true)
+    //     }
+    // }
+
+    const wheeler = $<HTMLDivElement>()
+
+    useEffect(() => {
+        if (!$$(visible)) return
+
+        if ($$(visible)) {
+            if ($$(ActiveWheelers).filter(w => w === wheeler).length === 0)
+                ActiveWheelers([...$$(ActiveWheelers), wheeler])
         }
-    }
+        else
+            if ($$(ActiveWheelers).filter(w => w === wheeler).length > 0)
+                ActiveWheelers([...$$(ActiveWheelers), wheeler])
+
+        // return () => {
+        //     if ($$(ActiveWheelers).filter(w => w === wheeler).length > 0)
+        //         ActiveWheelers($$(ActiveWheelers).filter(w => w !== wheeler))
+        // }
+    })
+
+    useClickAway(wheeler, () => {
+        if ($$(cancelOnBlur))
+            visible(false) //just hide, no save
+        if ($$(commitOnBlur)) //hide & save
+        {
+            visible(false) //just hide, no save
+            // if (!ok)
+            if (isObservable(oriValue))
+                oriValue($$(value))
+        }
+    })
+
 
     // w-[200px] border bg-white shadow-[0_4px_8px_rgba(0,0,0,0.1)] mb-2.5 rounded-lg border-solid border-[#ccc]
     return <>
@@ -514,15 +547,23 @@ export const Wheeler = <T,>(props: WheelerProps<T>) => {
                 <Portal mount={document.body}>
                     {() => $$(mask) ? <>
                         <div
-                            class={['fixed inset-0 bg-black/50 h-full w-full z-[50] opacity-50']}
-                            onClick={() => {
-                                visible(false)
-                            }}
+                            class={['fixed inset-0 bg-black/50 h-full w-full z-[00] opacity-50']}
+                        // onClick={() => {
+                        //     if ($$(hideOnBlur))
+                        //         visible(false) //just hide, no save
+                        //     if ($$(commitOnBlur)) //hide & save
+                        //     {
+                        //         visible(false) //just hide, no save
+                        //         // if (!ok)
+                        //         if (isObservable(oriValue))
+                        //             oriValue($$(value))
+                        //     }
+                        // }}
                         />
                     </> : null}
-                    <div class={['wheeler-widget z-[100]', cls, "fixed inset-x-0 bottom-0 w-full "]}>
-                        {() => $$(header) ? <>
-                            <div class={'font-bold text-center'}>{header}</div>
+                    <div ref={wheeler} class={['wheeler-widget z-[100]', cls, "fixed inset-x-0 bottom-0 w-full z-20 bg-white"]}>
+                        {() => header ? <>
+                            <div class={'font-bold text-center'}>{() => header(value)}</div>
                             <div class="my-1 h-px w-full bg-gray-300 dark:bg-gray-600"></div></> : null}
                         <div ref={viewport}
                             onPointerDown={handleStart as any}
@@ -548,8 +589,8 @@ export const Wheeler = <T,>(props: WheelerProps<T>) => {
                 </Portal>
                 :
                 <div class={['wheeler-widget', cls,]}>
-                    {() => $$(header) ? <>
-                        <div class={'font-bold text-center'}>{header}</div>
+                    {() => header ? <>
+                        <div class={'font-bold text-center'}>{() => header(value)}</div>
                         <div class="my-1 h-px w-full bg-gray-300 dark:bg-gray-600"></div></> : null}
                     <div ref={viewport}
                         onPointerDown={handleStart as any}

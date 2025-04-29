@@ -2,6 +2,7 @@ import { $, $$, Observable, ObservableMaybe, useEffect, useMemo, untrack, Portal
 import { use } from 'use-woby'
 import { Wheeler } from './Wheeler' // Adjust path
 import { Button, variant } from '../Button'
+import { WheelerItem, WheelerProps } from './WheelerType'
 
 // --- Utilities (unchanged) ---
 const parseDate = (dateInput: Date | string | null | undefined): Date | null => {
@@ -16,16 +17,10 @@ const parseDate = (dateInput: Date | string | null | undefined): Date | null => 
 type MultiWheelerProps = {
     options: Array<ObservableMaybe<any[]>>,
     value: Array<Observable<any>>
-    headers: string[]
-    itemHeight?: ObservableMaybe<number>
-    itemCount?: ObservableMaybe<number>
+    headers?: ((v: ObservableMaybe<ArrayMaybe<WheelerItem<any>['value']>>) => JSX.Element)[]
     divider?: ObservableMaybe<boolean>
-    bottom?: ObservableMaybe<boolean>
     title?: JSX.Element
-    visible?: Observable<boolean>
-    ok?: ObservableMaybe<boolean>
-    mask?: boolean
-}
+} & Pick<WheelerProps, 'bottom' | 'commitOnBlur' | 'ok' | 'visible' | 'mask' | 'cancelOnBlur' | 'itemHeight' | 'itemCount'>
 
 export const MultiWheeler = (props: MultiWheelerProps): JSX.Element => {
     const {
@@ -112,11 +107,11 @@ export const MultiWheeler = (props: MultiWheelerProps): JSX.Element => {
                     const columnName = headers[index]
 
                     return <Wheeler
-                        header={columnName}
+                        header={v => columnName(v)}
                         options={options}
                         value={stateArr[index]}
                         itemHeight={itemHeight}
-                        visibleItemCount={itemCount}
+                        itemCount={itemCount}
                         class={[wheelWrapperCls,]} />
                 })}
             </div>

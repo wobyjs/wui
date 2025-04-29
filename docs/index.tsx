@@ -444,7 +444,7 @@ const App = () => (
 					options={[["a", "b"], [1, 2, 3], [0, 5, 87, 8, 9]]}
 					title={<div>test</div>}
 					value={[$("a"), $(1), $(0)]}      // Pass date observable
-					headers={["col1", "col2", "col3"]}
+					headers={[v => "col1 " + $$(v), v => "col2 " + $$(v), v => "col3 " + $$(v)]}
 					// onChange removed
 					ok={dateOk}
 				/>

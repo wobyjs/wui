@@ -7,17 +7,17 @@ export type WheelerItem<T = unknown> = { value: T, label: string | number, compo
 export type WheelerProps<T = unknown> = {
     options: ObservableMaybe<WheelerItem<T>[]>,
     itemHeight?: ObservableMaybe<number>,
-    visibleItemCount?: ObservableMaybe<number>,
+    itemCount?: ObservableMaybe<number>,
     value?: ObservableMaybe<ArrayMaybe<WheelerItem<T>['value']>>,
     class?: JSX.Class
-    header?: JSX.Element
+    header?: (v: ObservableMaybe<ArrayMaybe<WheelerItem<T>['value']>>) => JSX.Element
     /** implicit for multiple */
     all?: ObservableMaybe<string>,
     ok?: ObservableMaybe<boolean>
     visible?: Observable<boolean>
 
     bottom?: ObservableMaybe<boolean>
-    hideOnBlur?: ObservableMaybe<boolean>
+    cancelOnBlur?: ObservableMaybe<boolean>
     commitOnBlur?: ObservableMaybe<boolean>
     mask?: boolean
 }

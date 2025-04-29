@@ -1,8 +1,8 @@
 import { $, $$, Observable, ObservableMaybe, useEffect, useMemo, untrack, Portal, type JSX, isObservable } from 'woby'
-import { use } from 'use-woby'
+import { use, useClickAway } from 'use-woby'
 import { Wheeler } from './Wheeler' // Adjust path
 import { Button, variant } from '../Button'
-import { WheelerItem } from './WheelerType'
+import { WheelerItem, WheelerProps } from './WheelerType'
 
 // --- Utilities (unchanged) ---
 const padZero = (num: number): string => (num < 10 ? '0' : '') + num
@@ -20,20 +20,15 @@ const parseDate = (dateInput: Date | string | null | undefined): Date | null => 
 export type DateTimeWheelerType = 'year' | 'month' | 'date' | 'time' | 'datetime' | 'hour'
 type DateTimeWheelerValue = ObservableMaybe<Date>
 
-type DateTimeWheelerProps = {
+export type DateTimeWheelerProps = {
     value: DateTimeWheelerValue
     mode?: ObservableMaybe<DateTimeWheelerType>
     minDate?: ObservableMaybe<Date | string>
     maxDate?: ObservableMaybe<Date | string>
-    itemHeight?: ObservableMaybe<number>
-    itemCount?: ObservableMaybe<number>
     yearRange?: ObservableMaybe<{ start: number, end: number }>
     divider?: ObservableMaybe<boolean>
-    bottom?: ObservableMaybe<boolean>
     title?: (d: Date) => JSX.Element
-    visible?: Observable<boolean>
-    ok?: ObservableMaybe<boolean>
-}
+} & Pick<WheelerProps, 'bottom' | 'commitOnBlur' | 'ok' | 'visible' | 'mask' | 'cancelOnBlur' | 'itemHeight' | 'itemCount'>
 
 export const DateTimeWheeler = ({
     value: oriDate,
@@ -45,7 +40,7 @@ export const DateTimeWheeler = ({
     yearRange: yearRangeProp,
     divider, bottom, title,
     visible = $(true),
-    ok
+    ok, mask, commitOnBlur, cancelOnBlur
 }: DateTimeWheelerProps): JSX.Element => {
 
     const type = use(mode)
@@ -228,18 +223,40 @@ export const DateTimeWheeler = ({
                     <Button class={[variant.contained, 'px-2']} onClick={() => { if (isObservable(oriDate)) oriDate($$(modDate)); visible(false) }}>OK</Button></div>
             </div>
             <div class={[dateTimeWheelerCls, '']}>
-                {() => $$(showYear) && <Wheeler header='Year' options={yearOptions} value={selectedYear} itemHeight={itemHeight} visibleItemCount={itemCount} class={[wheelWrapperCls,]} />}
-                {() => $$(showMonth) && <Wheeler header='Month' options={monthOptions} value={selectedMonth} itemHeight={itemHeight} visibleItemCount={itemCount} class={[wheelWrapperCls, br]} />}
-                {() => $$(showDay) && <Wheeler header='Day' options={dayOptions} value={selectedDay} itemHeight={itemHeight} visibleItemCount={itemCount} class={[wheelWrapperCls, br]} />}
-                {() => $$(showHour) && <Wheeler header='Hour' options={hourOptions} value={selectedHour} itemHeight={itemHeight} visibleItemCount={itemCount} class={[wheelWrapperCls, br]} />}
-                {() => $$(showMinute) && <Wheeler header='Minute' options={minuteOptions} value={selectedMinute} itemHeight={itemHeight} visibleItemCount={itemCount} class={[wheelWrapperCls, br]} />}
-                {() => $$(showSecond) && <Wheeler header='Second' options={secondOptions} value={selectedSecond} itemHeight={itemHeight} visibleItemCount={itemCount} class={[wheelWrapperCls, br]} />}
+                {() => $$(showYear) && <Wheeler header={v => 'Year'} options={yearOptions} value={selectedYear} itemHeight={itemHeight} itemCount={itemCount} class={[wheelWrapperCls,]} />}
+                {() => $$(showMonth) && <Wheeler header={v => 'Month'} options={monthOptions} value={selectedMonth} itemHeight={itemHeight} itemCount={itemCount} class={[wheelWrapperCls, br]} />}
+                {() => $$(showDay) && <Wheeler header={v => 'Day'} options={dayOptions} value={selectedDay} itemHeight={itemHeight} itemCount={itemCount} class={[wheelWrapperCls, br]} />}
+                {() => $$(showHour) && <Wheeler header={v => 'Hour'} options={hourOptions} value={selectedHour} itemHeight={itemHeight} itemCount={itemCount} class={[wheelWrapperCls, br]} />}
+                {() => $$(showMinute) && <Wheeler header={v => 'Minute'} options={minuteOptions} value={selectedMinute} itemHeight={itemHeight} itemCount={itemCount} class={[wheelWrapperCls, br]} />}
+                {() => $$(showSecond) && <Wheeler header={v => 'Second'} options={secondOptions} value={selectedSecond} itemHeight={itemHeight} itemCount={itemCount} class={[wheelWrapperCls, br]} />}
             </div>
         </div >
     </>)
+
+
+    const cont = $<HTMLDivElement>()
+
+
+    useClickAway(cont, () => {
+        if ($$(cancelOnBlur))
+            visible(false) //just hide, no save
+        if ($$(commitOnBlur)) //hide & save
+        {
+            visible(false) //just hide, no save
+            // if (!ok)
+            if (isObservable(oriDate))
+                oriDate($$(modDate))
+        }
+    })
+
+
     return () => !$$(visible) ? null :
-        $$(bottom) ? <Portal mount={document.body}>
-            <div class={[dateTimeWheelerCls, 'fixed inset-x-0 bottom-0 bg-blue-600 shadow-lg z-10']}>
+
+        $$(mask) ? <Portal mount={document.body}>
+            <div
+                class={['fixed inset-0 bg-black/50 h-full w-full z-[10] opacity-50']}
+            />
+            <div ref={cont} class={[dateTimeWheelerCls, 'fixed inset-x-0 bottom-0 bg-blue-600 shadow-lg z-20']}>
                 {comp}
             </div>
         </Portal>
