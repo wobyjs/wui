@@ -102,7 +102,7 @@ export const PropertyForm = (props: PropertyFormProps) => {
 					) : null,
 				<>
 					{() =>
-						(value && !(value instanceof HTMLElement)) || value === 0 ? (
+						($$(value) && !(value instanceof HTMLElement)) || value === 0 ? (
 							<tr className="flex h-fit items-center">
 								<th className="w-[40%] text-right">{optionName}</th>
 								<td className="w-full">
