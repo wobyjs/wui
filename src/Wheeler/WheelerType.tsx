@@ -3,7 +3,7 @@ import { use } from 'use-woby'
 import { EnumType } from 'typescript'
 import { Nullable } from 'woby/dist/types/types'
 
-export type WheelerItem<T = unknown> = { value: T, label: string | number, component?: JSX.Element }
+export type WheelerItem<T = unknown> = { value: T, label: string | number, component?: (props: { itemHeight: number, value: WheelerItem, index: number }) => HTMLLIElement }
 export type WheelerProps<T = unknown> = {
     options: ObservableMaybe<WheelerItem<T>[]>,
     itemHeight?: ObservableMaybe<number>,

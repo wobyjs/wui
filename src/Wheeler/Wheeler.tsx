@@ -72,7 +72,7 @@ export const Wheeler = <T,>(props: WheelerProps<T>) => {
             const vs = [...[$$(value)]].flat()
             base.forEach(opt => r[opt.label](vs.some(sv => sv === opt.value)))
 
-            base.forEach((o, index) => o.component = o.component ? o.component : () => <li class={['wheeler-item', 'text-black']} data-index={index} data-value={o.value}
+            base.forEach((o, index) => o.component = o.component ? o.component as any : (props: { itemHeight: number, value: WheelerItem, index: number }) => <li class={['wheeler-item', 'text-black']} data-index={index} data-value={o.value}
                 style={{ height: () => `${$$(itemHeight)}px` }}>
                 {() => {
                     const isChecked = $$(checkboxes)[o.label]
@@ -92,9 +92,9 @@ export const Wheeler = <T,>(props: WheelerProps<T>) => {
 
         }
         else {
-            base.forEach((o, index) => o.component = o.component ? o.component : () => <li class={['wheeler-item', pickerItemCls, 'text-[#555] opacity-60 ']} data-index={index} data-value={o.value}
+            base.forEach((o, index) => o.component = o.component ? o.component as any : (() => <li class={['wheeler-item', pickerItemCls, 'text-[#555] opacity-60 ']} data-index={index} data-value={o.value}
                 style={{ height: () => `${$$(itemHeight)}px` }}>{o.label}
-            </li>)
+            </li>))
         }
 
         preOptions = $$(options)
@@ -275,7 +275,7 @@ export const Wheeler = <T,>(props: WheelerProps<T>) => {
         // Actual items
         if ($$(formattedOptions))
             for (const [index, option] of $$(formattedOptions).entries())
-                yield <option.component />
+                yield <option.component {...{ index, value: option, itemHeight }} />
 
         // Bottom padding
         for (let i = 0; i < $$(paddingItemCount); i++)
