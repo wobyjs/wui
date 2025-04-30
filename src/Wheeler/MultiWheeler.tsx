@@ -20,6 +20,7 @@ type MultiWheelerProps = {
     headers?: ((v: ObservableMaybe<ArrayMaybe<WheelerItem<any>['value']>>) => JSX.Element)[]
     divider?: ObservableMaybe<boolean>
     title?: JSX.Element
+    changeValueOnClickOnly?: boolean
 } & Pick<WheelerProps, 'bottom' | 'commitOnBlur' | 'ok' | 'visible' | 'mask' | 'cancelOnBlur' | 'itemHeight' | 'itemCount'>
 
 export const MultiWheeler = (props: MultiWheelerProps): JSX.Element => {
@@ -34,6 +35,7 @@ export const MultiWheeler = (props: MultiWheelerProps): JSX.Element => {
         title,
         mask,
         visible = $(true),
+        changeValueOnClickOnly,
         ok
     } = props
 
@@ -112,7 +114,8 @@ export const MultiWheeler = (props: MultiWheelerProps): JSX.Element => {
                         value={stateArr[index]}
                         itemHeight={itemHeight}
                         itemCount={itemCount}
-                        class={[wheelWrapperCls,]} />
+                        class={[wheelWrapperCls,]}
+                        changeValueOnClickOnly={changeValueOnClickOnly} />
                 })}
             </div>
         </div >

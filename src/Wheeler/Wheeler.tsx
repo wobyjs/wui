@@ -17,7 +17,9 @@ export const Wheeler = <T,>(props: WheelerProps<T>) => {
         bottom = $$(mask),
         all,
         cancelOnBlur,
-        commitOnBlur } = props
+        commitOnBlur,
+        changeValueOnClickOnly
+    } = props
 
     const itemHeight = use(ih, 36)
     const itemCount = use(vic, 5)
@@ -47,6 +49,7 @@ export const Wheeler = <T,>(props: WheelerProps<T>) => {
 
     const viewport = $<HTMLDivElement>()
     const list = $<HTMLUListElement>()
+    const eventType = $<string>()
     const multiple = all
 
     let preOptions, preFormattedOptions
@@ -57,9 +60,6 @@ export const Wheeler = <T,>(props: WheelerProps<T>) => {
         const base = $$(options).map(opt =>
             typeof opt === 'object' && opt !== null ? opt : { value: opt, label: String(opt) } as WheelerItem
         ) //as { value: any, label: string, key1: string }[]
-
-
-        // const b2 = $$(multiple) ? [{ value: $$(multiple), label: $$(multiple), component: () => $$(multiple) } as WheelItem, ...base] : base
 
         if ($$(multiple)) {
             base.unshift({ value: $$(multiple), label: $$(multiple) })
@@ -292,7 +292,7 @@ export const Wheeler = <T,>(props: WheelerProps<T>) => {
     }
 
     let snapToIndexTimeout = 0
-    function snapToIndex(index: number, immediate = false) {
+    function snapToIndex(index: number, immediate = false, eventType?: Event) {
         if (!$$(list)) return
         if ($$(multiple)) return
 
@@ -327,7 +327,6 @@ export const Wheeler = <T,>(props: WheelerProps<T>) => {
         // )
     }
 
-
     function updateItemStyles() {
         if ($$(multiple)) return
 
@@ -348,6 +347,7 @@ export const Wheeler = <T,>(props: WheelerProps<T>) => {
         if (e.type === 'touchend' || e.type === 'touchcancel') { return e.changedTouches && e.changedTouches.length > 0 ? e.changedTouches[0].clientY : startY }
         return e.touches && e.touches.length > 0 ? e.touches[0].clientY : e.clientY
     }
+
     function handleStart(e: PointerEvent & TouchEvent) { /* ... unchanged ... */
         if ($$(wheelSnapTimeoutId)) {
             clearTimeout($$(wheelSnapTimeoutId))
@@ -362,28 +362,44 @@ export const Wheeler = <T,>(props: WheelerProps<T>) => {
         lastMoveY = startY
         lastMoveTime = startTime
         velocity = 0
+        eventType(e.type)
         $$(list).style.transition = 'none'
         $$(viewport).style.cursor = 'grabbing'
         if ($$(rafId)) cancelAnimationFrame($$(rafId))
     }
+
     function handleMove(e: PointerEvent & TouchEvent) { /* ... unchanged ... */
         if (!isDragging) return
+
         const currentMoveY = getClientY(e)
         const deltaY = currentMoveY - startY
-        if (!hasMoved && Math.abs(deltaY) > CLICK_THRESHOLD_PX) { hasMoved = true }
-        if (hasMoved && e.cancelable) { e.preventDefault() }
+
+        if (!hasMoved && Math.abs(deltaY) > CLICK_THRESHOLD_PX) {
+            hasMoved = true
+        }
+
+        if (hasMoved && e.cancelable) {
+            e.preventDefault()
+        }
+
         let newY = startTranslateY + deltaY
         if (hasMoved) { // Apply rubber band only if moved significantly
             if (newY > maxTranslateY) { newY = maxTranslateY + (newY - maxTranslateY) * 0.3 } else if (newY < minTranslateY) { newY = minTranslateY + (newY - minTranslateY) * 0.3 }
         }
+
         const now = Date.now()
         const timeDiff = now - lastMoveTime
+
         if (timeDiff > 10) {
             velocity = (currentMoveY - lastMoveY) / timeDiff
             lastMoveTime = now
             lastMoveY = currentMoveY
         }
-        if ($$(rafId)) cancelAnimationFrame($$(rafId))
+
+        if ($$(rafId)) {
+            cancelAnimationFrame($$(rafId))
+        }
+
         rafId(requestAnimationFrame(() => {
             currentY = newY
             $$(list).style.transform = `translateY(${currentY}px)`
@@ -392,11 +408,16 @@ export const Wheeler = <T,>(props: WheelerProps<T>) => {
     }
 
     function handleEnd(e: PointerEvent) { /* ... unchanged ... */
-        if (!isDragging)
+        if (!isDragging) {
             return
+        }
+
         isDragging = false
         $$(viewport).style.cursor = 'grab'
-        if ($$(rafId)) cancelAnimationFrame($$(rafId))
+        if ($$(rafId)) {
+            cancelAnimationFrame($$(rafId))
+        }
+
         if (!hasMoved) { // Click/Tap
             const targetElement = e.target as HTMLElement
             const targetItem = targetElement.closest('.wheeler-item') as HTMLElement
@@ -433,7 +454,7 @@ export const Wheeler = <T,>(props: WheelerProps<T>) => {
         const scrollAmount = event.deltaY * 0.5
         const newY = currentY - scrollAmount
         setTranslateY(newY)
-
+        eventType(event.type)
         // if ($$(selectedIndex) >= formattedOptions.length - 1) return
 
         wheelSnapTimeoutId(setTimeout(() => {
@@ -487,11 +508,16 @@ export const Wheeler = <T,>(props: WheelerProps<T>) => {
         oriIndex($$(selectedIndex))
 
         if ($$(value) !== $$(formattedOptions)[$$(selectedIndex)].value) {
-            value($$(formattedOptions)[$$(selectedIndex)].value)
+            if ($$(eventType) == "wheel" && changeValueOnClickOnly) {
 
-            if (!ok)
-                if (isObservable(oriValue))
-                    oriValue($$(value))
+            }
+            else {
+                value($$(formattedOptions)[$$(selectedIndex)].value)
+
+                if (!ok)
+                    if (isObservable(oriValue))
+                        oriValue($$(value))
+            }
         }
 
         if ($$(selectedIndex) >= 0 && $$(selectedIndex) < $$(formattedOptions).length) { snapToIndex($$(selectedIndex)) }

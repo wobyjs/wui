@@ -20,6 +20,7 @@ export type WheelerProps<T = unknown> = {
     cancelOnBlur?: ObservableMaybe<boolean>
     commitOnBlur?: ObservableMaybe<boolean>
     mask?: boolean
+    changeValueOnClickOnly?: boolean
 }
 
 /** 
