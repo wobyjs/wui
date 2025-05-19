@@ -221,7 +221,8 @@ const options = [ /* ... options ... */
 	{ value: 'apple', label: '🍎 Apple' }, { value: 'banana', label: '🍌 Banana' }, { value: 'orange', label: '🍊 Orange' }, { value: 'grape', label: '🍇 Grape' }, { value: 'strawberry', label: '🍓 Strawberry' }, { value: 'blueberry', label: '🫐 Blueberry' }, { value: 'mango', label: '🥭 Mango' }, { value: 'pineapple', label: '🍍 Pineapple' }, { value: 'kiwi', label: '🥝 Kiwi' }, { value: 'watermelon', label: '🍉 Watermelon' }, { value: 'peach', label: '🍑 Peach' }, { value: 'cherry', label: '🍒 Cherry' }
 ] as WheelerItem<string>[]
 
-const visibleItemCount = $(5)
+const itemCount = $(5)
+// const value = $('orange')
 const value = $('orange')
 
 
@@ -415,15 +416,15 @@ const App = () => (
 					<Wheeler {...{
 						options,
 						value,
-						visibleItemCount, // Initial count
+						itemCount,
 						all: 'All',
 						// ok,
 					}} class='w-[200px] border bg-white shadow-[0_4px_8px_rgba(0,0,0,0.1)] mb-2.5 rounded-lg border-solid border-[#ccc]' />
 					<td class='pl-10'>
 						<div class="controls">
 							<span>Visible Items: </span>
-							<Button class='w-[3rem] border-2' type="button" onClick={() => visibleItemCount($$(visibleItemCount) + 2)}>++</Button>&nbsp;
-							<Button class='w-[3rem] border-2' type="button" onClick={() => visibleItemCount($$(visibleItemCount) - 2)}>--</Button>
+							<Button class='w-[3rem] border-2' type="button" onClick={() => itemCount($$(itemCount) + 2)}>++</Button>&nbsp;
+							<Button class='w-[3rem] border-2' type="button" onClick={() => itemCount($$(itemCount) - 2)}>--</Button>
 						</div >
 
 						<Button id="setKiwiButton" type="button" onClick={() => value('kiwi')}>Set to Kiwi</Button>

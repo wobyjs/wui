@@ -114,33 +114,33 @@ export const Zoomable = ({ minScale = 1, maxScale = 5, class: cls = 'relative w-
     }
 
     const adjustTransformOnResize = (() => {
-        let previousRect: DOMRect | null = null;
+        let previousRect: DOMRect | null = null
 
         return () => {
-            const container = $$(containerRef);
-            if (!container) return;
+            const container = $$(containerRef)
+            if (!container) return
 
-            const currentRect = container.getBoundingClientRect();
+            const currentRect = container.getBoundingClientRect()
             if (!previousRect) {
-                previousRect = currentRect;
-                return;
+                previousRect = currentRect
+                return
             }
 
             // Calculate the scale ratios to adjust the translation correctly
-            const scaleRatioX = currentRect.width / previousRect.width;
-            const scaleRatioY = currentRect.height / previousRect.height;
+            const scaleRatioX = currentRect.width / previousRect.width
+            const scaleRatioY = currentRect.height / previousRect.height
 
             // Update translations to keep the center at the same position
-            translateX($$(translateX) * scaleRatioX);
-            translateY($$(translateY) * scaleRatioY);
+            translateX($$(translateX) * scaleRatioX)
+            translateY($$(translateY) * scaleRatioY)
 
             // const w = +window.getComputedStyle($$(ref)).width.replace('px', '')
             // if ($$($$(translateX) * scaleRatioX) > w)
             // console.log($$(translateX) * scaleRatioX, scaleRatioX, currentRect.width, w)
 
-            previousRect = currentRect;
-        };
-    })();
+            previousRect = currentRect
+        }
+    })()
 
     useEventListener(window, 'resize', adjustTransformOnResize)
 

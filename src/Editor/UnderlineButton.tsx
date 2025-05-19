@@ -1,18 +1,14 @@
 import { Button, variant } from '../Button'
-import ItalicIcon from '../icons/italic' // Renamed for clarity
-import { useEditor } from './undoredo' // useUndoRedo not directly needed here anymore
-import { applyStyle, range as globalRange } from './utils' // Import range as globalRange
+import UnderlineIcon from '../icons/underline' // Placeholder for UnderlineIcon
+import { useEditor } from './undoredo'
+import { applyStyle, range as globalRange } from './utils'
 import { $, $$, useEffect } from 'woby'
-// useSelection is not directly used here anymore if globalRange is sufficient
 
-export const ItalicButton = () => {
+export const UnderlineButton = () => {
     const isActive = $(false)
-    const editorNode = useEditor() // editorNode is an observable to the editor div
+    const editorNode = useEditor()
 
     useEffect(() => {
-        // We depend on globalRange from utils, which is already an observable
-        // and useEditor() to get the editorNode observable.
-        // Woby's useEffect will track these.
         const currentEditorNode = $$(editorNode)
         const currentSelectionRange = $$(globalRange)
 
@@ -29,7 +25,7 @@ export const ItalicButton = () => {
         let foundStyle = false
         while (nodeToCheck && nodeToCheck !== currentEditorNode && nodeToCheck instanceof HTMLElement) {
             const style = window.getComputedStyle(nodeToCheck)
-            if (style.fontStyle === 'italic') {
+            if (style.textDecorationLine === 'underline') { // Check for underline
                 foundStyle = true
                 break
             }
@@ -38,7 +34,7 @@ export const ItalicButton = () => {
 
         if (!foundStyle && nodeToCheck === currentEditorNode && nodeToCheck instanceof HTMLElement) {
             const style = window.getComputedStyle(nodeToCheck)
-            if (style.fontStyle === 'italic') {
+            if (style.textDecorationLine === 'underline') { // Check for underline
                 foundStyle = true
             }
         }
@@ -50,20 +46,21 @@ export const ItalicButton = () => {
         applyStyle((element) => {
             const p = window.getComputedStyle(element?.parentElement)
             const before = window.getComputedStyle(element)
-            element.style.fontStyle = before.fontStyle === 'italic' ? 'normal' : 'italic'
+            element.style.textDecorationLine = before.textDecorationLine.includes('underline') ? 'none' : 'underline'
             const after = window.getComputedStyle(element)
-            if (p.fontStyle === after.fontStyle) {
-                element.style.fontStyle = ''
+            // If parent has the same text-decoration, remove it from the element to inherit
+            if (p.textDecorationLine === after.textDecorationLine) {
+                element.style.textDecorationLine = ''
             }
         })
     }
 
     return <Button
-        class={[variant.outlined, 'h-8 w-8', () => $$(isActive) ? '!bg-slate-200' : '']} // Matched selected class
+        class={[variant.outlined, 'h-8 w-8', () => $$(isActive) ? '!bg-slate-200' : '']}
         aria-pressed={isActive}
         onClick={handleClick}
-        title="Italic"
+        title="Underline" // Updated title
     >
-        <ItalicIcon />
+        <UnderlineIcon />
     </Button>
 }

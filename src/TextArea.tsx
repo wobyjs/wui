@@ -1,7 +1,7 @@
 // ,type JSX } from 'woby'
 import { effect19a } from './TextField.effect'
 import { tw } from 'woby-styled'
-import { ObservableMaybe, $$, $, type JSX, isObservable } from 'woby'
+import { ObservableMaybe, $$, $, type JSX, isObservable, Observable } from 'woby'
 
 //https://codepen.io/maheshambure21/pen/EozKKy
 
@@ -38,8 +38,8 @@ export const TextArea = ({ className, class: cls, children, effect, reactive, ty
 
     return <div class={[(className ?? cls) ?? 'm-[20px]', 'relative']}>
         <textarea class={effect ?? effect19a}  {...{ ...ps, type, placeholder }}
-            onChange={e => !$$(reactive) && isObservable(ps.value) ? (ps.value?.(e.target.value), onChange?.(e)) : undefined}
-            onKeyUp={e => !$$(reactive) && isObservable(ps.value) ? (ps.value?.(e.target.value), onKeyUp?.(e)) : (e.key === 'Enter' && isObservable(ps.value) && ps.value(e.target.value), onKeyUp?.(e), onChange?.(e))} />
+            onChange={e => !$$(reactive) && isObservable(ps.value) ? ((ps.value as Observable)?.(e.target.value), onChange?.(e)) : undefined}
+            onKeyUp={e => !$$(reactive) && isObservable(ps.value) ? ((ps.value as Observable)?.(e.target.value), onKeyUp?.(e)) : (e.key === 'Enter' && isObservable(ps.value) && ps.value(e.target.value), onKeyUp?.(e), onChange?.(e))} />
         {children}
         <span>
             <i></i>

@@ -36,6 +36,7 @@
     "peerDependencies": {
         "nanoid": "^3.3.7",
         "use-woby": "workspace:../use-woby",
+        "oby": "workspace:../oby",
         "woby": "workspace:../woby",
         "woby-modal": "workspace:../woby-modal",
         "woby-styled": "workspace:../woby-styled"
