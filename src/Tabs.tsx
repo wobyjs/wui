@@ -1,4 +1,5 @@
-import React, { $, $$, ObservableMaybe, createContext, useContext, useEffect, type JSX } from "woby"
+import { $, $$, ObservableMaybe, createContext, useContext, useEffect, type JSX } from "woby"
+import * as React from "woby"
 
 type TabsProps = {
 	children: JSX.Child[] //| { key: string; label: JSX.Element; children: JSX.Element }

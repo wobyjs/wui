@@ -1,7 +1,7 @@
 import { Observable, $$ } from 'woby'
 import { Button, variant } from '../Button'
 import AlignLeft from '../icons/align_left'
-import { useEditor, useUndoRedo } from './undoredo'
+import { useEditor } from './undoredo' // Removed useUndoRedo
 import { findBlockParent, range } from './utils'
 
 
@@ -24,11 +24,11 @@ export const applyTextAlign = (alignment: 'left' | 'center' | 'right', editor: O
 
 
 export const AlignLeftButton = () => {
-    const { undos, saveDo } = useUndoRedo()
+    // const { undos, saveDo } = useUndoRedo() // Removed
     const editor = useEditor()
 
     return <Button class={variant.outlined} onClick={() => {
-        saveDo(undos)
+        // saveDo(undos) // Removed: MutationObserver in Editor.tsx should now handle this
 
         applyTextAlign('left', editor)
     }} title="Align Left"><AlignLeft /></Button>

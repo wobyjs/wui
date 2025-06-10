@@ -1,4 +1,4 @@
-import { $, $$, useEffect, isObservable, useTimeout, useInterval, ObservableMaybe, type JSX } from 'woby'
+import { $, $$, useEffect, isObservable, useTimeout, useInterval, Observable, ObservableMaybe, type JSX } from 'woby'
 
 
 const btn = `
@@ -41,8 +41,8 @@ export const NumberField = (props: NumberFieldProps): JSX.Element => {
 
 	useEffect(updated)
 
-	const dec = () => { !$$(reactive) && isObservable(value) ? value?.((+$$(inputRef).value as any) - +$$(step)) : undefined; updated() }
-	const inc = () => { !$$(reactive) && isObservable(value) ? value?.((+$$(inputRef).value as any) + +$$(step)) : undefined; updated() }
+	const dec = () => { !$$(reactive) && isObservable(value) ? (value as Observable)?.((+$$(inputRef).value as any) - +$$(step)) : undefined; updated() }
+	const inc = () => { !$$(reactive) && isObservable(value) ? (value as Observable)?.((+$$(inputRef).value as any) + +$$(step)) : undefined; updated() }
 
 	let interval: ReturnType<typeof useInterval>
 	let timeout: ReturnType<typeof useTimeout>
@@ -77,8 +77,8 @@ export const NumberField = (props: NumberFieldProps): JSX.Element => {
         `, () => ($$(error) ? "text-[red]" : "")]}
 			type="number"
 			value={value}
-			onChange={e => { !$$(reactive) && isObservable(value) ? (value?.(e.target.value), onChange?.(e)) : undefined; updated() }}
-			onKeyUp={e => { !$$(reactive) && isObservable(value) ? (value?.(e.target.value), onKeyUp?.(e)) : undefined; updated() }}
+			onChange={e => { !$$(reactive) && isObservable(value) ? ((value as Observable)?.(e.target.value), onChange?.(e)) : undefined; updated() }}
+			onKeyUp={e => { !$$(reactive) && isObservable(value) ? ((value as Observable)?.(e.target.value), onKeyUp?.(e)) : undefined; updated() }}
 			onWheel={e => { e.preventDefault(); Math.sign(e.deltaY) > 0 ? dec() : inc() }}
 			{...otherProps}
 			disabled={disabled}

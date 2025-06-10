@@ -25,6 +25,11 @@ export const Wheeler = <T,>(props: WheelerProps<T>) => {
     const itemCount = use(vic, 5)
     const value = $($$(oriValue))
 
+
+    useEffect(() => {
+        value($$(oriValue))
+    })
+
     const CLICK_THRESHOLD_PX = 5
 
     const checkboxes = $<Record<string, Observable<boolean>>>({})
@@ -54,15 +59,20 @@ export const Wheeler = <T,>(props: WheelerProps<T>) => {
 
     let preOptions, preFormattedOptions
 
+    useEffect(() => console.log('visible', $$(visible), $$(value)))
+
     const formattedOptions = useMemo(() => {
         if (preOptions === $$(options)) return preFormattedOptions
 
-        const base = $$(options).map(opt =>
-            typeof opt === 'object' && opt !== null ? opt : { value: opt, label: String(opt) } as WheelerItem
-        ) //as { value: any, label: string, key1: string }[]
+        const base = $$(options).map(opt => {
+            const o = typeof opt === 'object' && opt !== null ? opt : { value: opt, label: String(opt) } as WheelerItem
+            if (!('hasComponent' in o))
+                o.hasComponent = !!o.component
+            return o
+        })
 
         if ($$(multiple)) {
-            base.unshift({ value: $$(multiple), label: $$(multiple) })
+            base.unshift({ value: $$(multiple), label: $$(multiple), hasComponent: false })
 
             const r = {} as Record<string, Observable<boolean>>
 
@@ -70,17 +80,28 @@ export const Wheeler = <T,>(props: WheelerProps<T>) => {
             checkboxes(r)
 
             const vs = [...[$$(value)]].flat()
-            base.forEach(opt => r[opt.label](vs.some(sv => sv === opt.value)))
+            let allInitiallyChecked = true
+            base.forEach(opt => {
+                const isSelected = vs.some(sv => sv === opt.value)
+                r[opt.label](isSelected)
+                if (opt.label !== $$(multiple) && !isSelected) {
+                    allInitiallyChecked = false
+                }
+            })
+            // Set the "All" checkbox state based on initial values
+            if (r[$$(multiple)]) { // Ensure "All" checkbox exists
+                r[$$(multiple)](allInitiallyChecked && base.length > 1) // base.length > 1 to avoid "All" being checked if it's the only item
+            }
 
-            base.forEach((o, index) => o.component = o.component ? o.component : () => <li class={['wheeler-item', 'text-black']} data-index={index} data-value={o.value}
+
+            base.forEach((o, index) => o.component = o.hasComponent ? o.component as any : (props: { itemHeight: number, value: WheelerItem, index: number }) => <li class={['wheeler-item', 'text-black']} data-index={index} data-value={o.value}
                 style={{ height: () => `${$$(itemHeight)}px` }}>
                 {() => {
                     const isChecked = $$(checkboxes)[o.label]
 
                     // useEffect(() => {
-                    //     chk2value(option.label)
-
-                    //     console.log(option.label, 'checked', $$(isChecked))
+                    // chk2value(o.label)
+                    // console.log(option.label, 'checked', $$(isChecked))
                     // })
 
                     return <label class="flex items-center gap-2 px-2">
@@ -92,9 +113,9 @@ export const Wheeler = <T,>(props: WheelerProps<T>) => {
 
         }
         else {
-            base.forEach((o, index) => o.component = o.component ? o.component : () => <li class={['wheeler-item', pickerItemCls, 'text-[#555] opacity-60 ']} data-index={index} data-value={o.value}
+            base.forEach((o, index) => o.component = o.hasComponent ? o.component as any : (() => <li class={['wheeler-item', pickerItemCls, 'text-[#555] opacity-60 ']} data-index={index} data-value={o.value}
                 style={{ height: () => `${$$(itemHeight)}px` }}>{o.label}
-            </li>)
+            </li>))
         }
 
         preOptions = $$(options)
@@ -103,7 +124,7 @@ export const Wheeler = <T,>(props: WheelerProps<T>) => {
     })
 
     const chkValues = () => {
-        const c = $$(checkboxes)
+        // const c = $$(checkboxes)
 
         const vs = new Set([$$(value)].flat()) // current value set
         const os = $$(formattedOptions)        // options list
@@ -139,77 +160,169 @@ export const Wheeler = <T,>(props: WheelerProps<T>) => {
 
         if (isObservable(ok))
             ok(false)
+
+        if (isObservable(visible))
+            visible(false)
     })
 
     //values to chk
-    let preValues
-    let preCheckboxes
+    let preValue: any // Store previous value of the external prop
     const value2chk = () => {
         if (!$$(multiple)) return
 
-        const vv = $$(value)
-        if (preValues === vv) return
+        // If the component is visible and the external value hasn't changed since the last sync, skip.
+        // When visible becomes true, preValue is typically null (reset in visible useEffect),
+        // so this condition allows the sync to run.
+        if ($$(visible) && preValue === $$(value)) {
+            return
+        }
 
         const { onlyInCheckbox, onlyInValue } = chkValues()
 
         const os = $$(formattedOptions)
         const c = $$(checkboxes)
+        const allLabel = $$(multiple) // The label for the "All" checkbox
 
-        for (const v of onlyInValue) {
-            const opt = os.find(o => o.value === v)
-            if (opt) c[opt.label](true)
+        let changed = false
+
+        // Sync individual items based on the external `value` prop.
+        // Part 1: Check items in UI that are present in `value` but not checked.
+        for (const valFromProp of onlyInValue) {
+            const opt = os.find(o => o.value === valFromProp)
+            // Ensure the option exists, it's not the "All" option itself, and its checkbox observable exists.
+            if (opt && opt.label !== allLabel && c[opt.label]) {
+                if (!$$(c[opt.label])) { // If not already checked
+                    c[opt.label](true)
+                    changed = true
+                }
+            }
         }
 
-        for (const v of onlyInCheckbox) {
-            const opt = os.find(o => o.value === v)
-            if (opt) c[opt.label](false)
+        // Part 2: Uncheck items in UI that are checked but not present in `value`.
+        for (const valFromCheckbox of onlyInCheckbox) {
+            const opt = os.find(o => o.value === valFromCheckbox)
+            // Ensure the option exists, it's not the "All" option itself, and its checkbox observable exists.
+            if (opt && opt.label !== allLabel && c[opt.label]) {
+                if ($$(c[opt.label])) { // If it is currently checked (but shouldn't be)
+                    c[opt.label](false)
+                    changed = true
+                }
+            }
         }
 
-        if (onlyInCheckbox.length > 0 || onlyInValue.length > 0) {
+        // After individual items are synced, derive and set the state of the "All" checkbox.
+        if (allLabel && c[allLabel]) { // Proceed only if "All" functionality is active and its checkbox exists.
+            const individualItemCheckboxes = Object.entries(c).filter(([key, _]) => key !== allLabel)
+
+            const allIndividualsAreChecked = individualItemCheckboxes.length > 0 &&
+                individualItemCheckboxes.every(([_, obs]) => $$(obs as Observable<boolean>))
+
+            if ($$(c[allLabel]) !== allIndividualsAreChecked) {
+                c[allLabel](allIndividualsAreChecked)
+                changed = true
+            }
+        }
+
+        if (changed) {
+            // Trigger reactivity for `checkboxes` by providing a new object reference.
             checkboxes({ ...c })
-            preCheckboxes = $$(checkboxes)
         }
 
-        preValues = $$(value)
+        preValue = $$(value) // Update preValue for the next comparison.
     }
-    value2chk() //copy value to chk 1st
+    // This initial call ensures sync on mount or when component structure is first defined.
+    value2chk()
+    // This useEffect will run after every render because it has no dependency array.
+    // It's intended to catch changes to `value` or other relevant states that `value2chk` depends on.
+    // `value2chk` itself has a `preValue` check to prevent redundant work if `value` hasn't changed.
     useEffect(value2chk)
 
     //chkbox to values
-    const chk2value = (n: string | number) => {
+    const chk2value = (clickedLabel: string | number) => {
         if (!$$(multiple)) return
 
-        const c = $$(checkboxes)
-        // if (preCheckboxes === c) return
+        const checkboxesMap = $$(checkboxes)
+        const allLabel = $$(multiple)
 
-        // console.log(n, 'checked', $$(c[n]))
+        // Step 1: Update all checkbox states based on the click, especially "All" logic.
+        // The observable for clickedLabel was already flipped by the onClick handler.
+        if (clickedLabel === allLabel) {
+            // "All" checkbox was clicked. Its new state is in checkboxesMap[allLabel].
+            const isAllCheckedNow = $$(checkboxesMap[allLabel])
+            Object.entries(checkboxesMap).forEach(([key, obs]) => {
+                (obs as Observable<boolean>)(isAllCheckedNow)
+            })
+        } else {
+            // An individual item checkbox was clicked.
+            if (checkboxesMap[allLabel]) { // Only if "All" checkbox exists
+                const individualItems = Object.entries(checkboxesMap).filter(([key, _]) => key !== allLabel)
+                const allIndividualsAreChecked = individualItems.length > 0 && individualItems.every(([_, obs]) => $$(obs))
 
-        if (n === $$(multiple)) {
-            const vv = $$(c[n])
-            Object.values(c).forEach(o => o(vv))
+                if ($$(checkboxesMap[clickedLabel])) { // If the clicked item was just checked
+                    if (allIndividualsAreChecked) {
+                        checkboxesMap[allLabel](true) // If all individuals are now checked, check "All"
+                    }
+                } else { // If the clicked item was just unchecked
+                    checkboxesMap[allLabel](false) // Uncheck "All"
+                }
+            }
         }
-        else if (Object.values(c).some(o => !$$(o)))
-            c[$$(multiple)](false)
+        // At this point, checkboxesMap reflects the consistent state of all checkboxes.
 
-        const { onlyInCheckbox, onlyInValue } = chkValues()
+        // Step 2: Calculate differences based on the new checkbox states and current external value.
+        const { onlyInCheckbox, onlyInValue } = chkValues() // chkValues uses $$(checkboxes) internally
 
-        if (onlyInCheckbox.length === 0 && onlyInValue.length === 0) return
+        // Step 3: Update the external value if there's a change.
+        if (onlyInCheckbox.length === 0 && onlyInValue.length === 0) {
+            // This can happen if the click on "All" resulted in a state that already matches `value`.
+            // Or if an individual click didn't change the effective selection set relative to `value`.
+            // However, we still need to ensure `oriValue` is updated if `value` itself was changed by "All" click
+            // even if `onlyInCheckbox/onlyInValue` are empty because `value` was already "correct" relative to the new checkbox state.
 
-        const vs = new Set([$$(value)].flat()) // current value set
+            // A more direct approach: construct the new value set directly from checkboxes.
+            const newSelectedValues = new Set<T>()
+            const currentFormattedOptions = $$(formattedOptions)
+            Object.entries($$(checkboxes)).forEach(([label, isCheckedObservable]) => {
+                if (label !== allLabel && $$(isCheckedObservable)) {
+                    const opt = currentFormattedOptions.find(o => o.label === label)
+                    if (opt) {
+                        newSelectedValues.add(opt.value as T)
+                    }
+                }
+            })
 
-        // // Update value by removing `onlyInValue` and adding `onlyInCb`
-        for (const v of onlyInValue) vs.delete(v)
-        for (const v of onlyInCheckbox) vs.add(v)
+            const finalNewValueArray = [...newSelectedValues]
+            const oldValueJSON = JSON.stringify($$(value))
+            const newValueJSON = JSON.stringify(finalNewValueArray)
 
-        // if (Array.isArray($$(value)))
-        //     ($$(value) as []).push(...vs)
-        // else
+            if (oldValueJSON !== newValueJSON) {
+                value(finalNewValueArray)
+                if (!ok && isObservable(oriValue)) {
+                    oriValue($$(value))
+                }
+            }
+            return
+        }
 
-        value([...vs] as T[])
-        if (!ok)
-            if (isObservable(oriValue))
-                oriValue($$(value))
-        // preCheckboxes = $$(checkboxes)
+        const currentVal = $$(value)
+        const currentValueFlat = (Array.isArray(currentVal) ? currentVal.flat() : [currentVal]) as T[]
+        const currentValueAsSet = new Set<T>(currentValueFlat)
+
+        for (const v of onlyInValue) { // These are of type T (or elements of T if T was T[])
+            currentValueAsSet.delete(v as T)
+        }
+        for (const v of onlyInCheckbox) { // These are from WheelerItem['value'], should be T
+            currentValueAsSet.add(v as T)
+        }
+
+        const finalNewValueArray = [...currentValueAsSet]
+        value(finalNewValueArray as any) // Cast to any to satisfy T | T[] if T is not array
+
+        if (!ok) {
+            if (isObservable(oriValue)) {
+                (oriValue as Observable<T[]>)(finalNewValueArray as any) // Cast to any for T | T[]
+            }
+        }
     }
 
 
@@ -275,7 +388,7 @@ export const Wheeler = <T,>(props: WheelerProps<T>) => {
         // Actual items
         if ($$(formattedOptions))
             for (const [index, option] of $$(formattedOptions).entries())
-                yield <option.component />
+                yield <option.component {...{ index, value: option, itemHeight }} />
 
         // Bottom padding
         for (let i = 0; i < $$(paddingItemCount); i++)
@@ -475,7 +588,6 @@ export const Wheeler = <T,>(props: WheelerProps<T>) => {
     })
 
     //update by value
-    let preValue
     useEffect(() => {
         if ($$(multiple)) return
 
@@ -537,18 +649,25 @@ export const Wheeler = <T,>(props: WheelerProps<T>) => {
     const wheeler = $<HTMLDivElement>()
 
     useEffect(() => {
-        if (!$$(visible)) return
-
-        if ($$(visible)) {
-            if ($$(ActiveWheelers).filter(w => w === wheeler).length === 0)
-                ActiveWheelers([...$$(ActiveWheelers), wheeler])
+        if (!$$(visible)) { // When visible becomes false
+            preValue = null
+            // preValuesJSON = null // This variable was removed
+            if ($$(ActiveWheelers).some(w => w === wheeler)) // Check if it exists before filtering
+                ActiveWheelers($$(ActiveWheelers).filter(w => w !== wheeler)) // Corrected: remove wheeler
+            return
         }
-        else
-            if ($$(ActiveWheelers).filter(w => w === wheeler).length > 0)
-                ActiveWheelers([...$$(ActiveWheelers), wheeler])
 
+        // When visible becomes true
+        if ($$(ActiveWheelers).filter(w => w === wheeler).length === 0) {
+            ActiveWheelers([...$$(ActiveWheelers), wheeler])
+        }
+
+        console.log('resync value2chk')
+        value2chk() // Call value2chk to resync checkboxes
+
+        // The original return for cleanup when component unmounts (if needed, though original was commented out)
         // return () => {
-        //     if ($$(ActiveWheelers).filter(w => w === wheeler).length > 0)
+        //     if ($$(ActiveWheelers).some(w => w === wheeler))
         //         ActiveWheelers($$(ActiveWheelers).filter(w => w !== wheeler))
         // }
     })
@@ -558,6 +677,9 @@ export const Wheeler = <T,>(props: WheelerProps<T>) => {
             visible(false) //just hide, no save
         if ($$(commitOnBlur)) //hide & save
         {
+            if (isObservable(ok))
+                ok(true)
+
             visible(false) //just hide, no save
             // if (!ok)
             if (isObservable(oriValue))
