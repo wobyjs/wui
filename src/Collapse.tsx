@@ -1,4 +1,4 @@
-import { $, $$, ObservableMaybe, isObservable, useEffect, useMemo, type JSX } from "woby"
+import { $, $$, ObservableMaybe, isObservable, useMemo, type JSX } from "woby"
 
 type CollapseProps = JSX.VoidHTMLAttributes<HTMLDivElement> & {
 	children?: JSX.Child
@@ -10,12 +10,12 @@ export const Collapse = (props: CollapseProps): JSX.Element => {
 	const open = isObservable(op) ? op : $(op)
 	const ref = $<HTMLDivElement>()
 
-	const opened = useMemo(() => ($$(open) ? { height: "fit-content" } : { height: 0 }))
+	const opened = useMemo(() => ($$(open) ? { height: $$(ref).clientHeight + "px" } : { height: 0 }))
 
 	return (
 		<div
 			class={[
-				"overflow-hidden [transition:height_200ms]",
+				"overflow-hidden transition-height duration-200 ease-in-out",
 				() => (background ? "bg-[#ccc]" : ""),
 				cls ?? className,
 			]}
