@@ -59,8 +59,6 @@ export const Wheeler = <T,>(props: WheelerProps<T>) => {
 
     let preOptions, preFormattedOptions
 
-    useEffect(() => console.log('visible', $$(visible), $$(value)))
-
     const formattedOptions = useMemo(() => {
         if (preOptions === $$(options)) return preFormattedOptions
 
@@ -98,11 +96,6 @@ export const Wheeler = <T,>(props: WheelerProps<T>) => {
                 style={{ height: () => `${$$(itemHeight)}px` }}>
                 {() => {
                     const isChecked = $$(checkboxes)[o.label]
-
-                    // useEffect(() => {
-                    // chk2value(o.label)
-                    // console.log(option.label, 'checked', $$(isChecked))
-                    // })
 
                     return <label class="flex items-center gap-2 px-2">
                         <input class='pl-2' onClick={e => { isChecked(!$$(isChecked)); chk2value(o.label) }} type="checkbox" checked={$$(isChecked)} readonly />
@@ -594,17 +587,15 @@ export const Wheeler = <T,>(props: WheelerProps<T>) => {
         if ($$(value) === preValue) return
         preValue = $$(value)
 
-        // if ($$(multiple)) {
-        //     checkboxes(new Set(Array.isArray($$(value)) ? $$(value) : []))
-        // } else {
         const foundIndex = $$(formattedOptions).findIndex(opt => opt.value === $$(value))
-        if ($$(selectedIndex) !== foundIndex) selectedIndex(foundIndex)
-        // }
+        if ($$(selectedIndex) !== foundIndex) {
+            selectedIndex(foundIndex)
+        }
     })
 
 
     // <<< Populate list *after* first layout calculation >>>
-    //populateList()
+    // populateList()
 
     // <<< Snap to initial index *after* list is populated and layout is set >>>
     snapToIndex($$(selectedIndex), true)
@@ -639,19 +630,11 @@ export const Wheeler = <T,>(props: WheelerProps<T>) => {
         }
     })
 
-    // const _backdropTransEnd = () => {
-    //     if (!$$(visible)) {
-    //         // container().style.display = "none"
-    //         // closed(true)
-    //     }
-    // }
-
     const wheeler = $<HTMLDivElement>()
 
     useEffect(() => {
         if (!$$(visible)) { // When visible becomes false
             preValue = null
-            // preValuesJSON = null // This variable was removed
             if ($$(ActiveWheelers).some(w => w === wheeler)) // Check if it exists before filtering
                 ActiveWheelers($$(ActiveWheelers).filter(w => w !== wheeler)) // Corrected: remove wheeler
             return
@@ -662,7 +645,6 @@ export const Wheeler = <T,>(props: WheelerProps<T>) => {
             ActiveWheelers([...$$(ActiveWheelers), wheeler])
         }
 
-        console.log('resync value2chk')
         value2chk() // Call value2chk to resync checkboxes
 
         // The original return for cleanup when component unmounts (if needed, though original was commented out)
@@ -687,8 +669,23 @@ export const Wheeler = <T,>(props: WheelerProps<T>) => {
         }
     })
 
+    const search = (val: string) => {
+        let newVal
+        $$(options).find((options) => {
+            if ((options.value as string).toLowerCase().includes(val.toLowerCase())) {
+                newVal = options.value
+            }
+        })
 
-    // w-[200px] border bg-white shadow-[0_4px_8px_rgba(0,0,0,0.1)] mb-2.5 rounded-lg border-solid border-[#ccc]
+        if (newVal) {
+            value(newVal)
+            oriValue(newVal)
+        }
+        else {
+            alert("No results found")
+        }
+    }
+
     return <>
         {() => !$$(visible) ? null :
             $$(bottom) ?
@@ -710,9 +707,26 @@ export const Wheeler = <T,>(props: WheelerProps<T>) => {
                         />
                     </> : null}
                     <div ref={wheeler} class={['wheeler-widget z-[100]', cls, "fixed inset-x-0 bottom-0 w-full z-20 bg-white"]}>
-                        {() => header ? <>
-                            <div class={'font-bold text-center'}>{() => header(value)}</div>
-                            <div class="my-1 h-px w-full bg-gray-300 dark:bg-gray-600"></div></> : null}
+                        {() => header ?
+                            <>
+                                <div>
+                                    <div class='font-bold text-center'>{() => header(value)}</div>
+                                    <div class="w-screen relative flex flex-col flex-wrap items-center">
+                                        <input
+                                            type="text"
+                                            placeholder={`Enter ${header().toLowerCase()}`}
+                                            class="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 ease-in-out w-64"
+                                            onChange={(e) => {
+                                                const value = e.target.value
+                                                search(value)
+                                            }}
+                                        />
+                                    </div>
+                                    <div class="my-1 h-px w-full bg-gray-300 dark:bg-gray-600"></div>
+                                </div>
+                            </> :
+                            null
+                        }
                         <div ref={viewport}
                             onPointerDown={handleStart as any}
                             onPointerMove={handleMove as any}     /* {passive: false } */
