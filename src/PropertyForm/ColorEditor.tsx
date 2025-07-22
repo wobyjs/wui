@@ -1,6 +1,6 @@
 /** @jsxImportSource woby */
 
-import { $$, ObservableMaybe, isObservable } from "woby"
+import { $$, ObservableMaybe, isObservable, useEffect } from "woby"
 import { Editors, UIProps } from "./PropertyForm"
 import { EditorProps } from "./EditorProps"
 

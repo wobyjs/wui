@@ -24,12 +24,21 @@ import { Zoomable, Img } from "../src/Zoomable"
 import { ToggleButton } from "../src/ToggleButton"
 import { Tab, Tabs } from "../src/Tabs"
 import { Wodal } from 'woby-modal'
-import { useViewportSize } from 'use-woby'
+import { useViewportSize, useWindowSize } from 'use-woby'
 import { Wheeler } from '../src/Wheeler/Wheeler'
 import { WheelerItem } from '../src/Wheeler/WheelerType'
 import { MultiWheeler } from '../src/Wheeler/MultiWheeler'
 import { DateTimeWheeler, DateTimeWheelerType } from '../src/Wheeler/DateTimeWheeler'
 
+const { width, height } = useWindowSize()
+const { width:width2, height:height2 } = useWindowSize()
+useEffect(() => {
+	console.log("windowsize", $$(width), $$(height));
+})
+
+useEffect(() => {
+	console.log("windowsize2", $$(width2), $$(height2));
+})
 const FaceIcon = (
 	<svg
 		class="text-[rgb(97,97,97)] select-none w-[1em] h-[1em] inline-block fill-current shrink-0 transition-[fill] duration-200 ease-in-out delay-[0ms] text-2xl ml-[5px] -mr-1.5"
