@@ -4,6 +4,8 @@ import { $, $$, isObservable, ObservableMaybe, useEffect } from "woby"
 import { Editors, UIProps } from "./PropertyForm"
 import { EditorProps } from "./EditorProps"
 import { MultiWheeler } from "../Wheeler/MultiWheeler"
+import projAsia from "./proj/projAsia.json"
+
 export const DropDownEditor = () => {
 	const renderCondition = (value: ObservableMaybe<string>) => {
 		return Array.isArray($$(value))
@@ -28,34 +30,48 @@ export const DropDownEditor = () => {
 		const { editorName, obj, changeValueOnClickOnly } = props
 		const open = $(false)
 		const functions = [
-			undefined,
-			"Abs",
-			"Area",
-			"Centroid",
-			"Cos",
-			"Distance",
-			"Exp",
-			"Floor",
-			"Ln",
-			"Log",
-			"Pow",
-			"Sin",
-			"Sqrt",
-			"Tan",
-			"Trim",
-			"LTrim",
-			"RTrim",
-			"Substr",
-			"Length",
-			"Concat",
-			"Replace",
-			"Area",
-			"Distance",
-			"Or",
-			"X",
-			"Y",
+			{ value: "", label: "None" },
+			{ value: "Abs", label: "Abs" },
+			{ value: "Area", label: "Area" },
+			{ value: "Centroid", label: "Centroid" },
+			{ value: "Cos", label: "Cos" },
+			{ value: "Distance", label: "Distance" },
+			{ value: "Exp", label: "Exp" },
+			{ value: "Floor", label: "Floor" },
+			{ value: "Ln", label: "Ln" },
+			{ value: "Log", label: "Log" },
+			{ value: "Pow", label: "Pow" },
+			{ value: "Sin", label: "Sin" },
+			{ value: "Sqrt", label: "Sqrt" },
+			{ value: "Tan", label: "Tan" },
+			{ value: "Trim", label: "Trim" },
+			{ value: "LTrim", label: "LTrim" },
+			{ value: "RTrim", label: "RTrim" },
+			{ value: "Substr", label: "Substr" },
+			{ value: "Length", label: "Length" },
+			{ value: "Concat", label: "Concat" },
+			{ value: "Replace", label: "Replace" },
+			{ value: "Area", label: "Area" },
+			{ value: "Distance", label: "Distance" },
+			{ value: "Or", label: "Or" },
+			{ value: "X", label: "X" },
+			{ value: "Y", label: "Y" },
 		]
-		const operators = [undefined, "+", "-", "*", "/", "%", "=", ">", "<", ">=", "<=", "<>", "||"]
+		const operators = [
+			{ value: "", label: "None" },
+			{ value: "+", label: "+" },
+			{ value: "-", label: "-" },
+			{ value: "*", label: "*" },
+			{ value: "/", label: "/" },
+			{ value: "%", label: "%" },
+			{ value: "=", label: "=" },
+			{ value: ">", label: ">" },
+			{ value: "<", label: "<" },
+			{ value: ">=", label: ">=" },
+			{ value: "<=", label: "<=" },
+			{ value: "<>", label: "<>" },
+			{ value: "||", label: "||" },
+		]
 		let defaultValue
 		let data
 		let headers
@@ -63,16 +79,25 @@ export const DropDownEditor = () => {
 		switch (editorName) {
 			case "labels":
 				const val = $$(obj["colLabel"])
-				defaultValue = [$(val), $(operators[0]), $(functions[0])]
+				defaultValue = [$(val), $(operators[0].value), $(functions[0].value)]
 				data = [$$(props.value), operators, functions]
 				headers = [v => "Labels", v => "Operators", v => "Functions"]
 				break
 			case "thematicColumns":
 				const value = $$(obj["thematicColumn"])
-				defaultValue = [$(value), $(operators[0]), $(functions[0])]
+				defaultValue = [$(value), $(operators[0].value), $(functions[0].value)]
 				data = [$$(props.value), operators, functions]
 				headers = [v => "Labels", v => "Operators", v => "Functions"]
 				break
+			// case "projectionName":
+			// 	debugger
+			// 	console.log(test);
+			// 	defaultValue = [$(projectionName)]
+			// 	// data = [$$(props.value)]
+			// 	data = Object.keys(projAsia)
+			// 	headers = [v => "Projection Name"]
+			// 	const projectionName = $$(obj["thematicColumn"])
+			// 	break
 			default:
 				defaultValue = [$($$(props.value)[0])]
 				data = [$$(props.value)]
@@ -87,50 +112,52 @@ export const DropDownEditor = () => {
 		useEffect(() => {
 			if (!$$(innerInputRef)) return
 
-			if ($$(innerInputRef).value == originalVal) {
-				$$(innerInputRef).value = $$(defaultValue[0])
-				$$(outerInputRef).value = $$(defaultValue[0])
-				inputValue($$(innerInputRef).value)
+			let innerInputValue = $$(innerInputRef).value
+			let outerInputValue = $$(outerInputRef).value
+
+			if (innerInputValue == originalVal) {
+				innerInputValue = $$(defaultValue[0])
+				outerInputValue = $$(defaultValue[0])
+				inputValue(innerInputValue)
 			}
 			else {
-				if ($$(defaultValue[0]) == originalVal) {
-					$$(innerInputRef).value = $$(defaultValue[0])
-					$$(outerInputRef).value = $$(defaultValue[0])
-					inputValue($$(innerInputRef).value)
-				}
-				else if (typeof $$(defaultValue[0]) !== "undefined") {
-					$$(innerInputRef).value += " " + $$(defaultValue[0])
-					$$(outerInputRef).value += " " + $$(defaultValue[0])
-					defaultValue[0](undefined)
-					inputValue($$(innerInputRef).value)
-				}
+				innerInputValue = $$(defaultValue[0])
+				outerInputValue = $$(defaultValue[0])
+				inputValue(innerInputValue)
 			}
 		})
 
 		useEffect(() => {
 			if (!$$(innerInputRef)) return
 
-			if (typeof $$(defaultValue[1]) !== "undefined") {
-				$$(innerInputRef).value += " " + $$(defaultValue[1])
-				$$(outerInputRef).value += " " + $$(defaultValue[1])
-				inputValue($$(innerInputRef).value)
+			let innerInputValue = $$(innerInputRef).value
+			let outerInputValue = $$(outerInputRef).value
+
+			if ($$(defaultValue[1]) != "") {
+				innerInputValue += " " + $$(defaultValue[1])
+				outerInputValue += " " + $$(defaultValue[1])
+				inputValue(innerInputValue)
+				defaultValue[1]("")
 			}
 		})
 
 		useEffect(() => {
 			if (!$$(innerInputRef)) return
 
-			if (typeof $$(defaultValue[2]) !== "undefined") {
-				$$(innerInputRef).value += " " + $$(defaultValue[2])
-				$$(outerInputRef).value += " " + $$(defaultValue[2])
-				defaultValue[2](undefined)
-				inputValue($$(innerInputRef).value)
+			let innerInputValue = $$(innerInputRef).value
+			let outerInputValue = $$(outerInputRef).value
+
+			if ($$(defaultValue[2]) != "") {
+				innerInputValue += " " + $$(defaultValue[2])
+				outerInputValue += " " + $$(defaultValue[2])
+				inputValue(innerInputValue)
+				defaultValue[2]("")
 			}
 		})
 
 		useEffect(() => {
 			if (editorName == "labels") {
-				isObservable(obj["colLabel"]) ? obj["colLabel"]($$(inputValue)) : (obj["colLabel"] = $$(inputValue))
+				isObservable(obj["colLabel"]) ? obj["colLabel"]($$(inputValue)) : obj["colLabel"] = $$(inputValue)
 			}
 		})
 
