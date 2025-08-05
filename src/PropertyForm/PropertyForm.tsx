@@ -13,7 +13,7 @@ type PropertyFormProps = {
 export type UIProps<T> = {
 	value: ObservableMaybe<T>
 	reactive: ObservableMaybe<boolean>
-	data: ObservableMaybe<T>
+	data: ObservableMaybe<any>
 	editorName: string
 	onChange: (e) => void
 	changeValueOnClickOnly?: ObservableMaybe<boolean>
@@ -77,12 +77,17 @@ export const PropertyForm = (props: PropertyFormProps) => {
 			sortedKeys.splice(sortedKeys.indexOf("colLabel"), 1)
 		}
 
+		const skippedProperties = ["primitiveType", "restdb", "labelProps", "labelShow", "Altitude", "url", "distanceDisplayCondition", "eyeOffset", "id", "columnsDecoder", "style", "priority"]
 		const form = sortedKeys.map((key) => {
 			if (dashMatchReg.test(key)) {
 				return
 			}
 
 			if (key.includes("Obj") || key.startsWith("$")) {
+				return
+			}
+
+			if (skippedProperties.includes(key)) {
 				return
 			}
 
@@ -102,7 +107,7 @@ export const PropertyForm = (props: PropertyFormProps) => {
 					) : null,
 				<>
 					{() =>
-						($$(value) && !(value instanceof HTMLElement)) || value === 0 ? (
+						($$(value) && !(value instanceof HTMLElement)) || $$(value) === 0 ? (
 							<tr className="flex h-fit items-center">
 								<th className="w-[40%] text-right">{optionName}</th>
 								<td className="w-full">
