@@ -7,6 +7,7 @@ type PropertyFormProps = {
 	obj: any
 	order?: string[]
 	className?: JSX.Class
+	nested?: boolean
 	onCommit?: () => void
 }
 
@@ -77,7 +78,7 @@ export const PropertyForm = (props: PropertyFormProps) => {
 			sortedKeys.splice(sortedKeys.indexOf("colLabel"), 1)
 		}
 
-		const skippedProperties = ["primitiveType", "restdb", "labelProps", "labelShow", "Altitude", "url", "distanceDisplayCondition", "eyeOffset", "id", "columnsDecoder", "style", "priority"]
+		const skippedProperties = ["primitiveType", "restdb", "labelProps", "labelShow", "Altitude", "url", "distanceDisplayCondition", "eyeOffset", "ids", "id", "columnsDecoder", "style", "priority"]
 		const form = sortedKeys.map((key) => {
 			if (dashMatchReg.test(key)) {
 				return
@@ -107,9 +108,9 @@ export const PropertyForm = (props: PropertyFormProps) => {
 					) : null,
 				<>
 					{() =>
-						($$(value) && !(value instanceof HTMLElement)) || $$(value) === 0 ? (
+						($$(value) && !(value instanceof HTMLElement)) || $$(value) === 0 || $$(value) === false ? (
 							<tr className="flex h-fit items-center">
-								<th className="w-[40%] text-right">{optionName}</th>
+								<th className={`w-[150px] text-right`}>{optionName}</th>
 								<td className="w-full">
 									{formUI.map((formFields) => {
 										const { UI, renderCondition } = formFields
@@ -140,7 +141,7 @@ export const PropertyForm = (props: PropertyFormProps) => {
 		//@ts-ignore
 		<div>
 			<div class={["overflow-auto table-striped", () => (className ? className : "h-[300px]")] as JSX.Class}>
-				<table class="w-100 table-striped table-bordered table-sm">
+				<table class={`w-full table-striped table-bordered table-sm`}>
 					<tbody>{renderForm(obj, undefined, order)}</tbody>
 				</table>
 			</div>
