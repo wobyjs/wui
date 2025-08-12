@@ -7,7 +7,6 @@ type PropertyFormProps = {
 	obj: any
 	order?: string[]
 	className?: JSX.Class
-	nested?: boolean
 	onCommit?: () => void
 }
 
@@ -66,6 +65,8 @@ export const Editors = $<
 	})[]
 >([])
 
+export const skippedProperties = ["partial", "primitiveType", "restdb", "verticalOrigin", "horizontalOrigin", "labelProps", "labelShow", "Altitude", "url", "distanceDisplayCondition", "eyeOffset", "ids", "id", "columnsDecoder", "style", "priority"]
+
 export const PropertyForm = (props: PropertyFormProps) => {
 	changeEnumerable(props.obj)
 	const { obj, order, className } = props
@@ -78,17 +79,12 @@ export const PropertyForm = (props: PropertyFormProps) => {
 			sortedKeys.splice(sortedKeys.indexOf("colLabel"), 1)
 		}
 
-		const skippedProperties = ["primitiveType", "restdb", "labelProps", "labelShow", "Altitude", "url", "distanceDisplayCondition", "eyeOffset", "ids", "id", "columnsDecoder", "style", "priority"]
 		const form = sortedKeys.map((key) => {
 			if (dashMatchReg.test(key)) {
 				return
 			}
 
 			if (key.includes("Obj") || key.startsWith("$")) {
-				return
-			}
-
-			if (skippedProperties.includes(key)) {
 				return
 			}
 
@@ -109,25 +105,22 @@ export const PropertyForm = (props: PropertyFormProps) => {
 				<>
 					{() =>
 						($$(value) && !(value instanceof HTMLElement)) || $$(value) === 0 || $$(value) === false ? (
-							<tr className="flex h-fit items-center">
-								<th className={`w-[150px] text-right`}>{optionName}</th>
-								<td className="w-full">
-									{formUI.map((formFields) => {
-										const { UI, renderCondition } = formFields
-										const renderCon = renderCondition(value, key)
+							<>
+								{formUI.map((formFields) => {
+									const { UI, renderCondition } = formFields
+									const renderCon = renderCondition(value, key)
 
-										return (
-											renderCon && (
-												<UI
-													data={propertyData}
-													editorName={key}
-													value={value}
-												/>
-											)
+									return (
+										renderCon && (
+											<UI
+												data={propertyData}
+												editorName={key}
+												value={value}
+											/>
 										)
-									})}
-								</td>
-							</tr>
+									)
+								})}
+							</>
 						) : undefined
 					}
 				</>,

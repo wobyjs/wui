@@ -17,13 +17,21 @@ export const ColorEditor = () => {
 
 	const UI = (props: UIProps<string>) => {
 		const { value, editorName } = props
+		const skippedProperties = ["partial", "primitiveType", "restdb", "verticalOrigin", "horizontalOrigin", "labelProps", "labelShow", "Altitude", "url", "distanceDisplayCondition", "eyeOffset", "ids", "id", "columnsDecoder", "style", "priority"]
+		const optionName = editorName.replace(/([a-z])([A-Z])/g, "$1 $2").replace(/^./, function (str) {
+			return str.toUpperCase()
+		})
 
-		return (
-			//@ts-ignore
-			<ClrEditor
-				value={value}
-				editorName={editorName}
-			/>
+		return skippedProperties.includes(editorName) ? null : (
+			<tr className="flex h-fit items-center">
+				<th className={`w-[150px] text-right`}>{optionName}</th>
+				<td className="w-full">
+					<ClrEditor
+						value={value}
+						editorName={editorName}
+					/>
+				</td>
+			</tr>
 		)
 	}
 

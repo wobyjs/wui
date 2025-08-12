@@ -1,7 +1,7 @@
 /** @jsxImportSource woby */
 
 import { $, $$, isObservable, ObservableMaybe, useEffect } from "woby"
-import { Editors, UIProps } from "./PropertyForm"
+import { Editors, UIProps, skippedProperties } from "./PropertyForm"
 import { EditorProps } from "./EditorProps"
 import { MultiWheeler } from "../Wheeler/MultiWheeler"
 import projAsia from "./proj/projAsia.json"
@@ -13,16 +13,22 @@ export const DropDownEditor = () => {
 
 	const UI = (props: UIProps<ObservableMaybe<[]>>) => {
 		const { value, data, editorName } = props
+		const optionName = editorName.replace(/([a-z])([A-Z])/g, "$1 $2").replace(/^./, function (str) {
+			return str.toUpperCase()
+		})
 
-		return (
-			<>
-				<DropDown
-					value={value}
-					obj={data}
-					editorName={editorName}
-					changeValueOnClickOnly={editorName == "labels" || editorName == "thematicColumns" ? true : false}
-				/>
-			</>
+		return skippedProperties.includes(editorName) ? null : (
+			<tr className="flex h-fit items-center">
+				<th className={`w-[150px] text-right`}>{optionName}</th>
+				<td className="w-full">
+					<DropDown
+						value={value}
+						obj={data}
+						editorName={editorName}
+						changeValueOnClickOnly={editorName == "labels" || editorName == "thematicColumns" ? true : false}
+					/>
+				</td>
+			</tr>
 		)
 	}
 
@@ -89,15 +95,13 @@ export const DropDownEditor = () => {
 				data = [$$(props.value), operators, functions]
 				headers = [v => "Labels", v => "Operators", v => "Functions"]
 				break
-			// case "projectionName":
-			// 	debugger
-			// 	console.log(test);
-			// 	defaultValue = [$(projectionName)]
-			// 	// data = [$$(props.value)]
-			// 	data = Object.keys(projAsia)
-			// 	headers = [v => "Projection Name"]
-			// 	const projectionName = $$(obj["thematicColumn"])
-			// 	break
+			case "projectionName":
+				data = [Object.keys(projAsia)]
+				const projectionCode = $$(obj).projection
+				const projectionName = Object.keys(projAsia).filter(key => key.includes(projectionCode));
+				defaultValue = [$(projectionName[0])]
+				headers = [v => "Projection Name"]
+				break
 			default:
 				defaultValue = [$($$(props.value)[0])]
 				data = [$$(props.value)]
@@ -133,11 +137,10 @@ export const DropDownEditor = () => {
 			let innerInputValue = $$(innerInputRef).value
 			let outerInputValue = $$(outerInputRef).value
 
-			if ($$(defaultValue[1]) != "") {
+			if ($$(defaultValue[1]) != "" && $$(defaultValue[1]) != undefined) {
 				innerInputValue += " " + $$(defaultValue[1])
 				outerInputValue += " " + $$(defaultValue[1])
 				inputValue(innerInputValue)
-				defaultValue[1]("")
 			}
 		})
 
@@ -147,11 +150,10 @@ export const DropDownEditor = () => {
 			let innerInputValue = $$(innerInputRef).value
 			let outerInputValue = $$(outerInputRef).value
 
-			if ($$(defaultValue[2]) != "") {
+			if ($$(defaultValue[1]) != "" && $$(defaultValue[1]) != undefined) {
 				innerInputValue += " " + $$(defaultValue[2])
 				outerInputValue += " " + $$(defaultValue[2])
 				inputValue(innerInputValue)
-				defaultValue[2]("")
 			}
 		})
 
@@ -184,8 +186,8 @@ export const DropDownEditor = () => {
 		return (
 			<>
 				<input
-					className="border m-5"
-					size={40}
+					className="border m-2"
+					size={50}
 					ref={outerInputRef}
 					value={inputValue}
 					onClick={() => {
