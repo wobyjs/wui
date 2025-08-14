@@ -1,7 +1,7 @@
 /** @jsxImportSource woby */
 
 import { $$, ObservableMaybe, isObservable, useEffect } from "woby"
-import { Editors, UIProps } from "./PropertyForm"
+import { Editors, TableRow, UIProps } from "./PropertyForm"
 import { EditorProps } from "./EditorProps"
 
 export const ColorEditor = () => {
@@ -23,15 +23,12 @@ export const ColorEditor = () => {
 		})
 
 		return skippedProperties.includes(editorName) ? null : (
-			<tr className="flex h-fit items-center">
-				<th className={`w-[150px] text-right`}>{optionName}</th>
-				<td className="w-full">
-					<ClrEditor
-						value={value}
-						editorName={editorName}
-					/>
-				</td>
-			</tr>
+			<TableRow optionName={optionName}>
+				<ClrEditor
+					value={value}
+					editorName={editorName}
+				/>
+			</TableRow>
 		)
 	}
 

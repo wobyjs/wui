@@ -65,8 +65,20 @@ export const Editors = $<
 	})[]
 >([])
 
-export const skippedProperties = ["partial", "primitiveType", "restdb", "verticalOrigin", "horizontalOrigin", "labelProps", "labelShow", "Altitude", "url", "distanceDisplayCondition", "eyeOffset", "ids", "id", "columnsDecoder", "style", "priority"]
+export const skippedProperties = ["thematic", "isWall", "outline", "partial", "projection", "primitiveType", "restdb", "verticalOrigin", "horizontalOrigin", "labelProps", "labelShow", "Altitude", "url", "distanceDisplayCondition", "eyeOffset", "ids", "id", "columnsDecoder", "style", "priority"]
 
+export const TableRow = (props) => {
+	const { optionName, children } = props
+
+	return (
+		<tr className="flex h-fit items-stretch border-solid outline-1">
+			<th className={`w-[175px] text-left flex items-center outline-1 whitespace-nowrap`}>{optionName}</th>
+			<td className="w-full">
+				{children}
+			</td>
+		</tr>
+	)
+}
 export const PropertyForm = (props: PropertyFormProps) => {
 	changeEnumerable(props.obj)
 	const { obj, order, className } = props
@@ -133,8 +145,11 @@ export const PropertyForm = (props: PropertyFormProps) => {
 	return (
 		//@ts-ignore
 		<div>
-			<div class={["overflow-auto table-striped", () => (className ? className : "h-[300px]")] as JSX.Class}>
-				<table class={`w-full table-striped table-bordered table-sm`}>
+			<div
+				onClick={e => e.stopPropagation()}
+				class={["overflow-auto m-3", () => (className ? className : "h-[300px]")] as JSX.Class}
+			>
+				<table class={`w-full table-bordered table-sm`}>
 					<tbody>{renderForm(obj, undefined, order)}</tbody>
 				</table>
 			</div>

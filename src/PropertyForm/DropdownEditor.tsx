@@ -1,7 +1,7 @@
 /** @jsxImportSource woby */
 
 import { $, $$, isObservable, ObservableMaybe, useEffect } from "woby"
-import { Editors, UIProps, skippedProperties } from "./PropertyForm"
+import { Editors, TableRow, UIProps, skippedProperties } from "./PropertyForm"
 import { EditorProps } from "./EditorProps"
 import { MultiWheeler } from "../Wheeler/MultiWheeler"
 import projAsia from "./proj/projAsia.json"
@@ -18,17 +18,14 @@ export const DropDownEditor = () => {
 		})
 
 		return skippedProperties.includes(editorName) ? null : (
-			<tr className="flex h-fit items-center">
-				<th className={`w-[150px] text-right`}>{optionName}</th>
-				<td className="w-full">
-					<DropDown
-						value={value}
-						obj={data}
-						editorName={editorName}
-						changeValueOnClickOnly={editorName == "labels" || editorName == "thematicColumns" ? true : false}
-					/>
-				</td>
-			</tr>
+			<TableRow optionName={optionName}>
+				<DropDown
+					value={value}
+					obj={data}
+					editorName={editorName}
+					changeValueOnClickOnly={editorName == "labels" || editorName == "thematicColumns" ? true : false}
+				/>
+			</TableRow>
 		)
 	}
 
@@ -186,8 +183,8 @@ export const DropDownEditor = () => {
 		return (
 			<>
 				<input
-					className="border m-2"
-					size={50}
+					className="m-0"
+					// size={50}
 					ref={outerInputRef}
 					value={inputValue}
 					onClick={() => {

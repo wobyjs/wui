@@ -1,7 +1,7 @@
 /** @jsxImportSource woby */
 
 import { $$, isObservable, ObservableMaybe } from "woby"
-import { Editors, UIProps, skippedProperties } from "./PropertyForm"
+import { Editors, TableRow, UIProps, skippedProperties } from "./PropertyForm"
 import { TextField } from "../TextField"
 import { EditorProps } from "./EditorProps"
 import * as test from '../TextField.effect'
@@ -23,12 +23,9 @@ export const StringEditor = () => {
 		})
 
 		return skippedProperties.includes(editorName) ? null : (
-			<tr className="flex h-fit items-center">
-				<th className={`w-[150px] text-right`}>{optionName}</th>
-				<td className="w-full">
-					<StringEditor value={value} />
-				</td>
-			</tr>
+			<TableRow optionName={optionName}>
+				<StringEditor value={value} />
+			</TableRow>
 		)
 	}
 
@@ -37,8 +34,8 @@ export const StringEditor = () => {
 
 		return (
 			<TextField
-				// className={test.effect20}
-				effect={test.effect21}
+				className={"size-full"}
+				effect={""}
 				value={value}
 				assignOnEnter
 				disabled={!isObservable(value)}

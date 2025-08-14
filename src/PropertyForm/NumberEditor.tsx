@@ -1,7 +1,7 @@
 /** @jsxImportSource woby */
 
 import { $$, ObservableMaybe, isObservable, useEffect } from "woby"
-import { Editors, UIProps, skippedProperties } from "./PropertyForm"
+import { Editors, TableRow, UIProps, skippedProperties } from "./PropertyForm"
 import { NumberField } from "../NumberField"
 import { EditorProps } from "./EditorProps"
 
@@ -19,15 +19,12 @@ export const NumberEditor = () => {
 		})
 
 		return skippedProperties.includes(editorName) ? null : (
-			<tr className="flex h-fit items-center">
-				<th className={`w-[150px] text-right`}>{optionName}</th>
-				<td className="w-full">
-					<NumEditor
-						value={value}
-						editorName={editorName}
-					/>
-				</td>
-			</tr>
+			<TableRow optionName={optionName}>
+				<NumEditor
+					value={value}
+					editorName={editorName}
+				/>
+			</TableRow>
 		)
 	}
 
