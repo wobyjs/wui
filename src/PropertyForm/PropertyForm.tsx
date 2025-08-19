@@ -65,7 +65,7 @@ export const Editors = $<
 	})[]
 >([])
 
-export const skippedProperties = ["thematic", "isWall", "outline", "partial", "projection", "primitiveType", "restdb", "verticalOrigin", "horizontalOrigin", "labelProps", "labelShow", "Altitude", "url", "distanceDisplayCondition", "eyeOffset", "ids", "id", "columnsDecoder", "style", "priority"]
+export const skippedProperties = ["show", "label", "thematic", "isWall", "outline", "partial", "projection", "primitiveType", "restdb", "verticalOrigin", "horizontalOrigin", "labelProps", "labelShow", "Altitude", "url", "distanceDisplayCondition", "eyeOffset", "ids", "id", "columnsDecoder", "style", "priority"]
 
 export const TableRow = (props) => {
 	const { optionName, children } = props

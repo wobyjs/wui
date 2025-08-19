@@ -20,7 +20,6 @@ export const ObjectEditor = () => {
 		const open = $(false)
 
 		return skippedProperties.includes(editorName) ? null : (
-			<TableRow optionName={optionName}>
 			<div
 				className="flex m-3 items-center gap-2 bg-white hover:bg-gray-50 text-gray-700 font-semibold py-2 px-4 rounded-lg shadow-sm transition-all duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
 				onClick={() =>
@@ -33,9 +32,10 @@ export const ObjectEditor = () => {
 						<path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
 					</svg>
 				}
-				{/* <span className={"whitespace-nowrap"}>{`${optionName}`}</span> */}
+				<span className={"whitespace-nowrap"}>{`${optionName}`}</span>
 				<Collapse
 					open={open}
+					background={false}
 				>
 					<PropertyForm
 						obj={$$(value)}
@@ -43,7 +43,6 @@ export const ObjectEditor = () => {
 					/>
 				</Collapse>
 			</div>
-			</TableRow>
 		)
 	}
 

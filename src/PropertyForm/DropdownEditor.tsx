@@ -94,6 +94,7 @@ export const DropDownEditor = () => {
 				break
 			case "projectionName":
 				data = [Object.keys(projAsia)]
+				//@ts-expect-error
 				const projectionCode = $$(obj).projection
 				const projectionName = Object.keys(projAsia).filter(key => key.includes(projectionCode));
 				defaultValue = [$(projectionName[0])]
@@ -183,8 +184,7 @@ export const DropDownEditor = () => {
 		return (
 			<>
 				<input
-					className="m-0"
-					// size={50}
+					className="m-0 w-full"
 					ref={outerInputRef}
 					value={inputValue}
 					onClick={() => {
