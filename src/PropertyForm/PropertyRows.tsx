@@ -14,7 +14,7 @@ type PropertyRowProps = {
 
 export const PropertyRows = (props: PropertyRowProps) => {
 	changeEnumerable(props.obj)
-	const { obj, order, className, textAlign } = props
+	const { obj, order, textAlign } = props
 	const formUI = $$(Editors).map((e) => e())
 	const dashMatchReg = /^-([a-zA-Z].*)-$/
 
@@ -34,7 +34,7 @@ export const PropertyRows = (props: PropertyRowProps) => {
 			}
 
 			const value = propertyData[key]
-		
+
 			return [
 				() =>
 					title ? (
