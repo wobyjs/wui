@@ -7,8 +7,8 @@ import { MultiWheeler } from "../Wheeler/MultiWheeler"
 import projAsia from "./proj/projAsia.json"
 
 export const DropDownEditor = () => {
-	const renderCondition = (value: ObservableMaybe<string>) => {
-		return Array.isArray($$(value))
+	const renderCondition = (value: ObservableMaybe<string>, key) => {
+		return Array.isArray($$(value)) && key != "thematic"
 	}
 
 	const UI = (props: UIProps<ObservableMaybe<[]>>) => {

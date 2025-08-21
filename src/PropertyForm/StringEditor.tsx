@@ -17,13 +17,16 @@ export const StringEditor = () => {
 	}
 
 	const UI = (props: UIProps<ObservableMaybe<string>>) => {
-		const { value, editorName, data } = props
+		const { value, editorName, textAlign } = props
 		const optionName = editorName.replace(/([a-z])([A-Z])/g, "$1 $2").replace(/^./, function (str) {
 			return str.toUpperCase()
 		})
 
 		return skippedProperties.includes(editorName) ? null : (
-			<TableRow optionName={optionName}>
+			<TableRow
+				optionName={optionName}
+				textAlign={textAlign}
+			>
 				<StringEditor value={value} />
 			</TableRow>
 		)

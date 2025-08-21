@@ -17,6 +17,7 @@ export type UIProps<T> = {
 	data: ObservableMaybe<any>
 	editorName: string
 	textAlign?: string
+	indent?: boolean
 	onChange: (e) => void
 	changeValueOnClickOnly?: ObservableMaybe<boolean>
 }
@@ -67,7 +68,7 @@ export const Editors = $<
 	})[]
 >([])
 
-export const skippedProperties = ["isCached", "snap", "zIndex", "show", "label", "thematic", "isWall", "outline", "partial", "projection", "primitiveType", "restdb", "verticalOrigin", "horizontalOrigin", "labelProps", "labelShow", "Altitude", "url", "distanceDisplayCondition", "eyeOffset", "ids", "id", "columnsDecoder", "style", "priority"]
+export const skippedProperties = ["autoDistance", "rotated", "tolerance", "isCached", "snap", "zIndex", "show", "label", "isWall", "outline", "partial", "projection", "primitiveType", "restdb", "verticalOrigin", "horizontalOrigin", "labelProps", "labelShow", "Altitude", "url", "distanceDisplayCondition", "eyeoffset", "ids", "id", "columnsDecoder", "style", "priority"]
 
 export const TableRow = (props) => {
 	const { optionName, children, textAlign = "text-left" } = props
