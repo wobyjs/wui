@@ -7,14 +7,17 @@ type PropertyFormProps = {
 	obj: any
 	order?: string[]
 	className?: JSX.Class
+	textAlign?: string
 	onCommit?: () => void
 }
 
 export type UIProps<T> = {
 	value: ObservableMaybe<T>
 	reactive: ObservableMaybe<boolean>
-	data: ObservableMaybe<T>
+	data: ObservableMaybe<any>
 	editorName: string
+	textAlign?: string
+	indent?: boolean
 	onChange: (e) => void
 	changeValueOnClickOnly?: ObservableMaybe<boolean>
 }
@@ -60,14 +63,28 @@ export function changeEnumerable(json: object) {
 
 export const Editors = $<
 	(() => {
-		UI: (props: { data, editorName: string, value: any }) => JSX.Element,
+		UI: (props: { data, editorName: string, value: any, textAlign: string }) => JSX.Element,
 		renderCondition: (values: ObservableMaybe<any>, key?: string) => boolean
 	})[]
 >([])
 
+export const skippedProperties = ["autoDistance", "rotated", "tolerance", "isCached", "snap", "zIndex", "show", "label", "isWall", "outline", "partial", "projection", "primitiveType", "restdb", "verticalOrigin", "horizontalOrigin", "labelProps", "labelShow", "Altitude", "url", "distanceDisplayCondition", "eyeoffset", "ids", "id", "columnsDecoder", "style", "priority"]
+
+export const TableRow = (props) => {
+	const { optionName, children, textAlign = "text-left" } = props
+
+	return (
+		<tr className="flex h-fit items-stretch border-solid outline-1">
+			<th className={`w-[175px] outline-1 whitespace-nowrap ${textAlign}`}>{optionName}</th>
+			<td className="w-full">
+				{children}
+			</td>
+		</tr>
+	)
+}
 export const PropertyForm = (props: PropertyFormProps) => {
 	changeEnumerable(props.obj)
-	const { obj, order, className } = props
+	const { obj, order, className, textAlign } = props
 	const formUI = $$(Editors).map((e) => e())
 	const dashMatchReg = /^-([a-zA-Z].*)-$/
 
@@ -87,11 +104,6 @@ export const PropertyForm = (props: PropertyFormProps) => {
 			}
 
 			const value = propertyData[key]
-			const optionName = Array.isArray(propertyData)
-				? null
-				: key.replace(/([a-z])([A-Z])/g, "$1 $2").replace(/^./, function (str) {
-					return str.toUpperCase()
-				})
 
 			return [
 				() =>
@@ -102,26 +114,24 @@ export const PropertyForm = (props: PropertyFormProps) => {
 					) : null,
 				<>
 					{() =>
-						($$(value) && !(value instanceof HTMLElement)) || value === 0 ? (
-							<tr className="flex h-fit items-center">
-								<th className="w-[40%] text-right">{optionName}</th>
-								<td className="w-full">
-									{formUI.map((formFields) => {
-										const { UI, renderCondition } = formFields
-										const renderCon = renderCondition(value, key)
+						($$(value) && !(value instanceof HTMLElement)) || $$(value) === 0 || $$(value) === false ? (
+							<>
+								{formUI.map((formFields) => {
+									const { UI, renderCondition } = formFields
+									const renderCon = renderCondition(value, key)
 
-										return (
-											renderCon && (
-												<UI
-													data={propertyData}
-													editorName={key}
-													value={value}
-												/>
-											)
+									return (
+										renderCon && (
+											<UI
+												data={propertyData}
+												editorName={key}
+												value={value}
+												textAlign={textAlign}
+											/>
 										)
-									})}
-								</td>
-							</tr>
+									)
+								})}
+							</>
 						) : undefined
 					}
 				</>,
@@ -134,8 +144,11 @@ export const PropertyForm = (props: PropertyFormProps) => {
 	return (
 		//@ts-ignore
 		<div>
-			<div class={["overflow-auto table-striped", () => (className ? className : "h-[300px]")] as JSX.Class}>
-				<table class="w-100 table-striped table-bordered table-sm">
+			<div
+				onClick={e => e.stopPropagation()}
+				class={["overflow-auto", () => (className ? className : "h-[300px] m-3")] as JSX.Class}
+			>
+				<table class={`w-full table-bordered table-sm`}>
 					<tbody>{renderForm(obj, undefined, order)}</tbody>
 				</table>
 			</div>

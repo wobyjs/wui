@@ -1,7 +1,7 @@
 /** @jsxImportSource woby */
 
-import { $, $$, ObservableMaybe, isObservable } from "woby"
-import { Editors, UIProps } from "./PropertyForm"
+import { $, $$, ObservableMaybe, isObservable, useEffect } from "woby"
+import { Editors, TableRow, UIProps, skippedProperties } from "./PropertyForm"
 import { Checkbox } from "../Checkbox"
 import { EditorProps } from "./EditorProps"
 
@@ -13,33 +13,37 @@ export const BooleanEditor = () => {
 	}
 
 	const UI = (props: UIProps<boolean>) => {
-		const { value, reactive } = props
+		const { value, reactive, editorName } = props
+		const optionName = editorName.replace(/([a-z])([A-Z])/g, "$1 $2").replace(/^./, function (str) {
+			return str.toUpperCase()
+		})
 
-		return (
-			//@ts-ignore
-			<BoolEditor
-				value={value}
-				reactive={reactive}
-			/>
+		return skippedProperties.includes(editorName) ? null : (
+			<TableRow optionName={optionName}>
+				<BoolEditor
+					value={value}
+					reactive={reactive}
+					editorName={editorName}
+				/>
+			</TableRow>
 		)
 	}
 
 	const BoolEditor = (props: EditorProps) => {
-		const { value, onChange } = props
-		const originalValue = $($$(value))
-	
+		const { value, onChange, editorName } = props
+
 		return (
 			<Checkbox
 				checked={$$(value)}
 				disabled={!isObservable(value)}
 				onChange={(e) => {
-					originalValue((e.target as HTMLInputElement).value)
+					value((e.target as HTMLInputElement).checked)
 					onChange?.(e)
 				}}
 			/>
 		)
 	}
-	
+
 	return {
 		UI,
 		renderCondition,

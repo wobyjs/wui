@@ -1,7 +1,7 @@
 /** @jsxImportSource woby */
 
-import { $$, ObservableMaybe, isObservable } from "woby"
-import { Editors, UIProps } from "./PropertyForm"
+import { $$, ObservableMaybe, isObservable, useEffect } from "woby"
+import { Editors, TableRow, UIProps, skippedProperties } from "./PropertyForm"
 import { NumberField } from "../NumberField"
 import { EditorProps } from "./EditorProps"
 
@@ -13,13 +13,26 @@ export const NumberEditor = () => {
 	}
 
 	const UI = (props: UIProps<number>) => {
-		const { value } = props
+		const { value, editorName, textAlign } = props
+		const optionName = editorName.replace(/([a-z])([A-Z])/g, "$1 $2").replace(/^./, function (str) {
+			return str.toUpperCase()
+		})
 
-		return <NumEditor value={value} />
+		return skippedProperties.includes(editorName) ? null : (
+			<TableRow
+				optionName={optionName}
+				textAlign={textAlign}
+			>
+				<NumEditor
+					value={value}
+					editorName={editorName}
+				/>
+			</TableRow>
+		)
 	}
 
 	const NumEditor = (props: EditorProps) => {
-		const { value } = props
+		const { value, editorName } = props
 
 		return (
 			<NumberField

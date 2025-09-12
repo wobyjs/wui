@@ -1,9 +1,10 @@
 /** @jsxImportSource woby */
 
 import { $$, isObservable, ObservableMaybe } from "woby"
-import { Editors, UIProps } from "./PropertyForm"
+import { Editors, TableRow, UIProps, skippedProperties } from "./PropertyForm"
 import { TextField } from "../TextField"
 import { EditorProps } from "./EditorProps"
+import * as test from '../TextField.effect'
 
 export const StringEditor = () => {
 	const renderCondition = (value: ObservableMaybe<string>, key) => {
@@ -16,11 +17,18 @@ export const StringEditor = () => {
 	}
 
 	const UI = (props: UIProps<ObservableMaybe<string>>) => {
-		const { value, editorName, data } = props
+		const { value, editorName, textAlign } = props
+		const optionName = editorName.replace(/([a-z])([A-Z])/g, "$1 $2").replace(/^./, function (str) {
+			return str.toUpperCase()
+		})
 
-		return (
-			//@ts-ignore
-			<StringEditor value={value} />
+		return skippedProperties.includes(editorName) ? null : (
+			<TableRow
+				optionName={optionName}
+				textAlign={textAlign}
+			>
+				<StringEditor value={value} />
+			</TableRow>
 		)
 	}
 
@@ -29,7 +37,8 @@ export const StringEditor = () => {
 
 		return (
 			<TextField
-				className={""}
+				className={"size-full"}
+				effect={""}
 				value={value}
 				assignOnEnter
 				disabled={!isObservable(value)}

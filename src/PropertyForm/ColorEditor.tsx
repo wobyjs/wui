@@ -1,7 +1,7 @@
 /** @jsxImportSource woby */
 
 import { $$, ObservableMaybe, isObservable } from "woby"
-import { Editors, UIProps } from "./PropertyForm"
+import { Editors, TableRow, UIProps, skippedProperties } from "./PropertyForm"
 import { EditorProps } from "./EditorProps"
 
 export const ColorEditor = () => {
@@ -16,14 +16,21 @@ export const ColorEditor = () => {
 	}
 
 	const UI = (props: UIProps<string>) => {
-		const { value, editorName } = props
+		const { value, editorName, textAlign } = props
+		const optionName = editorName.replace(/([a-z])([A-Z])/g, "$1 $2").replace(/^./, function (str) {
+			return str.toUpperCase()
+		})
 
-		return (
-			//@ts-ignore
-			<ClrEditor
-				value={value}
-				editorName={editorName}
-			/>
+		return skippedProperties.includes(editorName) ? null : (
+			<TableRow
+				optionName={optionName}
+				textAlign={textAlign}
+			>
+				<ClrEditor
+					value={value}
+					editorName={editorName}
+				/>
+			</TableRow>
 		)
 	}
 

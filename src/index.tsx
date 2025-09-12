@@ -32,6 +32,7 @@ export * from "./PropertyForm/DropdownEditor"
 export * from "./PropertyForm/NumberEditor"
 export * from "./PropertyForm/ObjectEditor"
 export * from "./PropertyForm/PropertyForm"
+export * from "./PropertyForm/PropertyRows"
 export * from "./PropertyForm/StringEditor"
 export * from "./PropertyForm/EditorProps"
 
