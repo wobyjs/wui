@@ -1,8 +1,8 @@
 import { $, $$, JSX, Observable } from 'woby'
-import { Button, variant } from '../Button'
+import { Button } from '../Button'
 import { EditorContext, useUndoRedo } from './undoredo'
-import { useOnClickOutside } from 'use-woby'
-import { range, getSelectedText, replaceSelectedText } from './utils' // Assuming these utils exist or will be created
+import { useOnClickOutside } from '@woby/use'
+import { getCurrentRange, getSelectedText, replaceSelectedText } from './utils'
 
 // Icons (placeholders, replace with actual icons)
 const StrikethroughIcon = () => <span className="font-bold">S</span>
@@ -18,7 +18,7 @@ const applyFormat = (command: string, value?: string) => {
 }
 
 const transformCase = (transformType: 'lowercase' | 'uppercase' | 'capitalize') => {
-    const selectedText = getSelectedText($$(range))
+    const selectedText = getSelectedText(getCurrentRange())
     if (!selectedText) return
 
     let transformedText = ''
@@ -33,7 +33,7 @@ const transformCase = (transformType: 'lowercase' | 'uppercase' | 'capitalize') 
             transformedText = selectedText.replace(/\b\w/g, char => char.toUpperCase())
             break
     }
-    replaceSelectedText($$(range), transformedText)
+    replaceSelectedText(getCurrentRange(), transformedText)
 }
 
 
@@ -71,7 +71,8 @@ export const TextFormatOptionsDropDown = () => {
         <div className="relative inline-block text-left" ref={dropdownRef}>
             <div>
                 <Button
-                    class={[variant.outlined, "p-2"]}
+                    buttonType='outlined'
+                    class={["p-2"]}
                     onClick={toggleDropdown}
                     title="More text formats"
                 >

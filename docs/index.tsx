@@ -8,13 +8,13 @@ import { Avatar } from "../src/Avatar"
 import { Badge } from "../src/Badge"
 import { Appbar } from "../src/Appbar"
 import { Toolbar } from "../src/Toolbar"
-import { Button, variant } from "../src/Button"
+import { Button } from "../src/Button"
 import { Fab } from "../src/Fab"
 import * as spreset from "../src/Switch.effect"
 
 import * as React from 'woby'
 import { render, $, $$, useEffect, type JSX } from "woby"
-import "../dist/woby-wui.css"
+import "../dist/wui.css"
 import './input.css'
 import { Collapse } from "../src/Collapse"
 import { Checkbox } from "../src/Checkbox"
@@ -23,8 +23,8 @@ import { NumberField } from "../src/NumberField"
 import { Zoomable, Img } from "../src/Zoomable"
 import { ToggleButton } from "../src/ToggleButton"
 import { Tab, Tabs } from "../src/Tabs"
-import { Wodal } from 'woby-modal'
-import { useViewportSize } from 'use-woby'
+import { Wodal } from '@woby/modal'
+import { useViewportSize } from '@woby/use'
 import { Wheeler } from '../src/Wheeler/Wheeler'
 import { WheelerItem } from '../src/Wheeler/WheelerType'
 import { MultiWheeler } from '../src/Wheeler/MultiWheeler'
@@ -1086,10 +1086,10 @@ const App = () => (
 					<br />
 					<br />
 					<div class="block">
-						<Button class={variant.outlined}>Outlined</Button>
-						<Button class={variant.contained}>contained</Button>
-						<Button class={variant.text}>text</Button>
-						<Button class={variant.icon}>
+						<Button buttonType='outlined'>Outlined</Button>
+						<Button buttonType='contained'>contained</Button>
+						<Button buttonType='text'>text</Button>
+						<Button buttonType='icon'>
 							<svg
 								focusable="false"
 								viewBox="0 0 24 24"

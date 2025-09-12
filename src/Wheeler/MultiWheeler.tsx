@@ -1,7 +1,7 @@
 import { $, $$, Observable, ObservableMaybe, useEffect, useMemo, untrack, Portal, type JSX, isObservable, ArrayMaybe } from 'woby'
-import { use } from 'use-woby'
+import { use, useViewportSize } from '@woby/use'
 import { Wheeler } from './Wheeler' // Adjust path
-import { Button, variant } from '../Button'
+import { Button } from '../Button'
 import { WheelerItem, WheelerProps } from './WheelerType'
 
 // --- Utilities (unchanged) ---
@@ -31,7 +31,7 @@ export const MultiWheeler = (props: MultiWheelerProps): JSX.Element => {
         itemCount = 5,
         headers,
         divider,
-        bottom,
+        bottom = true,
         title,
         mask,
         visible = $(true),
@@ -70,18 +70,28 @@ export const MultiWheeler = (props: MultiWheelerProps): JSX.Element => {
     //     }
     // })
 
+    const { height: vh, width: vw, offsetLeft: ol, offsetTop: ot, pageTop: pt, pageLeft: pl } = useViewportSize()
+
+    // useEffect(() => console.log("vh", $$(vh), "vw", $$(vw), "ol", $$(ol), "ot", $$(ot), "pt", $$(pt), "pl", $$(pl)))
+
     // --- Render (unchanged) ---
-    const dateTimeWheelerCls = 'date-time-Wheeler flex w-full bg-white p-1 border justify-center border-gray-300 rounded-md shadow-sm '
+    const dateTimeWheelerCls = 'multi-Wheeler flex w-full bg-white p-1 border justify-center border-gray-300 rounded-md shadow-sm '
     const wheelWrapperCls = 'wheel-wrapper flex-1'
 
     const br = useMemo(() => $$(divider) ? 'border-l border-gray-300 dark:border-gray-600' : null)
 
+    // const { height: vh, width: vw, offsetLeft: ol, offsetTop: ot, pageTop: pt, pageLeft: pl } = useViewportSize()
+    // useEffect(() => console.log("vh", $$(vh), "vw", $$(vw), "ol", $$(ol), "ot", $$(ot), "pt", $$(pt), "pl", $$(pl)))
+
+    const ref = $<HTMLDivElement>()
     const comp = useMemo(() => <>
-        <div class={[dateTimeWheelerCls, 'flex-col fixed inset-x-0 bottom-0 bg-blue-600 shadow-lg z-10']}>
+        <div ref={ref} class={[dateTimeWheelerCls, 'flex-col fixed inset-x-0 bottom-0 bg-blue-600 shadow-lg z-10', 'h-fit']}
+            style={{ top: () => $$(vh) - ($$(ref) ? $$(ref).clientHeight ?? 0 : 0) + $$(pt) }}>
             <div class="flex items-center justify-between px-4 py-2 h-auto relative">
                 <div class="w-[80px] flex justify-start">
                     <Button
-                        class={[variant.contained, 'px-2']}
+                        buttonType='contained'
+                        class={['px-2']}
                         onClick={() => visible(false)}
                     >
                         Cancel
@@ -94,7 +104,8 @@ export const MultiWheeler = (props: MultiWheelerProps): JSX.Element => {
                 </div>
                 <div class="w-[80px] flex justify-end">
                     <Button
-                        class={[variant.contained, 'px-2']}
+                        buttonType='contained'
+                        class={['px-2']}
                         onClick={() => {
                             // if (isObservable(oriDate)) oriDate($$(modDate))
                             visible(false)
@@ -104,7 +115,7 @@ export const MultiWheeler = (props: MultiWheelerProps): JSX.Element => {
                     </Button>
                 </div>
             </div>
-            <div class={[dateTimeWheelerCls, '']}>
+            <div class={[dateTimeWheelerCls, 'h-fit']}>
                 {() => options.map((options, index) => {
                     const columnName = headers[index]
 
@@ -125,12 +136,19 @@ export const MultiWheeler = (props: MultiWheelerProps): JSX.Element => {
             {() => $$(mask) ? <>
                 <div
                     class={['fixed inset-0 bg-black/50 h-full w-full z-[50] opacity-50']}
+
                     onClick={() => {
                         visible(false)
                     }}
                 />
             </> : null}
-            <div class={[dateTimeWheelerCls, 'fixed inset-x-0 bottom-0 bg-blue-600 shadow-lg z-100']}>
+            <div class={[dateTimeWheelerCls, 'fixed inset-x-0 bottom-0 bg-blue-600 shadow-lg z-100']}
+                style={{
+                    maxHeight: () => `${$$(vh) * 0.8}px`,
+                    maxWidth: () => `90vw`,
+                    // left: '50%',
+                    // transform: 'translateX(-50%)'
+                }}>
                 {comp}
             </div>
         </Portal>

@@ -1,5 +1,5 @@
 import { $, $$, JSX, Observable, ObservableMaybe, ObservableReadonly, Context } from 'woby'
-import { Button, variant } from '../Button'
+import { Button } from '../Button'
 import { EditorContext, useEditor, useUndoRedo } from './undoredo'
 import { applyStyle } from './utils' // Import applyStyle
 import A from '../icons/a'
@@ -21,13 +21,12 @@ export const TextColorPicker = () => {
         if ($$(editor)) { // Ensure editor context is available
             saveDo()
             // Use applyStyle to set the color
-            EditorContext.provider(editor, () =>
-                applyStyle((element) => {
-                    element.style.color = $$(selectedColor)
-                    // If the new color is the default/inherited color, consider removing the style
-                    // This part depends on how "default" color is determined.
-                    // For simplicity, we'll just set it. To toggle off, user might pick black or a "remove color" option.
-                }))
+            applyStyle((element) => {
+                element.style.color = $$(selectedColor)
+                // If the new color is the default/inherited color, consider removing the style
+                // This part depends on how "default" color is determined.
+                // For simplicity, we'll just set it. To toggle off, user might pick black or a "remove color" option.
+            })
         }
     }
 
@@ -35,7 +34,8 @@ export const TextColorPicker = () => {
         <div className="relative inline-block text-left">
             {/* Button to apply the picked color */}
             <Button
-                class={[variant.outlined, "p-2 h-8"]}
+                buttonType='outlined'
+                class={["p-2 h-8"]}
                 title="Text color"
                 onClick={applyPickedColor} // Apply color on button click
             >

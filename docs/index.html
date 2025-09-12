@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>woby-wui Documentation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="docs.css">
+</head>
+
+<body class="bg-gray-50">
+    <div class="min-h-screen flex flex-col">
+        <!-- Header -->
+        <header class="bg-white shadow">
+            <div class="container mx-auto px-4 py-6">
+                <h1 class="text-3xl font-bold text-gray-900">woby-wui Documentation</h1>
+                <p class="text-gray-600 mt-2">A comprehensive UI library for Woby applications</p>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-grow container mx-auto px-4 py-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Getting Started -->
+                <div class="bg-white rounded-lg shadow-md p-6 component-card">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4">Getting Started</h2>
+                    <p class="text-gray-600 mb-4">Learn how to install and use woby-wui in your projects.</p>
+                    <a href="./guides/getting-started.md"
+                        class="text-blue-600 hover:text-blue-800 font-medium nav-link">Read Guide →</a>
+                </div>
+
+                <!-- Components -->
+                <div class="bg-white rounded-lg shadow-md p-6 component-card">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4">Components</h2>
+                    <p class="text-gray-600 mb-4">Explore all available UI components with examples.</p>
+                    <a href="./components/README.md" class="text-blue-600 hover:text-blue-800 font-medium nav-link">View
+                        Components →</a>
+                </div>
+
+                <!-- API Reference -->
+                <div class="bg-white rounded-lg shadow-md p-6 component-card">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4">API Reference</h2>
+                    <p class="text-gray-600 mb-4">Detailed documentation for all component APIs.</p>
+                    <a href="./api/README.md" class="text-blue-600 hover:text-blue-800 font-medium nav-link">View API
+                        →</a>
+                </div>
+            </div>
+
+            <div class="mt-12">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">Guides</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white rounded-lg shadow-md p-6 component-card">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">Installation</h3>
+                        <p class="text-gray-600 mb-3">How to install and set up woby-wui in your project.</p>
+                        <a href="./guides/installation.md"
+                            class="text-blue-600 hover:text-blue-800 text-sm nav-link">Read Guide →</a>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-md p-6 component-card">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">Styling Components</h3>
+                        <p class="text-gray-600 mb-3">Learn how to customize component appearance.</p>
+                        <a href="./guides/styling.md" class="text-blue-600 hover:text-blue-800 text-sm nav-link">Read
+                            Guide →</a>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-md p-6 component-card">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">Working with Observables</h3>
+                        <p class="text-gray-600 mb-3">Understand how to use Woby observables with components.</p>
+                        <a href="./guides/observables.md"
+                            class="text-blue-600 hover:text-blue-800 text-sm nav-link">Read Guide →</a>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-md p-6 component-card">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">Contributing</h3>
+                        <p class="text-gray-600 mb-3">Learn how to contribute to woby-wui.</p>
+                        <a href="./guides/contributing.md"
+                            class="text-blue-600 hover:text-blue-800 text-sm nav-link">Read Guide →</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-12">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">Popular Components</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-white rounded-lg shadow-md p-6 component-card">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">Button</h3>
+                        <p class="text-gray-600 mb-3">Versatile button component with multiple variants.</p>
+                        <div class="flex space-x-2">
+                            <a href="./components/Button.md"
+                                class="text-blue-600 hover:text-blue-800 text-sm nav-link">Docs</a>
+                            <a href="./api/Button.md" class="text-blue-600 hover:text-blue-800 text-sm nav-link">API</a>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-md p-6 component-card">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">TextField</h3>
+                        <p class="text-gray-600 mb-3">Input field with floating label and validation.</p>
+                        <div class="flex space-x-2">
+                            <a href="./components/TextField.md"
+                                class="text-blue-600 hover:text-blue-800 text-sm nav-link">Docs</a>
+                            <a href="./api/TextField.md"
+                                class="text-blue-600 hover:text-blue-800 text-sm nav-link">API</a>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-md p-6 component-card">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">Switch</h3>
+                        <p class="text-gray-600 mb-3">Toggle switch for boolean values.</p>
+                        <div class="flex space-x-2">
+                            <a href="./components/Switch.md"
+                                class="text-blue-600 hover:text-blue-800 text-sm nav-link">Docs</a>
+                            <a href="./api/Switch.md" class="text-blue-600 hover:text-blue-800 text-sm nav-link">API</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-white border-t mt-12 footer">
+            <div class="container mx-auto px-4 py-6">
+                <p class="text-gray-600 text-center">© 2025 woby-wui. Built with ❤️ for the Woby community.</p>
+                <p class="text-gray-500 text-center text-sm mt-2">
+                    <a href="./MAINTAINING.md" class="text-blue-600 hover:text-blue-800 nav-link">Maintainer Guide</a>
+                </p>
+            </div>
+        </footer>
+    </div>
+</body>
+
+</html>

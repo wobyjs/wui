@@ -1,7 +1,7 @@
 import { $, $$, Observable, ObservableMaybe, useEffect, useMemo, untrack, Portal, type JSX, isObservable } from 'woby'
-import { use, useClickAway } from 'use-woby'
+import { use, useClickAway, useViewportSize } from '@woby/use'
 import { Wheeler } from './Wheeler' // Adjust path
-import { Button, variant } from '../Button'
+import { Button } from '../Button'
 import { WheelerItem, WheelerProps } from './WheelerType'
 
 // --- Utilities (unchanged) ---
@@ -44,7 +44,7 @@ export const DateTimeWheeler = ({
 }: DateTimeWheelerProps): JSX.Element => {
 
     const type = use(mode)
-    const yearRange = use(yearRangeProp, { start: 1970, end: new Date().getFullYear() + 20 })
+    const yearRange = use(yearRangeProp, { start: 1900, end: new Date().getFullYear() + 20 })
     const minDate = useMemo(() => parseDate($$(use(minDateProp))))
     const maxDate = useMemo(() => parseDate($$(use(maxDateProp))))
 
@@ -208,11 +208,18 @@ export const DateTimeWheeler = ({
 
     const br = useMemo(() => $$(divider) ? 'border-l border-gray-300 dark:border-gray-600' : null)
 
+    const { height: vh, width: vw, offsetLeft: ol, offsetTop: ot, pageTop: pt, pageLeft: pl } = useViewportSize()
+
+    // useEffect(() => console.log('date wheeler', "vh", $$(vh), "vw", $$(vw), "ol", $$(ol), "ot", $$(ot), "pt", $$(pt), "pl", $$(pl)))
+
+    const ref = $<HTMLDivElement>()
+
     const comp = useMemo(() => <>
-        <div class={[dateTimeWheelerCls, 'flex-col fixed inset-x-0 bottom-0 bg-blue-600 shadow-lg z-10']}>
+        <div ref={ref} class={[dateTimeWheelerCls, 'flex-col fixed inset-x-0 bottom-0 bg-blue-600 shadow-lg z-10', 'h-fit']}
+            style={{ top: () => $$(vh) - ($$(ref) ? $$(ref).clientHeight ?? 0 : 0) + $$(pt) }}>
             <div class="flex items-center justify-between px-4 py-2 h-auto relative">
                 <div class="w-[80px] flex justify-start">
-                    <Button class={[variant.contained, 'px-2']} onClick={() => visible(false)}>Cancel</Button>
+                    <Button buttonType='contained' class={['px-2']} onClick={() => visible(false)}>Cancel</Button>
                 </div>
                 <div class="flex-1 text-center px-2">
                     <span class="inline-block break-words">
@@ -220,9 +227,9 @@ export const DateTimeWheeler = ({
                     </span>
                 </div>
                 <div class="w-[80px] flex justify-end">
-                    <Button class={[variant.contained, 'px-2']} onClick={() => { if (isObservable(oriDate)) oriDate($$(modDate)); visible(false) }}>OK</Button></div>
+                    <Button buttonType='contained' class={['px-2']} onClick={() => { if (isObservable(oriDate)) oriDate($$(modDate)); visible(false) }}>OK</Button></div>
             </div>
-            <div class={[dateTimeWheelerCls, '']}>
+            <div class={[dateTimeWheelerCls]}>
                 {() => $$(showYear) && <Wheeler header={v => 'Year'} options={yearOptions} value={selectedYear} itemHeight={itemHeight} itemCount={itemCount} class={[wheelWrapperCls,]} />}
                 {() => $$(showMonth) && <Wheeler header={v => 'Month'} options={monthOptions} value={selectedMonth} itemHeight={itemHeight} itemCount={itemCount} class={[wheelWrapperCls, br]} />}
                 {() => $$(showDay) && <Wheeler header={v => 'Day'} options={dayOptions} value={selectedDay} itemHeight={itemHeight} itemCount={itemCount} class={[wheelWrapperCls, br]} />}

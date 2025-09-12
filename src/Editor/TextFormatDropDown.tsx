@@ -1,8 +1,8 @@
 import { $, $$, JSX, useEffect } from 'woby'
-import { Button, variant } from '../Button'
+import { Button } from '../Button'
 import { EditorContext, useEditor } from './undoredo' // This context provides the contentEditable div ref
-import { convertToSemanticElement, range as reactiveRange } from './utils' // Import reactive range
-import { useOnClickOutside } from 'use-woby'
+import { convertToSemanticElement, getCurrentRange } from './utils' // Import getCurrentRange
+import { useOnClickOutside } from '@woby/use'
 
 // Helper to get current block element info before modification
 const getCurrentBlockInfo = (editorDiv: HTMLElement | null, currentRange: Range | null): { tagName: string; element: HTMLElement } | null => {
@@ -254,9 +254,9 @@ export const TextFormatDropDown = () => {
         if (!editorDiv) return
 
         const handleSelectionChange = () => {
-            const currentRangeValue = $$(reactiveRange) // Read the reactive range observable
-            if (currentRangeValue && editorDiv.contains(currentRangeValue.commonAncestorContainer)) { // Check if selection is within editor
-                const currentBlock = getCurrentBlockInfo(editorDiv, currentRangeValue) // Pass reactive range value
+            const nativeRange = getCurrentRange()
+            if (nativeRange && editorDiv.contains(nativeRange.commonAncestorContainer)) { // Check if selection is within editor
+                const currentBlock = getCurrentBlockInfo(editorDiv, nativeRange) // Pass native range
                 if (currentBlock) {
                     const matchedFormat = formatOptions.find(opt => opt.tag.toLowerCase() === currentBlock.tagName.toLowerCase())
                     if (matchedFormat) {
@@ -283,7 +283,8 @@ export const TextFormatDropDown = () => {
         <div className="relative inline-block text-left" ref={dropdownRef}>
             <div>
                 <Button
-                    class={[variant.outlined, "h-8 inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-black hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500"]}
+                    buttonType='outlined'
+                    class={["h-8 inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-black hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500"]}
                     onClick={toggleDropdown}
                     title="Text format"
                 >

@@ -1,4 +1,4 @@
-import { tw } from 'woby-styled'
+import { tw } from '@woby/styled'
 import { $, $$, Observable, useMemo, useEffect, ObservableMaybe, type JSX } from 'woby'
 
 //https://codepen.io/robstinson/pen/bGwpNMV

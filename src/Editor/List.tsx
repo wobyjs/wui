@@ -1,5 +1,5 @@
 import { $$, Observable, } from 'woby'
-import { Button, variant } from '../Button'
+import { Button } from '../Button'
 import ListBulleted from '../icons/list_bulleted'
 import ListNumbered from '../icons/list_numbered'
 import { expandRange, cloneAttributes, isTags, getElementsInRange } from './utils'
@@ -91,7 +91,7 @@ export const BulletListButton = () => {
     // const { undos, saveDo } = useUndoRedo() // Removed
     const editor = useEditor()
 
-    return <Button class={variant.outlined} onClick={() => {
+    return <Button buttonType='outlined' onClick={() => {
         // saveDo(undos) // Removed: MutationObserver in Editor.tsx should now handle this
         insertList(editor, 'ul', 'list-inside list-disc')
     }} title="Bulleted List"><ListBulleted /></Button>
@@ -101,7 +101,7 @@ export const NumberedListButton = () => {
     // const { undos, saveDo } = useUndoRedo() // Removed
     const editor = useEditor()
 
-    return <Button class={variant.outlined} onClick={() => {
+    return <Button buttonType='outlined' onClick={() => {
         // saveDo(undos) // Removed: MutationObserver in Editor.tsx should now handle this
         insertList(editor, 'ol', 'list-inside', 'list-decimal')
     }} title="Numbered List"><ListNumbered /></Button>

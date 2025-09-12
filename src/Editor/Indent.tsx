@@ -1,5 +1,5 @@
 import { $$, Observable } from 'woby'
-import { Button, variant } from '../Button'
+import { Button } from '../Button'
 import IndentIcon from '../icons/indent'
 import OutdentIcon from '../icons/outdent'
 import { useEditor } from './undoredo' // Removed useUndoRedo
@@ -45,7 +45,7 @@ export const Indent = () => {
     // const { undos, saveDo } = useUndoRedo() // Removed
     const editor = useEditor()
 
-    return <Button class={variant.outlined} onClick={() => {
+    return <Button buttonType='outlined' onClick={() => {
         // saveDo(undos) // Removed: MutationObserver in Editor.tsx should now handle this
 
         applyIndent(editor)
@@ -57,7 +57,7 @@ export const Outdent = () => {
     // const { undos, saveDo } = useUndoRedo() // Removed
     const editor = useEditor()
 
-    return <Button class={variant.outlined} onClick={() => {
+    return <Button buttonType='outlined' onClick={() => {
         // saveDo(undos) // Removed: MutationObserver in Editor.tsx should now handle this
 
         applyIndent(editor, true)

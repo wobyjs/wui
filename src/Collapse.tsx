@@ -10,7 +10,7 @@ export const Collapse = (props: CollapseProps): JSX.Element => {
 	const open = isObservable(op) ? op : $(op)
 	const ref = $<HTMLDivElement>()
 
-	const opened = useMemo(() => ($$(open) ? { height: $$(ref).clientHeight + "px" } : { height: 0 }))
+	const opened = useMemo(() => ($$(open) && $$(ref) ? { height: $$(ref).clientHeight + "px" } : { height: 0 }))
 
 	return (
 		<div

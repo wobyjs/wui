@@ -1,5 +1,5 @@
 import { effect19a } from './TextField.effect'
-import { tw } from 'woby-styled'
+import { tw } from '@woby/styled'
 import { ObservableMaybe, $$, $, type JSX, isObservable, Observable } from 'woby'
 import { EventHandler, TargetedEvent, TargetedInputEvent } from 'woby/dist/types/types'
 

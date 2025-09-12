@@ -1,7 +1,7 @@
 //@ts-ignore
 import { $, $$, isObservable, useEffect, type JSX } from "woby"
 
-export const variant = {
+const variant = {
     text: `inline-flex items-center justify-center relative box-border bg-transparent cursor-pointer select-none align-middle no-underline 
             font-medium text-sm leading-[1.75] tracking-[0.02857em] uppercase rounded text-[#1976d2] 
             rounded-none border-0 outline-0 font-sans

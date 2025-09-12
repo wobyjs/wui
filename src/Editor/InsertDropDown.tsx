@@ -1,8 +1,8 @@
 import { $, $$, JSX, Observable } from 'woby'
-import { Button, variant } from '../Button'
+import { Button } from '../Button'
 import { EditorContext, useUndoRedo } from './undoredo'
-import { useOnClickOutside } from 'use-woby'
-import { range } from './utils' // For insertImage and insertTable context
+import { useOnClickOutside } from '@woby/use'
+import { range, getCurrentRange } from './utils' // Import getCurrentRange
 
 // Icons - placeholders, replace with actual SVGs or components
 const HorizontalRuleIcon = () => <span>HR</span>
@@ -19,7 +19,7 @@ const execInsertHorizontalRule = () => {
 }
 
 const execInsertImage = () => {
-    const r = $$(range)
+    const r = getCurrentRange()
     if (!r) return
     const imageUrl = prompt('Enter image URL:')
     if (!imageUrl) return
@@ -32,7 +32,7 @@ const execInsertImage = () => {
 }
 
 const execInsertTable = () => {
-    const r = $$(range)
+    const r = getCurrentRange()
     if (!r) return
     const rowsStr = prompt('Enter number of rows:', '2')
     const colsStr = prompt('Enter number of columns:', '3')
@@ -107,7 +107,8 @@ export const InsertDropDown = () => {
         <div className="relative inline-block text-left" ref={dropdownRef}>
             <div>
                 <Button
-                    class={[variant.outlined, "p-2 h-8"]}
+                    buttonType='outlined'
+                    class={["p-2 h-8"]}
                     onClick={toggleDropdown}
                     title="Insert content"
                 >

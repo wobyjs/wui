@@ -1,5 +1,5 @@
 import { $, $$, isObservable, Observable, Portal, useEffect, useMemo } from 'woby'
-import { use, useClickAway } from 'use-woby'
+import { use, useClickAway } from '@woby/use'
 import { WheelerProps, WheelerItem } from './WheelerType'
 
 export const ActiveWheelers = $([])
@@ -59,7 +59,7 @@ export const Wheeler = <T,>(props: WheelerProps<T>) => {
 
     let preOptions, preFormattedOptions
 
-    useEffect(() => console.log('visible', $$(visible), $$(value)))
+    // useEffect(() => console.log('visible', $$(visible), $$(value)))
 
     const formattedOptions = useMemo(() => {
         if (preOptions === $$(options)) return preFormattedOptions
@@ -662,7 +662,7 @@ export const Wheeler = <T,>(props: WheelerProps<T>) => {
             ActiveWheelers([...$$(ActiveWheelers), wheeler])
         }
 
-        console.log('resync value2chk')
+        // console.log('resync value2chk')
         value2chk() // Call value2chk to resync checkboxes
 
         // The original return for cleanup when component unmounts (if needed, though original was commented out)
