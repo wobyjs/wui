@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Simple script to generate basic documentation for woby-wui components
+ * Simple script to generate basic documentation for @woby/wui components
  * This script creates markdown files with basic structure for each component
  */
 

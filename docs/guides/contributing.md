@@ -1,6 +1,6 @@
-# Contributing to woby-wui
+# Contributing to @woby/wui
 
-We welcome contributions to woby-wui! This guide will help you get started with contributing to the project.
+We welcome contributions to @woby/wui! This guide will help you get started with contributing to the project.
 
 ## Code of Conduct
 
@@ -27,8 +27,8 @@ Please read and follow our [Code of Conduct](../../CODE_OF_CONDUCT.md) before co
 
 ```bash
 # Clone the repository
-git clone https://github.com/wongchichong/wui.git
-cd woby-wui
+git clone https://github.com/wobyjs/wui.git
+cd wui
 
 # Install dependencies
 pnpm install
@@ -53,7 +53,7 @@ pnpm build
 ## Project Structure
 
 ```
-woby-wui/
+@woby/wui/
 ├── src/              # Source code
 │   ├── components/   # Individual components
 │   ├── hooks/        # Custom hooks
@@ -218,4 +218,4 @@ For feature requests, include:
 
 ## License
 
-By contributing to woby-wui, you agree that your contributions will be licensed under the MIT License.
+By contributing to @woby/wui, you agree that your contributions will be licensed under the MIT License.

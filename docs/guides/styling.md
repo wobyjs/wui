@@ -1,6 +1,6 @@
 # Styling Components
 
-woby-wui components are styled using Tailwind CSS classes. This guide explains how to customize the appearance of components.
+@woby/wui components are styled using Tailwind CSS classes. This guide explains how to customize the appearance of components.
 
 ## Basic Styling
 
@@ -41,7 +41,7 @@ import { TextField } from '@woby/wui'
 
 ## Using Tailwind CSS Directives
 
-You can use all Tailwind CSS utility classes with woby-wui components:
+You can use all Tailwind CSS utility classes with @woby/wui components:
 
 ```tsx
 import { Card } from '@woby/wui'
@@ -189,9 +189,9 @@ const isActive = $(false)
 </Button>
 ```
 
-### Using woby-styled
+### Using @woby/styled
 
-For more advanced styling, you can use the `tw` function from woby-styled:
+For more advanced styling, you can use the `tw` function from @woby/styled:
 
 ```tsx
 import { tw } from '@woby/styled'
@@ -199,7 +199,7 @@ import { Button } from '@woby/wui'
 
 const StyledButton = tw(Button)`bg-purple-500 hover:bg-purple-700 text-white`
 
-<StyledButton>Styled with woby-styled</StyledButton>
+<StyledButton>Styled with @woby/styled</StyledButton>
 ```
 
 This approach creates a new component with the specified styles applied.

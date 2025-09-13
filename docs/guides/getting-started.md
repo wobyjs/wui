@@ -43,7 +43,7 @@ render(<App />, document.getElementById('app'))
 
 ### Observables
 
-woby-wui works seamlessly with Woby observables. In the example above, `count` is an observable that automatically updates the UI when its value changes.
+@woby/wui works seamlessly with Woby observables. In the example above, `count` is an observable that automatically updates the UI when its value changes.
 
 ### Styling
 
@@ -57,7 +57,7 @@ All components accept a `class` prop for custom styling using Tailwind CSS class
 
 ## Building a Form Example
 
-Let's create a simple form using various woby-wui components:
+Let's create a simple form using various @woby/wui components:
 
 ```tsx
 import { render, $ } from 'woby'
@@ -125,7 +125,7 @@ render(<FormExample />, document.getElementById('app'))
 
 ## Component Composition
 
-woby-wui components are designed to work well together. You can easily compose complex UIs by combining different components:
+@woby/wui components are designed to work well together. You can easily compose complex UIs by combining different components:
 
 ```tsx
 import { render, $ } from 'woby'
@@ -180,4 +180,4 @@ render(<AppWithLayout />, document.getElementById('app'))
 - Explore the [Components](../components/README.md) documentation to learn about all available components
 - Check out the [API Reference](../api/README.md) for detailed information about component props and methods
 - Learn about [Styling Components](./styling.md) to customize the appearance of your UI
-- Read about [Working with Observables](./observables.md) to understand how reactivity works in woby-wui
+- Read about [Working with Observables](./observables.md) to understand how reactivity works in @woby/wui

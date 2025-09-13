@@ -1,6 +1,6 @@
 # Working with Observables
 
-woby-wui is designed to work seamlessly with Woby observables, providing reactive updates to your UI components.
+@woby/wui is designed to work seamlessly with Woby observables, providing reactive updates to your UI components.
 
 ## What are Observables?
 
@@ -22,7 +22,7 @@ console.log($$(count)) // 1
 
 ## Using Observables with Components
 
-Most woby-wui components that accept value props can work directly with observables:
+Most @woby/wui components that accept value props can work directly with observables:
 
 ### TextField with Observable
 
@@ -352,4 +352,4 @@ const updateField = (field, value) => {
 }
 ```
 
-By understanding and leveraging observables effectively, you can create highly reactive and efficient user interfaces with woby-wui.
+By understanding and leveraging observables effectively, you can create highly reactive and efficient user interfaces with @woby/wui.

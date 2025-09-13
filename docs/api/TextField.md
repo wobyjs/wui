@@ -52,8 +52,8 @@ focus:border-blue-500
 /* Label (generated via JS) */
 absolute top-4 left-0 pointer-events-none 
 text-gray-500 transition-all duration-200 ease-out
-[.woby-wui-input:focus+span>&]:top-0 [.woby-wui-input:focus+span>&]:text-xs
-[.woby-wui-input:not(:placeholder-shown)+span>&]:top-0 [.woby-wui-input:not(:placeholder-shown)+span>&]:text-xs
+[.@woby/wui-input:focus+span>&]:top-0 [.@woby/wui-input:focus+span>&]:text-xs
+[.@woby/wui-input:not(:placeholder-shown)+span>&]:top-0 [.@woby/wui-input:not(:placeholder-shown)+span>&]:text-xs
 ```
 
 ## TypeScript Definitions

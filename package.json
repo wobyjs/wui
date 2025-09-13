@@ -35,7 +35,7 @@
         "notification",
         "menu",
         "woby",
-        "woby-component"
+        "@woby/component"
     ],
     "license": "MIT",
     "peerDependencies": {
@@ -52,7 +52,7 @@
         "vite": "6.1.0"
     },
     "author": "Chi Chong <wongchichong@gmail.com>",
-    "homepage": "https://github.com/wongchichong/power-tooltip",
+    "homepage": "https://github.com/wobyjs/power-tooltip",
     "repository": {
         "type": "git",
         "url": "git@github.com:wongchichong/power-tooltip.git"

@@ -27,8 +27,8 @@ import { Tab, Tabs } from "../src/Tabs"
 import { Wodal } from '@woby/modal'
 import { useViewportSize } from '@woby/use'
 =======
-import { Wodal } from 'woby-modal'
-import { useViewportSize, useWindowSize } from 'use-woby'
+import { Wodal } from '@woby/modal'
+import { useViewportSize, useWindowSize } from '@woby/use'
 >>>>>>> 565612a0d05c8858f2ca6120270667bd518fbbfe
 import { Wheeler } from '../src/Wheeler/Wheeler'
 import { WheelerItem } from '../src/Wheeler/WheelerType'
@@ -36,13 +36,13 @@ import { MultiWheeler } from '../src/Wheeler/MultiWheeler'
 import { DateTimeWheeler, DateTimeWheelerType } from '../src/Wheeler/DateTimeWheeler'
 
 const { width, height } = useWindowSize()
-const { width:width2, height:height2 } = useWindowSize()
+const { width: width2, height: height2 } = useWindowSize()
 useEffect(() => {
-	console.log("windowsize", $$(width), $$(height));
+	console.log("windowsize", $$(width), $$(height))
 })
 
 useEffect(() => {
-	console.log("windowsize2", $$(width2), $$(height2));
+	console.log("windowsize2", $$(width2), $$(height2))
 })
 const FaceIcon = (
 	<svg

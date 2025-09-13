@@ -32,15 +32,15 @@ pnpm add @woby/wui
 
 ## Peer Dependencies
 
-woby-wui requires the following peer dependencies to be installed in your project:
+@woby/wui requires the following peer dependencies to be installed in your project:
 
 ```bash
-npm install woby woby-styled use-woby
+npm install woby @woby/styled @woby/use
 ```
 
 ## Basic Setup
 
-After installation, you can start using woby-wui components in your application:
+After installation, you can start using @woby/wui components in your application:
 
 ```tsx
 import { render, $ } from 'woby'
@@ -64,7 +64,7 @@ render(<App />, document.getElementById('app'))
 
 ## CSS Setup
 
-woby-wui components are styled with Tailwind CSS. You need to include Tailwind CSS in your project:
+@woby/wui components are styled with Tailwind CSS. You need to include Tailwind CSS in your project:
 
 ### Installation
 
@@ -102,7 +102,7 @@ In your main CSS file:
 
 ## TypeScript Support
 
-woby-wui includes TypeScript definitions. No additional setup is required for TypeScript support.
+@woby/wui includes TypeScript definitions. No additional setup is required for TypeScript support.
 
 ## Usage with Vite
 
@@ -119,14 +119,14 @@ import '@woby/wui/dist/wui.css'
 If you encounter module not found errors, ensure all peer dependencies are installed:
 
 ```bash
-npm install woby woby-styled use-woby nanoid
+npm install woby @woby/styled @woby/use nanoid
 ```
 
 ### CSS not loading
 
 If styles are not appearing, check that:
 1. Tailwind CSS is properly configured
-2. The content paths in `tailwind.config.js` include woby-wui components
+2. The content paths in `tailwind.config.js` include @woby/wui components
 3. Your CSS file imports Tailwind directives
 
 ### Version compatibility

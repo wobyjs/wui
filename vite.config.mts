@@ -7,7 +7,7 @@ const config = defineConfig({
         minify: false,
         lib: {
             entry: ["./src/index.tsx"],
-            name: "woby-wui",
+            name: "@woby/wui",
             formats: ['es'],
             fileName: (format: string, entryName: string) => `${entryName}.${format}.js`
         },
@@ -15,13 +15,13 @@ const config = defineConfig({
         sourcemap: true,
         rollupOptions: {
             external: ['woby', 'woby/jsx-runtime', 'oby', 'woby/jsx-runtime', 'nanoid',
-                '@woby/modal', '@woby/use', '@woby/styled', 'use-woby'],
+                '@woby/modal', '@woby/use', '@woby/styled', '@woby/use'],
             output: {
                 globals: {
                     'nanoid': 'nanoid',
                     'woby': 'woby',
                     'woby/jsx-runtime': 'woby/jsx-runtime',
-                    'use-woby': 'use-woby',
+                    '@woby/use': '@woby/use',
                 }
             }
         }
@@ -38,8 +38,7 @@ const config = defineConfig({
             'woby/jsx-runtime': process.argv.includes('dev') ? path.resolve('../../woby/src/jsx/runtime') : 'woby',
             'woby': process.argv.includes('dev') ? path.resolve('../../woby/src') : 'woby',
             '@woby/styled': process.argv.includes('dev') ? path.resolve('../styled/src') : '@woby/styled',
-            'woby-styled': process.argv.includes('dev') ? path.resolve('../styled/src') : '@woby/styled',
-            'use-woby': process.argv.includes('dev') ? path.resolve('../use/src') : '@woby/use'
+            '@woby/use': process.argv.includes('dev') ? path.resolve('../use/src') : '@woby/use'
         }
     }
 })

@@ -1,6 +1,6 @@
 # Maintaining Documentation
 
-This guide provides instructions for maintaining and updating the woby-wui documentation.
+This guide provides instructions for maintaining and updating the @woby/wui documentation.
 
 ## Documentation Structure
 
@@ -14,7 +14,7 @@ The documentation is organized into the following directories:
 
 ## Adding New Components
 
-When adding new components to woby-wui, follow these steps to create documentation:
+When adding new components to @woby/wui, follow these steps to create documentation:
 
 1. Create a component documentation file in `docs/components/`:
    ```bash

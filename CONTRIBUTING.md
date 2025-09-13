@@ -1,6 +1,6 @@
-## Contributing to woby-wui
+## Contributing to @woby/wui
 
-First off, thank you for considering contributing to woby-wui. This project is open source and relies on people like you for support.
+First off, thank you for considering contributing to @woby/wui. This project is open source and relies on people like you for support.
 
 For detailed contribution guidelines, please see our [Contributing Documentation](./docs/guides/contributing.md).
 
