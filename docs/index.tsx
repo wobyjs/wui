@@ -32,13 +32,7 @@ import { DateTimeWheeler, DateTimeWheelerType } from '../src/Wheeler/DateTimeWhe
 
 const { width, height } = useWindowSize()
 const { width:width2, height:height2 } = useWindowSize()
-useEffect(() => {
-	console.log("windowsize", $$(width), $$(height));
-})
 
-useEffect(() => {
-	console.log("windowsize2", $$(width2), $$(height2));
-})
 const FaceIcon = (
 	<svg
 		class="text-[rgb(97,97,97)] select-none w-[1em] h-[1em] inline-block fill-current shrink-0 transition-[fill] duration-200 ease-in-out delay-[0ms] text-2xl ml-[5px] -mr-1.5"
@@ -199,16 +193,7 @@ const number = $(0)
 const text1 = $("abc")
 const text2 = $("change on enter")
 
-useEffect(() => {
-	console.log($$(number))
-})
 
-useEffect(() => {
-	console.log($$(text1))
-})
-useEffect(() => {
-	console.log($$(text2))
-})
 
 enum A {
 	a,
@@ -217,9 +202,7 @@ enum A {
 
 const aa = $(A.a)
 
-useEffect(() => {
-	console.log("useEnumSwitch", $$(aa), A[$$(aa)])
-})
+
 const previousTab = $([])
 const activeTab = $(["first tab", "second tab"])
 const activeTab2 = $([<div>next instance tab</div>, <div>next second tab</div>])
@@ -453,9 +436,8 @@ const App = () => (
 				<MultiWheeler
 					options={[["a", "b"], [1, 2, 3], [0, 5, 87, 8, 9]]}
 					title={<div>test</div>}
-					value={[$("a"), $(1), $(0)]}      // Pass date observable
+					value={[$("a"), $(1), $(0)]}      
 					headers={[v => "col1 " + $$(v), v => "col2 " + $$(v), v => "col3 " + $$(v)]}
-					// onChange removed
 					ok={dateOk}
 				/>
 

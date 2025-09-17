@@ -22,7 +22,7 @@
             "WebWorker"
         ],
         "module": "esnext",
-        "moduleResolution": "node",
+        "moduleResolution": "bundler",
         "newLine": "lf",
         "noEmitOnError": false,
         "noImplicitThis": true,
@@ -48,6 +48,7 @@
         "typeRoots": [
             "types"
         ],
+        "resolveJsonModule": true,
         // "tsBuildInfoFile": "./dist/tsconfig.tsbuildinfo",
         // "composite": true,
     },

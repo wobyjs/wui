@@ -11,6 +11,9 @@ importers:
       nanoid:
         specifier: ^3.3.7
         version: 3.3.11
+      oby:
+        specifier: workspace:../soby
+        version: link:../soby
       typescript:
         specifier: 5.7.3
         version: 5.7.3
