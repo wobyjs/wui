@@ -8,7 +8,7 @@ export type WheelerProps<T = unknown> = {
     options: ObservableMaybe<WheelerItem<T>[]>,
     itemHeight?: ObservableMaybe<number>,
     itemCount?: ObservableMaybe<number>,
-    value?: ObservableMaybe<ArrayMaybe<WheelerItem<T>['value']>>,
+    value?: ObservableMaybe<WheelerItem<T>['value']>,
     class?: JSX.Class
     header?: (v: ObservableMaybe<ArrayMaybe<WheelerItem<T>['value']>>) => JSX.Element
     /** implicit for multiple */

@@ -19,7 +19,7 @@ type NumberFieldProps = JSX.InputHTMLAttributes<HTMLInputElement> & {
 
 export const NumberField = (props: NumberFieldProps): JSX.Element => {
 	const { className, class: cls, children, onChange, noMinMax, onKeyUp, reactive, noRotate = false, noFix, ...otherProps } = props
-	const { min, max, value, step, disabled } = otherProps
+	const { min, max, value, step = 1, disabled } = otherProps
 	const inputRef = $<HTMLInputElement>()
 	const error = () => $$(value) < $$(min) || $$(value) > $$(max)
 	const cantMin = () => $$(value) <= $$(min) && $$(noRotate)
@@ -41,18 +41,32 @@ export const NumberField = (props: NumberFieldProps): JSX.Element => {
 
 	useEffect(updated)
 
-	const dec = () => { !$$(reactive) && isObservable(value) ? (value as Observable)?.((+$$(inputRef).value as any) - +$$(step)) : undefined; updated() }
-	const inc = () => { !$$(reactive) && isObservable(value) ? (value as Observable)?.((+$$(inputRef).value as any) + +$$(step)) : undefined; updated() }
+	const dec = () => {
+		!$$(reactive) && isObservable(value) ? (value as Observable)?.((+$$(inputRef).valueAsNumber as any) - +$$(step))
+			: undefined
+		updated()
+	}
+
+	const inc = () => {
+		!$$(reactive) && isObservable(value) ? (value as Observable)?.((+$$(inputRef).valueAsNumber as any) + +$$(step))
+			: undefined
+		updated()
+	}
 
 	let interval: ReturnType<typeof useInterval>
 	let timeout: ReturnType<typeof useTimeout>
 
 	function startContinuousUpdate(isIncrement: boolean) {
 		// Update immediately on press
+		debugger
 		isIncrement ? inc() : dec()
 
 		// Start interval to continue updating while pressed
-		timeout = useTimeout(() => interval = useInterval(() => isIncrement ? inc() : dec(), 100), 200)
+		timeout = useTimeout(() => {
+			interval = useInterval(() => {
+				isIncrement ? inc() : dec(), 100
+			}), 200
+		})
 	}
 
 	function stopUpdate() {
@@ -77,9 +91,20 @@ export const NumberField = (props: NumberFieldProps): JSX.Element => {
         `, () => ($$(error) ? "text-[red]" : "")]}
 			type="number"
 			value={value}
-			onChange={e => { !$$(reactive) && isObservable(value) ? ((value as Observable)?.(e.target.value), onChange?.(e)) : undefined; updated() }}
-			onKeyUp={e => { !$$(reactive) && isObservable(value) ? ((value as Observable)?.(e.target.value), onKeyUp?.(e)) : undefined; updated() }}
-			onWheel={e => { e.preventDefault(); Math.sign(e.deltaY) > 0 ? dec() : inc() }}
+			onChange={e => {
+				!$$(reactive) && isObservable(value) ? ((value as Observable)?.(e.target.valueAsNumber), onChange?.(e))
+					: undefined;
+				updated()
+			}}
+			// onKeyUp={e => {
+			// 	!$$(reactive) && isObservable(value) ? ((value as Observable)?.(e.target.valueAsNumber), onKeyUp?.(e))
+			// 		: undefined;
+			// 	updated()
+			// }}
+			onWheel={e => {
+				e.preventDefault();
+				Math.sign(e.deltaY) > 0 ? dec() : inc()
+			}}
 			{...otherProps}
 			disabled={disabled}
 		/>

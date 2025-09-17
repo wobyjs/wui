@@ -1,4 +1,4 @@
-import { $, $$, ObservableMaybe, isObservable, useMemo, type JSX } from "woby"
+import { $, $$, ObservableMaybe, isObservable, useEffect, useMemo, type JSX } from "woby"
 
 type CollapseProps = JSX.VoidHTMLAttributes<HTMLDivElement> & {
 	children?: JSX.Child
@@ -9,8 +9,9 @@ export const Collapse = (props: CollapseProps): JSX.Element => {
 	const { className, background = true, children, open: op, class: cls } = props
 	const open = isObservable(op) ? op : $(op)
 	const ref = $<HTMLDivElement>()
+	const containerRef = $<HTMLDivElement>()
 
-	const opened = useMemo(() => ($$(open) ? { height: $$(ref).clientHeight + "px" } : { height: 0 }))
+	const opened = useMemo(() => ($$(open) ? { height: "auto" } : { height: 0 }))
 
 	return (
 		<div
@@ -20,6 +21,7 @@ export const Collapse = (props: CollapseProps): JSX.Element => {
 				cls ?? className,
 			]}
 			style={opened}
+			ref={containerRef}
 			{...props}
 		>
 			<div

@@ -24,8 +24,6 @@ export const Wheeler = <T,>(props: WheelerProps<T>) => {
     const itemHeight = use(ih, 36)
     const itemCount = use(vic, 5)
     const value = $($$(oriValue))
-    const searchValue = $<string>()
-
 
     useEffect(() => {
         value($$(oriValue))

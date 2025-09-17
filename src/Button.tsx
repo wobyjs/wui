@@ -31,7 +31,7 @@ export const variant = {
 type ButtonProps = JSX.ButtonHTMLAttributes<HTMLButtonElement> & {
     buttonType?: "text" | "contained" | "outlined" | "icon"
 }
-export const Button = (props: ButtonProps): JSX.Element => {
+export const Button = (props: ButtonProps) => {
     const { children, class: cls, buttonType = "contained", checked = $(false), disabled, ...otherProps } = props
 
     return (
