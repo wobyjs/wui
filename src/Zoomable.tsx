@@ -1,4 +1,4 @@
-import { useEventListener } from "use-woby"
+import { useEventListener } from "@woby/use"
 import { createContext, Observable, setStyle, useContext, useEffect, useMemo, type ObservableMaybe } from "woby"
 import { $, $$ } from "woby"
 

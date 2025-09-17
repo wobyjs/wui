@@ -1,6 +1,6 @@
 // ,type JSX } from 'woby'
 import { effect19a } from './TextField.effect'
-import { tw } from 'woby-styled'
+import { tw } from '@woby/styled'
 import { ObservableMaybe, $$, $, type JSX, isObservable, Observable } from 'woby'
 
 //https://codepen.io/maheshambure21/pen/EozKKy

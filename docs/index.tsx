@@ -8,13 +8,13 @@ import { Avatar } from "../src/Avatar"
 import { Badge } from "../src/Badge"
 import { Appbar } from "../src/Appbar"
 import { Toolbar } from "../src/Toolbar"
-import { Button, variant } from "../src/Button"
+import { Button } from "../src/Button"
 import { Fab } from "../src/Fab"
 import * as spreset from "../src/Switch.effect"
 
 import * as React from 'woby'
 import { render, $, $$, useEffect, type JSX } from "woby"
-import "../dist/woby-wui.css"
+import "../dist/wui.css"
 import './input.css'
 import { Collapse } from "../src/Collapse"
 import { Checkbox } from "../src/Checkbox"
@@ -23,16 +23,27 @@ import { NumberField } from "../src/NumberField"
 import { Zoomable, Img } from "../src/Zoomable"
 import { ToggleButton } from "../src/ToggleButton"
 import { Tab, Tabs } from "../src/Tabs"
-import { Wodal } from 'woby-modal'
-import { useViewportSize, useWindowSize } from 'use-woby'
+<<<<<<< HEAD
+import { Wodal } from '@woby/modal'
+import { useViewportSize } from '@woby/use'
+=======
+import { Wodal } from '@woby/modal'
+import { useViewportSize, useWindowSize } from '@woby/use'
+>>>>>>> 565612a0d05c8858f2ca6120270667bd518fbbfe
 import { Wheeler } from '../src/Wheeler/Wheeler'
 import { WheelerItem } from '../src/Wheeler/WheelerType'
 import { MultiWheeler } from '../src/Wheeler/MultiWheeler'
 import { DateTimeWheeler, DateTimeWheelerType } from '../src/Wheeler/DateTimeWheeler'
 
 const { width, height } = useWindowSize()
-const { width:width2, height:height2 } = useWindowSize()
+const { width: width2, height: height2 } = useWindowSize()
+useEffect(() => {
+	console.log("windowsize", $$(width), $$(height))
+})
 
+useEffect(() => {
+	console.log("windowsize2", $$(width2), $$(height2))
+})
 const FaceIcon = (
 	<svg
 		class="text-[rgb(97,97,97)] select-none w-[1em] h-[1em] inline-block fill-current shrink-0 transition-[fill] duration-200 ease-in-out delay-[0ms] text-2xl ml-[5px] -mr-1.5"
@@ -1077,10 +1088,10 @@ const App = () => (
 					<br />
 					<br />
 					<div class="block">
-						<Button class={variant.outlined}>Outlined</Button>
-						<Button class={variant.contained}>contained</Button>
-						<Button class={variant.text}>text</Button>
-						<Button class={variant.icon}>
+						<Button buttonType='outlined'>Outlined</Button>
+						<Button buttonType='contained'>contained</Button>
+						<Button buttonType='text'>text</Button>
+						<Button buttonType='icon'>
 							<svg
 								focusable="false"
 								viewBox="0 0 24 24"

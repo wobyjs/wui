@@ -1,7 +1,7 @@
 import { $, $$, JSX, Observable } from 'woby'
-import { Button, variant } from '../Button'
+import { Button } from '../Button'
 import { EditorContext, useUndoRedo } from './undoredo'
-import { useOnClickOutside } from 'use-woby'
+import { useOnClickOutside } from '@woby/use'
 
 // Icons - placeholders, replace with actual SVGs or components
 const AlignLeftIcon = () => <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M3 21h18v-2H3v2zm0-4h18v-2H3v2zm0-4h18v-2H3v2zm0-4h18V7H3v2zm0-4h18V3H3v2z"></path></svg>
@@ -74,7 +74,8 @@ export const TextAlignDropDown = () => {
         <div className="relative inline-block text-left" ref={dropdownRef}>
             <div>
                 <Button
-                    class={[variant.outlined, "p-2"]}
+                    buttonType='outlined'
+                    class={["p-2"]}
                     onClick={toggleDropdown}
                     title="Text alignment"
                 >

@@ -1,9 +1,9 @@
-import { useOnClickOutside } from 'use-woby'
+import { useOnClickOutside } from '@woby/use'
 import { $, $$, JSX, useEffect } from 'woby' // Added useEffect
-import { Button, variant } from '../Button'
+import { Button } from '../Button'
 import UndoIcon from '../icons/undo'
 import RedoIcon from '../icons/redo'
-import { range, expandRange, getElementsInRange, getSelectedTableCells, focusNextTableCell, convertToSemanticElement, findBlockParent } from './utils'
+import { getCurrentRange, expandRange, getElementsInRange, getSelectedTableCells, focusNextTableCell, convertToSemanticElement, findBlockParent } from './utils'
 import { BoldButton } from './BoldButton'
 import { ItalicButton } from './ItalicButton'
 import { UnderlineButton } from './UnderlineButton' // Added UnderlineButton
@@ -29,7 +29,8 @@ interface EditorProps {
 
 
 const insertImage = (imageUrl?: string) => {
-    const r = $$(range)
+    const r = getCurrentRange()
+    if (!r) return
 
     const imgUrl = imageUrl || prompt('Enter image URL:')
     if (!imgUrl) return
@@ -42,7 +43,8 @@ const insertImage = (imageUrl?: string) => {
 }
 
 const insertTable = (rowsIn?: number, colsIn?: number) => {
-    const r = $$(range)
+    const r = getCurrentRange()
+    if (!r) return
 
     const rows = rowsIn ?? parseInt(prompt('Enter number of rows:', '2'), 10)
     if (isNaN(rows)) return
@@ -153,9 +155,9 @@ export const Editor = ({ onChange, children }: EditorProps) => {
                                         <NumberedListButton />
                                         {/* CheckListButton would go here */}
 
-                                        <Button class={variant.outlined} onClick={() => undo()} title="Undo" disabled={(() => $$(undos).length === 0)}><UndoIcon /></Button>
-                                        <Button class={variant.outlined} onClick={() => redo()} title="Redo" disabled={(() => $$(redos).length === 0)}><RedoIcon /></Button>
-                                        <Button class={variant.outlined} onClick={() => {
+                                        <Button buttonType='outlined' onClick={() => undo()} title="Undo" disabled={(() => $$(undos).length === 0)}><UndoIcon /></Button>
+                                        <Button buttonType='outlined' onClick={() => redo()} title="Redo" disabled={(() => $$(redos).length === 0)}><RedoIcon /></Button>
+                                        <Button buttonType='outlined' onClick={() => {
                                             const editorNode = $$(editor)
                                             if (!editorNode) return
 
@@ -262,8 +264,11 @@ export const Editor = ({ onChange, children }: EditorProps) => {
                             onKeyDown={e => {
                                 console.log('keydown', e.ctrlKey, e.shiftKey, e.key)
 
-                                const r = getElementsInRange($$(range), editor)
-                                const c = getSelectedTableCells($$(range), editor)
+                                const currentRange = getCurrentRange()
+                                if (!currentRange) return
+
+                                const r = getElementsInRange(currentRange, editor)
+                                const c = getSelectedTableCells(currentRange, editor)
                                 console.log('keydown', r, c)
 
                                 if (e.ctrlKey) {
@@ -282,7 +287,7 @@ export const Editor = ({ onChange, children }: EditorProps) => {
                                         case 'Tab': {
                                             e.preventDefault()
                                             e.stopPropagation()
-                                            const currentCells = getSelectedTableCells($$(range), editor)
+                                            const currentCells = getSelectedTableCells(currentRange, editor)
                                             if (currentCells.length) {
                                                 focusNextTableCell(e.shiftKey)
                                             } else {

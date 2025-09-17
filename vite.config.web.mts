@@ -7,7 +7,7 @@ const config = defineConfig({
         minify: false,
         lib: {
             entry: ["index.html"],
-            name: "woby-wui",
+            name: "@woby/wui",
             formats: [/*'cjs', '*/'es'/*, 'umd'*/],
             fileName: (format: string, entryName: string) => `${entryName}.${format}.js`
         },
@@ -22,10 +22,10 @@ const config = defineConfig({
     ],
     resolve: {
         alias: {
-            'woby/jsx-dev-runtime': path.resolve('../woby/src/jsx'),
-            'woby/jsx-runtime': path.resolve('../woby/src/jsx'),
-            'woby-wui': path.resolve('../woby-wui/src'),
-            'woby': path.resolve('../woby/src'),
+            'woby/jsx-dev-runtime': process.argv.includes('dev') ? path.resolve('../../woby/src/jsx/runtime') : 'woby',
+            'woby/jsx-runtime': process.argv.includes('dev') ? path.resolve('../../woby/src/jsx/runtime') : 'woby',
+            'woby': process.argv.includes('dev') ? path.resolve('../../woby/src') : 'woby',
+            '@woby/wui': path.resolve('../wui/src'),
         }
     }
 })

@@ -1,25 +1,27 @@
 import { defineConfig } from 'vite'
 import tailwindcss from '@tailwindcss/vite'
+import path from 'path'
 
 const config = defineConfig({
     build: {
         minify: false,
         lib: {
             entry: ["./src/index.tsx"],
-            name: "woby-wui",
+            name: "@woby/wui",
             formats: ['es'],
             fileName: (format: string, entryName: string) => `${entryName}.${format}.js`
         },
-        emptyOutDir:false,
+        emptyOutDir: false,
         sourcemap: true,
         rollupOptions: {
             external: ['woby', 'woby/jsx-runtime', 'oby', 'woby/jsx-runtime', 'nanoid',
-                'woby-modal', 'use-woby', 'woby-styled',],
+                '@woby/modal', '@woby/use', '@woby/styled', '@woby/use'],
             output: {
                 globals: {
                     'nanoid': 'nanoid',
                     'woby': 'woby',
                     'woby/jsx-runtime': 'woby/jsx-runtime',
+                    '@woby/use': '@woby/use',
                 }
             }
         }
@@ -32,9 +34,11 @@ const config = defineConfig({
     ],
     resolve: {
         alias: {
-            'woby/jsx-dev-runtime': 'woby',
-            'woby/jsx-runtime': 'woby',
-            'woby-styled': process.argv.includes('dev') ? path.resolve('../woby-styled/src') : 'woby-styled'
+            'woby/jsx-dev-runtime': process.argv.includes('dev') ? path.resolve('../../woby/src/jsx/runtime') : 'woby',
+            'woby/jsx-runtime': process.argv.includes('dev') ? path.resolve('../../woby/src/jsx/runtime') : 'woby',
+            'woby': process.argv.includes('dev') ? path.resolve('../../woby/src') : 'woby',
+            '@woby/styled': process.argv.includes('dev') ? path.resolve('../styled/src') : '@woby/styled',
+            '@woby/use': process.argv.includes('dev') ? path.resolve('../use/src') : '@woby/use'
         }
     }
 })

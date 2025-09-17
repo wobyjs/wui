@@ -1,3 +1,37 @@
+## Contributing to @woby/wui
+
+First off, thank you for considering contributing to @woby/wui. This project is open source and relies on people like you for support.
+
+For detailed contribution guidelines, please see our [Contributing Documentation](./docs/guides/contributing.md).
+
+### Quick Start
+
+1. Fork the repository
+2. Clone your fork: `git clone https://github.com/your-username/wui.git`
+3. Create a new branch: `git checkout -b my-feature-branch`
+4. Make your changes
+5. Commit your changes: `git commit -am 'Add new feature'`
+6. Push to the branch: `git push origin my-feature-branch`
+7. Submit a pull request
+
+### Development Setup
+
+```bash
+# Install dependencies
+pnpm install
+
+# Start development server
+pnpm dev
+
+# Run tests
+pnpm test
+
+# Build for production
+pnpm build
+```
+
+For more detailed information about contributing, component development, testing, and code style guidelines, please refer to our [full contribution documentation](./docs/guides/contributing.md).
+
 ## Contributing to React-power-tooltip
 
 First off, thank you for considering contributing to React-power-tooltip. This project is open source and relies on people like you for support.
@@ -84,7 +118,7 @@ At this point, you should switch back to your master branch and make sure it's
 up to date with React-power-tooltip's master branch:
 
 ```sh
-git remote add upstream git@github.com:voby-power-tooltip/woby-power-tooltip.git
+git remote add upstream git@github.com:voby-power-tooltip/power-tooltip.git
 git checkout master
 git pull upstream master
 ```
@@ -149,11 +183,11 @@ Maintainers need to do the following to push out a release:
   git push voby-power-tooltip N-N-stable:N-N-stable
   ```
 
-[Stack Overflow]: http://stackoverflow.com/questions/tagged/woby-power-tooltip
-[search the issue tracker]: https://github.com/justinrhodes1/woby-power-tooltip/issues?q=something
-[new issue]: https://github.com/justinrhodes1/woby-power-tooltip/issues/new
+[Stack Overflow]: http://stackoverflow.com/questions/tagged/power-tooltip
+[search the issue tracker]: https://github.com/justinrhodes1/power-tooltip/issues?q=something
+[new issue]: https://github.com/justinrhodes1/power-tooltip/issues/new
 [fork React-power-tootlip]: https://help.github.com/articles/fork-a-repo
-[searching all issues]: https://github.com/justinrhodes1/woby-power-tooltip/issues?q=
+[searching all issues]: https://github.com/justinrhodes1/power-tooltip/issues?q=
 [make a pull request]: https://help.github.com/articles/creating-a-pull-request
 [git rebasing]: http://git-scm.com/book/en/Git-Branching-Rebasing
 [interactive rebase]: https://help.github.com/articles/interactive-rebase

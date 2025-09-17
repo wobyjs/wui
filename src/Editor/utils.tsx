@@ -1,4 +1,4 @@
-import { useOnClickOutside, useSelection } from 'use-woby'
+import { useOnClickOutside, useSelection } from '@woby/use'
 import { $, $$, useEffect, JSX, useMemo, Observable, createContext, useContext, ObservableMaybe } from 'woby'
 import { useEditor } from './undoredo'
 
@@ -120,6 +120,12 @@ function getNodeFromPath(path: number[], root: Node): Node | null {
 
 
 
+// Helper function to get the first Range object from the selection
+export const getCurrentRange = (): Range | null => {
+    const selection = $$(range)
+    return selection?.ranges?.[0] ?? null
+}
+
 export const range = useMemo(() => {
     const editor = useEditor()
     return $$(useSelection(editor))
@@ -133,8 +139,10 @@ export function cloneAttributes(target: HTMLElement, source: HTMLElement) {
 }
 
 
-export const expandRange = () => {
-    let r = $$(range) // This uses the global 'range' observable
+export const expandRange = (): Range | null => {
+    const r = getCurrentRange()
+    if (!r) return null
+
     if (r.collapsed) {
         // Expand to word under or beside the cursor
         const wordRange = document.createRange()
@@ -163,7 +171,7 @@ export const expandRange = () => {
             // For now, this revert won't handle this specific sub-case of element node expansion.
         }
     }
-    return r // Return original or potentially modified 'r'
+    return r // Return original range
 }
 
 export const sanitizeElement = (element: HTMLElement) => {

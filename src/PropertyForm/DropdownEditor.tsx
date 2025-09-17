@@ -4,7 +4,8 @@ import { $, $$, isObservable, ObservableMaybe, useEffect } from "woby"
 import { Editors, TableRow, UIProps, skippedProperties } from "./PropertyForm"
 import { EditorProps } from "./EditorProps"
 import { MultiWheeler } from "../Wheeler/MultiWheeler"
-import projAsia from "./proj/projAsia.json"
+// import projAsia from "./proj/projAsia.json"
+const projAsia = {}
 
 export const DropDownEditor = () => {
 	const renderCondition = (value: ObservableMaybe<string>, key) => {
@@ -96,7 +97,7 @@ export const DropDownEditor = () => {
 				data = [Object.keys(projAsia)]
 				//@ts-expect-error
 				const projectionCode = $$(obj).projection
-				const projectionName = Object.keys(projAsia).filter(key => key.includes(projectionCode));
+				const projectionName = Object.keys(projAsia).filter(key => key.includes(projectionCode))
 				defaultValue = [$(projectionName[0])]
 				headers = [v => "Projection Name"]
 				break
@@ -170,7 +171,7 @@ export const DropDownEditor = () => {
 		useEffect(() => {
 			if (editorName == "thematicType") {
 				//sort array to make inputValue first
-				const thematicType = $$(obj["thematicType"]).sort((x, y) => { return x == $$(inputValue) ? -1 : y == $$(inputValue) ? 1 : 0; });
+				const thematicType = $$(obj["thematicType"]).sort((x, y) => { return x == $$(inputValue) ? -1 : y == $$(inputValue) ? 1 : 0 })
 				isObservable(obj["thematicType"]) ? obj["thematicType"](thematicType) : (obj["thematicType"] = thematicType)
 			}
 		})

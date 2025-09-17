@@ -1,4 +1,4 @@
-import { useOnClickOutside, useSelection } from 'use-woby'
+import { useOnClickOutside, useSelection } from '@woby/use'
 import { $, $$, useEffect, JSX, useMemo, Observable, createContext, useContext, setRef } from 'woby'
 
 export const EditorContext = createContext<Observable<HTMLDivElement>>()

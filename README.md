@@ -1,19 +1,28 @@
-# woby-wui
+# @woby/wui
 
 A combo of UIs based on MUI.
 
 You might not need this library if you familiar with the technique of copying styles from any HTML page that you like.
 
+## Documentation
+
+Check out our [documentation](./docs/README.md) for detailed guides and API references:
+
+- [Component Documentation](./docs/components/README.md) - Learn about all available components
+- [Getting Started Guide](./docs/guides/getting-started.md) - Build your first app with @woby/wui
+- [Installation Guide](./docs/guides/installation.md) - How to install and set up @woby/wui
+- [API Reference](./docs/api/README.md) - Detailed API documentation
+
 ## DEMO
 
-Check out the [documentation &amp; demo](https://github.com/wongchichong/woby-wui/) pages to see all use cases.
+Check out the [documentation &amp; demo](https://github.com/wobyjs/wui/) pages to see all use cases.
 
 ## Installation
 
 ### NPM
 
 ```bash
-pnpm install woby-wui
+pnpm install @woby/wui
 ```
 ## Usage
 

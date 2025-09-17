@@ -1,9 +1,9 @@
-import { Button, variant } from '../Button'
+import { Button } from '../Button'
 import BoldIcon from '../icons/bold' // Renamed for clarity if Bold is a type/component elsewhere
-import { applyStyle, range } from './utils'
+import { applyStyle, range, getCurrentRange } from './utils'
 import { useEditor } from './undoredo' // useUndoRedo not directly needed here anymore
 import { $, $$, useEffect } from 'woby'
-import { useSelection } from 'use-woby'
+import { useSelection } from '@woby/use'
 
 export const BoldButton = () => {
     const isActive = $(false)
@@ -15,7 +15,12 @@ export const BoldButton = () => {
             return
         }
 
-        let nodeToCheck = $$(range).startContainer
+        const currentRange = getCurrentRange()
+        if (!currentRange) {
+            isActive(false)
+            return
+        }
+        let nodeToCheck = currentRange.startContainer
         if (nodeToCheck.nodeType === Node.TEXT_NODE) {
             nodeToCheck = nodeToCheck.parentElement
         }
@@ -64,7 +69,7 @@ export const BoldButton = () => {
     }
 
     return <Button
-        class={[variant.outlined, 'h-8 w-8', () => $$(isActive) ? '!bg-slate-200' : '']} // Example selected class
+        buttonType='outlined' class={['h-8 w-8', () => $$(isActive) ? '!bg-slate-200' : '']} // Example selected class
         aria-pressed={isActive}
         onClick={handleClick}
         title="Bold"

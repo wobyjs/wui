@@ -1,8 +1,8 @@
 import { $, $$, JSX, useEffect } from 'woby'
-import { Button, variant } from '../Button'
+import { Button } from '../Button'
 import { EditorContext } from './undoredo'
-import { useOnClickOutside } from 'use-woby'
-import { range } from './utils' // Import the shared range observable
+import { useOnClickOutside } from '@woby/use'
+import { range, getCurrentRange } from './utils' // Import getCurrentRange
 
 const applyFontFamily = (fontName: string) => {
     document.execCommand('fontName', false, fontName)
@@ -27,9 +27,9 @@ export const FontFamilyDropDown = () => {
 
     // Update selected font based on the shared range observable
     useEffect(() => {
-        const currentRange = $$(range) // Get the value from the observable
+        const currentRange = getCurrentRange()
 
-        if (currentRange && currentRange.startContainer) {
+        if (currentRange) {
             let nodeToCheck: Node | null = currentRange.startContainer
             // If it's a text node, get its parent element
             if (nodeToCheck.nodeType === Node.TEXT_NODE) {
@@ -75,7 +75,8 @@ export const FontFamilyDropDown = () => {
         <div className="relative inline-block text-left" ref={dropdownRef}>
             <div>
                 <Button
-                    class={[variant.outlined, "h-8 inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-black hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500"]}
+                    buttonType='outlined'
+                    class={["h-8 inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-black hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500"]}
                     onClick={toggleDropdown}
                     title="Font family"
                 >

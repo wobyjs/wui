@@ -1,7 +1,7 @@
-import { Button, variant } from '../Button'
+import { Button } from '../Button'
 import UnderlineIcon from '../icons/underline' // Placeholder for UnderlineIcon
 import { useEditor } from './undoredo'
-import { applyStyle, range as globalRange } from './utils'
+import { applyStyle, getCurrentRange } from './utils'
 import { $, $$, useEffect } from 'woby'
 
 export const UnderlineButton = () => {
@@ -10,14 +10,14 @@ export const UnderlineButton = () => {
 
     useEffect(() => {
         const currentEditorNode = $$(editorNode)
-        const currentSelectionRange = $$(globalRange)
+        const nativeRange = getCurrentRange()
 
-        if (!currentEditorNode || !currentSelectionRange) {
+        if (!currentEditorNode || !nativeRange) {
             isActive(false)
             return
         }
 
-        let nodeToCheck = currentSelectionRange.startContainer
+        let nodeToCheck = nativeRange.startContainer
         if (nodeToCheck.nodeType === Node.TEXT_NODE) {
             nodeToCheck = nodeToCheck.parentElement
         }
@@ -56,7 +56,7 @@ export const UnderlineButton = () => {
     }
 
     return <Button
-        class={[variant.outlined, 'h-8 w-8', () => $$(isActive) ? '!bg-slate-200' : '']}
+        buttonType='outlined' class={['h-8 w-8', () => $$(isActive) ? '!bg-slate-200' : '']}
         aria-pressed={isActive}
         onClick={handleClick}
         title="Underline" // Updated title

@@ -1,6 +1,9 @@
 {
-    "name": "woby-wui",
-    "version": "1.0.17",
+    "name": "@woby/wui",
+    "version": "1.0.21",
+    "publishConfig": {
+        "access": "public"
+    },
     "description": "A powerful tooltip and menu component library for voby.",
     "//main": "./dist/index.cjs.js",
     "module": "./dist/index.es.js",
@@ -17,29 +20,30 @@
         "declaration:watch": "tsc --build --force --declaration --emitDeclarationOnly --declarationMap  --verbose --watch",
         "watch": "run-p build:watch",
         "build": "run-s build:vite declaration",
-        "build:web": "vite build --config=vite.config.web.mts --force --mode production",
+        "build:web": "vite build --config=vite.config.web.mts --mode production",
         "web": "vite preview --config=vite.config.web.mts --host",
         "dev:only": "vite --config=vite.config.web.mts --force --mode dev --host",
         "dev": "run-p dev:only",
         "build:vite": "vite build",
         "build:watch": "vite build --watch",
-        "preview": "vite preview --host"
+        "preview": "vite preview --config=vite.config.web.mts  --host",
+        "docs:generate": "node scripts/generate-docs.js",
+        "docs:build": "echo \"Building documentation site\""
     },
     "keywords": [
         "tooltip",
         "notification",
         "menu",
         "woby",
-        "woby-component"
+        "@woby/component"
     ],
     "license": "MIT",
     "peerDependencies": {
         "nanoid": "^3.3.7",
-        "use-woby": "workspace:../use-woby",
-        "oby": "workspace:../soby",
+        "@woby/use": "workspace:../use",
         "woby": "workspace:../woby",
-        "woby-modal": "workspace:../woby-modal",
-        "woby-styled": "workspace:../woby-styled"
+        "@woby/modal": "workspace:../modal",
+        "@woby/styled": "workspace:../styled"
     },
     "devDependencies": {
         "tailwindcss": "^4.0.17",
@@ -48,10 +52,10 @@
         "vite": "6.1.0"
     },
     "author": "Chi Chong <wongchichong@gmail.com>",
-    "homepage": "https://github.com/wongchichong/woby-power-tooltip",
+    "homepage": "https://github.com/wobyjs/power-tooltip",
     "repository": {
         "type": "git",
-        "url": "git@github.com:wongchichong/woby-power-tooltip.git"
+        "url": "git@github.com:wongchichong/power-tooltip.git"
     },
     "dependencies": {
         "typescript": "5.7.3"

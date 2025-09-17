@@ -1,15 +1,15 @@
 import { $, $$, Observable, JSX, useMemo, useEffect } from 'woby' // Import useMemo
-import { Button, variant } from '../Button'
+import { Button } from '../Button'
 import TextIncrease from '../icons/text_increase'
 import TextDecrease from '../icons/text_decrease'
 import { useUndoRedo, EditorContext, useEditor } from './undoredo'
-import { applyStyle, range } from './utils'
+import { applyStyle, range, getCurrentRange } from './utils'
 // import { useEffect } from 'woby' // No longer needed
 
 // Create the reactive font size string using useMemo directly
 export const fontSizeValue = useMemo((): string => {
     let fontSize = '16px' // Default font size
-    const currentRange = $$(range) // Read the observable dependency
+    const currentRange = getCurrentRange()
     if (currentRange) {
         let parentElement = currentRange.commonAncestorContainer as HTMLElement
         // If the commonAncestorContainer is a text node, get its parent element
@@ -106,7 +106,7 @@ const FontSizeInputComponent = () => {
             <div>
                 {/* <div className="inline-flex items-center rounded-md shadow-sm"> */}
                 <Button
-                    class={[variant.outlined, "h-8 rounded-r-none px-2 py-1 border-r-0"]} // Adjusted padding and removed right border
+                    buttonType='outlined' class={["h-8 rounded-r-none px-2 py-1 border-r-0"]} // Adjusted padding and removed right border
                     onClick={decrementSize}
                     title="Decrease Font Size"
                 >
@@ -123,7 +123,7 @@ const FontSizeInputComponent = () => {
                     disabled
                 />
                 <Button
-                    class={[variant.outlined, "h-8 rounded-l-none px-2 py-1"]} // Adjusted padding
+                    buttonType='outlined' class={["h-8 rounded-l-none px-2 py-1"]} // Adjusted padding
                     onClick={incrementSize}
                     title="Increase Font Size"
                 >
@@ -142,7 +142,7 @@ export { FontSizeInputComponent as FontSizeInput }
 // Or update them to use $$fontSizeValue
 export const IncreaseFontSize = () => {
     // const { undos, saveDo } = useUndoRedo() // Removed
-    return <Button class={variant.outlined} onClick={() => {
+    return <Button buttonType='outlined' onClick={() => {
         // saveDo(undos) // Removed: MutationObserver in Editor.tsx should now handle this
         const currentFontSize = $$(fontSizeValue) // Use reactive value
         const newFontSize = parseFloat(currentFontSize) + 2
@@ -152,7 +152,7 @@ export const IncreaseFontSize = () => {
 
 export const DecreaseFontSize = () => {
     // const { undos, saveDo } = useUndoRedo() // Removed
-    return <Button class={variant.outlined} onClick={() => {
+    return <Button buttonType='outlined' onClick={() => {
         // saveDo(undos) // Removed: MutationObserver in Editor.tsx should now handle this
         const currentFontSize = $$(fontSizeValue) // Use reactive value
         const newFontSize = parseFloat(currentFontSize) - 2

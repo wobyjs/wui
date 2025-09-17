@@ -1,5 +1,5 @@
 import { $, $$, isObservable, Observable, Portal, useEffect, useMemo } from 'woby'
-import { use, useClickAway } from 'use-woby'
+import { use, useClickAway } from '@woby/use'
 import { WheelerProps, WheelerItem } from './WheelerType'
 
 export const ActiveWheelers = $([])
@@ -678,7 +678,7 @@ export const Wheeler = <T,>(props: WheelerProps<T>) => {
 
         if (newVal) {
             value(newVal)
-            oriValue(newVal)
+                ; (oriValue as any)(newVal)
         }
         else {
             alert("No results found")
@@ -713,7 +713,7 @@ export const Wheeler = <T,>(props: WheelerProps<T>) => {
                                     <div class="w-screen relative flex flex-col flex-wrap items-center">
                                         <input
                                             type="text"
-                                            placeholder={`Enter ${header().toLowerCase()}`}
+                                            placeholder={`Enter ${((header as any)() as any).toLowerCase()}`}
                                             class="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 ease-in-out w-64"
                                             onChange={(e) => {
                                                 const value = e.target.value

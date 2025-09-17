@@ -1,5 +1,5 @@
 import { $, $$, JSX, Observable, ObservableMaybe, ObservableReadonly } from 'woby'
-import { Button, variant } from '../Button'
+import { Button } from '../Button'
 import { EditorContext, useUndoRedo } from './undoredo'
 import { applyStyle } from './utils' // Import applyStyle
 import FormatInkHighlighter from '../icons/format_ink_highlighter' // Import the highlighter icon
@@ -33,7 +33,8 @@ export const TextBackgroundColorPicker = () => {
         <div className="relative inline-block text-left">
             {/* Button to apply the picked background color */}
             <Button
-                class={[variant.outlined, "p-2 h-8"]}
+                buttonType='outlined'
+                class={["p-2 h-8"]}
                 title="Text background color"
                 onClick={applyPickedBgColor} // Apply color on button click
             >
