@@ -8,13 +8,13 @@ type PropertyRowProps = {
 	obj: any
 	order?: string[]
 	className?: JSX.Class
-	textAlign?: string
+	indentLvl?: number
 	onCommit?: () => void
 }
 
 export const PropertyRows = (props: PropertyRowProps) => {
 	changeEnumerable(props.obj)
-	const { obj, order, textAlign } = props
+	const { obj, order, indentLvl } = props
 	const formUI = $$(Editors).map((e) => e())
 	const dashMatchReg = /^-([a-zA-Z].*)-$/
 
@@ -35,14 +35,14 @@ export const PropertyRows = (props: PropertyRowProps) => {
 
 			const value = propertyData[key]
 
-			return [
-				() =>
-					title ? (
-						<tr>
-							<td>{title}</td>
-						</tr>
-					) : null,
+			return (
 				<>
+					{() =>
+						title ? (
+							<tr>
+								<td>{title}</td>
+							</tr>
+						) : null}
 					{() =>
 						($$(value) && !(value instanceof HTMLElement)) || $$(value) === 0 || $$(value) === false ? (
 							<>
@@ -56,7 +56,7 @@ export const PropertyRows = (props: PropertyRowProps) => {
 												data={propertyData}
 												editorName={key}
 												value={value}
-												textAlign={textAlign}
+												indentLvl={indentLvl}
 											/>
 										)
 									)
@@ -64,8 +64,8 @@ export const PropertyRows = (props: PropertyRowProps) => {
 							</>
 						) : undefined
 					}
-				</>,
-			]
+				</>
+			)
 		})
 
 		return form

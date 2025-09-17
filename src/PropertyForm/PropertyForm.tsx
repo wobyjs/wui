@@ -1,6 +1,6 @@
 /** @jsxImportSource woby */
 
-import { $, $$, ObservableMaybe, type JSX } from "woby"
+import { $, $$, ObservableMaybe, Observable, type JSX } from "woby"
 import { Button } from "../Button"
 
 type PropertyFormProps = {
@@ -17,7 +17,9 @@ export type UIProps<T> = {
 	data: ObservableMaybe<any>
 	editorName: string
 	textAlign?: string
-	indent?: boolean
+	indentLvl?: number
+	open?: Observable<boolean>
+	button? : JSX.Element
 	onChange: (e) => void
 	changeValueOnClickOnly?: ObservableMaybe<boolean>
 }
@@ -63,20 +65,28 @@ export function changeEnumerable(json: object) {
 
 export const Editors = $<
 	(() => {
-		UI: (props: { data, editorName: string, value: any, textAlign: string }) => JSX.Element,
+		UI: (props: { data, editorName: string, value: any, indentLvl: string }) => JSX.Element,
 		renderCondition: (values: ObservableMaybe<any>, key?: string) => boolean
 	})[]
 >([])
 
 export const skippedProperties = ["autoDistance", "rotated", "tolerance", "isCached", "snap", "zIndex", "show", "label", "isWall", "outline", "partial", "projection", "primitiveType", "restdb", "verticalOrigin", "horizontalOrigin", "labelProps", "labelShow", "Altitude", "url", "distanceDisplayCondition", "eyeoffset", "ids", "id", "columnsDecoder", "style", "priority"]
+export const indent = ["pl-4", "pl-8", "pl-12", "pl-16"]
 
 export const TableRow = (props) => {
-	const { optionName, children, textAlign = "text-left" } = props
+	const { optionName, children, indentLvl } = props
 
 	return (
-		<tr className="flex h-fit items-stretch border-solid outline-1">
-			<th className={`w-[175px] outline-1 whitespace-nowrap ${textAlign}`}>{optionName}</th>
-			<td className="w-full">
+		<tr className="flex h-fit items-stretch">
+			<th className={`w-fit`}>
+				<button
+					className={"w-5 h-5"}>
+				</button>
+			</th>
+			<th className={`w-[175px] outline-1 whitespace-nowrap text-left`}>
+				<span className={`${indent[indentLvl]}`}>{optionName}</span>
+			</th>
+			<td className="w-full outline-1">
 				{children}
 			</td>
 		</tr>

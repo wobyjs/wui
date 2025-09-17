@@ -13,7 +13,7 @@ export const NumberEditor = () => {
 	}
 
 	const UI = (props: UIProps<number>) => {
-		const { value, editorName, textAlign } = props
+		const { value, editorName, indentLvl } = props
 		const optionName = editorName.replace(/([a-z])([A-Z])/g, "$1 $2").replace(/^./, function (str) {
 			return str.toUpperCase()
 		})
@@ -21,7 +21,7 @@ export const NumberEditor = () => {
 		return skippedProperties.includes(editorName) ? null : (
 			<TableRow
 				optionName={optionName}
-				textAlign={textAlign}
+				indentLvl={indentLvl}
 			>
 				<NumEditor
 					value={value}

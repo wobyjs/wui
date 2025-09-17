@@ -16,7 +16,7 @@ export const ColorEditor = () => {
 	}
 
 	const UI = (props: UIProps<string>) => {
-		const { value, editorName, textAlign } = props
+		const { value, editorName, indentLvl } = props
 		const optionName = editorName.replace(/([a-z])([A-Z])/g, "$1 $2").replace(/^./, function (str) {
 			return str.toUpperCase()
 		})
@@ -24,7 +24,7 @@ export const ColorEditor = () => {
 		return skippedProperties.includes(editorName) ? null : (
 			<TableRow
 				optionName={optionName}
-				textAlign={textAlign}
+				indentLvl={indentLvl}
 			>
 				<ClrEditor
 					value={value}
