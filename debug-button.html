@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Debug Button Component</title>
+</head>
+
+<body>
+    <h1>Debug Button Component</h1>
+
+    <h2>Button with empty checked attribute</h2>
+    <wui-button checked="">Empty Checked Button</wui-button>
+
+    <h2>Button with explicit false checked attribute</h2>
+    <wui-button checked="false">False Checked Button</wui-button>
+
+    <h2>Button with no checked attribute</h2>
+    <wui-button>No Attribute Button</wui-button>
+
+    <script type="module">
+        import './src/index.tsx';
+
+        // Add debugging
+        setTimeout(() => {
+            const buttons = document.querySelectorAll('wui-button');
+            buttons.forEach((button, index) => {
+                console.log(`Button ${index}:`, button);
+                console.log(`  checked attribute:`, button.getAttribute('checked'));
+                console.log(`  checked property:`, button.checked);
+            });
+        }, 1000);
+    </script>
+</body>
+
+</html>

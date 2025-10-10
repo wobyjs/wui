@@ -19,7 +19,7 @@ export type UIProps<T> = {
 	textAlign?: string
 	indentLvl?: number
 	open?: Observable<boolean>
-	button? : JSX.Element
+	button?: JSX.Element
 	onChange: (e) => void
 	changeValueOnClickOnly?: ObservableMaybe<boolean>
 }
@@ -65,7 +65,7 @@ export function changeEnumerable(json: object) {
 
 export const Editors = $<
 	(() => {
-		UI: (props: { data, editorName: string, value: any, indentLvl: string }) => JSX.Element,
+		UI: (props: { data, editorName: string, value: any, indentLvl?: number, textAlign?: string }) => JSX.Element,
 		renderCondition: (values: ObservableMaybe<any>, key?: string) => boolean
 	})[]
 >([])

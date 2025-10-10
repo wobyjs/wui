@@ -1,7 +1,4 @@
 import { $, $$, ArrayMaybe, isObservable, Observable, ObservableMaybe, ObservableReadonly, Portal, useEffect, useMemo } from 'woby'
-import { use } from '@woby/use'
-import { EnumType } from 'typescript'
-import { Nullable } from 'woby/dist/types/types'
 
 export type WheelerItem<T = unknown> = { value: T, label: string | number, component?: (props: { itemHeight: number, value: WheelerItem, index: number }) => JSX.Child, hasComponent?: boolean }
 export type WheelerProps<T = unknown> = {

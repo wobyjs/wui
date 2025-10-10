@@ -12,7 +12,7 @@ import { Button } from "../src/Button"
 import { Fab } from "../src/Fab"
 import * as spreset from "../src/Switch.effect"
 
-import * as React from 'woby'
+// import * as React from 'woby'
 import { render, $, $$, useEffect, type JSX } from "woby"
 import "../dist/wui.css"
 import './input.css'
@@ -23,13 +23,8 @@ import { NumberField } from "../src/NumberField"
 import { Zoomable, Img } from "../src/Zoomable"
 import { ToggleButton } from "../src/ToggleButton"
 import { Tab, Tabs } from "../src/Tabs"
-<<<<<<< HEAD
-import { Wodal } from '@woby/modal'
-import { useViewportSize } from '@woby/use'
-=======
 import { Wodal } from '@woby/modal'
 import { useViewportSize, useWindowSize } from '@woby/use'
->>>>>>> 565612a0d05c8858f2ca6120270667bd518fbbfe
 import { Wheeler } from '../src/Wheeler/Wheeler'
 import { WheelerItem } from '../src/Wheeler/WheelerType'
 import { MultiWheeler } from '../src/Wheeler/MultiWheeler'
@@ -447,7 +442,7 @@ const App = () => (
 				<MultiWheeler
 					options={[["a", "b"], [1, 2, 3], [0, 5, 87, 8, 9]]}
 					title={<div>test</div>}
-					value={[$("a"), $(1), $(0)]}      
+					value={[$("a"), $(1), $(0)]}
 					headers={[v => "col1 " + $$(v), v => "col2 " + $$(v), v => "col3 " + $$(v)]}
 					ok={dateOk}
 				/>

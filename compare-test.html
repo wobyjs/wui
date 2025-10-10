@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Compare Components Test</title>
+</head>
+
+<body>
+    <h1>Compare Components Test</h1>
+
+    <h2>Counter Element (working example)</h2>
+    <counter-element value="011">Counter Test</counter-element>
+
+    <h2>WUI Button (problematic)</h2>
+    <wui-button checked="" disabled="">Button Test</wui-button>
+
+    <h2>Standard HTML Button (reference)</h2>
+    <button checked disabled>Standard Button</button>
+
+    <script type="module">
+        import './src/index.tsx';
+
+        // Debug information
+        setTimeout(() => {
+            console.log('=== Debug Information ===');
+
+            const counter = document.querySelector('counter-element');
+            const button = document.querySelector('wui-button');
+            const standardButton = document.querySelector('button');
+
+            console.log('Counter element value attribute:', counter.getAttribute('value'));
+            console.log('Counter element value property:', counter.value);
+
+            console.log('WUI button checked attribute:', button.getAttribute('checked'));
+            console.log('WUI button disabled attribute:', button.getAttribute('disabled'));
+
+            console.log('Standard button checked property:', standardButton.checked);
+            console.log('Standard button disabled property:', standardButton.disabled);
+        }, 1000);
+    </script>
+</body>
+
+</html>

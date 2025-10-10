@@ -288,7 +288,7 @@ export const Wheeler = <T,>(props: WheelerProps<T>) => {
             const newValueJSON = JSON.stringify(finalNewValueArray)
 
             if (oldValueJSON !== newValueJSON) {
-                value(finalNewValueArray)
+                value(finalNewValueArray as any)
                 if (!ok && isObservable(oriValue)) {
                     oriValue($$(value))
                 }
@@ -308,7 +308,7 @@ export const Wheeler = <T,>(props: WheelerProps<T>) => {
         }
 
         const finalNewValueArray = [...currentValueAsSet]
-        value(finalNewValueArray as any) // Cast to any to satisfy T | T[] if T is not array
+        value(finalNewValueArray as any)
 
         if (!ok) {
             if (isObservable(oriValue)) {

@@ -57,6 +57,7 @@
         "tailwind.*.*",
         "vite.*.*ts",
         "dist*",
-        "docs"
+        "docs",
+        "index.test.ts"
     ]
 }
