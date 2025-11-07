@@ -1,0 +1,4 @@
+{
+  "props": {},
+  "html": "<div><div class=\"bg-white text-[rgba(0,0,0,0.87)] rounded overflow-hidden transition-[box-shadow,transform] duration-300 ease-in-out [transition-delay:0ms] shadow-md max-w-md m-2\"><div class=\"p-6\"><h3 class=\"text-lg font-semibold\">Actions Alignment</h3><p class=\"text-sm text-gray-600\">Try different horizontal justifications</p></div><div class=\"flex items-center justify-start px-4 py-2\"><span class=\"text-xs uppercase text-gray-500\">Start</span></div><div class=\"flex items-center justify-center px-4 py-2\"><span class=\"text-xs uppercase text-gray-500\">Center</span></div><div class=\"flex items-center justify-between px-4 py-2\"><span class=\"text-xs uppercase text-gray-500\">Between (left)</span><span class=\"text-xs uppercase text-gray-500\">Between (right)</span></div><div class=\"flex items-center justify-end px-4 py-2\"><span class=\"text-xs uppercase text-gray-500\">End</span></div></div></div>"
+}

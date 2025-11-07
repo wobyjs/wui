@@ -1,0 +1,4 @@
+{
+  "props": {},
+  "html": "<div><iframe class=\"border rounded-lg shadow-sm\" width=\"420\" height=\"300\" src=\"/AppBarDemo/AppBarCustomTsxDemo.html\"></iframe></div>"
+}

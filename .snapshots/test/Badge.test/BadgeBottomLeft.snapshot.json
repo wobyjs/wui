@@ -1,0 +1,4 @@
+{
+  "props": {},
+  "html": "<div><div><span class=\"relative inline-flex align-middle shrink-0 m-4\"><div class=\"w-10 h-10 bg-orange-500 rounded-full\"></div><span class=\"flex place-content-center items-center absolute box-border font-medium text-xs leading-none z-[1] text-white scale-100 [flex-flow:wrap] [transition:transform_225ms_cubic-bezier(0.4,0,0.2,1)0ms] min-w-[20px] h-5 rounded-[10px] px-1 -translate-x-2/4 translate-y-2/4 origin-[0%_100%] bottom-0 left-0 bg-[rgb(156,39,176)]\">BLeft</span></span></div></div>"
+}

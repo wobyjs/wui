@@ -1,0 +1,4 @@
+{
+  "props": {},
+  "html": "<slot-mocked> <wui-avatar class=\"w-6 h-6 !text-sm bg-purple-500 !text-green-400 !font-bold\" children=\"R\" snapshot-name=\"Custom-Avatar-2\"> </wui-avatar></slot-mocked>"
+}

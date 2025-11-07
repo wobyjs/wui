@@ -1,0 +1,4 @@
+{
+  "props": {},
+  "html": "<slot-mocked> <wui-button button-type=\"outlined\" children=\"Outlined Button\" snapshot-name=\"Outlined-Button\"> </wui-button></slot-mocked>"
+}

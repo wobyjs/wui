@@ -1,0 +1,4 @@
+{
+  "props": {},
+  "html": "<slot-mocked> <wui-badge badge-content=\"BLeft\" vertical=\"bottom\" horizontal=\"left\" snapshot=\"Bottom-Left-Badge\"> <div class=\"w-10 h-10 bg-orange-500 rounded-full\"></div> </wui-badge> </slot-mocked>"
+}

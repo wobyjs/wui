@@ -1,0 +1,4 @@
+{
+  "props": {},
+  "html": "<slot-mocked> <wui-button-mocked button-type=\"icon\" children=\"ℹ️\" snapshot-name=\"Icon-Button\" button-function=\"button\"><button type=\"button\" class=\"inline-flex items-center justify-center relative box-border cursor-pointer select-none align-middle no-underline rounded-none border-0 bg-transparent text-center flex-[0_0_auto] text-2xl overflow-visible text-[rgba(0,0,0,0.54)] transition-[background-color] duration ease-in-out delay-[0ms] rounded-[50%] hover:bg-[rgba(0,0,0,0.04)]\">ℹ️</button> </wui-button-mocked></slot-mocked>"
+}
