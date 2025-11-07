@@ -1,3 +1,5 @@
+// NOTE: use hidden the element still exist, Goal: Collapse (element no need render)
+
 import { $, $$, ObservableMaybe, isObservable, useEffect, useMemo, type JSX } from "woby"
 
 type CollapseProps = JSX.VoidHTMLAttributes<HTMLDivElement> & {
