@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>CheckBox Component Test</title>
+    <link href="/node_modules/@woby/chk/dist/index.css" rel="stylesheet">
+    <script type="module" src="../src/Checkbox.tsx"></script>
+</head>
+
+<body>
+    <link href="../dist/wui.css" rel="stylesheet">
+    <h2 class="text-[1.2em] pl-4">Check Box Component Test</h2>
+
+    <!-- <woby-chk name="Default CheckBox">
+        <wui-checkbox> Default Checkbox </wui-checkbox>
+    </woby-chk> -->
+
+    <woby-chk name="Left Label CheckBox">
+        <wui-checkbox id="left-label-checkbox-html" label-position="left" snapshot-name="Left-Label-CheckBox"> Left
+            Label </wui-checkbox>
+    </woby-chk>
+
+    <woby-chk name="Right Label CheckBox">
+        <wui-checkbox id="right-label-checkbox-html" label-position="right" snapshot-name="Right-Label-CheckBox"> Right
+            Label </wui-checkbox>
+    </woby-chk>
+
+    <woby-chk name="Top Label CheckBox">
+        <wui-checkbox id="top-label-checkbox-html" label-position="top" snapshot-name="Top-Label-CheckBox"> Top Label
+        </wui-checkbox>
+    </woby-chk>
+
+    <woby-chk name="Bottom Label CheckBox">
+        <wui-checkbox id="bottom-label-checkbox-html" label-position="bottom" snapshot-name="Bottom-Label-CheckBox">
+            Bottom Label </wui-checkbox>
+    </woby-chk>
+
+    <woby-chk name="Checked CheckBox">
+        <wui-checkbox id="checked-checkbox-html" checked="true" snapshot-name="Checked-CheckBox">Checked By
+            Default</wui-checkbox>
+    </woby-chk>
+
+    <woby-chk name="Disabled CheckBox">
+        <wui-checkbox id="disabled-checkbox-html" disabled="true" snapshot-name="Disabled-CheckBox">Disabled
+            CheckBox</wui-checkbox>
+    </woby-chk>
+
+    <woby-chk name="Disabled & Checked CheckBox">
+        <wui-checkbox id="disabled-checked-checkbox-html" checked="true" disabled="true"
+            snapshot-name="Disabled-Checked-CheckBox">Disabled &
+            Checked</wui-checkbox>
+    </woby-chk>
+
+    <woby-chk name="Custom Class CheckBox">
+        <wui-checkbox id="custom-class-checkbox-html" label-position="right" class="!text-blue-500 !font-bold"
+            snapshot-name="Custom-Class-CheckBox">
+            Custom styled checkbox</wui-checkbox>
+        </wui-checkbox>
+        <script>
+            document.getElementById('custom-class-checkbox-html').addEventListener('change', (e) => {
+                console.log('Checkbox changed:', e.target.checked);
+            });
+        </script>
+    </woby-chk>
+
+    <!-- <woby-chk name="Interactive CheckBox with Change Event">
+        <wui-checkbox id="interactive-checkbox" label-position="right">Click me and check console</wui-checkbox>
+        <script>
+            document.getElementById('interactive-checkbox').addEventListener('change', (e) => {
+                console.log('Checkbox changed:', e.target.checked);
+            });
+        </script>
+    </woby-chk> -->
+</body>
+
+</html>

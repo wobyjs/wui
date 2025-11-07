@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Badge Component Test</title>
+    <link href="/node_modules/@woby/chk/dist/index.css" rel="stylesheet">
+    <script type="module" src="../src/Badge.tsx"></script>
+</head>
+
+<body>
+    <link href="../dist/wui.css" rel="stylesheet">
+    <h2 class="text-[1.2em] pl-4">Badge Component Test</h2>
+
+    <woby-chk name="Default Badge">
+        <wui-badge snapshot="Default-Badge">
+            <div class="w-10 h-10 bg-gray-400 rounded-full"></div>
+        </wui-badge>
+    </woby-chk>
+
+    <woby-chk name="Top Left Badge">
+        <wui-badge badge-content="TLeft" vertical="top" horizontal="left" snapshot="Top-Left-Badge">
+            <div class="w-10 h-10 bg-green-500 rounded-full"></div>
+        </wui-badge>
+    </woby-chk>
+
+    <woby-chk name="Top Right Badge">
+        <wui-badge badge-content="TRight" vertical="top" horizontal="right" snapshot="Top-Right-Badge">
+            <div class="w-10 h-10 bg-blue-500 rounded-full"></div>
+        </wui-badge>
+    </woby-chk>
+
+    <woby-chk name="Bottom Left Badge">
+        <wui-badge badge-content="BLeft" vertical="bottom" horizontal="left" snapshot="Bottom-Left-Badge">
+            <div class="w-10 h-10 bg-orange-500 rounded-full"></div>
+        </wui-badge>
+    </woby-chk>
+
+    <woby-chk name="Bottom Right Badge">
+        <wui-badge badge-content="BRight" vertical="bottom" horizontal="right" snapshot="Bottom-Right-Badge">
+            <div class="w-10 h-10 bg-purple-500 rounded-full"></div>
+        </wui-badge>
+    </woby-chk>
+
+    <woby-chk name="Custom Color Badge">
+        <wui-badge badge-content="!" badge-class="bg-red-500" vertical="top" horizontal="right"
+            snapshot="Custom-Color-Badge">
+            <div class="w-10 h-10 bg-gray-400 rounded-full"></div>
+        </wui-badge>
+    </woby-chk>
+</body>
+
+</html>

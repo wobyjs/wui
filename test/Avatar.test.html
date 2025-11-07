@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Avatar Component Test</title>
+    <link href="/node_modules/@woby/chk/dist/index.css" rel="stylesheet">
+    <script type="module" src="../src/Avatar.tsx"></script>
+</head>
+
+<body>
+    <link href="../dist/wui.css" rel="stylesheet">
+
+    <h2 class="text-[1.2em] pl-4">Avatar Component Test</h2>
+
+    <woby-chk name="Default Avatar">
+        <wui-avatar snapshot-name="Default_Avatar" />
+    </woby-chk>
+
+    <woby-chk name="Image Avatar">
+        <wui-avatar src="../sample-avatar.png" alt="Avatar" snapshot-name="Image-Avatar" />
+    </woby-chk>
+
+    <woby-chk name="Image Avatar 2">
+        <wui-avatar src="sample.png" alt="Avatar" snapshot-name="Image-Avatar-2" />
+    </woby-chk>
+
+    <woby-chk name="H Avatar">
+        <wui-avatar children="H" snapshot-name="H-Avatar" />
+    </woby-chk>
+
+    <woby-chk name="Custom Avatar">
+        <wui-avatar class="w-6 h-6 !text-sm bg-purple-500" children="JL" snapshot-name="Custom-Avatar" />
+    </woby-chk>
+
+    <woby-chk name="Custom Avatar 2">
+        <wui-avatar class="w-6 h-6 !text-sm bg-purple-500 !text-green-400 !font-bold" children="R"
+            snapshot-name="Custom-Avatar-2" />
+    </woby-chk>
+</body>
+
+</html>
