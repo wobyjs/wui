@@ -1,5 +1,6 @@
 //@ts-ignore
-import { $, $$, isObservable, useEffect, type JSX } from "woby"
+import { HtmlHTMLAttributes } from "node_modules/woby/dist/types/types"
+import { $, $$, isObservable, useEffect, type JSX, defaults, customElement, ElementAttributes, HtmlBoolean, ObservableMaybe, HtmlString } from "woby"
 
 const variant = {
     text: `inline-flex items-center justify-center relative box-border bg-transparent cursor-pointer select-none align-middle no-underline 
@@ -30,23 +31,56 @@ const variant = {
 
 type ButtonProps = JSX.ButtonHTMLAttributes<HTMLButtonElement> & {
     buttonType?: "text" | "contained" | "outlined" | "icon"
+    checked?: boolean
 }
-export const Button = (props: ButtonProps) => {
-    const { children, class: cls, buttonType = "contained", checked = $(false), disabled, ...otherProps } = props
 
-    return (
-        <button
-            onClick={(e) => {
-                e.stopImmediatePropagation()
-                if (isObservable(checked)) {
-                    checked(!$$(checked))
-                }
-            }}
-            disabled={disabled}
-            class={[variant[buttonType], cls]}
-            {...otherProps}
-        >
-            {children}
-        </button>
-    )
+const def = () => ({
+    buttonType: $('contained', HtmlString) as ObservableMaybe<string> | undefined,
+    checked: $(false, HtmlBoolean),
+    disabled: $(false, HtmlBoolean),
+    ref: $(undefined,)
+}) as ReturnType<typeof def> & HtmlHTMLAttributes<HTMLDivElement>
+
+export const Button = defaults(def,
+    (props: any) => {
+        const { children, class: cls, buttonType = "contained", checked = $(false), disabled, ...otherProps } = props
+
+        return (
+            <button
+                onClick={(e) => {
+                    e.stopImmediatePropagation()
+                    if (isObservable(checked)) {
+                        checked(!$$(checked))
+                    }
+                }}
+                disabled={disabled}
+                class={[() => variant[$$(buttonType) as keyof typeof variant], cls]}
+                {...otherProps}
+            >
+                {children}
+            </button>
+        )
+    })
+
+// Register as a custom element
+customElement('wui-button', Button)
+
+// Augment JSX intrinsic elements for better TypeScript support
+declare module 'woby' {
+    namespace JSX {
+        interface IntrinsicElements {
+            /**
+             * Woby Button custom element
+             * 
+             * A button component that can be used as a custom element in HTML or JSX.
+             * Supports different button types (text, contained, outlined, icon) and toggle functionality.
+             * 
+             * The ElementAttributes<typeof ButtonComponent> type automatically includes:
+             * - All HTML attributes
+             * - Component-specific props from ButtonProps
+             * - Style properties via the style-* pattern (style$font-size in HTML, style-font-size in JSX)
+             */
+            'wui-button': ElementAttributes<typeof Button>
+        }
+    }
 }

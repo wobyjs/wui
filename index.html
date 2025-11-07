@@ -5,11 +5,133 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Voby-Button</title>
+
+    <link rel="stylesheet" href="./dist/wui.css">
     <script type="module" src="./docs/index.tsx"></script>
 </head>
 
 <body>
     <div id="app"></div>
+
+    <wui-button button-type='outlined'>Outlined</wui-button>
+    <wui-button button-type='contained'>contained</wui-button>
+    <wui-button button-type='text'>text</wui-button>
+    <wui-button button-type='icon'><svg focusable="false" viewBox="0 0 24 24" width="1.5rem" height="1.5rem">
+            <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"></path>
+        </svg></wui-button>
+
+    <!-- Icon Button Examples -->
+    <wui-icon-button onclick="alert('clicked')">
+        <svg focusable="false" viewBox="0 0 24 24" width="1.5rem" height="1.5rem">
+            <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"></path>
+        </svg>
+    </wui-icon-button>
+
+    <wui-icon-button disabled>
+        <svg focusable="false" viewBox="0 0 24 24">
+            <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"></path>
+        </svg>
+    </wui-icon-button>
+
+    <wui-icon-button class="[&_svg]:!fill-[#9C27B0]">
+        <svg focusable="false" viewBox="0 0 24 24" width="1.5rem" height="1.5rem">
+            <path
+                d="m22 5.72-4.6-3.86-1.29 1.53 4.6 3.86L22 5.72zM7.88 3.39 6.6 1.86 2 5.71l1.29 1.53 4.59-3.85zM12.5 8H11v6l4.75 2.85.75-1.23-4-2.37V8zM12 4c-4.97 0-9 4.03-9 9s4.02 9 9 9c4.97 0 9-4.03 9-9s-4.03-9-9-9zm0 16c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z">
+            </path>
+        </svg>
+    </wui-icon-button>
+
+    <wui-icon-button class="[&_svg]:!fill-[#1976D2]">
+        <svg focusable="false" viewBox="0 0 24 24" width="1.5rem" height="1.5rem">
+            <path
+                d="M11 9h2V6h3V4h-3V1h-2v3H8v2h3v3zm-4 9c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2zm-9.83-3.25.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.86-7.01L19.42 4h-.01l-1.1 2-2.76 5H8.53l-.13-.27L6.16 6l-.95-2-.94-2H1v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.13 0-.25-.11-.25-.25z">
+            </path>
+        </svg>
+    </wui-icon-button>
+
+    <!-- FAB Examples -->
+    <wui-fab1>
+        <svg focusable="false" viewBox="0 0 24 24" width="1.5rem" height="1.5rem">
+            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+        </svg>
+    </wui-fab1>
+
+    <wui-fab class="w-18 h-18">
+        ☰
+    </wui-fab>
+
+    <!-- Badge Examples -->
+    <wui-badge>
+        <svg focusable="false" viewBox="0 0 24 24">
+            <path
+                d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z">
+            </path>
+        </svg>
+    </wui-badge>
+
+    <wui-badge badge-content="9+">
+        <svg focusable="false" viewBox="0 0 24 24">
+            <path
+                d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z">
+            </path>
+        </svg>
+    </wui-badge>
+
+    <wui-badge badge-content="99+" horizontal="left">
+        <svg focusable="false" viewBox="0 0 24 24">
+            <path
+                d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z">
+            </path>
+        </svg>
+    </wui-badge>
+
+    <!-- Avatar Examples -->
+    <wui-avatar>H</wui-avatar>
+    <wui-avatar class-name="w-10 h-10 bg-orange-400">N</wui-avatar>
+    <wui-avatar class-name="w-10 h-10 bg-purple-600">OP</wui-avatar>
+
+    <!-- Appbar Example -->
+    <wui-appbar>
+        <div class="flex items-center justify-between p-4">
+            <div class="text-white font-medium text-xl">News</div>
+            <wui-button button-type="contained" class="bg-white text-blue-600">Login</wui-button>
+        </div>
+    </wui-appbar>
+
+    <!-- Chip Examples -->
+    <wui-chip>Basic Chip</wui-chip>
+    <wui-chip avatar="A">Chip with Avatar</wui-chip>
+    <wui-chip>Chip with Delete Icon</wui-chip>
+
+    <!-- Card Examples -->
+    <wui-card style="max-width: 345px; margin: 16px;">
+        <wui-card-media></wui-card-media>
+        <wui-card-content>
+            <h2>This is a Card Title</h2>
+            <p>Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+        </wui-card-content>
+        <wui-card-actions>
+            <wui-button button-type="text">Share</wui-button>
+            <wui-button button-type="text">Learn More</wui-button>
+        </wui-card-actions>
+    </wui-card>
+
+    <!-- Checkbox Examples -->
+    <wui-checkbox>Unchecked</wui-checkbox>
+    <wui-checkbox checked>Checked</wui-checkbox>
+    <wui-checkbox disabled>Disabled</wui-checkbox>
+
+    <!-- Collapse Examples -->
+    <button
+        onclick="document.getElementById('collapseExample').setAttribute('open', document.getElementById('collapseExample').getAttribute('open') === 'true' ? 'false' : 'true')">
+        Toggle Collapse
+    </button>
+    <wui-collapse id="collapseExample">
+        <div style="padding: 16px;">
+            <h3>Collapsible Content</h3>
+            <p>This content can be shown or hidden with the collapse component.</p>
+        </div>
+    </wui-collapse>
 </body>
 
 </html>
