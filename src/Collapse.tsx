@@ -7,7 +7,13 @@ type CollapseProps = JSX.VoidHTMLAttributes<HTMLDivElement> & {
 	open?: ObservableMaybe<boolean>
 	background?: boolean
 }
-export const Collapse = (props: CollapseProps): JSX.Element => {
+
+const def = () => ({
+	open: $(false, HtmlBoolean) as ObservableMaybe<boolean>,
+	background: $(true, HtmlBoolean) as ObservableMaybe<boolean>
+})
+
+const CollapseComponent = defaults(def, (props: any): JSX.Element => {
 	const { className, background = true, children, open: op, class: cls } = props
 	const open = isObservable(op) ? op : $(op)
 	const ref = $<HTMLDivElement>()
@@ -34,4 +40,29 @@ export const Collapse = (props: CollapseProps): JSX.Element => {
 			</div>
 		</div>
 	)
+})
+
+// Register as a custom element
+customElement('wui-collapse', CollapseComponent)
+
+// Augment JSX intrinsic elements for better TypeScript support
+declare module 'woby' {
+	namespace JSX {
+		interface IntrinsicElements {
+			/**
+			 * Woby Collapse custom element
+			 * 
+			 * A collapse component that can be used as a custom element in HTML or JSX.
+			 * Provides an expandable container that can show or hide content.
+			 * 
+			 * The ElementAttributes<typeof CollapseComponent> type automatically includes:
+			 * - All HTML attributes
+			 * - Component-specific props from CollapseProps
+			 * - Style properties via the style-* pattern (style$font-size in HTML, style-font-size in JSX)
+			 */
+			'wui-collapse': ElementAttributes<typeof CollapseComponent>
+		}
+	}
 }
+
+export { CollapseComponent as Collapse }

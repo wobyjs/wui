@@ -42,9 +42,6 @@ const Avatar = defaults<AvatarProps>(def, (props: AvatarProps) => {
     )
 })
 
-export { Avatar }
-
-
 // NOTE: Register the custom element
 customElement('wui-avatar', Avatar);
 
@@ -57,6 +54,7 @@ declare module 'woby' {
     }
 }
 
+export { Avatar }
 export default Avatar
 
 

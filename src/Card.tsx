@@ -270,5 +270,4 @@ export default Card
 
 // export const CardContent = tw('div')`p-[16px]`
 
-// export const CardActions = tw('div')`flex items-center p-2`
-// #endregion
+export const CardActions = tw('div')`flex items-center p-2`

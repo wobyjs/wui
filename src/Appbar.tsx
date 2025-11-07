@@ -184,8 +184,8 @@ const Appbar = defaults(def, (props) => {
     useEffect(() => {
         if (!el) return;
 
-        /* In TSX (no Shadow DOM): header -> parentElement (the scroll container) */ 
-        /* In custom element: header -> ShadowRoot (no parentElement). We need the host's parent. */ 
+        /* In TSX (no Shadow DOM): header -> parentElement (the scroll container) */
+        /* In custom element: header -> ShadowRoot (no parentElement). We need the host's parent. */
         const root = el.getRootNode() as any;           // Document | ShadowRoot
         const host: HTMLElement | null = root?.host ?? null; // present only in Shadow DOM
         const container: HTMLElement | null =

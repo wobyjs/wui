@@ -7,7 +7,6 @@ import path from "path"
 
 const isDevMode = process.argv.includes('dev') || (process.argv.includes('--mode') && process.argv.includes('dev'))
 
-
 const config = defineConfig({
     build: {
         minify: false,
@@ -37,7 +36,6 @@ const config = defineConfig({
             '@woby/chk/index.css': isDevMode ? path.resolve(__dirname, '../chk/dist/index.css') : '@woby/chk/index.css',
             '@woby/vite-plugin-test': path.resolve(__dirname, '../vite-plugin-test/src/index.ts'),
         }
-        
     },
     server: {
         port: 5173,
