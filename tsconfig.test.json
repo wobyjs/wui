@@ -1,0 +1,16 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "woby",
+    "noEmit": true
+  },
+  "include": [
+    "test/**/*",
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist*"
+  ]
+}
