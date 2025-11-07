@@ -36,4 +36,7 @@ export * from "./PropertyForm/PropertyRows"
 export * from "./PropertyForm/StringEditor"
 export * from "./PropertyForm/EditorProps"
 
+// Export custom elements registration
+// export * from './custom-elements'
+
 import './input.css'
