@@ -1,5 +1,5 @@
 //@ts-ignore
-import { $, $$, defaults, type JSX, isObservable, customElement, type ElementAttributes, type Observable, type CustomElementChildren, type StyleEncapsulationProps, useEffect } from "woby"
+import { $, $$, defaults, type JSX, isObservable, customElement, type ElementAttributes, type Observable, type CustomElementChildren, type StyleEncapsulationProps, useEffect, HtmlBoolean, ObservableMaybe } from "woby"
 import '@woby/chk'
 import './input.css'
 
@@ -129,47 +129,48 @@ const def = () => ({
     buttonFunction: $("button"),
     children: $("Button"),
     checked: $(false),
-    disabled: $(false) as Observable<boolean>,
+    // disabled: $(false) as Observable<boolean>,
+    disabled: $(false, HtmlBoolean) as ObservableMaybe<boolean> | undefined,
     class: $(""),
     onClick: undefined,
 })
 
 const Button = defaults(def, (props) => {
-    const { children, class: cls, buttonType, buttonFunction, checked = $(false), disabled, onClick, ...otherProps } = props
-    
+    const { children, class: className, buttonType, buttonFunction, checked = $(false), disabled, onClick, ...otherProps } = props
+
     // Convert disabled to boolean if it's a string (from HTML attributes)
-    const isDisabled = () => {
-        const disabledValue = $$(disabled)
-        if (typeof disabledValue === 'string') {
-            return disabledValue === 'true' || disabledValue === ''
-        }
-        return Boolean(disabledValue)
-    }
-    
+    // const isDisabled = () => {
+    //     const disabledValue = $$(disabled)
+    //     if (typeof disabledValue === 'string') {
+    //         return disabledValue === 'true' || disabledValue === ''
+    //     }
+    //     return Boolean(disabledValue)
+    // }
+
     // Create reactive displayText observable with proper type
     const displayText = $<string>('')
-    
+
     // Handle both slot elements (HTML custom elements) and regular children (TSX)
-    
+
     useEffect(() => {
         const childValue = $$(children)
-        
+
         if (childValue instanceof HTMLSlotElement) {
             // For HTML custom elements: extract text from slot
             const slot = childValue as HTMLSlotElement
-            
+
             const updateText = () => {
                 const assignedNodes = slot.assignedNodes()
                 const textContent = assignedNodes.map(node => node.textContent).join('')
                 displayText(textContent)
             }
-            
+
             // Listen for slot changes
             slot.addEventListener('slotchange', updateText)
-            
+
             // Get initial content
             updateText()
-            
+
             // Cleanup
             return () => slot.removeEventListener('slotchange', updateText)
         } else {
@@ -177,51 +178,53 @@ const Button = defaults(def, (props) => {
             displayText(String(childValue || ''))
         }
     })
-    
+
     return (
-        <div>
-            {/* <p style={"margin-bottom: 10px; color: black;"}>Button Type: <span style={"font-weight: bold; color: blue;"}>{buttonType}</span></p> */}
-            {/* <p style={"margin-bottom: 10px; color: black;"}>Button Function: <span style={"font-weight: bold; color: blue;"}>{buttonFunction}</span></p> */}
-            {/* <p style={"margin-bottom: 10px; color: black;"}>Class: <span style={"font-weight: bold; color: blue;"}>{cls}</span></p> */}
-            {/* <p style={"margin-bottom: 10px; color: black;"}>Display Text: <span style={"font-weight: bold; color: blue;"}>{() => $$(displayText)}</span></p> */}
-            {/* <p style={"margin-bottom: 10px; color: black;"}>Disabled: <span style={"font-weight: bold; color: blue;"}>{() => String(isDisabled())}</span></p> */}
-            <button
-                type={() => $$(buttonFunction) as "button" | "submit" | "reset"}
-                onClick={(e) => { 
-                    // Call the provided onClick handler if it exists
-                    if (onClick) {
-                        onClick(e)
-                    }
-                    
-                    // Handle the checked state toggle
-                    e.stopImmediatePropagation()
-                    if (isObservable(checked)) {
-                        checked(!$$(checked))
-                    }
-                }}
-                disabled={isDisabled}
-                class={() => [variant[$$(buttonType)], $$(cls)].join(' ')}
-                // style={() => {
-                //     const baseStyle = variantStyles[$$(buttonType)]
-                //     if (isDisabled()) {
-                //         // Disabled button styles
-                //         return {
-                //             ...baseStyle,
-                //             color: 'rgba(0, 0, 0, 0.26)',
-                //             backgroundColor: 'rgba(0, 0, 0, 0.12)',
-                //             boxShadow: 'none',
-                //             cursor: 'default',
-                //             pointerEvents: 'none',
-                //         }
-                //     }
-                //     return baseStyle
-                // }}
-                // class={() => [$$(cls)].join(' ')}
-                {...otherProps}
-            >
-                {children}
-            </button>
-        </div>
+        <button
+            type={() => $$(buttonFunction) as "button" | "submit" | "reset"}
+            onClick={(e) => {
+                // Call the provided onClick handler if it exists
+                if (onClick) {
+                    onClick(e)
+                }
+
+                // Handle the checked state toggle
+                e.stopImmediatePropagation()
+                if (isObservable(checked)) {
+                    checked(!$$(checked))
+                }
+            }}
+            disabled={disabled}
+            class={() => [variant[$$(buttonType)], $$(className)].join(' ')}
+            // style={() => {
+            //     const baseStyle = variantStyles[$$(buttonType)]
+            //     if (isDisabled()) {
+            //         // Disabled button styles
+            //         return {
+            //             ...baseStyle,
+            //             color: 'rgba(0, 0, 0, 0.26)',
+            //             backgroundColor: 'rgba(0, 0, 0, 0.12)',
+            //             boxShadow: 'none',
+            //             cursor: 'default',
+            //             pointerEvents: 'none',
+            //         }
+            //     }
+            //     return baseStyle
+            // }}
+            // class={() => [$$(cls)].join(' ')}
+            {...otherProps}
+        >
+            {children}
+        </button>
+        // <pre class="border border-black-500 rounded-[4px] p-3 m-2">
+        //     <p style={"margin-bottom: 10px; color: black;"}>Button Type: <span style={"font-weight: bold; color: blue;"}>{buttonType}</span></p>
+        //     <p style={"margin-bottom: 10px; color: black;"}>Button Function: <span style={"font-weight: bold; color: blue;"}>{buttonFunction}</span></p>
+        //     <p style={"margin-bottom: 10px; color: black;"}>Class: <span style={"font-weight: bold; color: blue;"}>{className}</span></p>
+        //     <p style={"margin-bottom: 10px; color: black;"}>Display Text: <span style={"font-weight: bold; color: blue;"}>{() => $$(displayText)}</span></p>
+        //     <p style={"margin-bottom: 10px; color: black;"}>Disabled: <span style={"font-weight: bold; color: blue;"}>{String(disabled)}</span></p>
+        // </pre>
+
+
     )
 
     // // TESTING: Uncomment below to test if Tailwind classes work in Shadow DOM
@@ -251,7 +254,7 @@ const Button = defaults(def, (props) => {
     //         </button>
     //     </div>
     // )
-    
+
 }) as typeof Button & StyleEncapsulationProps
 
 
@@ -273,22 +276,22 @@ export default Button
 
 // #region Original Button Source Code
 // const variant = {
-//     text: `inline-flex items-center justify-center relative box-border bg-transparent cursor-pointer select-none align-middle no-underline 
-//             font-medium text-sm leading-[1.75] tracking-[0.02857em] uppercase rounded text-[#1976d2] 
+//     text: `inline-flex items-center justify-center relative box-border bg-transparent cursor-pointer select-none align-middle no-underline
+//             font-medium text-sm leading-[1.75] tracking-[0.02857em] uppercase rounded text-[#1976d2]
 //             rounded-none border-0 outline-0 font-sans
 //             [transition:background-color_250ms_cubic-bezier(0.4,0,0.2,1)0ms,box-shadow_250ms_cubic-bezier(0.4,0,0.2,1)0ms,border-color_250ms_cubic-bezier(0.4,0,0.2,1)0ms,color_250ms_cubic-bezier(0.4,0,0.2,1)0ms]
 //             hover:no-underline hover:bg-[rgba(25,118,210,0.04)]
 //             disabled:text-[rgba(0,0,0,0.26)] disabled:pointer-events-none disabled:cursor-default`,
-//     contained: `inline-flex items-center justify-center relative box-border cursor-pointer select-none align-middle no-underline 
-//             font-medium text-sm leading-[1.75] tracking-[0.02857em] uppercase rounded text-white bg-[#1976d2] 
-//             shadow-[0px_3px_1px_-2px_rgba(0,0,0,0.2),0px_2px_2px_0px_rgba(0,0,0,0.14),0px_1px_5px_0px_rgba(0,0,0,0.12)] 
+//     contained: `inline-flex items-center justify-center relative box-border cursor-pointer select-none align-middle no-underline
+//             font-medium text-sm leading-[1.75] tracking-[0.02857em] uppercase rounded text-white bg-[#1976d2]
+//             shadow-[0px_3px_1px_-2px_rgba(0,0,0,0.2),0px_2px_2px_0px_rgba(0,0,0,0.14),0px_1px_5px_0px_rgba(0,0,0,0.12)]
 //             rounded-none border-0 outline-0 font-sans
 //             [transition:background-color_250ms_cubic-bezier(0.4,0,0.2,1)0ms,box-shadow_250ms_cubic-bezier(0.4,0,0.2,1)0ms,border-color_250ms_cubic-bezier(0.4,0,0.2,1)0ms,color_250ms_cubic-bezier(0.4,0,0.2,1)0ms]
 //             hover:no-underline hover:bg-[#1565c0] hover:shadow-[0px_2px_4px_-1px_rgba(0,0,0,0.2),0px_4px_5px_0px_rgba(0,0,0,0.14),0px_1px_10px_0px_rgba(0,0,0,0.12)]
 //             active:shadow-[0px_5px_5px_-3px_rgba(0,0,0,0.2),0px_8px_10px_1px_rgba(0,0,0,0.14),0px_3px_14px_2px_rgba(0,0,0,0.12)]
 //             disabled:text-[rgba(0,0,0,0.26)] disabled:shadow-none disabled:bg-[rgba(0,0,0,0.12)] disabled:pointer-events-none disabled:cursor-default`,
-//     outlined: `inline-flex items-center justify-center relative box-border bg-transparent cursor-pointer select-none align-middle no-underline font-medium 
-//             text-sm leading-[1.75] tracking-[0.02857em] uppercase rounded border text-[#1976d2] rounded-none 
+//     outlined: `inline-flex items-center justify-center relative box-border bg-transparent cursor-pointer select-none align-middle no-underline font-medium
+//             text-sm leading-[1.75] tracking-[0.02857em] uppercase rounded border text-[#1976d2] rounded-none
 //             border-solid border-[rgba(25,118,210,0.5)] font-sans
 //             [transition:background-color_250ms_cubic-bezier(0.4,0,0.2,1)0ms,box-shadow_250ms_cubic-bezier(0.4,0,0.2,1)0ms,border-color_250ms_cubic-bezier(0.4,0,0.2,1)0ms,color_250ms_cubic-bezier(0.4,0,0.2,1)0ms]
 //             hover:no-underline hover:bg-[rgba(25,118,210,0.04)] hover:border hover:border-solid hover:border-[#1976d2]

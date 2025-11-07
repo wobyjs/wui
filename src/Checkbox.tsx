@@ -1,4 +1,4 @@
-import { $, $$, defaults, type JSX, customElement, type ElementAttributes, type ObservableMaybe, useEffect, StyleEncapsulationProps } from "woby"
+import { $, $$, defaults, type JSX, customElement, type ElementAttributes, type ObservableMaybe, useEffect, StyleEncapsulationProps, HtmlBoolean } from "woby"
 import "@woby/chk"
 import "./input.css"
 
@@ -14,8 +14,10 @@ const def = () => ({
 	children: $(null as JSX.Child),
 	labelPosition: $("left" as LabelPosition),
 	class: $(""),
-	checked: $(false as boolean),
-	disabled: $(false as boolean),
+	// checked: $(false as boolean),
+	// disabled: $(false as boolean),
+	checked: $(false, HtmlBoolean) as ObservableMaybe<boolean> | undefined,
+	disabled: $(false, HtmlBoolean) as ObservableMaybe<boolean> | undefined,
 	id: $(`checkbox-${Math.random().toString(36).substr(2, 9)}`),
 })
 
@@ -23,13 +25,13 @@ const Checkbox = defaults(def, (props) => {
 	const { children, labelPosition, class: className, checked, disabled, id, ...otherProps } = props
 
 	// Convert disabled to boolean if it's a string (from HTML attributes)
-	const isDisabled = () => {
-		const disabledValue = $$(disabled)
-		if (typeof disabledValue === 'string') {
-			return disabledValue === 'true' || disabledValue === ''
-		}
-		return Boolean(disabledValue)
-	}
+	// const isDisabled = () => {
+	// 	const disabledValue = $$(disabled)
+	// 	if (typeof disabledValue === 'string') {
+	// 		return disabledValue === 'true' || disabledValue === ''
+	// 	}
+	// 	return Boolean(disabledValue)
+	// }
 
 	const before = () =>
 		$$(labelPosition) === "left" || $$(labelPosition) === "top" ?
@@ -45,16 +47,16 @@ const Checkbox = defaults(def, (props) => {
 		<div class={() => [(className)].join(" ")}>
 			{before}
 			{line}
-			<input id={id} type="checkbox" checked={checked} disabled={isDisabled} {...otherProps} />
+			<input id={id} type="checkbox" checked={checked} disabled={disabled} {...otherProps} />
 			{line}
 			{after}
 
-			<pre class="border border-black-500 p-4 mt-2">
+			{/* <pre class="border border-black-500 p-4 mt-2">
 				<p class="underline mb-2">Check Box Props</p>
 				<p>Id: {id}</p>
-				<p>Checked: {() => checked().toString()}</p>
-				<p>Disabled: {() => disabled().toString()}</p>
-			</pre>
+				<p>Checked: {() => String(checked)}</p>
+				<p>Disabled: {() => String(disabled)}</p>
+			</pre> */}
 		</div>
 	)
 }) as typeof Checkbox & StyleEncapsulationProps

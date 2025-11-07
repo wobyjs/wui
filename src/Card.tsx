@@ -1,5 +1,5 @@
 
-import { $, $$, defaults, type JSX, customElement, type ElementAttributes, type ObservableMaybe, useEffect, StyleEncapsulationProps } from "woby"
+import { $, $$, defaults, type JSX, customElement, type ElementAttributes, type ObservableMaybe, useEffect, StyleEncapsulationProps, HtmlBoolean } from "woby"
 import "@woby/chk"
 import "./input.css"
 
@@ -44,7 +44,7 @@ type CardContentProps = JSX.HTMLAttributes<HTMLDivElement> & {
     /** Padding utility (default 'p-4') */
     padding?: ObservableMaybe<JSX.Class>
 }
-
+/* ========= CardAction ========= */
 type CardActionsProps = JSX.HTMLAttributes<HTMLDivElement> & {
     class?: ObservableMaybe<JSX.Class>
     children?: ObservableMaybe<JSX.Child>
@@ -59,7 +59,8 @@ const defCard = () => ({
     children: $(null as JSX.Child),
     variant: $("elevated" as Variant),
     elevation: $(1 as Elevation, { type: 'number' } as const),
-    interactive: $(false, { type: 'boolean' } as const),
+    // interactive: $(false, { type: 'boolean' } as const),
+    interactive: $(false, HtmlBoolean) as ObservableMaybe<boolean> | undefined,
 })
 
 const defCardMedia = () => ({
@@ -133,7 +134,7 @@ const Card = defaults(defCard, (props) => {
                 ? "!bg-gray-50 " + elevationCls(elevation() as Elevation) : elevationCls(elevation() as Elevation)
 
     const interactiveCls = () =>
-        interactive() ? "cursor-pointer hover:shadow-[rgba(0,0,0,0.2)_0px_4px_5px_-2px,rgba(0,0,0,0.14)_0px_7px_10px_1px,rgba(0,0,0,0.12)_0px_2px_16px_1px]" : ""
+        interactive == true ? "cursor-pointer hover:shadow-[rgba(0,0,0,0.2)_0px_4px_5px_-2px,rgba(0,0,0,0.14)_0px_7px_10px_1px,rgba(0,0,0,0.12)_0px_2px_16px_1px]" : ""
     // interactive() ? "cursor-pointer hover:-translate-y-1 hover:shadow-[rgba(0,0,0,0.2)_0px_8px_10px_-5px,rgba(0,0,0,0.14)_0px_16px_24px_2px,rgba(0,0,0,0.12)_0px_6px_30px_5px]" : ""
     // interactive() ? "cursor-pointer hover:-translate-y-2 hover:shadow-[0_25px_50px_-12px_rgb(0,0,0,0.4)]" : ""
 
@@ -148,14 +149,15 @@ const Card = defaults(defCard, (props) => {
             <pre class="whitespace-pre-wrap justify m-2 p-2 border border-black overflow-auto">
                 Variant: {() => variant()}<br />
                 Elevation: {() => elevation()}<br />
-                Interactive: {() => interactive().toString()}
+                Interactive: {() => String(interactive)} <br />
+                Interactive Cls: {interactiveCls()}
             </pre>
             <p>Compile Class</p>
             <pre class="whitespace-pre-wrap justify m-2 p-2 border border-black overflow-auto">
                 {() => compileClass()}
             </pre> */}
             {children}
-        </div>
+        </div >
     )
 }) as typeof Card
 
