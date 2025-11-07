@@ -5,7 +5,7 @@
         "allowUnreachableCode": false,
         "allowUnusedLabels": false,
         "alwaysStrict": true,
-        "declaration": true,
+        "declaration": true,    // true to false
         "declarationDir": "./dist/types",
         "disableSizeLimit": true,
         "esModuleInterop": false,
@@ -22,7 +22,7 @@
             "WebWorker"
         ],
         "module": "esnext",
-        "moduleResolution": "node",
+        "moduleResolution": "node",     // node to bundler
         "newLine": "lf",
         "noEmitOnError": false,
         "noImplicitThis": true,
@@ -51,6 +51,17 @@
         // "tsBuildInfoFile": "./dist/tsconfig.tsbuildinfo",
         // "composite": true,
     },
+    // "exclude": [
+    //     "node_modules",
+    //     // HIGHLIGHT: exclude both .ts and .mts Vite configs
+    //     "vite.config.ts",
+    //     "vite.config.mts",
+    //     "dist*",
+    //     "index.test.ts",
+    //     "test",
+    //     "**/*.test.ts",
+    //     "**/*.test.tsx"
+    // ]
     "exclude": [
         "node_modules",
         "vite.config.ts",

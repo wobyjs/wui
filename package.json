@@ -20,6 +20,7 @@
         "declaration:watch": "tsc --build --force --declaration --emitDeclarationOnly --declarationMap  --verbose --watch",
         "watch": "run-p build:watch",
         "build": "run-s build:vite declaration",
+        "pretest": "cd ../chk && pnpm build",
         "build:web": "vite build --config=vite.config.web.mts --mode production",
         "web": "vite preview --config=vite.config.web.mts --host",
         "dev:only": "vite --config=vite.config.web.mts --force --mode dev --host",
@@ -28,7 +29,9 @@
         "build:watch": "vite build --watch",
         "preview": "vite preview --config=vite.config.web.mts  --host",
         "docs:generate": "node scripts/generate-docs.js",
-        "docs:build": "echo \"Building documentation site\""
+        "docs:build": "echo \"Building documentation site\"",
+        "test": "vite --config=vite.config.web.mts --host",
+        "test:run": "echo \"Running tests\""
     },
     "keywords": [
         "tooltip",
@@ -39,17 +42,20 @@
     ],
     "license": "MIT",
     "peerDependencies": {
-        "nanoid": "^3.3.7",
-        "@woby/use": "workspace:../use",
-        "woby": "workspace:../woby",
         "@woby/modal": "workspace:../modal",
-        "@woby/styled": "workspace:../styled"
+        "@woby/styled": "workspace:../styled",
+        "@woby/use": "workspace:../use",
+        "nanoid": "^3.3.7",
+        "woby": "workspace:../woby"
     },
     "devDependencies": {
-        "tailwindcss": "^4.0.17",
         "@tailwindcss/vite": "^4.0.6",
+        "@types/node": "^24.9.1",
+        "tailwindcss": "^4.0.17",
         "tailwindcss-elevation": "^2.0.0",
-        "vite": "6.1.0"
+        "vite": "6.1.0",
+        "vite-plugin-clean": "^1.0.0",
+        "vite-plugin-snapshot": "workspace:../../vite-plugin-snapshot"
     },
     "author": "Chi Chong <wongchichong@gmail.com>",
     "homepage": "https://github.com/wobyjs/power-tooltip",
@@ -58,6 +64,8 @@
         "url": "git@github.com:wongchichong/power-tooltip.git"
     },
     "dependencies": {
+        "@woby/chk": "workspace:../chk",
+        "@woby/vite-plugin-test": "workspace:../vite-plugin-test",
         "typescript": "5.7.3"
     }
 }

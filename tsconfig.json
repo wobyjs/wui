@@ -1,63 +1,85 @@
 {
-    "compilerOptions": {
-        "allowJs": false,
-        "allowSyntheticDefaultImports": true,
-        "allowUnreachableCode": false,
-        "allowUnusedLabels": false,
-        "alwaysStrict": true,
-        "declaration": true,
-        "declarationDir": "./dist/types",
-        "disableSizeLimit": true,
-        "esModuleInterop": false,
-        "forceConsistentCasingInFileNames": true,
-        // "importsNotUsedAsValues": "error",
-        "inlineSourceMap": false,
-        "inlineSources": false,
-        // "isolatedModules": true,
-        "jsx": "react-jsx",
-        "jsxImportSource": "woby",
-        "lib": [
-            "dom",
-            "esnext",
-            "WebWorker"
-        ],
-        "module": "esnext",
-        "moduleResolution": "bundler",
-        "newLine": "lf",
-        "noEmitOnError": false,
-        "noImplicitThis": true,
-        "noPropertyAccessFromIndexSignature": false,
-        "noUnusedLocals": false,
-        "noUnusedParameters": false,
-        "rootDir": "src",
-        "outDir": "dist",
-        "pretty": true,
-        "skipDefaultLibCheck": true,
-        "skipLibCheck": true,
-        "sourceMap": false,
-        "strict": true,
-        "strictBindCallApply": true,
-        "strictFunctionTypes": true,
-        "strictNullChecks": false,
-        "target": "es2020",
-        "useDefineForClassFields": false,
-        "useUnknownInCatchVariables": true,
-        "noImplicitAny": false,
-        "noUncheckedIndexedAccess": false,
-        "baseUrl": ".",
-        "typeRoots": [
-            "types"
-        ],
-        "resolveJsonModule": true,
-        // "tsBuildInfoFile": "./dist/tsconfig.tsbuildinfo",
-        // "composite": true,
-    },
-    "exclude": [
-        "node_modules",
-        "tailwind.*.*",
-        "vite.*.*ts",
-        "dist*",
-        "docs",
-        "index.test.ts"
-    ]
+  "compilerOptions": {
+    "allowJs": false,
+    "allowSyntheticDefaultImports": true,
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
+    "alwaysStrict": true,
+    "declaration": true,
+    "declarationMap": false,
+    "declarationDir": "./dist/types",
+    "disableSizeLimit": true,
+    "esModuleInterop": false,
+    "forceConsistentCasingInFileNames": true,
+    // "importsNotUsedAsValues": "error",
+    "inlineSourceMap": false,
+    "inlineSources": false,
+    // "isolatedModules": true,
+    "jsx": "react-jsx",
+    "jsxImportSource": "woby",
+    "lib": [
+      "dom",
+      "esnext",
+      "WebWorker"
+    ],
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "newLine": "lf",
+    "noEmitOnError": false,
+    "noImplicitThis": true,
+    "noPropertyAccessFromIndexSignature": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    // "rootDir": "src",
+    "outDir": "dist",
+    "pretty": true,
+    "skipDefaultLibCheck": true,
+    "skipLibCheck": true,
+    "sourceMap": false,
+    "strict": true,
+    "strictBindCallApply": true,
+    "strictFunctionTypes": true,
+    "strictNullChecks": false,
+    "target": "es2020",
+    "useDefineForClassFields": false,
+    "useUnknownInCatchVariables": true,
+    "noImplicitAny": false,
+    "noUncheckedIndexedAccess": false,
+    "baseUrl": ".",
+    "typeRoots": [
+      "types"
+    ],
+    "resolveJsonModule": true
+    // "tsBuildInfoFile": "./dist/tsconfig.tsbuildinfo",
+    // "composite": true,
+  },
+  // // HIGHLIGHT: exclude tests and non-sources
+  // "exclude": [
+  //     "node_modules",
+  //     "tailwind.*.*",
+  //     "vite.*.*ts",
+  //     "dist*",
+  //     "docs",
+  //     "**/*.test.ts",
+  //     "**/*.test.tsx"
+  // ],
+  "exclude": [
+    "node_modules",
+    "tailwind.*.*",
+    "vite.*.*ts",
+    "dist*",
+    "docs",
+    "test/**/*",
+    "index.test.ts"
+  ],
+  // // HIGHLIGHT: only build source files (and any ambient types)
+  // "include": [
+  //     "src/**/*",
+  //     "types/**/*.d.ts",
+  //     "index.test.ts"
+  // ]
+  "include": [
+    "src/**/*",
+    "index.test.ts"
+  ]
 }
