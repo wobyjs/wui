@@ -13,11 +13,11 @@ const HAvatar = () => {
 }
 
 const CustomAvatar = () => {
-    return (<Avatar class="w-6 h-6 !text-sm bg-purple-500">JL</Avatar>)
+    return (<Avatar cls="w-6 h-6 !text-sm bg-purple-500">JL</Avatar>)
 }
 
 const CustomAvatar2 = () => {
-    return (<Avatar class="w-6 h-6 !text-sm bg-purple-500 !text-green-400 !font-bold">R</Avatar>)
+    return (<Avatar cls="w-6 h-6 !text-sm bg-purple-500 !text-green-400 !font-bold">R</Avatar>)
 }
 
 export { DefaultAvatar, SampleAvatar, HAvatar, CustomAvatar, CustomAvatar2 };

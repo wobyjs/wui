@@ -5,7 +5,7 @@ import { Button } from '../src/Button'
 
 const TextBtn = () => { return (<Button buttonType="text">Text Button</Button>) }
 
-const ContainedBtn = () => { return (<Button buttonType="contained" class="!px-2 !py-1 !rounded-[4px]">Contained Button</Button>) }
+const ContainedBtn = () => { return (<Button buttonType="contained" buttonClass="!px-2 !py-1 !rounded-[4px]">Contained Button</Button>) }
 
 const OutlinedBtn = () => { return (<Button buttonType="outlined">Outlined Button</Button>) }
 
@@ -13,7 +13,11 @@ const IconBtn = () => { return (<Button buttonType="icon">ℹ️</Button>) }
 
 const DisabledBtn = () => { return (<Button disabled>Disabled Button</Button>) }
 
-const DisabledBtn2 = () => { return (<Button buttonType="text" disabled>Text Disabled Button</Button>) }
+const CustomBtn = () => {
+    return (
+        <Button buttonType="contained" cls="m-2 p-2 !rounded-[5px] !text-red-500 !bg-green-200">Custom Button</Button>
+    )
+}
 
 const ClickMeBtn = () => {
     return (
@@ -29,4 +33,12 @@ const ClickMeBtn = () => {
 }
 
 
-export { TextBtn, ContainedBtn, OutlinedBtn, IconBtn, DisabledBtn, DisabledBtn2, ClickMeBtn }
+export {
+    TextBtn,
+    ContainedBtn,
+    OutlinedBtn,
+    IconBtn,
+    DisabledBtn,
+    CustomBtn,
+    // ClickMeBtn
+}

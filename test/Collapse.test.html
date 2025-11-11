@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Collapse Component Test</title>
+    <link href="/node_modules/@woby/chk/dist/index.css" rel="stylesheet">
+    <script type="module" src="../src/Collapse.tsx"></script>
+</head>
+
+<body>
+    <link href="../dist/wui.css" rel="stylesheet">
+    <h2 class="text-[1.2em] pl-4 font-bold">Collapse Component Test Suite</h2>
+
+    <!-- ============================================ -->
+    <!-- BASIC TESTS -->
+    <!-- ============================================ -->
+    <h3 class="text-[1.1em] pl-4 mt-4 font-semibold">Basic Tests</h3>
+
+    <woby-chk name="Default Collapse">
+        <wui-collapse snapshot-name="Default-Collapse-Html">
+            <div class="p-4 bg-gray-100">
+                <p>This is the content inside the collapse component.</p>
+                <p>It should be visible by default.</p>
+            </div>
+        </wui-collapse>
+    </woby-chk>
+
+    <!-- ============================================ -->
+    <!-- OPEN STATE TESTS -->
+    <!-- ============================================ -->
+    <h3 class="text-[1.1em] pl-4 mt-4 font-semibold">Open State Tests</h3>
+
+    <woby-chk name="Open Collapse">
+        <wui-collapse snapshot-name="Open-Collapse-Html" open="true">
+            <div class="p-4 bg-blue-100">
+                <p>This collapse is explicitly set to open.</p>
+                <p>The content should be visible.</p>
+            </div>
+        </wui-collapse>
+    </woby-chk>
+
+    <woby-chk name="Closed Collapse">
+        <wui-collapse snapshot-name="Closed-Collapse-Html" open="false">
+            <div class="p-4 bg-red-100">
+                <p>This collapse is explicitly set to closed.</p>
+                <p>The content should be hidden.</p>
+            </div>
+        </wui-collapse>
+    </woby-chk>
+
+    <!-- ============================================ -->
+    <!-- BACKGROUND TESTS -->
+    <!-- ============================================ -->
+    <h3 class="text-[1.1em] pl-4 mt-4 font-semibold">Background Tests</h3>
+
+    <woby-chk name="Collapse with Background">
+        <wui-collapse snapshot-name="Collapse-With-Background-Html" background="true">
+            <div class="p-4">
+                <p>This collapse has a background (default behavior).</p>
+                <p>You should see a gray background.</p>
+            </div>
+        </wui-collapse>
+    </woby-chk>
+
+    <woby-chk name="Collapse without Background">
+        <wui-collapse snapshot-name="Collapse-Without-Background-Html" background="false">
+            <div class="p-4">
+                <p>This collapse has no background.</p>
+                <p>There should be no gray background.</p>
+            </div>
+        </wui-collapse>
+    </woby-chk>
+
+    <!-- ============================================ -->
+    <!-- COMBINED TESTS -->
+    <!-- ============================================ -->
+    <h3 class="text-[1.1em] pl-4 mt-4 font-semibold">Combined Tests</h3>
+
+    <woby-chk name="Open Collapse without Background">
+        <wui-collapse snapshot-name="Open-Collapse-Without-Background-Html" open="true" background="false">
+            <div class="p-4 border border-gray-300 rounded-[4px]">
+                <p>This collapse is open and has no background.</p>
+                <p>Content should be visible with just a border.</p>
+            </div>
+        </wui-collapse>
+    </woby-chk>
+
+    <woby-chk name="Closed Collapse with Background">
+        <wui-collapse snapshot-name="Closed-Collapse-With-Background-Html" open="false" background="true">
+            <div class="p-4">
+                <p>This collapse is closed but has a background.</p>
+                <p>Content should be hidden but container may still exist.</p>
+            </div>
+        </wui-collapse>
+    </woby-chk>
+
+    <!-- ============================================ -->
+    <!-- STYLING TESTS -->
+    <!-- ============================================ -->
+    <h3 class="text-[1.1em] pl-4 mt-4 font-semibold">Styling Tests</h3>
+
+    <woby-chk name="Custom Styled Collapse">
+        <wui-collapse snapshot-name="Custom-Styled-Collapse-Html" cls="!bg-yellow-100 !border-2 !border-purple-500"
+            open="true">
+            <div class="p-4">
+                <p>This collapse has custom styling.</p>
+                <p>It should have a yellow background and purple border.</p>
+            </div>
+        </wui-collapse>
+    </woby-chk>
+
+    <!-- ============================================ -->
+    <!-- CONTENT TESTS -->
+    <!-- ============================================ -->
+    <h3 class="text-[1.1em] pl-4 mt-4 font-semibold">Content Tests</h3>
+
+    <woby-chk name="Collapse with Complex Content">
+        <wui-collapse snapshot-name="Collapse-With-Complex-Content-Html" open="true">
+            <div class="p-4 bg-green-100">
+                <h4 class="font-bold">Complex Content Header</h4>
+                <p>This collapse contains more complex content:</p>
+                <ul class="list-disc pl-5">
+                    <li>Unordered list item 1</li>
+                    <li>Unordered list item 2</li>
+                </ul>
+                <p class="mt-2">And some more text content to test height calculations.</p>
+            </div>
+        </wui-collapse>
+    </woby-chk>
+
+</body>
+
+</html>

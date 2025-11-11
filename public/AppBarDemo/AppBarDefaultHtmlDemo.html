@@ -6,6 +6,7 @@
     <title>AppBar Default (HTML)</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" href="../../src/input.css" />
+    <script type="module" src="../../src/Appbar.tsx"></script>
     <style>
         html,
         body {
@@ -20,38 +21,48 @@
 </head>
 
 <body>
-    <div>
-        <div>
-            <wui-appbar class="px-4 mt-2">
-                <div class="flex items-center h-12 pl-4">Default Appbar</div>
-            </wui-appbar>
-            <div class="p-4 text-sm text-gray-500 space-y-4 pt-12">
-                <p>This demo shows the <span class="font-bold">Default Appbar</span> rendered using the <code
-                        class="font-bold">&lt;wui-appbar&gt;</code> custom element.</p>
-                <p>Scroll down…</p>
-                <div class="h-[600px] bg-gray-100 rounded border p-4">
-                    <div class="relative rounded bg-gray-900 text-gray-100 text-xs p-4 overflow-x-auto">
-                        <button id="copy-btn"
-                            class="absolute top-2 right-2 px-2 py-1 rounded bg-gray-700 hover:bg-gray-600 active:bg-gray-500 transition text-white"
-                            type="button" aria-live="polite">
-                            Copy
-                        </button>
+    <!-- 
+        FIX: Add padding-top to the container that holds both the app bar and the content.
+        The app bar's height is 4rem (h-12 + py-2), which corresponds to Tailwind's pt-16.
+        The fixed-position app bar will ignore this padding and stay at the top,
+        while the content below it will be pushed down correctly.
+    -->
+    <div class="pt-16">
+        <!-- The mt-2 was removed as margin has no effect on a fixed element at top:0 -->
+        <wui-appbar cls="px-4 mt-2">
+            <div class="flex items-center h-12 pl-4">Default Appbar</div>
+        </wui-appbar>
 
-                        <pre class="m-0 whitespace-pre overflow-x-auto">
-<code id="code-html" class="language-html">&lt;wui-appbar class="px-4 mt-2"&gt;
-	&lt;div class="flex items-center h-12 pl-4"&gt;Default Appbar&lt;/div&gt;
-&lt;/wui-appbar&gt;</code>
+        <!-- FIX: The incorrect pt-12 is removed from the content div. -->
+        <div class="p-4 text-sm text-gray-500 space-y-4">
+            <p>This demo shows the <span class="font-bold">Default Appbar</span> rendered using the <code
+                    class="font-bold">&lt;wui-appbar&gt;</code> custom element.</p>
+            <p>Scroll down…</p>
+            <div class="h-[600px] bg-gray-100 rounded border p-4">
+                <div class="relative rounded bg-gray-900 text-gray-100 text-xs p-4 overflow-x-auto">
+                    <button id="copy-btn"
+                        class="absolute top-2 right-2 px-2 py-1 rounded bg-gray-700 hover-bg-gray-600 active-bg-gray-500 transition text-white"
+                        type="button" aria-live="polite">
+                        Copy
+                    </button>
+
+                    <pre class="m-0 whitespace-pre overflow-x-auto">
+<!-- FIX: The code example is updated to show the correct implementation pattern. -->
+<code id="code-html" class="language-html">&lt;!-- The container needs top padding equal to the app bar's height --&gt;
+&lt;div class="pt-16"&gt;
+    &lt;wui-appbar class="px-4"&gt;
+        &lt;div class="flex items-center h-12 pl-4"&gt;Default Appbar&lt;/div&gt;
+    &lt;/wui-appbar&gt;
+    
+    &lt;!-- Page content follows here --&gt;
+    &lt;div&gt;...&lt;/div&gt;
+&lt;/div&gt;</code>
                         </pre>
-                    </div>
                 </div>
-                <!-- <div class="h-[600px] bg-gray-100 rounded border"></div> -->
             </div>
         </div>
     </div>
     <script type="module">
-        // registers <wui-appbar> on this page
-        import '../../src/Appbar.tsx'
-
         // Copy code handler (preserves tabs/newlines exactly)
         const btn = document.getElementById('copy-btn')
         const code = document.getElementById('code-html')

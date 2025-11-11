@@ -17,7 +17,7 @@ const App2 = () => (
 
 const App = () => (
     <div>
-        <Appbar position="sticky" class="px-4 mt-2">
+        <Appbar position="sticky" cls="px-4 mt-2">
             <div class="flex items-center h-12 pl-4">Sticky Appbar</div>
         </Appbar>
         <div class="p-4 text-sm text-gray-500 space-y-4">

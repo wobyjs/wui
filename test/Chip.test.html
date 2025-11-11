@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Chip Component Test</title>
+    <link href="/node_modules/@woby/chk/dist/index.css" rel="stylesheet">
+    <script type="module" src="../src/Chip.tsx"></script>
+    <script type="module" src="../src/Avatar.tsx"></script>
+</head>
+
+<body>
+    <link href="../dist/wui.css" rel="stylesheet">
+    <h2 class="text-[1.2em] pl-4 font-bold">Chip Component Test Suite</h2>
+
+    <!-- ============================================ -->
+    <!-- BASIC TESTS -->
+    <!-- ============================================ -->
+    <h3 class="text-[1.1em] pl-4 mt-4 font-semibold">Basic Tests</h3>
+
+    <woby-chk name="Default Chip">
+        <wui-chip snapshot-name="Default-Chip-Html">
+            Default Chip
+        </wui-chip>
+    </woby-chk>
+
+    <!-- ============================================ -->
+    <!-- VISIBILITY TESTS -->
+    <!-- ============================================ -->
+    <h3 class="text-[1.1em] pl-4 mt-4 font-semibold">Visibility Tests</h3>
+
+    <woby-chk name="Visible Chip (true)">
+        <wui-chip snapshot-name="Visible-Chip-True-Html" visible="true">
+            Visible Chip
+        </wui-chip>
+    </woby-chk>
+
+    <woby-chk name="Hidden Chip (false)">
+        <wui-chip snapshot-name="Hidden-Chip-False-Html" visible="false">
+            Hidden Chip (Should Not Appear)
+        </wui-chip>
+    </woby-chk>
+
+    <!-- ============================================ -->
+    <!-- DELETABLE TESTS -->
+    <!-- ============================================ -->
+    <h3 class="text-[1.1em] pl-4 mt-4 font-semibold">Deletable Tests</h3>
+
+    <woby-chk name="Deletable Chip">
+        <wui-chip snapshot-name="Deletable-Chip-Html" deletable="true">
+            Deletable Chip (Click X to hide)
+        </wui-chip>
+    </woby-chk>
+
+    <woby-chk name="Not Deletable Chip">
+        <wui-chip snapshot-name="Not-Deletable-Chip-Html" deletable="false">
+            Not Deletable Chip
+        </wui-chip>
+    </woby-chk>
+
+    <!-- ============================================ -->
+    <!-- COMBINED TESTS (Visible + Deletable) -->
+    <!-- ============================================ -->
+    <h3 class="text-[1.1em] pl-4 mt-4 font-semibold">Combined Tests (Visible + Deletable)</h3>
+
+    <woby-chk name="Visible Deletable Chip">
+        <wui-chip snapshot-name="Visible-Deletable-Chip-Html" visible="true" deletable="true">
+            Visible & Deletable
+        </wui-chip>
+    </woby-chk>
+
+    <woby-chk name="Hidden Deletable Chip">
+        <wui-chip snapshot-name="Hidden-Deletable-Chip-Html" visible="false" deletable="true">
+            Hidden & Deletable (Should Not Appear)
+        </wui-chip>
+    </woby-chk>
+
+    <!-- ============================================ -->
+    <!-- AVATAR TESTS -->
+    <!-- ============================================ -->
+    <h3 class="text-[1.1em] pl-4 mt-4 font-semibold">Avatar Tests</h3>
+
+    <woby-chk name="Chip with Avatar">
+        <wui-chip snapshot-name="Chip-With-Avatar-Html">
+            <wui-avatar cls="bg-blue-500 rounded-full font-bold" size="sm" variant="circular">S</wui-avatar>
+            <span class="mx-2">Chip with Avatar</span>
+            <wui-avatar cls="bg-blue-500 rounded-full font-bold" size="sm" variant="circular">E</wui-avatar>
+        </wui-chip>
+    </woby-chk>
+
+    <woby-chk name="Chip with Avatar and Delete">
+        <wui-chip snapshot-name="Chip-With-Avatar-Delete-Html" deletable="true">
+            <wui-avatar cls="bg-purple-500 rounded-full font-bold" size="sm" variant="circular">A</wui-avatar>
+            <span class="mx-2">Avatar & Delete</span>
+        </wui-chip>
+    </woby-chk>
+
+    <!-- ============================================ -->
+    <!-- STYLING TESTS -->
+    <!-- ============================================ -->
+    <h3 class="text-[1.1em] pl-4 mt-4 font-semibold">Styling Tests</h3>
+
+    <woby-chk name="Custom Class Chip">
+        <wui-chip snapshot-name="Custom-Class-Chip-Html" cls="!bg-red-100 !text-blue-800">
+            Custom Styled Chip
+        </wui-chip>
+    </woby-chk>
+
+    <woby-chk name="Colored Chips">
+        <div class="flex gap-2 flex-wrap" snapshot-name="Colored-Chips-Html">
+            <wui-chip cls="bg-green-100 text-green-800">Success</wui-chip>
+            <wui-chip cls="bg-red-100 text-red-800">Error</wui-chip>
+            <wui-chip cls="bg-yellow-100 text-yellow-800">Warning</wui-chip>
+            <wui-chip cls="bg-blue-100 text-blue-800">Info</wui-chip>
+        </div>
+    </woby-chk>
+
+    <!-- ============================================ -->
+    <!-- MULTIPLE CHIPS -->
+    <!-- ============================================ -->
+    <h3 class="text-[1.1em] pl-4 mt-4 font-semibold">Multiple Chips</h3>
+
+    <woby-chk name="Multiple Deletable Chips">
+        <div class="flex gap-2 flex-wrap" snapshot-name="Multiple-Deletable-Chips-Html">
+            <wui-chip deletable="true">Tag 1</wui-chip>
+            <wui-chip deletable="true">Tag 2</wui-chip>
+            <wui-chip deletable="true">Tag 3</wui-chip>
+            <wui-chip deletable="true" cls="!bg-green-100 !text-green-800">Success Tag</wui-chip>
+            <wui-chip deletable="true" cls="!bg-red-100 !text-red-800">Error Tag</wui-chip>
+        </div>
+    </woby-chk>
+
+</body>
+
+</html>

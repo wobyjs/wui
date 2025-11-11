@@ -21,7 +21,7 @@ const DisabledCheckedCheckBox = () => { return (<Checkbox id="disabled-checked-c
 
 const CustomClassCheckBox = () => {
     return (
-        <Checkbox id="custom-class-checkbox" labelPosition="right" class="!text-blue-500 !font-bold" onChange={(e) => console.log('Checkbox changed:', e.target.checked)}>
+        <Checkbox id="custom-class-checkbox" labelPosition="right" cls="!text-blue-500 !font-bold" onChange={(e) => console.log('Checkbox changed:', e.target.checked)}>
             Custom styled checkbox
         </Checkbox>
     )
