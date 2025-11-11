@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML Components Demo</title>
+    <!-- <script type="module" src="/src/main.ts"></script> -->
+    <script type="module" src="../src/Avatar.tsx"></script>
+    <script type="module" src="../src/Badge.tsx"></script>
+    <script type="module" src="../src/Button.tsx"></script>
+    <script type="module" src="../src/Editor/AlignButton.tsx"></script>
+    <script type="module" src="../src/Card.tsx"></script>
+    <script type="module" src="../src/Checkbox.tsx"></script>
+    <script type="module" src="../src/Chip.tsx"></script>
+    <script type="module" src="../src/Collapse.tsx"></script>
+
+    <!-- <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"> -->
+    <link rel="stylesheet" href="../dist/wui.css">
+</head>
+
+<body class="p-8">
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold mb-6">@woby/wui HTML Components Demo</h1>
+        <!-- Table Navigation -->
+        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-6 mb-8 shadow-sm">
+            <h2 class="text-xl font-bold mb-4 text-gray-800">📑 Quick Navigation</h2>
+            <div class="flex flex-wrap gap-2">
+                <a href="#appbar"
+                    class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                    AppBar
+                </a>
+                <a href="#avatar"
+                    class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                    Avatar
+                </a>
+                <a href="#badge"
+                    class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                    Badge
+                </a>
+                <a href="#button"
+                    class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                    Button
+                </a>
+                <a href="#alignbutton"
+                    class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                    AlignButton
+                </a>
+                <a href="#card"
+                    class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                    Card
+                </a>
+                <a href="#checkbox"
+                    class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                    Checkbox
+                </a>
+                <a href="#chip"
+                    class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                    Chip
+                </a>
+                <a href="#collapse"
+                    class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                    Collapse
+                </a>
+                <a href="/test.html" target="_blank"
+                    class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                    Test Runner
+                </a>
+                <a href="/html-demo.html" target="_blank"
+                    class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                    HTML Components Demo
+                </a>
+            </div>
+        </div>
+
+        <div class="space-y-4">
+            <!-- {/* Region: Appbar Examples */} -->
+            <h2 id="appbar" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Appbar Examples</h2>
+            <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
+                    <!-- {/* Default Appbar */} -->
+                    <!-- <div class="border border-gray-300 rounded-lg p-4">
+                        <h3 class="text-sm font-semibold mb-2">Default (TSX)</h3>
+                        <iframe class="w-full h-[300px] border rounded-lg shadow-sm"
+                            src="/AppBarDemo/AppBarDefaultTsxDemo.html"></iframe>
+                    </div> -->
+
+                    <div class="border border-gray-300 rounded-lg p-4">
+                        <h3 class="text-sm font-semibold mb-2">Default (HTML)</h3>
+                        <iframe class="w-full h-[300px] border rounded-lg shadow-sm"
+                            src="/AppBarDemo/AppBarDefaultHtmlDemo.html"></iframe>
+                    </div>
+
+                    <!-- {/* Fixed Appbar */} -->
+                    <!-- <div class="border border-gray-300 rounded-lg p-4">
+                        <h3 class="text-sm font-semibold mb-2">Fixed (TSX)</h3>
+                        <iframe class="w-full h-[300px] border rounded-lg shadow-sm"
+                            src="/AppBarDemo/AppBarFixedTsxDemo.html"></iframe>
+                    </div> -->
+
+                    <div class="border border-gray-300 rounded-lg p-4">
+                        <h3 class="text-sm font-semibold mb-2">Fixed (HTML)</h3>
+                        <iframe class="w-full h-[300px] border rounded-lg shadow-sm"
+                            src="/AppBarDemo/AppBarFixedHtmlDemo.html"></iframe>
+                    </div>
+
+                    <!-- {/* Sticky Appbar */} -->
+                    <!-- <div class="border border-gray-300 rounded-lg p-4">
+                        <h3 class="text-sm font-semibold mb-2">Sticky (TSX)</h3>
+                        <iframe class="w-full h-[300px] border rounded-lg shadow-sm"
+                            src="/AppBarDemo/AppBarStickyTsxDemo.html"></iframe>
+                    </div> -->
+
+                    <div class="border border-gray-300 rounded-lg p-4">
+                        <h3 class="text-sm font-semibold mb-2">Sticky (HTML)</h3>
+                        <iframe class="w-full h-[300px] border rounded-lg shadow-sm"
+                            src="/AppBarDemo/AppBarStickyHtmlDemo.html"></iframe>
+                    </div>
+
+                    <!-- {/* Static Appbar */} -->
+                    <!-- <div class="border border-gray-300 rounded-lg p-4">
+                        <h3 class="text-sm font-semibold mb-2">Static (TSX)</h3>
+                        <iframe class="w-full h-[300px] border rounded-lg shadow-sm"
+                            src="/AppBarDemo/AppBarStaticTsxDemo.html"></iframe>
+                    </div> -->
+
+                    <div class="border border-gray-300 rounded-lg p-4">
+                        <h3 class="text-sm font-semibold mb-2">Static (HTML)</h3>
+                        <iframe class="w-full h-[300px] border rounded-lg shadow-sm"
+                            src="/AppBarDemo/AppBarStaticHtmlDemo.html"></iframe>
+                    </div>
+
+                    <!-- {/* Custom Appbar */} -->
+                    <!-- <div class="border border-gray-300 rounded-lg p-4">
+                        <h3 class="text-sm font-semibold mb-2">Custom (TSX)</h3>
+                        <iframe class="w-full h-[300px] border rounded-lg shadow-sm"
+                            src="/AppBarDemo/AppBarCustomTsxDemo.html"></iframe>
+                    </div> -->
+
+                    <div class="border border-gray-300 rounded-lg p-4">
+                        <h3 class="text-sm font-semibold mb-2">Custom (HTML)</h3>
+                        <iframe class="w-full h-[300px] border rounded-lg shadow-sm"
+                            src="/AppBarDemo/AppBarCustomHtmlDemo.html"></iframe>
+                    </div>
+                </div>
+            </div>
+
+            <!-- {/* Region: Avatar Examples */} -->
+            <h2 id="avatar" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Avatar Examples</h2>
+            <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="border border-gray-300 rounded-lg p-4 flex items-center justify-center min-h-[120px]">
+                        <wui-avatar></wui-avatar>
+                    </div>
+                    <div class="border border-gray-300 rounded-lg p-4 flex items-center justify-center min-h-[120px]">
+                        <wui-avatar src="/sample-avatar.png" alt="Sample avatar"></wui-avatar>
+                    </div>
+                    <div class="border border-gray-300 rounded-lg p-4 flex items-center justify-center min-h-[120px]">
+                        <wui-avatar cls="ring-2 ring-blue-500" src="/sample-avatar.png"></wui-avatar>
+                    </div>
+                    <div class="border border-gray-300 rounded-lg p-4 flex items-center justify-center min-h-[120px]">
+                        <wui-avatar cls="bg-purple-500" size="md" variant="circular">JL</wui-avatar>
+                    </div>
+                </div>
+            </div>
+
+            <!-- {/* Region: Badge Examples */} -->
+            <h2 id="badge" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Badge Examples</h2>
+            <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                    <div
+                        class="border border-gray-300 rounded-lg p-4 flex flex-col items-center justify-center min-h-[120px]">
+                        <wui-badge>
+                            <div class="w-10 h-10 bg-gray-400 rounded-full"></div>
+                        </wui-badge>
+                    </div>
+                    <div
+                        class="border border-gray-300 rounded-lg p-4 flex flex-col items-center justify-center min-h-[120px]">
+                        <wui-badge badge-content="5" vertical="top" horizontal="right">
+                            <div class="w-10 h-10 bg-blue-500 rounded-full"></div>
+                        </wui-badge>
+                    </div>
+                    <div
+                        class="border border-gray-300 rounded-lg p-4 flex flex-col items-center justify-center min-h-[120px]">
+                        <wui-badge badge-content="!" vertical="bottom" horizontal="left" badge-class="bg-red-600">
+                            <div class="w-10 h-10 bg-gray-400 rounded-full"></div>
+                        </wui-badge>
+                    </div>
+                    <div
+                        class="border border-gray-300 rounded-lg p-4 flex flex-col items-center justify-center min-h-[120px]">
+                        <wui-badge badge-content="✓" badge-class="bg-green-600" vertical="top" horizontal="left">
+                            <div class="w-10 h-10 bg-gray-400 rounded-full"></div>
+                        </wui-badge>
+                    </div>
+                </div>
+            </div>
+
+            <!-- {/* Region: Button Examples */} -->
+            <h2 id="button" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Button Examples</h2>
+            <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                    <div
+                        class="border border-gray-300 rounded-lg p-4 flex flex-col items-center justify-center min-h-[120px]">
+                        <wui-button button-type="text">Text Button</wui-button>
+                    </div>
+                    <div
+                        class="border border-gray-300 rounded-lg p-4 flex flex-col items-center justify-center min-h-[120px]">
+                        <wui-button button-type="contained">Contained Button</wui-button>
+                    </div>
+                    <div
+                        class="border border-gray-300 rounded-lg p-4 flex flex-col items-center justify-center min-h-[120px]">
+                        <wui-button button-type="outlined">Outlined Button</wui-button>
+                    </div>
+                    <div
+                        class="border border-gray-300 rounded-lg p-4 flex flex-col items-center justify-center min-h-[120px]">
+                        <wui-button button-type="icon">🔔</wui-button>
+                    </div>
+                    <div
+                        class="border border-gray-300 rounded-lg p-4 flex flex-col items-center justify-center min-h-[120px]">
+                        <wui-button button-type="contained">Click Me</wui-button>
+                    </div>
+                    <div
+                        class="border border-gray-300 rounded-lg p-4 flex flex-col items-center justify-center min-h-[120px]">
+                        <wui-button button-type="outlined" disabled>Disabled</wui-button>
+                    </div>
+                    <div
+                        class="border border-gray-300 rounded-lg p-4 flex flex-col items-center justify-center min-h-[120px]">
+                        <wui-button button-type="contained"
+                            cls="m-2 p-2 !rounded-[5px] !text-red-500 !bg-green-200">Custom Style</wui-button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- {/* Region: AlignButton Demo */} -->
+            <h2 id="alignbutton" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">AlignButton Demo</h2>
+            <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                <EditorContext.Provider value={editorRef}>
+                    <UndoRedo>
+                        <div class="mb-4">
+                            <div class="flex gap-4 items-center my-2">
+                                <div class="border rounded-[4px] m-2 p-4">
+                                    <wui-align-button content-align="start"></wui-align-button>
+                                </div>
+                                <div class="border rounded-[4px] m-2 p-4">
+                                    <wui-align-button content-align="center"></wui-align-button>
+                                </div>
+                                <div class="border rounded-[4px] m-2 p-4">
+                                    <wui-align-button content-align="end"></wui-align-button>
+                                </div>
+                            </div>
+                            <div ref={editorRef} contentEditable
+                                class="border border-gray-300 rounded p-4 min-h-[200px] mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <p>Select this text and try the alignment buttons below!</p>
+                                <p>You can align start, center, or end.</p>
+                            </div>
+
+                        </div>
+                    </UndoRedo>
+                </EditorContext.Provider>
+            </div>
+
+            <!-- {/* Region: Card Demo */} -->
+            <h2 id="card" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Card Demo</h2>
+            <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- {/* Variant Card Example */} -->
+                    <div class="border border-gray-300 rounded-lg p-4">
+                        <h3 class="text-lg font-semibold mb-2">Variant Card Example</h3>
+                        <wui-card cls="max-w-sm m-2" variant="elevated" elevation="2" interactive="true">
+                            <wui-card-content>
+                                <h3 class="text-lg font-semibold">VariantCardExample</h3>
+                                <p class="text-sm text-gray-600">elevation=2, interactive hover shadow</p>
+                            </wui-card-content>
+                        </wui-card>
+                    </div>
+
+                    <!-- {/* Other Card Examples */} -->
+                    <div class="border border-gray-300 rounded-lg p-4">
+                        <h3 class="text-lg font-semibold mb-2">Outlined Card Example</h3>
+                        <wui-card cls="max-w-sm m-2" variant="outlined" elevation="0">
+                            <wui-card-content>
+                                <h3 class="text-lg font-semibold">Outlined Card</h3>
+                                <p class="text-sm text-gray-600">Border only, no elevation</p>
+                            </wui-card-content>
+                        </wui-card>
+                    </div>
+
+                    <!-- {/* Filled Card Example */} -->
+                    <div class="border border-gray-300 rounded-lg p-4">
+                        <h3 class="text-lg font-semibold mb-2">Filled Card Example</h3>
+                        <wui-card cls="max-w-sm m-2" variant="filled" elevation="0" interactive>
+                            <wui-card-content>
+                                <h3 class="text-lg font-semibold">Filled Card</h3>
+                                <p class="text-sm text-gray-600">Subtle filled bg + strong shadow</p>
+                            </wui-card-content>
+                        </wui-card>
+                    </div>
+
+                    <!-- {/* Actions Aligned Card Example */} -->
+                    <div class="border border-gray-300 rounded-lg p-4">
+                        <h3 class="text-lg font-semibold mb-2">Actions Aligned Card Example</h3>
+                        <wui-card cls="max-w-md m-2">
+                            <wui-card-content padding="p-6">
+                                <h3 class="text-lg font-semibold">Actions Alignment</h3>
+                                <p class="text-sm text-gray-600">Try different horizontal justifications</p>
+                            </wui-card-content>
+
+                            <wui-card-actions align="start" padding="px-4 py-2">
+                                <span class="text-xs uppercase text-gray-500">Start</span>
+                            </wui-card-actions>
+
+                            <wui-card-actions align="center" padding="px-4 py-2">
+                                <span class="text-xs uppercase text-gray-500">Center</span>
+                            </wui-card-actions>
+
+                            <wui-card-actions align="between" padding="px-4 py-2">
+                                <span class="text-xs uppercase text-gray-500">Between (left)</span>
+                                <span class="text-xs uppercase text-gray-500">Between (right)</span>
+                            </wui-card-actions>
+
+                            <wui-card-actions align="end" padding="px-4 py-2">
+                                <span class="text-xs uppercase text-gray-500">End</span>
+                            </wui-card-actions>
+                        </wui-card>
+                    </div>
+
+                    <!-- {/* Content Padding Card Example */} -->
+                    <div class="border border-gray-300 rounded-lg p-4">
+                        <h3 class="text-lg font-semibold mb-2">Content Padding Card Example</h3>
+                        <wui-card cls="max-w-sm m-2" elevation="1" interactive>
+                            <wui-card-content padding="p-6">
+                                <h3 class="text-lg font-semibold">Custom Padding</h3>
+                                <p class="text-sm text-gray-600">Using CardContent padding="p-6"</p>
+                                <p class="text-xs text-gray-500 mt-2">Hover to see subtle elevation change.</p>
+                            </wui-card-content>
+                        </wui-card>
+                    </div>
+
+                    <!-- {/* Media Banner Card Example */} -->
+                    <div class="border border-gray-300 rounded-lg p-4">
+                        <h3 class="text-lg font-semibold mb-2">Media Banner Card Example</h3>
+                        <wui-card cls="max-w-md m-2" elevation="2">
+                            <wui-card-media src="contemplative-reptile.jpg" alt="Banner image" height="160px"
+                                position="center center" fit="cover" cls="w-full"></wui-card-media>
+                            <wui-card-content>
+                                <h3 class="text-lg font-semibold">Banner Card</h3>
+                                <p class="text-sm text-gray-600">Media header with content below.</p>
+                            </wui-card-content>
+                        </wui-card>
+                    </div>
+
+                    <!-- {/* Media Centered Card Example */} -->
+                    <div class="border border-gray-300 rounded-lg p-4">
+                        <h3 class="text-lg font-semibold mb-2">Media Centered Card Example</h3>
+                        <wui-card cls="max-w-sm m-2">
+                            <wui-card-media src="/sample-avatar.png" alt="Avatar"
+                                cls="w-24 h-24 rounded-full mx-auto bg-center bg-cover mt-4" position="center center"
+                                fit="cover"></wui-card-media>
+                            <wui-card-content cls="px-5 pb-4">
+                                <h3 class="text-lg font-semibold text-center">Taylor</h3>
+                                <p class="text-sm text-gray-600 mt-1 text-justify">Front-end engineer focused on fast,
+                                    accessible components and delightful UX.</p>
+                            </wui-card-content>
+                            <wui-card-actions align="center" padding="p-3">
+                                <wui-button cls="px-4 py-2 !rounded-[4px]"> Say Hi
+                                </wui-button>
+                            </wui-card-actions>
+                        </wui-card>
+                    </div>
+
+                    <!-- {/* Name Card Example */} -->
+                    <div class="border border-gray-300 rounded-lg p-4">
+                        <h3 class="text-lg font-semibold mb-2">Name Card Example</h3>
+                        <wui-card cls="max-w-sm m-2">
+                            <wui-card-media src="/sample-avatar.png" alt="Sample avatar"
+                                cls="w-24 h-24 rounded-full mx-auto bg-center bg-cover mt-4" position="center center"
+                                fit="cover"></wui-card-media>
+                            <wui-card-content cls="px-5 pb-4">
+                                <h3 class="text-lg font-semibold text-center">Alex</h3>
+                                <p class="text-sm text-gray-600 mt-1 text-justify">Product-minded developer who enjoys
+                                    building cohesive UI systems and great DX.</p>
+                            </wui-card-content>
+                            <wui-card-actions align="center" padding="p-3">
+                                <wui-button button-type="contained" cls="px-4 py-2 !rounded-[4px]">Connect</wui-button>
+                            </wui-card-actions>
+                        </wui-card>
+                    </div>
+                </div>
+            </div>
+
+            <!-- {/* Region: Checkbox Demo */} -->
+            <h2 id="checkbox" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Checkbox Demo</h2>
+            <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- {/* Default Checkbox */} -->
+                    <div class="border border-gray-300 rounded-lg p-4">
+                        <h3 class="text-lg font-semibold mb-2">Default Checkbox</h3>
+                        <wui-checkbox> Default Checkbox </wui-checkbox>
+                    </div>
+
+                    <!-- {/* Left Label Checkbox */} -->
+                    <div class="border border-gray-300 rounded-lg p-4">
+                        <h3 class="text-lg font-semibold mb-2">Left Label Checkbox</h3>
+                        <wui-checkbox id="left-label-checkbox-html" label-position="left"> Left
+                            Label </wui-checkbox>
+                    </div>
+
+                    <!-- {/* Right Label Checkbox */} -->
+                    <div class="border border-gray-300 rounded-lg p-4">
+                        <h3 class="text-lg font-semibold mb-2">Right Label Checkbox</h3>
+                        <wui-checkbox id="right-label-checkbox-html" label-position="right"
+                            snapshot-name="Right-Label-CheckBox"> Right
+                            Label </wui-checkbox>
+                    </div>
+
+                    <!-- {/* Top Label Checkbox */} -->
+                    <div class="border border-gray-300 rounded-lg p-4">
+                        <h3 class="text-lg font-semibold mb-2">Top Label Checkbox</h3>
+                        <wui-checkbox id="top-label-checkbox-html" label-position="top"
+                            snapshot-name="Top-Label-CheckBox"> Top Label
+                        </wui-checkbox>
+                    </div>
+
+                    <!-- {/* Bottom Label Checkbox */} -->
+                    <div class="border border-gray-300 rounded-lg p-4">
+                        <h3 class="text-lg font-semibold mb-2">Bottom Label Checkbox</h3>
+                        <wui-checkbox id="bottom-label-checkbox-html" label-position="bottom"
+                            snapshot-name="Bottom-Label-CheckBox">
+                            Bottom Label </wui-checkbox>
+                    </div>
+
+                    <!-- {/* Checked Checkbox */} -->
+                    <div class="border border-gray-300 rounded-lg p-4">
+                        <h3 class="text-lg font-semibold mb-2">Checked Checkbox</h3>
+                        <wui-checkbox id="checked-checkbox-html" checked="true" snapshot-name="Checked-CheckBox">Checked
+                            By
+                            Default</wui-checkbox>
+                    </div>
+
+                    <!-- {/* Disabled Checkbox */} -->
+                    <div class="border border-gray-300 rounded-lg p-4">
+                        <h3 class="text-lg font-semibold mb-2">Disabled Checkbox</h3>
+                        <wui-checkbox id="disabled-checkbox-html" disabled="true"
+                            snapshot-name="Disabled-CheckBox">Disabled
+                            CheckBox</wui-checkbox>
+                    </div>
+
+                    <!-- {/* Disabled & Checked Checkbox */} -->
+                    <div class="border border-gray-300 rounded-lg p-4">
+                        <h3 class="text-lg font-semibold mb-2">Disabled & Checked Checkbox</h3>
+                        <wui-checkbox id="disabled-checked-checkbox-html" checked="true" disabled="true"
+                            snapshot-name="Disabled-Checked-CheckBox">Disabled &
+                            Checked</wui-checkbox>
+                    </div>
+
+                    <!-- {/* Custom Class Checkbox */} -->
+                    <div class="border border-gray-300 rounded-lg p-4">
+                        <h3 class="text-lg font-semibold mb-2">Custom Class Checkbox</h3>
+                        <wui-checkbox id="custom-class-checkbox-html" label-position="right"
+                            cls="!text-blue-500 !font-bold" snapshot-name="Custom-Class-CheckBox">
+                            Custom styled checkbox</wui-checkbox>
+                        </wui-checkbox>
+                        <script>
+                            document.getElementById('custom-class-checkbox-html').addEventListener('change', (e) => {
+                                console.log('Checkbox changed:', e.target.checked);
+                            });
+                        </script>
+                    </div>
+                </div>
+            </div>
+
+            <!-- {/* Region: Chip Demo */} -->
+            <h2 id="chip" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Chip Demo</h2>
+            <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4">
+                    <!-- {/* Default Chip */} -->
+                    <div class="border border-gray-300 rounded-lg p-4">
+                        <h3 class="text-lg font-semibold mb-2">Default Chip</h3>
+                        <wui-chip>Default Chip</wui-chip>
+                    </div>
+                    <!-- {/* Custom Chip */} -->
+                    <div class="border border-gray-300 rounded-lg p-4">
+                        <h3 class="text-lg font-semibold mb-2">Custom Chip</h3>
+                        <div class="flex gap-2 items-center">
+                            <wui-chip cls="!bg-green-100 !text-green-800">Success</wui-chip>
+                            <wui-chip cls="!bg-red-100 !text-red-800">Error</wui-chip>
+                            <wui-chip cls="!bg-yellow-100 !text-yellow-800">Warning</wui-chip>
+                            <wui-chip cls="!bg-blue-100 !text-blue-800">Info</wui-chip>
+                        </div>
+                    </div>
+                    <!-- {/* Deletable Chip */} -->
+                    <div class="border border-gray-300 rounded-lg p-4">
+                        <h3 class="text-lg font-semibold mb-2">Deletable Chip</h3>
+                        <div class="flex gap-2 items-center">
+                            <wui-chip cls="!bg-green-100 !text-green-800" deletable>Success</wui-chip>
+                            <wui-chip cls="!bg-red-100 !text-red-800" deletable>Error</wui-chip>
+                            <wui-chip cls="!bg-yellow-100 !text-yellow-800" deletable>Warning</wui-chip>
+                            <wui-chip cls="!bg-blue-100 !text-blue-800" deletable>Info</wui-chip>
+                        </div>
+                    </div>
+
+                    <!-- {/* Visible Chip */} -->
+                    <div class="border border-gray-300 rounded-lg p-4">
+                        <div class="flex gap-2">
+                            <div class="border border-black-500 rounded-[4px] p-3">
+                                <h3 class="text-lg font-semibold mb-2">Visible Chip - true</h3>
+                                <wui-chip visible="true">Visible</wui-chip>
+                            </div>
+                            <div class="border border-black-500 rounded-[4px] p-3">
+                                <h3 class="text-lg font-semibold mb-2">Visible Chip - false</h3>
+                                <wui-chip visible="false">Non Visible</wui-chip>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- {/* Avatar Chip */} -->
+                    <div class="border border-gray-300 rounded-lg p-4">
+                        <h3 class="text-lg font-semibold mb-2">Avatar Chip</h3>
+                        <div class="flex gap-2 items-center">
+                            <wui-chip cls="h-auto w-auto mx-2 bg-purple-500 text-white font-bold">
+                                <wui-avatar src="/sample-avatar.png" alt="Sample avatar"></wui-avatar>
+                                <span class="ml-2">Sample Avatar</span>
+                            </wui-chip>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- {/* Region: Collapse Demo */} -->
+            <h2 id="collapse" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Collapse Demo</h2>
+            <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
+                    <!-- {/* Default Collapse */} -->
+                    <div class="border border-gray-300 rounded-lg p-4">
+                        <h3 class="text-lg font-semibold mb-2">Default Collapse</h3>
+                        <wui-collapse cls="rounded-[4px] border border-gray-300">
+                            <div class="p-4 bg-gray-100">
+                                <p>This is the content inside the collapse component.</p>
+                                <p>It should be visible by default.</p>
+                            </div>
+                        </wui-collapse>
+                    </div>
+
+                    <!-- {/* Custom Collapse */} -->
+                    <div class="border border-gray-300 rounded-lg p-4">
+                        <h3 class="text-lg font-semibold mb-2">Custom Collapse</h3>
+                        <wui-collapse cls="rounded-[4px] border-2 border-purple-300 ">
+                            <div class="p-4 bg-yellow-100">
+                                <p>This is the content inside the collapse component.</p>
+                                <p>It should be visible by default.</p>
+                            </div>
+                        </wui-collapse>
+                    </div>
+
+                    <!-- {/* Toggle Collapse */} -->
+                    <div class="border border-gray-300 rounded-lg p-4">
+                        <h3 class="text-lg font-semibold mb-2">Toggle Collapse</h3>
+                        <div class="space-y-4">
+                            <wui-button id="toggle-is-open" button-type="contained" cls="text-xm
+                                text-white-500 px-4 py-2 bg-blue-500 border border-blue-300 rounded-[4px]">
+                                Toggle Collapse ({() => $$(toggleIsOpen) ? 'Open' : 'Closed'})
+                            </wui-button>
+                            <wui-collapse cls="rounded-[4px] border border-green-300" open={toggleIsOpen}>
+                                <div class="p-4 bg-green-100">
+                                    <p>This collapse can be toggled open/closed.</p>
+                                    <p>Click the button above to toggle visibility.</p>
+                                </div>
+                            </wui-collapse>
+                        </div>
+
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function () {
+                                const toggleButton = document.getElementById('toggle-is-open');
+                                const collapseElement = toggleButton.nextElementSibling;
+
+                                let isOpen = true;
+
+                                toggleButton.addEventListener('click', function () {
+                                    isOpen = !isOpen;
+                                    collapseElement.setAttribute('open', isOpen);
+                                    toggleButton.textContent = `Toggle Collapse (${isOpen ? 'Open' : 'Closed'})`;
+                                });
+                            });
+                        </script>
+                    </div>
+
+                    <!-- Toggle Background Collapse -->
+                    <div class="border border-gray-300 rounded-lg p-4">
+                        <h3 class="text-lg font-semibold mb-2">Toggle Background Collapse</h3>
+                        <div class="space-y-4">
+                            <wui-button id="toggle-background" button-type="contained"
+                                cls="text-xm text-white-500 px-4 py-2 bg-blue-500 border border-blue-300 rounded-[4px]">
+                                Toggle Background
+                            </wui-button>
+                            <wui-collapse id="background-collapse" cls="rounded-[4px] border border-gray-100">
+                                <div class="p-4 border border-gray-300 rounded-[4px]">
+                                    <p>This collapse can be toggled open/closed. The background visibility changes with
+                                        the toggle state.</p>
+                                    <p>Click the "Toggle Background" button above to switch between states.</p>
+                                </div>
+                            </wui-collapse>
+                        </div>
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function () {
+                                const toggleButton = document.getElementById('toggle-background');
+                                const collapseElement = document.getElementById('background-collapse');
+
+                                let hasBackground = true;
+
+                                toggleButton.addEventListener('click', function () {
+                                    hasBackground = !hasBackground;
+                                    collapseElement.setAttribute('background', hasBackground);
+                                    toggleButton.textContent = `Toggle Background (${hasBackground ? 'With' : 'Without'} Background)`;
+                                });
+                            });
+                        </script>
+                    </div>
+
+                    <!-- Open Collapse -->
+                    <div class="border border-gray-300 rounded-lg p-4">
+                        <h3 class="text-lg font-semibold mb-2">Open Collapse</h3>
+                        <wui-collapse cls="rounded-[4px] border border-blue-300" open>
+                            <div class="p-4 bg-blue-100">
+                                <p>This collapse is explicitly set to open.</p>
+                                <p>The content should be visible.</p>
+                            </div>
+                        </wui-collapse>
+                    </div>
+
+                    <!-- Close Collapse -->
+                    <div class="border border-gray-300 rounded-lg p-4">
+                        <h3 class="text-lg font-semibold mb-2">Close Collapse</h3>
+                        <wui-collapse cls="rounded-[4px] border border-red-300" open="false">
+                            <div class="p-4 bg-red-100">
+                                <p>This collapse is explicitly set to closed.</p>
+                                <p>The content should be hidden.</p>
+                            </div>
+                        </wui-collapse>
+                    </div>
+
+                    <!-- Background: True Collapse -->
+                    <div class="border border-gray-300 rounded-lg p-4">
+                        <h3 class="text-lg font-semibold mb-2">Background Collapse</h3>
+                        <wui-collapse cls="rounded-[4px] border border-gray-100" background="true">
+                            <div class="p-4">
+                                <p>This collapse has a background (default behavior).</p>
+                                <p>You should see a gray background.</p>
+                            </div>
+                        </wui-collapse>
+                    </div>
+
+                    <!-- Background: False Collapse -->
+                    <div class="border border-gray-300 rounded-lg p-4">
+                        <h3 class="text-lg font-semibold mb-2">Background Collapse</h3>
+                        <wui-collapse cls="rounded-[4px] border border-gray-100" background="false">
+                            <div class="p-4">
+                                <p>This collapse has no background.</p>
+                                <p>There should be no gray background.</p>
+                            </div>
+                        </wui-collapse>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-8">
+            <a href="/"
+                class="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors">
+                Back to Main Demo
+            </a>
+        </div>
+    </div>
+</body>
+
+</html>

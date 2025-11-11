@@ -1,6 +1,6 @@
 /// <reference types="vite/client" />
 
-import { DEBUGGER, $ } from 'woby'
+import { DEBUGGER, $, $$ } from 'woby'
 import { Button } from './Button'
 import { Badge } from './Badge'
 import { Avatar } from './Avatar'
@@ -8,6 +8,8 @@ import { AlignButton } from './Editor/AlignButton'
 import { EditorContext, UndoRedo } from './Editor/undoredo'
 import { Card, CardMedia, CardContent, CardActions } from './Card'
 import { Checkbox } from './Checkbox'
+import { Chip } from './Chip'
+import { Collapse } from './Collapse'
 
 const isDev = typeof import.meta.env !== 'undefined' && import.meta.env.DEV
 
@@ -17,6 +19,8 @@ if (isDev) {
 
 export function App() {
     const editorRef = $(null as HTMLDivElement | null)
+    const toggleIsOpen = $(true)
+    const toggleBackground = $(true)
 
     return (
         <div class="p-8">
@@ -26,9 +30,49 @@ export function App() {
                 Real page - Click <a href="/test" class="text-blue-600 hover:underline font-semibold">here</a> to load the test runner
             </p>
 
+            {/* Table of Contents Navigation */}
+            <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-6 mb-8 shadow-sm">
+                <h2 class="text-xl font-bold mb-4 text-gray-800">📑 Quick Navigation</h2>
+                <div class="flex flex-wrap gap-2">
+                    <a href="#appbar" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                        AppBar
+                    </a>
+                    <a href="#avatar" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                        Avatar
+                    </a>
+                    <a href="#badge" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                        Badge
+                    </a>
+                    <a href="#button" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                        Button
+                    </a>
+                    <a href="#alignbutton" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                        AlignButton
+                    </a>
+                    <a href="#card" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                        Card
+                    </a>
+                    <a href="#checkbox" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                        Checkbox
+                    </a>
+                    <a href="#chip" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                        Chip
+                    </a>
+                    <a href="#collapse" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                        Collapse
+                    </a>
+                    <a href="/test.html" target="_blank" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                        Test Runner
+                    </a>
+                    <a href="/html-demo.html" target="_blank" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                        HTML Components Demo
+                    </a>
+                </div>
+            </div>
+
             <div class="space-y-4">
                 {/* Region: Appbar Examples */}
-                <h2 class="text-2xl font-semibold mt-8 mb-4">Appbar Examples</h2>
+                <h2 id="appbar" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Appbar Examples</h2>
                 <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
                         {/* Default Appbar */}
@@ -89,7 +133,7 @@ export function App() {
                 </div>
 
                 {/* Region: Avatar Examples */}
-                <h2 class="text-2xl font-semibold mt-8 mb-4">Avatar Examples</h2>
+                <h2 id="avatar" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Avatar Examples</h2>
                 <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div class="border border-gray-300 rounded-lg p-4 flex items-center justify-center min-h-[120px]">
@@ -99,16 +143,16 @@ export function App() {
                             <Avatar src="/sample-avatar.png" alt="Sample avatar" />
                         </div>
                         <div class="border border-gray-300 rounded-lg p-4 flex items-center justify-center min-h-[120px]">
-                            <Avatar class="w-16 h-16 ring-2 ring-blue-500" src="/sample-avatar.png" />
+                            <Avatar cls="w-16 h-16 ring-2 ring-blue-500" src="/sample-avatar.png" />
                         </div>
                         <div class="border border-gray-300 rounded-lg p-4 flex items-center justify-center min-h-[120px]">
-                            <Avatar class="w-12 h-12 bg-purple-500">JL</Avatar>
+                            <Avatar cls="w-12 h-12 bg-purple-500">JL</Avatar>
                         </div>
                     </div>
                 </div>
 
                 {/* Region: Badge Examples */}
-                <h2 class="text-2xl font-semibold mt-8 mb-4">Badge Examples</h2>
+                <h2 id="badge" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Badge Examples</h2>
                 <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                         <div class="border border-gray-300 rounded-lg p-4 flex flex-col items-center justify-center min-h-[120px]">
@@ -135,7 +179,7 @@ export function App() {
                 </div>
 
                 {/* Region: Button Examples */}
-                <h2 class="text-2xl font-semibold mt-8 mb-4">Button Examples</h2>
+                <h2 id="button" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Button Examples</h2>
                 <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                         <div class="border border-gray-300 rounded-lg p-4 flex flex-col items-center justify-center min-h-[120px]">
@@ -157,13 +201,13 @@ export function App() {
                             <Button buttonType="outlined" disabled>Disabled</Button>
                         </div>
                         <div class="border border-gray-300 rounded-lg p-4 flex flex-col items-center justify-center min-h-[120px]">
-                            <Button buttonType="contained" class="m-2 p-2 !rounded-[5px] !text-red-500 !bg-green-200" onClick={() => alert('Button clicked!')}>Custom Style</Button>
+                            <Button buttonType="contained" cls="m-2 p-2 !rounded-[5px] !text-red-500 !bg-green-200" onClick={() => alert('Button clicked!')}>Custom Style</Button>
                         </div>
                     </div>
                 </div>
 
                 {/* Region: AlignButton Demo */}
-                <h2 class="text-2xl font-semibold mt-8 mb-4">AlignButton Demo</h2>
+                <h2 id="alignbutton" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">AlignButton Demo</h2>
                 <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
                     <EditorContext.Provider value={editorRef}>
                         <UndoRedo>
@@ -184,13 +228,13 @@ export function App() {
                 </div>
 
                 {/* Region: Card Demo */}
-                <h2 class="text-2xl font-semibold mt-8 mb-4">Card Demo</h2>
+                <h2 id="card" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Card Demo</h2>
                 <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         {/* Variant Card Example */}
                         <div class="border border-gray-300 rounded-lg p-4">
                             <h3 class="text-lg font-semibold mb-2">Variant Card Example</h3>
-                            <Card class="max-w-sm m-2" variant="elevated" elevation={2} interactive={true}>
+                            <Card cls="max-w-sm m-2" variant="elevated" elevation={2} interactive={true}>
                                 <CardContent>
                                     <h3 class="text-lg font-semibold">VariantCardExample</h3>
                                     <p class="text-sm text-gray-600">elevation=2, interactive hover shadow</p>
@@ -201,7 +245,7 @@ export function App() {
                         {/* Other Card Examples */}
                         <div class="border border-gray-300 rounded-lg p-4">
                             <h3 class="text-lg font-semibold mb-2">Outlined Card Example</h3>
-                            <Card class="max-w-sm m-2" variant="outlined" elevation={0}>
+                            <Card cls="max-w-sm m-2" variant="outlined" elevation={0}>
                                 <CardContent>
                                     <h3 class="text-lg font-semibold">Outlined Card</h3>
                                     <p class="text-sm text-gray-600">Border only, no elevation</p>
@@ -212,7 +256,7 @@ export function App() {
                         {/* Filled Card Example */}
                         <div class="border border-gray-300 rounded-lg p-4">
                             <h3 class="text-lg font-semibold mb-2">Filled Card Example</h3>
-                            <Card class="max-w-sm m-2" variant="filled" elevation={0} interactive>
+                            <Card cls="max-w-sm m-2" variant="filled" elevation={0} interactive>
                                 <CardContent>
                                     <h3 class="text-lg font-semibold">Filled Card</h3>
                                     <p class="text-sm text-gray-600">Subtle filled bg + strong shadow</p>
@@ -223,7 +267,7 @@ export function App() {
                         {/* Actions Aligned Card Example */}
                         <div class="border border-gray-300 rounded-lg p-4">
                             <h3 class="text-lg font-semibold mb-2">Actions Aligned Card Example</h3>
-                            <Card class="max-w-md m-2">
+                            <Card cls="max-w-md m-2">
                                 <CardContent padding="p-6">
                                     <h3 class="text-lg font-semibold">Actions Alignment</h3>
                                     <p class="text-sm text-gray-600">Try different horizontal justifications</p>
@@ -251,7 +295,7 @@ export function App() {
                         {/* Content Padding Card Example */}
                         <div class="border border-gray-300 rounded-lg p-4">
                             <h3 class="text-lg font-semibold mb-2">Content Padding Card Example</h3>
-                            <Card class="max-w-sm m-2" elevation={1} interactive>
+                            <Card cls="max-w-sm m-2" elevation={1} interactive>
                                 <CardContent padding="p-6">
                                     <h3 class="text-lg font-semibold">Custom Padding</h3>
                                     <p class="text-sm text-gray-600">Using CardContent padding="p-6"</p>
@@ -263,8 +307,8 @@ export function App() {
                         {/* Media Banner Card Example */}
                         <div class="border border-gray-300 rounded-lg p-4">
                             <h3 class="text-lg font-semibold mb-2">Media Banner Card Example</h3>
-                            <Card class="max-w-md m-2" elevation={2}>
-                                <CardMedia src="contemplative-reptile.jpg" alt="Banner image" height="160px" position="center center" fit="cover" class="w-full" />
+                            <Card cls="max-w-md m-2" elevation={2}>
+                                <CardMedia src="contemplative-reptile.jpg" alt="Banner image" height="160px" position="center center" fit="cover" cls="w-full" />
                                 <CardContent>
                                     <h3 class="text-lg font-semibold">Banner Card</h3>
                                     <p class="text-sm text-gray-600">Media header with content below.</p>
@@ -275,14 +319,14 @@ export function App() {
                         {/* Media Centered Card Example */}
                         <div class="border border-gray-300 rounded-lg p-4">
                             <h3 class="text-lg font-semibold mb-2">Media Centered Card Example</h3>
-                            <Card class="max-w-sm m-2">
-                                <CardMedia src="/sample-avatar.png" alt="Avatar" class="w-24 h-24 rounded-full mx-auto bg-center bg-cover mt-4" position="center center" fit="cover" />
-                                <CardContent class="px-5 pb-4">
+                            <Card cls="max-w-sm m-2">
+                                <CardMedia src="/sample-avatar.png" alt="Avatar" cls="w-24 h-24 rounded-full mx-auto bg-center bg-cover mt-4" position="center center" fit="cover" />
+                                <CardContent cls="px-5 pb-4">
                                     <h3 class="text-lg font-semibold text-center">Taylor</h3>
                                     <p class="text-sm text-gray-600 mt-1 text-justify">Front-end engineer focused on fast, accessible components and delightful UX.</p>
                                 </CardContent>
                                 <CardActions align="center" padding="p-3">
-                                    <Button class="px-4 py-2 !rounded-[4px]" onClick={() => alert("Hi Taylor!")}> Say Hi </Button>
+                                    <Button cls="px-4 py-2 !rounded-[4px]" onClick={() => alert("Hi Taylor!")}> Say Hi </Button>
                                 </CardActions>
                             </Card>
                         </div>
@@ -290,24 +334,22 @@ export function App() {
                         {/* Name Card Example */}
                         <div class="border border-gray-300 rounded-lg p-4">
                             <h3 class="text-lg font-semibold mb-2">Name Card Example</h3>
-                            <Card class="max-w-sm m-2">
-                                <CardMedia src="/sample-avatar.png" alt="Sample avatar" class="w-24 h-24 rounded-full mx-auto bg-center bg-cover mt-4" position="center center" fit="cover" />
-                                <CardContent class="px-5 pb-4">
+                            <Card cls="max-w-sm m-2">
+                                <CardMedia src="/sample-avatar.png" alt="Sample avatar" cls="w-24 h-24 rounded-full mx-auto bg-center bg-cover mt-4" position="center center" fit="cover" />
+                                <CardContent cls="px-5 pb-4">
                                     <h3 class="text-lg font-semibold text-center">Alex</h3>
                                     <p class="text-sm text-gray-600 mt-1 text-justify">Product-minded developer who enjoys building cohesive UI systems and great DX.</p>
                                 </CardContent>
                                 <CardActions align="center" padding="p-3">
-                                    <Button buttonType="contained" class="px-4 py-2 !rounded-[4px]" onClick={() => alert("Hello Alex!")}>Connect</Button>
+                                    <Button buttonType="contained" cls="px-4 py-2 !rounded-[4px]" onClick={() => alert("Hello Alex!")}>Connect</Button>
                                 </CardActions>
                             </Card>
                         </div>
-
-
                     </div>
                 </div>
 
                 {/* Region: Checkbox Demo */}
-                <h2 class="text-2xl font-semibold mt-8 mb-4">Checkbox Demo</h2>
+                <h2 id="checkbox" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Checkbox Demo</h2>
                 <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         {/* Default Checkbox */}
@@ -361,7 +403,7 @@ export function App() {
                         {/* Custom Class Checkbox */}
                         <div class="border border-gray-300 rounded-lg p-4">
                             <h3 class="text-lg font-semibold mb-2">Custom Class Checkbox</h3>
-                            <Checkbox id="custom-class-checkbox" labelPosition="right" class="!text-blue-500 !font-bold" onChange={(e) => {
+                            <Checkbox id="custom-class-checkbox" labelPosition="right" cls="!text-blue-500 !font-bold" onChange={(e) => {
                                 const span = document.getElementById('custom-class-checkbox-log')
                                 if (span) span.textContent = `Checkbox changed: ${e.currentTarget.checked}`
                             }}>
@@ -370,6 +412,167 @@ export function App() {
                             <pre class="mt-2 text-sm text-gray-600 whitespace-pre-wrap">
                                 <span id="custom-class-checkbox-log"></span>
                             </pre>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Region: Chip Demo */}
+                <h2 id="chip" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Chip Demo</h2>
+                <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4">
+                        {/* Default Chip */}
+                        <div class="border border-gray-300 rounded-lg p-4">
+                            <h3 class="text-lg font-semibold mb-2">Default Chip</h3>
+                            <Chip>Default Chip</Chip>
+                        </div>
+                        {/* Custom Chip */}
+                        <div class="border border-gray-300 rounded-lg p-4">
+                            <h3 class="text-lg font-semibold mb-2">Custom Chip</h3>
+                            <div class="flex gap-2 items-center">
+                                <Chip cls="!bg-green-100 !text-green-800">Success</Chip>
+                                <Chip cls="!bg-red-100 !text-red-800">Error</Chip>
+                                <Chip cls="!bg-yellow-100 !text-yellow-800">Warning</Chip>
+                                <Chip cls="!bg-blue-100 !text-blue-800">Info</Chip>
+                            </div>
+                        </div>
+                        {/* Deletable Chip */}
+                        <div class="border border-gray-300 rounded-lg p-4">
+                            <h3 class="text-lg font-semibold mb-2">Deletable Chip</h3>
+                            <div class="flex gap-2 items-center">
+                                <Chip cls="!bg-green-100 !text-green-800" deletable>Success</Chip>
+                                <Chip cls="!bg-red-100 !text-red-800" deletable>Error</Chip>
+                                <Chip cls="!bg-yellow-100 !text-yellow-800" deletable>Warning</Chip>
+                                <Chip cls="!bg-blue-100 !text-blue-800" deletable>Info</Chip>
+                            </div>
+                        </div>
+
+                        {/* Visible Chip */}
+                        <div class="border border-gray-300 rounded-lg p-4">
+                            {/* <h3 class="text-lg font-semibold mb-2">Visible Chip</h3> */}
+                            <div class="flex gap-2">
+                                <div class="border border-black-500 rounded-[4px] p-3">
+                                    <h3 class="text-lg font-semibold mb-2">Visible Chip - true</h3>
+                                    <Chip visible={true}>Visible</Chip>
+                                </div>
+                                <div class="border border-black-500 rounded-[4px] p-3">
+                                    <h3 class="text-lg font-semibold mb-2">Visible Chip - false</h3>
+                                    <Chip visible={false}>Non Visible</Chip>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Avatar Chip */}
+                        <div class="border border-gray-300 rounded-lg p-4">
+                            <h3 class="text-lg font-semibold mb-2">Avatar Chip</h3>
+                            <div class="flex gap-2 items-center">
+                                <Chip cls="h-auto w-auto mx-2 bg-purple-500 text-white font-bold">
+                                    <Avatar src="/sample-avatar.png" alt="Sample avatar" /> <span class="ml-2">Sample Avatar</span>
+                                </Chip>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Region: Collapse Demo */}
+                <h2 id="collapse" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Collapse Demo</h2>
+                <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
+                        {/* Default Collapse */}
+                        <div class="border border-gray-300 rounded-lg p-4">
+                            <h3 class="text-lg font-semibold mb-2">Default Collapse</h3>
+                            <Collapse class="rounded-[4px] border border-gray-300">
+                                <div class="p-4 bg-gray-100">
+                                    <p>This is the content inside the collapse component.</p>
+                                    <p>It should be visible by default.</p>
+                                </div>
+                            </Collapse>
+                        </div>
+
+                        {/* Custom Collapse */}
+                        <div class="border border-gray-300 rounded-lg p-4">
+                            <h3 class="text-lg font-semibold mb-2">Custom Collapse</h3>
+                            <Collapse class="rounded-[4px] border-2 border-purple-300 ">
+                                <div class="p-4 bg-yellow-100">
+                                    <p>This is the content inside the collapse component.</p>
+                                    <p>It should be visible by default.</p>
+                                </div>
+                            </Collapse>
+                        </div>
+
+                        {/* Toggle Collapse */}
+                        <div class="border border-gray-300 rounded-lg p-4">
+                            <h3 class="text-lg font-semibold mb-2">Toggle Collapse</h3>
+                            <div class="space-y-4">
+                                <Button buttonType="contained" onClick={() => toggleIsOpen(!$$(toggleIsOpen))} class="text-xm text-white-500 px-4 py-2 bg-blue-500 border border-blue-300 rounded-[4px]">
+                                    Toggle Collapse ({() => $$(toggleIsOpen) ? 'Open' : 'Closed'})
+                                </Button>
+                                <Collapse class="rounded-[4px] border border-green-300" open={toggleIsOpen}>
+                                    <div class="p-4 bg-green-100">
+                                        <p>This collapse can be toggled open/closed.</p>
+                                        <p>Click the button above to toggle visibility.</p>
+                                    </div>
+                                </Collapse>
+                            </div>
+                        </div>
+
+                        {/* Toggle Background Collapse */}
+                        <div class="border border-gray-300 rounded-lg p-4">
+                            <h3 class="text-lg font-semibold mb-2">Toggle Background Collapse</h3>
+                            <div class="space-y-4">
+                                <Button buttonType="contained" onClick={() => toggleBackground(!$$(toggleBackground))} class="text-xm text-white-500 px-4 py-2 bg-blue-500 border border-blue-300 rounded-[4px]">
+                                    Toggle Background ({() => $$(toggleBackground) ? 'Open' : 'Closed'})
+                                </Button>
+                                <Collapse class="rounded-[4px] border border-gray-100" background={toggleBackground}>
+                                    <div class="p-4 border border-gray-300 rounded-[4px]">
+                                        <p>This collapse can be toggled open/closed. The background visibility changes with the toggle state.</p>
+                                        <p>Click the "Toggle Background" button above to switch between states.</p>
+                                    </div>
+                                </Collapse>
+                            </div>
+                        </div>
+
+                        {/* Open Collapse */}
+                        <div class="border border-gray-300 rounded-lg p-4">
+                            <h3 class="text-lg font-semibold mb-2">Open Collapse</h3>
+                            <Collapse class="rounded-[4px] border border-blue-300" open>
+                                <div class="p-4 bg-blue-100">
+                                    <p>This collapse is explicitly set to open.</p>
+                                    <p>The content should be visible.</p>
+                                </div>
+                            </Collapse>
+                        </div>
+
+                        {/* Close Collapse */}
+                        <div class="border border-gray-300 rounded-lg p-4">
+                            <h3 class="text-lg font-semibold mb-2">Close Collapse</h3>
+                            <Collapse class="rounded-[4px] border border-red-300" open={false}>
+                                <div class="p-4 bg-red-100">
+                                    <p>This collapse is explicitly set to closed.</p>
+                                    <p>The content should be hidden.</p>
+                                </div>
+                            </Collapse>
+                        </div>
+
+                        {/* Background: True Collapse */}
+                        <div class="border border-gray-300 rounded-lg p-4">
+                            <h3 class="text-lg font-semibold mb-2">Background Collapse</h3>
+                            <Collapse class="rounded-[4px] border border-gray-100" background={true}>
+                                <div class="p-4">
+                                    <p>This collapse has a background (default behavior).</p>
+                                    <p>You should see a gray background.</p>
+                                </div>
+                            </Collapse>
+                        </div>
+
+                        {/* Background: False Collapse */}
+                        <div class="border border-gray-300 rounded-lg p-4">
+                            <h3 class="text-lg font-semibold mb-2">Background Collapse</h3>
+                            <Collapse class="rounded-[4px] border border-gray-100" background={false}>
+                                <div class="p-4">
+                                    <p>This collapse has no background.</p>
+                                    <p>There should be no gray background.</p>
+                                </div>
+                            </Collapse>
                         </div>
                     </div>
                 </div>
