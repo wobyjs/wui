@@ -18,7 +18,7 @@ type BadgeProps = {
 
 // Default props with explicit typing
 const def = () => ({
-    className: $(''),
+    cls: $(''),
     children: $(null as JSX.Child),
     badgeContent: $('' as JSX.Child),
     badgeClass: $("bg-[rgb(156,39,176)]" as JSX.Class),
@@ -29,7 +29,7 @@ const def = () => ({
 })
 
 const Badge = defaults(def, (props) => {
-    const { className, children, badgeContent, badgeClass, vertical, horizontal, ...otherProps } = props
+    const { cls, children, badgeContent, badgeClass, vertical, horizontal, ...otherProps } = props
 
     const isEmpty = () => !(badgeContent)
 
@@ -61,7 +61,7 @@ const Badge = defaults(def, (props) => {
             {/* <p className="m-2 p-2">Badge Content: <span className="text-blue-500 font-bold">{badgeContent}</span></p> */}
             {/* <p className="m-2 p-2">Badge Anchor: <span className="text-blue-500 font-bold">{vertical} - {horizontal}</span></p> */}
             {/* <p className="m-2 p-2">Class Name <span className="text-blue-500 font-bold">{className}</span></p> */}
-            <span class={() => `relative inline-flex align-middle shrink-0 m-4 ${(className)}`} {...otherProps}>
+            <span class={() => `relative inline-flex align-middle shrink-0 m-4 ${(cls)}`} {...otherProps}>
                 {(children)}
                 <span
                     class={() => [

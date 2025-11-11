@@ -128,15 +128,15 @@ const def = () => ({
     buttonType: $("contained"),
     buttonFunction: $("button"),
     children: $("Button"),
-    checked: $(false),
+    checked:$(false, HtmlBoolean) as ObservableMaybe<boolean> | undefined,
     // disabled: $(false) as Observable<boolean>,
     disabled: $(false, HtmlBoolean) as ObservableMaybe<boolean> | undefined,
-    class: $(""),
+    cls: $(""),
     onClick: undefined,
 })
 
 const Button = defaults(def, (props) => {
-    const { children, class: className, buttonType, buttonFunction, checked = $(false), disabled, onClick, ...otherProps } = props
+    const { children, cls, buttonType, buttonFunction, checked, disabled, onClick, ...otherProps } = props
 
     // Convert disabled to boolean if it's a string (from HTML attributes)
     // const isDisabled = () => {
@@ -195,7 +195,7 @@ const Button = defaults(def, (props) => {
                 }
             }}
             disabled={disabled}
-            class={() => [variant[$$(buttonType)], $$(className)].join(' ')}
+            class={() => [variant[$$(buttonType)], $$(cls)].join(' ')}
             // style={() => {
             //     const baseStyle = variantStyles[$$(buttonType)]
             //     if (isDisabled()) {
@@ -223,8 +223,6 @@ const Button = defaults(def, (props) => {
         //     <p style={"margin-bottom: 10px; color: black;"}>Display Text: <span style={"font-weight: bold; color: blue;"}>{() => $$(displayText)}</span></p>
         //     <p style={"margin-bottom: 10px; color: black;"}>Disabled: <span style={"font-weight: bold; color: blue;"}>{String(disabled)}</span></p>
         // </pre>
-
-
     )
 
     // // TESTING: Uncomment below to test if Tailwind classes work in Shadow DOM

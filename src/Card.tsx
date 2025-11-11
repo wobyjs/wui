@@ -55,7 +55,7 @@ type CardActionsProps = JSX.HTMLAttributes<HTMLDivElement> & {
 }
 
 const defCard = () => ({
-    class: $("" as JSX.Class),
+    cls: $(""),
     children: $(null as JSX.Child),
     variant: $("elevated" as Variant),
     elevation: $(1 as Elevation, { type: 'number' } as const),
@@ -69,17 +69,17 @@ const defCardMedia = () => ({
     height: $("140px"),
     position: $("center center"),
     fit: $("cover" as "cover" | "contain" | "fill" | "none" | "scale-down"),
-    class: $("" as JSX.Class),
+    cls: $(""),
 })
 
 const defCardContent = () => ({
-    class: $("" as JSX.Class),
+    cls: $(""),
     children: $(null as JSX.Child),
     padding: $("p-4" as JSX.Class),
 })
 
 const defCardAction = () => ({
-    class: $("" as JSX.Class),
+    cls: $(""),
     children: $(null as JSX.Child),
     align: $("start" as Justify),
     padding: $("p-2" as JSX.Class),
@@ -117,7 +117,7 @@ const elevationCls = (e: Elevation) => {
 
 const Card = defaults(defCard, (props) => {
 
-    const { class: className, children, variant, elevation, interactive, ...otherProps } = props
+    const { cls, children, variant, elevation, interactive, ...otherProps } = props
 
     // const v = () => ((variant) ?? "elevated") as Variant
     // const e = () => ((elevation) ?? 1) as Elevation
@@ -138,11 +138,11 @@ const Card = defaults(defCard, (props) => {
     // interactive() ? "cursor-pointer hover:-translate-y-1 hover:shadow-[rgba(0,0,0,0.2)_0px_8px_10px_-5px,rgba(0,0,0,0.14)_0px_16px_24px_2px,rgba(0,0,0,0.12)_0px_6px_30px_5px]" : ""
     // interactive() ? "cursor-pointer hover:-translate-y-2 hover:shadow-[0_25px_50px_-12px_rgb(0,0,0,0.4)]" : ""
 
-    const compileClass = () => [base, variantCls(), interactiveCls(), className()].join(" ")
+    const compileClass = () => [base, variantCls(), interactiveCls(), cls()].join(" ")
 
     return (
         <div
-            class={() => [base, variantCls(), interactiveCls(), className()].join(" ")}
+            class={() => [base, variantCls(), interactiveCls(), cls()].join(" ")}
             {...otherProps}
         >
             {/* <p>Attribute</p>
@@ -162,7 +162,7 @@ const Card = defaults(defCard, (props) => {
 }) as typeof Card
 
 const CardMedia = defaults(defCardMedia, (props) => {
-    const { class: className, src, alt, height, position, fit, ...otherProps } = props
+    const { cls, src, alt, height, position, fit, ...otherProps } = props
 
     // const src = () => _src ?? ""
     // const alt = () => _alt ?? ""
@@ -182,7 +182,7 @@ const CardMedia = defaults(defCardMedia, (props) => {
             role="img"
             title={alt()}
             aria-label={alt()}
-            class={() => ["block bg-no-repeat", className()].join(" ")}
+            class={() => ["block bg-no-repeat", $$(cls)].join(" ")}
             style={() => ({
                 height: height(),
                 backgroundImage: src() ? `url(${src()})` : "",
@@ -195,7 +195,7 @@ const CardMedia = defaults(defCardMedia, (props) => {
 }) as typeof CardMedia & StyleEncapsulationProps
 
 const CardContent = defaults(defCardContent, (props) => {
-    const { class: className, children, padding, ...otherProps } = props
+    const { cls, children, padding, ...otherProps } = props
 
     // const pad = () => (padding) ?? "p-4"
     // const extra = () => (className) ?? ""
@@ -206,7 +206,7 @@ const CardContent = defaults(defCardContent, (props) => {
     // console.log("CardContent children: ", children());
 
     return (
-        <div class={() => [padding(), className()].join(" ")} {...otherProps}>
+        <div class={() => [padding(), cls()].join(" ")} {...otherProps}>
             {children()}
         </div>
     )
@@ -214,7 +214,7 @@ const CardContent = defaults(defCardContent, (props) => {
 
 const CardActions = defaults(defCardAction, (props) => {
 
-    const { class: className, children, align, padding, ...otherProps } = props
+    const { cls, children, align, padding, ...otherProps } = props
 
     // const align = () => ((_align) ?? "start") as Justify
     // const pad = () => (padding) ?? "p-2"
@@ -230,7 +230,7 @@ const CardActions = defaults(defCardAction, (props) => {
 
     return (
         <div
-            class={() => ["flex items-center", justify(), padding(), className()].join(" ")}
+            class={() => ["flex items-center", justify(), padding(), cls()].join(" ")}
             {...otherProps}
         >
             {children()}
@@ -270,4 +270,5 @@ export default Card
 
 // export const CardContent = tw('div')`p-[16px]`
 
-export const CardActions = tw('div')`flex items-center p-2`
+// export const CardActions = tw('div')`flex items-center p-2`
+// #endregion

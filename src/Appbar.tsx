@@ -1,3 +1,4 @@
+// #region JenSien Appbar
 import { $, $$, defaults, type JSX, customElement, type ElementAttributes, type ObservableMaybe, useEffect } from "woby"
 import "@woby/chk"
 import "./input.css"
@@ -7,7 +8,7 @@ type Position = "fixed" | "sticky" | "static"
 type Edge = "top" | "bottom"
 
 type AppbarProps = JSX.HTMLAttributes<HTMLElement> & {
-    className?: ObservableMaybe<JSX.Class>
+    cls?: ObservableMaybe<JSX.Class>
     children?: ObservableMaybe<JSX.Child>
 
     /** Color preset (default: primary) */
@@ -32,25 +33,8 @@ type AppbarProps = JSX.HTMLAttributes<HTMLElement> & {
     z?: ObservableMaybe<number>
 }
 
-// const def = () => ({
-//     className: "" as JSX.Class,
-//     children: null as JSX.Child,
-
-//     color: "primary" as Color,
-//     bgClass: "" as JSX.Class,
-//     textClass: "" as JSX.Class,
-
-//     elevation: 2 as 0 | 1 | 2 | 3 | 4,
-
-//     position: "fixed" as Position,
-//     edge: "top" as Edge,
-
-//     dense: false,
-//     z: 1100,
-// })
-
 const def = () => ({
-    class: $("" as JSX.Class),
+    cls: $(""),
     children: $("" as JSX.Child),
     color: $("primary" as Color),
     bgClass: $(""),
@@ -66,7 +50,7 @@ const def = () => ({
 
 const Appbar = defaults(def, (props) => {
 
-    const { class: className, children, color, bgClass, textClass, elevation, position, edge, dense, z, offset, ...otherProps } = props
+    const { cls, children, color, bgClass, textClass, elevation, position, edge, dense, z, offset, ...otherProps } = props
 
     // unwrap helpers with read-time defaults
     // const color = () => ($$(props.color) ?? "primary") as Color
@@ -227,8 +211,8 @@ const Appbar = defaults(def, (props) => {
     return (
         <header
             ref={(e: any) => (el = e)}
-            class={() =>
-                [
+            class={
+                () => [
                     "w-full box-border shrink-0 left-auto",
                     posCls(),
                     zCls(),
@@ -236,7 +220,7 @@ const Appbar = defaults(def, (props) => {
                     elevationCls(),
                     heightCls(),
                     "[transition:box-shadow_300ms_cubic-bezier(0.4,0,0.2,1)0ms]",
-                    className,
+                    $$(cls)
                 ].join(" ")
             }
             {...otherProps}
@@ -261,7 +245,7 @@ declare module "woby" {
 }
 
 export default Appbar
-
+// #endregion
 
 
 // #region Original Appbar

@@ -15,14 +15,14 @@ type ContentAlign = 'start' | 'center' | 'end'
 const def = () => ({
     buttonType: $("outlined" as "text" | "contained" | "outlined" | "icon"),
     title: $("Align Center"),
-    class: $(""),
+    cls: $(""),
     disabled: $(false) as Observable<boolean>,
     children: $(<AlignCenter />) as Observable<JSX.Element>,
     contentAlign: $("center" as ContentAlign),
 })
 
 const AlignButton = defaults(def, (props) => {
-    const { buttonType, title, class: cls, disabled, children, contentAlign, ...otherProps } = props as any
+    const { buttonType, title, cls, disabled, children, contentAlign, ...otherProps } = props as any
     const editor = useEditor();
 
     // Extract onClick from otherProps if provided
@@ -81,7 +81,7 @@ const AlignButton = defaults(def, (props) => {
             <Button
                 buttonType={buttonType}
                 title={displayTitle}
-                class={cls}
+                cls={cls}
                 disabled={disabled}
                 onClick={handleClick}
                 {...otherProps}

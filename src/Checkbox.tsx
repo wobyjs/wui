@@ -7,13 +7,13 @@ type LabelPosition = "left" | "right" | "bottom" | "top"
 type CheckboxProps = JSX.InputHTMLAttributes<HTMLInputElement> & {
 	children?: ObservableMaybe<JSX.Child>
 	labelPosition?: ObservableMaybe<LabelPosition>
-	class?: ObservableMaybe<string>
+	cls?: ObservableMaybe<string>
 }
 
 const def = () => ({
 	children: $(null as JSX.Child),
 	labelPosition: $("left" as LabelPosition),
-	class: $(""),
+	cls: $(""),
 	// checked: $(false as boolean),
 	// disabled: $(false as boolean),
 	checked: $(false, HtmlBoolean) as ObservableMaybe<boolean> | undefined,
@@ -22,7 +22,7 @@ const def = () => ({
 })
 
 const Checkbox = defaults(def, (props) => {
-	const { children, labelPosition, class: className, checked, disabled, id, ...otherProps } = props
+	const { children, labelPosition, cls, checked, disabled, id, ...otherProps } = props
 
 	// Convert disabled to boolean if it's a string (from HTML attributes)
 	// const isDisabled = () => {
@@ -44,7 +44,7 @@ const Checkbox = defaults(def, (props) => {
 	const line = () => ($$(labelPosition) === "top" || $$(labelPosition) === "bottom" ? <br /> : null)
 
 	return (
-		<div class={() => [(className)].join(" ")}>
+		<div class={() => [(cls)].join(" ")}>
 			{before}
 			{line}
 			<input id={id} type="checkbox" checked={checked} disabled={disabled} {...otherProps} />
