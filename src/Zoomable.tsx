@@ -1,5 +1,5 @@
 import { useEventListener } from "@woby/use"
-import { createContext, Observable, setStyle, useContext, useEffect, useMemo, type ObservableMaybe } from "woby"
+import { createContext, Observable, useContext, useEffect, useMemo, type ObservableMaybe } from "woby"
 import { $, $$ } from "woby"
 
 const ZoomableContext = createContext<{ style: JSX.Style, ref: Observable<HTMLImageElement>, translateX: Observable<number>, translateY: Observable<number>, scale: Observable<number> }>()
