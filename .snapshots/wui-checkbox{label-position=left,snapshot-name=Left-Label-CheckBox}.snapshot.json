@@ -1,4 +1,0 @@
-{
-  "props": {},
-  "html": "<slot-mocked> <wui-checkbox-mocked id=\"left-label-checkbox-html\" label-position=\"left\" snapshot-name=\"Left-Label-CheckBox\"><div><label class=\"pr-1.5 select-none\" for=\"left-label-checkbox-html\"> <slot-mocked> Left Label </slot-mocked> </label><!----><input id=\"left-label-checkbox-html\" type=\"checkbox\"></input><!----><!----></div> Left Label </wui-checkbox-mocked> </slot-mocked>"
-}

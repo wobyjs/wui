@@ -1,4 +1,0 @@
-{
-  "props": {},
-  "html": "<slot-mocked> <wui-card class=\"max-w-md m-2\" elevation=\"1\" interactive=\"true\" snapshot-name=\"Content-Padding-Card-Example\"> <wui-card-content padding=\"p-6\"> <h3 class=\"text-lg font-semibold\">Custom Padding</h3> <p class=\"text-sm text-gray-600\">Using CardContent padding=\"p-6\"</p> <p class=\"text-xs text-gray-500 mt-2\">Hover to see subtle elevation change.</p> </wui-card-content> </wui-card> </slot-mocked>"
-}

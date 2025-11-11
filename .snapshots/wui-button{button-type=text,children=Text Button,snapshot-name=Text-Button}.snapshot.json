@@ -1,4 +1,0 @@
-{
-  "props": {},
-  "html": "<slot-mocked> <wui-button button-type=\"text\" children=\"Text Button\" snapshot-name=\"Text-Button\"> <!-- class=\"inline-flex items-center justify-center relative box-border bg-transparent cursor-pointer select-none align-middle no-underline font-medium text-sm leading-[1.75] tracking-[0.02857em] uppercase rounded text-[#1976d2] rounded-none border-0 outline-0 font-sans [transition:background-color_250ms_cubic-bezier(0.4,0,0.2,1)0ms,box-shadow_250ms_cubic-bezier(0.4,0,0.2,1)0ms,border-color_250ms_cubic-bezier(0.4,0,0.2,1)0ms,color_250ms_cubic-bezier(0.4,0,0.2,1)0ms] hover:no-underline hover:bg-[rgba(25,118,210,0.04)] disabled:text-[rgba(0,0,0,0.26)] disabled:pointer-events-none disabled:cursor-default\" --> </wui-button></slot-mocked>"
-}

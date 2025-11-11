@@ -1,4 +1,0 @@
-{
-  "props": {},
-  "html": "<div><div class=\"bg-white text-[rgba(0,0,0,0.87)] rounded overflow-hidden transition-[box-shadow,transform] duration-300 ease-in-out [transition-delay:0ms] shadow-md cursor-pointer hover:shadow-[rgba(0,0,0,0.2)_0px_4px_5px_-2px,rgba(0,0,0,0.14)_0px_7px_10px_1px,rgba(0,0,0,0.12)_0px_2px_16px_1px] max-w-sm m-2\"><div class=\"p-6\"><h3 class=\"text-lg font-semibold\">Custom Padding</h3><p class=\"text-sm text-gray-600\">Using CardContent padding=\"p-6\"</p><p class=\"text-xs text-gray-500 mt-2\">Hover to see subtle elevation change.</p></div></div></div>"
-}

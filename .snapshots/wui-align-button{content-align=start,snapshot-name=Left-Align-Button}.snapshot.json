@@ -1,4 +1,0 @@
-{
-  "props": {},
-  "html": "<slot-mocked> <wui-align-button content-align=\"start\" snapshot-name=\"Left-Align-Button\"> </wui-align-button></slot-mocked>"
-}
