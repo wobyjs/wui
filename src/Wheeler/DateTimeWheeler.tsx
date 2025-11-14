@@ -230,12 +230,12 @@ export const DateTimeWheeler = ({
                     <Button buttonType='contained' class={['px-2']} onClick={() => { if (isObservable(oriDate)) oriDate($$(modDate)); visible(false) }}>OK</Button></div>
             </div>
             <div class={[dateTimeWheelerCls]}>
-                {() => $$(showYear) && <Wheeler header={v => 'Year'} options={yearOptions} value={selectedYear} itemHeight={itemHeight} itemCount={itemCount} class={[wheelWrapperCls,]} />}
-                {() => $$(showMonth) && <Wheeler header={v => 'Month'} options={monthOptions} value={selectedMonth} itemHeight={itemHeight} itemCount={itemCount} class={[wheelWrapperCls, br]} />}
-                {() => $$(showDay) && <Wheeler header={v => 'Day'} options={dayOptions} value={selectedDay} itemHeight={itemHeight} itemCount={itemCount} class={[wheelWrapperCls, br]} />}
-                {() => $$(showHour) && <Wheeler header={v => 'Hour'} options={hourOptions} value={selectedHour} itemHeight={itemHeight} itemCount={itemCount} class={[wheelWrapperCls, br]} />}
-                {() => $$(showMinute) && <Wheeler header={v => 'Minute'} options={minuteOptions} value={selectedMinute} itemHeight={itemHeight} itemCount={itemCount} class={[wheelWrapperCls, br]} />}
-                {() => $$(showSecond) && <Wheeler header={v => 'Second'} options={secondOptions} value={selectedSecond} itemHeight={itemHeight} itemCount={itemCount} class={[wheelWrapperCls, br]} />}
+                {() => $$(showYear) && <Wheeler header={v => 'Year'} options={yearOptions} value={selectedYear} itemHeight={itemHeight} itemCount={itemCount} cls={[wheelWrapperCls,]} />}
+                {() => $$(showMonth) && <Wheeler header={v => 'Month'} options={monthOptions} value={selectedMonth} itemHeight={itemHeight} itemCount={itemCount} cls={[wheelWrapperCls, br]} />}
+                {() => $$(showDay) && <Wheeler header={v => 'Day'} options={dayOptions} value={selectedDay} itemHeight={itemHeight} itemCount={itemCount} cls={[wheelWrapperCls, br]} />}
+                {() => $$(showHour) && <Wheeler header={v => 'Hour'} options={hourOptions} value={selectedHour} itemHeight={itemHeight} itemCount={itemCount} cls={[wheelWrapperCls, br]} />}
+                {() => $$(showMinute) && <Wheeler header={v => 'Minute'} options={minuteOptions} value={selectedMinute} itemHeight={itemHeight} itemCount={itemCount} cls={[wheelWrapperCls, br]} />}
+                {() => $$(showSecond) && <Wheeler header={v => 'Second'} options={secondOptions} value={selectedSecond} itemHeight={itemHeight} itemCount={itemCount} cls={[wheelWrapperCls, br]} />}
             </div>
         </div >
     </>)

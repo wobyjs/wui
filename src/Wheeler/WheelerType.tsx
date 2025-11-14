@@ -1,6 +1,7 @@
 import { $, $$, ArrayMaybe, isObservable, Observable, ObservableMaybe, ObservableReadonly, Portal, useEffect, useMemo } from 'woby'
 
 export type WheelerItem<T = unknown> = { value: T, label: string | number, component?: (props: { itemHeight: number, value: WheelerItem, index: number }) => JSX.Child, hasComponent?: boolean }
+
 export type WheelerProps<T = unknown> = {
     options: ObservableMaybe<WheelerItem<T>[]>,
     itemHeight?: ObservableMaybe<number>,
@@ -18,6 +19,9 @@ export type WheelerProps<T = unknown> = {
     commitOnBlur?: ObservableMaybe<boolean>
     mask?: boolean
     changeValueOnClickOnly?: boolean
+
+    searchable?: ObservableMaybe<boolean>,
+    searchPlaceholder?: ObservableMaybe<string>,
 }
 
 /** 
