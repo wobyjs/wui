@@ -1,0 +1,4 @@
+{
+  "props": {},
+  "html": "<div><div class=\"overflow-hidden transition-height duration-200 ease-in-out\"><div class=\"h-fit\"><div class=\"p-4 border border-gray-300\"><p>This collapse is open and has no background.</p><p>Content should be visible with just a border.</p></div></div></div></div>"
+}

@@ -1,0 +1,4 @@
+{
+  "props": {},
+  "html": "<div><div class=\"overflow-hidden transition-height duration-200 ease-in-out bg-[#ccc]\"><div class=\"h-fit\"><div class=\"p-4 bg-blue-100\"><p>This collapse is explicitly set to open.</p><p>The content should be visible.</p></div></div></div></div>"
+}

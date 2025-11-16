@@ -31,7 +31,7 @@ const Avatar = defaults(def, (props) => {
 
     // Size variants
     const sizeClass = () => {
-        switch (size()) {
+        switch ($$(size)) {
             case "xs":
                 return "w-6 h-6 text-xs"
             case "sm":
@@ -46,7 +46,7 @@ const Avatar = defaults(def, (props) => {
 
     // Shape variants
     const variantClass = () => {
-        switch (variant()) {
+        switch ($$(variant)) {
             case "rounded":
                 return "rounded-xl"
             case "square":

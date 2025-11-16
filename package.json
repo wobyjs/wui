@@ -5,9 +5,9 @@
         "access": "public"
     },
     "description": "A powerful tooltip and menu component library for voby.",
-    "//main": "./dist/index.cjs.js",
+    "main": "./dist/index.es.js",
     "module": "./dist/index.es.js",
-    "//browser": "./dist/index.umd.js",
+    "browser": "./dist/index.es.js",
     "types": "./dist/types/index.d.ts",
     "scripts": {
         "git": "git add . && git commit -m \"Bump version\" && git push",

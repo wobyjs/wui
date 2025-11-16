@@ -1,6 +1,6 @@
 import { tw } from '@woby/styled'
 //@ts-ignore
-import { $, $$, isObservable, type JSX, defaults, customElement, ElementAttributes, HtmlBoolean, HtmlClass } from 'woby'
+import { $, $$, isObservable, type JSX, defaults, customElement, ElementAttributes, HtmlBoolean, HtmlClass, HtmlStyle, ObservableMaybe } from 'woby'
 
 const Fab1Component = tw('button')`inline-flex items-center justify-center relative box-border cursor-pointer select-none align-middle appearance-none no-underline font-medium text-sm leading-[1.75] tracking-[0.02857em] uppercase min-h-[36px] min-w-0 z-[1050] shadow-[rgba(0,0,0,0.2)_0px_3px_5px_-1px,rgba(0,0,0,0.14)_0px_6px_10px_0px,rgba(0,0,0,0.12)_0px_1px_18px_0px] text-white m-2 p-0 rounded-[50%] border-0
 [transition:background-color_250ms_cubic-bezier(0.4,0,0.2,1)0ms,box-shadow_250ms_cubic-bezier(0.4,0,0.2,1)0ms,border-color_250ms_cubic-bezier(0.4,0,0.2,1)0ms]
@@ -25,8 +25,9 @@ export const Fab1 = defaults(() => ({
 })
 
 export const Fab = defaults(() => ({
-      disabled: $(false, HtmlBoolean),
-      class: $(undefined, HtmlClass),
+      disabled: $(false, HtmlBoolean) as ObservableMaybe<boolean> | undefined,
+      class: $(undefined, HtmlClass) as ObservableMaybe<boolean> | undefined,
+      style: $(undefined, HtmlStyle) as ObservableMaybe<JSX.Style> | undefined
 }), (props: any) => {
       const { children, class: cls, disabled, ...otherProps } = props
 
