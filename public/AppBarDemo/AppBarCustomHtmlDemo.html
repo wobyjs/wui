@@ -5,6 +5,7 @@
     <meta charset="utf-8" />
     <title>AppBar Custom (HTML)</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script type="module" src="../../src/Appbar.tsx"></script>
     <link rel="stylesheet" href="../../src/input.css" />
     <style>
         html,
@@ -22,18 +23,16 @@
 <body>
     <div>
         <div>
-            <wui-appbar color="custom" bg-class="bg-black/80" text-class="text-white" elevation="4" edge="bottom"
-                cls="px-4 mt-2">
+            <wui-appbar type="custom" cls="bg-black/80 text-white font-bold uppercase shadow-md px-4 w-[50%]">
                 <div class="flex items-center h-12 pl-4">Custom Appbar</div>
             </wui-appbar>
-            <div class="p-4 text-sm text-gray-500 space-y-4 pb-12">
+            <div class="p-4 text-sm text-gray-500 space-y-4 pt-14 h-[600px] ">
                 <p>
                     This demo shows a <span class="font-bold">Custom Appbar</span> using the <code
-                        class="font-bold">&lt;wui-appbar&gt;</code>
-                    custom element with a custom dark background, white text, and elevation 4.
+                        class="font-bold">&lt;wui-appbar&gt;</code>.
                 </p>
                 <p>Scroll down…</p>
-                <div class="h-[600px] bg-gray-100 rounded border p-4">
+                <div class="bg-gray-100 rounded border p-4">
                     <div class="relative rounded bg-gray-900 text-gray-100 text-xs p-4 overflow-x-auto">
                         <button id="copy-btn"
                             class="absolute top-2 right-2 px-2 py-1 rounded bg-gray-700 hover:bg-gray-600 active:bg-gray-500 transition text-white"
@@ -42,7 +41,7 @@
                         </button>
 
                         <pre class="m-0 whitespace-pre overflow-x-auto">
-<code id="code-html" class="language-html">&lt;wui-appbar color="custom" bg-class="bg-black/80" text-class="text-white" elevation="4" edge="bottom" class="px-4 mt-2"&gt;
+<code id="code-html" class="language-html">&lt;wui-appbar custom cls="bg-black/80 text-white font-bold uppercase shadow-md px-4 mt-1 w-[50%]"&gt;
 	&lt;div class="flex items-center h-12 pl-4"&gt;Custom Appbar&lt;/div&gt;
 &lt;/wui-appbar&gt;</code>
                         </pre>
@@ -68,9 +67,6 @@
         </div>
     </div>
     <script type="module">
-        // registers <wui-appbar> on this page
-        import '../../src/Appbar.tsx'
-
         // Copy code handler (preserves tabs/newlines exactly)
         const btn = document.getElementById('copy-btn')
         const code = document.getElementById('code-html')

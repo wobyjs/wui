@@ -20,34 +20,42 @@
         <wui-avatar src="../sample-avatar.png" alt="Avatar" snapshot-name="Image-Avatar" />
     </woby-chk>
 
-    <woby-chk name="Image Avatar 2">
-        <wui-avatar src="sample.png" alt="Avatar" snapshot-name="Image-Avatar-2" />
+    <woby-chk name="Circular Avatar">
+        <wui-avatar snapshot-name="Circular-Avatar" type="circular" children="C" />
     </woby-chk>
 
+    <woby-chk name="Rounded Avatar">
+        <wui-avatar snapshot-name="Rounded-Avatar" type="rounded" children="R" />
+    </woby-chk>
+
+    <woby-chk name="Square Avatar">
+        <wui-avatar snapshot-name="Square-Avatar" type="square" children="S" />
+    </woby-chk>
+    
     <woby-chk name="H Avatar">
         <wui-avatar children="H" snapshot-name="H-Avatar" />
     </woby-chk>
 
     <woby-chk name="xs Avatar">
-        <wui-avatar size="xs" variant="circular" children="xs" snapshot-name="xs-Avatar" />
+        <wui-avatar size="xs" type="circular" children="xs" snapshot-name="xs-Avatar" />
     </woby-chk>
 
     <woby-chk name="SM Avatar">
-        <wui-avatar size="sm" variant="rounded" children="sm" snapshot-name="SM-Avatar" />
+        <wui-avatar size="sm" type="rounded" children="sm" snapshot-name="SM-Avatar" />
     </woby-chk>
 
     <woby-chk name="MD Avatar">
-        <wui-avatar size="md" variant="square" children="md" snapshot-name="md-Avatar" />
+        <wui-avatar size="md" type="square" children="md" snapshot-name="md-Avatar" />
     </woby-chk>
 
     <woby-chk name="Custom Avatar">
-        <wui-avatar class="!w-6 !h-6 font-bold bg-purple-500 text-green-500 rounded-full" size="sm" variant="circular" children="CU"
+        <wui-avatar type cls="relative flex items-center justify-center align-middle select-none leading-none overflow-hidden shrink-0 text-white m-0 w-6 h-6 text-sm bg-purple-500 rounded-full font-bold" children="CU"
             snapshot-name="Custom-Avatar" />
     </woby-chk>
 
     <woby-chk name="Custom Avatar">
-        <wui-avatar cls="bg-purple-500 text-white" size="sm" variant="rounded" children="JL"
-            snapshot-name="Custom-Avatar 2" />
+        <wui-avatar snapshot-name="Custom-Avatar-2" type size="xm" cls="relative flex items-center justify-center align-middle select-none leading-none overflow-hidden shrink-0 text-white m-0 w-6 h-6 text-sm bg-purple-500 rounded-full font-bold" children="C2"
+            />
     </woby-chk>
 
     <!-- <woby-chk name="Custom Avatar 2">

@@ -6,6 +6,7 @@
     <title>AppBar Fixed (HTML)</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" href="../../src/input.css" />
+    <script type="module" src="../../src/Appbar.tsx"></script>
     <style>
         html,
         body {
@@ -24,13 +25,13 @@
             <wui-appbar position="fixed" cls="px-4 mt-2">
                 <div class="flex items-center h-12 pl-4">Fixed Appbar</div>
             </wui-appbar>
-            <div class="p-4 text-sm text-gray-500 space-y-4 pt-12">
+            <div class="p-4 text-sm text-gray-500 space-y-4 mt-2 pt-14 h-[600px]">
                 <p>This demo shows an <span class="font-bold">Fixed Appbar</span> with <code
                         class="font-bold">position="fixed"</code> using the
                     <code class="font-bold">&lt;wui-appbar&gt;</code> custom element.
                 </p>
                 <p>Scroll down…</p>
-                <div class="h-[600px] bg-gray-100 rounded border p-4">
+                <div class="bg-gray-100 rounded border p-4">
                     <div class="relative rounded bg-gray-900 text-gray-100 text-xs p-4 overflow-x-auto">
                         <button id="copy-btn"
                             class="absolute top-2 right-2 px-2 py-1 rounded bg-gray-700 hover:bg-gray-600 active:bg-gray-500 transition text-white"
@@ -50,9 +51,6 @@
         </div>
     </div>
     <script type="module">
-        // registers <wui-appbar> on this page
-        import '../../src/Appbar.tsx'
-
         // Copy code handler (preserves tabs/newlines exactly)
         const btn = document.getElementById('copy-btn')
         const code = document.getElementById('code-html')

@@ -3,26 +3,34 @@
 
 import { Button } from '../src/Button'
 
-const TextBtn = () => { return (<Button buttonType="text">Text Button</Button>) }
+const DefaultBtn = () => { return (<Button>Default Button</Button>) }
 
-const ContainedBtn = () => { return (<Button buttonType="contained" buttonClass="!px-2 !py-1 !rounded-[4px]">Contained Button</Button>) }
+const TextBtn = () => { return (<Button type="text">Text Button</Button>) }
 
-const OutlinedBtn = () => { return (<Button buttonType="outlined">Outlined Button</Button>) }
+const ContainedBtn = () => { return (<Button type="contained" buttonClass="!px-2 !py-1 !rounded-[4px]">Contained Button</Button>) }
 
-const IconBtn = () => { return (<Button buttonType="icon">ℹ️</Button>) }
+const OutlinedBtn = () => { return (<Button type="outlined">Outlined Button</Button>) }
+
+const IconBtn = () => { return (<Button type="icon">ℹ️</Button>) }
 
 const DisabledBtn = () => { return (<Button disabled>Disabled Button</Button>) }
 
 const CustomBtn = () => {
     return (
-        <Button buttonType="contained" cls="m-2 p-2 !rounded-[5px] !text-red-500 !bg-green-200">Custom Button</Button>
+        <Button type="contained" cls="m-2 p-2 !rounded-[5px] !text-red-500 !bg-green-200">Custom Button</Button>
+    )
+}
+
+const CustomBtn2 = () => {
+    return (
+        <Button type cls="m-2 p-2 font-bold text-white border-2 rounded-full bg-blue-500 cursor-pointer">Custom Button</Button>
     )
 }
 
 const ClickMeBtn = () => {
     return (
         <Button
-            buttonType="contained"
+            type="contained"
             buttonFunction="submit"
             class="!px-12 !py-11 !text-red-500"
             onClick={() => alert('clicked me')}
@@ -34,11 +42,13 @@ const ClickMeBtn = () => {
 
 
 export {
+    DefaultBtn,
     TextBtn,
     ContainedBtn,
     OutlinedBtn,
     IconBtn,
     DisabledBtn,
     CustomBtn,
+    CustomBtn2,
     // ClickMeBtn
 }
