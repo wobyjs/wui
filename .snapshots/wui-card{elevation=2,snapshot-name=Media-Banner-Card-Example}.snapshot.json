@@ -1,4 +1,0 @@
-{
-  "props": {},
-  "html": "<slot-mocked> <wui-card class=\"max-w-md m-2\" elevation=\"2\" snapshot-name=\"Media-Banner-Card-Example\"> <wui-card-media src=\"contemplative-reptile.jpg\" alt=\"Banner image\" height=\"160px\" position=\"center center\" fit=\"cover\" class=\"w-full\"></wui-card-media> <wui-card-content> <h3 class=\"text-lg font-semibold\">Banner Card</h3> <p class=\"text-sm text-gray-600\">Media header with content below.</p> </wui-card-content> </wui-card> </slot-mocked>"
-}

@@ -7,28 +7,27 @@ import './input.css'
 const variant = {
     text: `inline-flex items-center justify-center relative box-border bg-transparent cursor-pointer select-none align-middle no-underline 
             font-medium text-sm leading-[1.75] tracking-[0.02857em] uppercase rounded text-[#1976d2] 
-            rounded-none border-0 outline-0 font-sans
+            rounded-[4px] border-0 outline-0 font-sans px-4 py-2 
             [transition:background-color_250ms_cubic-bezier(0.4,0,0.2,1)0ms,box-shadow_250ms_cubic-bezier(0.4,0,0.2,1)0ms,border-color_250ms_cubic-bezier(0.4,0,0.2,1)0ms,color_250ms_cubic-bezier(0.4,0,0.2,1)0ms]
             hover:no-underline hover:bg-[rgba(25,118,210,0.04)]
             disabled:text-[rgba(0,0,0,0.26)] disabled:pointer-events-none disabled:cursor-default`,
     contained: `inline-flex items-center justify-center relative box-border cursor-pointer select-none align-middle no-underline 
             font-medium text-sm leading-[1.75] tracking-[0.02857em] uppercase rounded text-white bg-[#1976d2] 
             shadow-[0px_3px_1px_-2px_rgba(0,0,0,0.2),0px_2px_2px_0px_rgba(0,0,0,0.14),0px_1px_5px_0px_rgba(0,0,0,0.12)] 
-            rounded-none border-0 outline-0 font-sans 
+            rounded-[4px] border-0 outline-0 font-sans px-4 py-2 
             [transition:background-color_250ms_cubic-bezier(0.4,0,0.2,1)0ms,box-shadow_250ms_cubic-bezier(0.4,0,0.2,1)0ms,border-color_250ms_cubic-bezier(0.4,0,0.2,1)0ms,color_250ms_cubic-bezier(0.4,0,0.2,1)0ms]
             hover:no-underline hover:bg-[#1565c0] hover:shadow-[0px_2px_4px_-1px_rgba(0,0,0,0.2),0px_4px_5px_0px_rgba(0,0,0,0.14),0px_1px_10px_0px_rgba(0,0,0,0.12)]
             active:shadow-[0px_5px_5px_-3px_rgba(0,0,0,0.2),0px_8px_10px_1px_rgba(0,0,0,0.14),0px_3px_14px_2px_rgba(0,0,0,0.12)]
             disabled:text-[rgba(0,0,0,0.26)] disabled:shadow-none disabled:bg-[rgba(0,0,0,0.12)] disabled:pointer-events-none disabled:cursor-default`,
     outlined: `inline-flex items-center justify-center relative box-border bg-transparent cursor-pointer select-none align-middle no-underline font-medium 
-            text-sm leading-[1.75] tracking-[0.02857em] uppercase rounded border text-[#1976d2] rounded-none 
-            border-solid border-[rgba(25,118,210,0.5)] font-sans
+            text-sm leading-[1.75] tracking-[0.02857em] uppercase rounded border text-[#1976d2] rounded-[4px] 
+            border-solid border-[rgba(25,118,210,0.5)] font-sans px-4 py-2 
             [transition:background-color_250ms_cubic-bezier(0.4,0,0.2,1)0ms,box-shadow_250ms_cubic-bezier(0.4,0,0.2,1)0ms,border-color_250ms_cubic-bezier(0.4,0,0.2,1)0ms,color_250ms_cubic-bezier(0.4,0,0.2,1)0ms]
             hover:no-underline hover:bg-[rgba(25,118,210,0.04)] hover:border hover:border-solid hover:border-[#1976d2]
             disabled:text-[rgba(0,0,0,0.26)] disabled:border disabled:border-solid disabled:border-[rgba(0,0,0,0.12)] disabled:pointer-events-none disabled:cursor-default`,
     icon: `inline-flex items-center justify-center relative box-border bg-transparent cursor-pointer select-none align-middle no-underline text-center
      flex-[0_0_auto] text-2xl overflow-visible text-[rgba(0,0,0,0.54)] transition-[background-color] duration ease-in-out delay-[0ms] rounded-none
-     rounded-[50%] border-0
-            hover:bg-[rgba(0,0,0,0.04)]`,
+     rounded-[50%] border-0 hover:bg-[rgba(0,0,0,0.04)]`,
 }
 
 // Inline styles (works in both Light DOM and Shadow DOM)
@@ -125,33 +124,22 @@ const variantStyles = {
 }
 
 const def = () => ({
-    buttonType: $("contained"),
+    type: $("contained"),
     buttonFunction: $("button"),
     children: $("Button"),
-    checked:$(false, HtmlBoolean) as ObservableMaybe<boolean> | undefined,
-    // disabled: $(false) as Observable<boolean>,
+    checked: $(false, HtmlBoolean) as ObservableMaybe<boolean> | undefined,
     disabled: $(false, HtmlBoolean) as ObservableMaybe<boolean> | undefined,
     cls: $(""),
     onClick: undefined,
 })
 
 const Button = defaults(def, (props) => {
-    const { children, cls, buttonType, buttonFunction, checked, disabled, onClick, ...otherProps } = props
-
-    // Convert disabled to boolean if it's a string (from HTML attributes)
-    // const isDisabled = () => {
-    //     const disabledValue = $$(disabled)
-    //     if (typeof disabledValue === 'string') {
-    //         return disabledValue === 'true' || disabledValue === ''
-    //     }
-    //     return Boolean(disabledValue)
-    // }
+    const { children, cls, type: buttonType, buttonFunction, checked, disabled, onClick, ...otherProps } = props
 
     // Create reactive displayText observable with proper type
     const displayText = $<string>('')
 
     // Handle both slot elements (HTML custom elements) and regular children (TSX)
-
     useEffect(() => {
         const childValue = $$(children)
 
@@ -187,7 +175,6 @@ const Button = defaults(def, (props) => {
                 if (onClick) {
                     onClick(e)
                 }
-
                 // Handle the checked state toggle
                 e.stopImmediatePropagation()
                 if (isObservable(checked)) {
@@ -195,23 +182,7 @@ const Button = defaults(def, (props) => {
                 }
             }}
             disabled={disabled}
-            class={() => [variant[$$(buttonType)], $$(cls)].join(' ')}
-            // style={() => {
-            //     const baseStyle = variantStyles[$$(buttonType)]
-            //     if (isDisabled()) {
-            //         // Disabled button styles
-            //         return {
-            //             ...baseStyle,
-            //             color: 'rgba(0, 0, 0, 0.26)',
-            //             backgroundColor: 'rgba(0, 0, 0, 0.12)',
-            //             boxShadow: 'none',
-            //             cursor: 'default',
-            //             pointerEvents: 'none',
-            //         }
-            //     }
-            //     return baseStyle
-            // }}
-            // class={() => [$$(cls)].join(' ')}
+            class={[() => variant[$$(buttonType)], cls]}
             {...otherProps}
         >
             {children}

@@ -1,0 +1,22 @@
+[
+    {
+        "label": "Small",
+        "value": "12px"
+    },
+    {
+        "label": "Normal",
+        "value": "16px"
+    },
+    {
+        "label": "Large",
+        "value": "20px"
+    },
+    {
+        "label": "Extra Large",
+        "value": "24px"
+    },
+    {
+        "label": "Heading",
+        "value": "32px"
+    }
+]

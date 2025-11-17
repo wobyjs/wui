@@ -90,8 +90,8 @@ export const MultiWheeler = (props: MultiWheelerProps): JSX.Element => {
             <div class="flex items-center justify-between px-4 py-2 h-auto relative">
                 <div class="w-[80px] flex justify-start">
                     <Button
-                        buttonType='contained'
-                        class={['px-2']}
+                        type='contained'
+                        cls={['px-2']}
                         onClick={() => visible(false)}
                     >
                         Cancel
@@ -104,8 +104,8 @@ export const MultiWheeler = (props: MultiWheelerProps): JSX.Element => {
                 </div>
                 <div class="w-[80px] flex justify-end">
                     <Button
-                        buttonType='contained'
-                        class={['px-2']}
+                        type='contained'
+                        cls={['px-2']}
                         onClick={() => {
                             // if (isObservable(oriDate)) oriDate($$(modDate))
                             visible(false)
@@ -125,7 +125,7 @@ export const MultiWheeler = (props: MultiWheelerProps): JSX.Element => {
                         value={stateArr[index]}
                         itemHeight={itemHeight}
                         itemCount={itemCount}
-                        class={[wheelWrapperCls,]}
+                        cls={[wheelWrapperCls,]}
                         changeValueOnClickOnly={changeValueOnClickOnly} />
                 })}
             </div>

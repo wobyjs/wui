@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Icon Button Component Test</title>
+    <link href="/node_modules/@woby/chk/dist/index.css" rel="stylesheet">
+    <script type="module" src="../src/IconButton.tsx"></script>
+</head>
+
+<body>
+    <link href="../dist/wui.css" rel="stylesheet">
+    <h2 class="text-[1.2em] pl-4 font-bold">Icon Button Component Test Suite</h2>
+
+    <div class="p-4">
+
+        <woby-chk name="default-icon-button-object">
+            <wui-icon-button snapshot-name="default-icon-button-object">
+                <object data="/svg/info-icon.svg" width="24" height="24"> Your browser does not support SVGs. </object>
+            </wui-icon-button>
+        </woby-chk>
+
+        <woby-chk name="default-icon-button-img">
+            <wui-icon-button snapshot-name="default-icon-button-img">
+                <img src="/svg/info-icon.svg" alt="Information Icon" width="24" height="24">
+            </wui-icon-button>
+        </woby-chk>
+
+        <woby-chk name="default-icon-button-svg">
+            <wui-icon-button snapshot-name="default-icon-button-svg">
+                <svg focusable="false" viewBox="0 0 24 24" width="24" height="24">
+                    <path
+                        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z">
+                    </path>
+                </svg>
+            </wui-icon-button>
+        </woby-chk>
+
+        <woby-chk name="disabled-icon-button-object">
+            <wui-icon-button disabled snapshot-name="disabled-icon-button-object">
+                <object data="/svg/info-icon.svg" width="24" height="24"> Your browser does not support SVGs. </object>
+            </wui-icon-button>
+        </woby-chk>
+
+        <woby-chk name="disabled-icon-button-img">
+            <wui-icon-button disabled snapshot-name="disabled-icon-button-img">
+                <img src="/svg/info-icon.svg" alt="Information Icon" width="24" height="24">
+            </wui-icon-button>
+        </woby-chk>
+
+        <woby-chk name="disabled-icon-button-svg">
+            <wui-icon-button disabled snapshot-name="disabled-icon-button-svg">
+                <svg focusable="false" viewBox="0 0 24 24" width="24" height="24">
+                    <path
+                        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z">
+                    </path>
+                </svg>
+            </wui-icon-button>
+        </woby-chk>
+
+         <woby-chk name="disabled-icon-button-svg">
+            <wui-icon-button disabled="true" snapshot-name="disabled-icon-button-svg">
+                <svg focusable="false" viewBox="0 0 24 24" width="24" height="24">
+                    <path
+                        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z">
+                    </path>
+                </svg>
+            </wui-icon-button>
+        </woby-chk>
+
+        <!-- <h3 class="text-[1.1em] font-semibold mt-4 mb-2">Disabled Icon Button</h3>
+        <woby-chk>
+            <wui-icon-button disabled>
+                <object data="/svg/info-icon.svg" width="24" height="24"> Your browser does not support SVGs. </object>
+            </wui-icon-button>
+        </woby-chk>
+
+        <h3 class="text-[1.1em] font-semibold mt-4 mb-2">Custom Styled Icon Button</h3>
+        <woby-chk>
+            <wui-icon-button cls="m-2 p-2 bg-blue-500 text-white rounded-full">
+                <object data="/svg/info-icon.svg" width="24" height="24"> Your browser does not support SVGs. </object>
+            </wui-icon-button>
+        </woby-chk>
+
+        <h3 class="text-[1.1em] font-semibold mt-4 mb-2">Icon Button with Click Handler</h3>
+        <woby-chk>
+            <wui-icon-button id="icon-button-with-click-handler">
+                <object data="/svg/info-icon.svg" width="24" height="24"> Your browser does not support SVGs. </object>
+            </wui-icon-button>
+        </woby-chk>
+
+        <script>
+            document.getElementById('icon-button-with-click-handler').onclick = () => alert('Icon button clicked!');
+        </script> -->
+    </div>
+
+</body>
+
+</html>

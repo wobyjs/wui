@@ -3,7 +3,7 @@ import '@woby/chk'
 import './input.css'
 
 type Size = "xs" | "sm" | "md" | "lg"
-type Variant = "circular" | "rounded" | "square"
+type Variant = "circular" | "rounded" | "square" | "custom"
 
 // Define the Avatar props type
 type AvatarProps = {
@@ -17,52 +17,32 @@ type AvatarProps = {
 
 // Default props
 const def = () => ({
-    // class: $("w-10 h-10 bg-[rgb(189,189,189)]"),
     cls: $(""),
     src: $(null as string | null),
     alt: $("Avatar"),
     children: $(null as JSX.Child),
     size: $("md" as Size),                 // xs | sm | md | lg
-    variant: $("circular" as Variant),
+    type: $("circular"),
 })
 
+const BASE_CLASS =
+    "relative flex items-center justify-center align-middle select-none leading-none overflow-hidden shrink-0 text-white m-0 bg-[rgb(189,189,189)]"
+
+const variantStyle = {
+    circular: [BASE_CLASS, "rounded-full"].join(" ").trim(),
+    rounded: [BASE_CLASS, "rounded-xl"].join(" ").trim(),
+    square: [BASE_CLASS, "rounded-md"].join(" ").trim(),
+}
+
+const sizeStyle = {
+    xs: "w-6 h-6 text-xs",
+    sm: "w-8 h-8 text-sm",
+    md: "w-10 h-10 text-base",
+    lg: "w-12 h-12 text-lg",
+}
+
 const Avatar = defaults(def, (props) => {
-    const { cls, src: src, alt: alt, children, size, variant, ...otherProps } = props
-
-    // Size variants
-    const sizeClass = () => {
-        switch ($$(size)) {
-            case "xs":
-                return "w-6 h-6 text-xs"
-            case "sm":
-                return "w-8 h-8 text-sm"
-            case "lg":
-                return "w-12 h-12 text-lg"
-            case "md":
-            default:
-                return "w-10 h-10 text-base"
-        }
-    }
-
-    // Shape variants
-    const variantClass = () => {
-        switch ($$(variant)) {
-            case "rounded":
-                return "rounded-xl"
-            case "square":
-                return "rounded-md"
-            case "circular":
-            default:
-                return "rounded-full"
-        }
-    }
-
-    // Convert plain values to observables if needed
-    // const srcObs = isObservable(src) ? src : $(src);
-    // const altObs = isObservable(alt) ? alt : $(alt);
-
-    // const child = useMemo(() => $$(srcObs) ? <img alt={$$(altObs)} src={$$(srcObs)} /> : children)
-    // const child = useMemo(() => $$(srcObs) ? <img class="w-full h-full object-cover" alt={$$(altObs)} src={$$(srcObs)} /> : children) // MODIFIED: Added classes to the img tag to ensure it fills the avatar container, making it fully rounded.
+    const { cls, src: src, alt: alt, children, size, type: variant, ...otherProps } = props
 
     // normalise src / alt into observables
     const srcObs = isObservable(src) ? (src as ObservableMaybe<string | null>) : $(src as string | null)
@@ -80,18 +60,14 @@ const Avatar = defaults(def, (props) => {
     })
 
 
-    // const baseClass = "relative flex items-center justify-center shrink-0 leading-none overflow-hidden select-none text-white"
-    // const baseClass =
-    //     "relative flex items-center justify-center align-middle select-none leading-none " +
-    //     "overflow-hidden shrink-0 text-white m-0 bg-[rgb(189,189,189)]"
-
-    const baseClass =
-        "relative flex items-center justify-center align-middle " +
-        "select-none leading-none overflow-hidden shrink-0 text-white m-0 bg-[rgb(189,189,189)]"
 
     return (
         <div
-            class={() => [baseClass, sizeClass(), variantClass(), $$(cls)].join(" ")}
+            class={[
+                () => variantStyle[$$(variant)],
+                () => sizeStyle[$$(size)],
+                cls
+            ]}
             {...otherProps}
         >
             {child}
@@ -99,55 +75,8 @@ const Avatar = defaults(def, (props) => {
                 <p>Class: <span>{className}</span></p>
             </pre> */}
         </div>
-
-
-        // <div
-        //     class={() =>
-        //         [
-        //             baseClass,
-        //             sizeClass(),
-        //             variantClass(),
-        //             $$(className), // user overrides go last
-        //         ]
-        //             .join(" ")
-        //     }
-        //     {...otherProps}
-        // >
-        //     {/* If src is set, render an image. Otherwise use children/initials */}
-        //     {() =>
-        //         src()
-        //             ? (
-        //                 <img
-        //                     src={src()}
-        //                     alt={alt()}
-        //                     class="w-full h-full object-cover"
-        //                 />
-        //             )
-        //             : (
-        //                 <span class="leading-none">
-        //                     {children ?? (alt() ? alt()[0] : "")}
-        //                 </span>
-        //             )
-        //     }
-        // </div>
-
-        // <div class={
-        //     ["relative flex items-center justify-center shrink-0 text-xl leading-none overflow-hidden select-none text-white m-0 rounded-[50%]", className]
-        //     } {...otherProps}>
-        //     {child}
-        // </div>
-
-
-        // <div>
-        //     <div class={["relative flex items-center justify-center shrink-0 text-xl leading-none overflow-hidden select-none text-white m-0 rounded-[50%]", cls ?? className]} {...otherProps}>
-        //         {child}
-        //     </div>
-        //     <pre>
-        //         <p>Class: <span>{className}</span></p>
-        //     </pre>
-        // </div>
     )
-}) as typeof Avatar & StyleEncapsulationProps
+}) as typeof Avatar
 
 // NOTE: Register the custom element
 customElement('wui-avatar', Avatar);
