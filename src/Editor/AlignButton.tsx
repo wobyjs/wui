@@ -13,7 +13,7 @@ type ContentAlign = 'start' | 'center' | 'end'
 
 // Default props
 const def = () => ({
-    buttonType: $("outlined" as "text" | "contained" | "outlined" | "icon"),
+    type: $("outlined" as "text" | "contained" | "outlined" | "icon"),
     title: $("Align Center"),
     cls: $(""),
     disabled: $(false) as Observable<boolean>,
@@ -22,7 +22,7 @@ const def = () => ({
 })
 
 const AlignButton = defaults(def, (props) => {
-    const { buttonType, title, cls, disabled, children, contentAlign, ...otherProps } = props as any
+    const { type: buttonType, title, cls, disabled, children, contentAlign, ...otherProps } = props as any
     const editor = useEditor();
 
     // Extract onClick from otherProps if provided
@@ -79,7 +79,7 @@ const AlignButton = defaults(def, (props) => {
         <div>
             {/* <p style={"margin-bottom: 10px; color: black;"}>Content Align: <span style={"font-weight: bold; color: blue;"}>{contentAlign}</span></p> */}
             <Button
-                buttonType={buttonType}
+                type={buttonType}
                 title={displayTitle}
                 cls={cls}
                 disabled={disabled}

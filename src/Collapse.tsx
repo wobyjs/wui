@@ -24,7 +24,7 @@ const Collapse = defaults(def, (props) => {
 	const baseClass = "overflow-hidden transition-height duration-200 ease-in-out "
 
 	const isBackground = () => {
-		return  $$(background) === true ? "bg-[#ccc]" : ""
+		return $$(background) === true ? "bg-[#ccc]" : ""
 	}
 
 	function renderCollapse() {
@@ -38,7 +38,7 @@ const Collapse = defaults(def, (props) => {
 					{/* <pre class="border border-black-500 rounded-[4px] justify-center align-center items-center overflow-auto w-[90%] mx-auto my-2 p-2">
 						<p class="underline">Collapse Props</p>
 						<p class="mt-2 font-bold text-black">Children: <span class="text-blue-500">{children()}</span></p>
-						<p class="mt-2 font-bold text-black">Class: <span class="text-blue-500">{className()}</span></p>
+						<p class="mt-2 font-bold text-black">Class: <span class="text-blue-500">{cls}</span></p>
 						<p class="mt-2 font-bold text-black">Open: <span class="text-blue-500">{() => internalOpen.toString()}</span></p>
 						<p class="mt-2 font-bold text-black">Background: <span class="text-blue-500">{() => background.toString()}</span></p>
 					</pre> */}
