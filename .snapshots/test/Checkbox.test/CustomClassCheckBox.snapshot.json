@@ -1,0 +1,4 @@
+{
+  "props": {},
+  "html": "<div><div class=\"!text-blue-500 !font-bold\"><!----><!----><input id=\"custom-class-checkbox\" type=\"checkbox\"></input><!----><label class=\"pl-1.5 select-none\" for=\"custom-class-checkbox\"> Custom styled checkbox </label></div></div>"
+}

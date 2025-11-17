@@ -1,0 +1,4 @@
+{
+  "props": {},
+  "html": "<slot-mocked> <wui-collapse-mocked snapshot-name=\"Default-Collapse-Html\" open=\"\" background=\"\" cls=\"\"><div class=\"overflow-hidden transition-height duration-200 ease-in-out bg-[#ccc]\"><div class=\"h-fit\"><slot-mocked> <div class=\"p-4 bg-gray-100\"> <p>This is the content inside the collapse component.</p> <p>It should be visible by default.</p> </div> </slot-mocked></div></div> <div class=\"p-4 bg-gray-100\"> <p>This is the content inside the collapse component.</p> <p>It should be visible by default.</p> </div> </wui-collapse-mocked> </slot-mocked>"
+}

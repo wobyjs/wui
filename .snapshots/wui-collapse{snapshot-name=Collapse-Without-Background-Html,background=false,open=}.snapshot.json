@@ -1,0 +1,4 @@
+{
+  "props": {},
+  "html": "<slot-mocked> <wui-collapse-mocked snapshot-name=\"Collapse-Without-Background-Html\" background=\"false\" open=\"\" cls=\"\"><div class=\"overflow-hidden transition-height duration-200 ease-in-out\"><div class=\"h-fit\"><slot-mocked> <div class=\"p-4\"> <p>This collapse has no background.</p> <p>There should be no gray background.</p> </div> </slot-mocked></div></div> <div class=\"p-4\"> <p>This collapse has no background.</p> <p>There should be no gray background.</p> </div> </wui-collapse-mocked> </slot-mocked>"
+}

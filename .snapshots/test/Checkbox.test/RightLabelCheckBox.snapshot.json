@@ -1,0 +1,4 @@
+{
+  "props": {},
+  "html": "<div><div><!----><!----><input id=\"right-label-checkbox\" type=\"checkbox\"></input><!----><label class=\"pl-1.5 select-none\" for=\"right-label-checkbox\"> Right Label </label></div></div>"
+}

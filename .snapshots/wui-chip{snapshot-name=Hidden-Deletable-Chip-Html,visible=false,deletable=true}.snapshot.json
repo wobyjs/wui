@@ -1,0 +1,4 @@
+{
+  "props": {},
+  "html": "<slot-mocked> <wui-chip-mocked snapshot-name=\"Hidden-Deletable-Chip-Html\" visible=\"false\" deletable=\"true\" delete-icon=\"() => { return untrack(() => isClass(component) ? new component(props) : component.call(component, props)); }\" cls=\"\"><!----> Hidden & Deletable (Should Not Appear) </wui-chip-mocked> </slot-mocked>"
+}

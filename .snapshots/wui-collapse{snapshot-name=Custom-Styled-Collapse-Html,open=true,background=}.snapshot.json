@@ -1,0 +1,4 @@
+{
+  "props": {},
+  "html": "<slot-mocked> <wui-collapse-mocked snapshot-name=\"Custom-Styled-Collapse-Html\" cls=\"!bg-yellow-100 !border-2 !border-purple-500\" open=\"true\" background=\"\"><div class=\"overflow-hidden transition-height duration-200 ease-in-out bg-[#ccc] !bg-yellow-100 !border-2 !border-purple-500\"><div class=\"h-fit\"><slot-mocked> <div class=\"p-4\"> <p>This collapse has custom styling.</p> <p>It should have a yellow background and purple border.</p> </div> </slot-mocked></div></div> <div class=\"p-4\"> <p>This collapse has custom styling.</p> <p>It should have a yellow background and purple border.</p> </div> </wui-collapse-mocked> </slot-mocked>"
+}
