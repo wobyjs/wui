@@ -5,7 +5,8 @@ import { WheelerProps, WheelerItem } from './WheelerType'
 export const ActiveWheelers = $([])
 
 const def = () => ({
-    options: $(null) as ObservableMaybe<WheelerItem<any>[]>,
+    // options: $(null) as ObservableMaybe<WheelerItem<any>[]>,
+    options: $([], { toHtml: o => JSON.stringify(o), fromHtml: o => JSON.parse(o) }) as ObservableMaybe<(string | number | WheelerItem<any>)[]>,
     itemHeight: $(36, HtmlNumber) as ObservableMaybe<number>,
     itemCount: $(5, HtmlNumber) as ObservableMaybe<number>,
     value: $(null) as ObservableMaybe<any>,
@@ -32,14 +33,8 @@ const Wheeler = defaults(def, (props) => {
 
     const itemHeight = use(ih, 36)
     const itemCount = use(vic, 5)
-    // const value = $($$(oriValue))
     const value = oriValue
 
-    // #region: Comment this hook
-    // useEffect(() => {
-    //     value($$(oriValue))
-    // })
-    // #endregion
 
     const CLICK_THRESHOLD_PX = 5
 
@@ -50,7 +45,6 @@ const Wheeler = defaults(def, (props) => {
     let maxTranslateY = 0
 
     // --- State variables ---
-    const selectedIndex = $(-1)
     let currentY = 0
     let startY = 0
     let startTranslateY = 0
@@ -68,66 +62,16 @@ const Wheeler = defaults(def, (props) => {
     const eventType = $<string>()
     const multiple = all
 
+    // Initialize selectedIndex based on the initial value prop
+    const initialIndex = !$$(multiple)
+        ? $$(options).findIndex(opt => {
+            const optValue = typeof opt === 'object' && opt !== null && 'value' in opt ? opt.value : opt;
+            return optValue === $$(value);
+        })
+        : -1;
+    const selectedIndex = $(initialIndex)
+
     let preOptions, preFormattedOptions
-
-    // #region: Original Formatted Options
-    // const formattedOptions = useMemo(() => {
-    //     if (preOptions === $$(options)) return preFormattedOptions
-
-    //     const base = $$(options).map(opt => {
-    //         const o = typeof opt === 'object' && opt !== null ? opt : { value: opt, label: String(opt) } as WheelerItem
-    //         if (!('hasComponent' in o))
-    //             o.hasComponent = !!o.component
-    //         return o
-    //     })
-
-    //     if ($$(multiple)) {
-    //         base.unshift({ value: $$(multiple), label: $$(multiple), hasComponent: false })
-
-    //         const r = {} as Record<string, Observable<boolean>>
-
-    //         base.map(opt => r[opt.label] = $(false)) //init
-    //         checkboxes(r)
-
-    //         const vs = [...[$$(value)]].flat()
-    //         let allInitiallyChecked = true
-    //         base.forEach(opt => {
-    //             const isSelected = vs.some(sv => sv === opt.value)
-    //             r[opt.label](isSelected)
-    //             if (opt.label !== $$(multiple) && !isSelected) {
-    //                 allInitiallyChecked = false
-    //             }
-    //         })
-    //         // Set the "All" checkbox state based on initial values
-    //         if (r[$$(multiple)]) { // Ensure "All" checkbox exists
-    //             r[$$(multiple)](allInitiallyChecked && base.length > 1) // base.length > 1 to avoid "All" being checked if it's the only item
-    //         }
-
-
-    //         base.forEach((o, index) => o.component = o.hasComponent ? o.component as any : (props: { itemHeight: number, value: WheelerItem, index: number }) => <li class={['wheeler-item', 'text-black']} data-index={index} data-value={o.value}
-    //             style={{ height: () => `${$$(itemHeight)}px` }}>
-    //             {() => {
-    //                 const isChecked = $$(checkboxes)[o.label]
-
-    //                 return <label class="flex items-center gap-2 px-2">
-    //                     <input class='pl-2' onClick={e => { isChecked(!$$(isChecked)); chk2value(o.label) }} type="checkbox" checked={$$(isChecked)} readonly />
-    //                     <span class={['pl-5 w-full']} >{o.label}</span>
-    //                 </label>
-    //             }}
-    //         </li>)
-
-    //     }
-    //     else {
-    //         base.forEach((o, index) => o.component = o.hasComponent ? o.component as any : (() => <li class={['wheeler-item', pickerItemCls, 'text-[#555] opacity-60 ']} data-index={index} data-value={o.value}
-    //             style={{ height: () => `${$$(itemHeight)}px` }}>{o.label}
-    //         </li>))
-    //     }
-
-    //     preOptions = $$(options)
-
-    //     return preFormattedOptions = base
-    // })
-    // #endregion
 
     /**
      * `formattedOptions` is a memoized, derived state that transforms the raw `options` prop
@@ -157,9 +101,8 @@ const Wheeler = defaults(def, (props) => {
         // we end up with a consistent array of `WheelerItem` objects.
         const base = $$(options).map(opt => {
             // If `opt` is already an object with `value` and `label`, use it.
-            // Otherwise, create a standard object from the primitive value.
             const o = typeof opt === 'object' && opt !== null && 'value' in opt
-                ? opt as WheelerItem
+                ? { ...opt } as WheelerItem
                 : { value: opt, label: String(opt) } as WheelerItem;
 
             // Check if a custom component was already provided for this item.
@@ -182,7 +125,7 @@ const Wheeler = defaults(def, (props) => {
             base.forEach(opt => r[opt.label] = $(false)); // Initialize all to false.
 
             // Sync the initial state of the checkboxes with the incoming `value` prop.
-            const vs = [...[$$(value)]].flat(); // Get the current selected values as a flat array.
+            const vs = Array.isArray($$(value)) ? $$(value) : [$$(value)].flat(); // Get the current selected values as a flat array.
             let allInitiallyChecked = true;
             base.forEach(opt => {
                 const isSelected = vs.some(sv => sv === opt.value);
@@ -249,34 +192,6 @@ const Wheeler = defaults(def, (props) => {
         return preFormattedOptions = base;
     })
 
-    // #region: Original chkValues
-    // const chkValues = () => {
-    //     // const c = $$(checkboxes)
-
-    //     const vs = new Set([$$(value)].flat()) // current value set
-    //     const os = $$(formattedOptions)        // options list
-    //     const cb = $$(checkboxes)              // current checkbox state
-
-    //     const cbv = new Set(
-    //         Object.entries(cb)
-    //             .filter(([_, active]) => $$(active))
-    //             .map(([label]) => label)
-    //     )
-
-    //     // Values checked in checkbox but not in current value
-    //     const onlyInCheckbox = os
-    //         .filter(opt => $$(cb[opt.label]) && !vs.has(opt.value) && opt.label !== $$(multiple))
-    //         .map(opt => opt.value)
-
-    //     // Values in current value but now unchecked
-    //     const onlyInValue = [...vs].filter(val => {
-    //         const opt = os.find(o => o.value === val)
-    //         return opt ? !$$(cbv.has(opt.label)) : true
-    //     })
-
-    //     return { onlyInCheckbox, onlyInValue }
-    // }
-    // #endregion
 
     /**
      * `chkValues` is a utility function that calculates the "diff" (difference) between
@@ -345,23 +260,8 @@ const Wheeler = defaults(def, (props) => {
         return { onlyInCheckbox, onlyInValue };
     }
 
+
     // #region: useEffect to handle value synchronization
-    // useEffect(() => {
-    //     if (!ok) return
-
-    //     if (!$$(ok)) return
-
-    //     if (isObservable(oriValue))
-    //         oriValue($$(value))
-
-    //     if (isObservable(ok))
-    //         ok(false)
-
-    //     if (isObservable(visible))
-    //         visible(false)
-    // })
-    // #endregion
-
     /**
      * This `useEffect` hook acts as a listener for a "commit" action,
      * typically triggered by an external "OK" button.
@@ -403,75 +303,10 @@ const Wheeler = defaults(def, (props) => {
             visible(false);
         }
     });
-
-    // #region: values to chk
-    // //values to chk
-    // let preValue: any // Store previous value of the external prop
-    // const value2chk = () => {
-    //     if (!$$(multiple)) return
-
-    //     // If the component is visible and the external value hasn't changed since the last sync, skip.
-    //     // When visible becomes true, preValue is typically null (reset in visible useEffect),
-    //     // so this condition allows the sync to run.
-    //     if ($$(visible) && preValue === $$(value)) {
-    //         return
-    //     }
-
-    //     const { onlyInCheckbox, onlyInValue } = chkValues()
-
-    //     const os = $$(formattedOptions)
-    //     const c = $$(checkboxes)
-    //     const allLabel = $$(multiple) // The label for the "All" checkbox
-
-    //     let changed = false
-
-    //     // Sync individual items based on the external `value` prop.
-    //     // Part 1: Check items in UI that are present in `value` but not checked.
-    //     for (const valFromProp of onlyInValue) {
-    //         const opt = os.find(o => o.value === valFromProp)
-    //         // Ensure the option exists, it's not the "All" option itself, and its checkbox observable exists.
-    //         if (opt && opt.label !== allLabel && c[opt.label]) {
-    //             if (!$$(c[opt.label])) { // If not already checked
-    //                 c[opt.label](true)
-    //                 changed = true
-    //             }
-    //         }
-    //     }
-
-    //     // Part 2: Uncheck items in UI that are checked but not present in `value`.
-    //     for (const valFromCheckbox of onlyInCheckbox) {
-    //         const opt = os.find(o => o.value === valFromCheckbox)
-    //         // Ensure the option exists, it's not the "All" option itself, and its checkbox observable exists.
-    //         if (opt && opt.label !== allLabel && c[opt.label]) {
-    //             if ($$(c[opt.label])) { // If it is currently checked (but shouldn't be)
-    //                 c[opt.label](false)
-    //                 changed = true
-    //             }
-    //         }
-    //     }
-
-    //     // After individual items are synced, derive and set the state of the "All" checkbox.
-    //     if (allLabel && c[allLabel]) { // Proceed only if "All" functionality is active and its checkbox exists.
-    //         const individualItemCheckboxes = Object.entries(c).filter(([key, _]) => key !== allLabel)
-
-    //         const allIndividualsAreChecked = individualItemCheckboxes.length > 0 &&
-    //             individualItemCheckboxes.every(([_, obs]) => $$(obs as Observable<boolean>))
-
-    //         if ($$(c[allLabel]) !== allIndividualsAreChecked) {
-    //             c[allLabel](allIndividualsAreChecked)
-    //             changed = true
-    //         }
-    //     }
-
-    //     if (changed) {
-    //         // Trigger reactivity for `checkboxes` by providing a new object reference.
-    //         checkboxes({ ...c })
-    //     }
-
-    //     preValue = $$(value) // Update preValue for the next comparison.
-    // }
     // #endregion
 
+
+    // #region: values to chk
     /**
      * `value2chk` (Value to Checkboxes) is a crucial synchronization function that handles
      * "top-down" data flow for the multi-select mode.
@@ -565,14 +400,18 @@ const Wheeler = defaults(def, (props) => {
         // top of the function works correctly on the next run.
         preValue = $$(value);
     }
+    // #endregion
+
 
     // --- Initial Synchronization on Mount ---
     // This direct call to `value2chk()` executes *during the component's initial render*.
     // Its purpose is to perform the first, immediate synchronization between the initial
     // `value` prop and the checkbox states. This ensures that when the component first
     // appears, the correct checkboxes are already ticked.
-    value2chk();
+    // value2chk();
 
+
+    // --- Continuous Synchronization on Re-renders ---
 
     // --- Continuous Synchronization on Re-renders ---
     // This `useEffect` hook schedules `value2chk` to run *after* every render of the component.
@@ -594,96 +433,7 @@ const Wheeler = defaults(def, (props) => {
     useEffect(value2chk);
 
 
-    // #region: Original chk2value
-    //chkbox to values
-    // const chk2value = (clickedLabel: string | number) => {
-    //     if (!$$(multiple)) return
-
-    //     const checkboxesMap = $$(checkboxes)
-    //     const allLabel = $$(multiple)
-
-    //     // Step 1: Update all checkbox states based on the click, especially "All" logic.
-    //     // The observable for clickedLabel was already flipped by the onClick handler.
-    //     if (clickedLabel === allLabel) {
-    //         // "All" checkbox was clicked. Its new state is in checkboxesMap[allLabel].
-    //         const isAllCheckedNow = $$(checkboxesMap[allLabel])
-    //         Object.entries(checkboxesMap).forEach(([key, obs]) => {
-    //             (obs as Observable<boolean>)(isAllCheckedNow)
-    //         })
-    //     } else {
-    //         // An individual item checkbox was clicked.
-    //         if (checkboxesMap[allLabel]) { // Only if "All" checkbox exists
-    //             const individualItems = Object.entries(checkboxesMap).filter(([key, _]) => key !== allLabel)
-    //             const allIndividualsAreChecked = individualItems.length > 0 && individualItems.every(([_, obs]) => $$(obs))
-
-    //             if ($$(checkboxesMap[clickedLabel])) { // If the clicked item was just checked
-    //                 if (allIndividualsAreChecked) {
-    //                     checkboxesMap[allLabel](true) // If all individuals are now checked, check "All"
-    //                 }
-    //             } else { // If the clicked item was just unchecked
-    //                 checkboxesMap[allLabel](false) // Uncheck "All"
-    //             }
-    //         }
-    //     }
-    //     // At this point, checkboxesMap reflects the consistent state of all checkboxes.
-
-    //     // Step 2: Calculate differences based on the new checkbox states and current external value.
-    //     const { onlyInCheckbox, onlyInValue } = chkValues() // chkValues uses $$(checkboxes) internally
-
-    //     // Step 3: Update the external value if there's a change.
-    //     if (onlyInCheckbox.length === 0 && onlyInValue.length === 0) {
-    //         // This can happen if the click on "All" resulted in a state that already matches `value`.
-    //         // Or if an individual click didn't change the effective selection set relative to `value`.
-    //         // However, we still need to ensure `oriValue` is updated if `value` itself was changed by "All" click
-    //         // even if `onlyInCheckbox/onlyInValue` are empty because `value` was already "correct" relative to the new checkbox state.
-
-    //         // A more direct approach: construct the new value set directly from checkboxes.
-    //         const newSelectedValues = new Set<any>()
-    //         const currentFormattedOptions = $$(formattedOptions)
-    //         Object.entries($$(checkboxes)).forEach(([label, isCheckedObservable]) => {
-    //             if (label !== allLabel && $$(isCheckedObservable)) {
-    //                 const opt = currentFormattedOptions.find(o => o.label === label)
-    //                 if (opt) {
-    //                     newSelectedValues.add(opt.value as any)
-    //                 }
-    //             }
-    //         })
-
-    //         const finalNewValueArray = [...newSelectedValues]
-    //         const oldValueJSON = JSON.stringify($$(value))
-    //         const newValueJSON = JSON.stringify(finalNewValueArray)
-
-    //         if (oldValueJSON !== newValueJSON) {
-    //             value(finalNewValueArray as any)
-    //             if (!ok && isObservable(oriValue)) {
-    //                 oriValue($$(value))
-    //             }
-    //         }
-    //         return
-    //     }
-
-    //     const currentVal = $$(value)
-    //     const currentValueFlat = (Array.isArray(currentVal) ? currentVal.flat() : [currentVal]) as T[]
-    //     const currentValueAsSet = new Set<T>(currentValueFlat)
-
-    //     for (const v of onlyInValue) { // These are of type T (or elements of T if T was T[])
-    //         currentValueAsSet.delete(v as T)
-    //     }
-    //     for (const v of onlyInCheckbox) { // These are from WheelerItem['value'], should be T
-    //         currentValueAsSet.add(v as T)
-    //     }
-
-    //     const finalNewValueArray = [...currentValueAsSet]
-    //     value(finalNewValueArray as any)
-
-    //     if (!ok) {
-    //         if (isObservable(oriValue)) {
-    //             (oriValue as Observable<T[]>)(finalNewValueArray as any) // Cast to any for T | T[]
-    //         }
-    //     }
-    // }
-    // #endregion
-
+    // #region: chk2value （Checkbox to Value)
     /**
      * `chk2value` (Checkboxes to Value) is the "bottom-up" synchronization function.
      * It is called directly from the `onClick` handler of a checkbox in the UI.
@@ -801,14 +551,10 @@ const Wheeler = defaults(def, (props) => {
             }
         }
     }
-
-    // #region: Original "All" Handling
-    // const isAllSelected = useMemo(() => {
-    //     const allValues = $$(formattedOptions).map(opt => opt.value)
-    //     return allValues.every(v => $$($$(checkboxes)[v]))
-    // })
     // #endregion
 
+
+    // #region: "All" Handling
     /**
      * `isAllSelected` is a memoized, reactive boolean that determines if all individual
      * items (excluding the "All" option itself) are currently checked.
@@ -845,17 +591,10 @@ const Wheeler = defaults(def, (props) => {
         // observable is currently `true`.
         return individualItemCheckboxes.every(obs => $$(obs));
     });
+    // #endregion
 
 
     // #region: Original Toggle All
-    // function toggleAll() {
-    //     const set = $$(checkboxes)
-    //     const b = $$(isAllSelected)
-    //     $$(formattedOptions).forEach(opt => set[opt.label](b))
-    //     // value([...newSet]) // notify external
-    // }
-    // #endregion
-
     /**
      * `toggleAll` is the event handler for a "Select All / Deselect All" action.
      *
@@ -898,32 +637,10 @@ const Wheeler = defaults(def, (props) => {
             (oriValue as Observable<any[]>)(finalNewValueArray as any);
         }
     }
-
-    // #region: Original Layout Effect
-    // useEffect(() => {
-    //     if (!$$(formattedOptions)) return
-
-    //     if (typeof $$(itemCount) !== 'number' || $$(itemCount) <= 0)
-    //         itemCount(3)
-
-    //     if ($$(itemCount) % 2 === 0) {
-    //         console.warn(`itemCount (${$$(itemCount)}) should be odd for symmetry. Adjusting to ${$$(itemCount) + 1}.`)
-    //         itemCount($$(itemCount) + 1)
-    //     }
-
-    //     paddingItemCount(Math.floor($$(itemCount) / 2))
-
-
-    //     // Recalculate scroll boundaries based on new layout
-    //     // Need to define getTargetYForIndex before calling it here
-    //     minTranslateY = _getTargetYForIndexUnbound($$(formattedOptions).length - 1)
-    //     maxTranslateY = _getTargetYForIndexUnbound(0)
-
-    //     snapToIndex($$(selectedIndex))
-    //     // console.log(`Layout Updated: count=${itemCount}, h=${viewportHeight}, pad=${paddingItemCount}, minY=${minTranslateY}, maxY=${maxTranslateY}`);
-    // })
     // #endregion
 
+
+    // #region: Original Layout Effect
     /**
      * This is the main Layout & Geometry Synchronization Hook for the Wheeler.
      *
@@ -984,6 +701,8 @@ const Wheeler = defaults(def, (props) => {
         // Example debug log to see the results of the layout calculation.
         // console.log(`Layout Updated: count=${itemCount}, h=${viewportHeight}, pad=${paddingItemCount}, minY=${minTranslateY}, maxY=${maxTranslateY}`);
     });
+    // #endregion
+
 
     // const viewportHeight = useMemo(() => $$(itemHeight) * $$(itemCount))
     // const indicatorTop = useMemo(() => ($$(viewportHeight) - $$(itemHeight)) / 2)
@@ -1035,13 +754,7 @@ const Wheeler = defaults(def, (props) => {
      */
     const indicatorTop = useMemo(() => ($$(viewportHeight) - $$(itemHeight)) / 2);
 
-    // #region: Original Get Target Y
-    // Internal helper to get target Y without index clamping, used for bounds calc
-    // function _getTargetYForIndexUnbound(index: number) {
-    //     // Uses the potentially updated indicatorTop and paddingItemCount
-    //     return $$(indicatorTop) - (index + $$(paddingItemCount)) * $$(itemHeight)
-    // }
-    // #endregion
+    // #region: Get Target Y
 
     /**
      * `_getTargetYForIndexUnbound` is an internal helper function for pure calculation.
@@ -1080,14 +793,6 @@ const Wheeler = defaults(def, (props) => {
         return $$(indicatorTop) - (index + $$(paddingItemCount)) * $$(itemHeight);
     }
 
-    // #region: Get Target Y
-    // Public getter for target Y, still used by snapToIndex etc.
-    // function getTargetYForIndex(index: number) {
-    //     // Uses the potentially updated indicatorTop and paddingItemCount
-    //     return $$(indicatorTop) - (index + $$(paddingItemCount)) * $$(itemHeight)
-    // }
-    // #endregion
-
     /**
      * `getTargetYForIndex` is the public-facing version of the Y-coordinate calculation.
      * It is used by functions like `snapToIndex` which operate on potentially user-provided
@@ -1111,6 +816,8 @@ const Wheeler = defaults(def, (props) => {
         // It relies on the memoized `indicatorTop`, `paddingItemCount`, and `itemHeight` to be up-to-date.
         return $$(indicatorTop) - (index + $$(paddingItemCount)) * $$(itemHeight);
     }
+    // #endregion
+
 
     const pickerItemCls = 'apply h-9 flex items-center justify-center text-base box-border transition-opacity duration-[0.3s,transform] delay-[0.3s] select-none scale-90'
 
@@ -1130,7 +837,6 @@ const Wheeler = defaults(def, (props) => {
     //     for (let i = 0; i < $$(paddingItemCount); i++)
     //         yield < li class={['wheeler-item is-padding invisible', pickerItemCls]} style={{ height: `${$$(itemHeight)}px` }}></li>
     // }
-    // #endregion
 
     /**
      * `populateList` is a JavaScript "generator function" used to declaratively build the
@@ -1181,19 +887,10 @@ const Wheeler = defaults(def, (props) => {
             yield <li class={['wheeler-item is-padding invisible', pickerItemCls]} style={{ height: `${$$(itemHeight)}px` }}></li>;
         }
     }
+    // #endregion
 
 
     // #region: Set Translate Y
-    // function setTranslateY(y: number) {
-    //     if (!$$(list)) return
-
-    //     // Clamp position using the potentially updated boundaries
-    //     currentY = Math.max(minTranslateY, Math.min(maxTranslateY, y))
-    //     $$(list).style.transform = `translateY(${currentY}px)`
-    //     updateItemStyles()
-    // }
-    // #endregion
-
     /**
      * `setTranslateY` is the component's core "rendering" function for movement. It is the
      * single, safe entry point for applying a vertical translation to the `<ul>` list.
@@ -1236,47 +933,15 @@ const Wheeler = defaults(def, (props) => {
         // 'is-near-center' styles (e.g., bold, colored, larger) to the correct one.
         updateItemStyles();
     }
+    // #endregion
+
 
     // A variable to hold the timeout ID for the current snap operation.
     // Used to prevent race conditions if `snapToIndex` is called multiple times in quick succession.
     let snapToIndexTimeout = 0;
 
     // #region: Snap To Index
-    // function snapToIndex(index: number, immediate = false, eventType?: Event) {
-    //     if (!$$(list)) return
-    //     if ($$(multiple)) return
 
-    //     // Clamp index based on options length (doesn't change)
-    //     const clampedIndex = Math.max(0, Math.min(index, $$(formattedOptions).length - 1))
-    //     // Calculate target Y using potentially updated layout values
-    //     const targetY = getTargetYForIndex(clampedIndex)
-
-    //     if (immediate) {
-    //         $$(list).style.transition = 'none'
-    //     } else {
-    //         $$(list).style.transition = 'transform 0.3s ease-out'
-    //     }
-
-    //     setTranslateY(targetY) // Apply target Y (uses updated bounds)
-
-    //     const timeoutDuration = immediate ? 10 : 310
-    //     if (snapToIndexTimeout !== 0) { clearTimeout(snapToIndexTimeout); snapToIndexTimeout = 0 }
-
-    //     // snapToIndexTimeout(
-    //     snapToIndexTimeout = setTimeout(() => {
-    //         if ($$(list).style.transition === 'none') { $$(list).style.transition = 'transform 0.3s ease-out' }
-    //         if ($$(selectedIndex) !== clampedIndex) {
-    //             selectedIndex(clampedIndex)
-    //             // if (onChange && $$(formattedOptions)[$$(selectedIndex)]) {
-    //             //     onChange($$(formattedOptions)[$$(selectedIndex)], $$(selectedIndex))
-    //             // }
-    //         }
-    //         updateItemStyles() // Uses updated viewportHeight
-    //         snapToIndexTimeout = 0
-    //     }, timeoutDuration)
-    //     // )
-    // }
-    // #endregion
 
     /**
      * `snapToIndex` is the core animation and state-settling function for the single-select wheeler.
@@ -1358,6 +1023,7 @@ const Wheeler = defaults(def, (props) => {
             snapToIndexTimeout = 0;
         }, timeoutDuration);
     }
+    // #endregion
 
     // #region: Update Item Styles
     // function updateItemStyles() {
@@ -1375,7 +1041,6 @@ const Wheeler = defaults(def, (props) => {
     //         else { item.classList.remove('is-near-center', 'opacity-100', 'font-bold', 'text-[#007bff]', 'scale-100',) }
     //     })
     // }
-    // #endregion
 
     /**
      * `updateItemStyles` is the visual feedback engine for the single-select wheeler.
@@ -1435,13 +1100,14 @@ const Wheeler = defaults(def, (props) => {
             }
         });
     }
+    // #endregion
+
 
     // #region: Get Client Y
     // function getClientY(e: PointerEvent & TouchEvent) { /* ... unchanged ... */
     //     if (e.type === 'touchend' || e.type === 'touchcancel') { return e.changedTouches && e.changedTouches.length > 0 ? e.changedTouches[0].clientY : startY }
     //     return e.touches && e.touches.length > 0 ? e.touches[0].clientY : e.clientY
     // }
-    // #endregion
 
     /**
      * `getClientY` is a cross-device utility function that reliably extracts the
@@ -1484,6 +1150,8 @@ const Wheeler = defaults(def, (props) => {
         // available directly on the event object as `e.clientY`. This is the fallback.
         return e.clientY;
     }
+    // #endregion
+
 
     // #region: Handle Start
     // function handleStart(e: PointerEvent & TouchEvent) { /* ... unchanged ... */
@@ -1505,7 +1173,6 @@ const Wheeler = defaults(def, (props) => {
     //     $$(viewport).style.cursor = 'grabbing'
     //     if ($$(rafId)) cancelAnimationFrame($$(rafId))
     // }
-    // #endregion
 
     /**
      * `handleStart` is the event handler for the `pointerdown` (mouse) and `touchstart` (touch) events.
@@ -1568,6 +1235,8 @@ const Wheeler = defaults(def, (props) => {
         // Cancel any stray animation frames from a previous, uncompleted gesture.
         if ($$(rafId)) cancelAnimationFrame($$(rafId));
     }
+    // #endregion
+
 
     // #region: Handle Move
     // function handleMove(e: PointerEvent & TouchEvent) { /* ... unchanged ... */
@@ -1608,7 +1277,6 @@ const Wheeler = defaults(def, (props) => {
     //         updateItemStyles()
     //     }))
     // }
-    // #endregion
 
     /**
      * `handleMove` is the event handler for `pointermove` and `touchmove` events.
@@ -1696,6 +1364,8 @@ const Wheeler = defaults(def, (props) => {
             updateItemStyles();
         }));
     }
+    // #endregion
+
 
     // #region: Handle End
     // function handleEnd(e: PointerEvent) { /* ... unchanged ... */
@@ -1736,7 +1406,6 @@ const Wheeler = defaults(def, (props) => {
     //     }
     //     velocity = 0
     // }
-    // #endregion
 
     /**
      * `handleEnd` is the event handler for `pointerup` and `pointercancel` events.
@@ -1824,6 +1493,7 @@ const Wheeler = defaults(def, (props) => {
         // Reset velocity for the next gesture.
         velocity = 0;
     }
+    // #endregion
 
     // #region: Handle Wheel
     // function handleWheel(event: WheelEvent) { /* ... unchanged ... */
@@ -1843,7 +1513,6 @@ const Wheeler = defaults(def, (props) => {
     //         wheelSnapTimeoutId(null)
     //     }, 150))
     // }
-    // #endregion
 
     /**
      * `handleWheel` is the event handler for the `onWheel` event, specifically for
@@ -1912,6 +1581,7 @@ const Wheeler = defaults(def, (props) => {
             wheelSnapTimeoutId(null);
         }, 150));
     }
+    // #endregion
 
 
     // #region: Handle Pointer Events
@@ -1924,7 +1594,6 @@ const Wheeler = defaults(def, (props) => {
     //         document.removeEventListener('pointerup', handleEnd)
     //     }
     // })
-    // #endregion
 
     /**
      * This `useEffect` hook is responsible for managing the GLOBAL event listeners
@@ -1973,6 +1642,8 @@ const Wheeler = defaults(def, (props) => {
             document.removeEventListener('pointerup', handleEnd);
         };
     });
+    // #endregion
+
 
     // #region: Handle Value Updates
     // useEffect(() => {
@@ -1986,7 +1657,6 @@ const Wheeler = defaults(def, (props) => {
     //         selectedIndex(foundIndex)
     //     }
     // })
-    // #endregion
 
     /**
      * This `useEffect` hook handles the "Top-Down" data synchronization for SINGLE-SELECT mode.
@@ -2031,6 +1701,7 @@ const Wheeler = defaults(def, (props) => {
             selectedIndex(foundIndex);
         }
     });
+    // #endregion
 
 
     // <<< Populate list *after* first layout calculation >>>
@@ -2071,7 +1742,6 @@ const Wheeler = defaults(def, (props) => {
     //         selectedIndex(-1)
     //     }
     // })    
-    // #endregion
 
     /**
      * This `useEffect` hook handles the "Bottom-Up" data synchronization for SINGLE-SELECT mode.
@@ -2142,6 +1812,7 @@ const Wheeler = defaults(def, (props) => {
             // selectedIndex(-1); // This could be added if you want to enforce no selection on error.
         }
     });
+    // #endregion
 
     const wheeler = $<HTMLDivElement>()
 
@@ -2167,7 +1838,6 @@ const Wheeler = defaults(def, (props) => {
     //     //         ActiveWheelers($$(ActiveWheelers).filter(w => w !== wheeler))
     //     // }
     // })
-    // #endregion
 
     /**
      * This `useEffect` hook manages the component's lifecycle in relation to its `visible` state
@@ -2229,6 +1899,7 @@ const Wheeler = defaults(def, (props) => {
         // A `return () => { ... }` could still be useful for final cleanup on unmount,
         // but the current implementation covers the primary use case.
     });
+    // #endregion
 
     // #region: Click Away Logic
     // useClickAway(wheeler, () => {
@@ -2245,7 +1916,6 @@ const Wheeler = defaults(def, (props) => {
     //             oriValue($$(value))
     //     }
     // })
-    // #endregion
 
     /**
      * This hook implements the "click away" or "blur" functionality for the Wheeler.
@@ -2305,6 +1975,7 @@ const Wheeler = defaults(def, (props) => {
         // used mutually exclusively. If both were true, `commitOnBlur` would run last
         // and take precedence.
     });
+    // #endregion
 
     // #region: Search Logic
     // const search = (val: string) => {
@@ -2323,7 +1994,6 @@ const Wheeler = defaults(def, (props) => {
     //         alert("No results found")
     //     }
     // }
-    // #endregion
 
     /**
      * The `search` function is an event handler for a text input, allowing users to
@@ -2376,6 +2046,7 @@ const Wheeler = defaults(def, (props) => {
             // alert("No results found");
         }
     }
+    // #endregion
 
     // #region: Placeholder Text Logic
     // const placeholderText = useMemo(() => {
