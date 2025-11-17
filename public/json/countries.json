@@ -1,0 +1,26 @@
+[
+    {
+        "label": "United States",
+        "value": "US"
+    },
+    {
+        "label": "Canada",
+        "value": "CA"
+    },
+    {
+        "label": "United Kingdom",
+        "value": "GB"
+    },
+    {
+        "label": "Australia",
+        "value": "AU"
+    },
+    {
+        "label": "Japan",
+        "value": "JP"
+    },
+    {
+        "label": "Germany",
+        "value": "DE"
+    }
+]
