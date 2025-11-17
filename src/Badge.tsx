@@ -31,7 +31,7 @@ const def = () => ({
 const Badge = defaults(def, (props) => {
     const { cls, children, badgeContent, badgeClass, vertical, horizontal, ...otherProps } = props
 
-    const isEmpty = () => !(badgeContent)
+    const isEmpty = () => !($$(badgeContent))
 
     // Badge visibility class
     const visibilityClass = () => isEmpty() ? 'hidden' : 'min-w-[20px] h-5 rounded-[10px] px-1'

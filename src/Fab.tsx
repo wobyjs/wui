@@ -65,8 +65,9 @@ export const Fab1 = defaults(() => ({
 })
 
 export const Fab = defaults(() => ({
-      disabled: $(false, HtmlBoolean),
-      class: $(undefined, HtmlClass),
+      disabled: $(false, HtmlBoolean) as ObservableMaybe<boolean> | undefined,
+      class: $(undefined, HtmlClass) as ObservableMaybe<boolean> | undefined,
+      style: $(undefined, HtmlStyle) as ObservableMaybe<JSX.Style> | undefined
 }), (props: any) => {
       const { children, class: cls, disabled, ...otherProps } = props
 
