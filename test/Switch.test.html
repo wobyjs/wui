@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Switch Component Test</title>
+    <link href="/node_modules/@woby/chk/dist/index.css" rel="stylesheet">
+    <script type="module" src="../src/Switch.tsx"></script>
+</head>
+
+<body>
+    <link href="../dist/wui.css" rel="stylesheet">
+    <h2 class="text-[1.2em] pl-4">Switch Component Test</h2>
+
+    <woby-chk name="Default Switch">
+        <wui-switch snapshot-name="Default-Switch" />
+    </woby-chk>
+
+    <woby-chk name="Custom Labels Switch">
+        <wui-switch on="YES" off="NO" snapshot-name="Custom-Labels-Switch" />
+    </woby-chk>
+
+    <woby-chk name="Checked Switch">
+        <wui-switch checked="true" snapshot-name="Checked-Switch" />
+    </woby-chk>
+
+    <woby-chk name="Disabled Switch">
+        <wui-switch disabled="true" snapshot-name="Disabled-Switch" />
+    </woby-chk>
+
+    <woby-chk name="Custom Class Switch">
+        <wui-switch cls="m-2 p-2 border-2 rounded" snapshot-name="Custom-Class-Switch" />
+    </woby-chk>
+</body>
+
+</html>

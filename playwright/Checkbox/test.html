@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Checkbox Component Playwright Test</title>
+    <link href="../../dist/wui.css" rel="stylesheet">
+    <script type="module" src="../../src/index.tsx"></script>
+    <script>
+        // Helper function to get full HTML including shadow DOM and slots
+        function getFullHTML(node) {
+            if (node instanceof HTMLSlotElement) {
+                // Handle slot elements specifically
+                let html = `<slot-mocked`
+
+                // Add attributes
+                for (const attr of node.attributes) {
+                    html += ` ${attr.name}="${attr.value}"`
+                }
+                html += '>'
+
+                // Handle assigned nodes if any
+                const assignedNodes = node.assignedNodes()
+                for (const assignedNode of assignedNodes) {
+                    html += getFullHTML(assignedNode)
+                }
+
+                html += '</slot-mocked>'
+                return html
+            } else if (node instanceof ShadowRoot) {
+                // Handle shadow root directly
+                let html = '<shadowRoot-mocked>'
+                for (const child of node.childNodes) {
+                    html += getFullHTML(child)
+                }
+                html += '</shadowRoot-mocked>'
+                return html
+            } else if (node instanceof Text) {
+                return node.textContent || ''
+            } else if (node instanceof Comment) {
+                return `<!--${node.textContent}-->`
+            } else if (node instanceof Element) {
+                const n = node.tagName.toLowerCase()
+                const isCE = customElements.get(n)
+                const name = !!isCE ? n + '-mocked' : n
+                let html = `<${name}`
+
+                // Add attributes
+                for (const attr of node.attributes) {
+                    html += ` ${attr.name}="${attr.value}"`
+                }
+                html += '>'
+
+                // Handle shadow DOM
+                if (node.shadowRoot) {
+                    // html += '<!-- shadowRoot -->'
+                    for (const child of node.shadowRoot.childNodes) {
+                        html += getFullHTML(child)
+                    }
+                    // html += '<!-- /shadowRoot -->'
+                }
+
+                // Handle light DOM children
+                for (const child of node.childNodes) {
+                    html += getFullHTML(child)
+                }
+
+                html += `</${name}>`
+                return html
+            }
+            return ''
+        }
+    </script>
+</head>
+
+<body>
+    <h1>Checkbox Component Playwright Tests</h1>
+
+    <h2>Basic Checkbox Tests</h2>
+    <div style="display: flex; gap: 20px; flex-wrap: wrap; align-items: center;">
+        <div>
+            <p>Unchecked Checkbox</p>
+            <wui-checkbox label="Unchecked" id="checkbox-unchecked"></wui-checkbox>
+        </div>
+        <div>
+            <p>Checked Checkbox</p>
+            <wui-checkbox label="Checked" checked="true" id="checkbox-checked"></wui-checkbox>
+        </div>
+        <div>
+            <p>Disabled Checkbox</p>
+            <wui-checkbox label="Disabled" disabled="true" id="checkbox-disabled"></wui-checkbox>
+        </div>
+        <div>
+            <p>Disabled Checked Checkbox</p>
+            <wui-checkbox label="Disabled Checked" checked="true" disabled="true"
+                id="checkbox-disabled-checked"></wui-checkbox>
+        </div>
+    </div>
+
+    <h2>Checkbox without Label</h2>
+    <wui-checkbox id="checkbox-no-label"></wui-checkbox>
+
+    <h2>Checkbox with Custom Label</h2>
+    <wui-checkbox id="checkbox-custom-label">
+        <span style="color: blue; font-weight: bold;">Custom Label</span>
+    </wui-checkbox>
+</body>
+
+</html>

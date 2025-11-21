@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Avatar Component Playwright Test</title>
+    <link href="../../dist/wui.css" rel="stylesheet">
+    <script type="module" src="../../src/index.tsx"></script>
+    <script>
+        // Helper function to get full HTML including shadow DOM and slots
+        function getFullHTML(node) {
+            if (node instanceof HTMLSlotElement) {
+                // Handle slot elements specifically
+                let html = `<slot-mocked`
+
+                // Add attributes
+                for (const attr of node.attributes) {
+                    html += ` ${attr.name}="${attr.value}"`
+                }
+                html += '>'
+
+                // Handle assigned nodes if any
+                const assignedNodes = node.assignedNodes()
+                for (const assignedNode of assignedNodes) {
+                    html += getFullHTML(assignedNode)
+                }
+
+                html += '</slot-mocked>'
+                return html
+            } else if (node instanceof ShadowRoot) {
+                // Handle shadow root directly
+                let html = '<shadowRoot-mocked>'
+                for (const child of node.childNodes) {
+                    html += getFullHTML(child)
+                }
+                html += '</shadowRoot-mocked>'
+                return html
+            } else if (node instanceof Text) {
+                return node.textContent || ''
+            } else if (node instanceof Comment) {
+                return `<!--${node.textContent}-->`
+            } else if (node instanceof Element) {
+                const n = node.tagName.toLowerCase()
+                const isCE = customElements.get(n)
+                const name = !!isCE ? n + '-mocked' : n
+                let html = `<${name}`
+
+                // Add attributes
+                for (const attr of node.attributes) {
+                    html += ` ${attr.name}="${attr.value}"`
+                }
+                html += '>'
+
+                // Handle shadow DOM
+                if (node.shadowRoot) {
+                    // html += '<!-- shadowRoot -->'
+                    for (const child of node.shadowRoot.childNodes) {
+                        html += getFullHTML(child)
+                    }
+                    // html += '<!-- /shadowRoot -->'
+                }
+
+                // Handle light DOM children
+                for (const child of node.childNodes) {
+                    html += getFullHTML(child)
+                }
+
+                html += `</${name}>`
+                return html
+            }
+            return ''
+        }
+    </script>
+</head>
+
+<body>
+    <h1>Avatar Component Playwright Tests</h1>
+
+    <h2>Basic Avatar Tests</h2>
+    <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+        <div>
+            <p>Circular Avatar</p>
+            <wui-avatar alt="Avatar" size="md" type="circular" children="A" id="avatar-circular"></wui-avatar>
+        </div>
+        <div>
+            <p>Rounded Avatar</p>
+            <wui-avatar alt="Avatar" size="md" type="rounded" children="B" id="avatar-rounded"></wui-avatar>
+        </div>
+        <div>
+            <p>Square Avatar</p>
+            <wui-avatar alt="Avatar" size="md" type="square" children="C" id="avatar-square"></wui-avatar>
+        </div>
+    </div>
+
+    <h2>Size Tests</h2>
+    <div style="display: flex; gap: 20px; flex-wrap: wrap; align-items: center;">
+        <div>
+            <p>Small Avatar</p>
+            <wui-avatar alt="Avatar" size="sm" type="circular" children="S" id="avatar-sm"></wui-avatar>
+        </div>
+        <div>
+            <p>Medium Avatar</p>
+            <wui-avatar alt="Avatar" size="md" type="circular" children="M" id="avatar-md"></wui-avatar>
+        </div>
+        <div>
+            <p>Large Avatar</p>
+            <wui-avatar alt="Avatar" size="lg" type="circular" children="L" id="avatar-lg"></wui-avatar>
+        </div>
+    </div>
+
+    <h2>With Image</h2>
+    <wui-avatar alt="Image Avatar" size="md" type="circular" id="avatar-image">
+        <img src="https://via.placeholder.com/40" alt="Placeholder"
+            style="width: 100%; height: 100%; object-fit: cover;">
+    </wui-avatar>
+</body>
+
+</html>

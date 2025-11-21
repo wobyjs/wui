@@ -1,4 +1,4 @@
-import { $, $$, defaults, type JSX, customElement, type ElementAttributes, type ObservableMaybe, type CustomElementChildren, isObservable, StyleEncapsulationProps } from "woby"
+import { $, $$, defaults, type JSX, customElement, type ElementAttributes, type ObservableMaybe, type CustomElementChildren, isObservable, StyleEncapsulationProps, useEffect } from "woby"
 import '@woby/chk'
 import './input.css'
 
@@ -8,33 +8,78 @@ type HorizontalPosition = 'left' | 'right'
 
 // Define the Badge props type
 type BadgeProps = {
-    className?: ObservableMaybe<string>;
-    children?: ObservableMaybe<JSX.Child> & CustomElementChildren;
-    badgeContent?: ObservableMaybe<JSX.Child>;
-    badgeClass?: ObservableMaybe<JSX.Class>;
-    vertical?: ObservableMaybe<VerticalPosition>;
-    horizontal?: ObservableMaybe<HorizontalPosition>;
+    className?: ObservableMaybe<string>
+    children?: ObservableMaybe<JSX.Child> & CustomElementChildren
+    badgeContent?: ObservableMaybe<JSX.Child>
+    badgeClass?: ObservableMaybe<JSX.Class>
+    vertical?: ObservableMaybe<VerticalPosition>
+    horizontal?: ObservableMaybe<HorizontalPosition>
 }
 
 // Default props with explicit typing
 const def = () => ({
     cls: $(''),
     children: $(null as JSX.Child),
-    badgeContent: $('' as JSX.Child),
+    badgeContent: $(null as JSX.Child),
     badgeClass: $("bg-[rgb(156,39,176)]" as JSX.Class),
-    // vertical: $<'top' | 'bottom'>('top'),
-    // horizontal: $<'left' | 'right'>('right'),
     vertical: $('top' as 'top' | 'bottom'),
     horizontal: $('right' as HorizontalPosition),
 })
 
 const Badge = defaults(def, (props) => {
+    console.log('Badge: props received:', props)
     const { cls, children, badgeContent, badgeClass, vertical, horizontal, ...otherProps } = props
+    console.log('Badge: destructured props - badgeContent:', badgeContent, 'otherProps:', otherProps)
 
-    const isEmpty = () => !($$(badgeContent))
+    // Handle attribute and prop values
+    useEffect(() => {
+        console.log('Badge: useEffect running')
+        // First check if badgeContent is provided as a prop
+        const contentValue = $$(badgeContent)
+        if (contentValue) {
+            console.log('Badge: Using prop content value:', contentValue)
+            return
+        }
+
+        // If no prop value, check for the badge-content attribute from otherProps
+        // For custom elements, attributes are passed in otherProps
+        // HTML attributes with hyphens are converted to camelCase
+        console.log('Badge: Checking otherProps for badge content...')
+        console.log('Badge: otherProps keys:', Object.keys(otherProps))
+
+        if (otherProps['badgeContent']) {
+            badgeContent(otherProps['badgeContent'])
+            console.log('Badge: Using badgeContent attribute:', otherProps['badgeContent'])
+        } else if (otherProps['badge-content']) {
+            badgeContent(otherProps['badge-content'])
+            console.log('Badge: Using badge-content attribute:', otherProps['badge-content'])
+        } else if (otherProps['children']) {
+            // For HTML custom elements, content might be passed as children
+            badgeContent(otherProps['children'])
+            console.log('Badge: Using children attribute:', otherProps['children'])
+        } else {
+            // For custom elements, we might need to access the attribute directly from the element
+            // This is a fallback for when the attribute isn't properly passed through otherProps
+            console.log('Badge: No content found in props, otherProps:', otherProps)
+            // Try to access the attribute directly from the element
+            // This is a workaround for cases where the attribute conversion is not working
+            console.log('Badge: Trying to access attribute directly from element')
+        }
+    })
+
+    const isEmpty = () => {
+        const empty = !($$(badgeContent))
+        console.log('Badge: isEmpty check, badgeContent:', $$(badgeContent), 'result:', empty)
+        return empty
+    }
 
     // Badge visibility class
-    const visibilityClass = () => isEmpty() ? 'hidden' : 'min-w-[20px] h-5 rounded-[10px] px-1'
+    const visibilityClass = () => {
+        const empty = isEmpty()
+        const visClass = empty ? 'hidden' : 'min-w-[20px] h-5 rounded-[10px] px-1'
+        console.log('Badge: visibilityClass, isEmpty:', empty, 'class:', visClass)
+        return visClass
+    }
 
     // Transform origin based on position
     const transformOriginClass = () => {
@@ -52,32 +97,37 @@ const Badge = defaults(def, (props) => {
 
     // Absolute positioning classes
     const positionClasses = () => {
-        return `${vertical() === 'top' ? 'top-0' : 'bottom-0'} ${horizontal() === 'right' ? 'right-0' : 'left-0'}`
+        const posClass = `${vertical() === 'top' ? 'top-0' : 'bottom-0'} ${horizontal() === 'right' ? 'right-0' : 'left-0'}`
+        console.log('Badge: positionClasses:', posClass)
+        return posClass
     }
 
     return (
         <div>
-            {/* <p className="m-2 p-2">Badge Content: <span className="text-blue-500 font-bold">{content()}</span></p>{() => $$(displayText)} */}
-            {/* <p className="m-2 p-2">Badge Content: <span className="text-blue-500 font-bold">{badgeContent}</span></p> */}
-            {/* <p className="m-2 p-2">Badge Anchor: <span className="text-blue-500 font-bold">{vertical} - {horizontal}</span></p> */}
-            {/* <p className="m-2 p-2">Class Name <span className="text-blue-500 font-bold">{className}</span></p> */}
             <span class={() => `relative inline-flex align-middle shrink-0 m-4 ${(cls)}`} {...otherProps}>
-                {(children)}
                 <span
-                    class={() => [
-                        // Core badge styling
-                        'flex place-content-center items-center absolute box-border font-medium text-xs leading-none z-[1] text-white scale-100 [flex-flow:wrap] [transition:transform_225ms_cubic-bezier(0.4,0,0.2,1)0ms]',
-                        visibilityClass(),
-                        transformOriginClass(),
-                        positionClasses(),
-                        (badgeClass),
-                    ].join(' ')}
+                    class={() => {
+                        const classes = [
+                            // Core badge styling
+                            'flex place-content-center items-center absolute box-border font-medium text-xs leading-none z-[1] text-white scale-100 [flex-flow:wrap] [transition:transform_225ms_cubic-bezier(0.4,0,0.2,1)0ms]',
+                            visibilityClass(),
+                            transformOriginClass(),
+                            positionClasses(),
+                            (badgeClass),
+                        ].join(' ')
+                        console.log('Badge: span classes:', classes)
+                        return classes
+                    }}
                 >
-                    {(badgeContent)}
+                    {() => {
+                        const content = $$(badgeContent)
+                        console.log('Badge: rendering content:', content)
+                        return content
+                    }}
                 </span>
+                {children}
             </span>
         </div>
-
     )
 }) as typeof Badge & StyleEncapsulationProps
 

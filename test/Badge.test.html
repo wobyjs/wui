@@ -5,15 +5,38 @@
     <title>Badge Component Test</title>
     <link href="/node_modules/@woby/chk/dist/index.css" rel="stylesheet">
     <script type="module" src="../src/Badge.tsx"></script>
+    <script type="module" src="../src/Avatar.tsx"></script>
 </head>
 
 <body>
     <link href="../dist/wui.css" rel="stylesheet">
-    <h2 class="text-[1.2em] pl-4">Badge Component Test</h2>
+    <h2 class="text-[1.2em] pl-4 font-bold">Badge Component Test Suite</h2>
+
+    <!-- ============================================ -->
+    <!-- BASIC TESTS -->
+    <!-- ============================================ -->
+    <h3 class="text-[1.1em] pl-4 mt-4 font-semibold">Basic Tests</h3>
 
     <woby-chk name="Default Badge">
         <wui-badge snapshot="Default-Badge">
             <div class="w-10 h-10 bg-gray-400 rounded-full"></div>
+        </wui-badge>
+    </woby-chk>
+
+    <woby-chk name="Badge with Number">
+        <wui-badge badge-content="5" snapshot="Badge-With-Number">
+            <div class="w-10 h-10 bg-gray-400 rounded-full"></div>
+        </wui-badge>
+    </woby-chk>
+
+    <!-- ============================================ -->
+    <!-- POSITION TESTS -->
+    <!-- ============================================ -->
+    <h3 class="text-[1.1em] pl-4 mt-4 font-semibold">Position Tests</h3>
+
+    <woby-chk name="Top Right Badge">
+        <wui-badge badge-content="TRight" vertical="top" horizontal="right" snapshot="Top-Right-Badge">
+            <div class="w-10 h-10 bg-blue-500 rounded-full"></div>
         </wui-badge>
     </woby-chk>
 
@@ -23,9 +46,9 @@
         </wui-badge>
     </woby-chk>
 
-    <woby-chk name="Top Right Badge">
-        <wui-badge badge-content="TRight" vertical="top" horizontal="right" snapshot="Top-Right-Badge">
-            <div class="w-10 h-10 bg-blue-500 rounded-full"></div>
+    <woby-chk name="Bottom Right Badge">
+        <wui-badge badge-content="BRight" vertical="bottom" horizontal="right" snapshot="Bottom-Right-Badge">
+            <div class="w-10 h-10 bg-purple-500 rounded-full"></div>
         </wui-badge>
     </woby-chk>
 
@@ -35,18 +58,77 @@
         </wui-badge>
     </woby-chk>
 
-    <woby-chk name="Bottom Right Badge">
-        <wui-badge badge-content="BRight" vertical="bottom" horizontal="right" snapshot="Bottom-Right-Badge">
-            <div class="w-10 h-10 bg-purple-500 rounded-full"></div>
-        </wui-badge>
-    </woby-chk>
+    <!-- ============================================ -->
+    <!-- CUSTOM COLOR TESTS -->
+    <!-- ============================================ -->
+    <h3 class="text-[1.1em] pl-4 mt-4 font-semibold">Custom Color Tests</h3>
 
     <woby-chk name="Custom Color Badge">
-        <wui-badge badge-content="!" badge-class="bg-red-500" vertical="top" horizontal="right"
-            snapshot="Custom-Color-Badge">
+        <wui-badge badge-content="!" badge-class="bg-red-500" snapshot="Custom-Color-Badge">
             <div class="w-10 h-10 bg-gray-400 rounded-full"></div>
         </wui-badge>
     </woby-chk>
+
+    <woby-chk name="Custom Color Green Badge">
+        <wui-badge badge-content="✓" badge-class="bg-green-600" snapshot="Custom-Color-Green-Badge">
+            <div class="w-10 h-10 bg-gray-400 rounded-full"></div>
+        </wui-badge>
+    </woby-chk>
+
+    <woby-chk name="Bottom Left Custom Badge">
+        <wui-badge badge-content="★" vertical="bottom" horizontal="left" badge-class="bg-yellow-500"
+            snapshot="Bottom-Left-Custom-Badge">
+            <div class="w-10 h-10 bg-indigo-500 rounded-full"></div>
+        </wui-badge>
+    </woby-chk>
+
+    <!-- ============================================ -->
+    <!-- LARGE CONTENT TESTS -->
+    <!-- ============================================ -->
+    <h3 class="text-[1.1em] pl-4 mt-4 font-semibold">Large Content Tests</h3>
+
+    <woby-chk name="Top Right Large Badge">
+        <wui-badge badge-content="999+" vertical="top" horizontal="right" snapshot="Top-Right-Large-Badge">
+            <div class="w-10 h-10 bg-pink-500 rounded-full"></div>
+        </wui-badge>
+    </woby-chk>
+
+    <woby-chk name="Bottom Right Custom Badge">
+        <wui-badge badge-content="◆" vertical="bottom" horizontal="right" badge-class="bg-cyan-500"
+            snapshot="Bottom-Right-Custom-Badge">
+            <div class="w-10 h-10 bg-teal-500 rounded-full"></div>
+        </wui-badge>
+    </woby-chk>
+
+    <woby-chk name="Top Left Alert Badge">
+        <wui-badge badge-content="!" vertical="top" horizontal="left" badge-class="bg-red-600"
+            snapshot="Top-Left-Alert-Badge">
+            <div class="w-10 h-10 bg-gray-500 rounded-full"></div>
+        </wui-badge>
+    </woby-chk>
+
+    <!-- ============================================ -->
+    <!-- MULTIPLE BADGES -->
+    <!-- ============================================ -->
+    <h3 class="text-[1.1em] pl-4 mt-4 font-semibold">Multiple Badges</h3>
+
+    <woby-chk name="Multiple Badges">
+        <div class="flex gap-4 flex-wrap" snapshot="Multiple-Badges">
+            <wui-badge badge-content="1">
+                <div class="w-10 h-10 bg-red-500 rounded-full"></div>
+            </wui-badge>
+            <wui-badge badge-content="2" badge-class="bg-green-500">
+                <div class="w-10 h-10 bg-blue-500 rounded-full"></div>
+            </wui-badge>
+            <wui-badge badge-content="3" vertical="bottom" horizontal="right">
+                <div class="w-10 h-10 bg-yellow-500 rounded-full"></div>
+            </wui-badge>
+            <wui-badge badge-content="!" badge-class="bg-purple-500" vertical="top" horizontal="left">
+                <div class="w-10 h-10 bg-pink-500 rounded-full"></div>
+            </wui-badge>
+        </div>
+    </woby-chk>
+
 </body>
 
 </html>

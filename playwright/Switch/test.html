@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Switch Component Playwright Test</title>
+    <link href="../../dist/wui.css" rel="stylesheet">
+    <script type="module" src="../../src/index.tsx"></script>
+    <script>
+        // Helper function to get full HTML including shadow DOM and slots
+        function getFullHTML(node) {
+            if (node instanceof HTMLSlotElement) {
+                // Handle slot elements specifically
+                let html = `<slot-mocked`
+
+                // Add attributes
+                for (const attr of node.attributes) {
+                    html += ` ${attr.name}="${attr.value}"`
+                }
+                html += '>'
+
+                // Handle assigned nodes if any
+                const assignedNodes = node.assignedNodes()
+                for (const assignedNode of assignedNodes) {
+                    html += getFullHTML(assignedNode)
+                }
+
+                html += '</slot-mocked>'
+                return html
+            } else if (node instanceof ShadowRoot) {
+                // Handle shadow root directly
+                let html = '<shadowRoot-mocked>'
+                for (const child of node.childNodes) {
+                    html += getFullHTML(child)
+                }
+                html += '</shadowRoot-mocked>'
+                return html
+            } else if (node instanceof Text) {
+                return node.textContent || ''
+            } else if (node instanceof Comment) {
+                return `<!--${node.textContent}-->`
+            } else if (node instanceof Element) {
+                const n = node.tagName.toLowerCase()
+                const isCE = customElements.get(n)
+                const name = !!isCE ? n + '-mocked' : n
+                let html = `<${name}`
+
+                // Add attributes
+                for (const attr of node.attributes) {
+                    html += ` ${attr.name}="${attr.value}"`
+                }
+                html += '>'
+
+                // Handle shadow DOM
+                if (node.shadowRoot) {
+                    // html += '<!-- shadowRoot -->'
+                    for (const child of node.shadowRoot.childNodes) {
+                        html += getFullHTML(child)
+                    }
+                    // html += '<!-- /shadowRoot -->'
+                }
+
+                // Handle light DOM children
+                for (const child of node.childNodes) {
+                    html += getFullHTML(child)
+                }
+
+                html += `</${name}>`
+                return html
+            }
+            return ''
+        }
+    </script>
+</head>
+
+<body>
+    <h1>Switch Component Playwright Tests</h1>
+
+    <h2>Basic Switch Tests</h2>
+    <div style="display: flex; gap: 20px; flex-wrap: wrap; align-items: center;">
+        <div>
+            <p>Unchecked Switch</p>
+            <wui-switch id="switch-unchecked"></wui-switch>
+        </div>
+        <div>
+            <p>Checked Switch</p>
+            <wui-switch id="switch-checked" checked="true"></wui-switch>
+        </div>
+        <div>
+            <p>Disabled Switch</p>
+            <wui-switch id="switch-disabled" disabled="true"></wui-switch>
+        </div>
+        <div>
+            <p>Disabled Checked Switch</p>
+            <wui-switch id="switch-disabled-checked" checked="true" disabled="true"></wui-switch>
+        </div>
+    </div>
+
+    <h2>Switch with Label</h2>
+    <div style="margin-bottom: 20px;">
+        <wui-switch id="switch-with-label">
+            <span>Enable notifications</span>
+        </wui-switch>
+    </div>
+
+    <h2>Switch with Custom Colors</h2>
+    <div style="display: flex; gap: 20px; flex-wrap: wrap; align-items: center;">
+        <div>
+            <p>Custom Color Switch</p>
+            <wui-switch id="switch-custom-color"
+                style="--wui-switch-checked-bg: #4caf50; --wui-switch-unchecked-bg: #9e9e9e;"></wui-switch>
+        </div>
+        <div>
+            <p>Custom Size Switch</p>
+            <wui-switch id="switch-custom-size"
+                style="--wui-switch-width: 60px; --wui-switch-height: 30px;"></wui-switch>
+        </div>
+    </div>
+</body>
+
+</html>

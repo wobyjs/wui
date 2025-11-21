@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Button Component Playwright Test</title>
+    <link href="../../dist/wui.css" rel="stylesheet">
+    <script type="module" src="../../src/index.tsx"></script>
+    <script>
+        // Helper function to get full HTML including shadow DOM and slots
+        function getFullHTML(node) {
+            if (node instanceof HTMLSlotElement) {
+                // Handle slot elements specifically
+                let html = `<slot-mocked`
+
+                // Add attributes
+                for (const attr of node.attributes) {
+                    html += ` ${attr.name}="${attr.value}"`
+                }
+                html += '>'
+
+                // Handle assigned nodes if any
+                const assignedNodes = node.assignedNodes()
+                for (const assignedNode of assignedNodes) {
+                    html += getFullHTML(assignedNode)
+                }
+
+                html += '</slot-mocked>'
+                return html
+            } else if (node instanceof ShadowRoot) {
+                // Handle shadow root directly
+                let html = '<shadowRoot-mocked>'
+                for (const child of node.childNodes) {
+                    html += getFullHTML(child)
+                }
+                html += '</shadowRoot-mocked>'
+                return html
+            } else if (node instanceof Text) {
+                return node.textContent || ''
+            } else if (node instanceof Comment) {
+                return `<!--${node.textContent}-->`
+            } else if (node instanceof Element) {
+                const n = node.tagName.toLowerCase()
+                const isCE = customElements.get(n)
+                const name = !!isCE ? n + '-mocked' : n
+                let html = `<${name}`
+
+                // Add attributes
+                for (const attr of node.attributes) {
+                    html += ` ${attr.name}="${attr.value}"`
+                }
+                html += '>'
+
+                // Handle shadow DOM
+                if (node.shadowRoot) {
+                    // html += '<!-- shadowRoot -->'
+                    for (const child of node.shadowRoot.childNodes) {
+                        html += getFullHTML(child)
+                    }
+                    // html += '<!-- /shadowRoot -->'
+                }
+
+                // Handle light DOM children
+                for (const child of node.childNodes) {
+                    html += getFullHTML(child)
+                }
+
+                html += `</${name}>`
+                return html
+            }
+            return ''
+        }
+    </script>
+</head>
+
+<body>
+    <h1>Button Component Playwright Tests</h1>
+
+    <h2>Button Type Tests</h2>
+    <div style="display: flex; gap: 20px; flex-wrap: wrap; align-items: center;">
+        <div>
+            <p>Text Button</p>
+            <wui-button type="text" children="Text Button" id="button-text"></wui-button>
+        </div>
+        <div>
+            <p>Contained Button</p>
+            <wui-button type="contained" children="Contained Button" id="button-contained"></wui-button>
+        </div>
+        <div>
+            <p>Outlined Button</p>
+            <wui-button type="outlined" children="Outlined Button" id="button-outlined"></wui-button>
+        </div>
+        <div>
+            <p>Icon Button</p>
+            <wui-button type="icon" children="?" id="button-icon"></wui-button>
+        </div>
+    </div>
+
+    <h2>Disabled State Tests</h2>
+    <div style="display: flex; gap: 20px; flex-wrap: wrap; align-items: center;">
+        <div>
+            <p>Disabled Text Button</p>
+            <wui-button type="text" disabled="true" children="Disabled Text" id="button-disabled-text"></wui-button>
+        </div>
+        <div>
+            <p>Disabled Contained Button</p>
+            <wui-button type="contained" disabled="true" children="Disabled Contained"
+                id="button-disabled-contained"></wui-button>
+        </div>
+    </div>
+
+    <h2>Button with Custom Content</h2>
+    <wui-button id="button-custom">
+        <span style="color: blue; font-weight: bold;">Custom Content</span>
+    </wui-button>
+</body>
+
+</html>

@@ -1,0 +1,4 @@
+{
+  "props": {},
+  "html": "<slot-mocked> <wui-checkbox-mocked id=\"custom-class-checkbox-html\" label-position=\"right\" cls=\"!text-blue-500 !font-bold\" snapshot-name=\"Custom-Class-CheckBox\"><div class=\"!text-blue-500 !font-bold\"><!----><!----><input id=\"custom-class-checkbox-html\" type=\"checkbox\"></input><!----><label class=\"pl-1.5 select-none\" for=\"custom-class-checkbox-html\"> <slot-mocked> Custom styled checkbox</slot-mocked> </label></div> Custom styled checkbox</wui-checkbox-mocked> <script> document.getElementById('custom-class-checkbox-html').addEventListener('change', (e) => { console.log('Checkbox changed:', e.target.checked); }); </script> </slot-mocked>"
+}

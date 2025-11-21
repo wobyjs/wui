@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Badge Component Playwright Test</title>
+    <link href="../../dist/wui.css" rel="stylesheet">
+    <script type="module" src="../../src/index.tsx"></script>
+    <script>
+        // Helper function to get full HTML including shadow DOM and slots
+        function getFullHTML(node) {
+            if (node instanceof HTMLSlotElement) {
+                // Handle slot elements specifically
+                let html = `<slot-mocked`
+
+                // Add attributes
+                for (const attr of node.attributes) {
+                    html += ` ${attr.name}="${attr.value}"`
+                }
+                html += '>'
+
+                // Handle assigned nodes if any
+                const assignedNodes = node.assignedNodes()
+                for (const assignedNode of assignedNodes) {
+                    html += getFullHTML(assignedNode)
+                }
+
+                html += '</slot-mocked>'
+                return html
+            } else if (node instanceof ShadowRoot) {
+                // Handle shadow root directly
+                let html = '<shadowRoot-mocked>'
+                for (const child of node.childNodes) {
+                    html += getFullHTML(child)
+                }
+                html += '</shadowRoot-mocked>'
+                return html
+            } else if (node instanceof Text) {
+                return node.textContent || ''
+            } else if (node instanceof Comment) {
+                return `<!--${node.textContent}-->`
+            } else if (node instanceof Element) {
+                const n = node.tagName.toLowerCase()
+                const isCE = customElements.get(n)
+                const name = !!isCE ? n + '-mocked' : n
+                let html = `<${name}`
+
+                // Add attributes
+                for (const attr of node.attributes) {
+                    html += ` ${attr.name}="${attr.value}"`
+                }
+                html += '>'
+
+                // Handle shadow DOM
+                if (node.shadowRoot) {
+                    // html += '<!-- shadowRoot -->'
+                    for (const child of node.shadowRoot.childNodes) {
+                        html += getFullHTML(child)
+                    }
+                    // html += '<!-- /shadowRoot -->'
+                }
+
+                // Handle light DOM children
+                for (const child of node.childNodes) {
+                    html += getFullHTML(child)
+                }
+
+                html += `</${name}>`
+                return html
+            }
+            return ''
+        }
+    </script>
+</head>
+
+<body>
+    <h1>Badge Component Playwright Tests</h1>
+
+    <h2>Basic Badge Test</h2>
+    <wui-badge badge-content="5" id="badge">
+        <div style="width: 40px; height: 40px; background-color: #ccc; border-radius: 50%;"></div>
+    </wui-badge>
+
+    <h2>Position Tests</h2>
+    <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+        <div>
+            <p>Top Right</p>
+            <wui-badge badge-content="TR" vertical="top" horizontal="right">
+                <div style="width: 40px; height: 40px; background-color: #3b82f6; border-radius: 50%;"></div>
+            </wui-badge>
+        </div>
+        <div>
+            <p>Top Left</p>
+            <wui-badge badge-content="TL" vertical="top" horizontal="left">
+                <div style="width: 40px; height: 40px; background-color: #10b981; border-radius: 50%;"></div>
+            </wui-badge>
+        </div>
+        <div>
+            <p>Bottom Right</p>
+            <wui-badge badge-content="BR" vertical="bottom" horizontal="right">
+                <div style="width: 40px; height: 40px; background-color: #8b5cf6; border-radius: 50%;"></div>
+            </wui-badge>
+        </div>
+        <div>
+            <p>Bottom Left</p>
+            <wui-badge badge-content="BL" vertical="bottom" horizontal="left">
+                <div style="width: 40px; height: 40px; background-color: #f97316; border-radius: 50%;"></div>
+            </wui-badge>
+        </div>
+    </div>
+
+    <h2>Custom Color Tests</h2>
+    <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+        <div>
+            <p>Red Badge</p>
+            <wui-badge badge-content="!" badge-class="bg-red-500">
+                <div style="width: 40px; height: 40px; background-color: #ccc; border-radius: 50%;"></div>
+            </wui-badge>
+        </div>
+        <div>
+            <p>Green Badge</p>
+            <wui-badge badge-content="✓" badge-class="bg-green-500">
+                <div style="width: 40px; height: 40px; background-color: #ccc; border-radius: 50%;"></div>
+            </wui-badge>
+        </div>
+        <div>
+            <p>Yellow Badge</p>
+            <wui-badge badge-content="★" badge-class="bg-yellow-500">
+                <div style="width: 40px; height: 40px; background-color: #ccc; border-radius: 50%;"></div>
+            </wui-badge>
+        </div>
+    </div>
+
+    <h2>Large Content Test</h2>
+    <wui-badge badge-content="999+">
+        <div style="width: 40px; height: 40px; background-color: #ec4899; border-radius: 50%;"></div>
+    </wui-badge>
+
+</body>
+
+</html>
