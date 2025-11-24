@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HTML Components Demo</title>
     <!-- <script type="module" src="/src/main.ts"></script> -->
+    <!-- #region import -->
     <script type="module" src="../src/Avatar.tsx"></script>
     <script type="module" src="../src/Badge.tsx"></script>
     <script type="module" src="../src/Button.tsx"></script>
@@ -15,6 +16,8 @@
     <script type="module" src="../src/Chip.tsx"></script>
     <script type="module" src="../src/Collapse.tsx"></script>
     <script type="module" src="../src/IconButton.tsx"></script>
+    <script type="module" src="../src/Wheeler/Wheeler.tsx"></script>
+    <!-- #endregion -->
 
     <!-- <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"> -->
     <link rel="stylesheet" href="../dist/wui.css">
@@ -40,6 +43,7 @@
         </div>
     </div>
 
+    <!-- #region table-navigation -->
     <template id="table-navigation">
         <h2 class="text-xl font-bold mb-4 text-gray-800">📑 Quick Navigation</h2>
         <div class="flex flex-wrap gap-2">
@@ -83,9 +87,9 @@
                 class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
                 Icon Button
             </a>
-            <a href="/test.html" target="_blank"
+            <a href="#wheeler"
                 class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
-                Test Runner
+                Wheeler
             </a>
             <a href="/html-demo.html" target="_blank"
                 class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
@@ -93,7 +97,10 @@
             </a>
         </div>
     </template>
+    <!-- #endregion -->
 
+
+    <!-- #region appbar -->
     <template id="appbar-demo">
         <h2 id="appbar" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Appbar Examples Using Template</h2>
         <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
@@ -130,7 +137,10 @@
             </div>
         </div>
     </template>
+    <!-- #endregion -->
 
+
+    <!-- #region avatar -->
     <template id="avatar-demo">
         <h2 id="avatar" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Avatar Examples</h2>
         <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
@@ -150,7 +160,10 @@
             </div>
         </div>
     </template>
+    <!-- #endregion -->
 
+
+    <!-- #region badge -->
     <template id="badge-demo">
         <h2 id="badge" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Badge Examples</h2>
         <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
@@ -182,7 +195,10 @@
             </div>
         </div>
     </template>
+    <!-- #endregion -->
 
+
+    <!-- #region button -->
     <template id="button-demo">
         <h2 id="button" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Button Examples</h2>
         <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
@@ -219,7 +235,10 @@
             </div>
         </div>
     </template>
+    <!-- #endregion -->
 
+
+    <!-- #region align button -->
     <template id="align-button-demo">
         <h2 id="alignbutton" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">AlignButton Demo</h2>
         <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
@@ -248,7 +267,10 @@
             </EditorContext.Provider>
         </div>
     </template>
+    <!-- #endregion -->
 
+
+    <!-- #region card -->
     <template id="card-demo">
         <h2 id="card" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Card Demo</h2>
         <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
@@ -378,7 +400,10 @@
             </div>
         </div>
     </template>
+    <!-- #endregion -->
 
+
+    <!-- #region checkbox -->
     <template id="checkbox-demo">
         <h2 id="checkbox" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Checkbox Demo</h2>
         <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
@@ -459,7 +484,10 @@
             </div>
         </div>
     </template>
+    <!-- #endregion -->
 
+
+    <!-- #region chip -->
     <template id="chip-demo">
         <h2 id="chip" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Chip Demo</h2>
         <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
@@ -517,7 +545,10 @@
             </div>
         </div>
     </template>
+    <!-- #endregion -->
 
+
+    <!-- #region collapse -->
     <template id="collapse-demo">
         <h2 id="collapse" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Collapse Demo</h2>
         <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
@@ -625,7 +656,10 @@
             </div>
         </div>
     </template>
+    <!-- #endregion -->
 
+
+    <!-- #region icon button -->
     <template id="icon-button-demo">
         <h2 id="icon-button" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Icon Button Demo</h2>
         <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
@@ -686,7 +720,119 @@
             </div>
         </div>
     </template>
+    <!-- #endregion -->
 
+    <!-- #region wheeler -->
+    <template id="wheeler-demo">
+        <h2 id="wheeler" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Wheeler Demo</h2>
+        <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Basic String Array -->
+                <div class="border border-gray-300 rounded-lg p-4">
+                    <h3 class="font-bold mb-2">Basic String Array</h3>
+                    <p class="text-sm text-gray-600 mb-2">
+                        Simple string array with default settings
+                    </p>
+                    <wui-wheeler
+                        options='["Apple", "Banana", "Cherry", "Date", "Elderberry", "Fig", "Grape", "Honeydew"]'
+                        value="Date" bottom="false" visible="true" cls="border rounded-md shadow-sm w-full" />
+                </div>
+
+                <!-- Number Array -->
+                <div class="border border-gray-300 rounded-lg p-4">
+                    <h3 class="font-bold mb-2">Number Array</h3>
+                    <p class="text-sm text-gray-600 mb-2">
+                        Wheeler with numeric values
+                    </p>
+                    <wui-wheeler options='["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]' value="3" bottom="false"
+                        visible="true" cls="border rounded-md shadow-sm w-full" />
+                </div>
+
+                <!-- JSON Object Array  -->
+                <div class="border border-gray-300 rounded-lg p-4">
+                    <h3 class="font-bold mb-2">JSON Object Array</h3>
+                    <p class="text-sm text-gray-600 mb-2">
+                        Objects with `label` and `value` keys
+                    </p>
+                    <wui-wheeler
+                        options='[{ "label": "Toyota", "value": "TOYOTA" }, { "label": "Honda", "value": "HONDA" }, { "label": "Ford", "value": "FORD" }, { "label": "Tesla", "value": "TESLA" }, { "label": "Subaru", "value": "SUBARU" }]'
+                        value="FORD" bottom="false" visible="true" cls="border rounded-md shadow-sm w-full" />
+                </div>
+
+                <!-- Custom Item Height -->
+                <div class="border border-gray-300 rounded-lg p-4">
+                    <h3 class="font-bold mb-2">Custom Item Height</h3>
+                    <p class="text-sm text-gray-600 mb-2">
+                        Wheeler with itemHeight=48px
+                    </p>
+                    <wui-wheeler options='["Chocolate", "Vanilla", "Strawberry", "Mint", "Caramel", "Coffee"]'
+                        value="Vanilla" itemHeight="48" bottom="false" visible="true"
+                        cls="border rounded-md shadow-sm w-full" />
+                </div>
+
+                <!-- Custom Item Count -->
+                <div class="border border-gray-300 rounded-lg p-4">
+                    <h3 class="font-bold mb-2">Custom Item Count</h3>
+                    <p class="text-sm text-gray-600 mb-2">
+                        Wheeler with itemCount=7 visible items
+                    </p>
+                    <wui-wheeler
+                        options='["Apple", "Banana", "Cherry", "Date", "Elderberry", "Fig", "Grape", "Honeydew"]'
+                        value="Date" itemCount="7" bottom="false" visible="true"
+                        cls="border rounded-md shadow-sm w-full" />
+                </div>
+
+                <!-- Custom Styling -->
+                <div class="border border-gray-300 rounded-lg p-4">
+                    <h3 class="font-bold mb-2">Custom Styling</h3>
+                    <p class="text-sm text-gray-600 mb-2">
+                        Wheeler with custom border and colors
+                    </p>
+                    <wui-wheeler options='["Chocolate", "Vanilla", "Strawberry", "Mint", "Caramel", "Coffee"]'
+                        value="Mint" bottom="false" visible="true"
+                        cls="border-2 border-blue-400 rounded-lg shadow-lg w-full bg-blue-50" />
+                </div>
+
+                <!-- Wheeler with Search  -->
+                <div class="border border-gray-300 rounded-lg p-4">
+                    <h3 class="font-bold mb-2">Wheeler with Search</h3>
+                    <p class="text-sm text-gray-600 mb-2">
+                        Searchable wheeler with custom placeholder
+                    </p>
+                    <wui-wheeler
+                        options='["Apple", "Banana", "Cherry", "Date", "Elderberry", "Fig", "Grape", "Honeydew"]'
+                        value="Date" bottom="false" visible="true" searchable="true"
+                        searchPlaceholder="This is sample placeholder" cls="border rounded-md shadow-sm w-full" />
+                </div>
+
+                <div class="border border-gray-300 rounded-lg p-4">
+                    <h3 class="font-bold mb-2">Wheeler with Search</h3>
+                    <p class="text-sm text-gray-600 mb-2">
+                        Searchable wheeler with header content
+                    </p>
+                    <wui-wheeler
+                        options='["Apple", "Banana", "Cherry", "Date", "Elderberry", "Fig", "Grape", "Honeydew"]'
+                        value="Date" bottom="false" visible="true" searchable="true" header="Pick a Fruit"
+                        cls="border rounded-md shadow-sm w-full" />
+
+                </div>
+
+                <div class="border border-gray-300 rounded-lg p-4">
+                    <h3 class="font-bold mb-2">Wheeler with Search</h3>
+                    <p class="text-sm text-gray-600 mb-2">
+                        Searchable wheeler with placeholder using default content
+                    </p>
+                    <wui-wheeler
+                        options='["Apple", "Banana", "Cherry", "Date", "Elderberry", "Fig", "Grape", "Honeydew"]'
+                        value="Date" bottom="false" visible="true" searchable="true"
+                        cls="border rounded-md shadow-sm w-full" />
+                </div>
+            </div>
+        </div>
+    </template>
+    <!-- #endregion -->
+
+    <!-- #region scripting -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
 
@@ -720,7 +866,8 @@
                 'checkbox-demo',
                 'chip-demo',
                 'collapse-demo',
-                'icon-button-demo'
+                'icon-button-demo',
+                'wheeler-demo'
             ];
 
             demoTemplates.forEach(id => {
@@ -768,6 +915,7 @@
         }
 
     </script>
+    <!-- #endregion -->
 </body>
 
 </html>

@@ -1,6 +1,6 @@
 /// <reference types="vite/client" />
 
-import { DEBUGGER, $, $$ } from 'woby'
+import { DEBUGGER, $, $$, useMemo, Observable, ObservableMaybe } from 'woby'
 import { Button } from './Button'
 import { Badge } from './Badge'
 import { Avatar } from './Avatar'
@@ -11,6 +11,10 @@ import { Checkbox } from './Checkbox'
 import { Chip } from './Chip'
 import { Collapse } from './Collapse'
 import { IconButton } from './IconButton'
+import { useArrayOptions } from './Wheeler/WheelerType'
+import Wheeler from './Wheeler/Wheeler'
+import MultiWheeler from './Wheeler/MultiWheeler'
+import DateTimeWheeler, { DateTimeWheelerType } from './Wheeler/DateTimeWheeler'
 
 
 const isDev = typeof import.meta.env !== 'undefined' && import.meta.env.DEV
@@ -23,7 +27,7 @@ export function App() {
     const editorRef = $(null as HTMLDivElement | null)
 
 
-    // #region: Table Of Contents
+    // #region Table Of Contents
     const tableOfContents = () => {
         return <>
             <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-6 mb-8 shadow-sm">
@@ -59,8 +63,14 @@ export function App() {
                     <a href="#icon-button" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
                         Icon Button
                     </a>
-                    <a href="/test.html" target="_blank" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
-                        Test Runner
+                    <a href="#wheeler" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                        Wheeler
+                    </a>
+                    <a href="#multi-wheeler" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                        Multi Wheeler
+                    </a>
+                    <a href="#datetime-wheeler" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                        DateTime Wheeler
                     </a>
                     <a href="/html-demo.html" target="_blank" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
                         HTML Components Demo
@@ -71,7 +81,8 @@ export function App() {
     }
     // #endregion
 
-    // #region: AppBar Demo
+
+    // #region AppBar Demo
     const appbarDemo = () => {
         return <>
             <h2 id="appbar" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Appbar Examples</h2>
@@ -138,7 +149,8 @@ export function App() {
     }
     // #endregion
 
-    // #region: Avatar Demo
+
+    // #region Avatar Demo
     const avatarDemo = () => {
         return <>
             <h2 id="avatar" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Avatar Examples</h2>
@@ -163,7 +175,8 @@ export function App() {
     }
     // #endregion
 
-    // #region: Badge Demo
+
+    // #region Badge Demo
     const badgeDemo = () => {
         return <>
             <h2 id="badge" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Badge Examples</h2>
@@ -196,7 +209,8 @@ export function App() {
     }
     // #endregion
 
-    // #region: Button Demo
+
+    // #region Button Demo
     const buttonDemo = () => {
         return <>
             <h2 id="button" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Button Examples</h2>
@@ -229,7 +243,8 @@ export function App() {
     }
     // #endregion
 
-    // #region: AlignButton Demo
+
+    // #region AlignButton Demo
     const alignButtonDemo = () => {
         return <>
             <h2 id="alignbutton" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">AlignButton Demo</h2>
@@ -255,7 +270,8 @@ export function App() {
     }
     // #endregion
 
-    // #region: Card Demo
+
+    // #region Card Demo
     const cardDemo = () => {
         return <>
             <h2 id="card" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Card Demo</h2>
@@ -381,7 +397,8 @@ export function App() {
     }
     // #endregion
 
-    // #region: Checkbox Demo
+
+    // #region Checkbox Demo
     const checkboxDemo = () => {
         return <>
             <h2 id="checkbox" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Checkbox Demo</h2>
@@ -454,7 +471,8 @@ export function App() {
     }
     // #endregion
 
-    // #region: Chip Demo
+
+    // #region Chip Demo
     const chipDemo = () => {
         return <>
             <h2 id="chip" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Chip Demo</h2>
@@ -516,7 +534,8 @@ export function App() {
     }
     // #endregion
 
-    // #region: Collapse Demo
+
+    // #region Collapse Demo
     const collapseDemo = () => {
         const toggleIsOpen = $(true)
         const toggleBackground = $(true)
@@ -628,7 +647,8 @@ export function App() {
     }
     // #endregion
 
-    // #region: Icon Button Demo
+
+    // #region Icon Button Demo
     const iconButtonDemo = () => {
         return <>
             <h2 id="icon-button" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Icon Button Demo</h2>
@@ -688,6 +708,721 @@ export function App() {
     }
     // #endregion
 
+
+    // #region Wheeler Demo
+    const wheelerDemo = () => {
+        // --- Reusable Data ---
+        const FRUITS = ['Apple', 'Banana', 'Cherry', 'Date', 'Elderberry', 'Fig', 'Grape', 'Honeydew']
+        const FLAVORS = ['Chocolate', 'Vanilla', 'Strawberry', 'Mint', 'Caramel', 'Coffee']
+        const NUMBERS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+        // --- Data simulating a JSON import ---
+        const JSON_CAR_DATA = [
+            { "label": "Toyota", "value": "TOYOTA" },
+            { "label": "Honda", "value": "HONDA" },
+            { "label": "Ford", "value": "FORD" },
+            { "label": "Tesla", "value": "TESLA" },
+            { "label": "Subaru", "value": "SUBARU" },
+        ];
+
+        // State for different examples
+        const selectedCarId = $('FORD');
+        const selectedFruit = $('Cherry');
+        const selectedNumber = $(5);
+        const selectedFlavor = $('Vanilla');
+        const selectedMultipleFruits = $(['Apple', 'Cherry']);
+        const selectedFruitWithHeader = $('Date');
+        const selectedFruitWithSearch = $('Elderberry');
+
+        const displayValue = useMemo(() => {
+            return formatOptionDisplay($$(selectedCarId), JSON_CAR_DATA);
+        });
+
+        function formatOptionDisplay(value: string | number, options: { label: string, value: any }[]) {
+            // Ensure options is an array before searching
+            if (!Array.isArray(options)) return String(value);
+
+            const option = options.find(opt => opt.value === value);
+            return option ? `${option.label} (${option.value})` : String(value);
+        }
+
+        return <>
+            <h2 id="wheeler" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Wheeler Demo</h2>
+            <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+
+                    {/* Basic String Array */}
+                    <div class="border border-gray-300 rounded-lg p-4">
+                        <h3 class="font-bold mb-2">Basic String Array</h3>
+                        <p class="text-sm text-gray-600 mb-2">
+                            Simple string array with default settings
+                        </p>
+                        <Wheeler
+                            options={FRUITS}
+                            value={selectedFruit}
+                            bottom={false}
+                            cls="border rounded-md shadow-sm w-full"
+                        />
+                        <p class="mt-4 text-sm">
+                            Selected: <span class="font-mono bg-gray-100 p-1 rounded">{selectedFruit}</span>
+                        </p>
+                    </div>
+
+                    {/* Number Array */}
+                    <div class="border border-gray-300 rounded-lg p-4">
+                        <h3 class="font-bold mb-2">Number Array</h3>
+                        <p class="text-sm text-gray-600 mb-2">
+                            Wheeler with numeric values
+                        </p>
+                        <Wheeler
+                            options={NUMBERS}
+                            value={selectedNumber}
+                            bottom={false}
+                            cls="border rounded-md shadow-sm w-full"
+                        />
+                        <p class="mt-4 text-sm">
+                            Selected: <span class="font-mono bg-gray-100 p-1 rounded">{selectedNumber}</span>
+                        </p>
+                    </div>
+
+                    {/* JSON Object Array */}
+                    <div class="border border-gray-300 rounded-lg p-4">
+                        <h3 class="font-bold mb-2">JSON Object Array</h3>
+                        <p class="text-sm text-gray-600 mb-2">
+                            Objects with `label` and `value` keys
+                        </p>
+                        <Wheeler
+                            options={JSON_CAR_DATA}
+                            value={selectedCarId}
+                            bottom={false}
+                            cls="border rounded-md shadow-sm w-full"
+                        />
+                        <p class="mt-4 text-sm">
+                            Selected: <span class="font-mono bg-gray-100 p-1 rounded">{displayValue}</span>
+                        </p>
+                    </div>
+
+                    {/* Custom Item Height */}
+                    <div class="border border-gray-300 rounded-lg p-4">
+                        <h3 class="font-bold mb-2">Custom Item Height</h3>
+                        <p class="text-sm text-gray-600 mb-2">
+                            Wheeler with itemHeight=48px
+                        </p>
+                        <Wheeler
+                            options={FLAVORS}
+                            value={selectedFlavor}
+                            itemHeight={48}
+                            bottom={false}
+                            cls="border rounded-md shadow-sm w-full"
+                        />
+                        <p class="mt-4 text-sm">
+                            Selected: <span class="font-mono bg-gray-100 p-1 rounded">{selectedFlavor}</span>
+                        </p>
+                    </div>
+
+                    {/* Custom Item Count */}
+                    <div class="border border-gray-300 rounded-lg p-4">
+                        <h3 class="font-bold mb-2">Custom Item Count</h3>
+                        <p class="text-sm text-gray-600 mb-2">
+                            Wheeler with itemCount=7 visible items
+                        </p>
+                        <Wheeler
+                            options={FRUITS}
+                            value={selectedFruit}
+                            itemCount={7}
+                            bottom={false}
+                            cls="border rounded-md shadow-sm w-full"
+                        />
+                        <p class="mt-4 text-sm">
+                            Selected: <span class="font-mono bg-gray-100 p-1 rounded">{selectedFruit}</span>
+                        </p>
+                    </div>
+
+                    {/* Custom Styling */}
+                    <div class="border border-gray-300 rounded-lg p-4">
+                        <h3 class="font-bold mb-2">Custom Styling</h3>
+                        <p class="text-sm text-gray-600 mb-2">
+                            Wheeler with custom border and colors
+                        </p>
+                        <Wheeler
+                            options={FLAVORS}
+                            value={selectedFlavor}
+                            bottom={false}
+                            cls="border-2 border-blue-400 rounded-lg shadow-lg w-full bg-blue-50"
+                        />
+                        <p class="mt-4 text-sm">
+                            Selected: <span class="font-mono bg-blue-100 p-1 rounded text-blue-800">{selectedFlavor}</span>
+                        </p>
+                    </div>
+
+                    {/* Wheeler with Search */}
+                    <div class="border border-gray-300 rounded-lg p-4">
+                        <h3 class="font-bold mb-2">Wheeler with Search</h3>
+                        <p class="text-sm text-gray-600 mb-2">
+                            Searchable wheeler with custom placeholder
+                        </p>
+                        <Wheeler
+                            options={FRUITS}
+                            value={selectedFruitWithSearch}
+                            searchable={true}
+                            searchPlaceholder="This is sample placeholder"
+                            bottom={false}
+                            cls="border rounded-md shadow-sm w-full"
+                        />
+                        <p class="mt-4 text-sm">
+                            Selected: <span class="font-mono bg-gray-100 p-1 rounded">{selectedFruitWithSearch}</span>
+                        </p>
+                    </div>
+
+                    <div class="border border-gray-300 rounded-lg p-4">
+                        <h3 class="font-bold mb-2">Wheeler with Search</h3>
+                        <p class="text-sm text-gray-600 mb-2">
+                            Searchable wheeler with header content
+                        </p>
+                        <Wheeler
+                            options={FRUITS}
+                            value={selectedFruitWithSearch}
+                            searchable={true}
+                            header={() => "Pick a Fruit"}
+                            bottom={false}
+                            cls="border rounded-md shadow-sm w-full"
+                        />
+                        <p class="mt-4 text-sm">
+                            Selected: <span class="font-mono bg-gray-100 p-1 rounded">{selectedFruitWithSearch}</span>
+                        </p>
+                    </div>
+
+                    <div class="border border-gray-300 rounded-lg p-4">
+                        <h3 class="font-bold mb-2">Wheeler with Search</h3>
+                        <p class="text-sm text-gray-600 mb-2">
+                            Searchable wheeler with placeholder using default content
+                        </p>
+                        <Wheeler
+                            options={FRUITS}
+                            value={selectedFruitWithSearch}
+                            searchable={true}
+                            bottom={false}
+                            cls="border rounded-md shadow-sm w-full"
+                        />
+                        <p class="mt-4 text-sm">
+                            Selected: <span class="font-mono bg-gray-100 p-1 rounded">{selectedFruitWithSearch}</span>
+                        </p>
+                    </div>
+
+                    {/* Wheeler Bottom Popup Demo */}
+                    <div class="border border-gray-300 rounded-lg p-4 md:col-span-2 lg:col-span-3">
+                        <div class="flex items-center justify-between mb-3">
+                            <div>
+                                <h3 class="font-bold text-lg">Wheeler Bottom Popup Demo</h3>
+                                <p class="text-sm text-gray-600 mt-1">
+                                    Interactive demo showing Wheeler with <code class="bg-gray-100 px-2 py-1 rounded text-xs">bottom={true}</code> - opens from bottom with mask overlay
+                                </p>
+                            </div>
+                            <a
+                                href="/WheelerDemo/WheelerDefaultDemo.html"
+                                target="_blank"
+                                class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 whitespace-nowrap"
+                            >
+                                Open Full Demo ↗
+                            </a>
+                        </div>
+                        <iframe class="w-full h-[400px] border-2 border-gray-200 rounded-lg shadow-sm" src="/WheelerDemo/WheelerDefaultDemo.html"></iframe>
+                    </div>
+
+                    {/* Wheeler with Header */}
+                    <div class="border border-gray-300 rounded-lg p-4 md:col-span-2 lg:col-span-3">
+                        <h3 class="font-bold mb-2">Wheeler with Header</h3>
+                        <p class="text-sm text-gray-600 mb-2">
+                            Custom header displaying the current selection
+                        </p>
+                        <Wheeler
+                            options={FRUITS}
+                            value={selectedFruitWithHeader}
+                            header={(v) => (
+                                <div class="bg-gradient-to-r from-purple-500 to-pink-500 text-white p-3 rounded-t-md">
+                                    <p class="text-xs font-semibold uppercase tracking-wide">Your Selection</p>
+                                    <p class="text-lg font-bold mt-1">{() => $$(v) || 'None'}</p>
+                                </div>
+                            )}
+                            bottom={false}
+                            cls="border rounded-md shadow-sm w-full"
+                        />
+                        <p class="mt-4 text-sm">
+                            Selected: <span class="font-mono bg-gray-100 p-1 rounded">{selectedFruitWithHeader}</span>
+                        </p>
+                    </div>
+
+                    {/* Multiple Selection Mode */}
+                    <div class="border border-gray-300 rounded-lg p-4 md:col-span-2 lg:col-span-3">
+                        <h3 class="font-bold mb-2">Multiple Selection Mode</h3>
+                        <p class="text-sm text-gray-600 mb-2">
+                            Wheeler with checkboxes for multi-select. Uses the `all` prop to enable "Select All" functionality.
+                        </p>
+                        <div class="flex flex-col md:flex-row gap-4">
+                            <Wheeler
+                                options={FRUITS}
+                                value={selectedMultipleFruits}
+                                all="Select All Fruits"
+                                bottom={false}
+                                cls="border rounded-md shadow-sm w-full md:w-64" />
+                            <div class="flex-1">
+                                <p class="text-sm font-semibold mb-2">Selected Fruits:</p>
+                                <div class="bg-gray-100 p-3 rounded-md">
+                                    {() => {
+                                        const selected = $$(selectedMultipleFruits);
+                                        if (Array.isArray(selected) && selected.length > 0) {
+                                            return (
+                                                <ul class="list-disc list-inside space-y-1">
+                                                    {selected.map(fruit => (
+                                                        <li class="font-mono text-sm">{fruit}</li>
+                                                    ))}
+                                                </ul>
+                                            );
+                                        }
+                                        return <span class="text-gray-500 italic">No fruits selected</span>;
+                                    }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </>
+    }
+    // #endregion
+
+
+    // #region Multi Wheeler Demo
+    const multiWheelerDemo = () => {
+        // --- Sample Data ---
+        const HOURS = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0'));
+        const MINUTES = Array.from({ length: 60 }, (_, i) => String(i).padStart(2, '0'));
+        const SECONDS = Array.from({ length: 60 }, (_, i) => String(i).padStart(2, '0'));
+        const DAYS = Array.from({ length: 31 }, (_, i) => i + 1);
+        const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const YEARS = Array.from({ length: 50 }, (_, i) => 2000 + i);
+
+        const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
+        const COLORS = ['Red', 'Blue', 'Green', 'Yellow', 'Black', 'White', 'Purple', 'Orange'];
+        const BRANDS = ['Nike', 'Adidas', 'Puma', 'Reebok', 'New Balance', 'Under Armour'];
+
+        // --- State Variables ---
+        // Time Picker
+        const selectedHour = $('12');
+        const selectedMinute = $('30');
+        const selectedSecond = $('00');
+        const timePickerVisible = $(false);
+        const timePickerOk = $(false);
+
+        // Date Picker
+        const selectedDay = $(15);
+        const selectedMonth = $('Jun');
+        const selectedYear = $(2024);
+        const datePickerVisible = $(false);
+        const datePickerOk = $(false);
+
+        // Product Selector
+        const selectedSize = $('M');
+        const selectedColor = $('Blue');
+        const selectedBrand = $('Nike');
+        const productSelectorVisible = $(false);
+        const productSelectorOk = $(false);
+
+        // Date-Time Picker with Search
+        const selectedDaySearch = $(1);
+        const selectedMonthSearch = $('Jan');
+        const selectedYearSearch = $(2024);
+        const selectedHourSearch = $('00');
+        const selectedMinuteSearch = $('00');
+        const dateTimeSearchVisible = $(false);
+        const dateTimeSearchOk = $(false);
+
+        // Custom Headers Example
+        const selectedHourHeader = $('09');
+        const selectedMinuteHeader = $('15');
+        const selectedSecondHeader = $('45');
+        const customHeaderVisible = $(false);
+        const customHeaderOk = $(false);
+
+        return (
+            <>
+                <h2 id="multi-wheeler" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Multi Wheeler Demo</h2>
+                <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                        {/* Time Picker */}
+                        <div class="border border-gray-300 rounded-lg p-4">
+                            <h3 class="font-bold mb-2">Time Picker (Bottom Popup)</h3>
+                            <p class="text-sm text-gray-600 mb-3">
+                                Three wheels for Hours, Minutes, and Seconds with popup from bottom
+                            </p>
+                            <Button
+                                type="contained"
+                                onClick={() => timePickerVisible(true)}
+                                cls="w-full mb-2"
+                            >
+                                Select Time
+                            </Button>
+                            <div class="bg-gray-100 p-3 rounded-md">
+                                <p class="text-sm font-semibold mb-1">Selected Time:</p>
+                                <p class="font-mono text-lg">
+                                    {() => `${$$(selectedHour)}:${$$(selectedMinute)}:${$$(selectedSecond)}`}
+                                </p>
+                                <p class="text-xs text-gray-600 mt-2">
+                                    OK clicked: {() => $$(timePickerOk) ? 'Yes' : 'No'}
+                                </p>
+                            </div>
+
+                            <MultiWheeler
+                                options={[HOURS, MINUTES, SECONDS]}
+                                value={[selectedHour, selectedMinute, selectedSecond]}
+                                headers={[
+                                    (v) => <span class="text-xs text-gray-600">Hour</span>,
+                                    (v) => <span class="text-xs text-gray-600">Min</span>,
+                                    (v) => <span class="text-xs text-gray-600">Sec</span>
+                                ]}
+                                title="Select Time"
+                                divider={true}
+                                bottom={true}
+                                mask={true}
+                                visible={timePickerVisible}
+                                ok={timePickerOk}
+                                cancelOnBlur={true}
+                                itemHeight={40}
+                                itemCount={5}
+                            />
+                        </div>
+
+                        {/* Date Picker */}
+                        <div class="border border-gray-300 rounded-lg p-4">
+                            <h3 class="font-bold mb-2">Date Picker (Bottom Popup)</h3>
+                            <p class="text-sm text-gray-600 mb-3">
+                                Three wheels for Day, Month, and Year
+                            </p>
+                            <Button
+                                type="contained"
+                                onClick={() => datePickerVisible(true)}
+                                cls="w-full mb-2"
+                            >
+                                Select Date
+                            </Button>
+                            <div class="bg-gray-100 p-3 rounded-md">
+                                <p class="text-sm font-semibold mb-1">Selected Date:</p>
+                                <p class="font-mono text-lg">
+                                    {() => `${$$(selectedMonth)} ${$$(selectedDay)}, ${$$(selectedYear)}`}
+                                </p>
+                                <p class="text-xs text-gray-600 mt-2">
+                                    OK clicked: {() => $$(datePickerOk) ? 'Yes' : 'No'}
+                                </p>
+                            </div>
+
+                            <MultiWheeler
+                                options={[DAYS, MONTHS, YEARS]}
+                                value={[selectedDay, selectedMonth, selectedYear]}
+                                headers={[
+                                    (v) => <span class="text-xs text-gray-600">Day</span>,
+                                    (v) => <span class="text-xs text-gray-600">Month</span>,
+                                    (v) => <span class="text-xs text-gray-600">Year</span>
+                                ]}
+                                title="Select Date"
+                                divider={true}
+                                bottom={true}
+                                mask={true}
+                                visible={datePickerVisible}
+                                ok={datePickerOk}
+                                cancelOnBlur={true}
+                                itemHeight={40}
+                                itemCount={5}
+                            />
+                        </div>
+
+                        {/* Product Selector */}
+                        <div class="border border-gray-300 rounded-lg p-4">
+                            <h3 class="font-bold mb-2">Product Selector (Inline)</h3>
+                            <p class="text-sm text-gray-600 mb-3">
+                                Inline MultiWheeler for Size, Color, and Brand selection
+                            </p>
+                            <div class="bg-gray-100 p-3 rounded-md mb-3">
+                                <p class="text-sm font-semibold mb-1">Selected:</p>
+                                <p class="text-sm">
+                                    Size: <span class="font-mono">{selectedSize}</span>,
+                                    Color: <span class="font-mono">{selectedColor}</span>,
+                                    Brand: <span class="font-mono">{selectedBrand}</span>
+                                </p>
+                            </div>
+
+                            <MultiWheeler
+                                options={[SIZES, COLORS, BRANDS]}
+                                value={[selectedSize, selectedColor, selectedBrand]}
+                                headers={[
+                                    (v) => <span class="text-xs font-semibold text-purple-600">Size</span>,
+                                    (v) => <span class="text-xs font-semibold text-blue-600">Color</span>,
+                                    (v) => <span class="text-xs font-semibold text-green-600">Brand</span>
+                                ]}
+                                title="Choose Product"
+                                divider={false}
+                                bottom={false}
+                                visible={true}
+                                itemHeight={36}
+                                itemCount={5}
+                                cls="border-2 border-gray-300 rounded-lg shadow-sm w-[80%] overflow-auto"
+                            />
+                        </div>
+
+                        {/* Date-Time with Search */}
+                        <div class="border border-gray-300 rounded-lg p-4">
+                            <h3 class="font-bold mb-2">Date-Time Picker with Search</h3>
+                            <p class="text-sm text-gray-600 mb-3">
+                                MultiWheeler with searchable wheels (Month, Hour, Minute)
+                            </p>
+                            <Button
+                                type="contained"
+                                onClick={() => dateTimeSearchVisible(true)}
+                                cls="w-full mb-2"
+                            >
+                                Select Date & Time
+                            </Button>
+                            <div class="bg-gray-100 p-3 rounded-md">
+                                <p class="text-sm font-semibold mb-1">Selected:</p>
+                                <p class="font-mono text-sm">
+                                    {() => `${$$(selectedMonthSearch)} ${$$(selectedDaySearch)}, ${$$(selectedYearSearch)} at ${$$(selectedHourSearch)}:${$$(selectedMinuteSearch)}`}
+                                </p>
+                                <p class="text-xs text-gray-600 mt-2">
+                                    OK clicked: {() => $$(dateTimeSearchOk) ? 'Yes' : 'No'}
+                                </p>
+                            </div>
+
+                            <MultiWheeler
+                                options={[DAYS, MONTHS, YEARS, HOURS, MINUTES]}
+                                value={[selectedDaySearch, selectedMonthSearch, selectedYearSearch, selectedHourSearch, selectedMinuteSearch]}
+                                headers={[
+                                    (v) => <span class="text-xs text-gray-600">Day</span>,
+                                    (v) => <span class="text-xs text-gray-600">Month</span>,
+                                    (v) => <span class="text-xs text-gray-600">Year</span>,
+                                    (v) => <span class="text-xs text-gray-600">Hour</span>,
+                                    (v) => <span class="text-xs text-gray-600">Min</span>
+                                ]}
+                                title="Select Date & Time"
+                                divider={true}
+                                bottom={true}
+                                mask={true}
+                                visible={dateTimeSearchVisible}
+                                ok={dateTimeSearchOk}
+                                cancelOnBlur={true}
+                                itemHeight={40}
+                                itemCount={5}
+                                searchable={[false, true, true, true, true]}
+                                searchPlaceholder={['', 'Search month...', 'Search year...', 'Search hour...', 'Search minute...']}
+                            />
+                        </div>
+
+                        {/* Custom Headers Example */}
+                        <div class="border border-gray-300 rounded-lg p-4 md:col-span-2">
+                            <h3 class="font-bold mb-2">Custom Headers with Dynamic Display</h3>
+                            <p class="text-sm text-gray-600 mb-3">
+                                Headers that display the current selected value with custom styling
+                            </p>
+                            <Button
+                                type="contained"
+                                onClick={() => customHeaderVisible(true)}
+                                cls="w-full mb-2"
+                            >
+                                Select Time with Custom Headers
+                            </Button>
+                            <div class="bg-gradient-to-r from-blue-50 to-purple-50 p-4 rounded-md">
+                                <p class="text-sm font-semibold mb-2">Selected Time:</p>
+                                <p class="font-mono text-2xl font-bold text-blue-600">
+                                    {() => `${$$(selectedHourHeader)}:${$$(selectedMinuteHeader)}:${$$(selectedSecondHeader)}`}
+                                </p>
+                                <p class="text-xs text-gray-600 mt-2">
+                                    OK clicked: {() => $$(customHeaderOk) ? 'Yes ✓' : 'No'}
+                                </p>
+                            </div>
+
+                            <MultiWheeler
+                                options={[HOURS, MINUTES, SECONDS]}
+                                value={[selectedHourHeader, selectedMinuteHeader, selectedSecondHeader]}
+                                headers={[
+                                    (v) => <div class="bg-blue-100 text-blue-800 font-bold py-1 px-2 rounded text-center"><div class="text-xs">Hour</div><div class="text-lg">{() => $$(v)}</div></div>,
+                                    (v) => <div class="bg-green-100 text-green-800 font-bold py-1 px-2 rounded text-center"><div class="text-xs">Minute</div><div class="text-lg">{() => $$(v)}</div></div>,
+                                    (v) => <div class="bg-purple-100 text-purple-800 font-bold py-1 px-2 rounded text-center"><div class="text-xs">Second</div><div class="text-lg">{() => $$(v)}</div></div>
+                                ]}
+                                title="Time Picker with Custom Headers"
+                                divider={true}
+                                bottom={true}
+                                mask={true}
+                                visible={customHeaderVisible}
+                                ok={customHeaderOk}
+                                cancelOnBlur={true}
+                                itemHeight={44}
+                                itemCount={5}
+                            />
+                        </div>
+                    </div>
+                </div>
+            </>
+        );
+    }
+    // #endregion
+
+    // #region DateTime Wheeler Demo
+    const datetimeWheelerDemo = () => {
+        const selectedDate = $(new Date(2024, 5, 15, 14, 30, 45)) // June 15, 2024, 2:30:45 PM
+        const visible = $(false)
+        const mode: Observable<DateTimeWheelerType> = $("datetime" as DateTimeWheelerType)
+        const itemCount = $(5)
+        const showMask = $(true)
+        const showDivider = $(true)
+        const bottom = $(true) // New bottom flag
+
+        // Format date for display
+        const formatDate = (date: Date) => {
+            return date.toLocaleString('en-US', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: true
+            })
+        }
+
+        return <>
+            <h2 id="datetime-wheeler" class="text-2xl font-bold mb-6 text-gray-800">DateTime Wheeler Demo</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                {/* Control Panel */}
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-semibold mb-4 text-gray-700">Configuration</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Mode</label>
+                            <select
+                                class="w-full p-2 border border-gray-300 rounded-md"
+                                onChange={(e) => mode(e.target.value as DateTimeWheelerType)}
+                                value={() => $$(mode)}
+                            >
+                                <option value="datetime">DateTime</option>
+                                <option value="date">Date Only</option>
+                                <option value="time">Time Only</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                Item Count: {() => $$(itemCount)}
+                            </label>
+                            <input
+                                type="range"
+                                min="3"
+                                max="9"
+                                value={() => $$(itemCount)}
+                                onInput={(e) => itemCount(parseInt(e.target.value))}
+                                class="w-full"
+                            />
+                        </div>
+                        <div class="items-center mr-2">
+                            <Checkbox id="mask" labelPosition="right" checked={() => $$(showMask)} onChange={(e) => showMask(e.target.checked)}>Show Mask</Checkbox>
+                            <Checkbox id="divider" labelPosition="right" checked={() => $$(showDivider)} onChange={(e) => showDivider(e.target.checked)}>Show Divider</Checkbox>
+                            <Checkbox id="bottom" labelPosition="right" checked={() => $$(bottom)} onChange={(e) => bottom(e.target.checked)}>Popup Mode (Bottom)</Checkbox>
+                        </div>
+
+                        <Button
+                            cls="w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                            onClick={() => visible(true)}
+                        >
+                            Open DateTime Picker
+                        </Button>
+                    </div>
+                </div>
+
+                {/* Preview Panel */}
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-semibold mb-4 text-gray-700">Selected Value</h3>
+                    <div class="p-4 bg-gray-50 rounded-md">
+                        <p class="text-lg font-mono">
+                            {() => formatDate($$(selectedDate))}
+                        </p>
+                        <p class="text-sm text-gray-500 mt-2">
+                            Mode: {() => $$(mode).toUpperCase()}
+                        </p>
+                    </div>
+
+                    <div class="mt-4">
+                        <h4 class="font-medium text-gray-700 mb-2">Try These Examples:</h4>
+                        <div class="grid grid-cols-2 gap-2">
+                            <Button
+                                onClick={() => {
+                                    mode("datetime" as DateTimeWheelerType)
+                                    selectedDate(new Date(2024, 0, 1, 12, 0, 0))
+                                }}
+                            >
+                                New Year
+                            </Button>
+                            <Button
+                                onClick={() => {
+                                    mode("date" as DateTimeWheelerType)
+                                    selectedDate(new Date(2024, 11, 25))
+                                }}
+                            >
+                                Christmas
+                            </Button>
+                            <Button
+                                onClick={() => {
+                                    mode("time" as DateTimeWheelerType)
+                                    selectedDate(new Date(2024, 0, 1, 18, 30, 0))
+                                }}
+                            >
+                                Evening
+                            </Button>
+                            <Button
+                                onClick={() => {
+                                    mode("datetime" as DateTimeWheelerType)
+                                    selectedDate(new Date())
+                                }}
+                            >
+                                Now
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* DateTimeWheeler Component */}
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h3 class="text-lg font-semibold mb-4 text-gray-700">DateTime Wheeler</h3>
+                <div class="border border-gray-200 rounded-md p-4 min-h-[300px]">
+                    <p class="text-sm text-gray-600 mb-3">
+                        This component provides an interactive date and time picker with customizable display modes.
+                        Adjust the settings above to see different configurations in action.
+                    </p>
+                    <DateTimeWheeler
+                        value={selectedDate}
+                        mode={mode}
+                        visible={visible}
+                        bottom={bottom} // Use the bottom flag here
+                        mask={showMask}
+                        divider={showDivider}
+                        itemCount={itemCount}
+                        title={(d) => `Select ${$$(mode) === 'time' ? 'Time' : $$(mode) === 'date' ? 'Date' : 'Date & Time'}`}
+                    />
+                </div>
+            </div>
+
+            {/* Information Panel */}
+            <div class="mt-6 bg-blue-50 rounded-lg p-4">
+                <h3 class="font-semibold text-blue-800 mb-2">About DateTime Wheeler</h3>
+                <p class="text-sm text-blue-700">
+                    The DateTime Wheeler component allows users to select dates and times using an intuitive wheel-based interface.
+                    It supports different modes (datetime, date-only, time-only), customizable item counts, and various styling options.
+                </p>
+            </div>
+        </>
+    }
+    // #endregion
+
+
+    // #region Render
     return (
         <div class="p-8">
             <h1 class="text-3xl font-bold mb-6">@woby/wui Component Library</h1>
@@ -700,35 +1435,19 @@ export function App() {
             {tableOfContents()}
 
             <div class="space-y-4">
-                {/* #region: Appbar Examples */}
                 {appbarDemo()}
-
-                {/* #region: Avatar Examples */}
                 {avatarDemo()}
-
-                {/* #region: Badge Examples */}
                 {badgeDemo()}
-
-                {/* #region: Button Examples */}
                 {buttonDemo()}
-
-                {/* #region: AlignButton Demo */}
                 {alignButtonDemo()}
-
-                {/* #region: Card Demo */}
                 {cardDemo()}
-
-                {/* #region: Checkbox Demo */}
                 {checkboxDemo()}
-
-                {/* #region: Chip Demo */}
                 {chipDemo()}
-
-                {/* #region: Collapse Demo */}
                 {collapseDemo()}
-
-                {/* #region: Icon Button Demo */}
                 {iconButtonDemo()}
+                {wheelerDemo()}
+                {multiWheelerDemo()}
+                {datetimeWheelerDemo()}
             </div>
 
             <div class="mt-8 p-4 bg-gray-100 rounded">
@@ -736,4 +1455,5 @@ export function App() {
             </div>
         </div >
     )
+    // #endregion
 }
