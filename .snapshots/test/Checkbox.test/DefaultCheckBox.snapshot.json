@@ -1,4 +1,0 @@
-{
-  "props": {},
-  "html": "<div><div><label class=\"pr-1.5 select-none\" for=\"default-checkbox\"> Default Checkbox </label><!----><input id=\"default-checkbox\" type=\"checkbox\"></input><!----><!----></div></div>"
-}

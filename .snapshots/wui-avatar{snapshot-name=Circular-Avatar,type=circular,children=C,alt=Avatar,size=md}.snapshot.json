@@ -1,4 +1,0 @@
-{
-  "props": {},
-  "html": "<slot-mocked> <wui-avatar-mocked snapshot-name=\"Circular-Avatar\" type=\"circular\" children=\"C\" cls=\"\" alt=\"Avatar\" size=\"md\"><div class=\"relative flex items-center justify-center align-middle select-none leading-none overflow-hidden shrink-0 text-white m-0 bg-[rgb(189,189,189)] rounded-full w-10 h-10 text-base\">C</div> </wui-avatar-mocked></slot-mocked>"
-}

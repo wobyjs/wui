@@ -1,4 +1,0 @@
-{
-  "props": {},
-  "html": "<div><button type=\"button\" class=\"m-2 p-2 font-bold text-white border-2 rounded-full bg-blue-500 cursor-pointer\">Custom Button</button></div>"
-}

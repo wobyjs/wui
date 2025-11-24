@@ -1,4 +1,0 @@
-{
-  "props": {},
-  "html": "<slot-mocked> <wui-button-mocked type=\"\" cls=\"m-2 p-2 font-bold text-white border-2 rounded-full bg-blue-500 cursor-pointer\" snapshot-name=\"Custom-Button-2\" button-function=\"button\"><button type=\"button\" class=\"cursor-pointer text-white m-2 p-2 font-bold border-2 rounded-full bg-blue-500\"><slot-mocked> Custom Style 2 </slot-mocked></button> Custom Style 2 </wui-button-mocked> </slot-mocked>"
-}

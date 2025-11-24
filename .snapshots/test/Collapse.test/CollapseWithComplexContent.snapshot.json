@@ -1,4 +1,0 @@
-{
-  "props": {},
-  "html": "<div><div class=\"overflow-hidden transition-height duration-200 ease-in-out bg-[#ccc]\"><div class=\"h-fit\"><div class=\"p-4 bg-green-100\"><h4 class=\"font-bold\">Complex Content Header</h4><p>This collapse contains more complex content:</p><ul class=\"list-disc pl-5\"><li>Unordered list item 1</li><li>Unordered list item 2</li></ul><p class=\"mt-2\">And some more text content to test height calculations.</p></div></div></div></div>"
-}

@@ -1,4 +1,0 @@
-{
-  "props": {},
-  "html": "<div><div class=\"overflow-hidden transition-height duration-200 ease-in-out\"><div class=\"h-fit\"><div class=\"p-4\"><p>This collapse has no background.</p><p>There should be no gray background.</p></div></div></div></div>"
-}
