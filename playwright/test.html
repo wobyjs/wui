@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>WUI Playwright Test</title>
+    <link href="../dist/wui.css" rel="stylesheet">
+    <script type="module" src="../src/index.tsx"></script>
+    <script>
+        // Helper function to get full HTML including shadow DOM and slots
+        function getFullHTML(node) {
+            if (node instanceof HTMLSlotElement) {
+                // Handle slot elements specifically
+                let html = `<slot-mocked`
+
+                // Add attributes
+                for (const attr of node.attributes) {
+                    html += ` ${attr.name}="${attr.value}"`
+                }
+                html += '>'
+
+                // Handle assigned nodes if any
+                const assignedNodes = node.assignedNodes()
+                for (const assignedNode of assignedNodes) {
+                    html += getFullHTML(assignedNode)
+                }
+
+                html += '</slot-mocked>'
+                return html
+            } else if (node instanceof ShadowRoot) {
+                // Handle shadow root directly
+                let html = '<shadowRoot-mocked>'
+                for (const child of node.childNodes) {
+                    html += getFullHTML(child)
+                }
+                html += '</shadowRoot-mocked>'
+                return html
+            } else if (node instanceof Text) {
+                return node.textContent || ''
+            } else if (node instanceof Comment) {
+                return `<!--${node.textContent}-->`
+            } else if (node instanceof Element) {
+                const n = node.tagName.toLowerCase()
+                const isCE = customElements.get(n)
+                const name = !!isCE ? n + '-mocked' : n
+                let html = `<${name}`
+
+                // Add attributes
+                for (const attr of node.attributes) {
+                    html += ` ${attr.name}="${attr.value}"`
+                }
+                html += '>'
+
+                // Handle shadow DOM
+                if (node.shadowRoot) {
+                    // html += '<!-- shadowRoot -->'
+                    for (const child of node.shadowRoot.childNodes) {
+                        html += getFullHTML(child)
+                    }
+                    // html += '<!-- /shadowRoot -->'
+                }
+
+                // Handle light DOM children
+                for (const child of node.childNodes) {
+                    html += getFullHTML(child)
+                }
+
+                html += `</${name}>`
+                return html
+            }
+            return ''
+        }
+    </script>
+</head>
+
+<body>
+    <h1>WUI Playwright Tests</h1>
+
+    <h2>Button Component</h2>
+    <wui-button type="text" children="Text Button" id="text-button"></wui-button>
+    <wui-button type="contained" children="Contained Button" id="contained-button"></wui-button>
+    <wui-button type="outlined" children="Outlined Button" id="outlined-button"></wui-button>
+    <wui-button type="icon" children="?" id="icon-button"></wui-button>
+    <wui-button disabled="true" children="Disabled Button" id="disabled-button"></wui-button>
+
+    <h2>Avatar Component</h2>
+    <wui-avatar alt="Avatar" size="md" type="circular" children="A" id="avatar"></wui-avatar>
+
+    <h2>Checkbox Component</h2>
+    <wui-checkbox label="Checkbox" id="checkbox"></wui-checkbox>
+
+    <h2>Appbar Component</h2>
+    <wui-appbar id="appbar">
+        <div>Appbar Content</div>
+    </wui-appbar>
+
+    <h2>Card Component</h2>
+    <wui-card id="card">
+        <wui-card-content>
+            <h3>Card Title</h3>
+            <p>Card content</p>
+        </wui-card-content>
+    </wui-card>
+
+    <h2>Chip Component</h2>
+    <wui-chip id="chip">Chip Content</wui-chip>
+
+    <h2>Collapse Component</h2>
+    <wui-collapse id="collapse">
+        <div>Collapse Content</div>
+    </wui-collapse>
+
+    <h2>Icon Button Component</h2>
+    <wui-icon-button id="icon-button-component">
+        <svg focusable="false" viewBox="0 0 24 24" width="24" height="24">
+            <path
+                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z">
+            </path>
+        </svg>
+    </wui-icon-button>
+
+    <h2>Number Field Component</h2>
+    <wui-number-field id="number-field"></wui-number-field>
+
+    <h2>Switch Component</h2>
+    <wui-switch id="switch"></wui-switch>
+
+    <h2>Text Field Component</h2>
+    <wui-text-field id="text-field"></wui-text-field>
+
+    <h2>Toggle Button Component</h2>
+    <wui-toggle-button id="toggle-button">Toggle</wui-toggle-button>
+
+    <h2>Align Button Component</h2>
+    <wui-align-button id="align-button"></wui-align-button>
+</body>
+
+</html>

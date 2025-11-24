@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>TextField Component Test</title>
+    <link href="/node_modules/@woby/chk/dist/index.css" rel="stylesheet">
+    <script type="module" src="../src/TextField.tsx"></script>
+</head>
+
+<body>
+    <link href="../dist/wui.css" rel="stylesheet">
+    <h2 class="text-[1.2em] pl-4">TextField Component Test</h2>
+
+    <woby-chk name="Default TextField">
+        <wui-text-field snapshot-name="Default-TextField" />
+    </woby-chk>
+
+    <woby-chk name="Placeholder TextField">
+        <wui-text-field placeholder="Enter your name" snapshot-name="Placeholder-TextField" />
+    </woby-chk>
+
+    <woby-chk name="Value TextField">
+        <wui-text-field value="John Doe" snapshot-name="Value-TextField" />
+    </woby-chk>
+
+    <woby-chk name="Disabled TextField">
+        <wui-text-field disabled="true" snapshot-name="Disabled-TextField" />
+    </woby-chk>
+
+    <woby-chk name="Custom Class TextField">
+        <wui-text-field cls="m-2 p-2 border-2 rounded" snapshot-name="Custom-Class-TextField" />
+    </woby-chk>
+
+    <woby-chk name="With Label TextField">
+        <wui-text-field snapshot-name="With-Label-TextField">
+            <label class="block text-gray-700 text-sm font-bold mb-2">Name</label>
+        </wui-text-field>
+    </woby-chk>
+</body>
+
+</html>

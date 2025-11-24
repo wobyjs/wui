@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Card Component Playwright Test</title>
+    <link href="../../dist/wui.css" rel="stylesheet">
+    <script type="module" src="../../src/index.tsx"></script>
+    <script>
+        // Helper function to get full HTML including shadow DOM and slots
+        function getFullHTML(node) {
+            if (node instanceof HTMLSlotElement) {
+                // Handle slot elements specifically
+                let html = `<slot-mocked`
+
+                // Add attributes
+                for (const attr of node.attributes) {
+                    html += ` ${attr.name}="${attr.value}"`
+                }
+                html += '>'
+
+                // Handle assigned nodes if any
+                const assignedNodes = node.assignedNodes()
+                for (const assignedNode of assignedNodes) {
+                    html += getFullHTML(assignedNode)
+                }
+
+                html += '</slot-mocked>'
+                return html
+            } else if (node instanceof ShadowRoot) {
+                // Handle shadow root directly
+                let html = '<shadowRoot-mocked>'
+                for (const child of node.childNodes) {
+                    html += getFullHTML(child)
+                }
+                html += '</shadowRoot-mocked>'
+                return html
+            } else if (node instanceof Text) {
+                return node.textContent || ''
+            } else if (node instanceof Comment) {
+                return `<!--${node.textContent}-->`
+            } else if (node instanceof Element) {
+                const n = node.tagName.toLowerCase()
+                const isCE = customElements.get(n)
+                const name = !!isCE ? n + '-mocked' : n
+                let html = `<${name}`
+
+                // Add attributes
+                for (const attr of node.attributes) {
+                    html += ` ${attr.name}="${attr.value}"`
+                }
+                html += '>'
+
+                // Handle shadow DOM
+                if (node.shadowRoot) {
+                    // html += '<!-- shadowRoot -->'
+                    for (const child of node.shadowRoot.childNodes) {
+                        html += getFullHTML(child)
+                    }
+                    // html += '<!-- /shadowRoot -->'
+                }
+
+                // Handle light DOM children
+                for (const child of node.childNodes) {
+                    html += getFullHTML(child)
+                }
+
+                html += `</${name}>`
+                return html
+            }
+            return ''
+        }
+    </script>
+</head>
+
+<body>
+    <h1>Card Component Playwright Tests</h1>
+
+    <h2>Basic Card Test</h2>
+    <wui-card id="card-basic">
+        <wui-card-content>
+            <h3>Basic Card</h3>
+            <p>This is a basic card with some content.</p>
+        </wui-card-content>
+    </wui-card>
+
+    <h2>Card with Header and Footer</h2>
+    <wui-card id="card-header-footer">
+        <wui-card-header>
+            <h2>Card Header</h2>
+        </wui-card-header>
+        <wui-card-content>
+            <p>Card content goes here.</p>
+        </wui-card-content>
+        <wui-card-footer>
+            <p>Card footer content</p>
+        </wui-card-footer>
+    </wui-card>
+
+    <h2>Card with Actions</h2>
+    <wui-card id="card-actions">
+        <wui-card-content>
+            <h3>Card with Actions</h3>
+            <p>This card has action buttons.</p>
+        </wui-card-content>
+        <wui-card-actions>
+            <wui-button type="text" children="Cancel"></wui-button>
+            <wui-button type="contained" children="Submit"></wui-button>
+        </wui-card-actions>
+    </wui-card>
+</body>
+
+</html>

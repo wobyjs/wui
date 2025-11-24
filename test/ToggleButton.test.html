@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>ToggleButton Component Test</title>
+    <link href="/node_modules/@woby/chk/dist/index.css" rel="stylesheet">
+    <script type="module" src="../src/ToggleButton.tsx"></script>
+</head>
+
+<body>
+    <link href="../dist/wui.css" rel="stylesheet">
+    <h2 class="text-[1.2em] pl-4">ToggleButton Component Test</h2>
+
+    <woby-chk name="Default ToggleButton">
+        <wui-toggle-button snapshot-name="Default-ToggleButton">Toggle</wui-toggle-button>
+    </woby-chk>
+
+    <woby-chk name="Checked ToggleButton">
+        <wui-toggle-button checked="true" snapshot-name="Checked-ToggleButton">Toggle</wui-toggle-button>
+    </woby-chk>
+
+    <woby-chk name="Custom Class ToggleButton">
+        <wui-toggle-button cls="m-2 p-2 border-2 rounded" snapshot-name="Custom-Class-ToggleButton">Toggle</wui-toggle-button>
+    </woby-chk>
+
+    <woby-chk name="On Off Class ToggleButton">
+        <wui-toggle-button 
+            on-class="bg-blue-500 text-white" 
+            off-class="bg-gray-200 text-black"
+            snapshot-name="On-Off-Class-ToggleButton"
+        >
+            Toggle
+        </wui-toggle-button>
+    </woby-chk>
+</body>
+
+</html>

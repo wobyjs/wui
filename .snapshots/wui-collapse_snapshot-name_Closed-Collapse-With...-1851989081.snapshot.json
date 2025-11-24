@@ -1,0 +1,4 @@
+{
+  "props": {},
+  "html": "<slot-mocked> <wui-collapse-mocked snapshot-name=\"Closed-Collapse-With-Background-Html\" open=\"false\" background=\"true\" cls=\"\"><!----> <div class=\"p-4\"> <p>This collapse is closed but has a background.</p> <p>Content should be hidden but container may still exist.</p> </div> </wui-collapse-mocked> </slot-mocked>"
+}

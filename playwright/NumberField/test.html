@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Number Field Component Playwright Test</title>
+    <link href="../../dist/wui.css" rel="stylesheet">
+    <script type="module" src="../../src/index.tsx"></script>
+    <script>
+        // Helper function to get full HTML including shadow DOM and slots
+        function getFullHTML(node) {
+            if (node instanceof HTMLSlotElement) {
+                // Handle slot elements specifically
+                let html = `<slot-mocked`
+
+                // Add attributes
+                for (const attr of node.attributes) {
+                    html += ` ${attr.name}="${attr.value}"`
+                }
+                html += '>'
+
+                // Handle assigned nodes if any
+                const assignedNodes = node.assignedNodes()
+                for (const assignedNode of assignedNodes) {
+                    html += getFullHTML(assignedNode)
+                }
+
+                html += '</slot-mocked>'
+                return html
+            } else if (node instanceof ShadowRoot) {
+                // Handle shadow root directly
+                let html = '<shadowRoot-mocked>'
+                for (const child of node.childNodes) {
+                    html += getFullHTML(child)
+                }
+                html += '</shadowRoot-mocked>'
+                return html
+            } else if (node instanceof Text) {
+                return node.textContent || ''
+            } else if (node instanceof Comment) {
+                return `<!--${node.textContent}-->`
+            } else if (node instanceof Element) {
+                const n = node.tagName.toLowerCase()
+                const isCE = customElements.get(n)
+                const name = !!isCE ? n + '-mocked' : n
+                let html = `<${name}`
+
+                // Add attributes
+                for (const attr of node.attributes) {
+                    html += ` ${attr.name}="${attr.value}"`
+                }
+                html += '>'
+
+                // Handle shadow DOM
+                if (node.shadowRoot) {
+                    // html += '<!-- shadowRoot -->'
+                    for (const child of node.shadowRoot.childNodes) {
+                        html += getFullHTML(child)
+                    }
+                    // html += '<!-- /shadowRoot -->'
+                }
+
+                // Handle light DOM children
+                for (const child of node.childNodes) {
+                    html += getFullHTML(child)
+                }
+
+                html += `</${name}>`
+                return html
+            }
+            return ''
+        }
+    </script>
+</head>
+
+<body>
+    <h1>Number Field Component Playwright Tests</h1>
+
+    <h2>Basic Number Field Tests</h2>
+    <div style="display: flex; gap: 20px; flex-wrap: wrap; align-items: center;">
+        <div>
+            <p>Default Number Field</p>
+            <wui-number-field id="number-field-default" placeholder="Enter a number"></wui-number-field>
+        </div>
+        <div>
+            <p>Number Field with Value</p>
+            <wui-number-field id="number-field-value" value="42"></wui-number-field>
+        </div>
+        <div>
+            <p>Disabled Number Field</p>
+            <wui-number-field id="number-field-disabled" disabled="true" value="100"></wui-number-field>
+        </div>
+    </div>
+
+    <h2>Number Field with Constraints</h2>
+    <div style="display: flex; gap: 20px; flex-wrap: wrap; align-items: center;">
+        <div>
+            <p>Min Value (0)</p>
+            <wui-number-field id="number-field-min" min="0" placeholder="Min 0"></wui-number-field>
+        </div>
+        <div>
+            <p>Max Value (100)</p>
+            <wui-number-field id="number-field-max" max="100" placeholder="Max 100"></wui-number-field>
+        </div>
+        <div>
+            <p>Step (0.5)</p>
+            <wui-number-field id="number-field-step" step="0.5" placeholder="Step 0.5"></wui-number-field>
+        </div>
+    </div>
+
+    <h2>Number Field with Label</h2>
+    <div style="margin-bottom: 20px;">
+        <label for="number-field-labeled">Labeled Number Field:</label>
+        <wui-number-field id="number-field-labeled" label="Enter a number"></wui-number-field>
+    </div>
+
+    <h2>Number Field with Custom Styling</h2>
+    <wui-number-field id="number-field-styled" style="width: 200px; border: 2px solid blue; border-radius: 8px;"
+        placeholder="Styled Number Field"></wui-number-field>
+
+    <h2>Number Field with Special Props</h2>
+    <div style="display: flex; gap: 20px; flex-wrap: wrap; align-items: center;">
+        <div>
+            <p>No Rotate (value wraps around)</p>
+            <wui-number-field id="number-field-no-rotate" no-rotate="true" value="50" min="0"
+                max="100"></wui-number-field>
+        </div>
+        <div>
+            <p>No Fix (value stays outside range)</p>
+            <wui-number-field id="number-field-no-fix" no-fix="true" value="150" min="0" max="100"></wui-number-field>
+        </div>
+        <div>
+            <p>No MinMax (no min/max constraints)</p>
+            <wui-number-field id="number-field-no-minmax" no-minmax="true" value="150" min="0"
+                max="100"></wui-number-field>
+        </div>
+        <div>
+            <p>No MinMax with No Rotate</p>
+            <wui-number-field id="number-field-no-minmax-no-rotate" no-minmax="true" no-rotate="true" value="150"
+                min="0" max="100"></wui-number-field>
+        </div>
+        <div>
+            <p>Reactive Mode</p>
+            <wui-number-field id="number-field-reactive" reactive="true" value="25" min="0"
+                max="100"></wui-number-field>
+        </div>
+        <div>
+            <p>Standard Behavior (for comparison)</p>
+            <wui-number-field id="number-field-standard" value="50" min="0" max="100"></wui-number-field>
+        </div>
+    </div>
+</body>
+
+</html>

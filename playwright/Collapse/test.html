@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Collapse Component Playwright Test</title>
+    <link href="../../dist/wui.css" rel="stylesheet">
+    <script type="module" src="../../src/index.tsx"></script>
+    <script>
+        // Helper function to get full HTML including shadow DOM and slots
+        function getFullHTML(node) {
+            if (node instanceof HTMLSlotElement) {
+                // Handle slot elements specifically
+                let html = `<slot-mocked`
+
+                // Add attributes
+                for (const attr of node.attributes) {
+                    html += ` ${attr.name}="${attr.value}"`
+                }
+                html += '>'
+
+                // Handle assigned nodes if any
+                const assignedNodes = node.assignedNodes()
+                for (const assignedNode of assignedNodes) {
+                    html += getFullHTML(assignedNode)
+                }
+
+                html += '</slot-mocked>'
+                return html
+            } else if (node instanceof ShadowRoot) {
+                // Handle shadow root directly
+                let html = '<shadowRoot-mocked>'
+                for (const child of node.childNodes) {
+                    html += getFullHTML(child)
+                }
+                html += '</shadowRoot-mocked>'
+                return html
+            } else if (node instanceof Text) {
+                return node.textContent || ''
+            } else if (node instanceof Comment) {
+                return `<!--${node.textContent}-->`
+            } else if (node instanceof Element) {
+                const n = node.tagName.toLowerCase()
+                const isCE = customElements.get(n)
+                const name = !!isCE ? n + '-mocked' : n
+                let html = `<${name}`
+
+                // Add attributes
+                for (const attr of node.attributes) {
+                    html += ` ${attr.name}="${attr.value}"`
+                }
+                html += '>'
+
+                // Handle shadow DOM
+                if (node.shadowRoot) {
+                    // html += '<!-- shadowRoot -->'
+                    for (const child of node.shadowRoot.childNodes) {
+                        html += getFullHTML(child)
+                    }
+                    // html += '<!-- /shadowRoot -->'
+                }
+
+                // Handle light DOM children
+                for (const child of node.childNodes) {
+                    html += getFullHTML(child)
+                }
+
+                html += `</${name}>`
+                return html
+            }
+            return ''
+        }
+    </script>
+</head>
+
+<body>
+    <h1>Collapse Component Playwright Tests</h1>
+
+    <h2>Basic Collapse Tests</h2>
+    <div style="margin-bottom: 20px;">
+        <p>Collapsed Collapse</p>
+        <wui-collapse id="collapse-collapsed">
+            <div style="padding: 16px; background-color: #f5f5f5;">
+                <p>This content is hidden by default.</p>
+                <p>It should only be visible when the collapse is expanded.</p>
+            </div>
+        </wui-collapse>
+    </div>
+
+    <div style="margin-bottom: 20px;">
+        <p>Expanded Collapse</p>
+        <wui-collapse expanded="true" id="collapse-expanded">
+            <div style="padding: 16px; background-color: #f5f5f5;">
+                <p>This content is visible by default.</p>
+                <p>It should be hidden when the collapse is collapsed.</p>
+            </div>
+        </wui-collapse>
+    </div>
+
+    <h2>Collapse with Custom Content</h2>
+    <wui-collapse id="collapse-custom">
+        <div style="padding: 16px; background-color: #e3f2fd;">
+            <h3>Custom Content Header</h3>
+            <p>This collapse contains custom styled content.</p>
+            <ul>
+                <li>List item 1</li>
+                <li>List item 2</li>
+                <li>List item 3</li>
+            </ul>
+        </div>
+    </wui-collapse>
+</body>
+
+</html>

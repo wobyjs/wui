@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Text Field Component Playwright Test</title>
+    <link href="../../dist/wui.css" rel="stylesheet">
+    <script type="module" src="../../src/index.tsx"></script>
+    <script>
+        // Helper function to get full HTML including shadow DOM and slots
+        function getFullHTML(node) {
+            if (node instanceof HTMLSlotElement) {
+                // Handle slot elements specifically
+                let html = `<slot-mocked`
+
+                // Add attributes
+                for (const attr of node.attributes) {
+                    html += ` ${attr.name}="${attr.value}"`
+                }
+                html += '>'
+
+                // Handle assigned nodes if any
+                const assignedNodes = node.assignedNodes()
+                for (const assignedNode of assignedNodes) {
+                    html += getFullHTML(assignedNode)
+                }
+
+                html += '</slot-mocked>'
+                return html
+            } else if (node instanceof ShadowRoot) {
+                // Handle shadow root directly
+                let html = '<shadowRoot-mocked>'
+                for (const child of node.childNodes) {
+                    html += getFullHTML(child)
+                }
+                html += '</shadowRoot-mocked>'
+                return html
+            } else if (node instanceof Text) {
+                return node.textContent || ''
+            } else if (node instanceof Comment) {
+                return `<!--${node.textContent}-->`
+            } else if (node instanceof Element) {
+                const n = node.tagName.toLowerCase()
+                const isCE = customElements.get(n)
+                const name = !!isCE ? n + '-mocked' : n
+                let html = `<${name}`
+
+                // Add attributes
+                for (const attr of node.attributes) {
+                    html += ` ${attr.name}="${attr.value}"`
+                }
+                html += '>'
+
+                // Handle shadow DOM
+                if (node.shadowRoot) {
+                    // html += '<!-- shadowRoot -->'
+                    for (const child of node.shadowRoot.childNodes) {
+                        html += getFullHTML(child)
+                    }
+                    // html += '<!-- /shadowRoot -->'
+                }
+
+                // Handle light DOM children
+                for (const child of node.childNodes) {
+                    html += getFullHTML(child)
+                }
+
+                html += `</${name}>`
+                return html
+            }
+            return ''
+        }
+    </script>
+</head>
+
+<body>
+    <h1>Text Field Component Playwright Tests</h1>
+
+    <h2>Basic Text Field Tests</h2>
+    <div style="display: flex; gap: 20px; flex-wrap: wrap; align-items: center;">
+        <div>
+            <p>Default Text Field</p>
+            <wui-text-field id="text-field-default" placeholder="Enter text"></wui-text-field>
+        </div>
+        <div>
+            <p>Text Field with Value</p>
+            <wui-text-field id="text-field-value" value="Sample text"></wui-text-field>
+        </div>
+        <div>
+            <p>Disabled Text Field</p>
+            <wui-text-field id="text-field-disabled" disabled="true" value="Disabled text"></wui-text-field>
+        </div>
+    </div>
+
+    <h2>Text Field Variants</h2>
+    <div style="display: flex; gap: 20px; flex-wrap: wrap; align-items: center;">
+        <div>
+            <p>Outlined Text Field</p>
+            <wui-text-field id="text-field-outlined" variant="outlined"
+                placeholder="Outlined text field"></wui-text-field>
+        </div>
+        <div>
+            <p>Filled Text Field</p>
+            <wui-text-field id="text-field-filled" variant="filled" placeholder="Filled text field"></wui-text-field>
+        </div>
+        <div>
+            <p>Standard Text Field</p>
+            <wui-text-field id="text-field-standard" variant="standard"
+                placeholder="Standard text field"></wui-text-field>
+        </div>
+    </div>
+
+    <h2>Text Field with Label</h2>
+    <div style="margin-bottom: 20px;">
+        <label for="text-field-labeled">Labeled Text Field:</label>
+        <wui-text-field id="text-field-labeled" label="Enter your name"></wui-text-field>
+    </div>
+
+    <h2>Text Field with Helper Text</h2>
+    <wui-text-field id="text-field-helper" helper-text="This is helper text"
+        placeholder="Text field with helper text"></wui-text-field>
+
+    <h2>Text Field with Error</h2>
+    <wui-text-field id="text-field-error" error="true" helper-text="This field is required"
+        placeholder="Text field with error"></wui-text-field>
+</body>
+
+</html>

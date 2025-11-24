@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>NumberField Component Test</title>
+    <link href="/node_modules/@woby/chk/dist/index.css" rel="stylesheet">
+    <script type="module" src="../src/NumberField.tsx"></script>
+</head>
+
+<body>
+    <link href="../dist/wui.css" rel="stylesheet">
+    <h2 class="text-[1.2em] pl-4">NumberField Component Test</h2>
+
+    <woby-chk name="Default NumberField">
+        <wui-number-field snapshot-name="Default-NumberField" />
+    </woby-chk>
+
+    <woby-chk name="Value NumberField">
+        <wui-number-field value="10" snapshot-name="Value-NumberField" />
+    </woby-chk>
+
+    <woby-chk name="Min Max NumberField">
+        <wui-number-field min="0" max="50" value="25" snapshot-name="Min-Max-NumberField" />
+    </woby-chk>
+
+    <woby-chk name="Step NumberField">
+        <wui-number-field step="5" value="10" snapshot-name="Step-NumberField" />
+    </woby-chk>
+
+    <woby-chk name="Disabled NumberField">
+        <wui-number-field disabled="true" snapshot-name="Disabled-NumberField" />
+    </woby-chk>
+
+    <woby-chk name="Custom Class NumberField">
+        <wui-number-field cls="m-2 p-2 border-2 rounded" snapshot-name="Custom-Class-NumberField" />
+    </woby-chk>
+</body>
+
+</html>

@@ -1,0 +1,4 @@
+{
+  "props": {},
+  "html": "<div><div><input type=\"checkbox\"></input><div data-tg-on=\"YES\" data-tg-off=\"NO\"><span data-tg-on=\"YES\" data-tg-off=\"NO\"></span></div><span></span><label data-tg-on=\"YES\" data-tg-off=\"NO\"></label></div></div>"
+}

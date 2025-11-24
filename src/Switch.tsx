@@ -1,8 +1,16 @@
+//@ts-ignore
 import { nanoid } from 'nanoid'
-import { ObservableMaybe, useEffect, $, $$, isObservable, Observable, type JSX, FunctionMaybe } from 'woby'
+import { ObservableMaybe, useEffect, $, $$, isObservable, Observable, type JSX, FunctionMaybe, defaults, customElement, type ElementAttributes, HtmlBoolean } from 'woby'
 // https://codepen.io/alvarotrigo/pen/oNoJePo
 
-
+const def = () => ({
+    off: $("OFF"),
+    on: $("ON"),
+    checked: $(false, HtmlBoolean) as ObservableMaybe<boolean> | undefined,
+    id: $(undefined as string | undefined),
+    cls: $(""),
+    children: $(null as JSX.Child),
+})
 
 /**
  * Override
@@ -17,19 +25,48 @@ import { ObservableMaybe, useEffect, $, $$, isObservable, Observable, type JSX, 
  * 
  * Some special case may need to see the output html tree node and modify classes as needed
  */
-export const Switch = ({ off = 'OFF', on = 'ON', checked, ...props }: JSX.VoidHTMLAttributes<HTMLDivElement> & { id?: string, on?: string, off?: string, checked?: FunctionMaybe<boolean> }) => {
-    const id = props.id ?? nanoid(8)
+const Switch = defaults(def, (props) => {
+    const { off, on, checked, id: idProp, cls, children, ...otherProps } = props
 
-    return <>
-        <div {...props}>
-            <input id={id} type="checkbox" checked={checked} /* onChange={v => checked(v.target.checked)} */ onChange={v => isObservable(checked) && checked(v.target.checked)} />
-            <div data-tg-on={on} data-tg-off={off}><span data-tg-on={on} data-tg-off={off}></span></div>
-            <span></span>
-            <label for={id} data-tg-on={on} data-tg-off={off}></label>
-        </div>
-    </>
+    // Generate ID if not provided
+    const generatedId = $(nanoid(8))
+    const id = idProp ?? generatedId
+
+    return (
+        <>
+            <div {...otherProps} class={cls}>
+                <input
+                    id={id}
+                    type="checkbox"
+                    checked={checked}
+                    /* onChange={v => checked(v.target.checked)} */
+                    onChange={v => isObservable(checked) && checked(v.target.checked)}
+                />
+                <div data-tg-on={on} data-tg-off={off}>
+                    <span data-tg-on={on} data-tg-off={off}></span>
+                </div>
+                <span></span>
+                <label for={id} data-tg-on={on} data-tg-off={off}></label>
+            </div>
+        </>
+    )
+})
+
+export { Switch }
+
+// Register as custom element
+customElement('wui-switch', Switch)
+
+// Add the custom element to the JSX namespace
+declare module 'woby' {
+    namespace JSX {
+        interface IntrinsicElements {
+            'wui-switch': ElementAttributes<typeof Switch>
+        }
+    }
 }
 
+export default Switch
 
 export const useEnumSwitch = <T,>(e: Observable<T>, t: ObservableMaybe<T>, f: ObservableMaybe<T>) => {
     const v = $($$(e) === t)

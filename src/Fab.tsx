@@ -1,5 +1,5 @@
 import { tw } from '@woby/styled'
-import { $, $$, isObservable, type JSX, defaults, customElement, ElementAttributes, HtmlBoolean, HtmlClass, ObservableMaybe } from 'woby'
+import { $, $$, isObservable, type JSX, defaults, customElement, ElementAttributes, HtmlBoolean, HtmlClass, ObservableMaybe, HtmlStyle } from 'woby'
 
 // const def = () => ({
 //       class: $(undefined, HtmlClass),

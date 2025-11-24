@@ -1,0 +1,4 @@
+{
+  "props": {},
+  "html": "<div><button class=\"rounded-tr-none rounded-br-none inline-flex items-center justify-center relative box-border cursor-pointer select-none align-middle leading-[1.75] tracking-[0.02857em] uppercase border m-0 border-[rgba(0,0,0,0.12)] [outline:0] text-[rgba(0,0,0,0.54)] hover:no-underline hover:bg-[rgba(0,0,0,0.04)] m-2 p-2 border-2 rounded\">Toggle</button></div>"
+}

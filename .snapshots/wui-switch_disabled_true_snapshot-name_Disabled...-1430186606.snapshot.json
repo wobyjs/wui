@@ -1,0 +1,4 @@
+{
+  "props": {},
+  "html": "<slot-mocked> <wui-switch-mocked disabled=\"true\" snapshot-name=\"Disabled-Switch\" off=\"OFF\" cls=\"\"><div><input type=\"checkbox\"></input><div data-tg-on=\"ON\" data-tg-off=\"OFF\"><span data-tg-on=\"ON\" data-tg-off=\"OFF\"></span></div><span></span><label data-tg-on=\"ON\" data-tg-off=\"OFF\"></label></div> </wui-switch-mocked></slot-mocked>"
+}
