@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>DateTime Wheeler Component Test</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="/node_modules/@woby/chk/dist/index.css" rel="stylesheet">
+    <script type="module" src="../../src/Wheeler/Wheeler.tsx"></script>
+    <script type="module" src="../../src/Wheeler/DateTimeWheeler.tsx"></script>
+    <!-- Include Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body>
+    <link href="../dist/wui.css" rel="stylesheet">
+    <h2 class="text-[1.2em] pl-4 font-bold">DateTime Wheeler Component Test Suite</h2>
+
+    <!-- Test Case 1: Basic DateTimeWheeler -->
+    <woby-chk name="Basic DateTimeWheeler - DateTime Mode">
+        <wui-datetime-wheeler snapshot-name="Basic-DateTimeWheeler" value="2024-06-15T14:30:45" bottom="false"
+            visible="true" title="Select Date & Time" cls="w-full border border-gray-300 rounded-md overflow-auto">
+        </wui-datetime-wheeler>
+    </woby-chk>
+
+    <!-- Test Case 2: DateOnlyWheeler -->
+    <!-- <woby-chk name="DateTimeWheeler - Date Mode">
+        <wui-datetime-wheeler snapshot-name="DateOnlyWheeler" value="2024-12-25" mode="date" visible="false"
+            bottom="true" mask="true" divider="true" title="Select Date">
+        </wui-datetime-wheeler>
+    </woby-chk> -->
+
+    <!-- Test Case 3: TimeOnlyWheeler -->
+    <!-- <woby-chk name="DateTimeWheeler - Time Mode">
+        <wui-datetime-wheeler snapshot-name="TimeOnlyWheeler" value="2024-01-01T09:30:15" mode="time" visible="false"
+            bottom="true" mask="true" divider="true" title="Select Time">
+        </wui-datetime-wheeler>
+    </woby-chk> -->
+
+    <!-- Test Case 4: ConstrainedDateTimeWheeler -->
+    <!-- <woby-chk name="Constrained DateTimeWheeler">
+        <wui-datetime-wheeler snapshot-name="ConstrainedDateTimeWheeler" value="2024-06-15" mode="date"
+            min-date="2020-01-01" max-date="2030-12-31" visible="false" bottom="false" mask="true" divider="true"
+            title="Select Date (2020-2030)" cls="w-full border border-gray-300 rounded-md overflow-auto">
+        </wui-datetime-wheeler>
+    </woby-chk> -->
+
+    <!-- Test Case 5: CustomYearRangeWheeler -->
+    <!-- <woby-chk name="DateTimeWheeler - Custom Year Range">
+        <wui-datetime-wheeler snapshot-name="CustomYearRangeWheeler" value="2025-06-15" mode="date"
+            min-date="2020-01-01" max-date="2025-12-31" visible="false" bottom="false" mask="false" divider="true"
+            title="Select Date (2020-2025)" cls="w-full border border-gray-300 rounded-md overflow-auto">
+        </wui-datetime-wheeler>
+    </woby-chk> -->
+
+    <!-- Test Case 6: CustomItemCountWheeler -->
+    <!-- <woby-chk name="DateTimeWheeler - Custom Item Count">
+        <wui-datetime-wheeler snapshot-name="CustomItemCountWheeler" value="2024-06-15T14:30:00" mode="datetime"
+            visible="false" bottom="true" mask="true" divider="true" title="Select Date & Time" item-count="7">
+        </wui-datetime-wheeler>
+    </woby-chk> -->
+
+</body>
+
+</html>

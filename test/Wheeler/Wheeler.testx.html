@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Wheeler Component Test</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="/node_modules/@woby/chk/dist/index.css" rel="stylesheet">
+    <script type="module" src="../../src/Wheeler/Wheeler.tsx"></script>
+    <!-- Include Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body>
+    <link href="../dist/wui.css" rel="stylesheet">
+    <h2 class="text-[1.2em] pl-4 font-bold">Wheeler Component Test Suite</h2>
+
+    <!-- Default Wheeler Example -->
+    <div class="border border-red-500">
+        <woby-chk name="Default Wheeler">
+            <wui-wheeler snapshot-name="Default-Wheeler" id="inline-json"
+                options='[{ "label": "Option 1", "value": "1" }, { "label": "Option 2", "value": "2" }]' value="2"
+                bottom="false" visible="true" cls="border rounded-md shadow-sm w-64">
+            </wui-wheeler>
+        </woby-chk>
+        <div class="p-4 my-4">
+            <p class="text-sm font-medium justify-center">Selected Value: <span class="font-bold bg-gray-100 py-1 px-2 rounded-md">2</span>
+            </p>
+        </div>
+    </div>
+
+    <!-- Wheeler with JSON Object Array -->
+    <!-- <woby-chk name="Wheeler with JSON Object Array">
+        <wui-wheeler snapshot-name="Wheeler-with-JSON-Object-Array" id="json-object-array"
+            options='[{ "label": "Toyota", "value": "TOYOTA" }, { "label": "Honda", "value": "HONDA" }, { "label": "Ford", "value": "FORD" }, { "label": "Tesla", "value": "TESLA" }, { "label": "Subaru", "value": "SUBARU" }]'
+            value="FORD" bottom="false" cls="border rounded-md shadow-sm w-64">
+        </wui-wheeler>
+    </woby-chk> -->
+
+    <!-- Wheeler with Simple String Array -->
+    <!-- <woby-chk name="Wheeler with Simple String Array">
+        <wui-wheeler snapshot-name="Wheeler-with-Simple-String-Array" id="simple-array"
+            options='["Apple", "Banana", "Cherry", "Date", "Elderberry", "Fig", "Grape", "Honeydew"]' value="Cherry"
+            bottom="false" cls="border rounded-md shadow-sm w-64">
+        </wui-wheeler>
+    </woby-chk> -->
+
+    <!-- Multi-Select Wheeler (Cars) -->
+    <!-- <woby-chk name="Multi-Select Wheeler (Cars)">
+        <wui-wheeler snapshot-name="Multi-Select-Wheeler-Cars" id="multi-select-cars"
+            options='[{ "label": "Toyota", "value": "TOYOTA" }, { "label": "Honda", "value": "HONDA" }, { "label": "Ford", "value": "FORD" }, { "label": "Tesla", "value": "TESLA" }, { "label": "Subaru", "value": "SUBARU" }]'
+            value='["TOYOTA", "SUBARU"]' all="All Cars" bottom="false"
+            cls="border rounded-md shadow-sm w-64 overflow-y-auto" item-count="4">
+        </wui-wheeler>
+    </woby-chk> -->
+
+    <!-- Multi-Select Wheeler (Fruits) -->
+    <!-- <woby-chk name="Multi-Select Wheeler (Fruits)">
+        <wui-wheeler snapshot-name="Multi-Select-Wheeler-Fruits" id="multi-select-fruits"
+            options='["Apple", "Banana", "Cherry", "Date", "Elderberry", "Fig", "Grape", "Honeydew"]'
+            value='["Banana", "Cherry"]' all="All Fruits" bottom="false"
+            cls="border rounded-md shadow-sm w-64 h-64 overflow-y-auto" item-count="7">
+        </wui-wheeler>
+    </woby-chk> -->
+
+    <!-- Wheeler with Header -->
+    <!-- <woby-chk name="Wheeler with Header">
+        <wui-wheeler snapshot-name="Wheeler-with-Header" id="wheeler-header"
+            options='[{ "label": "Toyota", "value": "TOYOTA" }, { "label": "Honda", "value": "HONDA" }, { "label": "Ford", "value": "FORD" }, { "label": "Tesla", "value": "TESLA" }, { "label": "Subaru", "value": "SUBARU" }]'
+            value="FORD" header="Car Picker" bottom="false" cls="border rounded-md shadow-sm w-64">
+        </wui-wheeler>
+    </woby-chk> -->
+
+    <!-- Searchable Wheeler -->
+    <!-- <woby-chk name="Searchable Wheeler">
+        <wui-wheeler snapshot-name="Searchable-Wheeler" id="searchable-wheeler"
+            options='[{ "label": "Toyota", "value": "TOYOTA" }, { "label": "Honda", "value": "HONDA" }, { "label": "Ford", "value": "FORD" }, { "label": "Tesla", "value": "TESLA" }, { "label": "Subaru", "value": "SUBARU" }]'
+            value="FORD" header="Car Picker" searchable="true" bottom="false" cls="border rounded-md shadow-sm w-64">
+        </wui-wheeler>
+    </woby-chk> -->
+
+    <!-- Searchable Wheeler with Simple Array -->
+    <!-- <woby-chk name="Searchable Wheeler with Simple Array">
+        <wui-wheeler snapshot-name="Searchable-Wheeler-with-Simple-Array" id="searchable-simple-array"
+            options='["Apple", "Banana", "Cherry", "Date", "Elderberry", "Fig", "Grape", "Honeydew"]' value="Cherry"
+            header="Fruit Picker" searchable="true" search-placeholder="Search for a fruit" bottom="false"
+            cls="border rounded-md shadow-sm w-64">
+        </wui-wheeler>
+    </woby-chk> -->
+
+</body>
+
+</html>

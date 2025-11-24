@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Multi Wheeler Component Test</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="/node_modules/@woby/chk/dist/index.css" rel="stylesheet">
+    <script type="module" src="../../src/Wheeler/Wheeler.tsx"></script>
+    <script type="module" src="../../src/Wheeler/MultiWheeler.tsx"></script>
+    <!-- Include Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body>
+    <link href="../dist/wui.css" rel="stylesheet">
+    <h2 class="text-[1.2em] pl-4 font-bold">Multi Wheeler Component Test Suite</h2>
+
+
+    <!-- <woby-chk name="Single Wheeler">
+        <wui-wheeler snapshot-name="Single Wheeler"
+            options='["Apple", "Banana", "Cherry", "Date", "Elderberry", "Fig", "Grape", "Honeydew"]' value="Cherry"
+            visible="true" bottom="false" cls="border rounded-md shadow-sm w-64">
+        </wui-wheeler>
+    </woby-chk> -->
+
+    <!-- 
+      Test Case 1: Simple Inline Multi-Wheeler
+      - Two columns with simple string arrays.
+      - Displays inline on the page (`bottom="false"`).
+      - Has a title and initial values.
+    -->
+    <woby-chk name="Simple Inline Two-Wheel Picker">
+        <wui-multi-wheeler snapshot-name="Simple-Inline-Two-Wheels" title="Select a Fruit and Color"
+            options='[["Apple", "Banana", "Cherry", "Date"], ["Red", "Green", "Blue", "Yellow"]]'
+            value='["Banana", "Green"]' bottom="false" visible="true" cls="border rounded-md shadow-sm w-96">
+        </wui-multi-wheeler>
+    </woby-chk>
+
+    <!-- 
+      Test Case 2: Popup Multi-Wheeler with JSON Objects
+      - Three columns using arrays of objects ({label, value}).
+      - Renders as a popup from the bottom of the screen (`bottom="true"`).
+      - Includes headers for each column (passed as a serialized function array).
+      - Has a divider between wheels.
+    -->
+    <!-- <woby-chk name="Popup Picker with JSON Objects">
+        <wui-multi-wheeler snapshot-name="Popup-Picker-JSON-Objects" title="Employee Details"
+            options='[[{ "label": "Engineering", "value": "ENG" }, { "label": "Marketing", "value": "MKT" }, { "label": "Sales", "value": "SALES" }], [{ "label": "Manager", "value": "MGR" }, { "label": "Senior", "value": "SR" }, { "label": "Junior", "value": "JR" }], [{ "label": "New York", "value": "NY" }, { "label": "Los Angeles", "value": "LA" }]]'
+            value='["MKT", "JR", "LA"]'
+            headers='[{"type":"function","value":"() => `Department`"}, {"type":"function","value":"() => `Position`"}, {"type":"function","value":"() => `Location`"}]'
+            bottom="true" visible="true" mask="true" divider="true" item-count="5" cls="max-w-md mx-auto">
+        </wui-multi-wheeler>
+    </woby-chk> -->
+
+    <!-- <woby-chk name="Basic MultiWheeler">
+        <wui-multi-wheeler snapshot-name="Basic MultiWheeler"
+            options="[['Option 1', 'Option 2', 'Option 3', 'Option 4', 'Option 5'], ['Option A', 'Option B']]">
+        </wui-multi-wheeler>
+    </woby-chk> -->
+
+
+
+    <!-- Basic MultiWheeler - Two Columns 
+    <woby-chk name="Basic MultiWheeler - Two Columns">
+        <wui-multi-wheeler snapshot-name="Basic-MultiWheeler-Two-Columns"
+            options='[["Apple", "Banana", "Cherry", "Date", "Elderberry", "Fig", "Grape", "Honeydew"], ["Red", "Green", "Blue", "Yellow", "Purple", "Orange"]]'
+            value='["Apple", "Red"]' headers='[Fruit, Color]' bottom="false" mask="true" title="Select Fruit and Color"
+            cls="border rounded-md shadow-sm w-96">
+        </wui-multi-wheeler>
+    </woby-chk> -->
+
+    <!-- MultiWheeler with Three Columns
+    <woby-chk name="MultiWheeler with Three Columns">
+        <wui-multi-wheeler snapshot-name="MultiWheeler-with-Three-Columns"
+            options='[["Apple", "Banana", "Cherry", "Date", "Elderberry", "Fig", "Grape", "Honeydew"], ["Carrot", "Broccoli", "Spinach", "Tomato", "Cucumber", "Lettuce"], ["XS", "S", "M", "L", "XL", "XXL"]]'
+            value='["Banana", "Carrot", "M"]'
+            headers='[{"type":"function","value":"() => <span class=\"text-sm font-semibold\">Fruit</span>"}, {"type":"function","value":"() => <span class=\"text-sm font-semibold\">Vegetable</span>"}, {"type":"function","value":"() => <span class=\"text-sm font-semibold\">Size</span>"}]'
+            bottom="true" mask="true" divider="true" title="<span class=\" font-bold\">Select Your Preferences</span>"
+            cls="border rounded-md shadow-sm w-96">
+        </wui-multi-wheeler>
+    </woby-chk> -->
+
+    <!-- MultiWheeler with JSON Object Arrays 
+    <woby-chk name="MultiWheeler with JSON Object Arrays">
+        <wui-multi-wheeler snapshot-name="MultiWheeler-with-JSON-Object-Arrays"
+            options='[[{ "label": "Engineering", "value": "ENG" }, { "label": "Marketing", "value": "MKT" }, { "label": "Sales", "value": "SALES" }, { "label": "Human Resources", "value": "HR" }, { "label": "Finance", "value": "FIN" }], [{ "label": "Manager", "value": "MGR" }, { "label": "Senior", "value": "SR" }, { "label": "Junior", "value": "JR" }, { "label": "Intern", "value": "INTERN" }], [{ "label": "New York", "value": "NY" }, { "label": "Los Angeles", "value": "LA" }, { "label": "Chicago", "value": "CHI" }, { "label": "Houston", "value": "HOU" }, { "label": "Phoenix", "value": "PHX" }]]'
+            value='["ENG", "SR", "NY"]'
+            headers='[{"type":"function","value":"() => <span class=\"text-sm font-semibold\">Department</span>"}, {"type":"function","value":"() => <span class=\"text-sm font-semibold\">Position</span>"}, {"type":"function","value":"() => <span class=\"text-sm font-semibold\">City</span>"}]'
+            bottom="false" mask="true" divider="true" title="<span class=\" font-bold\">Employee Details</span>"
+            item-count="5" cls="border rounded-md shadow-sm w-96">
+        </wui-multi-wheeler>
+    </woby-chk> -->
+
+    <!-- Date Picker MultiWheeler 
+    <woby-chk name="Date Picker MultiWheeler">
+        <wui-multi-wheeler snapshot-name="Date-Picker-MultiWheeler"
+            options='[["2020", "2021", "2022", "2023", "2024", "2025", "2026", "2027", "2028", "2029"], ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31"]]'
+            value='["2024", "Jan", "15"]'
+            headers='[{"type":"function","value":"() => <span class=\"text-sm font-semibold\">Year</span>"}, {"type":"function","value":"() => <span class=\"text-sm font-semibold\">Month</span>"}, {"type":"function","value":"() => <span class=\"text-sm font-semibold\">Day</span>"}]'
+            bottom="true" mask="true" divider="true" title="<span class=\" font-bold\">Select Date</span>"
+            item-count="5" cls="border rounded-md shadow-sm w-96">
+        </wui-multi-wheeler>
+    </woby-chk> -->
+
+    <!-- MultiWheeler with Custom Item Count 
+    <woby-chk name="MultiWheeler with Custom Item Count">
+        <wui-multi-wheeler snapshot-name="MultiWheeler-with-Custom-Item-Count"
+            options='[["Apple", "Banana", "Cherry", "Date", "Elderberry", "Fig", "Grape", "Honeydew"], ["Red", "Green", "Blue", "Yellow", "Purple", "Orange"]]'
+            value='["Date", "Orange"]'
+            headers='[{"type":"function","value":"() => <span class=\"text-sm font-semibold\">Fruit</span>"}, {"type":"function","value":"() => <span class=\"text-sm font-semibold\">Color</span>"}]'
+            bottom="true" mask="true" divider="true" title="<span class=\" font-bold\">Large Picker</span>"
+            item-count="7" cls="border rounded-md shadow-sm w-96">
+        </wui-multi-wheeler>
+    </woby-chk> -->
+
+</body>
+
+</html>

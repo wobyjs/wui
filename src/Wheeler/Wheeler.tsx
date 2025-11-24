@@ -4,7 +4,7 @@ import { WheelerProps, WheelerItem } from './WheelerType'
 
 export const ActiveWheelers = $([])
 
-const def = () => ({
+export const def = () => ({
     // options: $(null) as ObservableMaybe<WheelerItem<any>[]>,
     options: $([], { toHtml: o => JSON.stringify(o), fromHtml: o => JSON.parse(o) }) as ObservableMaybe<(string | number | WheelerItem<any>)[]>,
     itemHeight: $(36, HtmlNumber) as ObservableMaybe<number>,
@@ -15,7 +15,7 @@ const def = () => ({
     /** implicit for multiple */
     all: $(null, HtmlString) as ObservableMaybe<string>,
     ok: $(null, HtmlBoolean) as ObservableMaybe<boolean>,
-    visible: $(true),
+    visible: $(true, HtmlBoolean) as ObservableMaybe<boolean>,
 
     bottom: $(true, HtmlBoolean) as ObservableMaybe<boolean>,
     cancelOnBlur: $(true, HtmlBoolean) as ObservableMaybe<boolean>,
@@ -25,16 +25,30 @@ const def = () => ({
 
     searchable: $(false, HtmlBoolean) as ObservableMaybe<boolean>,
     searchPlaceholder: $(undefined, HtmlString) as ObservableMaybe<string>,
-
 });
 
 const Wheeler = defaults(def, (props) => {
-    const { options, itemHeight: ih, itemCount: vic, value: oriValue, cls, header, ok, visible, mask, bottom = $$(mask), all, cancelOnBlur, commitOnBlur, searchable, searchPlaceholder, changeValueOnClickOnly, ...otherProps } = props
+    const { options, itemHeight: ih, itemCount: vic, value: oriValue, cls, header, ok, visible: visibleProp, mask, bottom = $$(mask), all, cancelOnBlur, commitOnBlur, searchable, searchPlaceholder, changeValueOnClickOnly, ...otherProps } = props
 
     const itemHeight = use(ih, 36)
     const itemCount = use(vic, 5)
     const value = oriValue
+    const isVisible = $($$(visibleProp));
 
+    // This handles the "top-down" data flow.
+    useEffect(() => {
+        const propValue = $$(visibleProp);
+        if (propValue !== $$(isVisible)) {
+            isVisible(propValue);
+        }
+    });
+
+    const hide = () => {
+        isVisible(false);
+        if (isObservable(visibleProp)) {
+            visibleProp(false);
+        }
+    };
 
     const CLICK_THRESHOLD_PX = 5
 
@@ -153,8 +167,8 @@ const Wheeler = defaults(def, (props) => {
                     style={{ height: () => `${$$(itemHeight)}px` }}>
                     {() => {
                         // This component will reactively read the checked state for its label.
-                        const isChecked = checkboxes()[o.label];
-
+                        // const isChecked = checkboxes()[o.label];
+                        const isChecked = r[o.label];
                         return (
                             <label class="flex items-center gap-2 px-2 w-full h-full">
                                 <input
@@ -261,7 +275,7 @@ const Wheeler = defaults(def, (props) => {
     }
 
 
-    // #region: useEffect to handle value synchronization
+    // #region useEffect to handle value synchronization
     /**
      * This `useEffect` hook acts as a listener for a "commit" action,
      * typically triggered by an external "OK" button.
@@ -299,14 +313,14 @@ const Wheeler = defaults(def, (props) => {
 
         // --- Action 3: Close the Component ---
         // Finally, we hide the Wheeler component by setting the `visible` observable to `false`.
-        if (isObservable(visible)) {
-            visible(false);
+        if (isObservable(isVisible)) {
+            isVisible(false);
         }
     });
     // #endregion
 
 
-    // #region: values to chk
+    // #region values to chk
     /**
      * `value2chk` (Value to Checkboxes) is a crucial synchronization function that handles
      * "top-down" data flow for the multi-select mode.
@@ -327,7 +341,7 @@ const Wheeler = defaults(def, (props) => {
         // --- Guard Clause 2: Performance Optimization ---
         // If the component is visible and the internal `value` is identical to the last value we synced (`preValue`),
         // it means no external change has occurred that requires a UI update. So, we can skip the expensive work.
-        if ($$(visible) && preValue === $$(value)) {
+        if ($$(visibleProp) && preValue === $$(value)) {
             return;
         }
 
@@ -433,7 +447,7 @@ const Wheeler = defaults(def, (props) => {
     useEffect(value2chk);
 
 
-    // #region: chk2value （Checkbox to Value)
+    // #region chk2value （Checkbox to Value)
     /**
      * `chk2value` (Checkboxes to Value) is the "bottom-up" synchronization function.
      * It is called directly from the `onClick` handler of a checkbox in the UI.
@@ -554,7 +568,7 @@ const Wheeler = defaults(def, (props) => {
     // #endregion
 
 
-    // #region: "All" Handling
+    // #region "All" Handling
     /**
      * `isAllSelected` is a memoized, reactive boolean that determines if all individual
      * items (excluding the "All" option itself) are currently checked.
@@ -594,7 +608,7 @@ const Wheeler = defaults(def, (props) => {
     // #endregion
 
 
-    // #region: Original Toggle All
+    // #region Original Toggle All
     /**
      * `toggleAll` is the event handler for a "Select All / Deselect All" action.
      *
@@ -640,7 +654,7 @@ const Wheeler = defaults(def, (props) => {
     // #endregion
 
 
-    // #region: Original Layout Effect
+    // #region Original Layout Effect
     /**
      * This is the main Layout & Geometry Synchronization Hook for the Wheeler.
      *
@@ -754,7 +768,7 @@ const Wheeler = defaults(def, (props) => {
      */
     const indicatorTop = useMemo(() => ($$(viewportHeight) - $$(itemHeight)) / 2);
 
-    // #region: Get Target Y
+    // #region Get Target Y
 
     /**
      * `_getTargetYForIndexUnbound` is an internal helper function for pure calculation.
@@ -821,23 +835,7 @@ const Wheeler = defaults(def, (props) => {
 
     const pickerItemCls = 'apply h-9 flex items-center justify-center text-base box-border transition-opacity duration-[0.3s,transform] delay-[0.3s] select-none scale-90'
 
-    // #region: Populate List
-    // --- Populate List --- (Now uses the 'let' paddingItemCount)
-    // function* populateList() {
-    //     // Top padding
-    //     for (let i = 0; i < $$(paddingItemCount); i++)
-    //         yield <li class={['wheeler-item is-padding invisible', pickerItemCls]} style={{ height: () => `${$$(itemHeight)}px` }}></li>
-
-    //     // Actual items
-    //     if ($$(formattedOptions))
-    //         for (const [index, option] of $$(formattedOptions).entries())
-    //             yield <option.component {...{ index, value: option, itemHeight }} />
-
-    //     // Bottom padding
-    //     for (let i = 0; i < $$(paddingItemCount); i++)
-    //         yield < li class={['wheeler-item is-padding invisible', pickerItemCls]} style={{ height: `${$$(itemHeight)}px` }}></li>
-    // }
-
+    // #region Populate List
     /**
      * `populateList` is a JavaScript "generator function" used to declaratively build the
      * full list of `<li>` elements for the wheeler's `<ul>`.
@@ -890,7 +888,7 @@ const Wheeler = defaults(def, (props) => {
     // #endregion
 
 
-    // #region: Set Translate Y
+    // #region Set Translate Y
     /**
      * `setTranslateY` is the component's core "rendering" function for movement. It is the
      * single, safe entry point for applying a vertical translation to the `<ul>` list.
@@ -940,9 +938,7 @@ const Wheeler = defaults(def, (props) => {
     // Used to prevent race conditions if `snapToIndex` is called multiple times in quick succession.
     let snapToIndexTimeout = 0;
 
-    // #region: Snap To Index
-
-
+    // #region Snap To Index
     /**
      * `snapToIndex` is the core animation and state-settling function for the single-select wheeler.
      *
@@ -1025,23 +1021,8 @@ const Wheeler = defaults(def, (props) => {
     }
     // #endregion
 
-    // #region: Update Item Styles
-    // function updateItemStyles() {
-    //     if ($$(multiple)) return
-
-    //     // Uses the potentially updated viewportHeight
-    //     const centerViewportY = $$(viewportHeight) / 2
-    //     const listItems = $$(list).querySelectorAll('.wheeler-item:not(.is-padding)')
-    //     listItems.forEach(item => {
-    //         const itemRect = item.getBoundingClientRect()
-    //         const viewportRect = $$(viewport).getBoundingClientRect()
-    //         const itemCenterRelativeToViewport = (itemRect.top + itemRect.bottom) / 2 - viewportRect.top
-    //         const distanceFromCenter = Math.abs(itemCenterRelativeToViewport - centerViewportY)
-    //         if (distanceFromCenter < $$(itemHeight) * 0.6) { item.classList.add('is-near-center', 'opacity-100', 'font-bold', 'text-[#007bff]', 'scale-100',) }
-    //         else { item.classList.remove('is-near-center', 'opacity-100', 'font-bold', 'text-[#007bff]', 'scale-100',) }
-    //     })
-    // }
-
+    
+    // #region Update Item Styles
     /**
      * `updateItemStyles` is the visual feedback engine for the single-select wheeler.
      * Its sole purpose is to dynamically apply "selected" styles (e.g., bold, larger, different color)
@@ -1103,12 +1084,7 @@ const Wheeler = defaults(def, (props) => {
     // #endregion
 
 
-    // #region: Get Client Y
-    // function getClientY(e: PointerEvent & TouchEvent) { /* ... unchanged ... */
-    //     if (e.type === 'touchend' || e.type === 'touchcancel') { return e.changedTouches && e.changedTouches.length > 0 ? e.changedTouches[0].clientY : startY }
-    //     return e.touches && e.touches.length > 0 ? e.touches[0].clientY : e.clientY
-    // }
-
+    // #region Get Client Y
     /**
      * `getClientY` is a cross-device utility function that reliably extracts the
      * vertical (Y-axis) coordinate from a mouse (`PointerEvent`) or a touch (`TouchEvent`).
@@ -1153,27 +1129,7 @@ const Wheeler = defaults(def, (props) => {
     // #endregion
 
 
-    // #region: Handle Start
-    // function handleStart(e: PointerEvent & TouchEvent) { /* ... unchanged ... */
-    //     if ($$(wheelSnapTimeoutId)) {
-    //         clearTimeout($$(wheelSnapTimeoutId))
-    //         wheelSnapTimeoutId(null)
-    //     }
-    //     if (e.type !== 'touchstart') e.preventDefault()
-    //     isDragging = true
-    //     hasMoved = false
-    //     startY = getClientY(e)
-    //     startTranslateY = currentY
-    //     startTime = Date.now()
-    //     lastMoveY = startY
-    //     lastMoveTime = startTime
-    //     velocity = 0
-    //     eventType(e.type)
-    //     $$(list).style.transition = 'none'
-    //     $$(viewport).style.cursor = 'grabbing'
-    //     if ($$(rafId)) cancelAnimationFrame($$(rafId))
-    // }
-
+    // #region Handle Start
     /**
      * `handleStart` is the event handler for the `pointerdown` (mouse) and `touchstart` (touch) events.
      * It fires the moment a user presses their finger or mouse button on the wheeler.
@@ -1238,46 +1194,7 @@ const Wheeler = defaults(def, (props) => {
     // #endregion
 
 
-    // #region: Handle Move
-    // function handleMove(e: PointerEvent & TouchEvent) { /* ... unchanged ... */
-    //     if (!isDragging) return
-
-    //     const currentMoveY = getClientY(e)
-    //     const deltaY = currentMoveY - startY
-
-    //     if (!hasMoved && Math.abs(deltaY) > CLICK_THRESHOLD_PX) {
-    //         hasMoved = true
-    //     }
-
-    //     if (hasMoved && e.cancelable) {
-    //         e.preventDefault()
-    //     }
-
-    //     let newY = startTranslateY + deltaY
-    //     if (hasMoved) { // Apply rubber band only if moved significantly
-    //         if (newY > maxTranslateY) { newY = maxTranslateY + (newY - maxTranslateY) * 0.3 } else if (newY < minTranslateY) { newY = minTranslateY + (newY - minTranslateY) * 0.3 }
-    //     }
-
-    //     const now = Date.now()
-    //     const timeDiff = now - lastMoveTime
-
-    //     if (timeDiff > 10) {
-    //         velocity = (currentMoveY - lastMoveY) / timeDiff
-    //         lastMoveTime = now
-    //         lastMoveY = currentMoveY
-    //     }
-
-    //     if ($$(rafId)) {
-    //         cancelAnimationFrame($$(rafId))
-    //     }
-
-    //     rafId(requestAnimationFrame(() => {
-    //         currentY = newY
-    //         $$(list).style.transform = `translateY(${currentY}px)`
-    //         updateItemStyles()
-    //     }))
-    // }
-
+    // #region Handle Move
     /**
      * `handleMove` is the event handler for `pointermove` and `touchmove` events.
      * It is the workhorse of the drag gesture, firing continuously as the user's
@@ -1367,46 +1284,7 @@ const Wheeler = defaults(def, (props) => {
     // #endregion
 
 
-    // #region: Handle End
-    // function handleEnd(e: PointerEvent) { /* ... unchanged ... */
-    //     if (!isDragging) {
-    //         return
-    //     }
-
-    //     isDragging = false
-    //     $$(viewport).style.cursor = 'grab'
-    //     if ($$(rafId)) {
-    //         cancelAnimationFrame($$(rafId))
-    //     }
-
-    //     if (!hasMoved) { // Click/Tap
-    //         const targetElement = e.target as HTMLElement
-    //         const targetItem = targetElement.closest('.wheeler-item') as HTMLElement
-    //         if (targetItem && !targetItem.classList.contains('is-padding')) {
-    //             const clickedIndex = parseInt(targetItem.dataset.index, 10)
-    //             if (!isNaN(clickedIndex) && clickedIndex >= 0 && clickedIndex < $$(formattedOptions).length) {
-    //                 snapToIndex(clickedIndex)
-    //                 return
-    //             }
-    //         }
-    //         // Optional: if click missed, snap based on current visual position
-    //         const idealIndexMiss = Math.round(($$(indicatorTop) - currentY) / $$(itemHeight)) - $$(paddingItemCount)
-    //         snapToIndex(idealIndexMiss)
-    //         return
-    //     } // Drag/Fling
-    //     if (currentY > maxTranslateY || currentY < minTranslateY) {
-    //         const boundaryIndex = currentY > maxTranslateY ? 0 : $$(formattedOptions).length - 1
-    //         snapToIndex(boundaryIndex)
-    //     }
-    //     else {
-    //         const inertiaDist = velocity * 120
-    //         const predictedY = currentY + inertiaDist
-    //         const idealIndex = Math.round(($$(indicatorTop) - predictedY) / $$(itemHeight)) - $$(paddingItemCount)
-    //         snapToIndex(idealIndex)
-    //     }
-    //     velocity = 0
-    // }
-
+    // #region Handle End
     /**
      * `handleEnd` is the event handler for `pointerup` and `pointercancel` events.
      * It fires when the user releases their finger or mouse button, completing the gesture.
@@ -1495,25 +1373,8 @@ const Wheeler = defaults(def, (props) => {
     }
     // #endregion
 
-    // #region: Handle Wheel
-    // function handleWheel(event: WheelEvent) { /* ... unchanged ... */
-    //     if (isDragging) return
-    //     event.preventDefault()
-    //     if ($$(wheelSnapTimeoutId)) { clearTimeout($$(wheelSnapTimeoutId)) } $$(list).style.transition = 'none'
 
-    //     const scrollAmount = event.deltaY * 0.5
-    //     const newY = currentY - scrollAmount
-    //     setTranslateY(newY)
-    //     eventType(event.type)
-    //     // if ($$(selectedIndex) >= formattedOptions.length - 1) return
-
-    //     wheelSnapTimeoutId(setTimeout(() => {
-    //         const idealIndex = Math.round(($$(indicatorTop) - currentY) / $$(itemHeight)) - $$(paddingItemCount)
-    //         snapToIndex(idealIndex)
-    //         wheelSnapTimeoutId(null)
-    //     }, 150))
-    // }
-
+    // #region Handle Wheel
     /**
      * `handleWheel` is the event handler for the `onWheel` event, specifically for
      * mouse scroll wheels. It provides an alternative navigation method to touch/drag.
@@ -1584,17 +1445,7 @@ const Wheeler = defaults(def, (props) => {
     // #endregion
 
 
-    // #region: Handle Pointer Events
-    // useEffect(() => {
-    //     document.addEventListener('pointermove', handleMove as any)
-    //     document.addEventListener('pointerup', e => handleEnd)
-
-    //     return () => {
-    //         document.removeEventListener('pointermove', handleMove as any)
-    //         document.removeEventListener('pointerup', handleEnd)
-    //     }
-    // })
-
+    // #region Handle Pointer Events
     /**
      * This `useEffect` hook is responsible for managing the GLOBAL event listeners
      * for pointer (mouse/touch) movements and release actions.
@@ -1645,19 +1496,7 @@ const Wheeler = defaults(def, (props) => {
     // #endregion
 
 
-    // #region: Handle Value Updates
-    // useEffect(() => {
-    //     if ($$(multiple)) return
-
-    //     if ($$(value) === preValue) return
-    //     preValue = $$(value)
-
-    //     const foundIndex = $$(formattedOptions).findIndex(opt => opt.value === $$(value))
-    //     if ($$(selectedIndex) !== foundIndex) {
-    //         selectedIndex(foundIndex)
-    //     }
-    // })
-
+    // #region Handle Value Updates
     /**
      * This `useEffect` hook handles the "Top-Down" data synchronization for SINGLE-SELECT mode.
      *
@@ -1707,42 +1546,49 @@ const Wheeler = defaults(def, (props) => {
     // <<< Populate list *after* first layout calculation >>>
     // populateList()
 
-    // <<< Snap to initial index *after* list is populated and layout is set >>>
-    snapToIndex($$(selectedIndex), true)
-
     // A local state variable to track the last index that was processed by this effect,
     // used to prevent infinite loops.
     const oriIndex = $(-1)
 
-    // #region: Handle Index Updates
-    // useEffect(() => {
-    //     if ($$(multiple)) return
+    // Track if initial snap has been done
+    const hasInitialSnapped = $(false)
 
-    //     if ($$(oriIndex) === $$(selectedIndex))
-    //         return
+    // #region Initial Snap on Mount or Visibility Change
+    /**
+     * This `useEffect` handles the initial snap to position when the Wheeler
+     * first becomes visible. It ensures the correct item is centered without
+     * running on every render.
+     */
+    useEffect(() => {
+        // Only snap for single-select mode
+        if ($$(multiple)) return;
 
-    //     oriIndex($$(selectedIndex))
+        // Only snap when visible
+        if (!$$(visibleProp)) {
+            // Reset the flag when hidden so it will snap again when shown
+            hasInitialSnapped(false);
+            return;
+        }
 
-    //     if ($$(value) !== $$(formattedOptions)[$$(selectedIndex)].value) {
-    //         if ($$(eventType) == "wheel" && changeValueOnClickOnly) {
+        // Only snap once per visibility cycle
+        if ($$(hasInitialSnapped)) return;
 
-    //         }
-    //         else {
-    //             value($$(formattedOptions)[$$(selectedIndex)].value)
+        // Recalculate selectedIndex from the current value to ensure sync
+        const currentValue = $$(value);
+        const foundIndex = $$(formattedOptions).findIndex(opt => opt.value === currentValue);
 
-    //             if (!ok)
-    //                 if (isObservable(oriValue))
-    //                     oriValue($$(value))
-    //         }
-    //     }
+        if (foundIndex !== -1 && foundIndex !== $$(selectedIndex)) {
+            selectedIndex(foundIndex);
+        }
 
-    //     if ($$(selectedIndex) >= 0 && $$(selectedIndex) < $$(formattedOptions).length) { snapToIndex($$(selectedIndex)) }
-    //     else {
-    //         console.warn(`Index "${$$(selectedIndex)}" out of bounds.`)
-    //         selectedIndex(-1)
-    //     }
-    // })    
+        // Perform the initial snap with the correct index
+        const indexToSnap = foundIndex !== -1 ? foundIndex : $$(selectedIndex);
+        snapToIndex(indexToSnap, true);
+        hasInitialSnapped(true);
+    });
+    // #endregion
 
+    // #region Handle Index Updates
     /**
      * This `useEffect` hook handles the "Bottom-Up" data synchronization for SINGLE-SELECT mode.
      *
@@ -1816,29 +1662,7 @@ const Wheeler = defaults(def, (props) => {
 
     const wheeler = $<HTMLDivElement>()
 
-    // #region: Visibility Management
-    // useEffect(() => {
-    //     if (!$$(visible)) { // When visible becomes false
-    //         preValue = null
-    //         if ($$(ActiveWheelers).some(w => w === wheeler)) // Check if it exists before filtering
-    //             ActiveWheelers($$(ActiveWheelers).filter(w => w !== wheeler)) // Corrected: remove wheeler
-    //         return
-    //     }
-
-    //     // When visible becomes true
-    //     if ($$(ActiveWheelers).filter(w => w === wheeler).length === 0) {
-    //         ActiveWheelers([...$$(ActiveWheelers), wheeler])
-    //     }
-
-    //     value2chk() // Call value2chk to resync checkboxes
-
-    //     // The original return for cleanup when component unmounts (if needed, though original was commented out)
-    //     // return () => {
-    //     //     if ($$(ActiveWheelers).some(w => w === wheeler))
-    //     //         ActiveWheelers($$(ActiveWheelers).filter(w => w !== wheeler))
-    //     // }
-    // })
-
+    // #region Visibility Management
     /**
      * This `useEffect` hook manages the component's lifecycle in relation to its `visible` state
      * and a global list of `ActiveWheelers`.
@@ -1856,7 +1680,7 @@ const Wheeler = defaults(def, (props) => {
      */
     useEffect(() => {
         // --- Path 1: The component is being hidden ---
-        if (!$$(visible)) {
+        if (!$$(visibleProp)) {
             // --- A. Reset Internal State ---
             // `preValue` is a cache used to optimize the `value2chk` sync function.
             // When the component is hidden, we must clear this cache. This ensures that
@@ -1901,22 +1725,7 @@ const Wheeler = defaults(def, (props) => {
     });
     // #endregion
 
-    // #region: Click Away Logic
-    // useClickAway(wheeler, () => {
-    //     if ($$(cancelOnBlur))
-    //         visible(false) //just hide, no save
-    //     if ($$(commitOnBlur)) //hide & save
-    //     {
-    //         if (isObservable(ok))
-    //             ok(true)
-
-    //         visible(false) //just hide, no save
-    //         // if (!ok)
-    //         if (isObservable(oriValue))
-    //             oriValue($$(value))
-    //     }
-    // })
-
+    // #region Click Away Logic
     /**
      * This hook implements the "click away" or "blur" functionality for the Wheeler.
      * It uses the `useClickAway` custom hook, which detects any clicks that occur
@@ -1930,6 +1739,13 @@ const Wheeler = defaults(def, (props) => {
      */
     useClickAway(wheeler, () => {
 
+        const hide = () => {
+            isVisible(false); // Update internal state
+            if (isObservable(visibleProp)) {
+                visibleProp(false); // Also update the parent's state if it's an observable
+            }
+        };
+
         // --- Path 1: The "Cancel on Blur" Behavior ---
         // This block runs if the `cancelOnBlur` prop is true.
         if ($$(cancelOnBlur)) {
@@ -1937,7 +1753,8 @@ const Wheeler = defaults(def, (props) => {
             // current selection. The internal `value` is effectively discarded,
             // and the parent component's `oriValue` remains unchanged from before
             // the wheeler was opened.
-            visible(false); // Just hide, no save.
+            // visible(false); // Just hide, no save.
+            hide();
         }
 
 
@@ -1968,7 +1785,8 @@ const Wheeler = defaults(def, (props) => {
             // After triggering the save (either directly or indirectly), we hide the component.
             // Note: If using the `ok(true)` method, the other `useEffect` will also call
             // `visible(false)`, but calling it here ensures the component always closes.
-            visible(false);
+            // visible(false);
+            hide();
         }
 
         // NOTE: The props `cancelOnBlur` and `commitOnBlur` are likely intended to be
@@ -1977,24 +1795,7 @@ const Wheeler = defaults(def, (props) => {
     });
     // #endregion
 
-    // #region: Search Logic
-    // const search = (val: string) => {
-    //     let newVal
-    //     $$(options).find((options) => {
-    //         if ((options.value as string).toLowerCase().includes(val.toLowerCase())) {
-    //             newVal = options.value
-    //         }
-    //     })
-
-    //     if (newVal) {
-    //         value(newVal)
-    //             ; (oriValue as any)(newVal)
-    //     }
-    //     else {
-    //         alert("No results found")
-    //     }
-    // }
-
+    // #region Search Logic
     /**
      * The `search` function is an event handler for a text input, allowing users to
      * quickly find and select an item in the wheeler by typing.
@@ -2048,24 +1849,7 @@ const Wheeler = defaults(def, (props) => {
     }
     // #endregion
 
-    // #region: Placeholder Text Logic
-    // const placeholderText = useMemo(() => {
-    //     // If no header function is provided, return a default placeholder.
-    //     if (!header) {
-    //         return "Search...";
-    //     }
-
-    //     // Execute the header function to get its content.
-    //     const headerContent = header(value);
-
-    //     // Safely check if the content is a string or number before using it.
-    //     if (typeof headerContent === 'string' && headerContent.length > 0) {
-    //         return `Enter ${headerContent.toLowerCase()}`;
-    //     }
-
-    //     // Fallback for complex JSX content or empty strings.
-    //     return "Search...";
-    // });
+    // #region Placeholder Text Logic
     const placeholderText = useMemo(() => {
         const customPlaceholder = $$(searchPlaceholder);
 
@@ -2087,7 +1871,7 @@ const Wheeler = defaults(def, (props) => {
     });
     // #endregion
 
-    // #region: Header With Search
+    // #region Header With Search
     const HeaderWithSearch = () => {
         // If no header prop is provided, render nothing.
         if (!header) return null
@@ -2118,102 +1902,193 @@ const Wheeler = defaults(def, (props) => {
     // #endregion
 
 
-    // #region: Render Logic
-    return <>
-        {() => !$$(visible) ? null :
-            $$(bottom) ?
-                <Portal mount={document.body}>
-                    {
-                        () => $$(mask) ?
-                            <>
-                                <div class={['fixed inset-0 bg-black/50 h-full w-full z-[00] opacity-50']} />
-                            </>
-                            : null
-                    }
-                    <div ref={wheeler} class={() => ['wheeler-widget z-[100]', $$(cls), "fixed inset-x-0 bottom-0 w-full z-20 bg-white"]}>
-                        {/* {
-                            () => header ?
-                                <>
-                                    <div>
-                                        <div class='font-bold text-center'>{() => header(value)}</div>
-                                        <div class="w-screen relative flex flex-col flex-wrap items-center">
-                                            <input
-                                                type="text"
-                                                // placeholder={`Enter ${((header as any)() as any).toLowerCase()}`}
-                                                placeholder={placeholderText}
-                                                class="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 ease-in-out w-64"
-                                                onChange={(e) => {
-                                                    const value = e.target.value
-                                                    search(value)
-                                                }}
-                                            />
-                                        </div>
-                                        <div class="my-1 h-px w-full bg-gray-300 dark:bg-gray-600"></div>
-                                    </div>
-                                </>
-                                : null
-                        } */}
-                        <HeaderWithSearch />
-                        <div ref={viewport}
-                            onPointerDown={handleStart as any}
-                            onPointerMove={handleMove as any}     /* {passive: false } */
-                            onPointerUp={handleEnd}
-                            onPointerCancel={handleEnd}
-                            onWheel={handleWheel} /* {passive: false } */
-                            class={['wheeler-viewport overflow-hidden relative touch-none cursor-grab overscroll-y-contain transition-[height] duration-[0.3s] ease-[ease-out]']}
-                            style={{ height: () => `${$$(viewportHeight)}px` }}
-                        >
-                            <ul class='wheeler-list transition-transform duration-[0.3s] ease-[ease-out] m-0 p-0 list-none' ref={list}>
-                                {() => [...populateList()]}
-                            </ul>
-                            <div class='wheeler-indicator absolute h-9 box-border pointer-events-none bg-[rgba(0,123,255,0.05)] border-y-[#007bff] border-t border-solid border-b inset-x-0' style={{
-                                height: () => `${$$(itemHeight)}px`,
-                                top: () => `${$$(indicatorTop) + $$($$(itemHeight)) / 2}px`, // Center line of indicator
-                                transform: `translateY(-50%)`,
-                            }}>
-                            </div>
-                        </div>
-                    </div>
-                </Portal>
-                :
-                <div class={['wheeler-widget', $$(cls)]}>
-                    {/* {
-                        () => header ?
-                            <>
-                                <div class={'font-bold text-center'}>{() => header(value)}</div>
-                                <div class="my-1 h-px w-full bg-gray-300 dark:bg-gray-600"></div>
-                            </>
-                            : null
-                    } */}
-                    <HeaderWithSearch />
-                    <div ref={viewport}
-                        onPointerDown={handleStart as any}
-                        onPointerMove={handleMove as any}     /* {passive: false } */
-                        onPointerUp={handleEnd}
-                        onPointerCancel={handleEnd}
-                        onWheel={handleWheel} /* {passive: false } */
-                        class={['wheeler-viewport overflow-hidden relative touch-none cursor-grab overscroll-y-contain transition-[height] duration-[0.3s] ease-[ease-out]']}
-                        style={{ height: () => `${$$(viewportHeight)}px` }}
-                    >
-                        <ul class='wheeler-list transition-transform duration-[0.3s] ease-[ease-out] m-0 p-0 list-none' ref={list}>
-                            {() => [...populateList()]}
-                        </ul>
+    // #region Wheeler Content
+    const WheelerContent = () => (
+        <>
+            <HeaderWithSearch />
+            <div
+                ref={viewport}
+                onPointerDown={handleStart as any}
+                onWheel={handleWheel}
+                class="wheeler-viewport overflow-hidden relative touch-none cursor-grab overscroll-y-contain"
+                style={{ height: () => `${$$(viewportHeight)}px` }}
+            >
+                <ul class='wheeler-list m-0 p-0 list-none' ref={list}>
+                    {() => [...populateList()]}
+                </ul>
 
-                        {
-                            () => $$(multiple) ? null
-                                :
-                                <div class='wheeler-indicator absolute h-9 box-border pointer-events-none bg-[rgba(0,123,255,0.05)] border-y-[#007bff] border-t border-solid border-b inset-x-0' style={{
-                                    height: () => `${$$(itemHeight)}px`,
-                                    top: () => `${$$(indicatorTop) + $$($$(itemHeight)) / 2}px`, // Center line of indicator
-                                    transform: `translateY(-50%)`,
-                                }}>
-                                </div>
-                        }
-                    </div>
-                </div>
-        }
-    </>
+                {/* The selection indicator is only shown for single-select mode */}
+                {/* {!$$(multiple) &&
+                    <div
+                        class='wheeler-indicator absolute box-border pointer-events-none bg-[rgba(0,123,255,0.05)] border-y-[#007bff] border-t border-solid border-b inset-x-0'
+                        style={{
+                            height: () => `${$$(itemHeight)}px`,
+                            top: () => `${$$(indicatorTop)}px`,
+                        }}
+                    />
+                } */}
+                {
+                    () => $$(multiple) ? null
+                        :
+                        <div class='wheeler-indicator absolute h-9 box-border pointer-events-none bg-[rgba(0,123,255,0.05)] border-y-[#007bff] border-t border-solid border-b inset-x-0' style={{
+                            height: () => `${$$(itemHeight)}px`,
+                            top: () => `${$$(indicatorTop) + $$(itemHeight) / 2}px`, // Center line of indicator
+                            transform: `translateY(-50%)`,
+                        }}>
+                        </div>
+                }
+            </div>
+        </>
+    );
     // #endregion
+
+
+    // #region Render Logic
+
+    const renderAsPopup = () => (
+        <Portal mount={document.body}>
+            {/* {$$(mask) && (
+                <div
+                    class="fixed inset-0 bg-black/50 z-50"
+                    // This uses the `hide` function pattern from MultiWheeler for consistency
+                    onClick={() => $$(cancelOnBlur) && hide()}
+                />
+            )} */}
+            {
+                () => $$(mask) ?
+                    <>
+                        <div class={['fixed inset-0 bg-black/50 h-full w-full z-[00] opacity-50']} />
+                    </>
+                    : null
+            }
+            {/* <div
+                ref={wheeler}
+                // Combines the base popup styles with any custom classes from the `cls` prop
+                class={["wheeler-widget fixed inset-x-0 bottom-0 z-[100] w-full bg-white", $$(cls)]}
+                {...otherProps}
+            > */}
+            <div ref={wheeler} class={() => ['wheeler-widget z-[100]', $$(cls), "fixed inset-x-0 bottom-0 w-full z-20 bg-white"]}>
+                <WheelerContent />
+            </div>
+        </Portal>
+    );
+
+    const renderAsInline = () => (
+        <div
+            ref={wheeler}
+            // Combines base inline styles with custom classes from the `cls` prop
+            class={["wheeler-widget", $$(cls)]}
+            {...otherProps}
+        >
+            <WheelerContent />
+        </div>
+    );
+
+    // --- Main Return Logic ---
+    return () => {
+        // If not visible, render nothing.
+        // if (!$$(isVisible)) {
+        //     return null;
+        // }
+        // If visible, check the `bottom` prop to decide which render function to use.
+        return $$(bottom) ? renderAsPopup() : renderAsInline();
+    };
+    // return <>
+    //     {() => !$$(visibleProp) ? null :
+    //         $$(bottom) ?
+    //             <Portal mount={document.body}>
+    //                 {
+    //                     () => $$(mask) ?
+    //                         <>
+    //                             <div class={['fixed inset-0 bg-black/50 h-full w-full z-[00] opacity-50']} />
+    //                         </>
+    //                         : null
+    //                 }
+    //                 <div ref={wheeler} class={() => ['wheeler-widget z-[100]', $$(cls), "fixed inset-x-0 bottom-0 w-full z-20 bg-white"]}>
+    //                     {/* {
+    //                         () => header ?
+    //                             <>
+    //                                 <div>
+    //                                     <div class='font-bold text-center'>{() => header(value)}</div>
+    //                                     <div class="w-screen relative flex flex-col flex-wrap items-center">
+    //                                         <input
+    //                                             type="text"
+    //                                             // placeholder={`Enter ${((header as any)() as any).toLowerCase()}`}
+    //                                             placeholder={placeholderText}
+    //                                             class="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 ease-in-out w-64"
+    //                                             onChange={(e) => {
+    //                                                 const value = e.target.value
+    //                                                 search(value)
+    //                                             }}
+    //                                         />
+    //                                     </div>
+    //                                     <div class="my-1 h-px w-full bg-gray-300 dark:bg-gray-600"></div>
+    //                                 </div>
+    //                             </>
+    //                             : null
+    //                     } */}
+    //                     <HeaderWithSearch />
+    //                     <div ref={viewport}
+    //                         onPointerDown={handleStart as any}
+    //                         onPointerMove={handleMove as any}     /* {passive: false } */
+    //                         onPointerUp={handleEnd}
+    //                         onPointerCancel={handleEnd}
+    //                         onWheel={handleWheel} /* {passive: false } */
+    //                         class={['wheeler-viewport overflow-hidden relative touch-none cursor-grab overscroll-y-contain transition-[height] duration-[0.3s] ease-[ease-out]']}
+    //                         style={{ height: () => `${$$(viewportHeight)}px` }}
+    //                     >
+    //                         <ul class='wheeler-list transition-transform duration-[0.3s] ease-[ease-out] m-0 p-0 list-none' ref={list}>
+    //                             {() => [...populateList()]}
+    //                         </ul>
+    //                         <div class='wheeler-indicator absolute h-9 box-border pointer-events-none bg-[rgba(0,123,255,0.05)] border-y-[#007bff] border-t border-solid border-b inset-x-0' style={{
+    //                             height: () => `${$$(itemHeight)}px`,
+    //                             top: () => `${$$(indicatorTop) + $$(itemHeight) / 2}px`, // Center line of indicator
+    //                             transform: `translateY(-50%)`,
+    //                         }}>
+    //                         </div>
+    //                     </div>
+    //                 </div>
+    //             </Portal>
+    //             :
+    //             <div class={['wheeler-widget', $$(cls)]}>
+    //                 {/* {
+    //                     () => header ?
+    //                         <>
+    //                             <div class={'font-bold text-center'}>{() => header(value)}</div>
+    //                             <div class="my-1 h-px w-full bg-gray-300 dark:bg-gray-600"></div>
+    //                         </>
+    //                         : null
+    //                 } */}
+    //                 <HeaderWithSearch />
+    //                 <div ref={viewport}
+    //                     onPointerDown={handleStart as any}
+    //                     onPointerMove={handleMove as any}     /* {passive: false } */
+    //                     onPointerUp={handleEnd}
+    //                     onPointerCancel={handleEnd}
+    //                     onWheel={handleWheel} /* {passive: false } */
+    //                     class={['wheeler-viewport overflow-hidden relative touch-none cursor-grab overscroll-y-contain transition-[height] duration-[0.3s] ease-[ease-out]']}
+    //                     style={{ height: () => `${$$(viewportHeight)}px` }}
+    //                 >
+    //                     <ul class='wheeler-list transition-transform duration-[0.3s] ease-[ease-out] m-0 p-0 list-none' ref={list}>
+    //                         {() => [...populateList()]}
+    //                     </ul>
+
+    //                     {
+    //                         () => $$(multiple) ? null
+    //                             :
+    //                             <div class='wheeler-indicator absolute h-9 box-border pointer-events-none bg-[rgba(0,123,255,0.05)] border-y-[#007bff] border-t border-solid border-b inset-x-0' style={{
+    //                                 height: () => `${$$(itemHeight)}px`,
+    //                                 top: () => `${$$(indicatorTop) + $$(itemHeight) / 2}px`, // Center line of indicator
+    //                                 transform: `translateY(-50%)`,
+    //                             }}>
+    //                             </div>
+    //                     }
+    //                 </div>
+    //             </div>
+    //     }
+    // </>
+    // #endregion
+
 })
 
 
