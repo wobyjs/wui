@@ -1,6 +1,7 @@
-import { $, $$, useEffect, isObservable, useTimeout, useInterval, Observable, ObservableMaybe, type JSX, defaults, customElement, type ElementAttributes, HtmlBoolean, useMemo } from 'woby'
+import { $, $$, useEffect, isObservable, useTimeout, useInterval, Observable, ObservableMaybe, type JSX, defaults, customElement, type ElementAttributes, HtmlBoolean, useMemo, HtmlNumber } from 'woby'
+import { Button } from './Button'
 
-const btn = `
+const btnCls = `
 bg-transparent items-center justify-center cursor-pointer relative m-0 border-[none] [outline:none] [-webkit-appearance:none]
 disabled:bg-[#d9dbda]
 `
@@ -17,13 +18,13 @@ const def = () => ({
     /** When true, prevents value wrapping when reaching min/max limits */
     noRotate: $(false, HtmlBoolean) as ObservableMaybe<boolean> | undefined,
     /** The current value of the number field */
-    value: $(0),
+    value: $(0, HtmlNumber) as ObservableMaybe<number> | undefined,
     /** The minimum allowed value */
-    min: $(0),
+    min: $(0, HtmlNumber) as ObservableMaybe<number> | undefined,
     /** The maximum allowed value */
-    max: $(100),
+    max: $(100, HtmlNumber) as ObservableMaybe<number> | undefined,
     /** The step increment for the number field */
-    step: $(1),
+    step: $(1, HtmlNumber) as ObservableMaybe<number> | undefined,
     /** When true, disables the number field */
     disabled: $(false, HtmlBoolean) as ObservableMaybe<boolean> | undefined,
     /** Additional CSS classes to apply to the number field */
@@ -36,6 +37,7 @@ const def = () => ({
 
 const NumberField = defaults(def, (props) => {
     const { children, reactive, noMinMax, noFix, noRotate, value, min, max, step, disabled, cls, onChange, onKeyUp, ...otherProps } = props
+
     const inputRef = $<HTMLInputElement>()
 
     const error = useMemo(() => (+$$(value) < +$$(min) || +$$(value) > +$$(max)))
@@ -115,21 +117,36 @@ const NumberField = defaults(def, (props) => {
         interval?.()
     }
 
-    return <div class={["number-input inline-flex border-2 border-solid border-[#ddd] box-border [&_*]:box-border", cls]}>
-        <button
-            class={btn}
+    // return <div class={["number-input inline-flex border-2 border-solid border-[#ddd] box-border [&_*]:box-border", cls]}>
+    return <div class={[
+        "number-input inline-flex items-center bg-white border border-gray-300 rounded-lg transition-all duration-200",
+        "focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500", // Nice focus state
+        "divide-x divide-gray-200", // Subtle dividers between elements
+        { "bg-gray-100 opacity-70": disabled }, // Style for disabled state
+        cls
+    ]}>
+        <Button
+            // class={btnCls}
+            type="icon" cls="!rounded-none !rounded-l-md !w-10 !h-10"
+            buttonFunction="button"
             onPointerDown={() => startContinuousUpdate(false)}
             onPointerUp={stopUpdate}
             onPointerLeave={stopUpdate}
             disabled={cantMin}>
-            -
-        </button>
+            <span class="py-4 px-2 text-lg font-semibold">-</span>
+        </Button>
         <input
             ref={inputRef}
-            class={[`quantity  [-webkit-appearance:textfield] [-moz-appearance:textfield] [appearance:textfield]
-        [&::-webkit-inner-spin-button]:[-webkit-appearance:none] [&::-webkit-outer-spin-button]:[-webkit-appearance:none]
-        text-center p-2 border-solid border-[0_2px]
-        `, { "text-[red]": error }]}
+            //     class={[`quantity  [-webkit-appearance:textfield] [-moz-appearance:textfield] [appearance:textfield]
+            // [&::-webkit-inner-spin-button]:[-webkit-appearance:none] [&::-webkit-outer-spin-button]:[-webkit-appearance:none]
+            // text-center p-2 border-solid border-[0_2px]
+            // `, { "text-[red]": error }]}
+            class={[
+                // Remove old borders and make input transparent and clean
+                "w-16 text-center border-none bg-transparent focus:outline-none focus:ring-0 text-lg font-semibold text-gray-700",
+                "[-moz-appearance:textfield] [&::-webkit-inner-spin-button]:hidden [&::-webkit-outer-spin-button]:hidden",
+                { "text-red-500": error }
+            ]}
             type="number"
             value={value}
             min={min}
@@ -156,14 +173,16 @@ const NumberField = defaults(def, (props) => {
             {...otherProps}
             disabled={disabled}
         />
-        <button
-            class={[btn, "plus"]}
+        <Button
+            // class={[btnCls, "plus"]}
+            // cls="plus"
+            type="icon" cls="!rounded-none !rounded-r-md !w-10 !h-10"
             onPointerDown={() => startContinuousUpdate(true)}
             onPointerUp={stopUpdate}
             onPointerLeave={stopUpdate}
             disabled={cantMax}>
-            +
-        </button>
+            <span class="py-4 px-2 text-lg font-semibold">+</span>
+        </Button>
         {children}
     </div>
 }) as typeof NumberField & JSX.IntrinsicElements['div']
