@@ -16,7 +16,7 @@ import Wheeler from './Wheeler/Wheeler'
 import MultiWheeler from './Wheeler/MultiWheeler'
 import DateTimeWheeler, { DateTimeWheelerType } from './Wheeler/DateTimeWheeler'
 import Fab from './Fab'
-
+import NumberField from './NumberField'
 
 const isDev = typeof import.meta.env !== 'undefined' && import.meta.env.DEV
 
@@ -75,6 +75,9 @@ export function App() {
                     </a>
                     <a href="#fab" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
                         Fab
+                    </a>
+                    <a href="#number-field" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                        Number Field
                     </a>
                     <a href="/html-demo.html" target="_blank" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
                         HTML Components Demo
@@ -1269,6 +1272,7 @@ export function App() {
     }
     // #endregion
 
+
     // #region DateTime Wheeler Demo
     const datetimeWheelerDemo = () => {
         const selectedDate = $(new Date(2024, 5, 15, 14, 30, 45)) // June 15, 2024, 2:30:45 PM
@@ -1587,6 +1591,75 @@ export function App() {
     // #endregion
 
 
+    // #region NumberField Demo
+    const numberFieldDemo = () => {
+        const value1 = $(0)
+        const value2 = $(50)
+        const value3 = $(10)
+        const value4 = $(5)
+        const value5 = $(0)
+        const value6 = $(25)
+
+        return <>
+            <h2 id="number-field" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Number Field Demo</h2>
+            <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+                    {/* Default NumberField */}
+                    <div class="border border-gray-300 rounded-lg p-4">
+                        <h3 class="font-bold mb-2">Default NumberField</h3>
+                        <p class="text-sm text-gray-600 mb-2">Min: 0, Max: 100, Step: 1</p>
+                        <NumberField value={value1} />
+                        <p class="mt-2 text-sm">Value: <span class="font-mono bg-gray-100 p-1 rounded">{value1}</span></p>
+                    </div>
+
+                    {/* With Initial Value */}
+                    <div class="border border-gray-300 rounded-lg p-4">
+                        <h3 class="font-bold mb-2">With Initial Value</h3>
+                        <p class="text-sm text-gray-600 mb-2">Starts at 50</p>
+                        <NumberField value={value2} />
+                        <p class="mt-2 text-sm">Value: <span class="font-mono bg-gray-100 p-1 rounded">{value2}</span></p>
+                    </div>
+
+                    {/* Custom Step */}
+                    <div class="border border-gray-300 rounded-lg p-4">
+                        <h3 class="font-bold mb-2">Custom Step</h3>
+                        <p class="text-sm text-gray-600 mb-2">Increments by 10</p>
+                        <NumberField value={value3} step={10} />
+                        <p class="mt-2 text-sm">Value: <span class="font-mono bg-gray-100 p-1 rounded">{value3}</span></p>
+                    </div>
+
+                    {/* Min/Max Constraints & Error State */}
+                    <div class="border border-gray-300 rounded-lg p-4">
+                        <h3 class="font-bold mb-2">Min/Max Constraints</h3>
+                        <p class="text-sm text-gray-600 mb-2">Range: 0 to 10. Try going below 0.</p>
+                        <NumberField value={value4} min={0} max={10} />
+                        <p class="mt-2 text-sm">Value: <span class="font-mono bg-gray-100 p-1 rounded">{value4}</span></p>
+                    </div>
+
+                    {/* Disabled State */}
+                    <div class="border border-gray-300 rounded-lg p-4">
+                        <h3 class="font-bold mb-2">Disabled State</h3>
+                        <p class="text-sm text-gray-600 mb-2">Component is non-interactive</p>
+                        <NumberField value={value5} disabled={true} />
+                        <p class="mt-2 text-sm">Value: <span class="font-mono bg-gray-100 p-1 rounded">{value5}</span></p>
+                    </div>
+
+                    {/* Reactive Mode */}
+                    <div class="border border-gray-300 rounded-lg p-4">
+                        <h3 class="font-bold mb-2">Reactive Mode</h3>
+                        <p class="text-sm text-gray-600 mb-2">Updates value on every click/change</p>
+                        <NumberField value={value6} min={0} max={50} reactive={true} />
+                        <p class="mt-2 text-sm">Value: <span class="font-mono bg-gray-100 p-1 rounded">{value6}</span></p>
+                    </div>
+
+                </div>
+            </div>
+        </>
+    }
+    // #endregion
+
+
     // #region Render
     return (
         <div class="p-8">
@@ -1614,6 +1687,7 @@ export function App() {
                 {multiWheelerDemo()}
                 {datetimeWheelerDemo()}
                 {fabDemo()}
+                {numberFieldDemo()}
             </div>
 
             <div class="mt-8 p-4 bg-gray-100 rounded">

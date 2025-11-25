@@ -18,6 +18,7 @@
     <script type="module" src="../src/IconButton.tsx"></script>
     <script type="module" src="../src/Wheeler/Wheeler.tsx"></script>
     <script type="module" src="../src/Fab.tsx"></script>
+    <script type="module" src="../src/NumberField.tsx"></script>
     <!-- #endregion -->
 
     <!-- <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"> -->
@@ -95,6 +96,10 @@
             <a href="#fab"
                 class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
                 Fab
+            </a>
+            <a href="#number-field"
+                class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                Number Field
             </a>
             <a href="/html-demo.html" target="_blank"
                 class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
@@ -973,6 +978,71 @@
     <!-- #endregion -->
 
 
+    <!-- #region Number Field -->
+    <template id="number-field-demo">
+        <h2 id="number-field" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Number Field Demo</h2>
+        <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+                <!-- Default NumberField -->
+                <div class="border border-gray-300 rounded-lg p-4">
+                    <h3 class="font-bold mb-2">Default NumberField</h3>
+                    <p class="text-sm text-gray-600 mb-2">Min: 0, Max: 100, Step: 1</p>
+                    <wui-number-field id="nf-default"></wui-number-field>
+                    <p class="mt-2 text-sm">Value: <span id="nf-default-value"
+                            class="font-mono bg-gray-100 p-1 rounded">0</span></p>
+                </div>
+
+                <!-- With Initial Value -->
+                <div class="border border-gray-300 rounded-lg p-4">
+                    <h3 class="font-bold mb-2">With Initial Value</h3>
+                    <p class="text-sm text-gray-600 mb-2">Starts at 50</p>
+                    <wui-number-field id="nf-initial" value="50"></wui-number-field>
+                    <p class="mt-2 text-sm">Value: <span id="nf-initial-value"
+                            class="font-mono bg-gray-100 p-1 rounded">50</span></p>
+                </div>
+
+                <!-- Custom Step -->
+                <div class="border border-gray-300 rounded-lg p-4">
+                    <h3 class="font-bold mb-2">Custom Step</h3>
+                    <p class="text-sm text-gray-600 mb-2">Increments by 10</p>
+                    <wui-number-field id="nf-step" value="10" step="10"></wui-number-field>
+                    <p class="mt-2 text-sm">Value: <span id="nf-step-value"
+                            class="font-mono bg-gray-100 p-1 rounded">10</span></p>
+                </div>
+
+                <!-- Min/Max Constraints & Error State -->
+                <div class="border border-gray-300 rounded-lg p-4">
+                    <h3 class="font-bold mb-2">Min/Max Constraints</h3>
+                    <p class="text-sm text-gray-600 mb-2">Range: 0 to 10. Try going below 0.</p>
+                    <wui-number-field id="nf-minmax" value="5" min="0" max="10"></wui-number-field>
+                    <p class="mt-2 text-sm">Value: <span id="nf-minmax-value"
+                            class="font-mono bg-gray-100 p-1 rounded">5</span></p>
+                </div>
+
+                <!-- Disabled State -->
+                <div class="border border-gray-300 rounded-lg p-4">
+                    <h3 class="font-bold mb-2">Disabled State</h3>
+                    <p class="text-sm text-gray-600 mb-2">Component is non-interactive</p>
+                    <wui-number-field id="nf-disabled" value="0" disabled="true"></wui-number-field>
+                    <p class="mt-2 text-sm">Value: <span id="nf-disabled-value"
+                            class="font-mono bg-gray-100 p-1 rounded">0</span></p>
+                </div>
+
+                <!-- Reactive Mode -->
+                <div class="border border-gray-300 rounded-lg p-4">
+                    <h3 class="font-bold mb-2">Reactive Mode</h3>
+                    <p class="text-sm text-gray-600 mb-2">Updates value on every click/change</p>
+                    <wui-number-field id="nf-reactive" value="25" min="0" max="50" reactive="true"></wui-number-field>
+                    <p class="mt-2 text-sm">Value: <span id="nf-reactive-value"
+                            class="font-mono bg-gray-100 p-1 rounded">25</span></p>
+                </div>
+
+            </div>
+        </div>
+    </template>
+    <!-- #endregion -->
+
     <!-- #region scripting -->
     <script>
 
@@ -982,6 +1052,7 @@
             toggleCollapseBtn();
             toggleCollapseBackgroundBtn();
             setupFabControls();
+            // setupNumberFieldDemos();
         });
 
         function loadNavigation() {
@@ -1010,7 +1081,8 @@
                 'collapse-demo',
                 'icon-button-demo',
                 'wheeler-demo',
-                'fab-demo'
+                'fab-demo',
+                'number-field-demo'
             ];
 
             demoTemplates.forEach(id => {
@@ -1184,12 +1256,38 @@
             updateFab();
         }
 
+        function setupNumberFieldDemos() {
+            // Helper function to connect a number field to its display span
+            function connectNumberField(id) {
+                const numberField = document.getElementById(id);
+                const valueDisplay = document.getElementById(`${id}-value`);
 
+                console.log("[Number Field] Number Field: ", numberField)
+                console.log("[Number Field] Value Display: ", valueDisplay)
 
-        document.getElementById('show-fab-checkbox').addEventListener('click', function () { console.log("FAB checkbox toggle") })
+                if (numberField && valueDisplay) {
+                    // The 'change' event fires when the input value is committed (e.g., on blur or button click)
+                    numberField.addEventListener('change', (e) => {
+                        // valueDisplay.textContent = e.target.value;
+                        valueDisplay.textContent = e.getAttribute('value');
+                    });
 
+                    // The 'input' event fires continuously as the value changes (useful for reactive mode)
+                    numberField.addEventListener('input', (e) => {
+                        // valueDisplay.textContent = e.target.value;
+                        valueDisplay.textContent = e.getAttribute('value');
+                    });
+                }
+            }
 
-
+            // Connect all the demo instances
+            connectNumberField('nf-default');
+            connectNumberField('nf-initial');
+            connectNumberField('nf-step');
+            connectNumberField('nf-minmax');
+            connectNumberField('nf-disabled');
+            connectNumberField('nf-reactive');
+        }
 
     </script>
     <!-- #endregion -->
