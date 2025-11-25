@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Fab Component Test</title>
+    <link href="/node_modules/@woby/chk/dist/index.css" rel="stylesheet">
+    <script type="module" src="../src/Fab.tsx"></script> <!-- Make sure this path is correct -->
+</head>
+
+<body>
+    <link href="../dist/wui.css" rel="stylesheet"> <!-- Make sure this path is correct -->
+
+    <h2 class="text-[1.2em] pl-4">Fab Component Test</h2>
+
+    <woby-chk name="Default FAB">
+        <wui-fab snapshot-name="Default_FAB">Default FAB</wui-fab>
+    </woby-chk>
+
+    <woby-chk name="Circular FAB">
+        <wui-fab type="circular" snapshot-name="Circular_FAB">❤️</wui-fab>
+    </woby-chk>
+
+    <woby-chk name="Pill (Extended) FAB">
+        <wui-fab type="pill" snapshot-name="Pill_FAB">➕ Add Item</wui-fab>
+    </woby-chk>
+
+    <woby-chk name="Disabled FAB">
+        <wui-fab disabled="true" snapshot-name="Disabled_FAB">Disabled</wui-fab>
+    </woby-chk>
+
+    <woby-chk name="Custom FAB">
+        <wui-fab type="circular" cls="!bg-green-500 !text-white" snapshot-name="Custom_FAB">
+            👍
+        </wui-fab>
+    </woby-chk>
+
+    <woby-chk name="Custom Pill FAB">
+        <wui-fab type="pill" cls="!px-8 !py-4 !bg-purple-600 !rounded-full !shadow-lg hover:!bg-purple-700"
+            snapshot-name="Custom_Pill_FAB">
+            Custom Pill
+        </wui-fab>
+    </woby-chk>
+
+    <woby-chk name="Clickable FAB">
+        <wui-fab id="clickableFab" type="circular" snapshot-name="Clickable_FAB">
+            🔔
+        </wui-fab>
+    </woby-chk>
+
+    <script type="module">
+        const clickableFab = document.getElementById('clickableFab');
+        if (clickableFab) {
+            clickableFab.addEventListener('click', () => {
+                alert('FAB Clicked!');
+            });
+        }
+    </script>
+</body>
+
+</html>
