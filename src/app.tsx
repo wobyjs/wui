@@ -15,6 +15,7 @@ import { useArrayOptions } from './Wheeler/WheelerType'
 import Wheeler from './Wheeler/Wheeler'
 import MultiWheeler from './Wheeler/MultiWheeler'
 import DateTimeWheeler, { DateTimeWheelerType } from './Wheeler/DateTimeWheeler'
+import Fab from './Fab'
 
 
 const isDev = typeof import.meta.env !== 'undefined' && import.meta.env.DEV
@@ -71,6 +72,9 @@ export function App() {
                     </a>
                     <a href="#datetime-wheeler" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
                         DateTime Wheeler
+                    </a>
+                    <a href="#fab" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                        Fab
                     </a>
                     <a href="/html-demo.html" target="_blank" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
                         HTML Components Demo
@@ -1422,6 +1426,167 @@ export function App() {
     // #endregion
 
 
+    // #region Fab Demo
+    const fabDemo = () => {
+        const showFab = $(true)
+        const extendedFab = $(false)
+        const fabPosition = $('bottom-right' as 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left')
+
+        return <>
+            <h2 id="fab" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Fab (Floating Action Button) Demo</h2>
+            <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {/* Default Fab */}
+                    <div class="border border-gray-300 rounded-lg p-4 relative min-h-[200px]">
+                        <h3 class="text-lg font-semibold mb-2">Default Fab</h3>
+                        <p class="text-sm text-gray-600 mb-2">Basic floating action button with icon</p>
+                        <div class="relative h-32 bg-gray-50 rounded-md flex items-center justify-center">
+                            <Fab onClick={() => alert('Fab clicked!')}>
+                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" />
+                                </svg>
+                            </Fab>
+                        </div>
+                    </div>
+
+                    {/* Extended Fab */}
+                    <div class="border border-gray-300 rounded-lg p-4 relative min-h-[200px]">
+                        <h3 class="text-lg font-semibold mb-2">Extended Fab</h3>
+                        <p class="text-sm text-gray-600 mb-2">Fab with icon and text label</p>
+                        <div class="relative h-32 bg-gray-50 rounded-md flex items-center justify-center">
+                            <Fab extended onClick={() => alert('Extended Fab clicked!')}>
+                                <svg class="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6z" />
+                                </svg>
+                                <span>Add User</span>
+                            </Fab>
+                        </div>
+                    </div>
+
+                    {/* Custom Color Fab */}
+                    <div class="border border-gray-300 rounded-lg p-4 relative min-h-[200px]">
+                        <h3 class="text-lg font-semibold mb-2">Custom Color Fab</h3>
+                        <p class="text-sm text-gray-600 mb-2">Fab with custom background color</p>
+                        <div class="relative h-32 bg-gray-50 rounded-md flex items-center justify-center">
+                            <Fab cls="!bg-green-500 hover:!bg-green-600" onClick={() => alert('Success!')}>
+                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                </svg>
+                            </Fab>
+                        </div>
+                    </div>
+
+                    {/* Position Control Demo */}
+                    <div class="border border-gray-300 rounded-lg p-4 md:col-span-2 lg:col-span-3">
+                        <h3 class="text-lg font-semibold mb-2">Position Control</h3>
+                        <p class="text-sm text-gray-600 mb-4">Control the Fab position and visibility</p>
+
+                        <div class="flex gap-4 mb-4 flex-wrap">
+                            <div class="flex items-center gap-2">
+                                <label class="text-sm font-medium">Position:</label>
+                                <select
+                                    class="border rounded px-2 py-1"
+                                    onChange={(e) => fabPosition(e.target.value as any)}
+                                    value={() => $$(fabPosition)}
+                                >
+                                    <option value="bottom-right">Bottom Right</option>
+                                    <option value="bottom-left">Bottom Left</option>
+                                    <option value="top-right">Top Right</option>
+                                    <option value="top-left">Top Left</option>
+                                </select>
+                            </div>
+
+                            <Checkbox id="show-fab" checked={() => $$(showFab)} onChange={(e) => showFab(e.target.checked)}>
+                                Show Fab
+                            </Checkbox>
+
+                            <Checkbox id="extended-fab" checked={() => $$(extendedFab)} onChange={(e) => extendedFab(e.target.checked)}>
+                                Extended
+                            </Checkbox>
+                        </div>
+
+                        <div class="relative h-64 bg-gray-50 rounded-md border-2 border-dashed border-gray-300">
+                            <div class="absolute inset-0 flex items-center justify-center text-gray-400">
+                                Fab will appear in the selected position
+                            </div>
+                            {
+                                () => {
+                                    const positionClasses = {
+                                        'bottom-right': 'bottom-4 right-4',
+                                        'bottom-left': 'bottom-4 left-4',
+                                        'top-right': 'top-4 right-4',
+                                        'top-left': 'top-4 left-4',
+                                    };
+
+                                    return $$(showFab) && (
+                                        <Fab
+                                            // position={() => $$(fabPosition)}
+                                            // type={() => $$(extendedFab) ? 'pill' : 'circular'}
+                                            cls={() => positionClasses[$$(fabPosition)]}
+                                            extended={() => $$(extendedFab)}
+                                            onClick={() => alert(`Fab clicked at ${$$(fabPosition)}`)}
+                                        >
+                                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" />
+                                            </svg>
+                                            {() => $$(extendedFab) && <span class="ml-2">Create</span>}
+                                        </Fab>
+                                    )
+                                }
+                            }
+                        </div>
+                    </div>
+
+                    {/* Different Icons Demo */}
+                    <div class="border border-gray-300 rounded-lg p-4 md:col-span-4 lg:col-span-4">
+                        <h3 class="text-lg font-semibold mb-2">Different Actions</h3>
+                        <p class="text-sm text-gray-600 mb-4">Various Fab examples with different icons and actions</p>
+
+                        <div class="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-4 gap-4">
+                            <div class="relative h-32 bg-gray-50 rounded-md border flex items-center justify-center">
+                                <p class="absolute top-2 left-2 text-xs text-gray-600">Edit</p>
+                                <Fab cls="!bg-blue-500 hover:!bg-blue-600">
+                                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                                    </svg>
+                                </Fab>
+                            </div>
+
+                            <div class="relative h-32 bg-gray-50 rounded-md border flex items-center justify-center">
+                                <p class="absolute top-2 left-2 text-xs text-gray-600">Delete</p>
+                                <Fab cls="!bg-red-500 hover:!bg-red-600">
+                                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                    </svg>
+                                </Fab>
+                            </div>
+
+                            <div class="relative h-32 bg-gray-50 rounded-md border flex items-center justify-center">
+                                <p class="absolute top-2 left-2 text-xs text-gray-600">Share</p>
+                                <Fab cls="!bg-purple-500 hover:!bg-purple-600">
+                                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M15 8a3 3 0 10-2.977-2.63l-4.94 2.47a3 3 0 100 4.319l4.94 2.47a3 3 0 10.895-1.789l-4.94-2.47a3.027 3.027 0 000-.74l4.94-2.47C13.456 7.68 14.19 8 15 8z" />
+                                    </svg>
+                                </Fab>
+                            </div>
+
+                            <div class="relative h-32 bg-gray-50 rounded-md border flex items-center justify-center">
+                                <p class="absolute top-2 left-2 text-xs text-gray-600">Download</p>
+                                <Fab cls="!bg-indigo-500 hover:!bg-indigo-600">
+                                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                    </svg>
+                                </Fab>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </>
+    }
+    // #endregion
+
+
     // #region Render
     return (
         <div class="p-8">
@@ -1448,6 +1613,7 @@ export function App() {
                 {wheelerDemo()}
                 {multiWheelerDemo()}
                 {datetimeWheelerDemo()}
+                {fabDemo()}
             </div>
 
             <div class="mt-8 p-4 bg-gray-100 rounded">

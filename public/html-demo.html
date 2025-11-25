@@ -17,6 +17,7 @@
     <script type="module" src="../src/Collapse.tsx"></script>
     <script type="module" src="../src/IconButton.tsx"></script>
     <script type="module" src="../src/Wheeler/Wheeler.tsx"></script>
+    <script type="module" src="../src/Fab.tsx"></script>
     <!-- #endregion -->
 
     <!-- <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"> -->
@@ -90,6 +91,10 @@
             <a href="#wheeler"
                 class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
                 Wheeler
+            </a>
+            <a href="#fab"
+                class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                Fab
             </a>
             <a href="/html-demo.html" target="_blank"
                 class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
@@ -722,6 +727,7 @@
     </template>
     <!-- #endregion -->
 
+
     <!-- #region wheeler -->
     <template id="wheeler-demo">
         <h2 id="wheeler" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Wheeler Demo</h2>
@@ -832,14 +838,150 @@
     </template>
     <!-- #endregion -->
 
+
+    <!-- #region Fab  -->
+    <template id="fab-demo">
+        <h2 id="fab" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Fab (Floating Action Button) Demo</h2>
+        <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+
+                <!-- Default Fab -->
+                <div class="border border-gray-300 rounded-lg p-4 relative min-h-[200px]">
+                    <h3 class="text-lg font-semibold mb-2">Default Fab</h3>
+                    <p class="text-sm text-gray-600 mb-2">Basic circular FAB with icon</p>
+                    <div class="relative h-32 bg-gray-50 rounded-md flex items-center justify-center">
+                        <wui-fab type="circular" onclick="alert('Fab clicked!')">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                                <path
+                                    d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" />
+                            </svg>
+                        </wui-fab>
+                    </div>
+                </div>
+
+                <!-- Extended Fab -->
+                <div class="border border-gray-300 rounded-lg p-4 relative min-h-[200px]">
+                    <h3 class="text-lg font-semibold mb-2">Extended Fab</h3>
+                    <p class="text-sm text-gray-600 mb-2">Fab with icon and text label</p>
+                    <div class="relative h-32 bg-gray-50 rounded-md flex items-center justify-center">
+                        <wui-fab type="pill" onclick="alert('Extended Fab clicked!')"
+                            cls="!relative !text-base !font-semibold !px-4 !py-2">
+                            <div class="flex items-center">
+                                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6z" />
+                                </svg>
+                                <span>Add User</span>
+                            </div>
+                        </wui-fab>
+                    </div>
+                </div>
+
+                <!-- Custom Color Fab -->
+                <div class="border border-gray-300 rounded-lg p-4 relative min-h-[200px]">
+                    <h3 class="text-lg font-semibold mb-2">Custom Color Fab</h3>
+                    <p class="text-sm text-gray-600 mb-2">Fab with custom background color</p>
+                    <div class="relative h-32 bg-gray-50 rounded-md flex items-center justify-center">
+                        <wui-fab type="circular" cls="!bg-green-500 hover:!bg-green-600" onclick="alert('Success!')">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                        </wui-fab>
+                    </div>
+                </div>
+
+                <!-- Position Control Demo -->
+                <div class="border border-gray-300 rounded-lg p-4 md:col-span-2 lg:col-span-3">
+                    <h3 class="text-lg font-semibold mb-2">Position Control</h3>
+                    <p class="text-sm text-gray-600 mb-4">Control the Fab position and visibility</p>
+                    <div class="flex gap-4 mb-4 flex-wrap">
+                        <div class="flex items-center gap-2">
+                            <label class="text-sm font-medium">Position:</label>
+                            <select id="fab-position-select" class="border rounded px-2 py-1">
+                                <option value="bottom-right">Bottom Right</option>
+                                <option value="bottom-left">Bottom Left</option>
+                                <option value="top-right">Top Right</option>
+                                <option value="top-left">Top Left</option>
+                            </select>
+                        </div>
+                        <wui-checkbox id="show-fab-checkbox" checked="true">Show Fab</wui-checkbox>
+                        <wui-checkbox id="extended-fab-checkbox">Extended</wui-checkbox>
+                    </div>
+                    <div class="relative h-64 bg-gray-50 rounded-md border-2 border-dashed border-gray-300">
+                        <div class="absolute inset-0 flex items-center justify-center text-gray-400">
+                            Fab will appear in the selected position
+                        </div>
+                        <wui-fab id="controlled-fab" type="circular">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                                <path
+                                    d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" />
+                            </svg>
+                            <span id="controlled-fab-text" class="ml-2" style="display: none;">Create</span>
+                        </wui-fab>
+                    </div>
+                </div>
+
+                <!-- Different Icons Demo -->
+                <div class="border border-gray-300 rounded-lg p-4 md:col-span-2 lg:col-span-3">
+                    <h3 class="text-lg font-semibold mb-2">Different Actions</h3>
+                    <p class="text-sm text-gray-600 mb-4">Various Fab examples with different icons and actions</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div class="relative h-32 bg-gray-50 rounded-md border flex items-center justify-center">
+                            <p class="absolute top-2 left-2 text-xs text-gray-600">Edit</p>
+                            <wui-fab type="circular" cls="!bg-blue-500 hover:!bg-blue-600 !relative">
+                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                                    <path
+                                        d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                                </svg>
+                            </wui-fab>
+                        </div>
+                        <div class="relative h-32 bg-gray-50 rounded-md border flex items-center justify-center">
+                            <p class="absolute top-2 left-2 text-xs text-gray-600">Delete</p>
+                            <wui-fab type="circular" cls="!bg-red-500 hover:!bg-red-600 !relative">
+                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd"
+                                        d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                                        clip-rule="evenodd" />
+                                </svg>
+                            </wui-fab>
+                        </div>
+                        <div class="relative h-32 bg-gray-50 rounded-md border flex items-center justify-center">
+                            <p class="absolute top-2 left-2 text-xs text-gray-600">Share</p>
+                            <wui-fab type="circular" cls="!bg-purple-500 hover:!bg-purple-600 !relative">
+                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                                    <path
+                                        d="M15 8a3 3 0 10-2.977-2.63l-4.94 2.47a3 3 0 100 4.319l4.94 2.47a3 3 0 10.895-1.789l-4.94-2.47a3.027 3.027 0 000-.74l4.94-2.47C13.456 7.68 14.19 8 15 8z" />
+                                </svg>
+                            </wui-fab>
+                        </div>
+                        <div class="relative h-32 bg-gray-50 rounded-md border flex items-center justify-center">
+                            <p class="absolute top-2 left-2 text-xs text-gray-600">Download</p>
+                            <wui-fab type="circular" cls="!bg-indigo-500 hover:!bg-indigo-600 !relative">
+                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd"
+                                        d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
+                                        clip-rule="evenodd" />
+                                </svg>
+                            </wui-fab>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+    <!-- #endregion -->
+
+
     <!-- #region scripting -->
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
 
+        document.addEventListener('DOMContentLoaded', () => {
             loadNavigation();
             loadDemo();
             toggleCollapseBtn();
             toggleCollapseBackgroundBtn();
+            setupFabControls();
         });
 
         function loadNavigation() {
@@ -867,7 +1009,8 @@
                 'chip-demo',
                 'collapse-demo',
                 'icon-button-demo',
-                'wheeler-demo'
+                'wheeler-demo',
+                'fab-demo'
             ];
 
             demoTemplates.forEach(id => {
@@ -913,6 +1056,140 @@
         function handleIconClickImg() {
             alert('Icon Button img clicked!')
         }
+
+        // function setupFabControls() {
+        //     const positionSelect = document.getElementById('fab-position-select');
+        //     const showCheckbox = document.getElementById('show-fab-checkbox');
+        //     const extendedCheckbox = document.getElementById('extended-fab-checkbox');
+        //     const controlledFab = document.getElementById('controlled-fab');
+        //     const fabText = document.getElementById('controlled-fab-text');
+
+        //     if (!positionSelect || !showCheckbox || !extendedCheckbox || !controlledFab || !fabText) {
+        //         console.error('One or more Fab control elements are missing!');
+        //         return;
+        //     }
+
+        //     const positionClasses = {
+        //         'bottom-right': 'bottom-4 right-4',
+        //         'bottom-left': 'bottom-4 left-4',
+        //         'top-right': 'top-4 right-4',
+        //         'top-left': 'top-4 left-4',
+        //     };
+
+        //     function updateFab() {
+        //         // --- 1. Control Visibility (The Main Fix) ---
+        //         // Use the standard HTML `hidden` attribute.
+        //         // If the checkbox is checked, remove the attribute to show the FAB.
+        //         // If it's unchecked, add the attribute to hide it.
+        //         if (showCheckbox.checked) {
+        //             controlledFab.removeAttribute('hidden');
+        //         } else {
+        //             controlledFab.setAttribute('hidden', '');
+        //         }
+
+        //         // --- 2. Control Style and Position ---
+        //         const isExtended = extendedCheckbox.checked;
+        //         const currentPositionClass = positionClasses[positionSelect.value];
+
+        //         // Set the `type` attribute to switch between 'circular' and 'pill'
+        //         controlledFab.setAttribute('type', isExtended ? 'pill' : 'circular');
+
+        //         // Set the `cls` attribute for positioning and extended styling
+        //         if (isExtended) {
+        //             controlledFab.setAttribute('cls', `${currentPositionClass} !text-base !font-semibold !px-4 !py-2`);
+        //         } else {
+        //             controlledFab.setAttribute('cls', currentPositionClass);
+        //         }
+
+        //         // --- 3. Control Text Visibility ---
+        //         fabText.style.display = isExtended ? 'inline' : 'none';
+        //     }
+
+        //     // Add event listeners that trigger the update
+        //     positionSelect.addEventListener('change', updateFab);
+        //     showCheckbox.addEventListener('change', updateFab);
+        //     extendedCheckbox.addEventListener('change', updateFab);
+
+        //     // Run once on page load to set the initial state
+        //     updateFab();
+        // }
+
+        function setupFabControls() {
+            const positionSelect = document.getElementById('fab-position-select');
+            const showCheckbox = document.getElementById('show-fab-checkbox');
+            const extendedCheckbox = document.getElementById('extended-fab-checkbox');
+            const controlledFab = document.getElementById('controlled-fab');
+            const fabText = document.getElementById('controlled-fab-text');
+
+            if (!positionSelect || !showCheckbox || !extendedCheckbox || !controlledFab || !fabText) {
+                console.error('One or more Fab control elements are missing!');
+                return;
+            }
+
+            const positionClasses = {
+                'bottom-right': 'bottom-4 right-4',
+                'bottom-left': 'bottom-4 left-4',
+                'top-right': 'top-4 right-4',
+                'top-left': 'top-4 left-4',
+            };
+
+            function updateFab() {
+                // This function now only READS the current state and updates the FAB.
+                if (showCheckbox.hasAttribute('checked')) {
+                    controlledFab.removeAttribute('hidden');
+                } else {
+                    controlledFab.setAttribute('hidden', '');
+                }
+
+                const isExtended = extendedCheckbox.hasAttribute('checked');
+                const currentPositionClass = positionClasses[positionSelect.value];
+
+                controlledFab.setAttribute('type', isExtended ? 'pill' : 'circular');
+
+                if (isExtended) {
+                    controlledFab.setAttribute('cls', `${currentPositionClass} !text-base !font-semibold !px-4 !py-2`);
+                } else {
+                    controlledFab.setAttribute('cls', currentPositionClass);
+                }
+
+                fabText.style.display = isExtended ? 'inline' : 'none';
+            }
+
+            // --- Add event listeners that MANUALLY TOGGLE the attribute ---
+
+            positionSelect.addEventListener('change', updateFab);
+
+            showCheckbox.addEventListener('change', () => {
+                // Manually toggle the 'checked' attribute based on its current presence.
+                if (showCheckbox.hasAttribute('checked')) {
+                    showCheckbox.removeAttribute('checked');
+                } else {
+                    showCheckbox.setAttribute('checked', 'true');
+                }
+                // After updating the attribute, call updateFab to sync the UI.
+                updateFab();
+            });
+
+            extendedCheckbox.addEventListener('change', () => {
+                // Do the same for the 'extended' checkbox.
+                if (extendedCheckbox.hasAttribute('checked')) {
+                    extendedCheckbox.removeAttribute('checked');
+                } else {
+                    extendedCheckbox.setAttribute('checked', 'true');
+                }
+                updateFab();
+            });
+
+            // Run once on page load to set the initial state
+            updateFab();
+        }
+
+
+
+        document.getElementById('show-fab-checkbox').addEventListener('click', function () { console.log("FAB checkbox toggle") })
+
+
+
 
     </script>
     <!-- #endregion -->
