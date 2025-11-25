@@ -17,6 +17,7 @@ import MultiWheeler from './Wheeler/MultiWheeler'
 import DateTimeWheeler, { DateTimeWheelerType } from './Wheeler/DateTimeWheeler'
 import Fab from './Fab'
 import NumberField from './NumberField'
+import Paper from './Paper'
 
 const isDev = typeof import.meta.env !== 'undefined' && import.meta.env.DEV
 
@@ -78,6 +79,9 @@ export function App() {
                     </a>
                     <a href="#number-field" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
                         Number Field
+                    </a>
+                    <a href="#paper" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                        Paper
                     </a>
                     <a href="/html-demo.html" target="_blank" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
                         HTML Components Demo
@@ -1660,6 +1664,70 @@ export function App() {
     // #endregion
 
 
+    // #region Paper Demo
+    const paperDemo = () => {
+        return <>
+            <h2 id="paper" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Paper Demo</h2>
+            <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+                    {/* Default Paper */}
+                    <div class="border border-gray-300 rounded-lg p-4 bg-gray-100">
+                        <h3 class="font-bold mb-2">Default Paper</h3>
+                        <p class="text-sm text-gray-600 mb-2">This should have the default elevation of 1.</p>
+                        <Paper cls="p-4">
+                            <p>This content is inside a Paper component.</p>
+                        </Paper>
+                    </div>
+
+                    {/* No Elevation */}
+                    <div class="border border-gray-300 rounded-lg p-4 bg-gray-100">
+                        <h3 class="font-bold mb-2">No Elevation</h3>
+                        <p class="text-sm text-gray-600 mb-2">Using `elevation={0}` for a flat appearance.</p>
+                        <Paper elevation={0} cls="p-4">
+                            <p>This Paper component has no shadow.</p>
+                        </Paper>
+                    </div>
+
+                    {/* High Elevation */}
+                    <div class="border border-gray-300 rounded-lg p-4 bg-gray-100">
+                        <h3 class="font-bold mb-2">High Elevation</h3>
+                        <p class="text-sm text-gray-600 mb-2">Using `elevation={16}` for a prominent shadow.</p>
+                        <Paper elevation={16} cls="p-4">
+                            <p>This Paper is floating high above the page.</p>
+                        </Paper>
+                    </div>
+
+                    {/* Custom Styled Paper */}
+                    <div class="border border-gray-300 rounded-lg p-4 bg-gray-100">
+                        <h3 class="font-bold mb-2">Custom Styled Paper</h3>
+                        <p class="text-sm text-gray-600 mb-2">Merging custom classes with elevation styles.</p>
+                        <Paper elevation={4} cls="p-6 bg-yellow-50 border-2 border-yellow-200">
+                            <p class="text-yellow-800">Custom background, border, and padding.</p>
+                        </Paper>
+                    </div>
+
+                    {/* Paper as a Card */}
+                    <div class="border border-gray-300 rounded-lg p-4 md:col-span-2 bg-gray-100">
+                        <h3 class="font-bold mb-2">Paper as a Profile Card</h3>
+                        <p class="text-sm text-gray-600 mb-2">A practical example using Paper as a container.</p>
+                        <Paper cls="p-6 flex items-center gap-4" elevation={8}>
+                            <Avatar src="/sample-avatar.png" size="lg" />
+                            <div class="flex-1">
+                                <p class="font-bold text-lg">Alex Doe</p>
+                                <p class="text-sm text-gray-600">Frontend Developer</p>
+                            </div>
+                            <Button type="outlined">Follow</Button>
+                        </Paper>
+                    </div>
+
+                </div>
+            </div>
+        </>
+    }
+    // #endregion
+
+
     // #region Render
     return (
         <div class="p-8">
@@ -1688,6 +1756,7 @@ export function App() {
                 {datetimeWheelerDemo()}
                 {fabDemo()}
                 {numberFieldDemo()}
+                {paperDemo()}
             </div>
 
             <div class="mt-8 p-4 bg-gray-100 rounded">
