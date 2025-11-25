@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Paper Component Test</title>
+    <link href="/node_modules/@woby/chk/dist/index.css" rel="stylesheet">
+    <script type="module" src="../src/Paper.tsx"></script>
+</head>
+
+<body>
+    <link href="../dist/wui.css" rel="stylesheet">
+    <h2 class="text-[1.2em] pl-4">Paper Component Test</h2>
+
+    <!-- #region Default Paper -->
+    <woby-chk name="Default Paper">
+        <wui-paper snapshot-name="Default-Paper" cls="p-4">
+            <h3 class="font-bold">Default Paper</h3>
+            <p class="text-sm">This should have elevation 1 shadow.</p>
+        </wui-paper>
+    </woby-chk>
+    <!-- #endregion -->
+
+    <!-- #region No Elevation Paper -->
+    <woby-chk name="No Elevation Paper">
+        <wui-paper elevation="0" snapshot-name="No_Elevation_Paper" cls="p-4">
+            <h3 class="font-bold">No Elevation (elevation={0})</h3>
+            <p class="text-sm">This should have no shadow.</p>
+        </wui-paper>
+    </woby-chk>
+    <!-- #endregion -->
+
+    <!-- #region High Elevation Paper -->
+    <woby-chk name="High Elevation Paper">
+        <wui-paper elevation="16" snapshot-name="High_Elevation_Paper" cls="p-4">
+            <h3 class="font-bold">High Elevation (elevation={16})</h3>
+            <p class="text-sm">This should have a very prominent shadow.</p>
+        </wui-paper>
+    </woby-chk>
+    <!-- #endregion -->
+
+    <!-- #region Custom Styled Paper -->
+    <woby-chk name="Custom Styled Paper">
+        <wui-paper elevation="4" snapshot-name="Custom_Styled_Paper" cls="p-6 bg-yellow-50 border-2 border-yellow-200">
+            <h3 class="font-bold text-yellow-800">Custom Styled Paper</h3>
+            <p class="text-sm">This has elevation 4 plus a custom background and border.</p>
+        </wui-paper>
+    </woby-chk>
+    <!-- #endregion -->
+
+</body>
+
+</html>
