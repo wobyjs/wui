@@ -1021,7 +1021,7 @@ const Wheeler = defaults(def, (props) => {
     }
     // #endregion
 
-    
+
     // #region Update Item Styles
     /**
      * `updateItemStyles` is the visual feedback engine for the single-select wheeler.
@@ -1738,14 +1738,6 @@ const Wheeler = defaults(def, (props) => {
      * @param {Function} callback - The function to run when a click outside `wheeler` occurs.
      */
     useClickAway(wheeler, () => {
-
-        const hide = () => {
-            isVisible(false); // Update internal state
-            if (isObservable(visibleProp)) {
-                visibleProp(false); // Also update the parent's state if it's an observable
-            }
-        };
-
         // --- Path 1: The "Cancel on Blur" Behavior ---
         // This block runs if the `cancelOnBlur` prop is true.
         if ($$(cancelOnBlur)) {
@@ -1945,7 +1937,22 @@ const Wheeler = defaults(def, (props) => {
 
     // #region Render Logic
 
-    const renderAsPopup = () => (
+    const BackgroundOverlay = () => {
+        return (
+            <Portal mount={document.body}>
+                {
+                    () => $$(mask) ?
+                        <>
+                            <div class={['fixed inset-0 bg-black/50 h-full w-full z-[00] opacity-50']} />
+                        </>
+                        : null
+                }
+            </Portal>
+        )
+    }
+
+    const renderAsPopup = () => <>
+        <BackgroundOverlay />
         <Portal mount={document.body}>
             {/* {$$(mask) && (
                 <div
@@ -1954,13 +1961,13 @@ const Wheeler = defaults(def, (props) => {
                     onClick={() => $$(cancelOnBlur) && hide()}
                 />
             )} */}
-            {
+            {/* {
                 () => $$(mask) ?
                     <>
-                        <div class={['fixed inset-0 bg-black/50 h-full w-full z-[00] opacity-50']} />
+                        <div class={['fixed inset-0 bg-black/50 h-full w-full z-[00] opacity-50']} onClick={() => $$(cancelOnBlur) && hide()}/>
                     </>
                     : null
-            }
+            } */}
             {/* <div
                 ref={wheeler}
                 // Combines the base popup styles with any custom classes from the `cls` prop
@@ -1971,7 +1978,7 @@ const Wheeler = defaults(def, (props) => {
                 <WheelerContent />
             </div>
         </Portal>
-    );
+    </>;
 
     const renderAsInline = () => (
         <div
@@ -1986,12 +1993,8 @@ const Wheeler = defaults(def, (props) => {
 
     // --- Main Return Logic ---
     return () => {
-        // If not visible, render nothing.
-        // if (!$$(isVisible)) {
-        //     return null;
-        // }
         // If visible, check the `bottom` prop to decide which render function to use.
-        return $$(bottom) ? renderAsPopup() : renderAsInline();
+        return !$$(isVisible) ? null : $$(bottom) ? renderAsPopup() : renderAsInline();
     };
     // return <>
     //     {() => !$$(visibleProp) ? null :

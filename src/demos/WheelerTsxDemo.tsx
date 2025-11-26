@@ -73,7 +73,6 @@ const App = () => {
                             ok={okFruit}
                             bottom={true}
                             mask={true}
-                            cls="w-full"
                         />
                     </div>
 

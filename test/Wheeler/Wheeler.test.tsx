@@ -50,7 +50,7 @@ const WheelerWithJsonObjectArray = () => {
                     <Wheeler
                         options={JSON_CAR_DATA}
                         value={selectedCarId}
-                        bottom={false}
+                        bottom={true}
                         visible={isVisible}
                         cls="border rounded-md shadow-sm w-64"
                     />
@@ -433,21 +433,21 @@ function getOptionInfo(optionValue: string, jsonData: any) {
 
 export {
     WheelerWithJsonObjectArray,
-    // WheelerWithSimpleArray,
-    // WheelerWithCountryData,
+    WheelerWithSimpleArray,
+    WheelerWithCountryData,
 
-    // CheckboxWheelerWithJsonObjectArray,
-    // CheckboxWheelerWithSimpleArrayFruit,
-    // CheckboxWheelerWithSimpleArrayFlavors,
-    // CheckboxWheelerWithCountryData,
+    CheckboxWheelerWithJsonObjectArray,
+    CheckboxWheelerWithSimpleArrayFruit,
+    CheckboxWheelerWithSimpleArrayFlavors,
+    CheckboxWheelerWithCountryData,
 
-    // ControlledWheelerWithJsonObjectArray,
-    // ControlledWheelerWithSimpleArray,
-    // ControlledWheelerWithCountryData,
+    ControlledWheelerWithJsonObjectArray,
+    ControlledWheelerWithSimpleArray,
+    ControlledWheelerWithCountryData,
 
-    // HeaderWheelerWithJsonObjectArray,
+    HeaderWheelerWithJsonObjectArray,
 
-    // SearchWheelerWithJsonObjectArray,
-    // SearchWheelerWithSimpleArray,
-    // SearchWheelerWithCountryData,
+    SearchWheelerWithJsonObjectArray,
+    SearchWheelerWithSimpleArray,
+    SearchWheelerWithCountryData,
 }

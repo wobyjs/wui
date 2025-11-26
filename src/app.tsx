@@ -741,9 +741,25 @@ export function App() {
         const selectedFruit = $('Cherry');
         const selectedNumber = $(5);
         const selectedFlavor = $('Vanilla');
+        const selectedFruitWithCustomItem = $('Cherry');
+        const selectedFlavorWithCustomStyle = $('Vanilla');
         const selectedMultipleFruits = $(['Apple', 'Cherry']);
         const selectedFruitWithHeader = $('Date');
-        const selectedFruitWithSearch = $('Elderberry');
+        const selectedFruitWithSearch_1 = $('Elderberry');
+        const selectedFruitWithSearch_2 = $('Elderberry');
+        const selectedFruitWithSearch_3 = $('Elderberry');
+
+        const visibleFruit = $(true);
+        const visibleNumber = $(true);
+        const visibleCarId = $(true);
+        const visibleFlavor = $(true);
+        const visibleFruitWithCustomItem = $(true);
+        const visibleFlavorWithCustomStyle = $(true);
+        const visibleFruitWithSearch_1 = $(true);
+        const visibleFruitWithSearch_2 = $(true);
+        const visibleFruitWithSearch_3 = $(true);
+        const visibleFruitWithHeader = $(true);
+        const visibleMultipleFruits = $(true);
 
         const displayValue = useMemo(() => {
             return formatOptionDisplay($$(selectedCarId), JSON_CAR_DATA);
@@ -768,12 +784,19 @@ export function App() {
                         <p class="text-sm text-gray-600 mb-2">
                             Simple string array with default settings
                         </p>
+                        <Button
+                            type="contained"
+                            onClick={() => { visibleFruit(true) }}
+                            cls="my-2"
+                        >
+                            Open Wheeler
+                        </Button>
                         <Wheeler
                             options={FRUITS}
                             value={selectedFruit}
+                            visible={visibleFruit}
                             bottom={false}
-                            cls="border rounded-md shadow-sm w-full"
-                        />
+                            cls="border rounded-md shadow-sm w-full" />
                         <p class="mt-4 text-sm">
                             Selected: <span class="font-mono bg-gray-100 p-1 rounded">{selectedFruit}</span>
                         </p>
@@ -785,9 +808,17 @@ export function App() {
                         <p class="text-sm text-gray-600 mb-2">
                             Wheeler with numeric values
                         </p>
+                        <Button
+                            type="contained"
+                            onClick={() => { visibleNumber(true) }}
+                            cls="my-2"
+                        >
+                            Open Wheeler
+                        </Button>
                         <Wheeler
                             options={NUMBERS}
                             value={selectedNumber}
+                            visible={visibleNumber}
                             bottom={false}
                             cls="border rounded-md shadow-sm w-full"
                         />
@@ -802,9 +833,17 @@ export function App() {
                         <p class="text-sm text-gray-600 mb-2">
                             Objects with `label` and `value` keys
                         </p>
+                        <Button
+                            type="contained"
+                            onClick={() => { visibleCarId(true) }}
+                            cls="my-2"
+                        >
+                            Open Wheeler
+                        </Button>
                         <Wheeler
                             options={JSON_CAR_DATA}
                             value={selectedCarId}
+                            visible={visibleCarId}
                             bottom={false}
                             cls="border rounded-md shadow-sm w-full"
                         />
@@ -819,9 +858,17 @@ export function App() {
                         <p class="text-sm text-gray-600 mb-2">
                             Wheeler with itemHeight=48px
                         </p>
+                        <Button
+                            type="contained"
+                            onClick={() => { visibleFlavor(true) }}
+                            cls="my-2"
+                        >
+                            Open Wheeler
+                        </Button>
                         <Wheeler
                             options={FLAVORS}
                             value={selectedFlavor}
+                            visible={visibleFlavor}
                             itemHeight={48}
                             bottom={false}
                             cls="border rounded-md shadow-sm w-full"
@@ -837,15 +884,23 @@ export function App() {
                         <p class="text-sm text-gray-600 mb-2">
                             Wheeler with itemCount=7 visible items
                         </p>
+                        <Button
+                            type="contained"
+                            onClick={() => { visibleFruitWithCustomItem(true) }}
+                            cls="my-2"
+                        >
+                            Open Wheeler
+                        </Button>
                         <Wheeler
                             options={FRUITS}
-                            value={selectedFruit}
+                            value={selectedFruitWithCustomItem}
+                            visible={visibleFruitWithCustomItem}
                             itemCount={7}
                             bottom={false}
                             cls="border rounded-md shadow-sm w-full"
                         />
                         <p class="mt-4 text-sm">
-                            Selected: <span class="font-mono bg-gray-100 p-1 rounded">{selectedFruit}</span>
+                            Selected: <span class="font-mono bg-gray-100 p-1 rounded">{selectedFruitWithCustomItem}</span>
                         </p>
                     </div>
 
@@ -855,14 +910,23 @@ export function App() {
                         <p class="text-sm text-gray-600 mb-2">
                             Wheeler with custom border and colors
                         </p>
+                        <Button
+                            type="contained"
+                            onClick={() => { visibleFlavorWithCustomStyle(true) }}
+                            cls="my-2"
+                        >
+                            Open Wheeler
+                        </Button>
+                        
                         <Wheeler
                             options={FLAVORS}
-                            value={selectedFlavor}
+                            value={selectedFlavorWithCustomStyle}
+                            visible={visibleFlavorWithCustomStyle}
                             bottom={false}
                             cls="border-2 border-blue-400 rounded-lg shadow-lg w-full bg-blue-50"
                         />
                         <p class="mt-4 text-sm">
-                            Selected: <span class="font-mono bg-blue-100 p-1 rounded text-blue-800">{selectedFlavor}</span>
+                            Selected: <span class="font-mono bg-blue-100 p-1 rounded text-blue-800">{selectedFlavorWithCustomStyle}</span>
                         </p>
                     </div>
 
@@ -872,16 +936,24 @@ export function App() {
                         <p class="text-sm text-gray-600 mb-2">
                             Searchable wheeler with custom placeholder
                         </p>
+                        <Button
+                            type="contained"
+                            onClick={() => { visibleFruitWithSearch_1(true) }}
+                            cls="my-2"
+                        >
+                            Open Wheeler
+                        </Button>
                         <Wheeler
                             options={FRUITS}
-                            value={selectedFruitWithSearch}
+                            value={selectedFruitWithSearch_1}
+                            visible={visibleFruitWithSearch_1}
                             searchable={true}
                             searchPlaceholder="This is sample placeholder"
                             bottom={false}
                             cls="border rounded-md shadow-sm w-full"
                         />
                         <p class="mt-4 text-sm">
-                            Selected: <span class="font-mono bg-gray-100 p-1 rounded">{selectedFruitWithSearch}</span>
+                            Selected: <span class="font-mono bg-gray-100 p-1 rounded">{selectedFruitWithSearch_1}</span>
                         </p>
                     </div>
 
@@ -890,16 +962,24 @@ export function App() {
                         <p class="text-sm text-gray-600 mb-2">
                             Searchable wheeler with header content
                         </p>
+                        <Button
+                            type="contained"
+                            onClick={() => { visibleFruitWithSearch_2(true) }}
+                            cls="my-2"
+                        >
+                            Open Wheeler
+                        </Button>
                         <Wheeler
                             options={FRUITS}
-                            value={selectedFruitWithSearch}
+                            value={selectedFruitWithSearch_2}
+                            visible={visibleFruitWithSearch_2}
                             searchable={true}
                             header={() => "Pick a Fruit"}
                             bottom={false}
                             cls="border rounded-md shadow-sm w-full"
                         />
                         <p class="mt-4 text-sm">
-                            Selected: <span class="font-mono bg-gray-100 p-1 rounded">{selectedFruitWithSearch}</span>
+                            Selected: <span class="font-mono bg-gray-100 p-1 rounded">{selectedFruitWithSearch_2}</span>
                         </p>
                     </div>
 
@@ -908,15 +988,23 @@ export function App() {
                         <p class="text-sm text-gray-600 mb-2">
                             Searchable wheeler with placeholder using default content
                         </p>
+                        <Button
+                            type="contained"
+                            onClick={() => { visibleFruitWithSearch_3(true) }}
+                            cls="my-2"
+                        >
+                            Open Wheeler
+                        </Button>
                         <Wheeler
                             options={FRUITS}
-                            value={selectedFruitWithSearch}
+                            value={selectedFruitWithSearch_3}
+                            visible={visibleFruitWithSearch_3}
                             searchable={true}
                             bottom={false}
                             cls="border rounded-md shadow-sm w-full"
                         />
                         <p class="mt-4 text-sm">
-                            Selected: <span class="font-mono bg-gray-100 p-1 rounded">{selectedFruitWithSearch}</span>
+                            Selected: <span class="font-mono bg-gray-100 p-1 rounded">{selectedFruitWithSearch_3}</span>
                         </p>
                     </div>
 
@@ -946,9 +1034,17 @@ export function App() {
                         <p class="text-sm text-gray-600 mb-2">
                             Custom header displaying the current selection
                         </p>
+                        <Button
+                            type="contained"
+                            onClick={() => { visibleFruitWithHeader(true) }}
+                            cls="my-2"
+                        >
+                            Open Wheeler
+                        </Button>
                         <Wheeler
                             options={FRUITS}
                             value={selectedFruitWithHeader}
+                            visible={visibleFruitWithHeader}
                             header={(v) => (
                                 <div class="bg-gradient-to-r from-purple-500 to-pink-500 text-white p-3 rounded-t-md">
                                     <p class="text-xs font-semibold uppercase tracking-wide">Your Selection</p>
@@ -969,10 +1065,18 @@ export function App() {
                         <p class="text-sm text-gray-600 mb-2">
                             Wheeler with checkboxes for multi-select. Uses the `all` prop to enable "Select All" functionality.
                         </p>
+                        <Button
+                            type="contained"
+                            onClick={() => { visibleMultipleFruits(true) }}
+                            cls="my-2"
+                        >
+                            Open Wheeler
+                        </Button>
                         <div class="flex flex-col md:flex-row gap-4">
                             <Wheeler
                                 options={FRUITS}
                                 value={selectedMultipleFruits}
+                                visible={visibleMultipleFruits}
                                 all="Select All Fruits"
                                 bottom={false}
                                 cls="border rounded-md shadow-sm w-full md:w-64" />
