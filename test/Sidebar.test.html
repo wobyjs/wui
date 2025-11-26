@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Sidebar Component Test</title>
+    <link href="/node_modules/@woby/chk/dist/index.css" rel="stylesheet">
+    <script type="module" src="../src/SideBar.tsx"></script> <!-- Adjust path if needed -->
+    <script type="module" src="../src/Button.tsx"></script> <!-- Make sure Button is imported -->
+</head>
+
+<body>
+    <link id="woby-style" href="../dist/wui.css" rel="stylesheet"> <!-- Ensure this ID and path are correct -->
+
+    <div class="p-8">
+        <h2 class="text-[1.5em] font-bold pl-4 mb-4">Sidebar Component Test</h2>
+
+        <!-- Basic Interactive Sidebar -->
+        <woby-chk name="Basic Sidebar">
+            <div snapshot-name="Basic Sidebar" class="p-4">
+                <h3 class="font-bold mb-2">Basic Interactive Sidebar</h3>
+                <p class="text-sm text-gray-600 mb-4">
+                    Click the button to open the sidebar. Click the overlay to close.
+                </p>
+
+                <!-- The Sidebar custom element -->
+                <wui-sidebar id="basic-sidebar">
+                    <div class="p-4">
+                        <h2 class="text-xl font-bold mb-4">Menu</h2>
+                        <nav>
+                            <wui-menu-item href="#">
+                                <!-- <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                                </svg> -->
+                                <wui-menu-text>Dashboard</wui-menu-text>
+                            </wui-menu-item>
+                            <wui-menu-item href="#">
+                                <wui-menu-text>Profile</wui-menu-text>
+                            </wui-menu-item>
+                            <wui-menu-item href="#">
+                                <wui-menu-text>Settings</wui-menu-text>
+                            </wui-menu-item>
+                        </nav>
+                    </div>
+                </wui-sidebar>
+
+                <!-- The main content area that will be pushed -->
+                <div id="basic-content">
+                    <wui-button id="open-basic-sidebar">
+                        Open Sidebar
+                    </wui-button>
+                    <div class="mt-4 p-4 border rounded-lg bg-gray-50">
+                        <h4 class="font-semibold">Main Content Area</h4>
+                        <p class="mt-2 text-sm">This is the main content of your page. When the sidebar opens, this
+                            entire section will slide to the right.</p>
+                    </div>
+                </div>
+            </div>
+        </woby-chk>
+
+        <!-- Custom Width Sidebar -->
+        <woby-chk name="Custom Width Sidebar">
+            <div snapshot-name="Custom Width Sidebar" class="p-4">
+                <h3 class="font-bold mb-2">Custom Width Sidebar</h3>
+                <p class="text-sm text-gray-600 mb-4">
+                    This sidebar has a width of "400px".
+                </p>
+                <wui-sidebar id="wide-sidebar" width="400px">
+                    <div class="p-4">
+                        <h2 class="text-xl font-bold">Wide Menu</h2>
+                    </div>
+                </wui-sidebar>
+                <div id="wide-content">
+                    <wui-button id="open-wide-sidebar">Open Wide Sidebar</wui-button>
+                </div>
+            </div>
+        </woby-chk>
+
+        <!-- No Overlay Sidebar -->
+        <woby-chk name="No Overlay Sidebar">
+            <div snapshot-name="No Overlay Sidebar" class="p-4">
+                <h3 class="font-bold mb-2">Sidebar Without Overlay</h3>
+                <p class="text-sm text-gray-600 mb-4">
+                    Using `show-overlay="false"`.
+                </p>
+                <wui-sidebar id="no-overlay-sidebar" show-overlay="false">
+                    <div class="p-4">
+                        <h2 class="text-xl font-bold mb-2">No Overlay</h2>
+                        <wui-button id="close-no-overlay-sidebar">Close Me</wui-button>
+                    </div>
+                </wui-sidebar>
+                <div id="no-overlay-content">
+                    <wui-button id="open-no-overlay-sidebar">Open (No Overlay)</wui-button>
+                </div>
+            </div>
+        </woby-chk>
+
+        <!-- Custom Styled Sidebar -->
+        <woby-chk name="Custom Styled Sidebar">
+            <div snapshot-name="Custom Styled Sidebar" class="p-4">
+                <h3 class="font-bold mb-2">Custom Styled Sidebar</h3>
+                <p class="text-sm text-gray-600 mb-4">
+                    Using `cls` to change the background and add a border.
+                </p>
+                <wui-sidebar id="custom-sidebar" cls="!bg-indigo-900 border-r-4 border-indigo-500">
+                    <div class="p-4">
+                        <h2 class="text-xl font-bold text-indigo-200">Indigo Sidebar</h2>
+                    </div>
+                </wui-sidebar>
+                <div id="custom-content">
+                    <wui-button id="open-custom-sidebar">Open Custom Sidebar</wui-button>
+                </div>
+            </div>
+        </woby-chk>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Helper function to connect a button to a sidebar
+            function connectSidebar(buttonId, sidebarId, contentId) {
+                const openButton = document.getElementById(buttonId);
+                const sidebar = document.getElementById(sidebarId);
+                const content = document.getElementById(contentId);
+
+                if (openButton && sidebar && content) {
+                    // CRITICAL STEP: Set the `contentRef` property on the custom element instance.
+                    // This tells the sidebar which content element to push.
+                    sidebar.contentRef = content;
+
+                    // Set up the open button to add the 'open' attribute.
+                    openButton.addEventListener('click', () => {
+                        sidebar.setAttribute('open', 'true');
+                    });
+                }
+            }
+
+            // --- Connect all the interactive demos ---
+            connectSidebar('open-basic-sidebar', 'basic-sidebar', 'basic-content');
+            connectSidebar('open-wide-sidebar', 'wide-sidebar', 'wide-content');
+            connectSidebar('open-no-overlay-sidebar', 'no-overlay-sidebar', 'no-overlay-content');
+            connectSidebar('open-custom-sidebar', 'custom-sidebar', 'custom-content');
+
+
+            // --- Special logic for the "No Overlay" close button ---
+            const closeNoOverlayButton = document.getElementById('close-no-overlay-sidebar');
+            const noOverlaySidebar = document.getElementById('no-overlay-sidebar');
+            if (closeNoOverlayButton && noOverlaySidebar) {
+                // This button removes the 'open' attribute to close the sidebar.
+                closeNoOverlayButton.addEventListener('click', () => {
+                    noOverlaySidebar.removeAttribute('open');
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>
