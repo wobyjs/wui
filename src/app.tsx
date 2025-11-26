@@ -19,6 +19,7 @@ import Fab from './Fab'
 import NumberField from './NumberField'
 import Paper from './Paper'
 import { SideBar, MenuItem, MenuText } from './SideBar'
+import { Switch } from './Switch'
 
 const isDev = typeof import.meta.env !== 'undefined' && import.meta.env.DEV
 
@@ -86,6 +87,9 @@ export function App() {
                     </a>
                     <a href="#sidebar" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
                         Sidebar
+                    </a>
+                    <a href="#switch" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                        Switch
                     </a>
                     <a href="/html-demo.html" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
                         HTML Components Demo
@@ -2016,6 +2020,174 @@ export function App() {
     // #endregion
 
 
+    // #region Switch Demo
+    const switchDemo = () => {
+        const toggleState = $(true)
+
+        // Individual states for each switch in the Styles & Custom Labels section
+        const iosSwitchState = $(false)
+        const flatSwitchState = $(false)
+        const lightSwitchState = $(false)
+        const skewedSwitchState = $(false)
+        const customTextSwitchState = $(false)
+        const flipSwitchState = $(false)
+
+        const toggleAllCustomLabelState = $(false)
+        const toggleAllEffectsState = $(false)
+
+
+
+        // Defined with descriptive names matching the CSS effects
+        const effectsList = [
+            { effect: "effect1", name: "Basic Slide", state: $(false) },
+            { effect: "effect2", name: "Dual Knob", state: $(false) },
+            { effect: "effect3", name: "Elastic", state: $(false) },
+            { effect: "effect4", name: "Vertical Flip", state: $(false) },
+            { effect: "effect5", name: "3D Rotate", state: $(false) },
+            { effect: "effect6", name: "Spin", state: $(false) },
+            { effect: "effect7", name: "Fade Scale", state: $(false) },
+            { effect: "effect8", name: "Ripple", state: $(false) },
+            { effect: "effect9", name: "Bounce", state: $(false) },
+            { effect: "effect10", name: "Square Text", state: $(false) },
+            { effect: "effect11", name: "Perspective", state: $(false) },
+            { effect: "effect12", name: "Multi-Layer", state: $(false) },
+            { effect: "effect13", name: "Reverse", state: $(false) },
+            { effect: "effect14", name: "Vert. Bounce", state: $(false) },
+            { effect: "effect15", name: "Zoom Fade", state: $(false) },
+            { effect: "effect16", name: "Stretch", state: $(false) },
+            { effect: "effect17", name: "Dual Slide", state: $(false) },
+            { effect: "effect18", name: "Interactive", state: $(false) },
+        ]
+
+        const toggleAllCustomLabel = () => {
+            const newState = !$$(toggleAllCustomLabelState);
+            toggleAllCustomLabelState(newState);
+            // Apply the same state to all switches in the Styles & Custom Labels section
+            iosSwitchState(newState);
+            flatSwitchState(newState);
+            lightSwitchState(newState);
+            skewedSwitchState(newState);
+            customTextSwitchState(newState);
+            flipSwitchState(newState);
+        }
+        const toggleAllEffects = () => {
+            const newState = !$$(toggleAllEffectsState);
+            toggleAllEffectsState(newState);
+            // Apply the same state to all switches in the CSS Effects Library section
+            effectsList.forEach(effect => effect.state(newState));
+        }
+
+        return <>
+            <h2 id="switch" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Switch Demo</h2>
+
+            <div class="space-y-6">
+                {/* #region Interactive State */}
+                <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                    <h3 class="text-lg font-semibold mb-4">Interactive State</h3>
+                    <div class="flex flex-col md:flex-row gap-8 items-center">
+                        <div class="flex flex-col items-center gap-2">
+                            <span class="text-sm text-gray-500 font-mono">Control</span>
+                            <Switch checked={toggleState} effect="ios" />
+                        </div>
+
+                        <div
+                            class={[
+                                "flex-1 w-full p-6 rounded-lg border border-gray-200 transition-colors duration-300 flex items-center justify-center gap-3",
+                                () => $$(toggleState) ? "bg-green-50 border-green-200" : "bg-gray-50"]}
+                        >
+                            <div class="text-center">
+                                <p class="font-bold text-gray-700 mb-1">Current State</p>
+                                <span class={[
+                                    "px-3 py-1 rounded-full text-xs font-bold transition-all",
+                                    () => $$(toggleState) ? "bg-green-500 text-white" : "bg-gray-300 text-gray-600"
+                                ]}>
+                                    {() => $$(toggleState) ? "ACTIVE" : "INACTIVE"}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {/* #endregion */}
+
+                {/* #region Styles & Custom Label  */}
+                <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                    <div class="flex justify-between items-center border-b mb-4 pb-4 mb-6 mt-12">
+                        <h3 class="text-lg font-semibold mb-6">Styles & Custom Labels</h3>
+                        <Button onClick={toggleAllCustomLabel}>
+                            Toggle All ({() => $$(toggleAllCustomLabelState) ? 'ON' : 'OFF'})
+                        </Button>
+                    </div>
+
+                    <div class="flex flex-wrap gap-8 justify-center">
+
+                        <div class="flex flex-col items-center gap-3">
+                            <span class="text-xs font-semibold text-gray-400 uppercase">iOS Style</span>
+                            <Switch effect="ios" checked={iosSwitchState} />
+                        </div>
+
+                        <div class="flex flex-col items-center gap-3">
+                            <span class="text-xs font-semibold text-gray-400 uppercase">Flat Style</span>
+                            <Switch effect="flat" checked={flatSwitchState} />
+                        </div>
+
+                        <div class="flex flex-col items-center gap-3">
+                            <span class="text-xs font-semibold text-gray-400 uppercase">Material Light</span>
+                            <Switch effect="light" checked={lightSwitchState} />
+                        </div>
+
+                        <div class="flex flex-col items-center gap-3">
+                            <span class="text-xs font-semibold text-gray-400 uppercase">Skewed</span>
+                            <Switch effect="skewed" on="ON" off="OFF" checked={skewedSwitchState} />
+                        </div>
+
+                        <div class="flex flex-col items-center gap-3">
+                            <span class="text-xs font-semibold text-gray-400 uppercase">Custom Text</span>
+                            <Switch effect="flat" on="YES" off="NO" checked={customTextSwitchState} />
+                        </div>
+
+                        <div class="flex flex-col items-center gap-3">
+                            <span class="text-xs font-semibold text-gray-400 uppercase">3D Flip</span>
+                            <Switch effect="flip" checked={flipSwitchState} />
+                        </div>
+                    </div>
+                </div>
+                {/* #endregion */}
+
+                {/* #region CSS Effects Library Grid */}
+                <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-lg font-semibold">CSS Effects Library</h3>
+                        {/* <span class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">18 Variants</span> */}
+                        <span class="text-lg font-semibold px-2 py-1 rounded">18 Variants</span>
+                        <Button onClick={toggleAllEffects}>
+                            Toggle All ({() => $$(toggleAllEffectsState) ? 'ON' : 'OFF'})
+                        </Button>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-6">
+                        {effectsList.map((item) => (
+                            <div class="flex flex-col bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-200">
+                                {/* Header */}
+                                <div class="px-4 py-2 bg-gray-50 border-b border-gray-100 flex justify-between items-center">
+                                    <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">{item.effect}</span>
+                                    <span class="text-xs font-semibold text-gray-700 truncate ml-2" title={item.name}>{item.name}</span>
+                                </div>
+
+                                {/* Switch Area */}
+                                <div class="relative w-full h-24 flex items-center justify-center bg-white z-0 overflow-hidden">
+                                    <Switch effect={item.effect} checked={item.state} />
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+                {/* #endregion */}
+
+            </div>
+        </>
+    }
+    // #endregion
+
     // #region Render
     return (
         <div class="p-8">
@@ -2046,6 +2218,7 @@ export function App() {
                 {numberFieldDemo()}
                 {paperDemo()}
                 {sidebarDemo()}
+                {switchDemo()}
             </div>
 
             <div class="mt-8 p-4 bg-gray-100 rounded">

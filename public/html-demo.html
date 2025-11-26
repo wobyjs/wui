@@ -21,6 +21,7 @@
     <script type="module" src="../src/NumberField.tsx"></script>
     <script type="module" src="../src/Paper.tsx"></script>
     <script type="module" src="../src/SideBar.tsx"></script>
+    <script type="module" src="../src/Switch.tsx"></script>
     <!-- #endregion -->
 
     <!-- <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"> -->
@@ -110,6 +111,10 @@
             <a href="#sidebar"
                 class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
                 Sidebar
+            </a>
+            <a href="#switch"
+                class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                Switch
             </a>
             <a href="/html-demo.html" target="_blank"
                 class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
@@ -1114,7 +1119,7 @@
     </template>
     <!-- #endregion -->
 
-    
+
     <!-- #region Sidebar -->
     <template id="sidebar-demo">
         <h2 id="sidebar" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Sidebar Demo</h2>
@@ -1227,6 +1232,95 @@
     </template>
     <!-- #endregion -->
 
+    <!-- #region Switch demo -->
+    <template id="switch-demo">
+        <h2 id="switch" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Switch Demo</h2>
+
+        <div class="space-y-6">
+
+            <!-- 1. Interactive State -->
+            <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                <h3 class="text-lg font-semibold mb-4">Interactive State</h3>
+                <div class="flex flex-col md:flex-row gap-8 items-center">
+                    <div class="flex flex-col items-center gap-2">
+                        <span class="text-sm text-gray-500 font-mono">Control</span>
+                        <wui-switch id="interactive-switch" effect="ios"></wui-switch>
+                    </div>
+
+                    <div id="interactive-result-box"
+                        class="flex-1 w-full p-6 rounded-lg border border-gray-200 transition-colors duration-300 flex items-center justify-center gap-3 bg-gray-50">
+                        <div class="text-center">
+                            <p class="font-bold text-gray-700 mb-1">Current State</p>
+                            <span id="interactive-result-text"
+                                class="px-3 py-1 rounded-full text-xs font-bold transition-all bg-gray-300 text-gray-600">
+                                INACTIVE
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Styles & Custom Labels -->
+            <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                <div class="flex justify-between items-center border-b mb-4 pb-4 mt-2">
+                    <h3 class="text-lg font-semibold">Styles & Custom Labels</h3>
+                    <wui-button onclick="toggleSwitchGroup('style-group')">Toggle All</wui-button>
+                </div>
+
+                <div class="flex flex-wrap gap-8 justify-center">
+                    <div class="flex flex-col items-center gap-3">
+                        <span class="text-xs font-semibold text-gray-400 uppercase">iOS Style</span>
+                        <wui-switch class="style-group" effect="ios"></wui-switch>
+                    </div>
+
+                    <div class="flex flex-col items-center gap-3">
+                        <span class="text-xs font-semibold text-gray-400 uppercase">Flat Style</span>
+                        <wui-switch class="style-group" effect="flat"></wui-switch>
+                    </div>
+
+                    <div class="flex flex-col items-center gap-3">
+                        <span class="text-xs font-semibold text-gray-400 uppercase">Material Light</span>
+                        <wui-switch class="style-group" effect="light"></wui-switch>
+                    </div>
+
+                    <div class="flex flex-col items-center gap-3">
+                        <span class="text-xs font-semibold text-gray-400 uppercase">Skewed</span>
+                        <wui-switch class="style-group" effect="skewed" on="ON" off="OFF"></wui-switch>
+                    </div>
+
+                    <div class="flex flex-col items-center gap-3">
+                        <span class="text-xs font-semibold text-gray-400 uppercase">Custom Text</span>
+                        <wui-switch class="style-group" effect="flat" on="YES" off="NO"></wui-switch>
+                    </div>
+
+                    <div class="flex flex-col items-center gap-3">
+                        <span class="text-xs font-semibold text-gray-400 uppercase">3D Flip</span>
+                        <wui-switch class="style-group" effect="flip"></wui-switch>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. CSS Effects Library Grid -->
+            <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                <div class="flex justify-between items-center mb-6">
+                    <div class="flex items-center gap-3">
+                        <h3 class="text-lg font-semibold">CSS Effects Library</h3>
+                        <span class="text-xs font-bold text-gray-500 bg-gray-100 px-2 py-1 rounded">18 Variants</span>
+                    </div>
+                    <wui-button onclick="toggleSwitchGroup('effect-group')">Toggle All</wui-button>
+                </div>
+
+                <!-- Grid Container to be populated by JS -->
+                <div id="effects-grid-container"
+                    class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-6">
+                    <!-- Cards will be injected here -->
+                </div>
+            </div>
+
+        </div>
+    </template>
+    <!-- #endregion -->
+
 
     <!-- #region scripting -->
     <script>
@@ -1238,6 +1332,7 @@
             toggleCollapseBackgroundBtn();
             setupFabControls();
             setupSidebarDemo();
+            setupSwitchDemo();
         });
 
         function loadNavigation() {
@@ -1270,6 +1365,7 @@
                 'number-field-demo',
                 'paper-demo',
                 'sidebar-demo',
+                'switch-demo',
             ];
 
             demoTemplates.forEach(id => {
@@ -1567,6 +1663,149 @@
                 sidebar.setAttribute('open', 'true');
             }, 50);
         }
+
+        function setupSwitchDemo() {
+            setupInteractiveSwitch();
+            renderEffectsLibrary();
+        }
+
+        // 1. Handle the "Interactive State" demo
+
+        function setupInteractiveSwitch() {
+            const sw = document.getElementById('interactive-switch');
+            const box = document.getElementById('interactive-result-box');
+            const text = document.getElementById('interactive-result-text');
+
+            if (!sw) return;
+
+            // 1. Function to update UI based on current state
+            function updateUI() {
+                // Get the checked attribute from the custom element
+                const isActive = sw.hasAttribute('checked');
+
+                // Visual Updates
+                if (isActive) {
+                    // Active State Styles
+                    box.classList.remove('bg-gray-50', 'border-gray-200');
+                    box.classList.add('bg-green-50', 'border-green-200');
+
+                    text.classList.remove('bg-gray-300', 'text-gray-600');
+                    text.classList.add('bg-green-500', 'text-white');
+                    text.textContent = "ACTIVE";
+                } else {
+                    // Inactive State Styles
+                    box.classList.add('bg-gray-50', 'border-gray-200');
+                    box.classList.remove('bg-green-50', 'border-green-200');
+
+                    text.classList.add('bg-gray-300', 'text-gray-600');
+                    text.classList.remove('bg-green-500', 'text-white');
+                    text.textContent = "INACTIVE";
+                }
+            }
+
+            // 2. Create the Observer (The "Watcher")
+            // This fires immediately whenever the HTML attribute changes
+            const observer = new MutationObserver((mutationsList) => {
+                for (const mutation of mutationsList) {
+                    if (mutation.type === 'attributes' && mutation.attributeName === 'checked') {
+                        updateUI();
+                    }
+                }
+            });
+
+            // 3. Start Observing
+            // We specifically tell it to watch for the 'checked' attribute
+            observer.observe(sw, {
+                attributes: true,
+                attributeFilter: ['checked']
+            });
+
+            // 4. The Bridge (Sync Internal Input -> Host Attribute)
+            // Since clicking the switch updates the internal <input> but doesn't always 
+            // update the <wui-switch> tag attribute automatically, we force it here.
+            sw.addEventListener('change', (e) => {
+                // If the input is checked, ADD the attribute. If not, REMOVE it.
+                if (e.target.checked) {
+                    sw.setAttribute('checked', 'true');
+                } else {
+                    sw.removeAttribute('checked');
+                }
+                // Note: We don't call updateUI() here. 
+                // Setting/Removing the attribute triggers the MutationObserver, which calls updateUI().
+            });
+
+            // 5. Initial State Check
+            updateUI();
+        }
+
+        // 2. Render the 18 Effects Cards
+        function renderEffectsLibrary() {
+            const container = document.getElementById('effects-grid-container');
+            if (!container) return;
+
+            const effectsList = [
+                { effect: "effect1", name: "Basic Slide" },
+                { effect: "effect2", name: "Dual Knob" },
+                { effect: "effect3", name: "Elastic" },
+                { effect: "effect4", name: "Vertical Flip" },
+                { effect: "effect5", name: "3D Rotate" },
+                { effect: "effect6", name: "Spin" },
+                { effect: "effect7", name: "Fade Scale" },
+                { effect: "effect8", name: "Ripple" },
+                { effect: "effect9", name: "Bounce" },
+                { effect: "effect10", name: "Square Text" },
+                { effect: "effect11", name: "Perspective" },
+                { effect: "effect12", name: "Multi-Layer" },
+                { effect: "effect13", name: "Reverse" },
+                { effect: "effect14", name: "Vert. Bounce" },
+                { effect: "effect15", name: "Zoom Fade" },
+                { effect: "effect16", name: "Stretch" },
+                { effect: "effect17", name: "Dual Slide" },
+                { effect: "effect18", name: "Interactive" },
+            ];
+
+            // Generate HTML for each card
+            const cardsHTML = effectsList.map(item => `
+            <div class="flex flex-col bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-200">
+                <!-- Header -->
+                <div class="px-4 py-2 bg-gray-50 border-b border-gray-100 flex justify-between items-center">
+                    <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">${item.effect}</span>
+                    <span class="text-xs font-semibold text-gray-700 truncate ml-2" title="${item.name}">${item.name}</span>
+                </div>
+
+                <!-- Switch Area -->
+                <div class="relative w-full h-24 flex items-center justify-center bg-white z-0 overflow-hidden">
+                    <wui-switch class="effect-group" effect="${item.effect}"></wui-switch>
+                </div>
+            </div>
+        `).join('');
+
+            container.innerHTML = cardsHTML;
+        }
+
+        // 3. Global Toggle Function
+        // Uses a closure or static property to track toggle state per group
+        const toggleStates = {
+            'style-group': false,
+            'effect-group': false
+        };
+
+        window.toggleSwitchGroup = function (className) {
+            // Flip state
+            toggleStates[className] = !toggleStates[className];
+            const newState = toggleStates[className];
+
+            // Find all switches with that class and update them
+            const switches = document.querySelectorAll(`.${className}`);
+            switches.forEach(sw => {
+                if (newState) {
+                    sw.setAttribute('checked', 'true');
+                } else {
+                    sw.removeAttribute('checked');
+                }
+            });
+        }
+
     </script>
     <!-- #endregion -->
 </body>
