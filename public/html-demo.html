@@ -20,6 +20,7 @@
     <script type="module" src="../src/Fab.tsx"></script>
     <script type="module" src="../src/NumberField.tsx"></script>
     <script type="module" src="../src/Paper.tsx"></script>
+    <script type="module" src="../src/SideBar.tsx"></script>
     <!-- #endregion -->
 
     <!-- <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"> -->
@@ -106,6 +107,9 @@
                 class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
                 Paper
             </a>
+            <a href="#sidebar"
+                class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                Sidebar
             </a>
             <a href="/html-demo.html" target="_blank"
                 class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
@@ -1110,6 +1114,119 @@
     </template>
     <!-- #endregion -->
 
+    
+    <!-- #region Sidebar -->
+    <template id="sidebar-demo">
+        <h2 id="sidebar" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Sidebar Demo</h2>
+
+        <!-- Control Panel Buttons -->
+        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 mb-4">
+            <p class="text-sm font-semibold mb-3 text-gray-700">Select a Sidebar Mode:</p>
+            <div class="flex flex-wrap gap-2">
+                <wui-button type="outlined" onclick="setSidebarMode('default')">Default</wui-button>
+                <wui-button type="outlined" onclick="setSidebarMode('no-overlay')">No Overlay</wui-button>
+                <wui-button type="outlined" onclick="setSidebarMode('wide')">Wide</wui-button>
+                <wui-button type="outlined" onclick="setSidebarMode('narrow')">Narrow</wui-button>
+            </div>
+        </div>
+
+        <!-- 
+            DEMO CONTAINER 
+            style="transform: scale(1)" creates a new stacking context. 
+            This forces the 'fixed' sidebar to be contained within this div.
+        -->
+        <div id="sidebar-viewport"
+            class="relative w-full h-[600px] border border-gray-300 rounded-lg overflow-hidden bg-gray-50 shadow-inner"
+            style="transform: scale(1);">
+
+            <!-- Sidebar Component -->
+            <!-- Note: content-ref via HTML attributes is complex, so we handle the push animation via JS observer in this demo -->
+            <wui-sidebar id="demo-sidebar" width="280px" show-overlay="true">
+                <div class="flex flex-col h-full bg-gray-800 text-white">
+                    <!-- Header -->
+                    <div class="h-16 flex items-center justify-center border-b border-gray-700 bg-gray-900">
+                        <h2 id="sidebar-title" class="text-xl font-bold tracking-wider">WOBY UI</h2>
+                    </div>
+
+                    <!-- Menu -->
+                    <div class="flex-1 py-4 overflow-y-auto">
+                        <wui-menu-item>
+                            <span class="text-xl min-w-[24px] text-center">🏠</span>
+                            <wui-menu-text class="sidebar-text">Dashboard</wui-menu-text>
+                        </wui-menu-item>
+                        <wui-menu-item>
+                            <span class="text-xl min-w-[24px] text-center">👥</span>
+                            <wui-menu-text class="sidebar-text">Users</wui-menu-text>
+                        </wui-menu-item>
+                        <wui-menu-item>
+                            <span class="text-xl min-w-[24px] text-center">📈</span>
+                            <wui-menu-text class="sidebar-text">Analytics</wui-menu-text>
+                        </wui-menu-item>
+
+                        <div class="my-4 border-t border-gray-700"></div>
+
+                        <wui-menu-item>
+                            <span class="text-xl min-w-[24px] text-center">⚙️</span>
+                            <wui-menu-text class="sidebar-text">Settings</wui-menu-text>
+                        </wui-menu-item>
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="p-4 bg-gray-900">
+                        <wui-menu-item onclick="toggleSidebar(false)">
+                            <span class="text-xl min-w-[24px] text-center">🔙</span>
+                            <wui-menu-text class="sidebar-text">Close Menu</wui-menu-text>
+                        </wui-menu-item>
+                    </div>
+                </div>
+            </wui-sidebar>
+
+            <!-- Main Content Area -->
+            <div id="demo-content" class="w-full h-full overflow-y-auto bg-white transition-all duration-300">
+                <!-- Header Bar -->
+                <div class="sticky top-0 z-10 bg-white border-b px-8 py-4 flex items-center gap-4 shadow-sm">
+                    <button class="p-2 rounded-md hover:bg-gray-100 text-gray-600 focus:outline-none"
+                        onclick="toggleSidebar()">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+                    <h1 id="demo-mode-title" class="text-xl font-bold text-gray-800">Default Configuration</h1>
+                </div>
+
+                <!-- Body -->
+                <div class="p-8">
+                    <div class="max-w-3xl">
+                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
+                            <h3 class="font-bold text-blue-800 mb-2">HTML Web Component Demo</h3>
+                            <p class="text-blue-700 text-sm mb-2">
+                                This demo uses <code>&lt;wui-sidebar&gt;</code>. The javascript on this page listens for
+                                attribute changes
+                                to the sidebar and manually applies the <code>margin-left</code> style to this content
+                                area to simulate the push effect.
+                            </p>
+                        </div>
+                        <p class="mb-4 text-gray-600 leading-relaxed">
+                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut
+                            labore et dolore magna aliqua.
+                        </p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                            <div class="h-40 bg-gray-100 rounded-lg animate-pulse"></div>
+                            <div class="h-40 bg-gray-100 rounded-lg animate-pulse"></div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                            <div class="h-24 bg-gray-100 rounded-lg"></div>
+                            <div class="h-24 bg-gray-100 rounded-lg"></div>
+                            <div class="h-24 bg-gray-100 rounded-lg"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+    <!-- #endregion -->
+
 
     <!-- #region scripting -->
     <script>
@@ -1120,7 +1237,7 @@
             toggleCollapseBtn();
             toggleCollapseBackgroundBtn();
             setupFabControls();
-            // setupNumberFieldDemos();
+            setupSidebarDemo();
         });
 
         function loadNavigation() {
@@ -1152,6 +1269,7 @@
                 'fab-demo',
                 'number-field-demo',
                 'paper-demo',
+                'sidebar-demo',
             ];
 
             demoTemplates.forEach(id => {
@@ -1358,6 +1476,97 @@
             connectNumberField('nf-reactive');
         }
 
+        function setupSidebarDemo() {
+            const sidebar = document.getElementById('demo-sidebar');
+            const content = document.getElementById('demo-content');
+
+            if (!sidebar || !content) return;
+
+            // 1. Create a MutationObserver to watch for changes to the 'open' and 'width' attributes on the sidebar.
+            // This allows us to "push" the content div using JS, mimicking the React logic.
+            const observer = new MutationObserver((mutations) => {
+                mutations.forEach((mutation) => {
+                    if (mutation.type === 'attributes' && (mutation.attributeName === 'open' || mutation.attributeName === 'width')) {
+                        updateContentPush(sidebar, content);
+                    }
+                });
+            });
+
+            observer.observe(sidebar, { attributes: true });
+        }
+
+        function updateContentPush(sidebar, content) {
+            const isOpen = sidebar.getAttribute('open') === 'true';
+            // Get raw width string (e.g., "280px" or "280")
+            let width = sidebar.getAttribute('width') || '280px';
+
+            // Normalize width for CSS
+            if (!isNaN(width)) width = width + 'px';
+
+            content.style.marginLeft = isOpen ? width : '0px';
+        }
+
+        // Global function to toggle sidebar open state
+        window.toggleSidebar = function (forceState) {
+            const sidebar = document.getElementById('demo-sidebar');
+            if (!sidebar) return;
+
+            if (typeof forceState === 'boolean') {
+                sidebar.setAttribute('open', forceState);
+            } else {
+                const isOpen = sidebar.getAttribute('open') === 'true';
+                sidebar.setAttribute('open', !isOpen);
+            }
+        }
+
+        // Global function to handle mode switching
+        window.setSidebarMode = function (mode) {
+            const sidebar = document.getElementById('demo-sidebar');
+            const title = document.getElementById('demo-mode-title');
+            const sidebarTitle = document.getElementById('sidebar-title');
+            const menuTexts = document.querySelectorAll('.sidebar-text');
+
+            if (!sidebar) return;
+
+            // Close first for smooth transition
+            // sidebar.setAttribute('open', 'false');
+
+            setTimeout(() => {
+                // Default visibility for text
+                menuTexts.forEach(el => el.style.display = 'inline');
+                sidebarTitle.textContent = "WOBY UI";
+
+                switch (mode) {
+                    case 'default':
+                        sidebar.setAttribute('width', '280px');
+                        sidebar.setAttribute('show-overlay', 'true');
+                        title.textContent = "Default Configuration";
+                        break;
+                    case 'no-overlay':
+                        sidebar.setAttribute('width', '280px');
+                        sidebar.setAttribute('show-overlay', 'false');
+                        title.textContent = "No Overlay (Click Toggle to Close)";
+                        break;
+                    case 'wide':
+                        sidebar.setAttribute('width', '450px');
+                        sidebar.setAttribute('show-overlay', 'true');
+                        title.textContent = "Wide Sidebar (450px)";
+                        break;
+                    case 'narrow':
+                        sidebar.setAttribute('width', '80px');
+                        sidebar.setAttribute('show-overlay', 'true');
+                        title.textContent = "Narrow / Icon Mode (80px)";
+
+                        // Hide text for narrow mode
+                        menuTexts.forEach(el => el.style.display = 'none');
+                        sidebarTitle.textContent = "W";
+                        break;
+                }
+
+                // Open sidebar
+                sidebar.setAttribute('open', 'true');
+            }, 50);
+        }
     </script>
     <!-- #endregion -->
 </body>

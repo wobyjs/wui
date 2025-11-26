@@ -18,6 +18,7 @@ import DateTimeWheeler, { DateTimeWheelerType } from './Wheeler/DateTimeWheeler'
 import Fab from './Fab'
 import NumberField from './NumberField'
 import Paper from './Paper'
+import { SideBar, MenuItem, MenuText } from './SideBar'
 
 const isDev = typeof import.meta.env !== 'undefined' && import.meta.env.DEV
 
@@ -83,7 +84,10 @@ export function App() {
                     <a href="#paper" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
                         Paper
                     </a>
-                    <a href="/html-demo.html" target="_blank" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                    <a href="#sidebar" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                        Sidebar
+                    </a>
+                    <a href="/html-demo.html" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
                         HTML Components Demo
                     </a>
                 </div>
@@ -917,7 +921,7 @@ export function App() {
                         >
                             Open Wheeler
                         </Button>
-                        
+
                         <Wheeler
                             options={FLAVORS}
                             value={selectedFlavorWithCustomStyle}
@@ -1832,6 +1836,186 @@ export function App() {
     // #endregion
 
 
+    // #region Sidebar Demo
+    const sidebarDemo = () => {
+        // 1. Core State
+        const isOpen = $(false)
+        const contentRef = $(null as HTMLElement | null)
+
+        // 2. Configuration State (Observables to change props dynamically)
+        const sidebarWidth = $(280)
+        const showOverlay = $(true)
+        const demoTitle = $("Default Configuration")
+
+        // 3. Helper functions to switch modes
+        const setMode = (mode: 'default' | 'no-overlay' | 'wide' | 'narrow') => {
+            // Reset to closed first for smooth transition effect, or keep open if preferred
+            // isOpen(false) 
+
+            setTimeout(() => {
+                switch (mode) {
+                    case 'default':
+                        sidebarWidth(280)
+                        showOverlay(true)
+                        demoTitle("Default Configuration")
+                        break;
+                    case 'no-overlay':
+                        sidebarWidth(280)
+                        showOverlay(false)
+                        demoTitle("No Overlay (Click Toggle to Close)")
+                        break;
+                    case 'wide':
+                        sidebarWidth(450)
+                        showOverlay(true)
+                        demoTitle("Wide Sidebar (450px)")
+                        break;
+                    case 'narrow':
+                        sidebarWidth(80)
+                        showOverlay(true)
+                        demoTitle("Narrow / Icon Mode (80px)")
+                        break;
+                }
+                isOpen(true)
+            }, 50)
+        }
+
+        return <>
+            <h2 id="sidebar" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Sidebar Demo</h2>
+
+            {/* Control Panel Buttons */}
+            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 mb-4">
+                <p class="text-sm font-semibold mb-3 text-gray-700">Select a Sidebar Mode:</p>
+                <div class="flex flex-wrap gap-2">
+                    <Button type="outlined" onClick={() => setMode('default')}>Default</Button>
+                    <Button type="outlined" onClick={() => setMode('no-overlay')}>No Overlay</Button>
+                    <Button type="outlined" onClick={() => setMode('wide')}>Wide</Button>
+                    <Button type="outlined" onClick={() => setMode('narrow')}>Narrow</Button>
+                </div>
+            </div>
+
+            {/* 
+                DEMO CONTAINER 
+                Note: style="transform: scale(1)" creates a new stacking context. 
+                This forces the 'fixed' sidebar to be contained within this div 
+                instead of the entire browser window.
+            */}
+            <div class="relative w-full h-[600px] border border-gray-300 rounded-lg overflow-hidden bg-gray-50 shadow-inner" style={{ transform: 'scale(1)' }}>
+
+                {/* --- The Sidebar Component --- */}
+                <SideBar
+                    open={isOpen}
+                    contentRef={contentRef}
+                    width={sidebarWidth}
+                    showOverlay={showOverlay}
+                >
+                    <div class="flex flex-col h-full">
+                        {/* Sidebar Header */}
+                        <div class="h-16 flex items-center justify-center border-b border-gray-700 bg-gray-900">
+                            {/* Logic to hide text if narrow */}
+                            {() => $$(sidebarWidth) > 100
+                                ? <h2 class="text-xl font-bold text-white tracking-wider">WOBY UI</h2>
+                                : <span class="text-xl font-bold text-white">W</span>
+                            }
+                        </div>
+
+                        {/* Sidebar Menu */}
+                        <div class="flex-1 py-4 overflow-y-auto">
+                            <MenuItem>
+                                <span class="text-xl min-w-[24px] text-center">🏠</span>
+                                {() => $$(sidebarWidth) > 100 && <MenuText>Dashboard</MenuText>}
+                            </MenuItem>
+
+                            <MenuItem>
+                                <span class="text-xl min-w-[24px] text-center">👥</span>
+                                {() => $$(sidebarWidth) > 100 && <MenuText>Users</MenuText>}
+                            </MenuItem>
+
+                            <MenuItem>
+                                <span class="text-xl min-w-[24px] text-center">📈</span>
+                                {() => $$(sidebarWidth) > 100 && <MenuText>Analytics</MenuText>}
+                            </MenuItem>
+
+                            <div class="my-4 border-t border-gray-700"></div>
+
+                            <MenuItem>
+                                <span class="text-xl min-w-[24px] text-center">⚙️</span>
+                                {() => $$(sidebarWidth) > 100 && <MenuText>Settings</MenuText>}
+                            </MenuItem>
+                        </div>
+
+                        {/* Sidebar Footer */}
+                        <div class="p-4 bg-gray-900">
+                            <MenuItem onClick={() => isOpen(false)}>
+                                <span class="text-xl min-w-[24px] text-center">🔙</span>
+                                {() => $$(sidebarWidth) > 100 && <MenuText>Close Menu</MenuText>}
+                            </MenuItem>
+                        </div>
+                    </div>
+                </SideBar>
+
+
+                {/* --- The Main Content Area --- */}
+                <div
+                    ref={contentRef}
+                    class="w-full h-full overflow-y-auto bg-white transition-all duration-300"
+                >
+                    {/* Header Bar within content */}
+                    <div class="sticky top-0 z-10 bg-white border-b px-8 py-4 flex items-center gap-4 shadow-sm">
+                        <button
+                            class="p-2 rounded-md hover:bg-gray-100 text-gray-600 focus:outline-none"
+                            onClick={() => isOpen(!$$(isOpen))}
+                        >
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                        </button>
+                        <h1 class="text-xl font-bold text-gray-800">{demoTitle}</h1>
+                    </div>
+
+                    {/* Body Content */}
+                    <div class="p-8">
+                        <div class="max-w-3xl">
+                            <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
+                                <h3 class="font-bold text-blue-800 mb-2">How it works</h3>
+                                <p class="text-blue-700 text-sm mb-2">
+                                    The <code>SideBar</code> component takes a <code>contentRef</code> prop.
+                                    When opened, it calculates its width and applies a <code>margin-left</code> style
+                                    to the referenced content element.
+                                </p>
+                                <p class="text-blue-700 text-sm">
+                                    <strong>Current settings:</strong><br />
+                                    Width: {sidebarWidth}px<br />
+                                    Overlay: {() => $$(showOverlay) ? 'Enabled' : 'Disabled'}
+                                </p>
+                            </div>
+
+                            <p class="mb-4 text-gray-600 leading-relaxed">
+                                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                                Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                            </p>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                                <div class="h-40 bg-gray-100 rounded-lg animate-pulse"></div>
+                                <div class="h-40 bg-gray-100 rounded-lg animate-pulse"></div>
+                            </div>
+
+                            <p class="mb-4 text-gray-600 leading-relaxed">
+                                Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+                                Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                            </p>
+
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                                <div class="h-24 bg-gray-100 rounded-lg"></div>
+                                <div class="h-24 bg-gray-100 rounded-lg"></div>
+                                <div class="h-24 bg-gray-100 rounded-lg"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </>
+    }
+    // #endregion
+
+
     // #region Render
     return (
         <div class="p-8">
@@ -1861,10 +2045,18 @@ export function App() {
                 {fabDemo()}
                 {numberFieldDemo()}
                 {paperDemo()}
+                {sidebarDemo()}
             </div>
 
             <div class="mt-8 p-4 bg-gray-100 rounded">
                 <p class="text-sm text-gray-600">💡 This is the main application view. The test runner at <code class="bg-gray-200 px-1 rounded">/test</code> will show snapshot tests for all components.</p>
+            </div>
+
+            <div class="mt-8">
+                <a href="/html-demo.html"
+                    class="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors">
+                    HTML Demo
+                </a>
             </div>
         </div >
     )
