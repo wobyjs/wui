@@ -1,5 +1,7 @@
 // https://codepen.io/alvarotrigo/pen/oNoJePo
 
+
+// #region Common Style Fragments
 const yesKnot = `[&>div]:before:w-[2rem] [&>div]:before:h-[2rem] [&>div]:before:flex [&>div]:before:items-center [&>div]:before:justify-center`
 const noKnot = `[&>div]:after:w-[2rem] [&>div]:after:h-[2rem] [&>div]:after:flex [&>div]:after:items-center [&>div]:after:justify-center`
 const divSpanDim = `[&>div>span]:w-[2rem] [&>div>span]:h-[2rem]`
@@ -9,9 +11,35 @@ const button_ = `relative w-[74px] h-9 overflow-hidden -mt-5 mb-0 mx-auto top-2/
 [&>span]:absolute [&>span]:inset-0
 [&>div]:absolute [&>div]:inset-0 [&>div]:z-[2]
 [&>input]:relative [&>input]:w-full [&>input]:h-full [&>input]:opacity-0 [&>input]:cursor-pointer [&>input]:z-[3] [&>input]:m-0 [&>input]:p-0
-
 `
+
 const buttonr = button_ + " rounded-[100px] [&>span]:rounded-[100px]"
+// #endregion
+
+
+/**
+ * Toggle Switch Effects
+ * 
+ * effect 1: Basic slide with background color transition
+ * effect 2: Dual-knob slide animation
+ * effect 3: Elastic slide with active state expansion
+ * effect 4: Vertical slide animation
+ * effect 5: 3D rotate flip effect
+ * effect 6: Full rotation transform
+ * effect 7: Fade and scale transition
+ * effect 8: Ripple scale effect
+ * effect 9: Bounce slide animation
+ * effect10: Square knob with text display
+ * effect11: 3D perspective flip
+ * effect12: Multi-layer slide animation
+ * effect13: Reverse slide direction
+ * effect14: Vertical bounce transition
+ * effect15: Zoom fade effect
+ * effect16: Elastic active stretch
+ * effect17: Dual-element slide sync
+ * effect18: Interactive drag stretch
+ */
+// #region Effect Styles 1-18
 
 export const effect1 = `
 ${buttonr}
@@ -104,6 +132,7 @@ ${yesKnot}
 [&>div]:before:[transition:0.3s_ease_all]
 [&>span]:[transition:0.3s_ease_all]
 `
+
 export const effect6 = `
 ${layer}
 overflow-visible
@@ -182,6 +211,7 @@ ${divSpanDim}
 [&>input:checked~span]:bg-[#ebfbfc]
 `
 
+
 export const effect10 = `
 ${layer}
 [&>div]:before:absolute [&>div]:before:text-[10px] [&>div]:before:font-bold [&>div]:before:text-center [&>div]:before:leading-none [&>div]:before:[transition:0.3s_ease_all] [&>div]:before:px-1 [&>div]:before:py-[9px] [&>div]:before:rounded-sm [&>div]:before:top-[px]
@@ -238,6 +268,7 @@ ${layer}
 [&>input~span]:bg-[#fcebeb]
 [&>input:checked~span]:bg-[#ebfbfc]
 `
+
 export const effect13 = `
 ${layer}
 [&>div]:before:absolute [&>div]:before:text-[10px] [&>div]:before:font-bold [&>div]:before:text-center [&>div]:before:leading-none [&>div]:before:[transition:0.3s_ease_all] [&>div]:before:px-1 [&>div]:before:py-[9px] [&>div]:before:rounded-sm [&>div]:before:top-[2px]
@@ -252,6 +283,7 @@ ${layer}
 [&>input~span]:bg-[#fcebeb]
 [&>input:checked~span]:bg-[#ebfbfc]
 `
+
 export const effect14 = `
 ${layer}
 [&>div]:before:absolute [&>div]:before:text-[10px] [&>div]:before:font-bold [&>div]:before:text-center [&>div]:before:leading-none [&>div]:before:[transition:0.3s_ease_all] [&>div]:before:px-1 [&>div]:before:py-[9px] [&>div]:before:rounded-sm [&>div]:before:top-[2px]
@@ -285,6 +317,7 @@ ${noKnot}
 [&>input~span]:bg-[#fcebeb]
 [&>input:checked~span]:bg-[#ebfbfc]
 `
+
 export const effect16 = `
 ${layer}
 [&>div]:before:content-[attr(data-tg-off)] [&>div]:before:absolute [&>div]:before:text-white [&>div]:before:text-[10px] [&>div]:before:font-bold [&>div]:before:text-center [&>div]:before:leading-none [&>div]:before:bg-[#f44336] [&>div]:before:px-1 [&>div]:before:py-[9px] [&>div]:before:rounded-sm [&>div]:before:left-1 [&>div]:before:top-[2px] [&>div]:before:[transition:0.3s_ease_all,left_0.3s_cubic-bezier(0.18,0.89,0.35,1.15)]
@@ -325,8 +358,20 @@ ${layer}
 [&>input~span]:bg-[#fcebeb]
 [&>input:checked~span]:bg-[#ebfbfc]
 `
+// #endregion
 
 //https://codepen.io/alvarotrigo/pen/RwjEZeJ
+
+/**
+ * Alternative Switch Styles
+ * 
+ * Light: Simple light-themed toggle
+ * iOS: iOS-style toggle with shadow
+ * Skewed: Diagonal skewed toggle
+ * Flat: Flat design toggle
+ */
+
+// #region Alternative Switch Styles
 
 const iinput = `
 ${layer}
@@ -342,6 +387,7 @@ const ilabel = `
 [&>label]:after:content-[attr(data-tg-on)] [&>label]:after:flex [&>label]:after:justify-center [&>label]:after:align-center
 [&>input:checked~label]:after:content-[attr(data-tg-off)] [&>input:checked~label]:after:flex [&>input:checked~label]:after:justify-center [&>input:checked~label]:after:align-center
 `
+
 export const light = `mx-[2em] my-0 ${iinput}
 [&>label]:[transition:all_0.4s_ease] [&>label]:p-0.5 [&>label]:rounded-[2em] [&>label]:after:[transition:all_0.2s_ease] [&>label]:after:rounded-[50%] 
 [&>label]:bg-[#f0f0f0]
@@ -406,4 +452,4 @@ export const flip = `mx-[2em] my-0
 [&>label]:after:inline-block [&>label]:after:[transition:all_0.4s_ease] [&>label]:after:w-full [&>label]:after:text-center [&>label]:after:leading-[2em] [&>label]:after:font-bold [&>label]:after:text-white [&>label]:after:absolute [&>label]:after:rounded [&>label]:after:left-0 [&>label]:after:top-0 [&>label]:after:[backface-visibility:hidden]
 
 `
-
+// #endregion
