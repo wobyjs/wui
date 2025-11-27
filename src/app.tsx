@@ -20,6 +20,8 @@ import NumberField from './NumberField'
 import Paper from './Paper'
 import { SideBar, MenuItem, MenuText } from './SideBar'
 import { Switch } from './Switch'
+import { Tabs, Tab } from './Tabs'
+
 
 const isDev = typeof import.meta.env !== 'undefined' && import.meta.env.DEV
 
@@ -90,6 +92,9 @@ export function App() {
                     </a>
                     <a href="#switch" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
                         Switch
+                    </a>
+                    <a href="#tabs" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                        Tabs
                     </a>
                     <a href="/html-demo.html" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
                         HTML Components Demo
@@ -2282,6 +2287,289 @@ export function App() {
     // #endregion
 
 
+    // #region Tabs Demo
+    const tabsDemo = () => {
+        // --- State for Observable Example ---
+        const activeTab = $("Home")
+
+        // --- State for Dynamic Example ---
+        const dynamicTabs = $([
+            { id: 1, title: "Tab 1", content: "Content for the first tab" },
+            { id: 2, title: "Tab 2", content: "Content for the second tab" }
+        ])
+
+        const addDynamicTab = () => {
+            const newId = Date.now()
+            const count = $$(dynamicTabs).length + 1
+            dynamicTabs([...$$(dynamicTabs), {
+                id: newId,
+                title: `Tab ${count}`,
+                content: `This is dynamically added content for Tab ${count}.`
+            }])
+        }
+
+        const removeDynamicTab = (id: number) => {
+            dynamicTabs($$(dynamicTabs).filter(tab => tab.id !== id))
+        }
+
+        return <>
+            <h2 id="tabs" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Tabs Demo</h2>
+
+            <div class="space-y-6">
+
+                <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                    <h3 class="text-lg font-semibold mb-4">1. Basic Static Tabs</h3>
+                    <div class="border border-gray-100 rounded-lg bg-gray-50 p-4">
+                        <Tabs>
+                            <Tab title="Home">
+                                <div class="p-6 bg-white rounded-lg shadow-sm">
+                                    <h3 class="text-xl font-bold mb-2">Welcome Home</h3>
+                                    <p class="text-gray-600">This is the default view. The content area adjusts to the height of the content.</p>
+                                </div>
+                            </Tab>
+                            <Tab title="Profile">
+                                <div class="p-6 bg-white rounded-lg shadow-sm">
+                                    <h3 class="text-xl font-bold mb-2">User Profile</h3>
+                                    <div class="flex items-center gap-4 mt-4">
+                                        <Avatar src="/sample-avatar.png" />
+                                        <div>
+                                            <p class="font-bold">John Doe</p>
+                                            <p class="text-sm text-gray-500">Software Engineer</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </Tab>
+                            <Tab title="Settings">
+                                <div class="p-6 bg-white rounded-lg shadow-sm">
+                                    <h3 class="text-xl font-bold mb-2">Settings</h3>
+                                    <p class="text-gray-600">Preferences and configuration options go here.</p>
+                                </div>
+                            </Tab>
+                        </Tabs>
+                    </div>
+                </div>
+
+                <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                    <h3 class="text-lg font-semibold mb-4">2. Observable (Controlled) State</h3>
+                    <div class="flex gap-2 mb-6 p-4 bg-blue-50 rounded-lg border border-blue-100">
+                        <div class="flex items-center mr-4">
+                            <span class="text-sm font-bold text-blue-800">Current Signal: </span>
+                            <span class="ml-2 font-mono bg-white px-2 py-1 rounded text-blue-600 border border-blue-200">{activeTab}</span>
+                        </div>
+                        <Button type="outlined" onClick={() => activeTab("Home")}>Set Home</Button>
+                        <Button type="outlined" onClick={() => activeTab("Profile")}>Set Profile</Button>
+                        <Button type="outlined" onClick={() => activeTab("Messages")}>Set Messages</Button>
+                    </div>
+
+                    <div class="border border-gray-100 rounded-lg bg-gray-50 p-4">
+                        <Tabs activeTag={activeTab}>
+                            <Tab title="Home">
+                                <div class="p-10 text-center bg-white rounded-lg">
+                                    <span class="text-4xl">🏠</span>
+                                    <h3 class="text-xl font-bold mt-2">Home Dashboard</h3>
+                                </div>
+                            </Tab>
+                            <Tab title="Profile">
+                                <div class="p-10 text-center bg-white rounded-lg">
+                                    <span class="text-4xl">👤</span>
+                                    <h3 class="text-xl font-bold mt-2">User Profile</h3>
+                                </div>
+                            </Tab>
+                            <Tab title="Messages">
+                                <div class="p-10 text-center bg-white rounded-lg">
+                                    <span class="text-4xl">📬</span>
+                                    <h3 class="text-xl font-bold mt-2">Inbox</h3>
+                                    <p>You have 3 new messages.</p>
+                                </div>
+                            </Tab>
+                        </Tabs>
+                    </div>
+                </div>
+
+                <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                    <h3 class="text-lg font-semibold mb-4">3. Styled & Rich Content</h3>
+                    <Tabs cls="bg-gray-50 rounded-xl border border-gray-200">
+                        <Tab title="Statistics">
+                            <div class="p-6">
+                                <h4 class="font-bold text-gray-700 mb-4">Overview</h4>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+                                        <p class="text-xs text-gray-500 uppercase">Users</p>
+                                        <p class="text-2xl font-black text-blue-600">1,234</p>
+                                    </div>
+                                    <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+                                        <p class="text-xs text-gray-500 uppercase">Revenue</p>
+                                        <p class="text-2xl font-black text-green-600">$45k</p>
+                                    </div>
+                                    <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+                                        <p class="text-xs text-gray-500 uppercase">Growth</p>
+                                        <p class="text-2xl font-black text-purple-600">+12%</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </Tab>
+                        <Tab title="Users List">
+                            <div class="p-6">
+                                <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                                    <table class="min-w-full text-sm">
+                                        <thead class="bg-gray-50">
+                                            <tr>
+                                                <th class="px-4 py-2 text-left font-medium text-gray-500">Name</th>
+                                                <th class="px-4 py-2 text-left font-medium text-gray-500">Role</th>
+                                                <th class="px-4 py-2 text-left font-medium text-gray-500">Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y divide-gray-100">
+                                            <tr>
+                                                <td class="px-4 py-2">Alice Smith</td>
+                                                <td class="px-4 py-2">Admin</td>
+                                                <td class="px-4 py-2"><Chip cls="!bg-green-100 !text-green-800 scale-75 origin-left">Active</Chip></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="px-4 py-2">Bob Jones</td>
+                                                <td class="px-4 py-2">Editor</td>
+                                                <td class="px-4 py-2"><Chip cls="!bg-yellow-100 !text-yellow-800 scale-75 origin-left">Away</Chip></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </Tab>
+                    </Tabs>
+                </div>
+
+                <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                    <h3 class="text-lg font-semibold mb-4">4. Dynamic Add/Remove</h3>
+                    <div class="flex items-center gap-4 mb-4">
+                        <Button type="contained" onClick={addDynamicTab}>
+                            + Add New Tab
+                        </Button>
+                        <span class="text-sm text-gray-500">Count: {() => $$(dynamicTabs).length}</span>
+                    </div>
+
+                    <div class="border border-gray-200 rounded-lg">
+                        <Tabs>
+                            {() => $$(dynamicTabs).map(tab => (
+                                <Tab key={tab.id} title={tab.title}>
+                                    <div class="p-8 flex flex-col items-center justify-center text-center bg-gray-50 rounded-b-lg min-h-[200px]">
+                                        <h4 class="text-xl font-bold mb-2">{tab.title}</h4>
+                                        <p class="text-gray-600 mb-6">{tab.content}</p>
+                                        <Button
+                                            cls="!bg-red-50 !text-red-600 hover:!bg-red-100 border border-red-200"
+                                            onClick={() => removeDynamicTab(tab.id)}
+                                        >
+                                            Remove This Tab
+                                        </Button>
+                                    </div>
+                                </Tab>
+                            ))}
+                        </Tabs>
+                    </div>
+                </div>
+
+                <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                    <h3 class="text-lg font-semibold mb-4">5. Icons & Emojis</h3>
+                    <p class="text-sm text-gray-600 mb-4">Tabs accept any string, including emojis or unicode icons.</p>
+
+                    <div class="border border-gray-200 rounded-lg bg-gray-50 p-4">
+                        <Tabs>
+                            <Tab title="🎵 Music">
+                                <div class="p-6 bg-white rounded-lg shadow-sm flex items-center justify-center min-h-[150px]">
+                                    <div class="text-center">
+                                        <div class="text-4xl mb-2">🎧</div>
+                                        <p class="font-bold">Now Playing</p>
+                                        <p class="text-xs text-gray-400">Lo-Fi Beats</p>
+                                    </div>
+                                </div>
+                            </Tab>
+                            <Tab title="📷 Photos">
+                                <div class="p-6 bg-white rounded-lg shadow-sm flex items-center justify-center min-h-[150px]">
+                                    <div class="grid grid-cols-3 gap-2">
+                                        <div class="w-16 h-16 bg-gray-200 rounded"></div>
+                                        <div class="w-16 h-16 bg-gray-200 rounded"></div>
+                                        <div class="w-16 h-16 bg-gray-200 rounded"></div>
+                                    </div>
+                                </div>
+                            </Tab>
+                            <Tab title="🎥 Video">
+                                <div class="p-6 bg-white rounded-lg shadow-sm flex items-center justify-center min-h-[150px]">
+                                    <div class="w-full max-w-xs h-32 bg-black rounded flex items-center justify-center text-white">
+                                        ▶ Play
+                                    </div>
+                                </div>
+                            </Tab>
+                        </Tabs>
+                    </div>
+                </div>
+
+                <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                    <h3 class="text-lg font-semibold mb-4">6. Nested Tabs</h3>
+                    <p class="text-sm text-gray-600 mb-4">Tabs can be nested inside other tabs without conflict.</p>
+
+                    <div class="border border-gray-200 rounded-lg">
+                        <Tabs>
+                            <Tab title="Account">
+                                <div class="p-6 bg-gray-50 rounded-b-lg">
+                                    <p class="mb-4 font-bold text-gray-700">Account Settings</p>
+                                    {/* Inner Tabs */}
+                                    <div class="bg-white p-4 rounded-lg border border-gray-200">
+                                        <Tabs>
+                                            <Tab title="General">
+                                                <div class="p-4 bg-gray-50 rounded border border-gray-100 mt-2">
+                                                    General account information inputs...
+                                                </div>
+                                            </Tab>
+                                            <Tab title="Security">
+                                                <div class="p-4 bg-gray-50 rounded border border-gray-100 mt-2">
+                                                    Password change form...
+                                                </div>
+                                            </Tab>
+                                        </Tabs>
+                                    </div>
+                                </div>
+                            </Tab>
+                            <Tab title="Notifications">
+                                <div class="p-6 bg-gray-50 rounded-b-lg">
+                                    <p class="font-bold text-gray-700">Notification Preferences</p>
+                                    <p class="text-sm text-gray-500 mt-2">Email, SMS, and Push settings.</p>
+                                </div>
+                            </Tab>
+                        </Tabs>
+                    </div>
+                </div>
+
+                <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                    <h3 class="text-lg font-semibold mb-4">7. State Preservation</h3>
+                    <p class="text-sm text-gray-600 mb-4">
+                        Because tabs hide/show rather than unmount, form inputs keep their values when you switch tabs.
+                    </p>
+
+                    <div class="border border-gray-200 rounded-lg p-4 bg-yellow-50">
+                        <Tabs>
+                            <Tab title="Step 1: Info">
+                                <div class="p-6 bg-white rounded-lg border border-yellow-100">
+                                    <label class="block text-sm font-bold mb-2">Type something here:</label>
+                                    <input type="text" class="border p-2 w-full rounded" placeholder="e.g., Hello World" />
+                                    <p class="text-xs text-gray-500 mt-2">Now switch to "Step 2" and come back. Your text will still be here.</p>
+                                </div>
+                            </Tab>
+                            <Tab title="Step 2: Review">
+                                <div class="p-6 bg-white rounded-lg border border-yellow-100">
+                                    <p class="font-bold">Review Section</p>
+                                    <p class="text-sm text-gray-600">This simulates a different view in a multi-step form.</p>
+                                    <Button type="contained" cls="mt-4">Submit</Button>
+                                </div>
+                            </Tab>
+                        </Tabs>
+                    </div>
+                </div>
+
+            </div>
+        </>
+    }
+    // #endregion
+
+
     // #region Render
     return (
         <div class="p-8">
@@ -2313,6 +2601,7 @@ export function App() {
                 {paperDemo()}
                 {sidebarDemo()}
                 {switchDemo()}
+                {tabsDemo()}
             </div>
 
             <div class="mt-8 p-4 bg-gray-100 rounded">
