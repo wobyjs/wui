@@ -2035,7 +2035,9 @@ export function App() {
         const toggleAllCustomLabelState = $(false)
         const toggleAllEffectsState = $(false)
 
-
+        // State for the effect selector form
+        const selectedEffect = $("ios")
+        const switchState = $(false)
 
         // Defined with descriptive names matching the CSS effects
         const effectsList = [
@@ -2062,7 +2064,6 @@ export function App() {
         const toggleAllCustomLabel = () => {
             const newState = !$$(toggleAllCustomLabelState);
             toggleAllCustomLabelState(newState);
-            // Apply the same state to all switches in the Styles & Custom Labels section
             iosSwitchState(newState);
             flatSwitchState(newState);
             lightSwitchState(newState);
@@ -2070,18 +2071,46 @@ export function App() {
             customTextSwitchState(newState);
             flipSwitchState(newState);
         }
+
         const toggleAllEffects = () => {
             const newState = !$$(toggleAllEffectsState);
             toggleAllEffectsState(newState);
-            // Apply the same state to all switches in the CSS Effects Library section
             effectsList.forEach(effect => effect.state(newState));
         }
+
+        // Effect options for the selector
+        const effectOptions = [
+            { value: "ios", label: "iOS Style" },
+            { value: "flat", label: "Flat Style" },
+            { value: "light", label: "Light Style" },
+            { value: "skewed", label: "Skewed Style" },
+            { value: "flip", label: "3D Flip" },
+            { value: "effect1", label: "Basic Slide" },
+            { value: "effect2", label: "Dual Knob" },
+            { value: "effect3", label: "Elastic" },
+            { value: "effect4", label: "Vertical Flip" },
+            { value: "effect5", label: "3D Rotate" },
+            { value: "effect6", label: "Spin" },
+            { value: "effect7", label: "Fade Scale" },
+            { value: "effect8", label: "Ripple" },
+            { value: "effect9", label: "Bounce" },
+            { value: "effect10", label: "Square Text" },
+            { value: "effect11", label: "Perspective" },
+            { value: "effect12", label: "Multi-Layer" },
+            { value: "effect13", label: "Reverse" },
+            { value: "effect14", label: "Vert. Bounce" },
+            { value: "effect15", label: "Zoom Fade" },
+            { value: "effect16", label: "Stretch" },
+            { value: "effect17", label: "Dual Slide" },
+            { value: "effect18", label: "Interactive" },
+        ]
 
         return <>
             <h2 id="switch" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Switch Demo</h2>
 
             <div class="space-y-6">
-                {/* #region Interactive State */}
+
+                {/* Interactive State */}
                 <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
                     <h3 class="text-lg font-semibold mb-4">Interactive State</h3>
                     <div class="flex flex-col md:flex-row gap-8 items-center">
@@ -2107,9 +2136,76 @@ export function App() {
                         </div>
                     </div>
                 </div>
-                {/* #endregion */}
 
-                {/* #region Styles & Custom Label  */}
+                {/* Effect Selector Form */}
+                <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                    <h3 class="text-lg font-semibold mb-4">Effect Selector Form</h3>
+                    <p class="text-sm text-gray-600 mb-4">Select a switch effect from the dropdown to see it in action</p>
+
+                    <div class="flex flex-col md:flex-row gap-6 items-center">
+                        <div class="flex-1">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Select Switch Effect</label>
+                            <select
+                                class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                value={() => $$(selectedEffect)}
+                                onChange={(e) => selectedEffect(e.target.value)}
+                            >
+                                {effectOptions.map(option => (
+                                    <option value={option.value}>{option.label}</option>
+                                ))}
+                            </select>
+                        </div>
+
+
+                        <div class="flex-1 bg-gray-50 border-2 border-gray-200 rounded-lg p-6">
+                            <div class="text-center mb-4">
+                                <p class="text-xs text-gray-500 uppercase tracking-wider mb-3">Live Preview</p>
+                            </div>
+
+                            <div class="bg-white rounded-lg shadow-sm p-6 space-y-4">
+                                <p class="text-gray-700 leading-relaxed">
+                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                                    Use the switch below to toggle this content.
+                                </p>
+
+                                {/* <div class="flex items-center justify-center py-4"> */}
+                                <div class="relative w-full h-24 flex items-center justify-center bg-white z-0 overflow-hidden">
+                                    <Switch
+                                        effect={() => $$(selectedEffect)}
+                                        checked={switchState}
+                                        on="ON"
+                                        off="OFF"
+                                    />
+                                </div>
+
+                                <p class="text-sm text-gray-600">
+                                    Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                                    The switch state affects the behavior of this component.
+                                </p>
+
+                                <div class="text-center pt-2 border-t border-gray-200">
+                                    <p class="text-xs text-gray-600">
+                                        Effect: <span class="font-mono font-semibold">{() => $$(selectedEffect)}</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 flex items-center gap-4">
+                        <Button
+                            onClick={() => switchState(!$$(switchState))}
+                            type="contained"
+                        >
+                            Toggle Switch
+                        </Button>
+                        <span class="text-sm">
+                            Current State: <span class="font-mono">{() => $$(switchState) ? "ON" : "OFF"}</span>
+                        </span>
+                    </div>
+                </div>
+
+                {/* Styles & Custom Label  */}
                 <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
                     <div class="flex justify-between items-center border-b mb-4 pb-4 mb-6 mt-12">
                         <h3 class="text-lg font-semibold mb-6">Styles & Custom Labels</h3>
@@ -2151,9 +2247,8 @@ export function App() {
                         </div>
                     </div>
                 </div>
-                {/* #endregion */}
 
-                {/* #region CSS Effects Library Grid */}
+                {/* CSS Effects Library Grid */}
                 <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
                     <div class="flex justify-between items-center mb-6">
                         <h3 class="text-lg font-semibold">CSS Effects Library</h3>
@@ -2181,12 +2276,11 @@ export function App() {
                         ))}
                     </div>
                 </div>
-                {/* #endregion */}
-
             </div>
         </>
     }
     // #endregion
+
 
     // #region Render
     return (
