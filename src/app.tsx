@@ -22,7 +22,7 @@ import { SideBar, MenuItem, MenuText } from './SideBar'
 import { Switch } from './Switch'
 import { Tabs, Tab } from './Tabs'
 import { Toolbar } from './Toolbar'
-
+import { Zoomable, Img } from './Zoomable'
 
 
 const isDev = typeof import.meta.env !== 'undefined' && import.meta.env.DEV
@@ -100,6 +100,9 @@ export function App() {
                     </a>
                     <a href="#toolbar" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
                         Toolbar
+                    </a>
+                    <a href="#zoomable" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                        Zoomable
                     </a>
                     <a href="/html-demo.html" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
                         HTML Components Demo
@@ -2686,6 +2689,161 @@ export function App() {
     }
     // #endregion
 
+    // #region Zoomable Demo
+    const zoomableDemo = () => {
+
+        // 1. Define State Signals
+        const scale = $(1)
+        const minScale = $(1)
+        const maxScale = $(5)
+
+        // Dimensions (defaulting to 400px)
+        const width = $(400)
+        const height = $(400)
+
+        const x = $(0)
+        const y = $(0)
+
+        // 2. Button Logic
+        const handleZoomIn = () => {
+            const next = $$(scale) + 0.5
+            scale(Math.min($$(maxScale), next))
+        }
+
+        const handleZoomOut = () => {
+            const next = $$(scale) - 0.5
+            scale(Math.max($$(minScale), next))
+        }
+
+        // NEW: Reset Logic
+        const handleReset = () => {
+            scale(1) // Reset to original size
+            x(0)
+            y(0)
+        }
+
+        return <>
+            <h2 id="zoomable" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Zoomable Demo</h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-[300px_1fr] gap-8">
+                {/* --- LEFT COLUMN: CONTROLS --- */}
+                <div class="flex flex-col gap-6">
+
+                    {/* Size Controls */}
+                    <div class="space-y-3">
+                        <h3 class="font-semibold text-gray-600 text-sm uppercase tracking-wider">Dimensions (px)</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="flex flex-col">
+                                <label class="text-xs text-gray-500 mb-1">Width</label>
+                                <input
+                                    type="number"
+                                    value={width}
+                                    onInput={(e) => width(parseInt((e.target as HTMLInputElement).value))}
+                                    class="border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
+                                />
+                            </div>
+                            <div class="flex flex-col">
+                                <label class="text-xs text-gray-500 mb-1">Height</label>
+                                <input
+                                    type="number"
+                                    value={height}
+                                    onInput={(e) => height(parseInt((e.target as HTMLInputElement).value))}
+                                    class="border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    {/* Scale Limits */}
+                    <div class="space-y-3">
+                        <h3 class="font-semibold text-gray-600 text-sm uppercase tracking-wider">Limits</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="flex flex-col">
+                                <label class="text-xs text-gray-500 mb-1">Min Scale</label>
+                                <input
+                                    type="number"
+                                    value={minScale}
+                                    onInput={(e) => minScale(parseFloat((e.target as HTMLInputElement).value))}
+                                    class="border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
+                                />
+                            </div>
+                            <div class="flex flex-col">
+                                <label class="text-xs text-gray-500 mb-1">Max Scale</label>
+                                <input
+                                    type="number"
+                                    value={maxScale}
+                                    onInput={(e) => maxScale(parseFloat((e.target as HTMLInputElement).value))}
+                                    class="border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    {/* Actions */}
+                    <div class="space-y-3">
+                        <h3 class="font-semibold text-gray-600 text-sm uppercase tracking-wider">
+                            Actions (Current: {$$(scale).toFixed(1)}x)
+                        </h3>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button
+                                onClick={handleZoomOut}
+                                class="cursor-pointer bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-2 px-4 rounded transition-colors active:scale-95"
+                            >
+                                Zoom Out
+                            </button>
+                            <button
+                                onClick={handleZoomIn}
+                                class="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded transition-colors active:scale-95"
+                            >
+                                Zoom In
+                            </button>
+
+                            {/* NEW: Reset Button */}
+                            <button
+                                onClick={handleReset}
+                                class="cursor-pointer col-span-2 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-2 px-4 rounded transition-colors active:scale-95"
+                            >
+                                Reset
+                            </button>
+                        </div>
+                        <p class="text-xs text-gray-400 italic mt-2">
+                            * You can also use Mouse Wheel or Pinch to zoom.
+                        </p>
+                    </div>
+                </div>
+
+
+                {/* --- RIGHT COLUMN: PREVIEW --- */}
+                <div class="bg-gray-50 rounded-lg p-4 flex items-center justify-center border border-dashed border-gray-300">
+
+                    {/* The Component Instance */}
+                    <Zoomable
+                        scale={scale}          // Two-way binding
+                        minScale={minScale}    // Configuration
+                        maxScale={maxScale}    // Configuration
+                        width={width}          // Configuration
+                        height={height}        // Configuration
+                        x={x}
+                        y={y}
+                        cls="bg-white shadow-lg border border-gray-200"
+                    >
+                        <Img
+                            src="https://picsum.photos/800/800"
+                            alt="Demo Image"
+                        />
+                    </Zoomable>
+
+                </div>
+            </div>
+        </>
+    }
+    // #endregion 
+
+
 
     // #region Render
     return (
@@ -2720,6 +2878,7 @@ export function App() {
                 {switchDemo()}
                 {tabsDemo()}
                 {toolbarDemo()}
+                {zoomableDemo()}
             </div>
 
             <div class="mt-8 p-4 bg-gray-100 rounded">

@@ -24,6 +24,7 @@
     <script type="module" src="../src/Switch.tsx"></script>
     <script type="module" src="../src/Tabs.tsx"></script>
     <script type="module" src="../src/Toolbar.tsx"></script>
+    <script type="module" src="../src/Zoomable.tsx"></script>
     <!-- #endregion -->
 
     <!-- <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"> -->
@@ -125,6 +126,10 @@
             <a href="#toolbar"
                 class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
                 Toolbar
+            </a>
+            <a href="#zoomable"
+                class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                Zoomable
             </a>
             <a href="/html-demo.html" target="_blank"
                 class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
@@ -1703,6 +1708,162 @@
     <!-- #endregion -->
 
 
+
+    <!-- #region Zoomable demo -->
+    <template id="zoomable-demo">
+        <h2 id="zoomable" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Zoomable Demo (HTML)</h2>
+        <div class=" space-y-6">
+            <div
+                class="p-6 border rounded-xl shadow-sm bg-white min-w-4xl mx-auto font-sans w-full border-gray-200 border">
+
+                <div class="grid grid-cols-1 md:grid-cols-[300px_1fr] gap-8">
+
+                    <!-- --- LEFT COLUMN: CONTROLS --- -->
+                    <div class="flex flex-col gap-6">
+
+                        <!-- Size Controls -->
+                        <div class="space-y-3">
+                            <h3 class="font-semibold text-gray-600 text-sm uppercase tracking-wider">Dimensions (px)
+                            </h3>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="flex flex-col">
+                                    <label class="text-xs text-gray-500 mb-1">Width</label>
+                                    <input type="number" id="ctrl-width" value="400"
+                                        class="border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none">
+                                </div>
+                                <div class="flex flex-col">
+                                    <label class="text-xs text-gray-500 mb-1">Height</label>
+                                    <input type="number" id="ctrl-height" value="400"
+                                        class="border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none">
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="border-gray-200" />
+
+                        <!-- Scale Limits -->
+                        <div class="space-y-3">
+                            <h3 class="font-semibold text-gray-600 text-sm uppercase tracking-wider">Limits</h3>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="flex flex-col">
+                                    <label class="text-xs text-gray-500 mb-1">Min Scale</label>
+                                    <input type="number" id="ctrl-min" value="1" step="0.5"
+                                        class="border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none">
+                                </div>
+                                <div class="flex flex-col">
+                                    <label class="text-xs text-gray-500 mb-1">Max Scale</label>
+                                    <input type="number" id="ctrl-max" value="5" step="0.5"
+                                        class="border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none">
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="border-gray-200" />
+
+                        <!-- Actions -->
+                        <div class="space-y-3">
+                            <h3 class="font-semibold text-gray-600 text-sm uppercase tracking-wider">
+                                Actions <span id="status-display" class="text-xs font-normal text-gray-400 ml-2"></span>
+                            </h3>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button id="btn-out"
+                                    class="bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-2 px-4 rounded transition-colors active:scale-95">
+                                    - Out
+                                </button>
+                                <button id="btn-in"
+                                    class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded transition-colors active:scale-95">
+                                    + In
+                                </button>
+
+                                <button id="btn-reset"
+                                    class="col-span-2 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-2 px-4 rounded transition-colors active:scale-95">
+                                    Reset to Center
+                                </button>
+                            </div>
+                            <p class="text-xs text-gray-400 italic mt-2">
+                                * You can also use Mouse Wheel or Pinch to zoom.
+                            </p>
+                        </div>
+                    </div>
+
+
+                    <!-- --- RIGHT COLUMN: PREVIEW --- -->
+                    <div
+                        class="bg-gray-50 rounded-lg p-4 flex items-center justify-center border border-dashed border-gray-300 overflow-hidden">
+
+                        <!-- The Custom Element -->
+                        <!-- Note: Attributes use kebab-case (min-scale, max-scale) -->
+                        <wui-zoomable id="demo-target" width="400" height="400" min-scale="1" max-scale="5" scale="1"
+                            x="0" y="0" class="bg-white shadow-lg border border-gray-200">
+
+                            <wui-zoomable-img src="https://picsum.photos/800/800" alt="Demo Image"></wui-zoomable-img>
+
+                        </wui-zoomable>
+                    </div>
+                </div>
+            </div>
+            </div>
+
+            <script>
+                (() => {
+                    const target = document.getElementById('demo-target');
+
+                    // Inputs
+                    const wInput = document.getElementById('ctrl-width');
+                    const hInput = document.getElementById('ctrl-height');
+                    const minInput = document.getElementById('ctrl-min');
+                    const maxInput = document.getElementById('ctrl-max');
+                    const statusEl = document.getElementById('status-display');
+
+                    // 1. Handle Dimensions
+                    wInput.oninput = (e) => target.setAttribute('width', e.target.value);
+                    hInput.oninput = (e) => target.setAttribute('height', e.target.value);
+
+                    // 2. Handle Limits
+                    minInput.oninput = (e) => target.setAttribute('min-scale', e.target.value);
+                    maxInput.oninput = (e) => target.setAttribute('max-scale', e.target.value);
+
+                    // 3. Zoom Logic Helper
+                    const changeZoom = (delta) => {
+                        // Read current values
+                        const currentScale = parseFloat(target.getAttribute('scale') || "1");
+                        const min = parseFloat(target.getAttribute('min-scale') || "1");
+                        const max = parseFloat(target.getAttribute('max-scale') || "5");
+
+                        // Calculate next
+                        let next = currentScale + delta;
+
+                        // Clamp
+                        if (next < min) next = min;
+                        if (next > max) next = max;
+
+                        // Update Attribute
+                        target.setAttribute('scale', next);
+                        updateStatus(next);
+                    }
+
+                    // 4. Buttons
+                    document.getElementById('btn-in').onclick = () => changeZoom(0.5);
+                    document.getElementById('btn-out').onclick = () => changeZoom(-0.5);
+
+                    document.getElementById('btn-reset').onclick = () => {
+                        target.setAttribute('scale', 1);
+                        target.setAttribute('x', 0);
+                        target.setAttribute('y', 0);
+                        updateStatus(1);
+                    };
+
+                    const updateStatus = (val) => {
+                        statusEl.innerText = `(${val.toFixed(1)}x)`;
+                    }
+
+                    updateStatus(1);
+                })();
+            </script>
+    </template>
+    <!-- #endregion -->
+
+
     <!-- #region scripting -->
     <script>
 
@@ -1750,6 +1911,7 @@
                 'switch-demo',
                 'tabs-demo',
                 'toolbar-demo',
+                'zoomable-demo',
             ];
 
             demoTemplates.forEach(id => {
