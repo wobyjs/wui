@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Toolbar Component Test</title>
+    <link href="/node_modules/@woby/chk/dist/index.css" rel="stylesheet">
+    <script type="module" src="../src/Toolbar.tsx"></script>
+    <script type="module" src="../src/wui-button.tsx"></script>
+</head>
+
+<body>
+    <link href="../dist/wui.css" rel="stylesheet">
+    <h2 class="text-[1.2em] pl-4 font-bold">Toolbar Component Test Suite</h2>
+
+    <woby-chk name="Default Toolbar">
+        <wui-toolbar snapshot-name="Default Toolbar">
+            <div class="flex items-center justify-between w-full">
+                <div class="text-lg font-bold">App Title</div>
+                <div class="flex space-x-2">
+                    <wui-button type="outlined" cls="px-3 py-1 bg-gray-200 rounded">Menu</wui-button>
+                    <wui-button type="outlined" cls="px-3 py-1 bg-gray-200 rounded">Settings</wui-button>
+                </div>
+            </div>
+        </wui-toolbar>
+    </woby-chk>
+
+    <woby-chk name="Styled Toolbar">
+        <wui-toolbar cls="bg-blue-600 text-white shadow-lg" snapshot-name="Styled Toolbar">
+            <div class="flex items-center justify-between w-full">
+                <div class="text-xl font-bold">My Application</div>
+                <div class="flex space-x-4">
+                    <wui-button type="outlined"
+                        cls="px-4 py-2 hover:bg-blue-700 rounded text-white !border-white">Home</wui-button>
+                    <wui-button type="outlined"
+                        cls="px-4 py-2 hover:bg-blue-700 rounded text-white !border-white">Profile</wui-button>
+                    <wui-button type="outlined"
+                        cls="px-4 py-2 hover:bg-blue-700 rounded text-white !border-white">Settings</wui-button>
+                </div>
+            </div>
+        </wui-toolbar>
+    </woby-chk>
+
+    <woby-chk name="Compact Toolbar">
+        <wui-toolbar cls="bg-gray-100 p-2" snapshot-name="Compact Toolbar">
+            <div class="flex items-center justify-between">
+                <div class="text-sm font-medium">Document Editor</div>
+                <div class="flex space-x-1 px-2">
+                    <wui-button type="outlined"
+                        cls="!px-2 !py-1 text-black text-xs bg-white border rounded">Save</wui-button>
+                    <wui-button type="outlined"
+                        cls="!px-2 !py-1 text-black text-xs bg-white border rounded">Undo</wui-button>
+                    <wui-button type="outlined"
+                        cls="!px-2 !py-1 text-black text-xs bg-white border rounded">Redo</wui-button>
+                </div>
+            </div>
+        </wui-toolbar>
+    </woby-chk>
+
+</body>
+
+</html>
