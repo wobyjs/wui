@@ -21,6 +21,8 @@ import Paper from './Paper'
 import { SideBar, MenuItem, MenuText } from './SideBar'
 import { Switch } from './Switch'
 import { Tabs, Tab } from './Tabs'
+import { Toolbar } from './Toolbar'
+
 
 
 const isDev = typeof import.meta.env !== 'undefined' && import.meta.env.DEV
@@ -95,6 +97,9 @@ export function App() {
                     </a>
                     <a href="#tabs" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
                         Tabs
+                    </a>
+                    <a href="#toolbar" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                        Toolbar
                     </a>
                     <a href="/html-demo.html" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
                         HTML Components Demo
@@ -2569,6 +2574,118 @@ export function App() {
     }
     // #endregion
 
+    // #region Toolbar Demo
+    const toolbarDemo = () => {
+        return <>
+            <h2 id="toolbar" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Toolbar Demo</h2>
+
+            <div class="space-y-6">
+
+                {/* Basic Application Bar */}
+                <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                    <h3 class="text-lg font-semibold mb-4">1. Basic Application Bar</h3>
+                    <p class="text-sm text-gray-600 mb-4">Toolbar used as a primary navigation container with a logo, spacer, and action button.</p>
+
+                    {/* Container simulating an AppBar */}
+                    <div class="bg-blue-600 text-white rounded-lg shadow-md h-16 overflow-hidden">
+                        <Toolbar>
+                            <IconButton cls="text-white mr-2">
+                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z" /></svg>
+                            </IconButton>
+                            <h3 class="text-lg font-bold">My App</h3>
+                            {/* Flex Spacer */}
+                            <div class="flex-1"></div>
+                            <Button type="text" cls="text-white hover:bg-blue-700">Login</Button>
+                        </Toolbar>
+                    </div>
+                </div>
+
+                {/* Editor Tools (Dense) */}
+                <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                    <h3 class="text-lg font-semibold mb-4">2. Editor Tools (Dense)</h3>
+                    <p class="text-sm text-gray-600 mb-4">Used for grouping small action buttons (like a text editor).</p>
+
+                    <div class="border border-gray-300 rounded-lg bg-gray-50 h-12 overflow-hidden">
+                        <Toolbar cls="!px-2 gap-1"> {/* Override padding for dense look */}
+                            <IconButton cls="hover:bg-gray-200 rounded p-1 w-8 h-8"><span class="font-bold">B</span></IconButton>
+                            <IconButton cls="hover:bg-gray-200 rounded p-1 w-8 h-8"><span class="italic">I</span></IconButton>
+                            <IconButton cls="hover:bg-gray-200 rounded p-1 w-8 h-8"><span class="underline">U</span></IconButton>
+
+                            <div class="w-[1px] h-6 bg-gray-300 mx-2"></div> {/* Separator */}
+
+                            <IconButton cls="hover:bg-gray-200 rounded p-1 w-8 h-8">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z" /></svg>
+                            </IconButton>
+                            <IconButton cls="hover:bg-gray-200 rounded p-1 w-8 h-8">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M10 18h5v-6h-5v6zm-6 0h5V5H4v13zm12 0h5v-6h-5v6zM10 5v6h11V5H10z" /></svg>
+                            </IconButton>
+                        </Toolbar>
+                    </div>
+                </div>
+
+                {/* Search & Filter */}
+                <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                    <h3 class="text-lg font-semibold mb-4">3. Search & Filter</h3>
+                    <p class="text-sm text-gray-600 mb-4">A toolbar containing input fields.</p>
+
+                    <div class="bg-white border border-gray-200 rounded-full shadow-sm h-14 overflow-hidden focus-within:ring-2 focus-within:ring-blue-100 transition-shadow">
+                        <Toolbar>
+                            <svg class="w-5 h-5 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                            <input type="text" placeholder="Search..." class="outline-none text-gray-700 flex-1 bg-transparent h-full" />
+
+                            <div class="w-[1px] h-8 bg-gray-200 mx-2"></div>
+
+                            <Button type="text" cls="text-gray-500 hover:text-blue-600 font-normal">Filters</Button>
+                            <IconButton cls="text-white bg-blue-600 hover:bg-blue-700 rounded-full p-2 ml-2 w-10 h-10 flex items-center justify-center">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                            </IconButton>
+                        </Toolbar>
+                    </div>
+                </div>
+
+                {/* Complex Dashboard Header */}
+                <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                    <h3 class="text-lg font-semibold mb-4">4. Complex Layout</h3>
+                    <p class="text-sm text-gray-600 mb-4">Using nested flexbox logic within the Toolbar.</p>
+
+                    <div class="bg-gray-900 text-white rounded-lg shadow-lg h-20 overflow-hidden">
+                        <Toolbar>
+                            {/* Left: Branding */}
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-gradient-to-tr from-pink-500 to-orange-500 rounded-lg shadow-inner"></div>
+                                <div>
+                                    <p class="font-bold leading-none">Dashboard</p>
+                                    <p class="text-xs text-gray-400">v2.0.1</p>
+                                </div>
+                            </div>
+
+                            {/* Center: Navigation Links */}
+                            <div class="flex-1 flex justify-center">
+                                <div class="md:flex gap-6 text-sm font-medium text-gray-400">
+                                    <a class="hover:text-white transition-colors">Overview</a>
+                                    <a class="text-white border-b-2 border-orange-500 pb-1">Reports</a>
+                                    <a class="hover:text-white transition-colors">Settings</a>
+                                </div>
+                            </div>
+
+                            {/* Right: Actions */}
+                            <div class="flex items-center gap-3">
+                                <IconButton cls="text-gray-400 hover:text-white hover:bg-gray-800 transition-colors">
+                                    <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2zm-2 1H8v-6c0-2.48 1.51-4.5 4-4.5s4 2.02 4 4.5v6z" />
+                                    </svg>
+                                </IconButton>
+                                <div class="w-[1px] h-6 bg-gray-700"></div>
+                                <Avatar src="/sample-avatar.png" cls="w-9 h-9 ring-2 ring-gray-700 cursor-pointer" />
+                            </div>
+                        </Toolbar>
+                    </div>
+                </div>
+            </div>
+        </>
+    }
+    // #endregion
+
 
     // #region Render
     return (
@@ -2602,6 +2719,7 @@ export function App() {
                 {sidebarDemo()}
                 {switchDemo()}
                 {tabsDemo()}
+                {toolbarDemo()}
             </div>
 
             <div class="mt-8 p-4 bg-gray-100 rounded">
