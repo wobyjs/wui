@@ -4,6 +4,7 @@
 //input[type='text']
 const inputText = 'text-[#333] w-full box-border tracking-[1px]'
 
+// #region Underline Effects 1-3
 const underlineOnly = `focus:[outline:none] px-0 py-[7px] border-b-[#ccc] border-0 border-b border-solid`
 
 export const effect1 = `${underlineOnly} 
@@ -22,7 +23,9 @@ export const effect3 = `${underlineOnly}
 [&:focus~span]:before:w-1/2 [&:focus~span]:before:duration-[0.4s]
 [&:focus~span]:after:w-1/2 [&:focus~span]:after:duration-[0.4s]
 `
+// #endregion
 
+// #region Box Effects 4-6
 const box = `focus:[outline:none] duration-[0.4s] pt-[5px] pb-[7px] px-0 border-b-[#ccc] border-b-solid border-b-2 w-full`
 export const effect4 = `${box}
 focus:duration-[0.4s] focus:pt-[5px] focus:pb-[7px] focus:px-3.5
@@ -39,7 +42,9 @@ focus:duration-[0.4s] focus:pt-[5px] focus:pb-[7px] focus:px-3.5
 [&~span]:absolute [&~span]:h-9 [&~span]:w-0 [&~span]:duration-[0.4s] [&~span]:right-0 [&~span]:bottom-0
 [&:focus~span]:w-full [&:focus~span]:duration-[0.4s] [&:focus~span]:border-2 [&:focus~span]:border-solid [&:focus~span]:border-[#4caf50]
 `
+// #endregion
 
+// #region Outline Effects 7-9
 const outline7 = `focus:[outline:none] border-2 duration-[0.4s] pt-[7px] pb-[9px] px-3.5 border-solid border-[#ccc]`
 export const effect7 = `${outline7}
 [&~span]:before:content-[''] [&~span]:before:absolute [&~span]:before:w-0 [&~span]:before:h-0.5 [&~span]:before:bg-[#4caf50] [&~span]:before:duration-[0.4s] [&~span]:before:left-2/4 [&~span]:before:top-0
@@ -80,7 +85,7 @@ export const effect9 = `${outline7}
 [&:focus~span_i]:after:h-full [&:focus~span_i]:after:duration-[0.2s]
 
 `
-
+// #endregion
 const fill10 = `focus:[outline:none] relative px-[15px] py-[7px] border-2 border-solid border-[#ccc] bg-transparent`
 export const effect10 = `${fill10}
 [&~span]:absolute [&~span]:w-full [&~span]:h-full [&~span]:bg-[#ededed] [&~span]:opacity-0 [&~span]:duration-[0.5s] [&~span]:z-[-1] [&~span]:left-0 [&~span]:top-0
@@ -120,7 +125,9 @@ export const effect15 = `${fill10}
 [&~span]:after:left-auto [&~span]:after:right-2/4 [&~span]:after:top-auto [&~span]:after:bottom-2/4
 [&:focus~span]:after:duration-[0.3s] [&:focus~span]:after:w-1/2 [&:focus~span]:after:h-full [&:focus~span]:after:right-0 [&:focus~span]:after:bottom-0
 `
+// #endregion
 
+// #region Labeled Underline Effects 16-18
 const underline16 = `focus:[outline:none] bg-transparent px-0 py-1 border-b-[#ccc] border-0 border-b border-solid`
 export const effect16 = `${underline16}
 [&~span]:absolute [&~span]:w-0 [&~span]:h-0.5 [&~span]:bg-[#4caf50] [&~span]:duration-[0.4s] [&~span]:left-0 [&~span]:bottom-0
@@ -153,7 +160,9 @@ export const effect18 = `${underline16}
 [&:focus~label]:text-xs [&:focus~label]:text-[#4caf50] [&:focus~label]:duration-[0.3s] [&:focus~label]:-top-4
 [&:not(:placeholder-shown)~label]:text-xs [&:not(:placeholder-shown)~label]:text-[#4caf50] [&:not(:placeholder-shown)~label]:duration-[0.3s] [&:not(:placeholder-shown)~label]:-top-4
 `
+// #endregion
 
+// #region Labeled Box Effects 19-21
 const box19 = `focus:[outline:none] border duration-[0.4s] px-3.5 py-[7px] border-solid border-[#ccc] bg-transparent`
 export const effect19 = `${box19}
 [&~span]:before:content-[''] [&~span]:before:absolute [&~span]:before:w-0 [&~span]:before:h-0.5 [&~span]:before:bg-[#4caf50] [&~span]:before:duration-[0.4s] [&~span]:before:left-2/4 [&~span]:before:-top-px
@@ -221,7 +230,9 @@ ${hpLabel20}
 [&~span_i]:before:delay-[0.8s]
 [&:focus~span_i]:before:delay-0
 `
+// #endregion
 
+// #region Labeled Fill Effects 22-24
 const fill22 = `focus:[outline:none] border-2 relative px-[15px] py-[7px] border-0 border-solid border-[#ccc] bg-transparent`
 export const effect22 = `${fill22}
 [&~span]:absolute [&~span]:w-0 [&~span]:h-full [&~span]:bg-transparent [&~span]:duration-[0.4s] [&~span]:z-[-1] [&~span]:left-0 [&~span]:top-0
@@ -257,6 +268,9 @@ export const effect24 = `${fill22}
 [&:focus~label]:top-[-18px] [&:focus~label]:text-xs [&:focus~label]:text-[#333] [&:focus~label]:duration-[0.3s] [&:focus~label]:left-0
 [&:not(:placeholder-shown)~label]:top-[-18px] [&:not(:placeholder-shown)~label]:text-xs [&:not(:placeholder-shown)~label]:text-[#333] [&:not(:placeholder-shown)~label]:duration-[0.3s] [&:not(:placeholder-shown)~label]:left-0
 `
+// #endregion
+
+// #region Alternative Labeled Effects 19a-21a
 const hLabel = `[&:focus~label]:top-[-12px] [&:focus~label]:text-xs [&:focus~label]:text-[#4caf50] [&:focus~label]:duration-[0.3s] [&:focus~label]:left-[7px] [&:focus~label]:bg-[white] [&:focus~label]:w-fit [&:focus~label]:z-10 [&:focus~label]:p-[2px]`
 const hpLabel = `[&:not(:placeholder-shown)~label]:top-[-12px] [&:not(:placeholder-shown)~label]:text-xs [&:not(:placeholder-shown)~label]:text-[#4caf50] [&:not(:placeholder-shown)~label]:duration-[0.3s] [&:not(:placeholder-shown)~label]:left-[7px] [&:not(:placeholder-shown)~label]:bg-[white] [&:not(:placeholder-shown)~label]:w-fit [&:not(:placeholder-shown)~label]:z-10 [&:not(:placeholder-shown)~label]:p-[2px]`
 
@@ -325,5 +339,6 @@ ${hpLabel}
 [&~span_i]:before:delay-[0.8s]
 [&:focus~span_i]:before:delay-0
 `
+// #endregion
 
 
