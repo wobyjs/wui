@@ -23,6 +23,7 @@ import { Switch } from './Switch'
 import { Tabs, Tab } from './Tabs'
 import { Toolbar } from './Toolbar'
 import { Zoomable, Img } from './Zoomable'
+import TextField from './TextField'
 
 
 const isDev = typeof import.meta.env !== 'undefined' && import.meta.env.DEV
@@ -97,6 +98,9 @@ export function App() {
                     </a>
                     <a href="#tabs" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
                         Tabs
+                    </a>
+                    <a href="#textfield" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                        Text Field
                     </a>
                     <a href="#toolbar" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
                         Toolbar
@@ -2577,6 +2581,68 @@ export function App() {
     }
     // #endregion
 
+
+    // #region Text Field Demo
+    const textFieldDemo = () => {
+        return <>
+            <h2 id="textfield" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Text Field Demo</h2>
+            <div class="space-y-6">
+                <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                    <h3 class="text-lg font-semibold mb-4 uppercase">Border Effect</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+                        <TextField effect="effect1" placeholder="Effect 1" />
+                        <TextField effect="effect2" placeholder="Effect 2" />
+                        <TextField effect="effect3" placeholder="Effect 3" />
+
+                        <TextField effect="effect4" placeholder="Effect 4" />
+                        <TextField effect="effect5" placeholder="Effect 5" />
+                        <TextField effect="effect6" placeholder="Effect 6" />
+
+                        <TextField effect="effect7" placeholder="Effect 7" />
+                        <TextField effect="effect8" placeholder="Effect 8" />
+                        <TextField effect="effect9" placeholder="Effect 9" />
+                    </div>
+
+                    <h3 class="text-lg font-semibold mb-4 uppercase">Background Effect</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+                        <TextField effect="effect10" placeholder="Effect 10" />
+                        <TextField effect="effect11" placeholder="Effect 11" />
+                        <TextField effect="effect12" placeholder="Effect 12" />
+
+                        <TextField effect="effect13" placeholder="Effect 13" />
+                        <TextField effect="effect14" placeholder="Effect 14" />
+                        <TextField effect="effect15" placeholder="Effect 15" />
+                    </div>
+
+                    <h3 class="text-lg font-semibold mb-4 uppercase">Input With Label Effect</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+                        <TextField effect="effect16" label="Effect 16" />
+                        <TextField effect="effect17" label="Effect 17" />
+                        <TextField effect="effect18" label="Effect 18" />
+
+                        <TextField effect="effect19" label="Effect 19" />
+                        <TextField effect="effect20" label="Effect 20" />
+                        <TextField effect="effect21" label="Effect 21" />
+
+                        <TextField effect="effect22" label="Effect 22" />
+                        <TextField effect="effect23" label="Effect 23" />
+                        <TextField effect="effect24" label="Effect 24" />
+                    </div>
+
+                    <h3 class="text-lg font-semibold mb-4 uppercase">Alternative Label Effects</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+                        <TextField effect="effect19a" label="Effect 19a" />
+                        <TextField effect="effect20a" label="Effect 20a" />
+                        <TextField effect="effect21a" label="Effect 21a" />
+
+                    </div>
+                </div>
+            </div>
+        </>
+    }
+    // #endregion
+
+
     // #region Toolbar Demo
     const toolbarDemo = () => {
         return <>
@@ -2877,6 +2943,7 @@ export function App() {
                 {sidebarDemo()}
                 {switchDemo()}
                 {tabsDemo()}
+                {textFieldDemo()}
                 {toolbarDemo()}
                 {zoomableDemo()}
             </div>

@@ -23,6 +23,7 @@
     <script type="module" src="../src/SideBar.tsx"></script>
     <script type="module" src="../src/Switch.tsx"></script>
     <script type="module" src="../src/Tabs.tsx"></script>
+    <script type="module" src="../src/TextField.tsx"></script>
     <script type="module" src="../src/Toolbar.tsx"></script>
     <script type="module" src="../src/Zoomable.tsx"></script>
     <!-- #endregion -->
@@ -122,6 +123,10 @@
             <a href="#tabs"
                 class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
                 Tabs
+            </a>
+            <a href="#textfield"
+                class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                Text Field
             </a>
             <a href="#toolbar"
                 class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
@@ -1575,6 +1580,63 @@
     </template>
     <!-- #endregion -->
 
+    <!-- #region Text Field demo -->
+    <template id="textfield-demo">
+        <h2 id="textfield" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Text Field Demo</h2>
+        <div class="space-y-6">
+            <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                <h3 class="text-lg font-semibold mb-4 uppercase">Border Effect</h3>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+                    <wui-text-field effect="effect1" placeholder="Effect 1"></wui-text-field>
+                    <wui-text-field effect="effect2" placeholder="Effect 2"></wui-text-field>
+                    <wui-text-field effect="effect3" placeholder="Effect 3"></wui-text-field>
+
+                    <wui-text-field effect="effect4" placeholder="Effect 4"></wui-text-field>
+                    <wui-text-field effect="effect5" placeholder="Effect 5"></wui-text-field>
+                    <wui-text-field effect="effect6" placeholder="Effect 6"></wui-text-field>
+
+                    <wui-text-field effect="effect7" placeholder="Effect 7"></wui-text-field>
+                    <wui-text-field effect="effect8" placeholder="Effect 8"></wui-text-field>
+                    <wui-text-field effect="effect9" placeholder="Effect 9"></wui-text-field>
+                </div>
+
+                <h3 class="text-lg font-semibold mb-4 uppercase">Background Effect</h3>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+                    <wui-text-field effect="effect10" placeholder="Effect 10"></wui-text-field>
+                    <wui-text-field effect="effect11" placeholder="Effect 11"></wui-text-field>
+                    <wui-text-field effect="effect12" placeholder="Effect 12"></wui-text-field>
+
+                    <wui-text-field effect="effect13" placeholder="Effect 13"></wui-text-field>
+                    <wui-text-field effect="effect14" placeholder="Effect 14"></wui-text-field>
+                    <wui-text-field effect="effect15" placeholder="Effect 15"></wui-text-field>
+                </div>
+
+                <h3 class="text-lg font-semibold mb-4 uppercase">Input With Label Effect</h3>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+                    <wui-text-field effect="effect16" label="Effect 16"></wui-text-field>
+                    <wui-text-field effect="effect17" label="Effect 17"></wui-text-field>
+                    <wui-text-field effect="effect18" label="Effect 18"></wui-text-field>
+
+                    <wui-text-field effect="effect19" label="Effect 19"></wui-text-field>
+                    <wui-text-field effect="effect20" label="Effect 20"></wui-text-field>
+                    <wui-text-field effect="effect21" label="Effect 21"></wui-text-field>
+
+                    <wui-text-field effect="effect22" label="Effect 22"></wui-text-field>
+                    <wui-text-field effect="effect23" label="Effect 23"></wui-text-field>
+                    <wui-text-field effect="effect24" label="Effect 24"></wui-text-field>
+                </div>
+
+                <h3 class="text-lg font-semibold mb-4 uppercase">Alternative Label Effects</h3>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+                    <wui-text-field effect="effect19a" label="Effect 19a"></wui-text-field>
+                    <wui-text-field effect="effect20a" label="Effect 20a"></wui-text-field>
+                    <wui-text-field effect="effect21a" label="Effect 21a"></wui-text-field>
+                </div>
+            </div>
+        </div>
+    </template>
+    <!-- #endregion -->
+
 
     <!-- #region Toolbar demo -->
     <template id="toolbar-demo">
@@ -1802,64 +1864,64 @@
                     </div>
                 </div>
             </div>
-            </div>
+        </div>
 
-            <script>
-                (() => {
-                    const target = document.getElementById('demo-target');
+        <script>
+            (() => {
+                const target = document.getElementById('demo-target');
 
-                    // Inputs
-                    const wInput = document.getElementById('ctrl-width');
-                    const hInput = document.getElementById('ctrl-height');
-                    const minInput = document.getElementById('ctrl-min');
-                    const maxInput = document.getElementById('ctrl-max');
-                    const statusEl = document.getElementById('status-display');
+                // Inputs
+                const wInput = document.getElementById('ctrl-width');
+                const hInput = document.getElementById('ctrl-height');
+                const minInput = document.getElementById('ctrl-min');
+                const maxInput = document.getElementById('ctrl-max');
+                const statusEl = document.getElementById('status-display');
 
-                    // 1. Handle Dimensions
-                    wInput.oninput = (e) => target.setAttribute('width', e.target.value);
-                    hInput.oninput = (e) => target.setAttribute('height', e.target.value);
+                // 1. Handle Dimensions
+                wInput.oninput = (e) => target.setAttribute('width', e.target.value);
+                hInput.oninput = (e) => target.setAttribute('height', e.target.value);
 
-                    // 2. Handle Limits
-                    minInput.oninput = (e) => target.setAttribute('min-scale', e.target.value);
-                    maxInput.oninput = (e) => target.setAttribute('max-scale', e.target.value);
+                // 2. Handle Limits
+                minInput.oninput = (e) => target.setAttribute('min-scale', e.target.value);
+                maxInput.oninput = (e) => target.setAttribute('max-scale', e.target.value);
 
-                    // 3. Zoom Logic Helper
-                    const changeZoom = (delta) => {
-                        // Read current values
-                        const currentScale = parseFloat(target.getAttribute('scale') || "1");
-                        const min = parseFloat(target.getAttribute('min-scale') || "1");
-                        const max = parseFloat(target.getAttribute('max-scale') || "5");
+                // 3. Zoom Logic Helper
+                const changeZoom = (delta) => {
+                    // Read current values
+                    const currentScale = parseFloat(target.getAttribute('scale') || "1");
+                    const min = parseFloat(target.getAttribute('min-scale') || "1");
+                    const max = parseFloat(target.getAttribute('max-scale') || "5");
 
-                        // Calculate next
-                        let next = currentScale + delta;
+                    // Calculate next
+                    let next = currentScale + delta;
 
-                        // Clamp
-                        if (next < min) next = min;
-                        if (next > max) next = max;
+                    // Clamp
+                    if (next < min) next = min;
+                    if (next > max) next = max;
 
-                        // Update Attribute
-                        target.setAttribute('scale', next);
-                        updateStatus(next);
-                    }
+                    // Update Attribute
+                    target.setAttribute('scale', next);
+                    updateStatus(next);
+                }
 
-                    // 4. Buttons
-                    document.getElementById('btn-in').onclick = () => changeZoom(0.5);
-                    document.getElementById('btn-out').onclick = () => changeZoom(-0.5);
+                // 4. Buttons
+                document.getElementById('btn-in').onclick = () => changeZoom(0.5);
+                document.getElementById('btn-out').onclick = () => changeZoom(-0.5);
 
-                    document.getElementById('btn-reset').onclick = () => {
-                        target.setAttribute('scale', 1);
-                        target.setAttribute('x', 0);
-                        target.setAttribute('y', 0);
-                        updateStatus(1);
-                    };
-
-                    const updateStatus = (val) => {
-                        statusEl.innerText = `(${val.toFixed(1)}x)`;
-                    }
-
+                document.getElementById('btn-reset').onclick = () => {
+                    target.setAttribute('scale', 1);
+                    target.setAttribute('x', 0);
+                    target.setAttribute('y', 0);
                     updateStatus(1);
-                })();
-            </script>
+                };
+
+                const updateStatus = (val) => {
+                    statusEl.innerText = `(${val.toFixed(1)}x)`;
+                }
+
+                updateStatus(1);
+            })();
+        </script>
     </template>
     <!-- #endregion -->
 
@@ -1912,6 +1974,7 @@
                 'tabs-demo',
                 'toolbar-demo',
                 'zoomable-demo',
+                'textfield-demo',
             ];
 
             demoTemplates.forEach(id => {
