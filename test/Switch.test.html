@@ -4,151 +4,172 @@
 <head>
     <title>wui-switch Component Test</title>
     <link href="/node_modules/@woby/chk/dist/index.css" rel="stylesheet">
-    <script type="module" src="../src/wui-switch.tsx"></script>
+    <script type="module" src="../src/Switch.tsx"></script>
 </head>
 
 <body>
     <link href="../dist/wui.css" rel="stylesheet">
     <h2 class="text-[1.2em] pl-4 font-bold">wui-switch Component Test Suite</h2>
 
-    <!-- #region Basic Switch -->
-    <woby-chk name="Basic wui-switch">
-        <div snapshot-name="Basic wui-switch">
-            <div class="flex justify-between items-center border-b pb-4 mb-4">
-                <h1 class="text-2xl font-bold text-gray-800">wui-switch Basic Styles & Effects</h1>
-                <wui-button id="toggle-all-basic-switch-button" onClick="toggleAllBasicSwitch()" global-state="false">
-                    Toggle All (<span id="toggle-all-basic-switch-button-content">OFF</span>)
-                </wui-button>
-            </div>
-            <div name="basic-switch"
-                class="flex flex-wrap items-center justify-center gap-12 p-8 bg-gray-50 border border-gray-200 rounded-lg">
-                <div class="flex flex-col items-center gap-4">
-                    <span class="text-sm font-mono text-gray-500">Default</span>
-                    <wui-switch effect="default" />
-                </div>
-
-                <div class="flex flex-col items-center gap-4">
-                    <span class="text-sm font-mono text-gray-500">iOS</span>
-                    <wui-switch effect="ios" />
-                </div>
-
-                <div class="flex flex-col items-center gap-4">
-                    <span class="text-sm font-mono text-gray-500">Flat</span>
-                    <wui-switch effect="flat" />
-                </div>
-
-                <div class="flex flex-col items-center gap-4">
-                    <span class="text-sm font-mono text-gray-500">Light</span>
-                    <wui-switch effect="light" />
-                </div>
-
-                <div class="flex flex-col items-center gap-4">
-                    <span class="text-sm font-mono text-gray-500">Skewed</span>
-                    <wui-switch effect="skewed" />
-                </div>
-
-                <div class="flex flex-col items-center gap-4">
-                    <span class="text-sm font-mono text-gray-500">Flip 3D</span>
-                    <wui-switch effect="flip" />
-                </div>
-            </div>
-        </div>
-    </woby-chk>
-    <!-- #endregion -->
-
-    <!-- #region Text Label Switch -->
-    <woby-chk name="Text Label wui-switch">
-        <div snapshot-name="Text Label wui-switch">
-            <div class="flex justify-between items-center border-b mb-4 pb-4">
-                <h1 class="text-2xl font-bold text-gray-800">wui-switch Text Label Switch </h1>
-                <wui-button id="toggle-all-text-label-switch-button" onClick="toggleAllTextLabelSwitch()"
-                    global-state="false">
-                    Toggle All (<span id="toggle-all-text-label-switch-button-content">OFF</span>)
-                </wui-button>
-            </div>
-            <div name="label-text-switch"
-                class="flex flex-wrap items-center justify-center gap-12 p-8 bg-gray-50 border border-gray-200 rounded-lg">
-                <div class="flex flex-col items-center gap-4">
-                    <span class="text-sm font-mono text-gray-500">Effect 1 (YES/NO)</span>
-                    <wui-switch effect="effect1" on="YES" off="NO" />
-                </div>
-
-                <div class="flex flex-col items-center gap-4">
-                    <span class="text-sm font-mono text-gray-500">Skewed (High/Low)</span>
-                    <wui-switch effect="skewed" on="High" off="Low" />
-                </div>
-
-                <div class="flex flex-col items-center gap-4">
-                    <span class="text-sm font-mono text-gray-500">Flat (I/O)</span>
-                    <wui-switch effect="flat" on="I" off="O" />
-                </div>
-            </div>
-        </div>
-    </woby-chk>
-    <!-- #endregion -->
-
-
     <!-- #region Effect Switch -->
-    <woby-chk name="Effect wui-switch">
-        <div snapshot-name="Effect wui-switch">
+    <woby-chk name="Effect Switch">
+        <div snapshot-name="Effect Switch">
             <div class="flex justify-between items-center border-b mb-4 pb-4">
                 <h1 class="text-2xl font-bold text-gray-800">wui-switch Effect Variations</h1>
                 <wui-button id="toggle-all-effect-switch-button" onClick="toggleAllEffectSwitch()" global-state="false">
                     Toggle All (<span id="toggle-all-effect-switch-button-content">OFF</span>)
                 </wui-button>
             </div>
+            <div name="effect-switch"
+                class="flex flex-wrap items-center justify-center grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-8 bg-gray-50 border border-gray-200 rounded-lg">
+                <!-- class="flex flex-wrap items-center justify-center gap-12 p-8 bg-gray-50 border border-gray-200 rounded-lg"> -->
+                <!-- Effect 1 - 3 -->
+                <div class="flex flex-col items-center">
+                    <span class="text-sm font-mono text-gray-500">Effect 1</span>
+                    <wui-switch effect="effect1" on="I" off="O"></wui-switch>
+                </div>
+
+                <div class="flex flex-col items-center">
+                    <span class="text-sm font-mono text-gray-500">Effect 2</span>
+                    <wui-switch effect="effect2"></wui-switch>
+                </div>
+
+                <div class="flex flex-col items-center">
+                    <span class="text-sm font-mono text-gray-500">Effect 3</span>
+                    <wui-switch effect="effect3"></wui-switch>
+                </div>
+
+                <!-- Effect 4 - 6 -->
+                <div class="flex flex-col items-center">
+                    <span class="text-sm font-mono text-gray-500">Effect 4</span>
+                    <wui-switch effect="effect4"></wui-switch>
+                </div>
+
+                <div class="flex flex-col items-center">
+                    <span class="text-sm font-mono text-gray-500">Effect 5</span>
+                    <wui-switch effect="effect5"></wui-switch>
+                </div>
+
+                <div class="flex flex-col items-center">
+                    <span class="text-sm font-mono text-gray-500">Effect 6</span>
+                    <wui-switch effect="effect6"></wui-switch>
+                </div>
 
 
-            <div name="effect-switch" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
-                <!-- Effects 1-18 will be generated by script -->
+                <!-- Effect 7 - 9 -->
+                <div class="flex flex-col items-center">
+                    <span class="text-sm font-mono text-gray-500">Effect 7</span>
+                    <wui-switch effect="effect7"></wui-switch>
+                </div>
+
+                <div class="flex flex-col items-center">
+                    <span class="text-sm font-mono text-gray-500">Effect 8</span>
+                    <wui-switch effect="effect8"></wui-switch>
+                </div>
+
+                <div class="flex flex-col items-center">
+                    <span class="text-sm font-mono text-gray-500">Effect 9</span>
+                    <wui-switch effect="effect9"></wui-switch>
+                </div>
+
+                <!-- Effect 10 - 12 -->
+                <div class="flex flex-col items-center">
+                    <span class="text-sm font-mono text-gray-500">Effect 10</span>
+                    <wui-switch effect="effect10"></wui-switch>
+                </div>
+
+                <div class="flex flex-col items-center">
+                    <span class="text-sm font-mono text-gray-500">Effect 11</span>
+                    <wui-switch effect="effect11"></wui-switch>
+                </div>
+
+                <div class="flex flex-col items-center">
+                    <span class="text-sm font-mono text-gray-500">Effect 12</span>
+                    <wui-switch effect="effect12"></wui-switch>
+                </div>
+
+                <!-- Effect 13 - 15 -->
+                <div class="flex flex-col items-center">
+                    <span class="text-sm font-mono text-gray-500">Effect 13</span>
+                    <wui-switch effect="effect13"></wui-switch>
+                </div>
+
+                <div class="flex flex-col items-center">
+                    <span class="text-sm font-mono text-gray-500">Effect 14</span>
+                    <wui-switch effect="effect14"></wui-switch>
+                </div>
+
+                <div class="flex flex-col items-center">
+                    <span class="text-sm font-mono text-gray-500">Effect 15</span>
+                    <wui-switch effect="effect15"></wui-switch>
+                </div>
+
+                <!-- Effect 16 - 18 -->
+                <div class="flex flex-col items-center">
+                    <span class="text-sm font-mono text-gray-500">Effect 16</span>
+                    <wui-switch effect="effect16"></wui-switch>
+                </div>
+
+                <div class="flex flex-col items-center">
+                    <span class="text-sm font-mono text-gray-500">Effect 17</span>
+                    <wui-switch effect="effect17"></wui-switch>
+                </div>
+
+                <div class="flex flex-col items-center">
+                    <span class="text-sm font-mono text-gray-500">Effect 18</span>
+                    <wui-switch effect="effect18"></wui-switch>
+                </div>
             </div>
-            <script>
-                (function () {
-                    const effectNames = [
-                        'Basic Slide',
-                        'Smooth Toggle',
-                        'Bounce Effect',
-                        'Fade Transition',
-                        'Rotate Switch',
-                        'Scale Animation',
-                        'Slide & Fade',
-                        'Elastic Motion',
-                        'Flip Horizontal',
-                        'Squeeze Effect',
-                        'Glow Pulse',
-                        'Shadow Shift',
-                        'Color Morph',
-                        'Neon Glow',
-                        'Wave Motion',
-                        'Ripple Effect',
-                        'Sparkle Switch',
-                        'Rainbow Shift'
-                    ];
-
-                    const container = document.querySelector('div[name="effect-switch"]');
-
-                    for (let i = 1; i <= 18; i++) {
-                        const cardDiv = document.createElement('div');
-                        cardDiv.className = 'flex flex-col bg-white border border-gray-300 rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all duration-200';
-
-                        cardDiv.innerHTML = `
-                            <div class="px-5 py-3 bg-gray-100 border-b border-gray-200 flex justify-between items-center">
-                                <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Effect ${i}</span>
-                                <span class="text-sm font-semibold text-gray-800">${effectNames[i - 1]}</span>
-                            </div>
-                            <div class="flex-1 flex items-center justify-center bg-white p-6 relative">
-                                <wui-switch effect="effect${i}" />
-                            </div>
-                        `;
-
-                        container.appendChild(cardDiv);
-                    }
-                })();
-            </script>
         </div>
     </woby-chk>
+    <!-- #endregion -->
+
+    <!-- #region Styles Switch -->
+    <woby-chk name="Styles Switch">
+        <div snapshot-name="Styles Switch">
+            <div class="flex justify-between items-center border-b mb-4 pb-4">
+                <h1 class="text-2xl font-bold text-gray-800">wui-switch Styles Variations</h1>
+                <wui-button id="toggle-all-effect-switch-button" onClick="toggleAllEffectSwitch()" global-state="false">
+                    Toggle All (<span id="toggle-all-effect-switch-button-content">OFF</span>)
+                </wui-button>
+            </div>
+
+            <div name="effect-switch"
+                class="flex flex-wrap items-center justify-center grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-8 bg-gray-50 border border-gray-200 rounded-lg">
+                <!-- class="flex flex-wrap items-center justify-center gap-12 p-8 bg-gray-50 border border-gray-200 rounded-lg"> -->
+
+                <div class="flex flex-col items-center">
+                    <span class="text-sm font-mono text-gray-500">light</span>
+                    <wui-switch effect="light" on="I" off="O"></wui-switch>
+                </div>
+
+                <div class="flex flex-col items-center">
+                    <span class="text-sm font-mono text-gray-500">ios</span>
+                    <wui-switch effect="ios" on="I" off="O"></wui-switch>
+                </div>
 
 
+                <div class="flex flex-col items-center">
+                    <span class="text-sm font-mono text-gray-500">skewed</span>
+                    <wui-switch effect="skewed" on="I" off="O"></wui-switch>
+                </div>
+
+                <div class="flex flex-col items-center">
+                    <span class="text-sm font-mono text-gray-500">flat</span>
+                    <wui-switch effect="flat" on="I" off="O"></wui-switch>
+                </div>
+
+                <div class="flex flex-col items-center">
+                    <span class="text-sm font-mono text-gray-500">flip</span>
+                    <wui-switch effect="flip" on="I" off="O"></wui-switch>
+                </div>
+            </div>
+        </div>
+    </woby-chk>
+    <!-- #endregion -->
+
+
+    <!-- #region Event Switch -->
     <script>
         function toggleAllBasicSwitch() {
             const button = document.getElementById('toggle-all-basic-switch-button')
@@ -193,6 +214,11 @@
             })
         }
     </script>
+    <!-- #endregion -->
+
+
+
+
 </body>
 
 </html>

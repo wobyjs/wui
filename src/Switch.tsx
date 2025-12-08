@@ -2,9 +2,11 @@
 import { nanoid } from 'nanoid'
 import { ObservableMaybe, useEffect, $, $$, isObservable, Observable, type JSX, FunctionMaybe, defaults, customElement, type ElementAttributes, HtmlBoolean, HtmlString, useMemo } from 'woby'
 import {
-    effect1, effect2, effect3, effect4, effect5,
-    effect6, effect7, effect8, effect9, effect10,
-    effect11, effect12, effect13, effect14, effect15,
+    effect1, effect2, effect3,
+    effect4, effect5, effect6,
+    effect7, effect8, effect9,
+    effect10, effect11, effect12,
+    effect13, effect14, effect15,
     effect16, effect17, effect18,
     ios, flat, skewed, flip, light
 } from './Switch.effect';
@@ -25,9 +27,11 @@ const styleMap: Record<string, string> = {
     // Common Styles
     ios, flat, skewed, flip, light,
     // Numbered Effects
-    effect1, effect2, effect3, effect4, effect5,
-    effect6, effect7, effect8, effect9, effect10,
-    effect11, effect12, effect13, effect14, effect15,
+    effect1, effect2, effect3,
+    effect4, effect5, effect6,
+    effect7, effect8, effect9,
+    effect10, effect11, effect12,
+    effect13, effect14, effect15,
     effect16, effect17, effect18
 }
 

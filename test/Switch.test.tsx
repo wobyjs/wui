@@ -1,187 +1,216 @@
 import { $, $$ } from 'woby'
 import { Switch } from '../src/Switch'
 import {
-    effect1, effect2, effect3, effect4, effect5,
-    effect6, effect7, effect8, effect9, effect10,
-    effect11, effect12, effect13, effect14, effect15,
-    effect16, effect17, effect18,
-    ios, flat, skewed, flip, light
+    effect1, effect2, // effect3,
+    // effect4, effect5, effect6,
+    // effect7, effect8, effect9,
+    // effect10, effect11, effect12,
+    // effect13, effect14, effect15,
+    // effect16, effect17, effect18,
+    // ios, flat, skewed, flip, light
 } from '../src/Switch.effect'
 import { Button } from '../src/Button'
 
 
-const StylesSwitch = () => {
-    const defaultState = $(false);
-    const iosState = $(false);
-    const flatState = $(false);
-    const lightState = $(false);
-    const skewedState = $(false);
-    const flipState = $(false);
-
-    const globalState = $(false);
-
-    const toogleAll = () => {
-        const newState = !$$(globalState);
-        globalState(newState);
-        defaultState(newState);
-        iosState(newState);
-        flatState(newState);
-        lightState(newState);
-        skewedState(newState);
-        flipState(newState);
-    }
-
-    return <>
-        <div class="flex justify-between items-center border-b pb-4 mb-4">
-            <h1 class="text-2xl font-bold text-gray-800">Switch Styles & Effects</h1>
-            <Button onClick={toogleAll}>
-                Toggle All ({() => $$(globalState) ? 'ON' : 'OFF'})
-            </Button>
-        </div>
-        <div class="flex flex-wrap items-center justify-center gap-12 p-8 bg-gray-50 border border-gray-200 rounded-lg">
-            <div class="flex flex-col items-center gap-4">
-                <span class="text-sm font-mono text-gray-500">Default</span>
-                <Switch checked={defaultState} effect="default" />
-            </div>
-
-            <div class="flex flex-col items-center gap-4">
-                <span class="text-sm font-mono text-gray-500">iOS</span>
-                <Switch checked={iosState} effect="ios" />
-            </div>
-
-            <div class="flex flex-col items-center gap-4">
-                <span class="text-sm font-mono text-gray-500">Flat</span>
-                <Switch checked={flatState} effect="flat" />
-            </div>
-
-            <div class="flex flex-col items-center gap-4">
-                <span class="text-sm font-mono text-gray-500">Light</span>
-                <Switch checked={lightState} effect="light" />
-            </div>
-
-            <div class="flex flex-col items-center gap-4">
-                <span class="text-sm font-mono text-gray-500">Skewed</span>
-                <Switch checked={skewedState} effect="skewed" />
-            </div>
-
-            <div class="flex flex-col items-center gap-4">
-                <span class="text-sm font-mono text-gray-500">Flip 3D</span>
-                <Switch checked={flipState} effect="flip" />
-            </div>
-        </div>
-    </>
-}
-
-const TextLabelSwitch = () => {
-
-    const effect1State = $(false);
-    const skewedState = $(false);
-    const flatState = $(false);
-
-    const globalState = $(false);
-
-    const toogleAll = () => {
-        const newState = !$$(globalState);
-        globalState(newState);
-        effect1State(newState);
-        skewedState(newState);
-        flatState(newState);
-    }
-
-    return <>
-        <div class="flex justify-between items-center border-b pb-4 mb-4">
-            <h1 class="text-2xl font-bold text-gray-800">Switch Styles & Effects</h1>
-            <Button onClick={toogleAll}>
-                Toggle All ({() => $$(globalState) ? 'ON' : 'OFF'})
-            </Button>
-        </div>
-        <div class="flex flex-wrap items-center justify-center gap-12 p-8 bg-gray-50 border border-gray-200 rounded-lg">
-            <div class="flex flex-col items-center gap-4">
-                <span class="text-sm font-mono text-gray-500">Effect 1 (YES/NO)</span>
-                <Switch effect="effect1" on="YES" off="NO" checked={effect1State} />
-            </div>
-
-            <div class="flex flex-col items-center gap-4">
-                <span class="text-sm font-mono text-gray-500">Skewed (High/Low)</span>
-                <Switch effect="skewed" on="High" off="Low" checked={skewedState} />
-            </div>
-
-            <div class="flex flex-col items-center gap-4">
-                <span class="text-sm font-mono text-gray-500">Flat (I/O)</span>
-                <Switch effect="flat" on="I" off="O" checked={flatState} />
-            </div>
-        </div>
-    </>
-}
-
 const EffectSwitch = () => {
+    const s1 = $(false);
+    const s2 = $(false);
+    const s3 = $(false);
+    const s4 = $(false);
+    const s5 = $(false);
+    const s6 = $(false);
+    const s7 = $(false);
+    const s8 = $(false);
+    const s9 = $(false);
+    const s10 = $(false);
+    const s11 = $(false);
+    const s12 = $(false);
+    const s13 = $(false);
+    const s14 = $(false);
+    const s15 = $(false);
+    const s16 = $(false);
+    const s17 = $(false);
+    const s18 = $(false);
+
     const globalState = $(false);
 
-    // Define data structure for all effects
-    const effects = [
-        { id: 1, name: "Basic Slide", effect: "effect1", state: $(false) },
-        { id: 2, name: "Dual Knob", effect: "effect2", state: $(false) },
-        { id: 3, name: "Elastic", effect: "effect3", state: $(false) },
-        { id: 4, name: "Vertical Flip", effect: "effect4", state: $(false) },
-        { id: 5, name: "3D Rotate", effect: "effect5", state: $(false) },
-        { id: 6, name: "Spin", effect: "effect6", state: $(false) },
-        { id: 7, name: "Fade Scale", effect: "effect7", state: $(false) },
-        { id: 8, name: "Ripple", effect: "effect8", state: $(false) },
-        { id: 9, name: "Bounce", effect: "effect9", state: $(false) },
-        { id: 10, name: "Square Text", effect: "effect10", state: $(false) },
-        { id: 11, name: "Perspective", effect: "effect11", state: $(false) },
-        { id: 12, name: "Multi-Layer", effect: "effect12", state: $(false) },
-        { id: 13, name: "Reverse", effect: "effect13", state: $(false) },
-        { id: 14, name: "Vert. Bounce", effect: "effect14", state: $(false) },
-        { id: 15, name: "Zoom Fade", effect: "effect15", state: $(false) },
-        { id: 16, name: "Stretch", effect: "effect16", state: $(false) },
-        { id: 17, name: "Dual Slide", effect: "effect17", state: $(false) },
-        { id: 18, name: "Interactive", effect: "effect18", state: $(false) },
-    ];
+    // Helper to toggle all
+    const toggleAll = () => {
+        const next = !$$(globalState);
+        s1(next); s2(next); s3(next);
+        s4(next); s5(next); s6(next);
+        s7(next); s8(next); s9(next);
+        s10(next); s11(next); s12(next);
+        s13(next); s14(next); s15(next);
+        s16(next); s17(next); s18(next);
+        globalState(next);
+    };
+
+    return <>
+        <div class="flex justify-between items-center border-b pb-4 mb-4">
+            <h1 class="text-2xl font-bold text-gray-800">Effect Switches</h1>
+            <Button onClick={toggleAll}>
+                Toggle All ({() => $$(globalState) ? 'ON' : 'OFF'})
+            </Button>
+        </div>
+        <div class="flex flex-wrap items-center justify-center grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-8 bg-gray-50 border border-gray-200 rounded-lg">
+            {/* Effect 1 - 3 */}
+            <div class="flex flex-col items-center">
+                <span class="text-sm font-mono text-gray-500">Effect 1</span>
+                <Switch effect="effect1" checked={s1} on="I" off="O" />
+            </div>
+
+            <div class="flex flex-col items-center">
+                <span class="text-sm font-mono text-gray-500">Effect 2</span>
+                <Switch effect="effect2" checked={s2} />
+            </div>
+
+            <div class="flex flex-col items-center">
+                <span class="text-sm font-mono text-gray-500">Effect 3</span>
+                <Switch effect="effect3" checked={s3} />
+            </div>
+
+            {/* Effect 4 - 6 */}
+            <div class="flex flex-col items-center">
+                <span class="text-sm font-mono text-gray-500">Effect 4</span>
+                <Switch effect="effect4" checked={s4} />
+            </div>
+
+            <div class="flex flex-col items-center">
+                <span class="text-sm font-mono text-gray-500">Effect 5</span>
+                <Switch effect="effect5" checked={s5} />
+            </div>
+
+            <div class="flex flex-col items-center">
+                <span class="text-sm font-mono text-gray-500">Effect 6</span>
+                <Switch effect="effect6" checked={s6} />
+            </div>
+
+            {/* Effect 7 - 9 */}
+            <div class="flex flex-col items-center">
+                <span class="text-sm font-mono text-gray-500">Effect 7</span>
+                <Switch effect="effect7" checked={s7} />
+            </div>
+
+            <div class="flex flex-col items-center">
+                <span class="text-sm font-mono text-gray-500">Effect 8</span>
+                <Switch effect="effect8" checked={s8} />
+            </div>
+
+            <div class="flex flex-col items-center">
+                <span class="text-sm font-mono text-gray-500">Effect 9</span>
+                <Switch effect="effect9" checked={s9} />
+            </div>
+
+            {/* Effect 10 - 12 */}
+            <div class="flex flex-col items-center">
+                <span class="text-sm font-mono text-gray-500">Effect 10</span>
+                <Switch effect="effect10" checked={s10} />
+            </div>
+
+            <div class="flex flex-col items-center">
+                <span class="text-sm font-mono text-gray-500">Effect 11</span>
+                <Switch effect="effect11" checked={s11} />
+            </div>
+
+            <div class="flex flex-col items-center">
+                <span class="text-sm font-mono text-gray-500">Effect 12</span>
+                <Switch effect="effect12" checked={s12} />
+            </div>
+
+            {/* Effect 13 - 15 */}
+            <div class="flex flex-col items-center">
+                <span class="text-sm font-mono text-gray-500">Effect 13</span>
+                <Switch effect="effect13" checked={s13} />
+            </div>
+
+            <div class="flex flex-col items-center">
+                <span class="text-sm font-mono text-gray-500">Effect 14</span>
+                <Switch effect="effect14" checked={s14} />
+            </div>
+
+            <div class="flex flex-col items-center">
+                <span class="text-sm font-mono text-gray-500">Effect 15</span>
+                <Switch effect="effect15" checked={s15} />
+            </div>
+
+            {/* Effect 16 - 18 */}
+            <div class="flex flex-col items-center">
+                <span class="text-sm font-mono text-gray-500">Effect 16</span>
+                <Switch effect="effect16" checked={s16} />
+            </div>
+
+            <div class="flex flex-col items-center">
+                <span class="text-sm font-mono text-gray-500">Effect 17</span>
+                <Switch effect="effect17" checked={s17} />
+            </div>
+
+            <div class="flex flex-col items-center">
+                <span class="text-sm font-mono text-gray-500">Effect 18</span>
+                <Switch effect="effect18" checked={s18} />
+            </div>
+        </div>
+    </>
+}
+
+
+const StylesSwitch = () => {
+    const light = $(false);
+    const ios = $(false);
+    const flat = $(false);
+    const skewed = $(false);
+    const flip = $(false)
+
+    const globalState = $(false)
 
     const toggleAll = () => {
-        const newState = !$$(globalState);
-        globalState(newState);
-        effects.forEach(e => e.state(newState));
-    }
+        const next = !$$(globalState);
+        light(next); ios(next); flat(next); skewed(next); flip(next);
+        globalState(next);
+    };
 
     return <>
-        <div class="flex justify-between items-center border-b mb-4 pb-4 mb-6 mt-12">
-            <h1 class="text-2xl font-bold text-gray-800">CSS Effects Library</h1>
+        <div class="flex justify-between items-center border-b pb-4 mb-4">
+            <h1 class="text-2xl font-bold text-gray-800">Styles Switches</h1>
             <Button onClick={toggleAll}>
                 Toggle All ({() => $$(globalState) ? 'ON' : 'OFF'})
             </Button>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
-            {effects.map((item) => (
-                // CONTAINER CARD
-                // min-h-[180px]: Ensures the card has enough height even if switch is small
-                // min-w-[240px]: Ensures the card isn't crushed on small screens
-                // overflow-hidden: Clips any switch animations that go out of bounds
-                <div class="flex flex-col bg-white border border-gray-300 rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all duration-200">
-                    {/* Header Section */}
-                    <div class="px-5 py-3 bg-gray-100 border-b border-gray-200 flex justify-between items-center">
-                        <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Effect {item.id}</span>
-                        <span class="text-sm font-semibold text-gray-800">{item.name}</span>
-                    </div>
+        <div class="flex flex-wrap items-center justify-center grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-8 bg-gray-50 border border-gray-200 rounded-lg">
 
-                    {/* Switch Display Area */}
-                    {/* flex-1 ensures it fills the remaining height of the min-h */}
-                    <div class="flex-1 flex items-center justify-center bg-white p-6 relative">
-                        <Switch
-                            effect={item.effect}
-                            checked={item.state}
-                        />
-                    </div>
-                </div>
-            ))}
+
+            <div class="flex flex-col items-center">
+                <span class="text-sm font-mono text-gray-500">Light</span>
+                <Switch effect="light" checked={light} on="I" off="O" />
+            </div>
+
+            <div class="flex flex-col items-center">
+                <span class="text-sm font-mono text-gray-500">ios</span>
+                <Switch effect="ios" checked={ios} on="I" off="O" />
+            </div>
+
+            <div class="flex flex-col items-center">
+                <span class="text-sm font-mono text-gray-500">skewed</span>
+                <Switch effect="skewed" checked={skewed} on="I" off="O" />
+            </div>
+
+            <div class="flex flex-col items-center">
+                <span class="text-sm font-mono text-gray-500">flat</span>
+                <Switch effect="flat" checked={flat} on="I" off="O" />
+            </div>
+
+            <div class="flex flex-col items-center">
+                <span class="text-sm font-mono text-gray-500">flip</span>
+                <Switch effect="flip" checked={flip} on="I" off="O" />
+            </div>
         </div>
+
     </>
+
 }
 
 export {
+    EffectSwitch,
     StylesSwitch,
-    // TextLabelSwitch,
-    // EffectSwitch,
 }
