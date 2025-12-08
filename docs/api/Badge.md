@@ -1,144 +1,151 @@
-# 🧩 Avatar API
+# 🏷️ Badge API
 
-The **Avatar API** describes all props, behaviors, and internal logic for the Avatar component.  
-It applies to both **TSX usage** and **Web Component usage (`<wui-avatar>`)**.  
-:contentReference[oaicite:6]{index=6}
+The **Badge API** describes the props, rendering logic, and styling behavior of the Badge component.  
+A Badge visually annotates another element with a small indicator (count, dot, status, etc.).
 
 ---
 
 # 📦 Import
 
 ### TSX
+
 ```tsx
-import { Avatar } from './Avatar'
+import { Badge } from "./Badge";
 ```
 
 ### Web Component
+
 ```ts
-import './Avatar'   // registers <wui-avatar>
+import "./Badge"; // registers <wui-badge>
 ```
 
 ---
 
 # 🧭 Props Overview
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| **src** | `string \| null` (observable allowed) | `null` | Image source. If provided, an `<img>` is rendered. |
-| **alt** | `string` | `"Avatar"` | Alternative text for image and fallback initial. |
-| **children** | `JSX.Child` | `null` | Custom content or initials. |
-| **size** | `"xs" \| "sm" \| "md" \| "lg"` | `"md"` | Controls the avatar’s dimensions & font size. |
-| **type** | `"circular" \| "rounded" \| "square"` | `"circular"` | Shape variant. |
-| **cls** | `ObservableMaybe<string>` | `""` | Additional class names merged into the base. |
-| **...otherProps** | `HTMLAttributes<HTMLDivElement>` | — | Any additional `<div>` attributes. |
+| Prop              | Type                                                          | Default                     | Description                                      |
+| ----------------- | ------------------------------------------------------------- | --------------------------- | ------------------------------------------------ |
+| **content**       | `number \| string \| null`                                    | `null`                      | The text/number displayed inside the badge.      |
+| **dot**           | `boolean`                                                     | `false`                     | If true, renders a small dot instead of content. |
+| **color**         | `"default" \| "primary" \| "success" \| "warning" \| "error"` | `"default"`                 | Badge theme color.                               |
+| **cls**           | `string \| ObservableMaybe<string>`                           | `""`                        | Additional classes.                              |
+| **children**      | `JSX.Child`                                                   | —                           | The element the badge attaches to.               |
+| **...otherProps** | —                                                             | Additional HTML attributes. |
 
 ---
 
 # ⚙️ Internal Logic
 
-## 🔄 Child Rendering Logic
+### Display Priority
 
-Avatar decides what to render in this order:
+Badge chooses what to render:
 
-1. **If `src` exists → render `<img>`**
-2. **Else if `children` exists → render children**
-3. **Else use first letter of `alt`**
+1. **If `dot = true` → render a dot badge**
+2. **Else if `content != null` → render a badge with content**
+3. **Else → hide badge (unless forced visible)**
 
-Implementation:  
+### Positioning
+
+Badge wraps children:
+
 ```tsx
-const child = useMemo(() => {
-    const s = $$(srcObs)
-    const a = $$(altObs)
-    if (s) return <img src={s} alt={a} class="w-full h-full object-cover" />
-    return children ?? (a ? a[0] : "")
-})
+<div class="relative inline-block">
+  {children}
+  <span class="absolute top-0 right-0 transform ...">{content}</span>
+</div>
 ```
-:contentReference[oaicite:7]{index=7}
 
 ---
 
 # 🎨 Styling Logic
 
-## Variant classes
+### Color Variants
 
 ```ts
-const variantStyle = {
-    circular: BASE_CLASS + " rounded-full",
-    rounded:  BASE_CLASS + " rounded-xl",
-    square:   BASE_CLASS + " rounded-md",
-}
+const colorMap = {
+  default: "bg-gray-500 text-white",
+  primary: "bg-blue-600 text-white",
+  success: "bg-green-600 text-white",
+  warning: "bg-yellow-500 text-white",
+  error: "bg-red-600 text-white",
+};
 ```
 
-`BASE_CLASS` includes:  
+### Dot Badge
+
+```html
+<div class="w-2 h-2 rounded-full"></div>
 ```
-relative flex items-center justify-center
-select-none leading-none overflow-hidden shrink-0 m-0 bg-[#bdbdbd]
-```
 
----
+### Content Badge
 
-## Size classes
-
-```ts
-const sizeStyle = {
-    xs: "w-6 h-6 text-xs",
-    sm: "w-8 h-8 text-sm",
-    md: "w-10 h-10 text-base",
-    lg: "w-12 h-12 text-lg",
-}
+```html
+<div class="px-2 py-[1px] text-xs rounded-full"></div>
 ```
 
 ---
 
 # 🧩 Render Structure
 
-Final HTML output:
-
 ```tsx
-<div
-    class={[
-        () => variantStyle[$$(variant)],
-        () => sizeStyle[$$(size)],
-        cls
-    ]}
-    {...otherProps}
->
-    {child}
+<div class="relative inline-block" {.otherProps}>
+    {children}
+
+    {() =>
+        dot
+            ? <span class={["badge-dot", colorClass, cls]} />
+            : content != null && (
+                <span class={["badge-content", colorClass, cls]}>
+                    {content}
+                </span>
+            )
+    }
 </div>
 ```
-
-:contentReference[oaicite:8]{index=8}
 
 ---
 
 # 🧪 Usage Examples
 
 ## TSX
+
 ```tsx
-<Avatar type="square" size="sm">R</Avatar>
+<Badge content={5}>
+  <Button>Inbox</Button>
+</Badge>
+```
+
+### Dot Badge
+
+```tsx
+<Badge dot>
+  <Avatar>J</Avatar>
+</Badge>
 ```
 
 ## HTML
+
 ```html
-<wui-avatar type="square" size="sm">R</wui-avatar>
+<wui-badge content="9">
+  <button>Messages</button>
+</wui-badge>
 ```
 
 ---
 
 # ♿ Accessibility
 
-- When using `src`, `<img alt="...">` ensures proper screen reader support
-- Initials fallback gives meaningful content even without images
-- Uses semantic `<div>` container; ensure context provides role when needed
+- Badge content is readable by screen readers
+- Dot badges should include an accessible label via `aria-label` when used for status
 
 ---
 
 # 📝 Summary
 
-Avatar provides:
+Badge provides:
 
-- **Flexible content**: image / initials / custom JSX  
-- **Configurable shape & size**  
-- **Full TSX + Web Component support**  
-- **Fallback logic for broken images**  
-- **Customizable styling** with `cls`  
+- **Counts & indicators**
+- **Dot or content display**
+- **Color variants**
+- **TSX and Web Component support**
+- **Flexible styling & layout**
