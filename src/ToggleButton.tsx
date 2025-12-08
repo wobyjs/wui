@@ -1,4 +1,4 @@
-import { $, $$, isObservable, defaults, customElement, type ElementAttributes, HtmlBoolean, type JSX } from "woby"
+import { $, $$, isObservable, defaults, customElement, type ElementAttributes, HtmlBoolean, type JSX, ObservableMaybe } from "woby"
 
 const def = () => ({
     children: $("" as JSX.Child),
@@ -31,10 +31,10 @@ const ToggleButton = defaults(def, ({
             }
         }}
         class={[
-            `rounded-tr-none rounded-br-none`,
-            `inline-flex items-center justify-center relative box-border cursor-pointer select-none align-middle leading-[1.75] tracking-[0.02857em] uppercase border m-0 border-[rgba(0,0,0,0.12)]`,
-            `[outline:0]`,
-            () => ($$(checked) ? onClass : offClass),
+            // `rounded-tr-none rounded-br-none`,
+            // `inline-flex items-center justify-center relative box-border cursor-pointer select-none align-middle leading-[1.75] tracking-[0.02857em] uppercase border m-0 border-[rgba(0,0,0,0.12)]`,
+            // `[outline:0]`,
+            // () => ($$(checked) ? onClass : offClass),
             cls,
         ]}
         {...props}
