@@ -1,103 +1,176 @@
-# Button API
+# 🧩 Button API
 
-## Import
+The **Button API** describes all available props, behaviors, interactions, and internal logic for the `Button` component.  
+This defines how the component works in both **TSX** and **Web Component (`<wui-button>`)** modes.
 
+---
+
+# 📦 Import
+
+### TSX
 ```tsx
-import { Button } from '@woby/wui'
+import { Button } from './Button'
 ```
 
-## Props
+### Web Component
+```ts
+import './Button'   // registers <wui-button>
+```
 
-| Name | Type | Default | Description |
+---
+
+# 🧭 Props Overview
+
+Below is the complete list of supported props for both TSX and HTML usage.
+
+| Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| buttonType | `"text" \| "contained" \| "outlined" \| "icon"` | `"contained"` | The style variant of the button |
-| disabled | `boolean` | `false` | If `true`, the button will be disabled |
-| children | `JSX.Child` | - | The content of the button |
-| class | `string \| string[] \| { [key: string]: boolean }` | - | Additional CSS classes to apply |
-| onClick | `EventHandler<HTMLButtonElement>` | - | Callback fired when the button is clicked |
-| ... | `JSX.ButtonHTMLAttributes<HTMLButtonElement>` | - | All other standard button attributes |
+| **type** | `"text" \| "contained" \| "outlined" \| "icon"` | `"contained"` | Controls the visual variant |
+| **buttonFunction** | `"button" \| "submit" \| "reset"` | `"button"` | Maps to the native HTML button `type` attribute |
+| **checked** | `Observable<boolean> \| boolean` | `false` | Toggles automatically on click if observable |
+| **disabled** | `Observable<boolean> \| boolean` | `false` | Disables the button and updates styling |
+| **cls** | `string \| Observable<string>` | `""` | Additional classes applied to the button |
+| **children** | `JSX.Child` | `"Button"` | Inner label or icon |
+| **onClick** | `(e: MouseEvent) => void` | `undefined` | Runs before internal toggle behavior |
+| **...otherProps** | `JSX.ButtonHTMLAttributes<HTMLButtonElement>` | — | Any native HTML `<button>` attributes |
 
-## CSS Classes
+---
 
-### Variants
+# ⚙️ Behavior & Internal Logic
 
-#### Contained (default)
-```css
-inline-flex items-center justify-center relative box-border cursor-pointer select-none align-middle no-underline 
-font-medium text-sm leading-[1.75] tracking-[0.02857em] uppercase rounded text-white bg-[#1976d2] 
-shadow-[0px_3px_1px_-2px_rgba(0,0,0,0.2),0px_2px_2px_0px_rgba(0,0,0,0.14),0px_1px_5px_0px_rgba(0,0,0,0.12)] 
-rounded-none border-0 outline-0 font-sans
-[transition:background-color_250ms_cubic-bezier(0.4,0,0.2,1)0ms,box-shadow_250ms_cubic-bezier(0.4,0,0.2,1)0ms,border-color_250ms_cubic-bezier(0.4,0,0.2,1)0ms,color_250ms_cubic-bezier(0.4,0,0.2,1)0ms]
-hover:no-underline hover:bg-[#1565c0] hover:shadow-[0px_2px_4px_-1px_rgba(0,0,0,0.2),0px_4px_5px_0px_rgba(0,0,0,0.14),0px_1px_10px_0px_rgba(0,0,0,0.12)]
-active:shadow-[0px_5px_5px_-3px_rgba(0,0,0,0.2),0px_8px_10px_1px_rgba(0,0,0,0.14),0px_3px_14px_2px_rgba(0,0,0,0.12)]
-disabled:text-[rgba(0,0,0,0.26)] disabled:shadow-none disabled:bg-[rgba(0,0,0,0.12)] disabled:pointer-events-none disabled:cursor-default
+## 🔄 Checked Toggle
+
+If the `checked` prop is a Woby observable, the value toggles each time the button is clicked:
+
+```ts
+checked(!$$(checked))
 ```
 
-#### Text
-```css
-inline-flex items-center justify-center relative box-border bg-transparent cursor-pointer select-none align-middle no-underline 
-font-medium text-sm leading-[1.75] tracking-[0.02857em] uppercase rounded text-[#1976d2] 
-rounded-none border-0 outline-0 font-sans
-[transition:background-color_250ms_cubic-bezier(0.4,0,0.2,1)0ms,box-shadow_250ms_cubic-bezier(0.4,0,0.2,1)0ms,border-color_250ms_cubic-bezier(0.4,0,0.2,1)0ms,color_250ms_cubic-bezier(0.4,0,0.2,1)0ms]
-hover:no-underline hover:bg-[rgba(25,118,210,0.04)]
-disabled:text-[rgba(0,0,0,0.26)] disabled:pointer-events-none disabled:cursor-default
+This toggle happens **after** your custom `onClick` handler runs.
+
+---
+
+## 🛑 Event Propagation Control
+
+The component calls:
+
+```ts
+e.stopImmediatePropagation()
 ```
 
-#### Outlined
-```css
-inline-flex items-center justify-center relative box-border bg-transparent cursor-pointer select-none align-middle no-underline font-medium 
-text-sm leading-[1.75] tracking-[0.02857em] uppercase rounded border text-[#1976d2] rounded-none 
-border-solid border-[rgba(25,118,210,0.5)] font-sans
-[transition:background-color_250ms_cubic-bezier(0.4,0,0.2,1)0ms,box-shadow_250ms_cubic-bezier(0.4,0,0.2,1)0ms,border-color_250ms_cubic-bezier(0.4,0,0.2,1)0ms,color_250ms_cubic-bezier(0.4,0,0.2,1)0ms]
-hover:no-underline hover:bg-[rgba(25,118,210,0.04)] hover:border hover:border-solid hover:border-[#1976d2]
-disabled:text-[rgba(0,0,0,0.26)] disabled:border disabled:border-solid disabled:border-[rgba(0,0,0,0.12)] disabled:pointer-events-none disabled:cursor-default
+This prevents duplicate click events—especially important inside nested interactive containers.
+
+---
+
+## 🧩 Children Resolution
+
+The button supports:
+
+- JSX children
+- Web component text via `children="..."`
+- Web component `<slot>` text
+
+Web Component slot extraction:
+
+```ts
+slot.assignedNodes().map(n => n.textContent).join('')
 ```
 
-#### Icon
-```css
-inline-flex items-center justify-center relative box-border bg-transparent cursor-pointer select-none align-middle no-underline text-center
-flex-[0_0_auto] text-2xl overflow-visible text-[rgba(0,0,0,0.54)] transition-[background-color] duration ease-in-out delay-[0ms] rounded-none
-rounded-[50%] border-0
-hover:bg-[rgba(0,0,0,0.04)]
-```
+Ensures `_TSX output matches Web Component output_`.
 
-## TypeScript Definitions
+---
 
-```tsx
+# 🎨 Visual Variants
+
+The button uses Tailwind-style utility classes for styling.
+
+### **contained**
+- Filled background  
+- High emphasis  
+- White text  
+- Hover & active elevation  
+
+### **text**
+- Transparent background  
+- Low emphasis  
+- Subtle hover effect  
+
+### **outlined**
+- Border  
+- Medium emphasis  
+- Blue text & border  
+
+### **icon**
+- Circular  
+- Icon-only  
+- Hover background  
+
+---
+
+# 🔤 TypeScript Definition
+
+```ts
 type ButtonProps = JSX.ButtonHTMLAttributes<HTMLButtonElement> & {
-    buttonType?: "text" | "contained" | "outlined" | "icon"
+    type?: "text" | "contained" | "outlined" | "icon",
+    buttonFunction?: "button" | "submit" | "reset",
+    checked?: Observable<boolean> | boolean,
+    disabled?: Observable<boolean> | boolean,
+    cls?: string | Observable<string>,
+    children?: JSX.Child,
+    onClick?: (e: MouseEvent) => void
 }
 
 export const Button: (props: ButtonProps) => JSX.Element
 ```
 
-## Usage Examples
+Web Component registration:
 
-### Basic Usage
+```ts
+customElement('wui-button', Button)
+```
+
+---
+
+# 🧪 Usage Examples
+
+## TSX
 ```tsx
-import { Button } from '@woby/wui'
-
-<Button onClick={() => console.log('Clicked!')}>
-  Click me
+<Button
+    type="contained"
+    cls="px-3 py-2"
+    onClick={() => console.log('clicked')}
+>
+    Save
 </Button>
 ```
 
-### Disabled Button
-```tsx
-<Button disabled>Disabled Button</Button>
+## HTML
+```html
+<wui-button
+    type="contained"
+    cls="px-3 py-2"
+    children="Save"
+></wui-button>
 ```
 
-### Custom Styled Button
-```tsx
-<Button class="bg-red-500 hover:bg-red-700 text-white">
-  Custom Button
-</Button>
-```
+---
 
-## Accessibility
+# ♿ Accessibility
 
-The Button component follows accessibility best practices:
-- Proper focus management
-- Keyboard navigation support
-- ARIA attributes where appropriate
-- Sufficient color contrast
+- Uses native `<button>` semantics  
+- Keyboard activation supported (`Enter`, `Space`)  
+- Proper disabled behavior across TSX + HTML  
+- Slot content is handled correctly for screen readers  
+- Good contrast in contained/outlined variants  
+
+---
+
+# 📝 Summary
+
+The Button component is:
+
+- **Consistent** — same API across TSX & HTML  
+- **Reactive** — supports Woby observable props  
+- **Customizable** — extend styles using `cls`  
+- **Accessible** — fully keyboard-friendly  
+- **Flexible** — supports text, outlined, contained, and icon modes  
