@@ -1,120 +1,186 @@
-# TextField API
+# 🧩 TextField API
 
-## Import
+This API describes the internal logic, props, reactive behavior, DOM structure, and effect resolution of the TextField component.
 
+---
+
+# 📦 Import
+
+### TSX
 ```tsx
-import { TextField } from '@woby/wui'
+import { TextField } from './TextField'
 ```
 
-## Props
+### Web Component
+```ts
+import './TextField'   // registers <wui-text-field>
+```
 
-| Name | Type | Default | Description |
+---
+
+# 🧭 Props Overview
+
+| Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| value | `Observable<string> \| string` | - | The value of the input field |
-| placeholder | `string` | `"Placeholder Text"` | Placeholder text to display when empty |
-| type | `string` | `"text"` | The type of input (text, password, email, etc.) |
-| disabled | `boolean` | `false` | If `true`, the input will be disabled |
-| children | `JSX.Child` | - | Additional content to render inside the field |
-| class | `string \| string[] \| { [key: string]: boolean }` | - | Additional CSS classes to apply to the container |
-| assignOnEnter | `Observable<boolean> \| boolean` | - | If `true`, value is committed on Enter key press |
-| effect | `string` | - | Custom CSS classes for styling effects |
-| onChange | `EventHandler<HTMLInputElement>` | - | Callback fired when the input value changes |
-| onKeyUp | `EventHandler<HTMLInputElement>` | - | Callback fired when a key is released |
-| ... | `JSX.InputHTMLAttributes<HTMLInputElement>` | - | All other standard input attributes |
+| **label** | string | `""` | Floating label text |
+| **value** | string or Observable | `""` | Input value |
+| **placeholder** | string | `""` | Placeholder text |
+| **helperText** | string | `""` | Helper text below the field |
+| **error** | boolean | `false` | Error state styling |
+| **disabled** | boolean | `false` | Disables input interaction |
+| **required** | boolean | `false` | Shows required indicator |
+| **effect** | string | `"underline"` | One of 27 supported visual effects |
+| **startIcon** | JSX.Child | `null` | Leading icon |
+| **endIcon** | JSX.Child | `null` | Trailing icon |
+| **multiline** | boolean | `false` | Uses `<textarea>` instead of `<input>` |
+| **rows** | number | `3` | Textarea row count |
+| **type** | string | `"text"` | Input type attribute |
+| **cls** | string | `""` | Additional class overrides |
+| **...otherProps** | HTMLAttributes | — | Passed to `<input>` or `<textarea>` |
 
-## Subcomponents
+---
 
-### StartAdornment
-```tsx
-import { StartAdornment } from '@woby/wui'
+# ⚙️ Value Logic
+
+If an observable is passed:
+
+```ts
+value() → currentValue
+value(newValue) → update
 ```
 
-### EndAdornment
-```tsx
-import { EndAdornment } from '@woby/wui'
+If a primitive is passed:
+
+- TextField becomes controlled internally  
+- Only parent re-render changes the value  
+
+---
+
+# 🎛 Focus & Floating Label Logic
+
+TextField tracks:
+
+- `isFocused`
+- `hasValue`
+- `isErrored`
+- `isDisabled`
+
+Label floats when:
+
+```
+isFocused === true
+or
+value !== ""
 ```
 
-## CSS Classes
+---
 
-### Default Effect (effect19a)
-The default styling effect uses the following CSS classes:
-```css
-/* Container */
-relative
+# 🎨 Effect Resolution
 
-/* Input */
-w-full pt-4 pb-1 px-0 text-base border-0 border-b-2 border-gray-300 
-outline-0 bg-transparent transition-colors duration-200 ease-out
-focus:border-blue-500
-[&:not(:placeholder-shown)]:pt-5 [&:not(:placeholder-shown)]:pb-0
-[&:not(:placeholder-shown)]:border-t-0
+Effects are stored in a lookup object:
 
-/* Label (generated via JS) */
-absolute top-4 left-0 pointer-events-none 
-text-gray-500 transition-all duration-200 ease-out
-[.@woby/wui-input:focus+span>&]:top-0 [.@woby/wui-input:focus+span>&]:text-xs
-[.@woby/wui-input:not(:placeholder-shown)+span>&]:top-0 [.@woby/wui-input:not(:placeholder-shown)+span>&]:text-xs
-```
-
-## TypeScript Definitions
-
-```tsx
-type TextFieldProps = JSX.InputHTMLAttributes<HTMLInputElement> & {
-  children?: JSX.Child
-  effect?: JSX.Class
-  assignOnEnter?: ObservableMaybe<boolean>
+```ts
+effects = {
+    underline, underline2, underline3,
+    box, box2, box3,
+    outline, outline2, outline3,
+    filled, filled2, ..., filled6,
+    floatUnderline, floatUnderline2, floatUnderline3,
+    floatBox, floatBox2, floatBox3,
+    floatFill, floatFill2, floatFill3,
+    labeledBox, labeledBox2, labeledBox3
 }
-
-export const TextField: (props: TextFieldProps) => JSX.Element
-
-export const StartAdornment: ComponentFunction
-export const EndAdornment: ComponentFunction
 ```
 
-## Usage Examples
+Then selected via:
 
-### Basic Usage
+```ts
+activeEffect = effects[effect] || effects["underline"]
+```
+
+---
+
+# 📐 Rendering Structure
+
+TextField outputs:
+
 ```tsx
-import { $ } from 'woby'
-import { TextField } from '@woby/wui'
+<div class="textfield-wrapper [cls] [effectClass]">
+    <div class="leading-icon">{startIcon}</div>
 
-const value = $('')
+    <div class="input-container">
+        <input or textarea ... />
 
-<TextField value={value} placeholder="Enter text" />
+        <label class="floating-label">{label}</label>
+
+        <!-- Animated effect elements -->
+        <div class="effect-layer"></div>
+    </div>
+
+    <div class="trailing-icon">{endIcon}</div>
+
+    <div class="helper-text">{helperText}</div>
+</div>
 ```
 
-### Password Field
+---
+
+# 🔄 Events
+
+TextField fires:
+
+- `onFocus`
+- `onBlur`
+- `onInput`
+- `onChange`
+- `onKeyDown`
+- `onKeyUp`
+
+All support observables seamlessly.
+
+---
+
+# 🧪 Usage Examples
+
+### Simple
 ```tsx
-import { $ } from 'woby'
-import { TextField } from '@woby/wui'
-
-const password = $('')
-
-<TextField value={password} type="password" placeholder="Enter password" />
+<TextField label="Name" />
 ```
 
-### TextField with Adornments
+### With error
 ```tsx
-import { $ } from 'woby'
-import { TextField, StartAdornment, EndAdornment } from '@woby/wui'
-
-const value = $('')
-
-<TextField value={value} placeholder="Search...">
-  <StartAdornment>
-    <svg>...</svg>
-  </StartAdornment>
-  <EndAdornment>
-    <button>Clear</button>
-  </EndAdornment>
-</TextField>
+<TextField label="Email" error helperText="Invalid email." />
 ```
 
-## Accessibility
+### With effect
+```tsx
+<TextField effect="outline" label="Search" />
+```
 
-The TextField component follows accessibility best practices:
-- Proper labeling through placeholder text
-- Keyboard navigation support
-- Focus management
-- ARIA attributes where appropriate
-- Sufficient color contrast
+### Multiline
+```tsx
+<TextField multiline rows={4} label="Message" />
+```
+
+---
+
+# ♿ Accessibility
+
+- Uses native `<input>` or `<textarea>` → full screen reader support  
+- Floating label doubles as accessible `<label>`  
+- Error & helper text are visibly connected  
+- Disabled state blocks interaction and reduces opacity  
+
+---
+
+# 📝 Summary
+
+TextField provides:
+
+- 27 animated effect variants  
+- Leading/trailing icons  
+- Floating label system  
+- Helper/error text  
+- Observable-friendly input value  
+- Full TSX + Web Component compatibility  
+- Highly customizable visual styling  
