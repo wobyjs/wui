@@ -196,35 +196,6 @@ const Button = defaults(def, (props) => {
         //     <p style={"margin-bottom: 10px; color: black;"}>Disabled: <span style={"font-weight: bold; color: blue;"}>{String(disabled)}</span></p>
         // </pre>
     )
-
-    // // TESTING: Uncomment below to test if Tailwind classes work in Shadow DOM
-    // return (
-    //     <div>
-    //         <p style={"margin-bottom: 10px; color: black;"}>Button Type: <span style={"font-weight: bold; color: blue;"}>{buttonType}</span></p>
-    //         <p style={"margin-bottom: 10px; color: black;"}> Display Text: <span style={"font-weight: bold; color: blue;"}>{() => $$(displayText)}</span></p>
-    //         <p style={"margin-bottom: 10px; color: black;"}>Disabled: <span style={"font-weight: bold; color: blue;"}>{disabled.toString()}</span></p>
-    //         <button
-    //             onClick={(e) => { 
-    //                 // Call the provided onClick handler if it exists
-    //                 if (onClick) {
-    //                     onClick(e)
-    //                 }
-    //                 
-    //                 // Handle the checked state toggle
-    //                 e.stopImmediatePropagation()
-    //                 if (isObservable(checked)) {
-    //                     checked(!$$(checked))
-    //                 }
-    //             }}
-    //             disabled={disabled}
-    //             class={() => [variant[$$(buttonType)], cls]}
-    //             {...otherProps}
-    //         >
-    //             {children}
-    //         </button>
-    //     </div>
-    // )
-
 }) as typeof Button & StyleEncapsulationProps
 
 
