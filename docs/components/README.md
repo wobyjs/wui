@@ -1,56 +1,109 @@
-# Components
+# 🧩 Woby UI — Component Documentation
 
-@woby/wui provides a comprehensive set of UI components built for the Woby framework. All components are designed to be lightweight, customizable, and easy to use.
+Welcome to the **Component Documentation** section of Woby UI.
 
-## Available Components
+This directory contains guides for **how to use each component**, with:
 
-### Form Components
-- [TextField](./TextField.md) - Input field with floating label ([API](../api/TextField.md))
-- [TextArea](./TextArea.md) - Multi-line text input
-- [NumberField](./NumberField.md) - Numeric input field
-- [Checkbox](./Checkbox.md) - Checkbox input
-- [Switch](./Switch.md) - Toggle switch ([API](../api/Switch.md))
-- [ToggleButton](./ToggleButton.md) - Toggle button
+- Interactive examples
+- TSX + Web Component usage
+- Visual behavior walkthroughs
+- Styling instructions (`cls`)
+- Best practices
+- Tips & notes
 
-### Button Components
-- [Button](./Button.md) - Versatile button component ([API](../api/Button.md))
-- [IconButton](./IconButton.md) - Icon-only button
-- [Fab](./Fab.md) - Floating action button
+---
 
-### Layout Components
-- [Appbar](./Appbar.md) - Application bar
-- [Toolbar](./Toolbar.md) - Toolbar container
-- [Card](./Card.md) - Content container
-- [Paper](./Paper.md) - Elevated surface
-- [SideBar](./SideBar.md) - Navigation sidebar
+# 🎨 Component Documentation Structure
 
-### Data Display Components
-- [Avatar](./Avatar.md) - User profile image
-- [Badge](./Badge.md) - Status indicator
-- [Chip](./Chip.md) - Compact element for actions or categories
+Each component file provides:
 
-### Navigation Components
-- [Tabs](./Tabs.md) - Tabbed interface
+### **1. Overview**
 
-### Utility Components
-- [Collapse](./Collapse.md) - Collapsible content container
-- [Zoomable](./Zoomable.md) - Zoomable image component
+What the component does and common use cases.
 
-### Editor Components
-- [Editor](./Editor.md) - Rich text editor
+### **2. Usage Examples**
 
-### Wheeler Components
-- [Wheeler](./Wheeler.md) - Wheel selector component
-- [DateTimeWheeler](./DateTimeWheeler.md) - Date/time wheel selector
-- [MultiWheeler](./MultiWheeler.md) - Multi-wheel selector
+With TSX and HTML (`<wui-*>`) versions.
 
-## Component API Structure
+### **3. Styling Options**
 
-All components follow a consistent API pattern:
+How to customize appearance using:
 
-1. **Props**: Each component accepts standard HTML attributes plus custom props
-2. **Styling**: All components support Tailwind CSS classes via the `class` prop
-3. **Observables**: Components work seamlessly with Woby observables for reactive updates
-4. **Customization**: Components can be customized through props and CSS classes
+- `cls`
+- Variants
+- Effects
+- Props
 
-For detailed API documentation, see the [API Reference](../api/README.md) section.
+### **4. Behavior Summary**
+
+Explains how the component works at a user-facing level.
+
+### **5. Notes**
+
+Important do’s/don’ts, edge cases, caveats.
+
+---
+
+# 📚 Components Documented
+
+- **AppBar** — Application header bar
+- **Avatar** — User profile circles/squares
+- **Button** — Action triggers with variants
+- **Card** — Container with elevation
+- **Checkbox** — Controlled/uncontrolled toggles
+- **Chip** — Compact labeled UI elements
+- **Collapse** — Expandable content wrapper
+- **Fab** — Floating action button
+- **IconButton** — Icon-only button
+- **NumberField** — Numeric input with increment/decrement
+- **Paper** — Elevated surface container
+- **Switch** — Animated toggle with 23+ effects
+- **Tabs** — Section navigation with Tab views
+- **TextField** — Input with 27 effects & floating label
+- **Toolbar** — Horizontal layout for actions/navigation
+- **Zoomable** — Pan + pinch + wheel zoom container
+
+---
+
+# ✨ Design-System Principles
+
+All components follow:
+
+- Consistent naming
+- Predictable behavior
+- Tailwind-class-friendly styling
+- Shadow DOM isolation (Web Components)
+- Woby observables for reactivity
+- Clean TSX examples
+
+---
+
+# 🧪 Test Files as Examples
+
+Usage is also demonstrated in each component’s:
+
+- `*.testx.tsx`
+- `*.testx.html`
+
+These tests show real, production-safe patterns.
+
+---
+
+# 📝 Contributing New Components
+
+When adding a component:
+
+1. Create:
+   ```
+   docs/Component/YourComponent.md
+   docs/Api/YourComponent.md
+   ```
+2. Follow the structure from existing docs
+3. Include examples in TSX + HTML
+4. Keep descriptions clean and readable
+5. Keep the premium design-system style
+
+---
+
+Need help generating documentation for a new component?  
+Just provide the `.tsx` file and test files.

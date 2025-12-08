@@ -1,147 +1,149 @@
-# Maintaining Documentation
+# 🛠 Maintaining Documentation
 
-This guide provides instructions for maintaining and updating the @woby/wui documentation.
+This guide provides best practices and standardized workflows for maintaining and updating the **@woby/wui** documentation.  
+Its purpose is to ensure consistency, clarity, and high quality across all docs as the library grows.
 
-## Documentation Structure
+---
 
-The documentation is organized into the following directories:
+## 📁 Documentation Structure
 
-- `docs/` - Main documentation directory
-  - `components/` - Individual component documentation
-  - `guides/` - Tutorials and guides
-  - `api/` - Detailed API references
-  - `index.html` - Documentation homepage
+The documentation is organized into four major directories:
 
-## Adding New Components
+```
+docs/
+  components/   → Component usage documentation
+  guides/       → Developer & user guides
+  api/          → Technical API references
+  index.html    → Documentation homepage
+```
 
-When adding new components to @woby/wui, follow these steps to create documentation:
+Each directory serves a distinct purpose:
 
-1. Create a component documentation file in `docs/components/`:
-   ```bash
-   # Run the documentation generation script
-   npm run docs:generate
-   ```
+### **components/**
 
-2. Manually update the generated documentation with:
-   - Detailed prop descriptions
-   - Usage examples
-   - TypeScript definitions
-   - CSS class information
+Houses readable, example-driven documentation for individual UI components.
 
-3. Add API documentation in `docs/api/` with detailed prop information and TypeScript definitions
+### **guides/**
 
-4. Update `docs/components/README.md` to include the new component
+Provides tutorials, conceptual explanations, onboarding, styling techniques, and contribution instructions.
 
-## Updating Documentation
+### **api/**
 
-### Component Documentation
+Contains technical reference material including prop definitions, internal behaviors, and rendering structures.
 
-When updating components, ensure the documentation is kept in sync:
+---
 
-1. Update prop descriptions when adding/removing props
-2. Add new usage examples for new features
-3. Update TypeScript definitions
-4. Modify CSS class documentation if styling changes
+## ➕ Adding New Components
 
-### Guides
+When contributing a new component to **@woby/wui**, follow this workflow:
 
-Update guides when:
-- Adding new features that developers need to know about
-- Changing APIs that affect usage patterns
-- Adding new best practices
+### **1. Create Component Documentation**
 
-## Documentation Format
+Add a file to:
 
-### Component Documentation
+```
+docs/components/
+```
 
-Component documentation should include:
+Use an existing component file as a template.
 
-1. **Import statement** - How to import the component
-2. **Basic usage** - Simple example of how to use the component
-3. **Props table** - Detailed prop descriptions with types and defaults
-4. **Examples** - Multiple usage examples
-5. **TypeScript definitions** - Type definitions for the component
-6. **CSS classes** - Information about styling and customization
+### **2. Run the Documentation Generation Script**
 
-### Guide Documentation
-
-Guide documentation should include:
-
-1. **Clear objective** - What the guide will teach
-2. **Prerequisites** - What the reader should know before reading
-3. **Step-by-step instructions** - Clear, actionable steps
-4. **Examples** - Code examples with explanations
-5. **Best practices** - Recommendations for optimal usage
-6. **Troubleshooting** - Common issues and solutions
-
-## Style Guide
-
-### Writing Style
-
-- Use clear, concise language
-- Write in the second person ("you" rather than "the developer")
-- Use active voice
-- Include practical examples
-- Explain the "why" behind recommendations
-
-### Code Examples
-
-- Use TypeScript syntax highlighting
-- Provide complete, runnable examples
-- Include comments for complex code
-- Show both basic and advanced usage
-- Use realistic data in examples
-
-### Formatting
-
-- Use Markdown for all documentation
-- Use H1 for main titles
-- Use H2 for section headers
-- Use H3 for subsections
-- Use tables for prop documentation
-- Use code blocks for examples
-- Use links to related documentation
-
-## Testing Documentation
-
-To test documentation:
-
-1. Review all links to ensure they work
-2. Verify code examples are syntactically correct
-3. Check that TypeScript definitions match the actual implementation
-4. Ensure all component names and APIs are accurate
-
-## Publishing Documentation
-
-Documentation is published as part of the GitHub repository and can be viewed directly on GitHub or through GitHub Pages.
-
-To publish documentation updates:
-
-1. Commit changes to the repository
-2. Push to the main branch
-3. Documentation will be available immediately on GitHub
-
-## Automated Documentation Generation
-
-The project includes a script to automatically generate basic documentation for components:
-
-```bash
+```sh
 npm run docs:generate
 ```
 
-This script:
-- Creates basic documentation files for all components
-- Includes import statements and basic usage examples
-- Provides a template for props and TypeScript definitions
+This creates baseline documentation that must be further refined manually.
 
-Note that generated documentation requires manual updates to be complete and accurate.
+### **3. Enhance the Generated Documentation**
 
-## Keeping Documentation Up-to-Date
+Update the component doc with:
 
-To ensure documentation stays current:
+- Full prop descriptions
+- Usage examples (TSX + HTML)
+- TypeScript definitions
+- Relevant CSS class information
 
-1. Update documentation when making code changes
-2. Review documentation during code reviews
-3. Periodically audit documentation for accuracy
-4. Update examples when APIs change
-5. Add deprecation notices for deprecated features
+### **4. Add the API Reference**
+
+Create a matching file in:
+
+```
+docs/api/
+```
+
+Include:
+
+- Precise prop definitions
+- Internal logic
+- Rendering structure
+- Event behavior
+
+---
+
+## 🔄 Updating Existing Documentation
+
+When modifying a component, ensure you also update its documentation accordingly:
+
+### Required updates include:
+
+- Prop & API changes
+- Usage examples
+- TS definitions
+- CSS classes
+- Behavioral notes
+
+Check if related _guides_ require updates—for example, if behavior changes affect tutorials or examples.
+
+---
+
+## 🧪 Testing Documentation Changes
+
+Verify the following before committing documentation changes:
+
+- All links work correctly
+- Examples compile or render properly
+- TypeScript definitions are accurate
+- Prop descriptions match implementation
+- No outdated patterns remain
+
+Following these steps ensures the documentation stays accurate and reliable.
+
+---
+
+## 📝 Style Guide for Documentation
+
+To maintain professionalism and consistency across the docs, follow these guidelines:
+
+### ✔ Writing Style
+
+- Use **clear and concise** language
+- Prefer **active voice**
+- Provide both **TSX and HTML examples**
+- Document only relevant behavior
+
+### ✔ Markdown Formatting
+
+- Use headings to structure content
+- Use code fences (` ``` `) for examples
+- Use tables for prop definitions
+- Keep formatting consistent across all pages
+
+Adhering to these conventions ensures readability and reduces friction for users and contributors alike.
+
+---
+
+## ⚙️ Automated Documentation Generation
+
+The documentation generator creates starting templates, but **manual refinement** is always required.
+
+Automation helps with structure; humans supply clarity and correctness.
+
+---
+
+## 🤝 Contributing
+
+Maintaining documentation is a collaborative effort.  
+Following this guide ensures that **@woby/wui** remains easy to understand, consistent, and a pleasure to work with.
+
+Thank you for helping improve the library!
