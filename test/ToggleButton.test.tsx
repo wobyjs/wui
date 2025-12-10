@@ -6,18 +6,18 @@ const DefaultToggleButton = () => {
 }
 
 const CheckedToggleButton = () => {
-    return <ToggleButton checked={$<boolean>(true)}>Toggle</ToggleButton>
+    return <ToggleButton checked={true}>Toggle</ToggleButton>
 }
 
 const CustomClassToggleButton = () => {
-    return <ToggleButton cls={$<string>("m-2 p-2 border-2 rounded")}>Toggle</ToggleButton>
+    return <ToggleButton cls={"m-2 p-2 border-2 rounded"}>Toggle</ToggleButton>
 }
 
 const OnOffClassToggleButton = () => {
     return (
-        <ToggleButton 
-            onClass={$<string>("bg-blue-500 text-white")} 
-            offClass={$<string>("bg-gray-200 text-black")}
+        <ToggleButton
+            onClass={"bg-blue-500 text-white"}
+            offClass={"bg-gray-200 text-black"}
         >
             Toggle
         </ToggleButton>
