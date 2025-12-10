@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Align Button Editor Test</title>
+    <link href="/node_modules/@woby/chk/dist/index.css" rel="stylesheet">
+    <script type="module" src="../../src/Editor/AlignButton.tsx"></script>
+</head>
+
+<body>
+    <link href="../dist/wui.css" rel="stylesheet">
+
+    <h2 class="text-[1.2em] pl-4">Align Button Component Test</h2>
+
+    <!-- <woby-chk name="Default Align Button">
+        <wui-align-button snapshot-name="Default-Align-Button" />
+    </woby-chk>
+
+    <woby-chk name="Left Align Button">
+        <wui-align-button content-align="start" snapshot-name="Left-Align-Button" />
+    </woby-chk>
+
+    <woby-chk name="Center Align Button">
+        <wui-align-button content-align="center" snapshot-name="Center-Align-Button" />
+    </woby-chk>
+
+    <woby-chk name="Right Align Button">
+        <wui-align-button content-align="end" snapshot-name="Right-Align-Button" />
+    </woby-chk>
+
+    <woby-chk name="Disable Align Button">
+        <wui-align-button disabled snapshot-name="Disable-Align-Button" />
+    </woby-chk> -->
+
+    <woby-chk name="AlignButton">
+        <div snapshot-name="AlignButtonTest" class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+            <EditorContext.Provider value={editorRef}>
+                <UndoRedo>
+                    <div class="mb-4">
+                        <p>Disabled Button</p>
+                        <div class="flex gap-4 items-center my-2">
+                            <wui-align-button content-align="start" disabled="true"></wui-align-button>
+                            <wui-align-button content-align="center" disabled="true"></wui-align-button>
+                            <wui-align-button content-align="end" disabled="true"></wui-align-button>
+                        </div>
+                        <p>Enabled Button</p>
+                        <div class="flex gap-4 items-center my-2">
+                            <wui-align-button content-align="start"></wui-align-button>
+                            <wui-align-button content-align="center"></wui-align-button>
+                            <wui-align-button content-align="end"></wui-align-button>
+                        </div>
+                        <div contentEditable
+                            class="border border-gray-300 rounded p-4 min-h-[200px] mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <p>Select this text and try the alignment buttons below!</p>
+                            <p>You can align start, center, or end.</p>
+                        </div>
+
+                    </div>
+                </UndoRedo>
+            </EditorContext.Provider>
+        </div>
+    </woby-chk>
+
+</body>
+
+</html>
