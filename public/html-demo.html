@@ -23,6 +23,7 @@
     <script type="module" src="../src/SideBar.tsx"></script>
     <script type="module" src="../src/Switch.tsx"></script>
     <script type="module" src="../src/Tabs.tsx"></script>
+    <script type="module" src="../src/TextArea.tsx"></script>
     <script type="module" src="../src/TextField.tsx"></script>
     <script type="module" src="../src/Toolbar.tsx"></script>
     <script type="module" src="../src/Zoomable.tsx"></script>
@@ -123,6 +124,10 @@
             <a href="#tabs"
                 class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
                 Tabs
+            </a>
+            <a href="#textarea"
+                class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                Text Area
             </a>
             <a href="#textfield"
                 class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
@@ -1078,6 +1083,7 @@
     </template>
     <!-- #endregion -->
 
+
     <!-- #region Paper -->
     <template id="paper-demo">
         <h2 id="paper" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Paper Demo</h2>
@@ -1580,6 +1586,196 @@
     </template>
     <!-- #endregion -->
 
+
+    <!-- #region Textarea Demo-->
+    <template id="textarea-demo">
+        <h2 id="textarea" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Textarea Demo</h2>
+        <div class="space-y-6">
+            <!-- Textarea Demo -->
+            <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                <h3 class="text-lg font-semibold mb-4 uppercase">Border Effect</h3>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+                    <wui-text-area resize="none" effect="effect1" placeholder="Non Resizeable Effect 1"></wui-text-area>
+                    <wui-text-area resize="none" effect="effect2" placeholder="Non Resizeable Effect 2"></wui-text-area>
+                    <wui-text-area resize="none" effect="effect3" placeholder="Non Resizeable Effect 3"></wui-text-area>
+
+                    <wui-text-area resize="none" effect="effect4" placeholder="Non Resizeable Effect 4"></wui-text-area>
+                    <wui-text-area resize="none" effect="effect5" placeholder="Non Resizeable Effect 5"></wui-text-area>
+                    <wui-text-area resize="none" effect="effect6" placeholder="Non Resizeable Effect 6"></wui-text-area>
+
+                    <wui-text-area resize="none" effect="effect7" placeholder="Non Resizeable Effect 7"></wui-text-area>
+                    <wui-text-area resize="none" effect="effect8" placeholder="Non Resizeable Effect 8"></wui-text-area>
+                    <wui-text-area resize="none" effect="effect9" placeholder="Non Resizeable Effect 9"></wui-text-area>
+                </div>
+
+                <h3 class="text-lg font-semibold mb-4 uppercase">Background Effect</h3>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+                    <wui-text-area resize="none" effect="effect10"
+                        placeholder="Non Resizeable Effect 10"></wui-text-area>
+                    <wui-text-area resize="none" effect="effect11"
+                        placeholder="Non Resizeable Effect 11"></wui-text-area>
+                    <wui-text-area resize="none" effect="effect12"
+                        placeholder="Non Resizeable Effect 12"></wui-text-area>
+
+                    <wui-text-area resize="none" effect="effect13"
+                        placeholder="Non Resizeable Effect 13"></wui-text-area>
+                    <wui-text-area resize="none" effect="effect14"
+                        placeholder="Non Resizeable Effect 14"></wui-text-area>
+                    <wui-text-area resize="none" effect="effect15"
+                        placeholder="Non Resizeable Effect 15"></wui-text-area>
+                </div>
+
+                <h3 class="text-lg font-semibold mb-4 uppercase">Input With Label Effect</h3>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+                    <wui-text-area resize="none" effect="effect16" label="Non Resizeable Effect 16"></wui-text-area>
+                    <wui-text-area resize="none" effect="effect17" label="Non Resizeable Effect 17"></wui-text-area>
+                    <wui-text-area resize="none" effect="effect18" label="Non Resizeable Effect 18"></wui-text-area>
+
+                    <wui-text-area resize="none" effect="effect19" label="Non Resizeable Effect 19"></wui-text-area>
+                    <wui-text-area resize="none" effect="effect20" label="Non Resizeable Effect 20"></wui-text-area>
+                    <wui-text-area resize="none" effect="effect21" label="Non Resizeable Effect 21"></wui-text-area>
+
+                    <wui-text-area resize="none" effect="effect22" label="Non Resizeable Effect 22"></wui-text-area>
+                    <wui-text-area resize="none" effect="effect23" label="Non Resizeable Effect 23"></wui-text-area>
+                    <wui-text-area resize="none" effect="effect24" label="Non Resizeable Effect 24"></wui-text-area>
+                </div>
+
+                <h3 class="text-lg font-semibold mb-4 uppercase">Alternative Label Effects</h3>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+                    <wui-text-area resize="none" effect="effect19a" label="Non Resizeable Effect 19a"></wui-text-area>
+                    <wui-text-area resize="none" effect="effect20a" label="Non Resizeable Effect 20a"></wui-text-area>
+                    <wui-text-area resize="none" effect="effect21a" label="Non Resizeable Effect 21a"></wui-text-area>
+                </div>
+            </div>
+
+            <!-- Dynamic Textarea -->
+            <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm w-full">
+                <h3 class="text-lg font-bold mb-6 uppercase border-b pb-2">Control Textarea</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+
+                    <!-- LEFT COLUMN: CONTROLS -->
+                    <div class="space-y-4">
+
+                        <div name="control resize">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Resize Mode</label>
+                            <select name="resize" id="resize"
+                                class="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                                <option value="none">none</option>
+                                <option value="horizontal">horizontal</option>
+                                <option value="vertical">vertical</option>
+                                <option value="both" selected>both</option>
+                            </select>
+                        </div>
+
+                        <div name="control effects">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Visual Effect</label>
+                            <select name="effects" id="effects"
+                                class="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                                <optgroup label="Underline">
+                                    <option value="effect1" selected>Effect 1</option>
+                                    <option value="effect2">Effect 2</option>
+                                    <option value="effect3">Effect 3</option>
+                                </optgroup>
+
+                                <optgroup label="Box">
+                                    <option value="effect4">Effect 4</option>
+                                    <option value="effect5">Effect 5</option>
+                                    <option value="effect6">Effect 6</option>
+                                </optgroup>
+
+                                <optgroup label="Outline">
+                                    <option value="effect7">Effect 7</option>
+                                    <option value="effect8">Effect 8</option>
+                                    <option value="effect9">Effect 9</option>
+                                </optgroup>
+
+                                <optgroup label="Fill">
+                                    <option value="effect10">Effect 10</option>
+                                    <option value="effect11">Effect 11</option>
+                                    <option value="effect12">Effect 12</option>
+                                    <option value="effect13">Effect 13</option>
+                                    <option value="effect14">Effect 14</option>
+                                    <option value="effect15">Effect 15</option>
+                                </optgroup>
+
+                                <optgroup label="With Label (Float)">
+                                    <option value="effect16">Effect 16</option>
+                                    <option value="effect17">Effect 17</option>
+                                    <option value="effect18">Effect 18</option>
+                                    <option value="effect19">Effect 19</option>
+                                    <option value="effect20">Effect 20</option>
+                                    <option value="effect21">Effect 21</option>
+                                    <option value="effect22">Effect 22</option>
+                                    <option value="effect23">Effect 23</option>
+                                    <option value="effect24">Effect 24</option>
+                                </optgroup>
+
+                                <optgroup label="With Label (Cut)">
+                                    <option value="effect19a">Effect 19a</option>
+                                    <option value="effect20a">Effect 20a</option>
+                                    <option value="effect21a">Effect 21a</option>
+                                </optgroup>
+                            </select>
+                        </div>
+
+                        <div class="p-3 bg-gray-50 rounded-md border border-gray-100">
+                            <div class="flex items-center justify-between mb-2">
+                                <!-- Custom Checkbox (Simulated click in JS below) -->
+                                <wui-checkbox id="textarea-show-label" label-position="right"
+                                    cls="!text-blue-500 !font-bold" checked="true">
+                                    Show Label?
+                                </wui-checkbox>
+                            </div>
+                            <input type="text" value="My Label" id="textarea-label"
+                                class="w-full border border-gray-300 rounded-md p-2 text-sm disabled:opacity-50"
+                                placeholder="Enter label text" />
+                        </div>
+
+                        <div class="p-3 bg-gray-50 rounded-md border border-gray-100">
+                            <div class="flex items-center justify-between mb-2">
+                                <!-- Custom Checkbox (Simulated click in JS below) -->
+                                <wui-checkbox id="textarea-show-placeholder" label-position="left"
+                                    cls="!text-blue-500 !font-bold place-content-between" checked="true">
+                                    Show Placeholder?
+                                </wui-checkbox>
+                            </div>
+                            <input type="text" id="textarea-placeholder"
+                                class="w-full border border-gray-300 rounded-md p-2 text-sm disabled:opacity-50"
+                                value="Type something here..." placeholder="Enter placeholder text" />
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col gap-6">
+                        <div class="flex-1 bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg p-8 relative">
+                            <div
+                                class="absolute top-2 left-2 text-xs font-bold text-gray-400 uppercase tracking-widest">
+                                Preview
+                            </div>
+                            <div class="w-full h-[260px] max-w-full overflow-hidden flex items-center justify-center">
+                                <wui-text-area cls="min-w-[280px] min-h-[120px] max-size-full box-border" id="target-textarea" resize="both" effect="effect1" label="My Label"
+                                    placeholder="Type something here..."></wui-text-area>
+                            </div>
+                        </div>
+
+                        <div class="text-xs">
+                            <h4 class="font-bold text-gray-500 mb-2 uppercase">Current State</h4>
+                            <pre class="bg-gray-800 text-gray-100 rounded-md p-4 font-mono overflow-auto">
+                                <p>Resize:      <span id="debug-resize">both</span></p>
+                                <p>Effect:      <span id="debug-effect">effect1</span></p>
+                                <p>Label:       <span id="debug-label">true ("My Label")</span></p>
+                                <p>Placeholder: <span id="debug-placeholder">true ("Type something here...")</span></p>
+                            </pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </template>
+    <!-- #endregion -->
+
+
     <!-- #region Text Field demo -->
     <template id="textfield-demo">
         <h2 id="textfield" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Text Field Demo</h2>
@@ -1770,7 +1966,6 @@
     <!-- #endregion -->
 
 
-
     <!-- #region Zoomable demo -->
     <template id="zoomable-demo">
         <h2 id="zoomable" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Zoomable Demo (HTML)</h2>
@@ -1938,6 +2133,7 @@
             setupSidebarDemo();
             setupSwitchDemo();
             setupTabsDemo();
+            setupTextAreaDemo();
         });
 
         function loadNavigation() {
@@ -1974,6 +2170,7 @@
                 'tabs-demo',
                 'toolbar-demo',
                 'zoomable-demo',
+                'textarea-demo',
                 'textfield-demo',
             ];
 
@@ -2475,6 +2672,89 @@
                     tabToRemove.remove();
                 }
             };
+        }
+
+        function setupTextAreaDemo() {
+            // 1. Select DOM Elements
+            const target = document.getElementById('target-textarea');
+
+            // Guard clause in case we aren't on the page with the text area demo
+            if (!target) return;
+
+            const inputs = {
+                resize: document.getElementById('resize'),
+                effects: document.getElementById('effects'),
+                showLabel: document.getElementById('textarea-show-label'),
+                labelTxt: document.getElementById('textarea-label'),
+                showPlaceholder: document.getElementById('textarea-show-placeholder'),
+                placeholderTxt: document.getElementById('textarea-placeholder'),
+            };
+
+            const debug = {
+                resize: document.getElementById('debug-resize'),
+                effects: document.getElementById('debug-effect'),
+                label: document.getElementById('debug-label'),
+                placeholder: document.getElementById('debug-placeholder'),
+            };
+
+            // 2. State Update Function
+            const updateState = () => {
+                // Resize
+                const resizeVal = inputs.resize.value;
+                target.setAttribute('resize', resizeVal);
+                if (debug.resize) debug.resize.textContent = resizeVal;
+
+                // Effect
+                const effectVal = inputs.effects.value;
+                target.setAttribute('effect', effectVal);
+                if (debug.effects) debug.effects.textContent = effectVal;
+
+                // Label Logic
+                const isLabelShown = inputs.showLabel.hasAttribute('checked') && inputs.showLabel.getAttribute('checked') !== 'false';
+                const labelText = isLabelShown ? inputs.labelTxt.value : "";
+
+                if (labelText) {
+                    target.setAttribute('label', labelText);
+                } else {
+                    target.removeAttribute('label');
+                }
+
+                inputs.labelTxt.disabled = !isLabelShown;
+                if (debug.label) debug.label.textContent = `${isLabelShown} ("${labelText}")`;
+
+                // Placeholder Logic
+                const isPlaceholderShown = inputs.showPlaceholder.hasAttribute('checked') && inputs.showPlaceholder.getAttribute('checked') !== 'false';
+                const placeholderText = isPlaceholderShown ? inputs.placeholderTxt.value : "";
+
+                target.setAttribute('placeholder', placeholderText);
+                inputs.placeholderTxt.disabled = !isPlaceholderShown;
+                if (debug.placeholder) debug.placeholder.textContent = `${isPlaceholderShown} ("${placeholderText}")`;
+            };
+
+            // 3. Helper to toggle custom checkbox element
+            const toggleCheckbox = (element) => {
+                const isChecked = element.hasAttribute('checked') && element.getAttribute('checked') !== 'false';
+                if (isChecked) {
+                    element.removeAttribute('checked');
+                } else {
+                    element.setAttribute('checked', 'true');
+                }
+                updateState();
+            };
+
+            // 4. Attach Event Listeners
+            inputs.resize.addEventListener('change', updateState);
+            inputs.effects.addEventListener('change', updateState);
+
+            inputs.labelTxt.addEventListener('input', updateState);
+            inputs.placeholderTxt.addEventListener('input', updateState);
+
+            // Handle custom checkbox clicks
+            inputs.showLabel.addEventListener('click', () => toggleCheckbox(inputs.showLabel));
+            inputs.showPlaceholder.addEventListener('click', () => toggleCheckbox(inputs.showPlaceholder));
+
+            // 5. Initial Run
+            updateState();
         }
 
     </script>

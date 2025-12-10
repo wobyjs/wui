@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>TextArea Component Test</title>
+    <link href="/node_modules/@woby/chk/dist/index.css" rel="stylesheet">
+    <script type="module" src="../src/TextArea.tsx"></script>
+</head>
+
+<body>
+    <link href="../dist/wui.css" rel="stylesheet">
+    <h2 class="text-[1.2em] pl-4 font-bold">TextArea Component Test Suite</h2>
+
+    <woby-chk name="BorderEffectTextArea">
+        <div snapshot-name="Border Effect TextArea" class="space-y-2">
+            <h3 class="font-bold text-gray-500 uppercase">Border Effect</h3>
+            <div class="grid grid-cols-2 md:grid-cols-2 gap-4 mb-6">
+                <wui-text-area resize="none" effect="effect1" placeholder="Effect 1 TextArea..."></wui-text-area>
+                <wui-text-area resize="none" effect="effect2" placeholder="Effect 2 TextArea..."></wui-text-area>
+                <wui-text-area resize="none" effect="effect3" placeholder="Effect 3 TextArea..."></wui-text-area>
+                <wui-text-area resize="none" effect="effect4" placeholder="Effect 4 TextArea..."></wui-text-area>
+                <wui-text-area resize="none" effect="effect5" placeholder="Effect 5 TextArea..."></wui-text-area>
+                <wui-text-area resize="none" effect="effect6" placeholder="Effect 6 TextArea..."></wui-text-area>
+                <wui-text-area resize="none" effect="effect7" placeholder="Effect 7 TextArea..."></wui-text-area>
+                <wui-text-area resize="none" effect="effect8" placeholder="Effect 8 TextArea..."></wui-text-area>
+                <wui-text-area resize="none" effect="effect9" placeholder="Effect 9 TextArea..."></wui-text-area>
+            </div>
+        </div>
+    </woby-chk>
+
+    <woby-chk name="FillEffectTextArea">
+        <div snapshot-name="Fill Effect TextArea" class="space-y-2">
+            <h3 class="font-bold text-gray-500 uppercase">Fill Effect</h3>
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+                <wui-text-area resize="none" effect="effect10" placeholder="Effect 10 TextArea..."></wui-text-area>
+                <wui-text-area resize="none" effect="effect11" placeholder="Effect 11 TextArea..."></wui-text-area>
+                <wui-text-area resize="none" effect="effect12" placeholder="Effect 12 TextArea..."></wui-text-area>
+                <wui-text-area resize="none" effect="effect13" placeholder="Effect 13 TextArea..."></wui-text-area>
+                <wui-text-area resize="none" effect="effect14" placeholder="Effect 14 TextArea..."></wui-text-area>
+                <wui-text-area resize="none" effect="effect15" placeholder="Effect 15 TextArea..."></wui-text-area>
+            </div>
+        </div>
+    </woby-chk>
+
+    <woby-chk name="LabelEffectTextArea">
+        <div snapshot-name="Label Effect TextArea" class="space-y-2">
+            <h3 class="font-bold text-gray-500 uppercase">Label Effect</h3>
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+                <wui-text-area resize="none" effect="effect16" label="Effect 16"></wui-text-area>
+                <wui-text-area resize="none" effect="effect17" label="Effect 17"></wui-text-area>
+                <wui-text-area resize="none" effect="effect18" label="Effect 18"></wui-text-area>
+
+                <wui-text-area resize="none" effect="effect19" label="Effect 19"></wui-text-area>
+                <wui-text-area resize="none" effect="effect20" label="Effect 20"></wui-text-area>
+                <wui-text-area resize="none" effect="effect21" label="Effect 21"></wui-text-area>
+
+                <wui-text-area resize="none" effect="effect22" label="Effect 22"></wui-text-area>
+                <wui-text-area resize="none" effect="effect23" label="Effect 23"></wui-text-area>
+                <wui-text-area resize="none" effect="effect24" label="Effect 24"></wui-text-area>
+
+            </div>
+        </div>
+    </woby-chk>
+
+    <woby-chk name="AlternativeEffectTextArea">
+        <div snapshot-name="Alternative Effect TextArea" class="space-y-2">
+            <h3 class="font-bold text-gray-500 uppercase">Alternative Effect</h3>
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+                <wui-text-area resize="none" effect="effect19a" label="Effect 19a"></wui-text-area>
+                <wui-text-area resize="none" effect="effect20a" label="Effect 20a"></wui-text-area>
+                <wui-text-area resize="none" effect="effect21a" label="Effect 21a"></wui-text-area>
+            </div>
+        </div>
+    </woby-chk>
+
+    <woby-chk name="Resizeable_BorderEffect">
+        <div snapshot-name="Resizeable Border Effect TextArea" class="space-y-2">
+            <h3 class="font-bold text-gray-500 uppercase">Underline Effect Resizeable TextArea (Effect 1 - 3)</h3>
+            <wui-text-area cls="w-[300px] h-[100px]" resize="both" effect="effect1" placeholder="Underline Effect Textarea..."></wui-text-area>
+            <hr class="mx-auto my-2 border-gray-300 border-1" />
+
+            <h3 class="font-bold text-gray-500 uppercase">Box Effect Resizeable TextArea (Effect 4 - 6)</h3>
+            <wui-text-area cls="w-[300px] h-[100px]" resize="both" effect="effect4" placeholder="Box Effect Textarea..."></wui-text-area>
+            <hr class="mx-auto my-2 border-gray-300 border-1" />
+
+            <h3 class="font-bold text-gray-500 uppercase">Outline Effect Resizeable TextArea (Effect 7 - 9)</h3>
+            <wui-text-area cls="w-[300px] h-[100px]" resize="both" effect="effect7" placeholder="Outline Effect Textarea..."></wui-text-area>
+        </div>
+    </woby-chk>
+
+    <woby-chk name="Resizeable_FillEffect">
+        <div snapshot-name="Fill Effect TextArea" class="space-y-2">
+            <h3 class="font-bold text-gray-500 uppercase">Fill Effect Resizeable TextArea (Effect 10 - 15)</h3>
+            <wui-text-area cls="w-[300px] h-[100px]" resize="both" effect="effect10" placeholder="Fill Effect Textarea..."></wui-text-area>
+        </div>
+    </woby-chk>
+
+    <woby-chk name="Resizeable_LabelEffect">
+        <div snapshot-name="Resizeable Label Effect TextArea" class="space-y-2">
+            <h3 class="font-bold text-gray-500 uppercase">With Label Effect Resizeable TextArea (Effect 16 - 18)</h3>
+            <wui-text-area cls="w-[300px] h-[100px]" resize="both" effect="effect16" label="Underline Effect Textarea..."></wui-text-area>
+            <hr class="mx-auto my-2 border-gray-300 border-1" />
+
+            <h3 class="font-bold text-gray-500 uppercase">With Label Effect Resizeable TextArea (Effect 19 - 21)</h3>
+            <wui-text-area cls="w-[300px] h-[100px]" resize="both" effect="effect19" label="Box Effect Textarea..."></wui-text-area>
+            <hr class="mx-auto my-2 border-gray-300 border-1" />
+
+            <h3 class="font-bold text-gray-500 uppercase">With Label Effect Resizeable TextArea (Effect 22 - 24)</h3>
+            <wui-text-area cls="w-[300px] h-[100px]" resize="both" effect="effect22" label="Fill Effect Textarea..."></wui-text-area>
+        </div>
+    </woby-chk>
+</body>
+
+</html>

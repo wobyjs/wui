@@ -24,6 +24,7 @@ import { Tabs, Tab } from './Tabs'
 import { Toolbar } from './Toolbar'
 import { Zoomable, Img } from './Zoomable'
 import TextField from './TextField'
+import { TextArea } from './TextArea'
 
 
 const isDev = typeof import.meta.env !== 'undefined' && import.meta.env.DEV
@@ -98,6 +99,9 @@ export function App() {
                     </a>
                     <a href="#tabs" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
                         Tabs
+                    </a>
+                    <a href="#textarea" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                        Text Area
                     </a>
                     <a href="#textfield" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
                         Text Field
@@ -2582,6 +2586,224 @@ export function App() {
     // #endregion
 
 
+    // #region TextArea Demo
+    const textareaDemo = () => {
+        const controlTextArea = () => {
+            // 1. State Definitions
+            const resize = $("both") // Default to both to see resize effect immediately
+            const effect = $("effect1")
+
+            // Toggles
+            const showLabel = $(true)
+            const showPlaceholder = $(true)
+
+            // Text Content
+            const labelTxt = $("My Label")
+            const placeholderTxt = $("Type something here...")
+
+            // 2. Computed Props for the Component
+            // We pass these functions to the component so it updates reactively
+            const activeLabel = () => $$(showLabel) ? $$(labelTxt) : undefined
+            const activePlaceholder = () => $$(showPlaceholder) ? $$(placeholderTxt) : undefined
+
+            // 3. Lists for Dropdowns
+            const resizeOptions = ["none", "horizontal", "vertical", "both"]
+
+            // Grouping effects for easier selection
+            const effectGroups = {
+                "Underline": ["effect1", "effect2", "effect3"],
+                "Box": ["effect4", "effect5", "effect6"],
+                "Outline": ["effect7", "effect8", "effect9"],
+                "Fill": ["effect10", "effect11", "effect12", "effect13", "effect14", "effect15"],
+                "With Label (Float)": ["effect16", "effect17", "effect18", "effect19", "effect20", "effect21", "effect22", "effect23", "effect24"],
+                "With Label (Cut)": ["effect19a", "effect20a", "effect21a"],
+            }
+
+            return (
+                <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm w-full">
+                    <h3 class="text-lg font-bold mb-6 uppercase border-b pb-2">Control Textarea</h3>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        {/* LEFT COLUMN: Controls */}
+                        <div class="space-y-4">
+                            {/* Resize Control */}
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Resize Mode</label>
+                                <select
+                                    value={resize}
+                                    onChange={(e: any) => resize(e.target.value)}
+                                    class="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                                >
+                                    {resizeOptions.map(opt => <option value={opt}>{opt}</option>)}
+                                </select>
+                            </div>
+
+                            {/* Effect Control */}
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Visual Effect</label>
+                                <select
+                                    value={effect}
+                                    onChange={(e: any) => effect(e.target.value)}
+                                    class="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                                >
+                                    {Object.entries(effectGroups).map(([group, effects]) => (
+                                        <optgroup label={group}>
+                                            {effects.map(eff => <option value={eff}>{eff}</option>)}
+                                        </optgroup>
+                                    ))}
+                                </select>
+                            </div>
+
+                            {/* Label Control */}
+                            <div class="p-3 bg-gray-50 rounded-md border border-gray-100">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-sm font-medium text-gray-700">Show Label?</span>
+                                    <input
+                                        type="checkbox"
+                                        checked={showLabel}
+                                        onChange={(e: any) => showLabel(e.target.checked)}
+                                        class="w-4 h-4 text-blue-600 rounded"
+                                    />
+                                </div>
+                                <input
+                                    type="text"
+                                    value={labelTxt}
+                                    onChange={(e: any) => labelTxt(e.target.value)}
+                                    disabled={() => !$$(showLabel)}
+                                    class="w-full border border-gray-300 rounded-md p-2 text-sm disabled:opacity-50"
+                                    placeholder="Enter label text"
+                                />
+                            </div>
+
+                            {/* Placeholder Control */}
+                            <div class="p-3 bg-gray-50 rounded-md border border-gray-100">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-sm font-medium text-gray-700">Show Placeholder?</span>
+                                    <input
+                                        type="checkbox"
+                                        checked={showPlaceholder}
+                                        onChange={(e: any) => showPlaceholder(e.target.checked)}
+                                        class="w-4 h-4 text-blue-600 rounded"
+                                    />
+                                </div>
+                                <input
+                                    type="text"
+                                    value={placeholderTxt}
+                                    onChange={(e: any) => placeholderTxt(e.target.value)}
+                                    disabled={() => !$$(showPlaceholder)}
+                                    class="w-full border border-gray-300 rounded-md p-2 text-sm disabled:opacity-50"
+                                    placeholder="Enter placeholder text"
+                                />
+                            </div>
+                        </div>
+
+                        {/* RIGHT COLUMN: Preview & Debug */}
+                        <div class="flex flex-col gap-6">
+
+                            {/* Live Preview Area */}
+                            <div class="flex-1 bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg p-8 relative">
+                                <div class="absolute top-2 left-2 text-xs font-bold text-gray-400 uppercase tracking-widest">
+                                    Preview
+                                </div>
+
+                                {/* Constraining box for the resizable TextArea */}
+                                <div class="w-full h-[260px] max-w-full overflow-hidden flex items-center justify-center">
+                                    <TextArea
+                                        cls="min-w-[280px] min-h-[120px] max-size-full box-border"
+                                        resize={resize}
+                                        effect={effect}
+                                        label={activeLabel}
+                                        placeholder={activePlaceholder}
+                                    />
+                                </div>
+                            </div>
+
+
+                            {/* Debug Info (Fixed your snippet) */}
+                            <div class="text-xs">
+                                <h4 class="font-bold text-gray-500 mb-2 uppercase">Current State</h4>
+                                <pre class="bg-gray-800 text-gray-100 rounded-md p-4 font-mono overflow-auto">
+                                    {() => `
+Resize:      ${$$(resize)}
+Effect:      ${$$(effect)}
+Label:       ${$$(showLabel)} ("${$$(labelTxt)}")
+Placeholder: ${$$(showPlaceholder)} ("${$$(placeholderTxt)}")
+`}
+                                </pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )
+        }
+
+
+        const displayTextArea = () => {
+            return <>
+                <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                    <h3 class="text-lg font-semibold mb-4 uppercase">Border Effect</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+                        <TextArea resize="none" effect="effect1" placeholder="Effect 1" />
+                        <TextArea resize="none" effect="effect2" placeholder="Effect 2" />
+                        <TextArea resize="none" effect="effect3" placeholder="Effect 3" />
+
+                        <TextArea resize="none" effect="effect4" placeholder="Effect 4" />
+                        <TextArea resize="none" effect="effect5" placeholder="Effect 5" />
+                        <TextArea resize="none" effect="effect6" placeholder="Effect 6" />
+
+                        <TextArea resize="none" effect="effect7" placeholder="Effect 7" />
+                        <TextArea resize="none" effect="effect8" placeholder="Effect 8" />
+                        <TextArea resize="none" effect="effect9" placeholder="Effect 9" />
+                    </div>
+
+                    <h3 class="text-lg font-semibold mb-4 uppercase">Background Effect</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+                        <TextArea resize="none" effect="effect10" placeholder="Effect 10" />
+                        <TextArea resize="none" effect="effect11" placeholder="Effect 11" />
+                        <TextArea resize="none" effect="effect12" placeholder="Effect 12" />
+
+                        <TextArea resize="none" effect="effect13" placeholder="Effect 13" />
+                        <TextArea resize="none" effect="effect14" placeholder="Effect 14" />
+                        <TextArea resize="none" effect="effect15" placeholder="Effect 15" />
+                    </div>
+
+                    <h3 class="text-lg font-semibold mb-4 uppercase">Input With Label Effect</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+                        <TextArea resize="none" effect="effect16" label="Effect 16" />
+                        <TextArea resize="none" effect="effect17" label="Effect 17" />
+                        <TextArea resize="none" effect="effect18" label="Effect 18" />
+
+                        <TextArea resize="none" effect="effect19" label="Effect 19" />
+                        <TextArea resize="none" effect="effect20" label="Effect 20" />
+                        <TextArea resize="none" effect="effect21" label="Effect 21" />
+
+                        <TextArea resize="none" effect="effect22" label="Effect 22" />
+                        <TextArea resize="none" effect="effect23" label="Effect 23" />
+                        <TextArea resize="none" effect="effect24" label="Effect 24" />
+                    </div>
+
+                    <h3 class="text-lg font-semibold mb-4 uppercase">Alternative Label Effects</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+                        <TextArea resize="none" effect="effect19a" label="Effect 19a" />
+                        <TextArea resize="none" effect="effect20a" label="Effect 20a" />
+                        <TextArea resize="none" effect="effect21a" label="Effect 21a" />
+
+                    </div>
+                </div>
+            </>
+        }
+
+        return <>
+            <h2 id="textarea" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Text Area Demo</h2>
+            <div class="space-y-6">
+                {displayTextArea}
+                {controlTextArea}
+            </div>
+        </>
+    }
+    // #endregion
+
+
     // #region Text Field Demo
     const textFieldDemo = () => {
         return <>
@@ -2943,6 +3165,7 @@ export function App() {
                 {sidebarDemo()}
                 {switchDemo()}
                 {tabsDemo()}
+                {textareaDemo()}
                 {textFieldDemo()}
                 {toolbarDemo()}
                 {zoomableDemo()}
