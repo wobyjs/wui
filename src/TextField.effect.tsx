@@ -92,7 +92,7 @@ export const effect3 = [
 
 // #region Box Effects 4-6
 const box =
-    "focus:[outline:none] pt-[5px] px-0 pb-[7px] border-0 border-b border-b-solid border-transparent border-b-[#ccc] duration-[0.4s] w-full";
+    "focus:[outline:none] pt-[5px] px-0 pb-[7px] border-0 border-b border-b-solid border-transparent border-b-[#ccc] duration-[0.4s] w-full h-full";
 const focusBox =
     "focus:w-full focus:pt-[5px] focus:px-3.5 focus:pb-[7px] focus:duration-[0.4s]";
 
@@ -102,16 +102,16 @@ export const effect4 = [
 
     /* ---------- span (base) ---------- */
     "[&~span]:absolute",
+    "[&~span]:w-full",
     "[&~span]:h-0",
     "[&~span]:bottom-0",
     "[&~span]:left-0",
-    "[&~span]:w-full",
     "[&~span]:duration-[0.4s]",
     "[&~span]:z-[-1]",
 
     /* ---------- span (focus) ---------- */
     "[&:focus~span]:duration-[0.4s]",
-    "[&:focus~span]:h-9",
+    "[&:focus~span]:h-full",
     "[&:focus~span]:border-2",
     "[&:focus~span]:border-solid",
     "[&:focus~span]:border-[#4caf50]",
@@ -124,7 +124,7 @@ export const effect5 = [
 
     /* ---------- span (base) ---------- */
     "[&~span]:absolute",
-    "[&~span]:h-9",
+    "[&~span]:h-full",
     "[&~span]:bottom-0",
     "[&~span]:left-0",
     "[&~span]:w-0",
@@ -144,7 +144,7 @@ export const effect6 = [
 
     /* ---------- span (base) ---------- */
     "[&~span]:absolute",
-    "[&~span]:h-9",
+    "[&~span]:h-full",
     "[&~span]:bottom-0",
     "[&~span]:right-0",
     "[&~span]:w-0",
@@ -995,7 +995,7 @@ export const effect21 = [
 
 
 // #region Labeled Fill Effects 22-24
-// const fill22 = `focus: [outline: none] border - 2 relative px - [15px] py - [7px] border - 0 border - solid border - [#ccc] bg - transparent w - full` + `focus: border - [#4caf50] transition - colors duration - [0.7s]`;
+
 const fillWithLabel = "focus:[outline:none] px-3.5 py-2 border border-solid border-[#ccc] relative bg-transparent z-10 w-full"
 
 const fillLabel = [
@@ -1299,7 +1299,7 @@ export const effect19a = [
 export const effect20a = [
     boxWithLabel,
 
-    chipLabelBase, hpLabel, hLabel,
+    chipLabelBase,
 
 
     /* ---------- span ::before / ::after (base) ---------- */
@@ -1376,7 +1376,7 @@ export const effect21a = [
 
     boxWithLabel,
 
-    chipLabelBase, hpLabel, hLabel,
+    chipLabelBase,
 
     /* ---------- span ::before / ::after (base) ---------- */
     "[&~span]:before:content-['']",
