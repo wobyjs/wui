@@ -16,22 +16,13 @@ const def = () => ({
 	cls: $(""),
 	// checked: $(false as boolean),
 	// disabled: $(false as boolean),
-	checked: $(false, HtmlBoolean) as ObservableMaybe<boolean> | undefined,
-	disabled: $(false, HtmlBoolean) as ObservableMaybe<boolean> | undefined,
+	checked: $(false, HtmlBoolean) as ObservableMaybe<boolean>,
+	disabled: $(false, HtmlBoolean) as ObservableMaybe<boolean>,
 	id: $(`checkbox-${Math.random().toString(36).substr(2, 9)}`),
 })
 
 const Checkbox = defaults(def, (props) => {
 	const { children, labelPosition, cls, checked, disabled, id, ...otherProps } = props
-
-	// Convert disabled to boolean if it's a string (from HTML attributes)
-	// const isDisabled = () => {
-	// 	const disabledValue = $$(disabled)
-	// 	if (typeof disabledValue === 'string') {
-	// 		return disabledValue === 'true' || disabledValue === ''
-	// 	}
-	// 	return Boolean(disabledValue)
-	// }
 
 	const before = () =>
 		$$(labelPosition) === "left" || $$(labelPosition) === "top" ?
@@ -44,22 +35,15 @@ const Checkbox = defaults(def, (props) => {
 	const line = () => ($$(labelPosition) === "top" || $$(labelPosition) === "bottom" ? <br /> : null)
 
 	return (
-		<div class={() => [(cls)].join(" ")}>
+		<div class={() => [(cls)]}>
 			{before}
 			{line}
 			<input id={id} type="checkbox" checked={checked} disabled={disabled} {...otherProps} />
 			{line}
 			{after}
-
-			{/* <pre class="border border-black-500 p-4 mt-2">
-				<p class="underline mb-2">Check Box Props</p>
-				<p>Id: {id}</p>
-				<p>Checked: {() => String(checked)}</p>
-				<p>Disabled: {() => String(disabled)}</p>
-			</pre> */}
 		</div>
 	)
-}) as typeof Checkbox & StyleEncapsulationProps
+}) as typeof Checkbox
 
 export { Checkbox }
 

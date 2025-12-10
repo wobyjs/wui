@@ -140,7 +140,6 @@ const TextField = defaults(def, (props) => {
 
 			<input
 				class={effectStyle}
-				// class={[effectStyle, "flex-1 w-full min-w-0 bg-transparent z-10"]}
 				value={value}
 				disabled={disabled}
 				type={inputType}

@@ -30,7 +30,9 @@ const Collapse = defaults(def, (props) => {
 	function renderCollapse() {
 		return (
 			<div
-				class={() => [baseClass, isBackground(), $$(cls)].join(" ")}
+				class={() => [
+					baseClass, isBackground, cls]
+				}
 				{...otherProps}
 			>
 				<div class="h-fit">
