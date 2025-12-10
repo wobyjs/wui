@@ -91,7 +91,7 @@ const AlignButton = defaults(def, (props) => {
         </div>
 
     )
-}) as typeof AlignButton & StyleEncapsulationProps
+}) as typeof AlignButton
 
 export { AlignButton }
 
