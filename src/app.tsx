@@ -25,6 +25,7 @@ import { Toolbar } from './Toolbar'
 import { Zoomable, Img } from './Zoomable'
 import TextField from './TextField'
 import { TextArea } from './TextArea'
+import { ToggleButton } from './ToggleButton'
 
 
 const isDev = typeof import.meta.env !== 'undefined' && import.meta.env.DEV
@@ -105,6 +106,9 @@ export function App() {
                     </a>
                     <a href="#textfield" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
                         Text Field
+                    </a>
+                    <a href="#toggle-button" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                        Toggle Button
                     </a>
                     <a href="#toolbar" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
                         Toolbar
@@ -2865,6 +2869,137 @@ Placeholder: ${$$(showPlaceholder)} ("${$$(placeholderTxt)}")
     // #endregion
 
 
+    // #region Toggle Button Demo
+    const toggleButtonDemo = () => {
+        // Alignment state (single-select group)
+        const align = $("left")
+
+        // Text style states (multi-select toggles)
+        const isBold = $(false)
+        const isItalic = $(false)
+        const isUnderline = $(false)
+
+        const previewClass = () => [
+            "inline-block rounded-md px-4 py-2 border border-gray-300 bg-white w-full max-size-full",
+            $$(align) === "left" && "text-left",
+            $$(align) === "center" && "text-center",
+            $$(align) === "right" && "text-right",
+            $$(isBold) && "font-semibold",
+            $$(isItalic) && "italic",
+            $$(isUnderline) && "underline underline-offset-2",
+        ]
+
+        return (
+            <>
+                <h2
+                    id="toggle-button"
+                    class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4"
+                >
+                    Toggle Button Demo
+                </h2>
+
+                <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                    <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,260px)_minmax(0,1fr)] gap-6">
+                        {/* LEFT: Controls */}
+                        <div class="space-y-6">
+                            {/* Alignment Group */}
+                            <div>
+                                <h3 class="text-sm font-semibold mb-2 text-gray-800 uppercase tracking-wide">
+                                    Alignment
+                                </h3>
+                                <p class="text-xs text-gray-500 mb-3">
+                                    Single-select group using <code>ToggleButton</code> for text alignment.
+                                </p>
+                                <div class="inline-flex gap-2 bg-gray-50 border border-gray-200 rounded-full px-2 py-1">
+                                    <ToggleButton
+                                        checked={() => $$(align) === "left"}
+                                        onClick={() => align("left")}
+                                        cls="min-w-[64px]"
+                                    >
+                                        Left
+                                    </ToggleButton>
+                                    <ToggleButton
+                                        checked={() => $$(align) === "center"}
+                                        onClick={() => align("center")}
+                                        cls="min-w-[64px]"
+                                    >
+                                        Center
+                                    </ToggleButton>
+                                    <ToggleButton
+                                        checked={() => $$(align) === "right"}
+                                        onClick={() => align("right")}
+                                        cls="min-w-[64px]"
+                                    >
+                                        Right
+                                    </ToggleButton>
+                                </div>
+                            </div>
+
+                            {/* Text Style Group */}
+                            <div>
+                                <h3 class="text-sm font-semibold mb-2 text-gray-800 uppercase tracking-wide">
+                                    Text Style
+                                </h3>
+                                <p class="text-xs text-gray-500 mb-3">
+                                    Multi-select toggles controlling bold, italic and underline.
+                                </p>
+                                <div class="inline-flex gap-2 bg-gray-50 border border-gray-200 rounded-full px-2 py-1">
+                                    <ToggleButton
+                                        checked={isBold}
+                                        cls="w-9 h-9 font-semibold"
+                                    >
+                                        B
+                                    </ToggleButton>
+                                    <ToggleButton
+                                        checked={isItalic}
+                                        cls="w-9 h-9 italic"
+                                    >
+                                        I
+                                    </ToggleButton>
+                                    <ToggleButton
+                                        checked={isUnderline}
+                                        cls="w-9 h-9 underline underline-offset-2"
+                                    >
+                                        U
+                                    </ToggleButton>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* RIGHT: Preview + Debug */}
+                        <div class="flex flex-col gap-6">
+                            {/* Preview */}
+                            <div class="border-2 border-dashed border-gray-300 rounded-lg bg-gray-50 p-4">
+                                <p class="text-xs font-semibold text-gray-500 tracking-wide uppercase mb-2">
+                                    Preview
+                                </p>
+                                <div class={previewClass}>
+                                    This is a sample text controlled by Toggle Buttons.
+                                </div>
+                            </div>
+
+                            {/* Debug info */}
+                            <div class="text-xs">
+                                <h4 class="font-bold text-gray-500 mb-2 uppercase tracking-wide">
+                                    Current State
+                                </h4>
+                                <pre class="bg-gray-900 text-gray-100 rounded-md p-3 font-mono text-[11px] overflow-auto">
+                                    {() => `align:      ${$$(align)}
+bold:       ${$$(isBold)}
+italic:     ${$$(isItalic)}
+underline:  ${$$(isUnderline)}`}
+                                </pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </>
+        )
+    }
+    // #endregion
+
+
+
     // #region Toolbar Demo
     const toolbarDemo = () => {
         return <>
@@ -3167,6 +3302,7 @@ Placeholder: ${$$(showPlaceholder)} ("${$$(placeholderTxt)}")
                 {tabsDemo()}
                 {textareaDemo()}
                 {textFieldDemo()}
+                {toggleButtonDemo()}
                 {toolbarDemo()}
                 {zoomableDemo()}
             </div>

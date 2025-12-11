@@ -25,6 +25,7 @@
     <script type="module" src="../src/Tabs.tsx"></script>
     <script type="module" src="../src/TextArea.tsx"></script>
     <script type="module" src="../src/TextField.tsx"></script>
+    <script type="module" src="../src/ToggleButton.tsx"></script>
     <script type="module" src="../src/Toolbar.tsx"></script>
     <script type="module" src="../src/Zoomable.tsx"></script>
     <!-- #endregion -->
@@ -132,6 +133,10 @@
             <a href="#textfield"
                 class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
                 Text Field
+            </a>
+            <a href="#togglebutton"
+                class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                Toggle Button
             </a>
             <a href="#toolbar"
                 class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
@@ -1752,7 +1757,8 @@
                                 Preview
                             </div>
                             <div class="w-full h-[260px] max-w-full overflow-hidden flex items-center justify-center">
-                                <wui-text-area cls="min-w-[280px] min-h-[120px] max-size-full box-border" id="target-textarea" resize="both" effect="effect1" label="My Label"
+                                <wui-text-area cls="min-w-[280px] min-h-[120px] max-size-full box-border"
+                                    id="target-textarea" resize="both" effect="effect1" label="My Label"
                                     placeholder="Type something here..."></wui-text-area>
                             </div>
                         </div>
@@ -1832,6 +1838,93 @@
         </div>
     </template>
     <!-- #endregion -->
+
+
+    <!-- #region Toggle Button Demo -->
+    <template id="toggle-button-demo">
+        <h2 id="togglebutton" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">
+            Toggle Button Demo
+        </h2>
+
+        <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+            <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,260px)_minmax(0,1fr)] gap-6">
+                <!-- LEFT COLUMN: Groups -->
+                <div class="space-y-6">
+                    <!-- Alignment Group -->
+                    <div>
+                        <h3 class="text-sm font-semibold mb-2 text-gray-800 uppercase tracking-wide">
+                            Alignment
+                        </h3>
+                        <p class="text-xs text-gray-500 mb-3">
+                            Single-select style alignment using <code>&lt;wui-toggle-button&gt;</code>.
+                        </p>
+                        <div class="inline-flex gap-2 bg-gray-50 border border-gray-200 rounded-full px-2 py-1">
+                            <wui-toggle-button id="toggle-align-left" cls="min-w-[64px]">
+                                Left
+                            </wui-toggle-button>
+                            <wui-toggle-button id="toggle-align-center" cls="min-w-[64px]">
+                                Center
+                            </wui-toggle-button>
+                            <wui-toggle-button id="toggle-align-right" cls="min-w-[64px]">
+                                Right
+                            </wui-toggle-button>
+                        </div>
+                    </div>
+
+                    <!-- Text Style Group -->
+                    <div>
+                        <h3 class="text-sm font-semibold mb-2 text-gray-800 uppercase tracking-wide">
+                            Text Style
+                        </h3>
+                        <p class="text-xs text-gray-500 mb-3">
+                            Multi-select toggles for bold, italic, and underline styles.
+                        </p>
+                        <div class="inline-flex gap-2 bg-gray-50 border border-gray-200 rounded-full px-2 py-1">
+                            <wui-toggle-button id="toggle-bold" cls="w-9 h-9 font-semibold">
+                                B
+                            </wui-toggle-button>
+                            <wui-toggle-button id="toggle-italic" cls="w-9 h-9 italic">
+                                I
+                            </wui-toggle-button>
+                            <wui-toggle-button id="toggle-underline" cls="w-9 h-9 underline underline-offset-2">
+                                U
+                            </wui-toggle-button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RIGHT COLUMN: Preview & Debug -->
+                <div class="flex flex-col gap-6">
+                    <!-- Preview -->
+                    <div class="border-2 border-dashed border-gray-300 rounded-lg bg-gray-50 p-4">
+                        <p class="text-xs font-semibold text-gray-500 tracking-wide uppercase mb-2">
+                            Preview
+                        </p>
+                        <div id="toggle-preview"
+                            class="inline-block rounded-md px-4 py-2 border border-gray-300 bg-white w-full max-size-full text-left">
+                            This is a sample text controlled by Toggle Buttons.
+                        </div>
+                    </div>
+
+                    <!-- Debug Info -->
+                    <div class="text-xs">
+                        <h4 class="font-bold text-gray-500 mb-2 uppercase tracking-wide">
+                            Current State
+                        </h4>
+                        <pre
+                            class="bg-gray-900 text-gray-100 rounded-md p-3 font-mono text-[11px] overflow-auto leading-5">
+Resize   :<span id="debug-toggle-align">left</span>
+Bold     :<span id="debug-toggle-bold">false</span>
+Italic   :<span id="debug-toggle-italic">false</span>
+Underline:<span id="debug-toggle-underline">false</span></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+    <!-- #endregion -->
+
+
 
 
     <!-- #region Toolbar demo -->
@@ -2134,6 +2227,7 @@
             setupSwitchDemo();
             setupTabsDemo();
             setupTextAreaDemo();
+            setupToggleButtonDemo();
         });
 
         function loadNavigation() {
@@ -2172,6 +2266,7 @@
                 'zoomable-demo',
                 'textarea-demo',
                 'textfield-demo',
+                'toggle-button-demo',
             ];
 
             demoTemplates.forEach(id => {
@@ -2757,6 +2852,112 @@
             updateState();
         }
 
+        function setupToggleButtonDemo() {
+            const preview = document.getElementById('toggle-preview');
+            if (!preview) return;
+
+            // Alignment buttons
+            const btnLeft = document.getElementById('toggle-align-left');
+            const btnCenter = document.getElementById('toggle-align-center');
+            const btnRight = document.getElementById('toggle-align-right');
+
+            // Style buttons
+            const btnBold = document.getElementById('toggle-bold');
+            const btnItalic = document.getElementById('toggle-italic');
+            const btnUnderline = document.getElementById('toggle-underline');
+
+            // Debug spans
+            const dbgAlign = document.getElementById('debug-toggle-align');
+            const dbgBold = document.getElementById('debug-toggle-bold');
+            const dbgItalic = document.getElementById('debug-toggle-italic');
+            const dbgUnderline = document.getElementById('debug-toggle-underline');
+
+            // Internal state
+            let align = 'left';
+            let bold = false;
+            let italic = false;
+            let underline = false;
+
+            const applyPreviewClasses = () => {
+                if (!preview) return;
+
+                // Base classes
+                preview.className =
+                    'inline-block rounded-md px-4 py-2 border border-gray-300 bg-white w-full max-size-full';
+
+                // Alignment
+                if (align === 'left') preview.classList.add('text-left');
+                if (align === 'center') preview.classList.add('text-center');
+                if (align === 'right') preview.classList.add('text-right');
+
+                // Styles
+                if (bold) preview.classList.add('font-semibold');
+                if (italic) preview.classList.add('italic');
+                if (underline) preview.classList.add('underline', 'underline-offset-2');
+
+                // Debug text
+                if (dbgAlign) dbgAlign.textContent = align;
+                if (dbgBold) dbgBold.textContent = String(bold);
+                if (dbgItalic) dbgItalic.textContent = String(italic);
+                if (dbgUnderline) dbgUnderline.textContent = String(underline);
+            };
+
+            // Alignment handlers
+            if (btnLeft) {
+                btnLeft.addEventListener('click', () => {
+                    align = 'left';
+                    applyPreviewClasses();
+
+                    btnCenter.setAttribute('checked', 'false');
+                    btnRight.setAttribute('checked', 'false');
+                });
+            }
+
+            if (btnCenter) {
+                btnCenter.addEventListener('click', () => {
+                    align = 'center';
+                    applyPreviewClasses();
+
+                    btnLeft.setAttribute('checked', 'false');
+                    btnRight.setAttribute('checked', 'false');
+                });
+            }
+
+            if (btnRight) {
+                btnRight.addEventListener('click', () => {
+                    align = 'right';
+                    applyPreviewClasses();
+
+                    btnLeft.setAttribute('checked', 'false');
+                    btnCenter.setAttribute('checked', 'false');
+                });
+            }
+
+            // Style handlers (toggle true/false)
+            if (btnBold) {
+                btnBold.addEventListener('click', () => {
+                    bold = !bold;
+                    applyPreviewClasses();
+                });
+            }
+
+            if (btnItalic) {
+                btnItalic.addEventListener('click', () => {
+                    italic = !italic;
+                    applyPreviewClasses();
+                });
+            }
+
+            if (btnUnderline) {
+                btnUnderline.addEventListener('click', () => {
+                    underline = !underline;
+                    applyPreviewClasses();
+                });
+            }
+
+            // Initial state
+            applyPreviewClasses();
+        }
     </script>
     <!-- #endregion -->
 </body>
