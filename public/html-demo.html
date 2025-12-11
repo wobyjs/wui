@@ -11,6 +11,10 @@
     <script type="module" src="../src/Badge.tsx"></script>
     <script type="module" src="../src/Button.tsx"></script>
     <script type="module" src="../src/Editor/AlignButton.tsx"></script>
+    <script type="module" src="../src/Editor/BoldButton.tsx"></script>
+    <script type="module" src="../src/Editor/ItalicButton.tsx"></script>
+    <script type="module" src="../src/Editor/UnderlineButton.tsx"></script>
+    <script type="module" src="../src/Editor/TextStyleButton.tsx"></script>
     <script type="module" src="../src/Card.tsx"></script>
     <script type="module" src="../src/Checkbox.tsx"></script>
     <script type="module" src="../src/Chip.tsx"></script>
@@ -77,6 +81,22 @@
             <a href="#alignbutton"
                 class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
                 AlignButton
+            </a>
+            <a href="#boldbutton"
+                class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                BoldButton
+            </a>
+            <a href="#italicbutton"
+                class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                ItalicButton
+            </a>
+            <a href="#underlinebutton"
+                class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                UnderlineButton
+            </a>
+            <a href="#textstylebutton"
+                class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                TextStyleButton
             </a>
             <a href="#card"
                 class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
@@ -292,6 +312,7 @@
     </template>
     <!-- #endregion -->
 
+    <!-- #region Editor -->
 
     <!-- #region align button -->
     <template id="align-button-demo">
@@ -301,15 +322,9 @@
                 <UndoRedo>
                     <div class="mb-4">
                         <div class="flex gap-4 items-center my-2">
-                            <div class="border rounded-[4px] m-2 p-4">
-                                <wui-align-button content-align="start"></wui-align-button>
-                            </div>
-                            <div class="border rounded-[4px] m-2 p-4">
-                                <wui-align-button content-align="center"></wui-align-button>
-                            </div>
-                            <div class="border rounded-[4px] m-2 p-4">
-                                <wui-align-button content-align="end"></wui-align-button>
-                            </div>
+                            <wui-align-button content-align="start"></wui-align-button>
+                            <wui-align-button content-align="center"></wui-align-button>
+                            <wui-align-button content-align="end"></wui-align-button>
                         </div>
                         <div ref={editorRef} contentEditable
                             class="border border-gray-300 rounded p-4 min-h-[200px] mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -322,6 +337,103 @@
             </EditorContext.Provider>
         </div>
     </template>
+    <!-- #endregion -->
+
+    <!-- #region bold button -->
+    <template id="bold-button-demo">
+        <h2 id="boldbutton" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">BoldButton Demo</h2>
+        <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+            <EditorContext.Provider value={editorRef}>
+                <UndoRedo>
+                    <div class="mb-4">
+                        <div class="flex gap-4 items-center my-2">
+                            <wui-bold-button cls="text-black"></wui-bold-button>
+                        </div>
+                        <div ref={editorRef} contentEditable
+                            class="border border-gray-300 rounded p-4 min-h-[200px] mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <p>Select this text and try the bold button below!</p>
+                            <p>You can make text bold.</p>
+                        </div>
+                    </div>
+                </UndoRedo>
+            </EditorContext.Provider>
+        </div>
+    </template>
+    <!-- #endregion -->
+
+
+    <!-- #region italic button -->
+    <template id="italic-button-demo">
+        <h2 id="italicbutton" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">ItalicButton Demo</h2>
+        <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+            <EditorContext.Provider value={editorRef}>
+                <UndoRedo>
+                    <div class="mb-4">
+                        <div class="flex gap-4 items-center my-2">
+                            <wui-italic-button cls="text-black"></wui-italic-button>
+                        </div>
+                        <div ref={editorRef} contentEditable
+                            class="border border-gray-300 rounded p-4 min-h-[200px] mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <p>Select this text and try the italic button below!</p>
+                            <p>You can make text italic.</p>
+                        </div>
+                    </div>
+                </UndoRedo>
+            </EditorContext.Provider>
+        </div>
+    </template>
+    <!-- #endregion -->
+
+
+    <!-- #region underline button -->
+    <template id="underline-button-demo">
+        <h2 id="underlinebutton" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">UnderlineButton Demo</h2>
+        <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+            <EditorContext.Provider value={editorRef}>
+                <UndoRedo>
+                    <div class="mb-4">
+                        <div class="flex gap-4 items-center my-2">
+                            <wui-underline-button cls="text-black"></wui-underline-button>
+                        </div>
+                        <div ref={editorRef} contentEditable
+                            class="border border-gray-300 rounded p-4 min-h-[200px] mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <p>Select this text and try the underline button below!</p>
+                            <p>You can make text underline.</p>
+                        </div>
+                    </div>
+                </UndoRedo>
+            </EditorContext.Provider>
+        </div>
+    </template>
+    <!-- #endregion -->
+
+
+    <!-- #region text style button -->
+    <template id="text-style-button-demo">
+        <h2 id="textstylebutton" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">TextStyleButton Demo</h2>
+        <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+            <EditorContext.Provider value={editorRef}>
+                <UndoRedo>
+                    <div class="mb-4">
+                        <div class="flex gap-4 items-center my-2">
+                            <wui-text-style-button cls="text-black" type="bold"></wui-text-style-button>
+                            <wui-text-style-button cls="text-black" type="italic"></wui-text-style-button>
+                            <wui-text-style-button cls="text-black" type="underline"></wui-text-style-button>
+                        </div>
+                        <div ref={editorRef} contentEditable
+                            class="border border-gray-300 rounded p-4 min-h-[200px] mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <p>Select this text and try the text style button below!</p>
+                            <p>You can make text styled.</p>
+                        </div>
+                    </div>
+                </UndoRedo>
+            </EditorContext.Provider>
+        </div>
+    </template>
+    <!-- #endregion -->
+
+
+
     <!-- #endregion -->
 
 
@@ -2249,7 +2361,13 @@ Underline:<span id="debug-toggle-underline">false</span></pre>
                 'avatar-demo',
                 'badge-demo',
                 'button-demo',
+                // Editor
                 'align-button-demo', // Add IDs for all your templates
+                'bold-button-demo',
+                'italic-button-demo',
+                'underline-button-demo',
+                'text-style-button-demo',
+
                 'card-demo',
                 'checkbox-demo',
                 'chip-demo',

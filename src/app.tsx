@@ -27,6 +27,11 @@ import TextField from './TextField'
 import { TextArea } from './TextArea'
 import { ToggleButton } from './ToggleButton'
 
+import { BoldButton } from './Editor/BoldButton'
+import { ItalicButton } from './Editor/ItalicButton'
+import { UnderlineButton } from './Editor/UnderlineButton'
+import { TextStyleButton } from './Editor/TextStyleButton'
+
 
 const isDev = typeof import.meta.env !== 'undefined' && import.meta.env.DEV
 
@@ -58,6 +63,18 @@ export function App() {
                     </a>
                     <a href="#alignbutton" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
                         AlignButton
+                    </a>
+                    <a href="#boldbutton" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                        BoldButton
+                    </a>
+                    <a href="#italicbutton" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                        ItalicButton
+                    </a>
+                    <a href="#underlinebutton" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                        UnderlineButton
+                    </a>
+                    <a href="#textstylebutton" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                        TextStyleButton
                     </a>
                     <a href="#card" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
                         Card
@@ -288,6 +305,8 @@ export function App() {
     // #endregion
 
 
+    // #region Editor
+
     // #region AlignButton Demo
     const alignButtonDemo = () => {
         return <>
@@ -297,9 +316,9 @@ export function App() {
                     <UndoRedo>
                         <div class="mb-4">
                             <div class="flex gap-4 items-center my-2">
-                                <div class="border rounded-[4px] m-2 p-4"><AlignButton contentAlign="start" /></div>
-                                <div class="border rounded-[4px] m-2 p-4"><AlignButton contentAlign="center" /></div>
-                                <div class="border rounded-[4px] m-2 p-4"><AlignButton contentAlign="end" /></div>
+                                <AlignButton contentAlign="start" />
+                                <AlignButton contentAlign="center" />
+                                <AlignButton contentAlign="end" />
                             </div>
                             <div ref={editorRef} contentEditable class="border border-gray-300 rounded p-4 min-h-[200px] mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 <p>Select this text and try the alignment buttons below!</p>
@@ -313,6 +332,108 @@ export function App() {
         </>
     }
     // #endregion
+
+
+    // #region Bold Button Demo
+    const boldButtonDemo = () => {
+        return <>
+            <h2 id="boldbutton" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Bold Button Demo</h2>
+            <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                <EditorContext.Provider value={editorRef}>
+                    <UndoRedo>
+                        <div class="mb-4">
+                            <div class="flex gap-4 items-center my-2">
+                                <BoldButton cls="text-black" />
+                            </div>
+                            <div ref={editorRef} contentEditable class="border border-gray-300 rounded p-4 min-h-[200px] mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <p>Select this text and try the Bold Buttons below!</p>
+                                <p>You can make text bold.</p>
+                            </div>
+                        </div>
+                    </UndoRedo>
+                </EditorContext.Provider>
+            </div>
+        </>
+    }
+    // #endregion
+
+
+    // #region Italic Button Demo
+    const italicButtonDemo = () => {
+        return <>
+            <h2 id="italicbutton" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Italic Button Demo</h2>
+            <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                <EditorContext.Provider value={editorRef}>
+                    <UndoRedo>
+                        <div class="mb-4">
+                            <div class="flex gap-4 items-center my-2">
+                                <ItalicButton cls="text-black" />
+                            </div>
+                            <div ref={editorRef} contentEditable class="border border-gray-300 rounded p-4 min-h-[200px] mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <p>Select this text and try the Italic Buttons below!</p>
+                                <p>You can make text italic.</p>
+                            </div>
+                        </div>
+                    </UndoRedo>
+                </EditorContext.Provider>
+            </div>
+        </>
+    }
+    // #endregion
+
+
+    // #region Underline Button Demo
+    const underlineButtonDemo = () => {
+        return <>
+            <h2 id="underlinebutton" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Underline Button Demo</h2>
+            <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                <EditorContext.Provider value={editorRef}>
+                    <UndoRedo>
+                        <div class="mb-4">
+                            <div class="flex gap-4 items-center my-2">
+                                <UnderlineButton cls="text-black" />
+                            </div>
+                            <div ref={editorRef} contentEditable class="border border-gray-300 rounded p-4 min-h-[200px] mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <p>Select this text and try the Underline Buttons below!</p>
+                                <p>You can make text underline.</p>
+                            </div>
+                        </div>
+                    </UndoRedo>
+                </EditorContext.Provider>
+            </div>
+        </>
+    }
+    // #endregion
+
+
+    // #region Text Style Button Demo
+    const textStyleButtonDemo = () => {
+        return <>
+            <h2 id="boldbutton" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Text Style Button Demo</h2>
+            <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                <EditorContext.Provider value={editorRef}>
+                    <UndoRedo>
+                        <div class="mb-4">
+                            <div class="flex gap-4 items-center my-2">
+                                <TextStyleButton cls="text-black" type="bold" />
+                                <TextStyleButton cls="text-black" type="italic" />
+                                <TextStyleButton cls="text-black" type="underline" />
+                            </div>
+                            <div ref={editorRef} contentEditable class="border border-gray-300 rounded p-4 min-h-[200px] mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <p>Select this text and try the text style buttons above!</p>
+                                <p>You can apply bold, italic, or underline formatting.</p>
+                            </div>
+                        </div>
+                    </UndoRedo>
+                </EditorContext.Provider>
+            </div>
+        </>
+    }
+    // #endregion
+
+
+    // #endregion
+
 
 
     // #region Card Demo
@@ -3285,7 +3406,14 @@ underline:  ${$$(isUnderline)}`}
                 {avatarDemo()}
                 {badgeDemo()}
                 {buttonDemo()}
+
+                {/* Editor */}
                 {alignButtonDemo()}
+                {boldButtonDemo()}
+                {italicButtonDemo()}
+                {underlineButtonDemo}
+                {textStyleButtonDemo()}
+
                 {cardDemo()}
                 {checkboxDemo()}
                 {chipDemo()}
