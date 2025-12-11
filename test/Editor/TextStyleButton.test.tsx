@@ -1,5 +1,6 @@
-import { $ } from 'woby'
+/** @jsxImportSource woby */
 
+import { $ } from 'woby'
 import { EditorContext, UndoRedo } from '../../src/Editor/undoredo'
 import TextStyleButton from '../../src/Editor/TextStyleButton'
 
