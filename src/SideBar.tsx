@@ -5,6 +5,7 @@ import { $, $$, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlNum
 const sideBarDef = () => ({
     /** Custom CSS classes to apply to the sidebar container. */
     cls: $(""),
+    class: $(""),
     /** The content to be rendered inside the sidebar. */
     children: $(null) as ObservableMaybe<JSX.Element>,
     /** A boolean observable to control whether the sidebar is open or closed. */
@@ -18,7 +19,7 @@ const sideBarDef = () => ({
 })
 
 const SideBar = defaults(sideBarDef, (props) => {
-    const { cls, children, open, contentRef, width, showOverlay, ...otherProps } = props
+    const { cls, class: cn, children, open, contentRef, width, showOverlay, ...otherProps } = props
 
     const BASE_CLASS = "fixed h-full top-0 left-0 z-[1000] overflow-x-hidden transition-all duration-500 ease-in-out"
 
@@ -82,7 +83,7 @@ const SideBar = defaults(sideBarDef, (props) => {
     const SidebarComponent = () => {
         return (
             <div
-                class={[BASE_CLASS, cls]}
+                class={[() => $$(cn) ?? BASE_CLASS, cls]}
                 style={{ width: sidebarWidth }}
                 {...otherProps}
             >
@@ -133,15 +134,16 @@ const SideBar = defaults(sideBarDef, (props) => {
 // #region Menu Item Component
 const menuItemDef = () => ({
     cls: $(""),
+    class: $(""),
     children: $(null as JSX.Child),
 })
 
 
 const MenuItem = defaults(menuItemDef, (props) => {
-    const { cls, children, ...otherProps } = props
+    const { cls, class: cn, children, ...otherProps } = props
 
     return (
-        <a class={['flex items-center w-full h-12 px-4 mt-2 rounded cursor-pointer', cls]} {...otherProps}>
+        <a class={[() => $$(cn) ?? 'flex items-center w-full h-12 px-4 mt-2 rounded cursor-pointer', cls]} {...otherProps}>
             {children}
         </a>
     )
