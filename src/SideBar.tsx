@@ -5,6 +5,7 @@ import { $, $$, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlNum
 const sideBarDef = () => ({
     /** Custom CSS classes to apply to the sidebar container. */
     cls: $(""),
+    class: $(""),
     /** The content to be rendered inside the sidebar. */
     children: $(null) as ObservableMaybe<JSX.Element>,
     /** A boolean observable to control whether the sidebar is open or closed. */
@@ -18,16 +19,16 @@ const sideBarDef = () => ({
 })
 
 const SideBar = defaults(sideBarDef, (props) => {
-    const { cls, children, open, contentRef, width, showOverlay, ...otherProps } = props
+    const { cls, class: cn, children, open, contentRef, width, showOverlay, ...otherProps } = props
 
-    const BASE_CLASS = "fixed h-full top-0 left-0 z-[1000] overflow-x-hidden bg-gray-800 text-white transition-all duration-500 ease-in-out"
+    const BASE_CLASS = "fixed h-full top-0 left-0 z-[1000] overflow-x-hidden transition-all duration-500 ease-in-out"
 
     const sidebarWidth = useMemo(() => {
-        if (!$$(open)) return '0px';
+        if (!$$(open)) return '0px'
 
-        const w = $$(width);
+        const w = $$(width)
 
-        return typeof w === 'number' ? `${w}px` : w;
+        return typeof w === 'number' ? `${w}px` : w
     })
 
     /**
@@ -46,19 +47,19 @@ const SideBar = defaults(sideBarDef, (props) => {
 
         // 2. Guard Clause: If no content element is provided, we can't do anything.
         // This prevents errors if `contentRef` is null or hasn't been attached yet.
-        if (!contentEl) return;
+        if (!contentEl) return
 
         // 3. Apply the Sidebar's Width as a Margin.
         // `sidebarWidth` is a memoized value that reactively changes between '0px' (when closed)
         // and the full width (e.g., '250px') when open. By setting `marginLeft`, we "push"
         // the content element to the right to make space for the sidebar.
-        contentEl.style.marginLeft = $$(sidebarWidth);
+        contentEl.style.marginLeft = $$(sidebarWidth)
 
         // 4. Ensure a Smooth Animation.
         // This line applies a CSS transition to the `marginLeft` property.
         // It tells the browser to animate any changes to the margin over 0.5 seconds,
         // creating a smooth sliding effect instead of an instant jump.
-        contentEl.style.transition = 'margin-left 0.5s ease';
+        contentEl.style.transition = 'margin-left 0.5s ease'
     })
     // #endregion
 
@@ -82,7 +83,7 @@ const SideBar = defaults(sideBarDef, (props) => {
     const SidebarComponent = () => {
         return (
             <div
-                class={[BASE_CLASS, cls]}
+                class={[() => $$(cn) ?? BASE_CLASS, cls]}
                 style={{ width: sidebarWidth }}
                 {...otherProps}
             >
@@ -133,15 +134,16 @@ const SideBar = defaults(sideBarDef, (props) => {
 // #region Menu Item Component
 const menuItemDef = () => ({
     cls: $(""),
+    class: $(""),
     children: $(null as JSX.Child),
 })
 
 
 const MenuItem = defaults(menuItemDef, (props) => {
-    const { cls, children, ...otherProps } = props
+    const { cls, class: cn, children, ...otherProps } = props
 
     return (
-        <a class={['flex items-center w-full h-12 px-4 mt-2 rounded hover:bg-gray-700 cursor-pointer', cls]} {...otherProps}>
+        <a class={[() => $$(cn) ?? 'flex items-center w-full h-12 px-4 mt-2 rounded cursor-pointer', cls]} {...otherProps}>
             {children}
         </a>
     )
@@ -168,9 +170,9 @@ const MenuText = defaults(menuTextDef, (props) => {
 
 export { SideBar, MenuItem, MenuText }
 
-customElement("wui-sidebar", SideBar);
-customElement("wui-menu-item", MenuItem);
-customElement("wui-menu-text", MenuText);
+customElement("wui-sidebar", SideBar)
+customElement("wui-menu-item", MenuItem)
+customElement("wui-menu-text", MenuText)
 
 // Add the custom element to the JSX namespace
 declare module 'woby' {

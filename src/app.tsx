@@ -888,43 +888,43 @@ export function App() {
             { "label": "Ford", "value": "FORD" },
             { "label": "Tesla", "value": "TESLA" },
             { "label": "Subaru", "value": "SUBARU" },
-        ];
+        ]
 
         // State for different examples
-        const selectedCarId = $('FORD');
-        const selectedFruit = $('Cherry');
-        const selectedNumber = $(5);
-        const selectedFlavor = $('Vanilla');
-        const selectedFruitWithCustomItem = $('Cherry');
-        const selectedFlavorWithCustomStyle = $('Vanilla');
-        const selectedMultipleFruits = $(['Apple', 'Cherry']);
-        const selectedFruitWithHeader = $('Date');
-        const selectedFruitWithSearch_1 = $('Elderberry');
-        const selectedFruitWithSearch_2 = $('Elderberry');
-        const selectedFruitWithSearch_3 = $('Elderberry');
+        const selectedCarId = $('FORD')
+        const selectedFruit = $('Cherry')
+        const selectedNumber = $(5)
+        const selectedFlavor = $('Vanilla')
+        const selectedFruitWithCustomItem = $('Cherry')
+        const selectedFlavorWithCustomStyle = $('Vanilla')
+        const selectedMultipleFruits = $(['Apple', 'Cherry'])
+        const selectedFruitWithHeader = $('Date')
+        const selectedFruitWithSearch_1 = $('Elderberry')
+        const selectedFruitWithSearch_2 = $('Elderberry')
+        const selectedFruitWithSearch_3 = $('Elderberry')
 
-        const visibleFruit = $(true);
-        const visibleNumber = $(true);
-        const visibleCarId = $(true);
-        const visibleFlavor = $(true);
-        const visibleFruitWithCustomItem = $(true);
-        const visibleFlavorWithCustomStyle = $(true);
-        const visibleFruitWithSearch_1 = $(true);
-        const visibleFruitWithSearch_2 = $(true);
-        const visibleFruitWithSearch_3 = $(true);
-        const visibleFruitWithHeader = $(true);
-        const visibleMultipleFruits = $(true);
+        const visibleFruit = $(true)
+        const visibleNumber = $(true)
+        const visibleCarId = $(true)
+        const visibleFlavor = $(true)
+        const visibleFruitWithCustomItem = $(true)
+        const visibleFlavorWithCustomStyle = $(true)
+        const visibleFruitWithSearch_1 = $(true)
+        const visibleFruitWithSearch_2 = $(true)
+        const visibleFruitWithSearch_3 = $(true)
+        const visibleFruitWithHeader = $(true)
+        const visibleMultipleFruits = $(true)
 
         const displayValue = useMemo(() => {
-            return formatOptionDisplay($$(selectedCarId), JSON_CAR_DATA);
-        });
+            return formatOptionDisplay($$(selectedCarId), JSON_CAR_DATA)
+        })
 
         function formatOptionDisplay(value: string | number, options: { label: string, value: any }[]) {
             // Ensure options is an array before searching
-            if (!Array.isArray(options)) return String(value);
+            if (!Array.isArray(options)) return String(value)
 
-            const option = options.find(opt => opt.value === value);
-            return option ? `${option.label} (${option.value})` : String(value);
+            const option = options.find(opt => opt.value === value)
+            return option ? `${option.label} (${option.value})` : String(value)
         }
 
         return <>
@@ -1238,7 +1238,7 @@ export function App() {
                                 <p class="text-sm font-semibold mb-2">Selected Fruits:</p>
                                 <div class="bg-gray-100 p-3 rounded-md">
                                     {() => {
-                                        const selected = $$(selectedMultipleFruits);
+                                        const selected = $$(selectedMultipleFruits)
                                         if (Array.isArray(selected) && selected.length > 0) {
                                             return (
                                                 <ul class="list-disc list-inside space-y-1">
@@ -1246,9 +1246,9 @@ export function App() {
                                                         <li class="font-mono text-sm">{fruit}</li>
                                                     ))}
                                                 </ul>
-                                            );
+                                            )
                                         }
-                                        return <span class="text-gray-500 italic">No fruits selected</span>;
+                                        return <span class="text-gray-500 italic">No fruits selected</span>
                                     }}
                                 </div>
                             </div>
@@ -1264,54 +1264,54 @@ export function App() {
     // #region Multi Wheeler Demo
     const multiWheelerDemo = () => {
         // --- Sample Data ---
-        const HOURS = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0'));
-        const MINUTES = Array.from({ length: 60 }, (_, i) => String(i).padStart(2, '0'));
-        const SECONDS = Array.from({ length: 60 }, (_, i) => String(i).padStart(2, '0'));
-        const DAYS = Array.from({ length: 31 }, (_, i) => i + 1);
-        const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-        const YEARS = Array.from({ length: 50 }, (_, i) => 2000 + i);
+        const HOURS = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0'))
+        const MINUTES = Array.from({ length: 60 }, (_, i) => String(i).padStart(2, '0'))
+        const SECONDS = Array.from({ length: 60 }, (_, i) => String(i).padStart(2, '0'))
+        const DAYS = Array.from({ length: 31 }, (_, i) => i + 1)
+        const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+        const YEARS = Array.from({ length: 50 }, (_, i) => 2000 + i)
 
-        const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
-        const COLORS = ['Red', 'Blue', 'Green', 'Yellow', 'Black', 'White', 'Purple', 'Orange'];
-        const BRANDS = ['Nike', 'Adidas', 'Puma', 'Reebok', 'New Balance', 'Under Armour'];
+        const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL']
+        const COLORS = ['Red', 'Blue', 'Green', 'Yellow', 'Black', 'White', 'Purple', 'Orange']
+        const BRANDS = ['Nike', 'Adidas', 'Puma', 'Reebok', 'New Balance', 'Under Armour']
 
         // --- State Variables ---
         // Time Picker
-        const selectedHour = $('12');
-        const selectedMinute = $('30');
-        const selectedSecond = $('00');
-        const timePickerVisible = $(false);
-        const timePickerOk = $(false);
+        const selectedHour = $('12')
+        const selectedMinute = $('30')
+        const selectedSecond = $('00')
+        const timePickerVisible = $(false)
+        const timePickerOk = $(false)
 
         // Date Picker
-        const selectedDay = $(15);
-        const selectedMonth = $('Jun');
-        const selectedYear = $(2024);
-        const datePickerVisible = $(false);
-        const datePickerOk = $(false);
+        const selectedDay = $(15)
+        const selectedMonth = $('Jun')
+        const selectedYear = $(2024)
+        const datePickerVisible = $(false)
+        const datePickerOk = $(false)
 
         // Product Selector
-        const selectedSize = $('M');
-        const selectedColor = $('Blue');
-        const selectedBrand = $('Nike');
-        const productSelectorVisible = $(false);
-        const productSelectorOk = $(false);
+        const selectedSize = $('M')
+        const selectedColor = $('Blue')
+        const selectedBrand = $('Nike')
+        const productSelectorVisible = $(false)
+        const productSelectorOk = $(false)
 
         // Date-Time Picker with Search
-        const selectedDaySearch = $(1);
-        const selectedMonthSearch = $('Jan');
-        const selectedYearSearch = $(2024);
-        const selectedHourSearch = $('00');
-        const selectedMinuteSearch = $('00');
-        const dateTimeSearchVisible = $(false);
-        const dateTimeSearchOk = $(false);
+        const selectedDaySearch = $(1)
+        const selectedMonthSearch = $('Jan')
+        const selectedYearSearch = $(2024)
+        const selectedHourSearch = $('00')
+        const selectedMinuteSearch = $('00')
+        const dateTimeSearchVisible = $(false)
+        const dateTimeSearchOk = $(false)
 
         // Custom Headers Example
-        const selectedHourHeader = $('09');
-        const selectedMinuteHeader = $('15');
-        const selectedSecondHeader = $('45');
-        const customHeaderVisible = $(false);
-        const customHeaderOk = $(false);
+        const selectedHourHeader = $('09')
+        const selectedMinuteHeader = $('15')
+        const selectedSecondHeader = $('45')
+        const customHeaderVisible = $(false)
+        const customHeaderOk = $(false)
 
         return (
             <>
@@ -1530,7 +1530,7 @@ export function App() {
                     </div>
                 </div>
             </>
-        );
+        )
     }
     // #endregion
 
@@ -1782,7 +1782,7 @@ export function App() {
                                         'bottom-left': 'bottom-4 left-4',
                                         'top-right': 'top-4 right-4',
                                         'top-left': 'top-4 left-4',
-                                    };
+                                    }
 
                                     return $$(showFab) && (
                                         <Fab
@@ -2008,22 +2008,22 @@ export function App() {
                         sidebarWidth(280)
                         showOverlay(true)
                         demoTitle("Default Configuration")
-                        break;
+                        break
                     case 'no-overlay':
                         sidebarWidth(280)
                         showOverlay(false)
                         demoTitle("No Overlay (Click Toggle to Close)")
-                        break;
+                        break
                     case 'wide':
                         sidebarWidth(450)
                         showOverlay(true)
                         demoTitle("Wide Sidebar (450px)")
-                        break;
+                        break
                     case 'narrow':
                         sidebarWidth(80)
                         showOverlay(true)
                         demoTitle("Narrow / Icon Mode (80px)")
-                        break;
+                        break
                 }
                 isOpen(true)
             }, 50)
@@ -2057,6 +2057,7 @@ export function App() {
                     contentRef={contentRef}
                     width={sidebarWidth}
                     showOverlay={showOverlay}
+                    cls="bg-gray-800 text-white"
                 >
                     <div class="flex flex-col h-full">
                         {/* Sidebar Header */}
@@ -2208,20 +2209,20 @@ export function App() {
         ]
 
         const toggleAllCustomLabel = () => {
-            const newState = !$$(toggleAllCustomLabelState);
-            toggleAllCustomLabelState(newState);
-            iosSwitchState(newState);
-            flatSwitchState(newState);
-            lightSwitchState(newState);
-            skewedSwitchState(newState);
-            customTextSwitchState(newState);
-            flipSwitchState(newState);
+            const newState = !$$(toggleAllCustomLabelState)
+            toggleAllCustomLabelState(newState)
+            iosSwitchState(newState)
+            flatSwitchState(newState)
+            lightSwitchState(newState)
+            skewedSwitchState(newState)
+            customTextSwitchState(newState)
+            flipSwitchState(newState)
         }
 
         const toggleAllEffects = () => {
-            const newState = !$$(toggleAllEffectsState);
-            toggleAllEffectsState(newState);
-            effectsList.forEach(effect => effect.state(newState));
+            const newState = !$$(toggleAllEffectsState)
+            toggleAllEffectsState(newState)
+            effectsList.forEach(effect => effect.state(newState))
         }
 
         // Effect options for the selector

@@ -31,20 +31,20 @@ const BasicSidebar = () => {
             </p>
 
             {/* The SideBar component itself. It's a portal, so it renders outside this div. */}
-            <SideBar open={open} contentRef={contentRef}>
+            <SideBar open={open} contentRef={contentRef} cls='bg-gray-800 text-white'>
                 <div class="p-4">
                     <h2 class="text-xl font-bold mb-4">Menu</h2>
                     <nav>
-                        <MenuItem href="#">
+                        <MenuItem href="#" cls='hover:bg-gray-700 '>
                             <svg class="w-6 h-6 text-white fill-current stroke-current" viewBox="0 0 24 24">
                                 <use href="/svg/home-icon.svg#icon" />
                             </svg>
                             <MenuText>Dashboard</MenuText>
                         </MenuItem>
-                        <MenuItem href="#">
+                        <MenuItem href="#" cls='hover:bg-gray-700 '>
                             <MenuText>Profile</MenuText>
                         </MenuItem>
-                        <MenuItem href="#">
+                        <MenuItem href="#" cls='hover:bg-gray-700 '>
                             <MenuText>Settings</MenuText>
                         </MenuItem>
                     </nav>
