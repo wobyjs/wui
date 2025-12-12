@@ -14,6 +14,7 @@ import {
     ObservableMaybe, $$, $, type JSX, isObservable, Observable,
     defaults, customElement, type ElementAttributes,
     HtmlBoolean, HtmlString, useMemo,
+    HtmlClass,
 } from 'woby'
 
 /* ------------------------------------------------------------------ */
@@ -72,6 +73,7 @@ type ResizeProps = "none" | "horizontal" | "vertical" | "both"
 /* ------------------------------------------------------------------ */
 
 const def = () => ({
+    class: $('', HtmlClass) as JSX.Class | undefined,
     cls: $("", HtmlString) as ObservableMaybe<string> | undefined,
     children: $(null) as ObservableMaybe<JSX.Child> | undefined,
 
@@ -102,7 +104,7 @@ const def = () => ({
 /* ------------------------------------------------------------------ */
 
 const TextArea = defaults(def, (props) => {
-    const { cls, children, effect, assignOnEnter, value, placeholder, label, resize, onChange, onKeyUp, ...otherProps } = props
+    const { class: cn, cls, children, effect, assignOnEnter, value, placeholder, label, resize, onChange, onKeyUp, ...otherProps } = props
 
     // Wrapper: only positions span/label, allows overflow for floating label
     const baseClass = "m-[20px] relative size-fit" //  z-0 inline-block overflow-visible
@@ -131,7 +133,7 @@ const TextArea = defaults(def, (props) => {
     }
 
     return (
-        <div class={() => [baseClass, cls]}>
+        <div class={() => [baseClass, () => $$(cn) ? $$(cn) : "", cls]}>
             {/* textarea defines the size and is resizable */}
             <textarea
                 style={() => ({ resize: resizeValue })}

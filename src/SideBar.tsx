@@ -1,12 +1,22 @@
-import { $, $$, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlNumber, HtmlString, ObservableMaybe, Portal, useEffect, useMemo, isObservable } from "woby"
+import { $, $$, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlNumber, HtmlString, ObservableMaybe, Portal, useEffect, useMemo, isObservable, HtmlClass } from "woby"
 
 
 // #region Sidebar Component
 const sideBarDef = () => ({
-    /** Custom CSS classes to apply to the sidebar container. */
-    cls: $(""),
-    class: $(""),
-    /** The content to be rendered inside the sidebar. */
+    /** 
+     * Custom CSS classes to apply to the sidebar container.
+     * 
+     * Class override mechanism:
+     * - `class` prop (aliased as `cn`): Used as the primary class, if undefined the default BASE_CLASS is used
+     * - `cls` prop: Additional classes that patch/extend the given class
+     * 
+     * Usage:
+     * - When `class` is undefined, the default BASE_CLASS is used
+     * - User can override the default class by providing a `class` prop
+     * - `cls` can be used to add additional classes to the component
+     */
+    cls: $("", HtmlClass) as JSX.Class | undefined,
+    class: $("", HtmlClass) as JSX.Class | undefined,    /** The content to be rendered inside the sidebar. */
     children: $(null) as ObservableMaybe<JSX.Element>,
     /** A boolean observable to control whether the sidebar is open or closed. */
     open: $(false, HtmlBoolean) as ObservableMaybe<boolean>,
@@ -15,7 +25,7 @@ const sideBarDef = () => ({
     /** The width of the sidebar when it is open (e.g., '250px' or 250). */
     width: $('250px', HtmlString) as ObservableMaybe<string | number>,
     /** When true, a dark overlay will appear over the main content, which closes the sidebar on click. */
-    showOverlay: $(true, HtmlBoolean) as ObservableMaybe<boolean>,
+    showOverlay: $(false, HtmlBoolean) as ObservableMaybe<boolean>,
 })
 
 const SideBar = defaults(sideBarDef, (props) => {
@@ -83,7 +93,7 @@ const SideBar = defaults(sideBarDef, (props) => {
     const SidebarComponent = () => {
         return (
             <div
-                class={[() => $$(cn) ?? BASE_CLASS, cls]}
+                class={[() => $$(cn) ? $$(cn) : BASE_CLASS, cls]}
                 style={{ width: sidebarWidth }}
                 {...otherProps}
             >
@@ -133,17 +143,28 @@ const SideBar = defaults(sideBarDef, (props) => {
 
 // #region Menu Item Component
 const menuItemDef = () => ({
-    cls: $(""),
-    class: $(""),
+    /** 
+     * Custom CSS classes to apply to the menu item.
+     * 
+     * Class override mechanism:
+     * - `class` prop (aliased as `cn`): Used as the primary class, if undefined the default class is used
+     * - `cls` prop: Additional classes that patch/extend the given class
+     * 
+     * Usage:
+     * - When `class` is undefined, the default 'flex items-center w-full h-12 px-4 mt-2 rounded cursor-pointer' is used
+     * - User can override the default class by providing a `class` prop
+     * - `cls` can be used to add additional classes to the component
+     */
+    cls: $('', HtmlClass) as JSX.Class | undefined,
+    class: $('', HtmlClass) as JSX.Class | undefined,
     children: $(null as JSX.Child),
 })
-
 
 const MenuItem = defaults(menuItemDef, (props) => {
     const { cls, class: cn, children, ...otherProps } = props
 
     return (
-        <a class={[() => $$(cn) ?? 'flex items-center w-full h-12 px-4 mt-2 rounded cursor-pointer', cls]} {...otherProps}>
+        <a class={[() => $$(cn) ? $$(cn) : 'flex items-center w-full h-12 px-4 mt-2 rounded cursor-pointer', cls]} {...otherProps}>
             {children}
         </a>
     )
@@ -153,15 +174,27 @@ const MenuItem = defaults(menuItemDef, (props) => {
 
 // #region Menu Text Component
 const menuTextDef = () => ({
-    cls: $(""),
+    /** 
+     * Custom CSS classes to apply to the menu text.
+     * 
+     * Class override mechanism:
+     * - `class` prop: Used as the primary class, if undefined the default class is used
+     * - `cls` prop: Additional classes that patch/extend the given class
+     * 
+     * Usage:
+     * - When `class` is undefined, the default 'ml-3 text-sm font-medium' is used
+     * - User can override the default class by providing a `class` prop
+     * - `cls` can be used to add additional classes to the component
+     */
+    class: $('', HtmlClass) as JSX.Class | undefined,
+    cls: $('', HtmlClass) as JSX.Class | undefined,
     children: $(null as JSX.Child),
 })
 
 const MenuText = defaults(menuTextDef, (props) => {
-    const { cls, children, ...otherProps } = props
-
+    const { cls, class: cn, children, ...otherProps } = props
     return (
-        <span class={['ml-3 text-sm font-medium', cls]} {...otherProps}>
+        <span class={[() => $$(cn) ? $$(cn) : 'ml-3 text-sm font-medium', cls]} {...otherProps}>
             {children}
         </span>
     )

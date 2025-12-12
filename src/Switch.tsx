@@ -1,6 +1,6 @@
 //@ts-ignore
 import { nanoid } from 'nanoid'
-import { ObservableMaybe, useEffect, $, $$, isObservable, Observable, type JSX, FunctionMaybe, defaults, customElement, type ElementAttributes, HtmlBoolean, HtmlString, useMemo } from 'woby'
+import { ObservableMaybe, useEffect, $, $$, isObservable, Observable, type JSX, FunctionMaybe, defaults, customElement, type ElementAttributes, HtmlBoolean, HtmlString, useMemo, HtmlClass } from 'woby'
 import {
     effect1, effect2, effect3,
     effect4, effect5, effect6,
@@ -9,7 +9,7 @@ import {
     effect13, effect14, effect15,
     effect16, effect17, effect18,
     ios, flat, skewed, flip, light
-} from './Switch.effect';
+} from './Switch.effect'
 
 // https://codepen.io/alvarotrigo/pen/oNoJePo
 
@@ -18,7 +18,7 @@ import {
 //     on: $("ON"),
 //     checked: $(false, HtmlBoolean) as ObservableMaybe<boolean> | undefined,
 //     id: $(undefined as string | undefined),
-//     cls: $(""),
+//     cls: $('', HtmlClass) as ObservableMaybe<JSX.Class>|undefined,
 //     children: $(null as JSX.Child),
 // })
 
@@ -37,13 +37,14 @@ const styleMap: Record<string, string> = {
 
 
 const def = () => {
-    const generatedId = nanoid(8);
+    const generatedId = nanoid(8)
     return ({
         off: $("OFF"),
         on: $("ON"),
         checked: $(false, HtmlBoolean) as ObservableMaybe<boolean> | undefined,
         id: $(generatedId as string | undefined),
-        cls: $(""),
+        class: $('', HtmlClass) as JSX.Class | undefined,
+        cls: $('', HtmlClass) as JSX.Class | undefined,
         children: $(null as JSX.Child),
         effect: $("", HtmlString) as ObservableMaybe<string> | undefined,
     })
@@ -63,15 +64,15 @@ const def = () => {
  * Some special case may need to see the output html tree node and modify classes as needed
  */
 const Switch = defaults(def, (props) => {
-    const { off, on, checked, id, cls, children, effect, ...otherProps } = props
+    const { off, on, checked, id, class: cn, cls, children, effect, ...otherProps } = props
 
     const activeStyle = useMemo(() => {
-        const effectName = $$(effect); // Unwrap the observable
-        return styleMap[effectName] || ""; // Return the CSS string or empty if not found
+        const effectName = $$(effect) // Unwrap the observable
+        return styleMap[effectName] || "" // Return the CSS string or empty if not found
     })
 
     return (
-        <div {...otherProps} class={[activeStyle, cls]}>
+        <div {...otherProps} class={[activeStyle, () => $$(cn) ? $$(cn) : "", cls]}>
             <input
                 id={id}
                 type="checkbox"

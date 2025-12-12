@@ -1,4 +1,4 @@
-import { $, $$, customElement, defaults, ElementAttributes, HtmlNumber, ObservableMaybe, useMemo } from "woby"
+import { $, $$, customElement, defaults, ElementAttributes, HtmlClass, HtmlNumber, ObservableMaybe, useMemo } from "woby"
 
 // const preset = {
 //     0: `bg-white transition-shadow duration-300 ease-in-out rounded-lg shadow-none`,
@@ -30,24 +30,37 @@ const preset = {
 
 
 const def = () => ({
-    cls: $(""),
+    /** 
+     * Custom CSS classes to apply to the paper.
+     * 
+     * Class override mechanism:
+     * - `class` prop (aliased as `cn`): Used as the primary class, if undefined the default classes are used
+     * - `cls` prop: Additional classes that patch/extend the given classes
+     * 
+     * Usage:
+     * - When `class` is undefined, the default classes are used
+     * - User can override the default class by providing a `class` prop
+     * - `cls` can be used to add additional classes to the component
+     */
+    class: $('', HtmlClass) as JSX.Class | undefined,
+    cls: $('', HtmlClass) as JSX.Class | undefined,
     children: $(null),
     elevation: $(1, HtmlNumber) as ObservableMaybe<number>,
 })
 
 const Paper = defaults(def, (props) => {
-    const { cls, children, elevation, ...otherProps } = props
+    const { cls, class: cn, children, elevation, ...otherProps } = props
 
     const elevationClass = useMemo(() => {
-        const elev = $$(elevation);
+        const elev = $$(elevation)
         // Look up the class string from the preset.
         // If the user provides an invalid number (e.g., 5), it safely falls back to elevation 0 (no shadow).
-        return preset[elev] ?? preset[0];
+        return preset[elev] ?? preset[0]
     })
 
 
     return (
-        <div class={[baseClass, elevationClass, cls]} {...otherProps}>
+        <div class={[() => $$(cn) ? $$(cn) : baseClass, elevationClass, cls]} {...otherProps}>
             {children}
             {/* <pre class="border border-gray-300 px-2 py-4 rounded my-2 justify-center items-center">
                 <p>Elevation: {elevation}</p>
@@ -59,7 +72,7 @@ const Paper = defaults(def, (props) => {
 
 export { Paper }
 
-customElement("wui-paper", Paper);
+customElement("wui-paper", Paper)
 
 // Add the custom element to the JSX namespace
 declare module 'woby' {

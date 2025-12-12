@@ -1,4 +1,4 @@
-import { $, $$, defaults, type JSX, customElement, type ElementAttributes, type ObservableMaybe, type CustomElementChildren, isObservable, StyleEncapsulationProps, useEffect } from "woby"
+import { $, $$, defaults, type JSX, customElement, type ElementAttributes, type ObservableMaybe, type CustomElementChildren, isObservable, StyleEncapsulationProps, useEffect, HtmlClass } from "woby"
 import '@woby/chk'
 import './input.css'
 
@@ -14,11 +14,25 @@ type BadgeProps = {
     badgeClass?: ObservableMaybe<JSX.Class>
     vertical?: ObservableMaybe<VerticalPosition>
     horizontal?: ObservableMaybe<HorizontalPosition>
+    class?: ObservableMaybe<JSX.Class>
 }
 
 // Default props with explicit typing
 const def = () => ({
-    cls: $(''),
+    /** 
+     * Custom CSS classes to apply to the badge.
+     * 
+     * Class override mechanism:
+     * - `class` prop (aliased as `cn`): Used as the primary class, if undefined the default classes are used
+     * - `cls` prop: Additional classes that patch/extend the given classes
+     * 
+     * Usage:
+     * - When `class` is undefined, the default classes are used
+     * - User can override the default class by providing a `class` prop
+     * - `cls` can be used to add additional classes to the component
+     */
+    class: $('', HtmlClass) as JSX.Class | undefined,
+    cls: $('', HtmlClass) as JSX.Class | undefined,
     children: $(null as JSX.Child),
     badgeContent: $(null as JSX.Child),
     badgeClass: $("bg-[rgb(156,39,176)]" as JSX.Class),
@@ -28,7 +42,7 @@ const def = () => ({
 
 const Badge = defaults(def, (props) => {
     console.log('Badge: props received:', props)
-    const { cls, children, badgeContent, badgeClass, vertical, horizontal, ...otherProps } = props
+    const { cls, class: cn, children, badgeContent, badgeClass, vertical, horizontal, ...otherProps } = props
     console.log('Badge: destructured props - badgeContent:', badgeContent, 'otherProps:', otherProps)
 
     // Handle attribute and prop values
@@ -104,7 +118,7 @@ const Badge = defaults(def, (props) => {
 
     return (
         <div>
-            <span class={() => `relative inline-flex align-middle shrink-0 m-4 ${(cls)}`} {...otherProps}>
+            <span class={[() => $$(cn) ? $$(cn) : `relative inline-flex align-middle shrink-0 m-4`, cls]} {...otherProps}>
                 <span
                     class={() => {
                         const classes = [

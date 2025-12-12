@@ -1,4 +1,4 @@
-import { $, $$, defaults, type JSX, isObservable, customElement, type ElementAttributes, type Observable, type CustomElementChildren, type StyleEncapsulationProps, useEffect } from "woby"
+import { $, $$, defaults, type JSX, isObservable, customElement, type ElementAttributes, type Observable, type CustomElementChildren, type StyleEncapsulationProps, useEffect, HtmlClass } from "woby"
 import '@woby/chk'
 import '../input.css'
 
@@ -15,7 +15,7 @@ type ContentAlign = 'start' | 'center' | 'end'
 const def = () => ({
     type: $("outlined" as "text" | "contained" | "outlined" | "icon"),
     title: $("Align Center"),
-    cls: $(""),
+    cls: $('', HtmlClass) as JSX.Class | undefined,
     disabled: $(false) as Observable<boolean>,
     children: $(<AlignCenter />) as Observable<JSX.Element>,
     contentAlign: $("center" as ContentAlign),
@@ -23,7 +23,7 @@ const def = () => ({
 
 const AlignButton = defaults(def, (props) => {
     const { type: buttonType, title, cls, disabled, children, contentAlign, ...otherProps } = props as any
-    const editor = useEditor();
+    const editor = useEditor()
 
     // Extract onClick from otherProps if provided
     const customOnClick = otherProps.onClick as ((e: any) => void) | undefined
@@ -96,7 +96,7 @@ const AlignButton = defaults(def, (props) => {
 export { AlignButton }
 
 // NOTE: Register the custom element
-customElement('wui-align-button', AlignButton);
+customElement('wui-align-button', AlignButton)
 
 // NOTE: Add the custom element to the JSX namespace
 declare module 'woby' {

@@ -1,4 +1,4 @@
-import { $, $$, defaults, type JSX, customElement, type ElementAttributes, type ObservableMaybe, StyleEncapsulationProps, isObservable, HtmlBoolean } from "woby"
+import { $, $$, defaults, type JSX, customElement, type ElementAttributes, type ObservableMaybe, StyleEncapsulationProps, isObservable, HtmlBoolean, HtmlClass } from "woby"
 import "@woby/chk"
 import "./input.css"
 
@@ -13,11 +13,24 @@ const def = () => ({
 	children: $(null as JSX.Child),
 	open: $(true, HtmlBoolean) as ObservableMaybe<boolean> | undefined,
 	background: $(true, HtmlBoolean) as ObservableMaybe<boolean> | undefined,
-	cls: $(""),
+	/** 
+	 * Custom CSS classes to apply to the collapse.
+	 * 
+	 * Class override mechanism:
+	 * - `class` prop (aliased as `cn`): Used as the primary class, if undefined the default classes are used
+	 * - `cls` prop: Additional classes that patch/extend the given classes
+	 * 
+	 * Usage:
+	 * - When `class` is undefined, the default classes are used
+	 * - User can override the default class by providing a `class` prop
+	 * - `cls` can be used to add additional classes to the component
+	 */
+	class: $('', HtmlClass) as JSX.Class | undefined,
+	cls: $('', HtmlClass) as JSX.Class | undefined,
 })
 
 const Collapse = defaults(def, (props) => {
-	const { children, open, background, cls, ...otherProps } = props
+	const { cls, class: cn, children, open, background, ...otherProps } = props
 	// Create internal open state if not provided as observable
 	const internalOpen = isObservable(open) ? open : $(open ?? true)
 
@@ -30,9 +43,7 @@ const Collapse = defaults(def, (props) => {
 	function renderCollapse() {
 		return (
 			<div
-				class={() => [
-					baseClass, isBackground, cls]
-				}
+				class={[() => $$(cn) ? $$(cn) : baseClass, () => isBackground(), cls]}
 				{...otherProps}
 			>
 				<div class="h-fit">

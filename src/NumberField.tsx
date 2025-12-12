@@ -1,4 +1,4 @@
-import { $, $$, useEffect, isObservable, useTimeout, useInterval, Observable, ObservableMaybe, type JSX, defaults, customElement, type ElementAttributes, HtmlBoolean, useMemo, HtmlNumber } from 'woby'
+import { $, $$, useEffect, isObservable, useTimeout, useInterval, Observable, ObservableMaybe, type JSX, defaults, customElement, type ElementAttributes, HtmlBoolean, useMemo, HtmlNumber, HtmlClass } from 'woby'
 import { Button } from './Button'
 
 const btnCls = `
@@ -27,8 +27,20 @@ const def = () => ({
     step: $(1, HtmlNumber) as ObservableMaybe<number> | undefined,
     /** When true, disables the number field */
     disabled: $(false, HtmlBoolean) as ObservableMaybe<boolean> | undefined,
-    /** Additional CSS classes to apply to the number field */
-    cls: $(""),
+    /** 
+     * Custom CSS classes to apply to the number field.
+     * 
+     * Class override mechanism:
+     * - `class` prop (aliased as `cn`): Used as the primary class, if undefined the default classes are used
+     * - `cls` prop: Additional classes that patch/extend the given classes
+     * 
+     * Usage:
+     * - When `class` is undefined, the default classes are used
+     * - User can override the default class by providing a `class` prop
+     * - `cls` can be used to add additional classes to the component
+     */
+    class: $('', HtmlClass) as JSX.Class | undefined,
+    cls: $('', HtmlClass) as JSX.Class | undefined,
     /** Callback function triggered when the value changes */
     onChange: undefined as ((e: any) => void) | undefined,
     /** Callback function triggered when a key is released */
@@ -36,7 +48,7 @@ const def = () => ({
 })
 
 const NumberField = defaults(def, (props) => {
-    const { children, reactive, noMinMax, noFix, noRotate, value, min, max, step, disabled, cls, onChange, onKeyUp, ...otherProps } = props
+    const { cls, class: cn, children, reactive, noMinMax, noFix, noRotate, value, min, max, step, disabled, onChange, onKeyUp, ...otherProps } = props
 
     const inputRef = $<HTMLInputElement>()
 
@@ -123,6 +135,7 @@ const NumberField = defaults(def, (props) => {
         "focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500", // Nice focus state
         "divide-x divide-gray-200", // Subtle dividers between elements
         { "bg-gray-100 opacity-70": disabled }, // Style for disabled state
+        () => $$(cn) ? $$(cn) : "",
         cls
     ]}>
         <Button

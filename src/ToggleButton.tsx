@@ -1,4 +1,4 @@
-import { $, $$, isObservable, defaults, customElement, type ElementAttributes, HtmlBoolean, type JSX, ObservableMaybe } from "woby"
+import { $, $$, isObservable, defaults, customElement, type ElementAttributes, HtmlBoolean, type JSX, ObservableMaybe, HtmlClass } from "woby"
 
 // 1. Define Base Styles (Common to both states)
 // const baseStyles = "inline-flex items-center justify-center relative box-border cursor-pointer select-none align-middle font-medium text-sm px-5 py-2.5 rounded transition-colors duration-200 border"
@@ -10,7 +10,8 @@ const def = () => ({
     offClass: $("text-gray-600 bg-transparent border-transparent hover:bg-gray-100"),
 
     checked: $(false, HtmlBoolean) as ObservableMaybe<boolean> | undefined,
-    cls: $(""),
+    class: $('', HtmlClass) as JSX.Class | undefined,
+    cls: $('', HtmlClass) as JSX.Class | undefined,
     onClick: undefined as ((e: any) => void) | undefined,
     disabled: $(false, HtmlBoolean) as ObservableMaybe<boolean> | undefined,
 })
@@ -22,6 +23,7 @@ const ToggleButton = defaults(def, (props) => {
         onClass,
         offClass,
         checked,
+        class: cn,
         cls,
         onClick,
         ...otherProps
@@ -57,6 +59,7 @@ const ToggleButton = defaults(def, (props) => {
                 () => ($$(checked) ? $$(onClass) : $$(offClass)),
 
                 // user-provided overrides
+                () => $$(cn) ? $$(cn) : "",
                 cls,
             ]}
             {...otherProps}

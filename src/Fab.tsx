@@ -1,7 +1,20 @@
 import { $, $$, isObservable, type JSX, defaults, customElement, ElementAttributes, HtmlBoolean, HtmlClass, ObservableMaybe, HtmlStyle, HtmlString } from 'woby'
 
 const def = () => ({
-      cls: $(""),
+      /** 
+       * Custom CSS classes to apply to the fab.
+       * 
+       * Class override mechanism:
+       * - `class` prop (aliased as `cn`): Used as the primary class, if undefined the default variant classes are used
+       * - `cls` prop: Additional classes that patch/extend the given classes
+       * 
+       * Usage:
+       * - When `class` is undefined, the default variant classes are used
+       * - User can override the default class by providing a `class` prop
+       * - `cls` can be used to add additional classes to the component
+       */
+      class: $('', HtmlClass) as JSX.Class | undefined,
+      cls: $('', HtmlClass) as JSX.Class | undefined,
       children: $(""),
       type: $("pill", HtmlString) as ObservableMaybe<string> | undefined,
       disabled: $(false, HtmlBoolean) as ObservableMaybe<boolean> | undefined,
@@ -14,23 +27,22 @@ const variantStyle = {
 }
 
 const Fab = defaults(def, (props) => {
-      const { children, cls, type: variant, disabled, ...otherProps } = props;
+      const { cls, class: cn, children, type: variant, disabled, ...otherProps } = props
 
       return (
             <button
-                  class={[() => variantStyle[$$(variant)], cls]}
+                  class={[() => $$(cn) ? $$(cn) : variantStyle[$$(variant)], cls]}
                   disabled={disabled}
                   {...otherProps}
             >
                   <div class="flex items-center">
                         {children}
-
                   </div>
             </button>
       )
 }) as typeof Fab
 
-export { Fab };
+export { Fab }
 
 // Register as custom elements
 customElement('wui-fab', Fab)

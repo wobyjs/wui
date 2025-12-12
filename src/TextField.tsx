@@ -8,11 +8,11 @@ import {
 	effect22, effect23, effect24,
 	effect19a, effect20a, effect21a,
 } from './TextField.effect'
-import { ObservableMaybe, $$, $, type JSX, isObservable, Observable, defaults, customElement, type ElementAttributes, HtmlBoolean, HtmlString, useMemo } from 'woby'
+import { ObservableMaybe, $$, $, type JSX, isObservable, Observable, defaults, customElement, type ElementAttributes, HtmlBoolean, HtmlString, useMemo, HtmlClass } from 'woby'
 
 //https://codepen.io/maheshambure21/pen/EozKKy
 
-type INPUT_TYPE = "text" | "password" | "email" | "number" | "tel" | "url" | "search" | "date" | "datetime-local" | "month" | "week" | "time" | "color";
+type INPUT_TYPE = "text" | "password" | "email" | "number" | "tel" | "url" | "search" | "date" | "datetime-local" | "month" | "week" | "time" | "color"
 
 const effectMap: Record<string, string> = {
 	// Underline Effects
@@ -60,7 +60,8 @@ const effectMap: Record<string, string> = {
 }
 
 const def = () => ({
-	cls: $(""),
+	class: $('', HtmlClass) as JSX.Class | undefined,
+	cls: $('', HtmlClass) as JSX.Class | undefined,
 	children: $(null),
 	effect: $("effect19a", HtmlString) as ObservableMaybe<string> | undefined,
 	assignOnEnter: $(false, HtmlBoolean) as ObservableMaybe<boolean> | undefined,
@@ -103,7 +104,7 @@ const def = () => ({
  */
 const TextField = defaults(def, (props) => {
 
-	const { cls, children, effect, assignOnEnter, value, inputType, placeholder, disabled, onChange, onKeyUp, label, ...otherProps } = props
+	const { class: cn, cls, children, effect, assignOnEnter, value, inputType, placeholder, disabled, onChange, onKeyUp, label, ...otherProps } = props
 
 	const baseClass = "m-[20px] relative z-0"
 
@@ -127,12 +128,12 @@ const TextField = defaults(def, (props) => {
 	// })
 
 	const effectStyle = useMemo(() => {
-		const effectName = $$(effect);
-		return effectMap[effectName] || "";
+		const effectName = $$(effect)
+		return effectMap[effectName] || ""
 	})
 
 	return (
-		<div class={[baseClass, cls]}>
+		<div class={[baseClass, () => $$(cn) ? $$(cn) : "", cls]}>
 
 
 			{/* if data-adnorment= start is exists render here */}
@@ -169,7 +170,7 @@ const TextField = defaults(def, (props) => {
 
 
 const defAdornment = () => ({
-	cls: $(""),
+	cls: $('', HtmlClass) as JSX.Class | undefined,
 	children: $(null),
 })
 
@@ -186,14 +187,14 @@ const StartAdornment = defaults(defAdornment, (props) => {
 }) as typeof StartAdornment
 
 const defEndAdnorment = () => ({
-	cls: $(""),
+	cls: $('', HtmlClass) as JSX.Class | undefined,
 	children: $(null),
 })
 
 const EndAdornment = defaults(defAdornment, (props) => {
 	const { cls, children, ...otherProps } = props
 
-	const baseClass = "flex h-[0.01em] max-h-[2em] items-center whitespace-nowrap text-[rgba(0,0,0,0.54)] ml-2";
+	const baseClass = "flex h-[0.01em] max-h-[2em] items-center whitespace-nowrap text-[rgba(0,0,0,0.54)] ml-2"
 
 	return (
 		<div class={[baseClass, cls]} data-adnorment="end" {...otherProps}>

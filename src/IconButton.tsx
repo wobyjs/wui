@@ -1,6 +1,6 @@
 import { tw } from '@woby/styled'
 //@ts-ignore
-import { $, $$, isObservable, type JSX, defaults, customElement, ElementAttributes, HtmlBoolean, type ObservableMaybe } from 'woby'
+import { $, $$, isObservable, type JSX, defaults, customElement, ElementAttributes, HtmlBoolean, type ObservableMaybe, HtmlClass } from 'woby'
 
 /** color: [&_svg]:fill-current */
 // const IconButtonComponent = tw('button')`inline-flex items-center justify-center relative box-border bg-transparent cursor-pointer select-none align-middle appearance-none no-underline text-center flex-[0_0_auto] text-2xl overflow-visible text-[rgba(0,0,0,0.54)] transition-[background-color] duration ease-in-out delay-[0ms] m-0 p-2 rounded-[50%] border-0
@@ -27,13 +27,26 @@ import { $, $$, isObservable, type JSX, defaults, customElement, ElementAttribut
 // })
 
 const def = () => ({
-    cls: $(""),
+    /** 
+     * Custom CSS classes to apply to the icon button.
+     * 
+     * Class override mechanism:
+     * - `class` prop (aliased as `cn`): Used as the primary class, if undefined the default classes are used
+     * - `cls` prop: Additional classes that patch/extend the given classes
+     * 
+     * Usage:
+     * - When `class` is undefined, the default classes are used
+     * - User can override the default class by providing a `class` prop
+     * - `cls` can be used to add additional classes to the component
+     */
+    class: $('', HtmlClass) as JSX.Class | undefined,
+    cls: $('', HtmlClass) as JSX.Class | undefined,
     children: $(null as JSX.Child),
     disabled: $(false, HtmlBoolean) as ObservableMaybe<boolean> | undefined,
 })
 
 const IconButton = defaults(def, (props) => {
-    const { cls, children, disabled, ...otherProps } = props
+    const { cls, class: cn, children, disabled, ...otherProps } = props
 
     // const baseClass = "inline-flex items-center justify-center relative box-border bg-transparent cursor-pointer select-none align-middle appearance-none no-underline text-center flex-[0_0_auto] text-2xl overflow-visible text-[rgba(0,0,0,0.54)] transition-[background-color] duration ease-in-out delay-[0ms] m-0 p-2 rounded-[50%] border-0 " +
     //             "[outline:0px] " +
@@ -62,7 +75,7 @@ const IconButton = defaults(def, (props) => {
     return (
         <button
             disabled={disabled}
-            class={[baseClass, $$(cls)]}
+            class={[() => $$(cn) ? $$(cn) : baseClass, cls]}
             {...otherProps}
         >
             {children}
