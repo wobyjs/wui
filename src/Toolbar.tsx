@@ -1,8 +1,8 @@
 import { $, $$, customElement, defaults, ElementAttributes, HtmlClass, HtmlString, ObservableMaybe, type JSX } from "woby"
 
 const def = () => ({
-    class: $('', HtmlClass) as JSX.Class | undefined,
     cls: $('', HtmlClass) as JSX.Class | undefined,
+    class: $('', HtmlClass) as JSX.Class | undefined,
     children: $(null),
     type: $("default", HtmlString) as ObservableMaybe<string>
 })
@@ -12,10 +12,10 @@ const variantStyle = {
 }
 
 const Toolbar = defaults(def, (props) => {
-    const { class: cn, cls, children, type, ...otherProps } = props
+    const { cls, class: cn, children, type, ...otherProps } = props
 
     return (
-        <div class={() => [variantStyle[$$(type)], () => $$(cn) ? $$(cn) : "", cls]}
+        <div class={() => [variantStyle[$$(type)], () => $$(cls) ? $$(cls) : "", cn]}
             {...otherProps}>
             {children}
         </div>

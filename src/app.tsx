@@ -1869,7 +1869,7 @@ export function App() {
 
         // 2. Configuration State (Observables to change props dynamically)
         const sidebarWidth = $(280)
-        const showOverlay = $(true)
+        const mask = $(true)
         const demoTitle = $("Default Configuration")
 
         // 3. Helper functions to switch modes
@@ -1881,22 +1881,22 @@ export function App() {
                 switch (mode) {
                     case 'default':
                         sidebarWidth(280)
-                        showOverlay(true)
+                        mask(true)
                         demoTitle("Default Configuration")
                         break
                     case 'no-overlay':
                         sidebarWidth(280)
-                        showOverlay(false)
+                        mask(false)
                         demoTitle("No Overlay (Click Toggle to Close)")
                         break
                     case 'wide':
                         sidebarWidth(450)
-                        showOverlay(true)
+                        mask(true)
                         demoTitle("Wide Sidebar (450px)")
                         break
                     case 'narrow':
                         sidebarWidth(80)
-                        showOverlay(true)
+                        mask(true)
                         demoTitle("Narrow / Icon Mode (80px)")
                         break
                 }
@@ -1924,15 +1924,15 @@ export function App() {
                 This forces the 'fixed' sidebar to be contained within this div 
                 instead of the entire browser window.
             */}
-            <div class="relative w-full h-[600px] border border-gray-300 rounded-lg overflow-hidden bg-gray-50 shadow-inner" style={{ transform: 'scale(1)' }}>
+            <div class="relative w-full h-[600px] border border-gray-300 rounded-lg overflow-hidden bg-gray-50 shadow-inner flex items-start" style={{ transform: 'scale(1)' }}>
 
                 {/* --- The Sidebar Component --- */}
                 <SideBar
                     open={isOpen}
                     contentRef={contentRef}
                     width={sidebarWidth}
-                    showOverlay={showOverlay}
-                    cls="bg-gray-800 text-white"
+                    mask={mask}
+                    cls="bg-gray-800 text-white flex items-start"
                 >
                     <div class="flex flex-col h-full">
                         {/* Sidebar Header */}
@@ -2009,7 +2009,7 @@ export function App() {
                                 <p class="text-blue-700 text-sm">
                                     <strong>Current settings:</strong><br />
                                     Width: {sidebarWidth}px<br />
-                                    Overlay: {() => $$(showOverlay) ? 'Enabled' : 'Disabled'}
+                                    Overlay: {() => $$(mask) ? 'Enabled' : 'Disabled'}
                                 </p>
                             </div>
 
@@ -2803,7 +2803,6 @@ Placeholder: ${$$(showPlaceholder)} ("${$$(placeholderTxt)}")
         </>
     }
     // #endregion
-
 
     // #region Text Field Demo
     const textFieldDemo = () => {

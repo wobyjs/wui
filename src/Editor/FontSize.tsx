@@ -106,7 +106,7 @@ const FontSizeInputComponent = () => {
             <div>
                 {/* <div className="inline-flex items-center rounded-md shadow-sm"> */}
                 <Button
-                    buttonType='outlined' class={["h-8 rounded-r-none px-2 py-1 border-r-0"]} // Adjusted padding and removed right border
+                    buttonType='outlined' cls={["h-8 rounded-r-none px-2 py-1 border-r-0"]} // Adjusted padding and removed right border
                     onClick={decrementSize}
                     title="Decrease Font Size"
                 >
@@ -123,7 +123,7 @@ const FontSizeInputComponent = () => {
                     disabled
                 />
                 <Button
-                    buttonType='outlined' class={["h-8 rounded-l-none px-2 py-1"]} // Adjusted padding
+                    buttonType='outlined' cls={["h-8 rounded-l-none px-2 py-1"]} // Adjusted padding
                     onClick={incrementSize}
                     title="Increase Font Size"
                 >

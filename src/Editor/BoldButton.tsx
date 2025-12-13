@@ -69,7 +69,7 @@ export const BoldButton = () => {
     }
 
     return <Button
-        buttonType='outlined' class={['h-8 w-8', () => $$(isActive) ? '!bg-slate-200' : '']} // Example selected class
+        buttonType='outlined' cls='h-8 w-8' class={() => $$(isActive) ? '!bg-slate-200' : ''} // Example selected class
         aria-pressed={isActive}
         onClick={handleClick}
         title="Bold"

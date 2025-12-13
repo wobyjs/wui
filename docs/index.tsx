@@ -421,8 +421,8 @@ const App = () => (
 					<td class='pl-10'>
 						<div class="controls">
 							<span>Visible Items: </span>
-							<Button class='w-[3rem] border-2' type="button" onClick={() => itemCount($$(itemCount) + 2)}>++</Button>&nbsp;
-							<Button class='w-[3rem] border-2' type="button" onClick={() => itemCount($$(itemCount) - 2)}>--</Button>
+							<Button cls='w-[3rem] border-2' type="button" onClick={() => itemCount($$(itemCount) + 2)}>++</Button>&nbsp;
+							<Button cls='w-[3rem] border-2' type="button" onClick={() => itemCount($$(itemCount) - 2)}>--</Button>
 						</div >
 
 						<Button id="setKiwiButton" type="button" onClick={() => value('kiwi')}>Set to Kiwi</Button>

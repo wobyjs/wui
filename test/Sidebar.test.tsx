@@ -112,10 +112,10 @@ const NoOverlaySidebar = () => {
         <div class="p-4">
             <h3 class="font-bold mb-2">Sidebar Without Overlay</h3>
             <p class="text-sm text-gray-600 mb-4">
-                Using `showOverlay={false}`. You must use a button to close it.
+                Using `mask={false}`. You must use a button to close it.
             </p>
 
-            <SideBar open={open} contentRef={contentRef} showOverlay={false}>
+            <SideBar open={open} contentRef={contentRef} mask={false}>
                 <div class="p-4">
                     <h2 class="text-xl font-bold mb-2">No Overlay</h2>
                     <Button onClick={() => open(false)}>Close Me</Button>

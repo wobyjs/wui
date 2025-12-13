@@ -11,20 +11,19 @@ import { applyTextAlign } from './AlignLeftButton'
 const def = () => ({
     buttonType: $("outlined" as "text" | "contained" | "outlined" | "icon"),
     title: $("Align Center"),
-    class: $('', HtmlClass) as JSX.Class | undefined,
     cls: $('', HtmlClass) as JSX.Class | undefined,
+    class: $('', HtmlClass) as JSX.Class | undefined,
     disabled: $(false) as Observable<boolean>,
 })
-
 const AlignCenterButton = defaults(def, (props) => {
-    const { buttonType, title, class: cn, cls, disabled, ...otherProps } = props
+    const { buttonType, title, cls, class: cn, disabled, ...otherProps } = props
     const editor = useEditor()
 
     return (
         <Button
             buttonType={buttonType}
             title={title}
-            class={[cn, cls]}
+            class={[() => $$(cls) ? $$(cls) : "", cn]}
             disabled={disabled}
             onClick={() => {
                 applyTextAlign('center', editor)
@@ -35,7 +34,6 @@ const AlignCenterButton = defaults(def, (props) => {
         </Button>
     )
 }) as typeof AlignCenterButton & StyleEncapsulationProps
-
 // const AlignCenterButton = () => {
 //     const editor = useEditor()
 

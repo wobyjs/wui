@@ -21,16 +21,16 @@ const def = () => ({
      * Custom CSS classes to apply to the avatar.
      * 
      * Class override mechanism:
-     * - `class` prop (aliased as `cn`): Used as the primary class, if undefined the default variant classes are used
-     * - `cls` prop: Additional classes that patch/extend the given classes
+     * - `cls` prop: Used as the primary class, if undefined the default variant classes are used
+     * - `class` prop (aliased as `cn`): Additional classes that patch/extend the given classes
      * 
      * Usage:
-     * - When `class` is undefined, the default variant classes are used
-     * - User can override the default class by providing a `class` prop
-     * - `cls` can be used to add additional classes to the component
+     * - When `cls` is undefined, the default variant classes are used
+     * - User can override the default class by providing a `cls` prop
+     * - `class` can be used to add additional classes to the component
      */
-    class: $('', HtmlClass) as JSX.Class | undefined,
     cls: $('', HtmlClass) as JSX.Class | undefined,
+    class: $('', HtmlClass) as JSX.Class | undefined,
     src: $(null as string | null),
     alt: $("Avatar"),
     children: $(null as JSX.Child),
@@ -41,11 +41,11 @@ const def = () => ({
 const BASE_CLASS =
     "relative flex items-center justify-center align-middle select-none leading-none overflow-hidden shrink-0 text-white m-0 bg-[rgb(189,189,189)]"
 
-const variantStyle = {
-    circular: [BASE_CLASS, "rounded-full"].join(" ").trim(),
-    rounded: [BASE_CLASS, "rounded-xl"].join(" ").trim(),
-    square: [BASE_CLASS, "rounded-md"].join(" ").trim(),
-}
+const variantStyle = (cls: JSX.Class) => ({
+    circular: [cls ? cls : BASE_CLASS, " rounded-full"],
+    rounded: [cls ? cls : BASE_CLASS, " rounded-xl"],
+    square: [cls ? cls : BASE_CLASS, "rounded-md"],
+})
 
 const sizeStyle = {
     xs: "w-6 h-6 text-xs",
@@ -55,7 +55,7 @@ const sizeStyle = {
 }
 
 const Avatar = defaults(def, (props) => {
-    const { cls, class: cn, src: src, alt: alt, children, size, type: variant, ...otherProps } = props
+    const { class: cn, cls, src, alt, children, size, type: variant, ...otherProps } = props
 
     // normalise src / alt into observables
     const srcObs = isObservable(src) ? (src as ObservableMaybe<string | null>) : $(src as string | null)
@@ -74,7 +74,7 @@ const Avatar = defaults(def, (props) => {
 
     return (
         <div
-            class={[() => $$(cn) ? $$(cn) : variantStyle[$$(variant)], cls]}
+            class={[() => (variantStyle($$(cls))[$$(variant)]), cn]}
             {...otherProps}
         >
             {child}

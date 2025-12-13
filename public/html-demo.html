@@ -1167,12 +1167,12 @@
             This forces the 'fixed' sidebar to be contained within this div.
         -->
         <div id="sidebar-viewport"
-            class="relative w-full h-[600px] border border-gray-300 rounded-lg overflow-hidden bg-gray-50 shadow-inner"
+            cls="relative w-full h-[600px] border border-gray-300 rounded-lg overflow-hidden bg-gray-50 shadow-inner"
             style="transform: scale(1);">
 
             <!-- Sidebar Component -->
             <!-- Note: content-ref via HTML attributes is complex, so we handle the push animation via JS observer in this demo -->
-            <wui-sidebar id="demo-sidebar" width="280px" show-overlay="true">
+            <wui-sidebar id="demo-sidebar" width="280px" mask="true">
                 <div class="flex flex-col h-full bg-gray-800 text-white">
                     <!-- Header -->
                     <div class="h-16 flex items-center justify-center border-b border-gray-700 bg-gray-900">
@@ -1752,7 +1752,8 @@
                                 Preview
                             </div>
                             <div class="w-full h-[260px] max-w-full overflow-hidden flex items-center justify-center">
-                                <wui-text-area cls="min-w-[280px] min-h-[120px] max-size-full box-border" id="target-textarea" resize="both" effect="effect1" label="My Label"
+                                <wui-text-area cls="min-w-[280px] min-h-[120px] max-size-full box-border"
+                                    id="target-textarea" resize="both" effect="effect1" label="My Label"
                                     placeholder="Type something here..."></wui-text-area>
                             </div>
                         </div>
@@ -2441,22 +2442,22 @@
                 switch (mode) {
                     case 'default':
                         sidebar.setAttribute('width', '280px');
-                        sidebar.setAttribute('show-overlay', 'true');
+                        sidebar.setAttribute('mask', 'true');
                         title.textContent = "Default Configuration";
                         break;
                     case 'no-overlay':
                         sidebar.setAttribute('width', '280px');
-                        sidebar.setAttribute('show-overlay', 'false');
+                        sidebar.setAttribute('mask', 'false');
                         title.textContent = "No Overlay (Click Toggle to Close)";
                         break;
                     case 'wide':
                         sidebar.setAttribute('width', '450px');
-                        sidebar.setAttribute('show-overlay', 'true');
+                        sidebar.setAttribute('mask', 'true');
                         title.textContent = "Wide Sidebar (450px)";
                         break;
                     case 'narrow':
                         sidebar.setAttribute('width', '80px');
-                        sidebar.setAttribute('show-overlay', 'true');
+                        sidebar.setAttribute('mask', 'true');
                         title.textContent = "Narrow / Icon Mode (80px)";
 
                         // Hide text for narrow mode

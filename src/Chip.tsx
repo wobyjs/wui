@@ -11,23 +11,23 @@ const def = () => ({
      * Custom CSS classes to apply to the chip.
      * 
      * Class override mechanism:
-     * - `class` prop (aliased as `cn`): Used as the primary class, if undefined the default classes are used
-     * - `cls` prop: Additional classes that patch/extend the given classes
+     * - `cls` prop: Used as the primary class, if undefined the default classes are used
+     * - `class` prop (aliased as `cn`): Additional classes that patch/extend the given classes
      * 
      * Usage:
-     * - When `class` is undefined, the default classes are used
-     * - User can override the default class by providing a `class` prop
-     * - `cls` can be used to add additional classes to the component
+     * - When `cls` is undefined, the default classes are used
+     * - User can override the default class by providing a `cls` prop
+     * - `class` can be used to add additional classes to the component
      */
-    class: $('', HtmlClass) as JSX.Class | undefined,
     cls: $('', HtmlClass) as JSX.Class | undefined,
+    class: $('', HtmlClass) as JSX.Class | undefined,
     deletable: $(false, HtmlBoolean) as ObservableMaybe<boolean> | undefined,
     visible: $(true, HtmlBoolean) as ObservableMaybe<boolean> | undefined,
     onDelete: undefined as ((e: JSX.TargetedMouseEvent<HTMLDivElement>) => void) | undefined,
 })
 
 const Chip = defaults(def, (props) => {
-    const { cls, class: cn, avatar, deleteIcon, children, deletable, visible, onDelete, ...otherProps } = props
+    const { class: cn, cls, avatar, deleteIcon, children, deletable, visible, onDelete, ...otherProps } = props
 
     // Create internal visible state if not provided as observable
     const internalVisible = isObservable(visible) ? visible : $(visible ?? true)
@@ -81,7 +81,7 @@ const Chip = defaults(def, (props) => {
 
         return (
             <div
-                class={[() => $$(cn) ? $$(cn) : baseClass, cls]}
+                class={[() => $$(cls) ? $$(cls) : baseClass, cn]}
                 tabIndex={0}
                 role="button"
                 {...otherProps}

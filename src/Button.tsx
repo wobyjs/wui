@@ -134,16 +134,16 @@ const def = () => ({
      * Custom CSS classes to apply to the button.
      * 
      * Class override mechanism:
-     * - `class` prop (aliased as `cn`): Used as the primary class, if undefined the default variant class is used
-     * - `cls` prop: Additional classes that patch/extend the given class
+     * - `cls` prop: Used as the primary class, if undefined the default variant class is used
+     * - `class` prop (aliased as `cn`): Additional classes that patch/extend the given class
      * 
      * Usage:
-     * - When `class` is undefined, the default variant class is used
-     * - User can override the default class by providing a `class` prop
-     * - `cls` can be used to add additional classes to the component
+     * - When `cls` is undefined, the default variant class is used
+     * - User can override the default class by providing a `cls` prop
+     * - `class` can be used to add additional classes to the component
      */
-    class: $('', HtmlClass) as JSX.Class | undefined,
     cls: $('', HtmlClass) as JSX.Class | undefined,
+    class: $('', HtmlClass) as JSX.Class | undefined,
     onClick: undefined,
 })
 const Button = defaults(def, (props) => {
@@ -193,7 +193,7 @@ const Button = defaults(def, (props) => {
                 }
             }}
             disabled={disabled}
-            class={[() => $$(cn) ? $$(cn) : variant[$$(buttonType)], cls]}
+            class={[() => $$(cls) ? $$(cls) : variant[$$(buttonType)], cn]}
             {...otherProps}
         >
             {children}

@@ -43,8 +43,8 @@ const def = () => {
         on: $("ON"),
         checked: $(false, HtmlBoolean) as ObservableMaybe<boolean> | undefined,
         id: $(generatedId as string | undefined),
-        class: $('', HtmlClass) as JSX.Class | undefined,
         cls: $('', HtmlClass) as JSX.Class | undefined,
+        class: $('', HtmlClass) as JSX.Class | undefined,
         children: $(null as JSX.Child),
         effect: $("", HtmlString) as ObservableMaybe<string> | undefined,
     })
@@ -64,7 +64,7 @@ const def = () => {
  * Some special case may need to see the output html tree node and modify classes as needed
  */
 const Switch = defaults(def, (props) => {
-    const { off, on, checked, id, class: cn, cls, children, effect, ...otherProps } = props
+    const { off, on, checked, id, cls, class: cn, children, effect, ...otherProps } = props
 
     const activeStyle = useMemo(() => {
         const effectName = $$(effect) // Unwrap the observable
@@ -72,7 +72,7 @@ const Switch = defaults(def, (props) => {
     })
 
     return (
-        <div {...otherProps} class={[activeStyle, () => $$(cn) ? $$(cn) : "", cls]}>
+        <div {...otherProps} class={[activeStyle, () => $$(cls) ? $$(cls) : "", cn]}>
             <input
                 id={id}
                 type="checkbox"

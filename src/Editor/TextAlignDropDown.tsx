@@ -75,7 +75,7 @@ export const TextAlignDropDown = () => {
             <div>
                 <Button
                     buttonType='outlined'
-                    class={["p-2"]}
+                    cls="p-2"
                     onClick={toggleDropdown}
                     title="Text alignment"
                 >

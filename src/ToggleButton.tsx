@@ -10,8 +10,8 @@ const def = () => ({
     offClass: $("text-gray-600 bg-transparent border-transparent hover:bg-gray-100"),
 
     checked: $(false, HtmlBoolean) as ObservableMaybe<boolean> | undefined,
-    class: $('', HtmlClass) as JSX.Class | undefined,
     cls: $('', HtmlClass) as JSX.Class | undefined,
+    class: $('', HtmlClass) as JSX.Class | undefined,
     onClick: undefined as ((e: any) => void) | undefined,
     disabled: $(false, HtmlBoolean) as ObservableMaybe<boolean> | undefined,
 })
@@ -23,8 +23,8 @@ const ToggleButton = defaults(def, (props) => {
         onClass,
         offClass,
         checked,
-        class: cn,
         cls,
+        class: cn,
         onClick,
         ...otherProps
     } = props
@@ -59,8 +59,8 @@ const ToggleButton = defaults(def, (props) => {
                 () => ($$(checked) ? $$(onClass) : $$(offClass)),
 
                 // user-provided overrides
-                () => $$(cn) ? $$(cn) : "",
-                cls,
+                () => $$(cls) ? $$(cls) : "",
+                cn,
             ]}
             {...otherProps}
         >

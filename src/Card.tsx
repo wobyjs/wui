@@ -59,16 +59,16 @@ const defCard = () => ({
      * Custom CSS classes to apply to the card.
      * 
      * Class override mechanism:
-     * - `class` prop (aliased as `cn`): Used as the primary class, if undefined the default base classes are used
-     * - `cls` prop: Additional classes that patch/extend the given classes
+     * - `cls` prop: Used as the primary class, if undefined the default base classes are used
+     * - `class` prop (aliased as `cn`): Additional classes that patch/extend the given classes
      * 
      * Usage:
-     * - When `class` is undefined, the default base classes are used
-     * - User can override the default class by providing a `class` prop
-     * - `cls` can be used to add additional classes to the component
+     * - When `cls` is undefined, the default base classes are used
+     * - User can override the default class by providing a `cls` prop
+     * - `class` can be used to add additional classes to the component
      */
-    class: $('', HtmlClass) as JSX.Class | undefined,
     cls: $('', HtmlClass) as JSX.Class | undefined,
+    class: $('', HtmlClass) as JSX.Class | undefined,
     children: $(null as JSX.Child),
     variant: $("elevated" as Variant),
     elevation: $(1 as Elevation, { type: 'number' } as const),
@@ -86,16 +86,16 @@ const defCardMedia = () => ({
      * Custom CSS classes to apply to the card media.
      * 
      * Class override mechanism:
-     * - `class` prop (aliased as `cn`): Used as the primary class, if undefined the default "block bg-no-repeat" class is used
-     * - `cls` prop: Additional classes that patch/extend the given class
+     * - `cls` prop: Used as the primary class, if undefined the default "block bg-no-repeat" class is used
+     * - `class` prop (aliased as `cn`): Additional classes that patch/extend the given class
      * 
      * Usage:
-     * - When `class` is undefined, the default "block bg-no-repeat" class is used
-     * - User can override the default class by providing a `class` prop
-     * - `cls` can be used to add additional classes to the component
+     * - When `cls` is undefined, the default "block bg-no-repeat" class is used
+     * - User can override the default class by providing a `cls` prop
+     * - `class` can be used to add additional classes to the component
      */
-    class: $('', HtmlClass) as JSX.Class | undefined,
     cls: $('', HtmlClass) as JSX.Class | undefined,
+    class: $('', HtmlClass) as JSX.Class | undefined,
 })
 
 const defCardContent = () => ({
@@ -103,16 +103,16 @@ const defCardContent = () => ({
      * Custom CSS classes to apply to the card content.
      * 
      * Class override mechanism:
-     * - `class` prop (aliased as `cn`): Used as the primary class, if undefined the default padding class is used
-     * - `cls` prop: Additional classes that patch/extend the given classes
+     * - `cls` prop: Used as the primary class, if undefined the default padding class is used
+     * - `class` prop (aliased as `cn`): Additional classes that patch/extend the given classes
      * 
      * Usage:
-     * - When `class` is undefined, the default padding class is used
-     * - User can override the default class by providing a `class` prop
-     * - `cls` can be used to add additional classes to the component
+     * - When `cls` is undefined, the default padding class is used
+     * - User can override the default class by providing a `cls` prop
+     * - `class` can be used to add additional classes to the component
      */
-    class: $('', HtmlClass) as JSX.Class | undefined,
     cls: $('', HtmlClass) as JSX.Class | undefined,
+    class: $('', HtmlClass) as JSX.Class | undefined,
     children: $(null as JSX.Child),
     padding: $("p-4" as JSX.Class),
 })
@@ -122,16 +122,16 @@ const defCardAction = () => ({
      * Custom CSS classes to apply to the card actions.
      * 
      * Class override mechanism:
-     * - `class` prop (aliased as `cn`): Used as the primary class, if undefined the default flex alignment classes are used
-     * - `cls` prop: Additional classes that patch/extend the given classes
+     * - `cls` prop: Used as the primary class, if undefined the default flex alignment classes are used
+     * - `class` prop (aliased as `cn`): Additional classes that patch/extend the given classes
      * 
      * Usage:
-     * - When `class` is undefined, the default flex alignment classes are used
-     * - User can override the default class by providing a `class` prop
-     * - `cls` can be used to add additional classes to the component
+     * - When `cls` is undefined, the default flex alignment classes are used
+     * - User can override the default class by providing a `cls` prop
+     * - `class` can be used to add additional classes to the component
      */
-    class: $('', HtmlClass) as JSX.Class | undefined,
     cls: $('', HtmlClass) as JSX.Class | undefined,
+    class: $('', HtmlClass) as JSX.Class | undefined,
     children: $(null as JSX.Child),
     align: $("start" as Justify),
     padding: $("p-2" as JSX.Class),
@@ -169,7 +169,7 @@ const elevationCls = (e: Elevation) => {
 
 const Card = defaults(defCard, (props) => {
 
-    const { cls, class: cn, children, variant, elevation, interactive, ...otherProps } = props
+    const { class: cn, cls, children, variant, elevation, interactive, ...otherProps } = props
 
     // const v = () => ((variant) ?? "elevated") as Variant
     // const e = () => ((elevation) ?? 1) as Elevation
@@ -192,7 +192,7 @@ const Card = defaults(defCard, (props) => {
 
     return (
         <div
-            class={[() => $$(cn) ? $$(cn) : [base, variantCls(), interactiveCls()].join(" "), cls]}
+            class={[() => $$(cls) ? $$(cls) : [base, variantCls(), interactiveCls()].join(" "), cn]}
             {...otherProps}
         >
             {/* <p>Attribute</p>
@@ -212,7 +212,7 @@ const Card = defaults(defCard, (props) => {
 }) as typeof Card
 
 const CardMedia = defaults(defCardMedia, (props) => {
-    const { cls, class: cn, src, alt, height, position, fit, ...otherProps } = props
+    const { class: cn, cls, src, alt, height, position, fit, ...otherProps } = props
 
     // const src = () => _src ?? ""
     // const alt = () => _alt ?? ""
@@ -232,7 +232,7 @@ const CardMedia = defaults(defCardMedia, (props) => {
             role="img"
             title={alt()}
             aria-label={alt()}
-            class={[() => $$(cn) ? $$(cn) : "block bg-no-repeat", cls]}
+            class={[() => $$(cls) ? $$(cls) : "block bg-no-repeat", cn]}
             style={() => ({
                 height: height(),
                 backgroundImage: src() ? `url(${src()})` : "",
@@ -245,7 +245,7 @@ const CardMedia = defaults(defCardMedia, (props) => {
 }) as typeof CardMedia & StyleEncapsulationProps
 
 const CardContent = defaults(defCardContent, (props) => {
-    const { cls, class: cn, padding, children, ...otherProps } = props
+    const { class: cn, cls, padding, children, ...otherProps } = props
 
     // const pad = () => (padding) ?? "p-4"
     // const extra = () => (className) ?? ""
@@ -256,7 +256,7 @@ const CardContent = defaults(defCardContent, (props) => {
     // console.log("CardContent children: ", children());
 
     return (
-        <div class={[() => $$(cn) ? $$(cn) : [$$(padding)].join(" "), cls]} {...otherProps}>
+        <div class={[() => $$(cls) ? $$(cls) : [$$(padding)].join(" "), cn]} {...otherProps}>
             {children()}
         </div>
     )
@@ -264,7 +264,7 @@ const CardContent = defaults(defCardContent, (props) => {
 
 const CardActions = defaults(defCardAction, (props) => {
 
-    const { cls, class: cn, children, align, padding, ...otherProps } = props
+    const { class: cn, cls, children, align, padding, ...otherProps } = props
 
     // const align = () => ((_align) ?? "start") as Justify
     // const pad = () => (padding) ?? "p-2"
@@ -280,7 +280,7 @@ const CardActions = defaults(defCardAction, (props) => {
 
     return (
         <div
-            class={[() => $$(cn) ? $$(cn) : ["flex items-center", justify(), $$(padding)].join(" "), cls]}
+            class={[() => $$(cls) ? $$(cls) : ["flex items-center", justify(), $$(padding)].join(" "), cn]}
             {...otherProps}
         >
             {children()}

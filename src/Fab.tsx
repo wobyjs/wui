@@ -5,16 +5,16 @@ const def = () => ({
        * Custom CSS classes to apply to the fab.
        * 
        * Class override mechanism:
-       * - `class` prop (aliased as `cn`): Used as the primary class, if undefined the default variant classes are used
-       * - `cls` prop: Additional classes that patch/extend the given classes
+       * - `cls` prop: Used as the primary class, if undefined the default variant classes are used
+       * - `class` prop (aliased as `cn`): Additional classes that patch/extend the given classes
        * 
        * Usage:
-       * - When `class` is undefined, the default variant classes are used
-       * - User can override the default class by providing a `class` prop
-       * - `cls` can be used to add additional classes to the component
+       * - When `cls` is undefined, the default variant classes are used
+       * - User can override the default class by providing a `cls` prop
+       * - `class` can be used to add additional classes to the component
        */
-      class: $('', HtmlClass) as JSX.Class | undefined,
       cls: $('', HtmlClass) as JSX.Class | undefined,
+      class: $('', HtmlClass) as JSX.Class | undefined,
       children: $(""),
       type: $("pill", HtmlString) as ObservableMaybe<string> | undefined,
       disabled: $(false, HtmlBoolean) as ObservableMaybe<boolean> | undefined,
@@ -27,11 +27,11 @@ const variantStyle = {
 }
 
 const Fab = defaults(def, (props) => {
-      const { cls, class: cn, children, type: variant, disabled, ...otherProps } = props
+      const { class: cn, cls, children, type: variant, disabled, ...otherProps } = props
 
       return (
             <button
-                  class={[() => $$(cn) ? $$(cn) : variantStyle[$$(variant)], cls]}
+                  class={[() => $$(cls) ? $$(cls) : variantStyle[$$(variant)], cn]}
                   disabled={disabled}
                   {...otherProps}
             >

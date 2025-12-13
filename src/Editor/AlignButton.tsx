@@ -16,13 +16,13 @@ const def = () => ({
     type: $("outlined" as "text" | "contained" | "outlined" | "icon"),
     title: $("Align Center"),
     cls: $('', HtmlClass) as JSX.Class | undefined,
+    class: $('', HtmlClass) as JSX.Class | undefined,
     disabled: $(false) as Observable<boolean>,
     children: $(<AlignCenter />) as Observable<JSX.Element>,
     contentAlign: $("center" as ContentAlign),
 })
-
 const AlignButton = defaults(def, (props) => {
-    const { type: buttonType, title, cls, disabled, children, contentAlign, ...otherProps } = props as any
+    const { type: buttonType, title, cls, class: cn, disabled, children, contentAlign, ...otherProps } = props as any
     const editor = useEditor()
 
     // Extract onClick from otherProps if provided
@@ -81,7 +81,7 @@ const AlignButton = defaults(def, (props) => {
             <Button
                 type={buttonType}
                 title={displayTitle}
-                cls={cls}
+                class={[() => $$(cls) ? $$(cls) : "", cn]}
                 disabled={disabled}
                 onClick={handleClick}
                 {...otherProps}
@@ -94,7 +94,6 @@ const AlignButton = defaults(def, (props) => {
 }) as typeof AlignButton
 
 export { AlignButton }
-
 // NOTE: Register the custom element
 customElement('wui-align-button', AlignButton)
 

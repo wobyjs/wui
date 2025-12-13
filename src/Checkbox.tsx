@@ -17,16 +17,16 @@ const def = () => ({
 	 * Custom CSS classes to apply to the checkbox.
 	 * 
 	 * Class override mechanism:
-	 * - `class` prop (aliased as `cn`): Used as the primary class, if undefined the default classes are used
-	 * - `cls` prop: Additional classes that patch/extend the given classes
+	 * - `cls` prop: Used as the primary class, if undefined the default classes are used
+	 * - `class` prop (aliased as `cn`): Additional classes that patch/extend the given classes
 	 * 
 	 * Usage:
-	 * - When `class` is undefined, the default classes are used
-	 * - User can override the default class by providing a `class` prop
-	 * - `cls` can be used to add additional classes to the component
+	 * - When `cls` is undefined, the default classes are used
+	 * - User can override the default class by providing a `cls` prop
+	 * - `class` can be used to add additional classes to the component
 	 */
-	class: $('', HtmlClass) as JSX.Class | undefined,
 	cls: $('', HtmlClass) as JSX.Class | undefined,
+	class: $('', HtmlClass) as JSX.Class | undefined,
 	// checked: $(false as boolean),
 	// disabled: $(false as boolean),
 	checked: $(false, HtmlBoolean) as ObservableMaybe<boolean>,
@@ -35,7 +35,7 @@ const def = () => ({
 })
 
 const Checkbox = defaults(def, (props) => {
-	const { cls, class: cn, children, labelPosition, checked, disabled, id, ...otherProps } = props
+	const { class: cn, cls, children, labelPosition, checked, disabled, id, ...otherProps } = props
 
 	const before = () =>
 		$$(labelPosition) === "left" || $$(labelPosition) === "top" ?
@@ -48,7 +48,7 @@ const Checkbox = defaults(def, (props) => {
 	const line = () => ($$(labelPosition) === "top" || $$(labelPosition) === "bottom" ? <br /> : null)
 
 	return (
-		<div class={[() => $$(cn) ? $$(cn) : "", cls]}>
+		<div class={[() => $$(cls) ? $$(cls) : "", cn]}>
 			{before}
 			{line}
 			<input id={id} type="checkbox" checked={checked} disabled={disabled} {...otherProps} />

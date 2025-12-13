@@ -56,7 +56,7 @@ export const ItalicButton = () => {
     }
 
     return <Button
-        buttonType='outlined' class={['h-8 w-8', () => $$(isActive) ? '!bg-slate-200' : '']} // Matched selected class
+        buttonType='outlined' cls='h-8 w-8' class={() => $$(isActive) ? '!bg-slate-200' : ''} // Matched selected class
         aria-pressed={isActive}
         onClick={handleClick}
         title="Italic"

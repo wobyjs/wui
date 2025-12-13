@@ -104,7 +104,7 @@ const def = () => ({
  */
 const TextField = defaults(def, (props) => {
 
-	const { class: cn, cls, children, effect, assignOnEnter, value, inputType, placeholder, disabled, onChange, onKeyUp, label, ...otherProps } = props
+	const { cls, class: cn, children, effect, assignOnEnter, value, inputType, placeholder, disabled, onChange, onKeyUp, label, ...otherProps } = props
 
 	const baseClass = "m-[20px] relative z-0"
 
@@ -133,7 +133,7 @@ const TextField = defaults(def, (props) => {
 	})
 
 	return (
-		<div class={[baseClass, () => $$(cn) ? $$(cn) : "", cls]}>
+		<div class={[baseClass, () => $$(cls) ? $$(cls) : "", cn]}>
 
 
 			{/* if data-adnorment= start is exists render here */}
