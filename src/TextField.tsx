@@ -8,7 +8,7 @@ import {
 	effect22, effect23, effect24,
 	effect19a, effect20a, effect21a,
 } from './TextField.effect'
-import { ObservableMaybe, $$, $, type JSX, isObservable, Observable, defaults, customElement, type ElementAttributes, HtmlBoolean, HtmlString, useMemo, HtmlClass } from 'woby'
+import { ObservableMaybe, $$, $, type JSX, isObservable, Observable, defaults, customElement, type ElementAttributes, HtmlBoolean, HtmlString, useMemo, HtmlClass, useEffect } from 'woby'
 
 //https://codepen.io/maheshambure21/pen/EozKKy
 
@@ -73,6 +73,7 @@ const def = () => ({
 	onKeyUp: undefined as ((e: any) => void) | undefined,
 
 	label: $("", HtmlString) as ObservableMaybe<string> | undefined,
+	ref: undefined as ((el: HTMLInputElement) => void) | undefined,
 })
 
 /**
@@ -104,11 +105,26 @@ const def = () => ({
  */
 const TextField = defaults(def, (props) => {
 
-	const { cls, class: cn, children, effect, assignOnEnter, value, inputType, placeholder, disabled, onChange, onKeyUp, label, ...otherProps } = props
+	const { cls, class: cn, children, effect, assignOnEnter, value, inputType, placeholder, disabled, onChange, onKeyUp, label, ref, ...otherProps } = props
 
 	const baseClass = "relative z-0"
 
+	const inputRef = $<HTMLInputElement | null>(null)
 
+	useEffect(() => {
+		if (ref && $$(inputRef)) {
+			ref($$(inputRef)!)
+		}
+	})
+
+	// // Expose focus method to forward focus to the input element
+	// Object.assign(props, {
+	// 	focus: () => {
+	// 		if (inputRef()) {
+	// 			inputRef()!.focus()
+	// 		}
+	// 	}
+	// })
 
 	// write me logic to check adnorment is exists or not
 	// const child = useMemo(() => {
@@ -132,14 +148,24 @@ const TextField = defaults(def, (props) => {
 		return effectMap[effectName] || ""
 	})
 
-	return (
-		<div class={[baseClass, () => $$(cls) ? $$(cls) : "", cn]}>
+	const handleFocus = () => {
+		if (inputRef()) {
+			inputRef()!.focus()
+		}
+	}
 
+	return (
+		<div
+			class={[baseClass, () => $$(cls) ? $$(cls) : "", cn]}
+			tabIndex={-1}
+			onFocus={handleFocus}
+		>
 
 			{/* if data-adnorment= start is exists render here */}
 			{/* {() => child().start} */}
 
 			<input
+				ref={inputRef}
 				class={effectStyle}
 				value={value}
 				disabled={disabled}
@@ -158,7 +184,7 @@ const TextField = defaults(def, (props) => {
 
 			<span class="focus-border focus-bg pointer-events-none"><i></i></span>
 
-			{() => $$(label) ? <label class="">{label}</label> : null}
+			{() => $$(label) ? <label class="cursor-text">{label}</label> : null}
 
 			{/* if data-adnorment= end is exists render here */}
 			{/* {() => child().end} */}
@@ -215,7 +241,7 @@ customElement('wui-end-adornment', EndAdornment)
 declare module 'woby' {
 	namespace JSX {
 		interface IntrinsicElements {
-			'wui-text-field': ElementAttributes<typeof TextField>,
+			'wui-text-field': ElementAttributes<typeof TextField> & { focus?: () => void },
 			'wui-start-adornment': ElementAttributes<typeof StartAdornment>,
 			'wui-end-adornment': ElementAttributes<typeof EndAdornment>,
 		}
