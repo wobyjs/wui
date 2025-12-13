@@ -22,9 +22,9 @@ const parseDate = (dateInput: Date | string | null | undefined): Date | null => 
 export type DateTimeWheelerType = 'year' | 'month' | 'date' | 'time' | 'datetime' | 'hour'
 
 
-const CURRENT_DATE = new Date();
-const MIN_YEAR = 1900;
-const MAX_YEAR = CURRENT_DATE.getFullYear() + 20;
+const CURRENT_DATE = new Date()
+const MIN_YEAR = 1900
+const MAX_YEAR = CURRENT_DATE.getFullYear() + 20
 
 const DATETIME_WHEELER_CLS = 'date-time-Wheeler flex w-full bg-white p-1 border border-gray-300 rounded-md shadow-sm '
 const WHEELER_WRAPPER_CLS = 'wheel-wrapper flex-1'
@@ -33,15 +33,15 @@ const WHEELER_WRAPPER_CLS = 'wheel-wrapper flex-1'
 const def = () => {
 
     // 1. Get the full object of default values from the single Wheeler
-    const baseDefaults = wheelerDef();
+    const baseDefaults = wheelerDef()
 
     // 2. Define the exact keys for props that are inherited and behave the same
     const inheritedKeys = [
         'cls', 'bottom', 'commitOnBlur', 'ok', 'visible', 'mask', 'cancelOnBlur', 'itemHeight', 'itemCount', 'changeValueOnClickOnly'
-    ] as const;
+    ] as const
 
     // 3. Pick those default values from the base Wheeler definition
-    const inheritedDefaults = pick(baseDefaults, inheritedKeys);
+    const inheritedDefaults = pick(baseDefaults, inheritedKeys)
 
     return {
         value: $(CURRENT_DATE) as ObservableMaybe<Date>,
@@ -75,22 +75,22 @@ const DateTimeWheeler = defaults(def, (props) => {
     const selectedSecond = $($$(modDate).getSeconds())
     // #endregion
 
-    const isVisible = $($$(visibleProp) ?? true);
+    const isVisible = $($$(visibleProp) ?? true)
 
     // This handles the "top-down" data flow.
     useEffect(() => {
-        const propValue = $$(visibleProp);
+        const propValue = $$(visibleProp)
         if (propValue !== undefined && propValue !== $$(isVisible)) {
-            isVisible(propValue);
+            isVisible(propValue)
         }
-    });
+    })
 
     const hide = () => {
-        isVisible(false);
+        isVisible(false)
         if (isObservable(visibleProp)) {
-            visibleProp(false);
+            visibleProp(false)
         }
-    };
+    }
 
 
     // #region Sync `modDate` to Individual Wheel States
@@ -226,31 +226,31 @@ const DateTimeWheeler = defaults(def, (props) => {
 
     // #region General Options Memoization
     const yearOptions = useMemo(() => {
-        const yearObject = $$(yearRange); // This might have undefined start/end
-        const min = $$(minDate);
-        const max = $$(maxDate);
+        const yearObject = $$(yearRange) // This might have undefined start/end
+        const min = $$(minDate)
+        const max = $$(maxDate)
 
         // 1. Establish the base range from the yearRange prop, providing safe fallbacks.
-        const baseStart = yearObject?.start ?? 1900;
-        const baseEnd = yearObject?.end ?? new Date().getFullYear() + 20;
+        const baseStart = yearObject?.start ?? 1900
+        const baseEnd = yearObject?.end ?? new Date().getFullYear() + 20
 
         // 2. Determine the effective start and end years by applying min/max constraints.
         // The final starting year is the LATEST of the base start or the minDate year.
-        const effectiveStart = min ? Math.max(baseStart, min.getFullYear()) : baseStart;
+        const effectiveStart = min ? Math.max(baseStart, min.getFullYear()) : baseStart
         // The final ending year is the EARLIEST of the base end or the maxDate year.
-        const effectiveEnd = max ? Math.min(baseEnd, max.getFullYear()) : baseEnd;
+        const effectiveEnd = max ? Math.min(baseEnd, max.getFullYear()) : baseEnd
 
         // 3. Generate the years array.
-        const years = [];
+        const years = []
         // This loop is now safe because effectiveStart and effectiveEnd are guaranteed to be numbers.
         if (effectiveStart <= effectiveEnd) { // Final safety check
             for (let y = effectiveStart; y <= effectiveEnd; y++) {
-                years.push({ value: y, label: y.toString() });
+                years.push({ value: y, label: y.toString() })
             }
         }
 
-        return years;
-    });
+        return years
+    })
 
     const monthOptions = useMemo(() => {
         const year = $$(selectedYear)
@@ -454,12 +454,12 @@ const DateTimeWheeler = defaults(def, (props) => {
 
                 <div
                     ref={cont}
-                    class={[DATETIME_WHEELER_CLS, 'fixed inset-x-0 bottom-0 bg-white shadow-lg z-20']}
+                    class={[DATETIME_WHEELER_CLS, 'fixed inset-x-0 bottom-0 bg-white shadow-lg z-200']}
                 >
                     {component}
                 </div>
             </Portal>
-        );
+        )
     }
 
     const renderAsInline = () => {
@@ -467,7 +467,7 @@ const DateTimeWheeler = defaults(def, (props) => {
             <div class={[$$(cls)].join(" ")} {...otherProps}>
                 {component}
             </div>
-        );
+        )
     }
 
     return () => !$$(isVisible) ? null : $$(bottomProp) ? renderAsPopup() : renderAsInline()
@@ -478,7 +478,7 @@ const DateTimeWheeler = defaults(def, (props) => {
     //         <div
     //             class={['fixed inset-0 bg-black/50 h-full w-full z-[10] opacity-50']}
     //         />
-    //         <div ref={cont} class={[DATETIME_WHEELER_CLS, 'fixed inset-x-0 bottom-0 bg-blue-600 shadow-lg z-20']}>
+    //         <div ref={cont} class={[DATETIME_WHEELER_CLS, 'fixed inset-x-0 bottom-0 bg-blue-600 shadow-lg z-200']}>
     //             {component}
     //         </div>
     //     </Portal>
@@ -490,7 +490,7 @@ const DateTimeWheeler = defaults(def, (props) => {
 export { DateTimeWheeler }
 
 // NOTE: Register the custom element
-customElement('wui-datetime-wheeler', DateTimeWheeler);
+customElement('wui-datetime-wheeler', DateTimeWheeler)
 
 // NOTE: Add the custom element to the JSX namespace
 declare module 'woby' {

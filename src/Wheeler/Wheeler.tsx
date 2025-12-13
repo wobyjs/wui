@@ -25,7 +25,7 @@ export const def = () => ({
 
     searchable: $(false, HtmlBoolean) as ObservableMaybe<boolean>,
     searchPlaceholder: $(undefined, HtmlString) as ObservableMaybe<string>,
-});
+})
 
 const Wheeler = defaults(def, (props) => {
     const { options, itemHeight: ih, itemCount: vic, value: oriValue, cls, header, ok, visible: visibleProp, mask, bottom = $$(mask), all, cancelOnBlur, commitOnBlur, searchable, searchPlaceholder, changeValueOnClickOnly, ...otherProps } = props
@@ -33,22 +33,22 @@ const Wheeler = defaults(def, (props) => {
     const itemHeight = use(ih, 36)
     const itemCount = use(vic, 5)
     const value = oriValue
-    const isVisible = $($$(visibleProp));
+    const isVisible = $($$(visibleProp))
 
     // This handles the "top-down" data flow.
     useEffect(() => {
-        const propValue = $$(visibleProp);
+        const propValue = $$(visibleProp)
         if (propValue !== $$(isVisible)) {
-            isVisible(propValue);
+            isVisible(propValue)
         }
-    });
+    })
 
     const hide = () => {
-        isVisible(false);
+        isVisible(false)
         if (isObservable(visibleProp)) {
-            visibleProp(false);
+            visibleProp(false)
         }
-    };
+    }
 
     const CLICK_THRESHOLD_PX = 5
 
@@ -79,10 +79,10 @@ const Wheeler = defaults(def, (props) => {
     // Initialize selectedIndex based on the initial value prop
     const initialIndex = !$$(multiple)
         ? $$(options).findIndex(opt => {
-            const optValue = typeof opt === 'object' && opt !== null && 'value' in opt ? opt.value : opt;
-            return optValue === $$(value);
+            const optValue = typeof opt === 'object' && opt !== null && 'value' in opt ? opt.value : opt
+            return optValue === $$(value)
         })
-        : -1;
+        : -1
     const selectedIndex = $(initialIndex)
 
     let preOptions, preFormattedOptions
@@ -117,14 +117,14 @@ const Wheeler = defaults(def, (props) => {
             // If `opt` is already an object with `value` and `label`, use it.
             const o = typeof opt === 'object' && opt !== null && 'value' in opt
                 ? { ...opt } as WheelerItem
-                : { value: opt, label: String(opt) } as WheelerItem;
+                : { value: opt, label: String(opt) } as WheelerItem
 
             // Check if a custom component was already provided for this item.
             if (!('hasComponent' in o)) {
-                o.hasComponent = !!o.component;
+                o.hasComponent = !!o.component
             }
-            return o;
-        });
+            return o
+        })
 
         // --- Step 2: Handle Multi-Select vs. Single-Select Modes ---
 
@@ -132,33 +132,33 @@ const Wheeler = defaults(def, (props) => {
             // --- Multi-Select Mode Logic (checkboxes) ---
 
             // Add the "Select All" option to the beginning of the list.
-            base.unshift({ value: $$(multiple), label: $$(multiple), hasComponent: false });
+            base.unshift({ value: $$(multiple), label: $$(multiple), hasComponent: false })
 
             // Create a map to hold the reactive state (true/false) for each checkbox.
-            const r = {} as Record<string, Observable<boolean>>;
-            base.forEach(opt => r[opt.label] = $(false)); // Initialize all to false.
+            const r = {} as Record<string, Observable<boolean>>
+            base.forEach(opt => r[opt.label] = $(false)) // Initialize all to false.
 
             // Sync the initial state of the checkboxes with the incoming `value` prop.
-            const vs = Array.isArray($$(value)) ? $$(value) : [$$(value)].flat(); // Get the current selected values as a flat array.
-            let allInitiallyChecked = true;
+            const vs = Array.isArray($$(value)) ? $$(value) : [$$(value)].flat() // Get the current selected values as a flat array.
+            let allInitiallyChecked = true
             base.forEach(opt => {
-                const isSelected = vs.some(sv => sv === opt.value);
-                r[opt.label](isSelected); // Set the checkbox state.
+                const isSelected = vs.some(sv => sv === opt.value)
+                r[opt.label](isSelected) // Set the checkbox state.
 
                 // Track if all individual items are checked to set the "All" checkbox state.
                 if (opt.label !== $$(multiple) && !isSelected) {
-                    allInitiallyChecked = false;
+                    allInitiallyChecked = false
                 }
-            });
+            })
 
             // Set the final state of the "All" checkbox.
             if (r[$$(multiple)]) { // Ensure "All" checkbox exists.
                 // It's checked if all other items are checked AND there's more than just the "All" option.
-                r[$$(multiple)](allInitiallyChecked && base.length > 1);
+                r[$$(multiple)](allInitiallyChecked && base.length > 1)
             }
 
             // Update the component's main `checkboxes` state with our newly created map.
-            checkboxes(r);
+            checkboxes(r)
 
             // --- Inject the Checkbox Renderer ---
             // Assign a `component` function to each option that will render an `<li>` with a checkbox.
@@ -168,7 +168,7 @@ const Wheeler = defaults(def, (props) => {
                     {() => {
                         // This component will reactively read the checked state for its label.
                         // const isChecked = checkboxes()[o.label];
-                        const isChecked = r[o.label];
+                        const isChecked = r[o.label]
                         return (
                             <label class="flex items-center gap-2 px-2 w-full h-full">
                                 <input
@@ -181,10 +181,10 @@ const Wheeler = defaults(def, (props) => {
                                 />
                                 <span class={['pl-5 w-full']}>{o.label}</span>
                             </label>
-                        );
+                        )
                     }}
                 </li>
-            );
+            )
 
         } else {
             // --- Single-Select Mode Logic (spinning wheel) ---
@@ -197,13 +197,13 @@ const Wheeler = defaults(def, (props) => {
                     style={{ height: () => `${$$(itemHeight)}px` }}>
                     {o.label}
                 </li>
-            ));
+            ))
         }
 
         // --- Step 3: Cache and Return the Result ---
         // Store the current options and the result for the next optimization check.
-        preOptions = $$(options);
-        return preFormattedOptions = base;
+        preOptions = $$(options)
+        return preFormattedOptions = base
     })
 
 
@@ -228,13 +228,13 @@ const Wheeler = defaults(def, (props) => {
 
         // `vs` (Value Set): The set of currently selected values from the external `value` prop.
         // Using a Set provides fast `has()` lookups for performance.
-        const vs = new Set([$$(value)].flat());
+        const vs = new Set([$$(value)].flat())
 
         // `os` (Options Set): The full, normalized list of all available options.
-        const os = $$(formattedOptions);
+        const os = $$(formattedOptions)
 
         // `cb` (Checkbox State): The map of all checkbox observables, e.g., { 'Apple': $(true), 'Banana': $(false) }.
-        const cb = $$(checkboxes);
+        const cb = $$(checkboxes)
 
         // `cbv` (Checkbox Value Set): The set of LABELS for all checkboxes that are currently checked.
         // This is created by filtering the `cb` map.
@@ -242,7 +242,7 @@ const Wheeler = defaults(def, (props) => {
             Object.entries(cb)
                 .filter(([_, active]) => $$(active)) // Keep only the checked ones.
                 .map(([label]) => label)             // Extract just the label.
-        );
+        )
 
         // --- Step 2: Calculate the differences ---
 
@@ -256,22 +256,22 @@ const Wheeler = defaults(def, (props) => {
                 opt.label !== $$(multiple) // 3. Are not the "Select All" checkbox itself.
             )
             // Extract the actual `value` (not the label) of these items.
-            .map(opt => opt.value);
+            .map(opt => opt.value)
 
         // Find items that are in the external value (`vs`) but are NOT checked in the UI (`cbv`).
         // These are items that the user has just deselected, or that were removed from the `value` prop externally.
         const onlyInValue = [...vs].filter(val => {
             // For each value in the external `value` Set...
             // Find the corresponding option object to get its label.
-            const opt = os.find(o => o.value === val);
+            const opt = os.find(o => o.value === val)
             // If an option is found, check if its label is MISSING from our set of checked labels (`cbv`).
             // If the option is not found (e.g., a value was passed in that doesn't exist in `options`),
             // it's also considered "only in value".
-            return opt ? !cbv.has(opt.label) : true;
-        });
+            return opt ? !cbv.has(opt.label) : true
+        })
 
         // --- Step 3: Return the calculated differences ---
-        return { onlyInCheckbox, onlyInValue };
+        return { onlyInCheckbox, onlyInValue }
     }
 
 
@@ -288,19 +288,19 @@ const Wheeler = defaults(def, (props) => {
         // --- Guard Clause 1: Check if the `ok` prop was provided ---
         // If the `ok` prop is not provided (it's null or undefined), this effect
         // has no trigger, so we exit immediately.
-        if (!ok) return;
+        if (!ok) return
 
         // --- Guard Clause 2: Check the VALUE of the `ok` observable ---
         // We only want to proceed if the `ok` signal is actually `true`.
         // If it's `false` or has just been reset, we do nothing and exit.
-        if (!$$(ok)) return;
+        if (!$$(ok)) return
 
         // --- Action 1: Update the Parent's State ---
         // This is the core "commit" action. It takes the Wheeler's internal,
         // potentially modified `value`, and pushes it up to the original `oriValue`
         // observable that was passed in from the parent component.
         if (isObservable(oriValue)) {
-            oriValue($$(value));
+            oriValue($$(value))
         }
 
         // --- Action 2: Reset the Trigger ---
@@ -308,15 +308,15 @@ const Wheeler = defaults(def, (props) => {
         // This is crucial to prevent the effect from running in an infinite loop.
         // It makes the `ok` signal a one-time "event" rather than a persistent state.
         if (isObservable(ok)) {
-            ok(false);
+            ok(false)
         }
 
         // --- Action 3: Close the Component ---
         // Finally, we hide the Wheeler component by setting the `visible` observable to `false`.
         if (isObservable(isVisible)) {
-            isVisible(false);
+            isVisible(false)
         }
-    });
+    })
     // #endregion
 
 
@@ -332,41 +332,41 @@ const Wheeler = defaults(def, (props) => {
      * This function is designed to be idempotent and is called in a `useEffect` hook,
      * running on mount and whenever the component re-renders to catch potential changes.
      */
-    let preValue: any; // A local cache of the last synced value to prevent unnecessary re-renders.
+    let preValue: any // A local cache of the last synced value to prevent unnecessary re-renders.
     const value2chk = () => {
         // --- Guard Clause 1: Mode Check ---
         // This entire logic is only for multi-select mode. If not in that mode, do nothing.
-        if (!$$(multiple)) return;
+        if (!$$(multiple)) return
 
         // --- Guard Clause 2: Performance Optimization ---
         // If the component is visible and the internal `value` is identical to the last value we synced (`preValue`),
         // it means no external change has occurred that requires a UI update. So, we can skip the expensive work.
         if ($$(visibleProp) && preValue === $$(value)) {
-            return;
+            return
         }
 
         // --- Step 1: Calculate the difference ---
         // Use the `chkValues` helper to determine which items need to be checked and which need to be unchecked.
-        const { onlyInCheckbox, onlyInValue } = chkValues();
+        const { onlyInCheckbox, onlyInValue } = chkValues()
 
         // Gather current state for manipulation.
-        const os = $$(formattedOptions); // All options.
-        const c = $$(checkboxes);        // The map of checkbox observables.
-        const allLabel = $$(multiple);   // The label for the "Select All" checkbox.
+        const os = $$(formattedOptions) // All options.
+        const c = $$(checkboxes)        // The map of checkbox observables.
+        const allLabel = $$(multiple)   // The label for the "Select All" checkbox.
 
-        let changed = false; // A flag to track if any state was actually modified.
+        let changed = false // A flag to track if any state was actually modified.
 
         // --- Step 2: Sync the `value` prop TO the checkboxes ---
 
         // Part A: Check items that are in the `value` prop but are currently unchecked in the UI.
         // `onlyInValue` contains values that should be selected but aren't.
         for (const valFromProp of onlyInValue) {
-            const opt = os.find(o => o.value === valFromProp);
+            const opt = os.find(o => o.value === valFromProp)
             // Ensure the option exists, it's not the "All" option, and it has a checkbox.
             if (opt && opt.label !== allLabel && c[opt.label]) {
                 if (!$$(c[opt.label])) { // Check if it's not already checked.
-                    c[opt.label](true); // Tick the checkbox.
-                    changed = true;
+                    c[opt.label](true) // Tick the checkbox.
+                    changed = true
                 }
             }
         }
@@ -374,12 +374,12 @@ const Wheeler = defaults(def, (props) => {
         // Part B: Uncheck items that are checked in the UI but are NOT in the `value` prop.
         // `onlyInCheckbox` contains values that are selected in the UI but shouldn't be.
         for (const valFromCheckbox of onlyInCheckbox) {
-            const opt = os.find(o => o.value === valFromCheckbox);
+            const opt = os.find(o => o.value === valFromCheckbox)
             // Ensure the option exists, it's not the "All" option, and it has a checkbox.
             if (opt && opt.label !== allLabel && c[opt.label]) {
                 if ($$(c[opt.label])) { // Check if it is currently checked.
-                    c[opt.label](false); // Un-tick the checkbox.
-                    changed = true;
+                    c[opt.label](false) // Un-tick the checkbox.
+                    changed = true
                 }
             }
         }
@@ -389,16 +389,16 @@ const Wheeler = defaults(def, (props) => {
         // needs to be re-evaluated to see if it should be checked or unchecked.
         if (allLabel && c[allLabel]) {
             // Get all checkboxes *except* the "All" one.
-            const individualItemCheckboxes = Object.entries(c).filter(([key, _]) => key !== allLabel);
+            const individualItemCheckboxes = Object.entries(c).filter(([key, _]) => key !== allLabel)
 
             // Determine if all of them are now checked.
             const allIndividualsAreChecked = individualItemCheckboxes.length > 0 &&
-                individualItemCheckboxes.every(([_, obs]) => $$(obs as Observable<boolean>));
+                individualItemCheckboxes.every(([_, obs]) => $$(obs as Observable<boolean>))
 
             // If the current state of the "All" checkbox doesn't match this derived state, update it.
             if ($$(c[allLabel]) !== allIndividualsAreChecked) {
-                c[allLabel](allIndividualsAreChecked);
-                changed = true;
+                c[allLabel](allIndividualsAreChecked)
+                changed = true
             }
         }
 
@@ -407,12 +407,12 @@ const Wheeler = defaults(def, (props) => {
         if (changed) {
             // If any checkbox state was changed, we need to trigger reactivity for the `checkboxes`
             // observable itself. The easiest way is to set it to a new object with the same content.
-            checkboxes({ ...c });
+            checkboxes({ ...c })
         }
 
         // Update the cached `preValue` to the current value, so the optimization check at the
         // top of the function works correctly on the next run.
-        preValue = $$(value);
+        preValue = $$(value)
     }
     // #endregion
 
@@ -444,7 +444,7 @@ const Wheeler = defaults(def, (props) => {
     //
     // This pattern effectively makes the `useEffect` behave as if its dependency was `value`,
     // but without needing to explicitly list it.
-    useEffect(value2chk);
+    useEffect(value2chk)
 
 
     // #region chk2value （Checkbox to Value)
@@ -463,10 +463,10 @@ const Wheeler = defaults(def, (props) => {
     const chk2value = (clickedLabel: string | number) => {
         // --- Guard Clause: Mode Check ---
         // This logic is only for multi-select mode.
-        if (!$$(multiple)) return;
+        if (!$$(multiple)) return
 
-        const checkboxesMap = $$(checkboxes);
-        const allLabel = $$(multiple);
+        const checkboxesMap = $$(checkboxes)
+        const allLabel = $$(multiple)
 
         // --- Step 1: Ensure Checkbox State is Internally Consistent ---
         // The onClick handler has already flipped the state of the *one* checkbox that was clicked.
@@ -474,9 +474,9 @@ const Wheeler = defaults(def, (props) => {
 
         if (clickedLabel === allLabel) {
             // Case A: The "All" checkbox itself was clicked.
-            const isAllCheckedNow = $$(checkboxesMap[allLabel]);
+            const isAllCheckedNow = $$(checkboxesMap[allLabel])
             // Propagate this new state to all other checkboxes.
-            Object.values(checkboxesMap).forEach(obs => obs(isAllCheckedNow));
+            Object.values(checkboxesMap).forEach(obs => obs(isAllCheckedNow))
         } else {
             // Case B: An individual item's checkbox was clicked.
             if (checkboxesMap[allLabel]) { // Only proceed if "All" functionality is active.
@@ -485,13 +485,13 @@ const Wheeler = defaults(def, (props) => {
                     // If the item was just checked, we need to see if *all* other items are now also checked.
                     const allIndividualsAreChecked = Object.entries(checkboxesMap)
                         .filter(([key, _]) => key !== allLabel)
-                        .every(([_, obs]) => $$(obs));
+                        .every(([_, obs]) => $$(obs))
                     if (allIndividualsAreChecked) {
-                        checkboxesMap[allLabel](true); // If so, tick the "All" checkbox.
+                        checkboxesMap[allLabel](true) // If so, tick the "All" checkbox.
                     }
                 } else {
                     // If the item was just unchecked, the "All" checkbox must also be unchecked.
-                    checkboxesMap[allLabel](false);
+                    checkboxesMap[allLabel](false)
                 }
             }
         }
@@ -504,64 +504,64 @@ const Wheeler = defaults(def, (props) => {
         // The code seems to try the diff-based approach first and falls back to the direct approach.
 
         // Use the helper to find the difference between our new UI state and the (still old) external `value`.
-        const { onlyInCheckbox, onlyInValue } = chkValues();
+        const { onlyInCheckbox, onlyInValue } = chkValues()
 
         // This block handles a tricky edge case. If the diff is empty, it might mean the selection
         // didn't *effectively* change, but we still need to build the final value array to be sure.
         if (onlyInCheckbox.length === 0 && onlyInValue.length === 0) {
             // The direct approach: build the new value array from scratch based on the current checkbox states.
-            const newSelectedValues = new Set<any>();
-            const currentFormattedOptions = $$(formattedOptions);
+            const newSelectedValues = new Set<any>()
+            const currentFormattedOptions = $$(formattedOptions)
             Object.entries(checkboxesMap).forEach(([label, isCheckedObservable]) => {
                 // If a checkbox is checked and it's not the "All" checkbox...
                 if (label !== allLabel && $$(isCheckedObservable)) {
                     // ...find its corresponding option and add its value to our set.
-                    const opt = currentFormattedOptions.find(o => o.label === label);
+                    const opt = currentFormattedOptions.find(o => o.label === label)
                     if (opt) {
-                        newSelectedValues.add(opt.value);
+                        newSelectedValues.add(opt.value)
                     }
                 }
-            });
+            })
 
-            const finalNewValueArray = [...newSelectedValues];
+            const finalNewValueArray = [...newSelectedValues]
 
             // Compare the new value array with the old one to see if an update is needed.
             // Using JSON.stringify is a common (though not perfectly robust) way to deep-compare arrays.
             if (JSON.stringify($$(value)) !== JSON.stringify(finalNewValueArray)) {
-                value(finalNewValueArray); // Update internal value.
+                value(finalNewValueArray) // Update internal value.
                 // If there's no "OK" button flow, update the parent's `oriValue` immediately.
                 if (!ok && isObservable(oriValue)) {
-                    oriValue($$(value));
+                    oriValue($$(value))
                 }
             }
-            return; // Exit the function.
+            return // Exit the function.
         }
 
         // --- Step 3: Update the Value Incrementally (The main path) ---
         // This path is taken if the `chkValues` diff was not empty.
 
         // Get the current external value as a Set for efficient modification.
-        const currentVal = $$(value);
-        const currentValueFlat = Array.isArray(currentVal) ? currentVal : [currentVal];
-        const currentValueAsSet = new Set<any>(currentValueFlat as any[]);
+        const currentVal = $$(value)
+        const currentValueFlat = Array.isArray(currentVal) ? currentVal : [currentVal]
+        const currentValueAsSet = new Set<any>(currentValueFlat as any[])
 
         // Remove values that were unchecked.
         for (const v of onlyInValue) {
-            currentValueAsSet.delete(v as any);
+            currentValueAsSet.delete(v as any)
         }
         // Add values that were newly checked.
         for (const v of onlyInCheckbox) {
-            currentValueAsSet.add(v as any);
+            currentValueAsSet.add(v as any)
         }
 
         // Convert the modified Set back to an array.
-        const finalNewValueArray = [...currentValueAsSet];
-        value(finalNewValueArray as any); // Update the internal value.
+        const finalNewValueArray = [...currentValueAsSet]
+        value(finalNewValueArray as any) // Update the internal value.
 
         // If there's no "OK" button flow, update the parent's `oriValue` immediately.
         if (!ok) {
             if (isObservable(oriValue)) {
-                (oriValue as Observable<any[]>)(finalNewValueArray as any);
+                (oriValue as Observable<any[]>)(finalNewValueArray as any)
             }
         }
     }
@@ -586,25 +586,25 @@ const Wheeler = defaults(def, (props) => {
      */
     const isAllSelected = useMemo(() => {
         // Get the current map of all checkbox observables.
-        const allCheckboxes = $$(checkboxes);
+        const allCheckboxes = $$(checkboxes)
 
         // Get the label for the "Select All" option, if it exists.
-        const allLabel = $$(multiple);
+        const allLabel = $$(multiple)
 
         // Get an array of all the checkbox observables, EXCLUDING the "All" checkbox.
         const individualItemCheckboxes = Object.entries(allCheckboxes)
             .filter(([label, _]) => label !== allLabel) // Filter out the "All" option by its label.
-            .map(([_, observable]) => observable);    // Get just the observable from the [key, value] pair.
+            .map(([_, observable]) => observable)    // Get just the observable from the [key, value] pair.
 
         // If there are no individual items to check, then we can't say "all" are selected.
         if (individualItemCheckboxes.length === 0) {
-            return false;
+            return false
         }
 
         // Use `every()` to check if the unwrapped value of every single individual checkbox
         // observable is currently `true`.
-        return individualItemCheckboxes.every(obs => $$(obs));
-    });
+        return individualItemCheckboxes.every(obs => $$(obs))
+    })
     // #endregion
 
 
@@ -621,34 +621,34 @@ const Wheeler = defaults(def, (props) => {
         // The new state should be the logical opposite of the current `isAllSelected` state.
         // If all are currently selected (true), the new state will be false (deselect all).
         // If not all are selected (false), the new state will be true (select all).
-        const newState = !$$(isAllSelected);
+        const newState = !$$(isAllSelected)
 
         // Get the map of checkbox observables to modify it.
-        const checkboxesMap = $$(checkboxes);
+        const checkboxesMap = $$(checkboxes)
 
         // --- Step 2: Apply the new state to all checkboxes ---
         // Iterate over all checkbox observables and set them to the `newState`.
         // This will cause the UI to visually update (all boxes become checked or unchecked).
-        Object.values(checkboxesMap).forEach(obs => obs(newState));
+        Object.values(checkboxesMap).forEach(obs => obs(newState))
 
         // --- Step 3: Construct the new value array based on the new state ---
-        let finalNewValueArray: any[] = [];
+        let finalNewValueArray: any[] = []
 
         if (newState === true) {
             // If the new state is "checked", the new value array should contain the `value`
             // of every option, excluding the "Select All" option itself.
             finalNewValueArray = $$(formattedOptions)
                 .filter(opt => opt.label !== $$(multiple)) // Exclude the 'All' controller
-                .map(opt => opt.value);
+                .map(opt => opt.value)
         }
         // If the new state is `false`, the `finalNewValueArray` will remain an empty array.
 
         // --- Step 4: Notify the parent component of the change ---
         // Update both the internal `value` and the external `oriValue` prop.
-        value(finalNewValueArray as any);
+        value(finalNewValueArray as any)
 
         if (!ok && isObservable(oriValue)) {
-            (oriValue as Observable<any[]>)(finalNewValueArray as any);
+            (oriValue as Observable<any[]>)(finalNewValueArray as any)
         }
     }
     // #endregion
@@ -676,20 +676,20 @@ const Wheeler = defaults(def, (props) => {
     useEffect(() => {
         // --- Guard Clause ---
         // If the options haven't been processed yet, we can't do any calculations.
-        if (!$$(formattedOptions)) return;
+        if (!$$(formattedOptions)) return
 
         // --- Step 1: Validate and Normalize `itemCount` ---
 
         // Ensure `itemCount` is a valid number, defaulting to 3 if not.
         if (typeof $$(itemCount) !== 'number' || $$(itemCount) <= 0) {
-            itemCount(3);
+            itemCount(3)
         }
 
         // A wheeler needs an odd number of items for a clear visual center.
         // If the user provides an even number, we log a warning and increment it to make it odd.
         if ($$(itemCount) % 2 === 0) {
-            console.warn(`itemCount (${$$(itemCount)}) should be odd for symmetry. Adjusting to ${$$(itemCount) + 1}.`);
-            itemCount($$(itemCount) + 1);
+            console.warn(`itemCount (${$$(itemCount)}) should be odd for symmetry. Adjusting to ${$$(itemCount) + 1}.`)
+            itemCount($$(itemCount) + 1)
         }
 
         // --- Step 2: Calculate Geometric Properties ---
@@ -697,24 +697,24 @@ const Wheeler = defaults(def, (props) => {
         // Calculate how many invisible padding `<li>` elements are needed at the top and bottom
         // of the list. This allows the first and last real items to scroll to the center.
         // For example, with 5 items, we need floor(5/2) = 2 padding items on each end.
-        paddingItemCount(Math.floor($$(itemCount) / 2));
+        paddingItemCount(Math.floor($$(itemCount) / 2))
 
         // Recalculate the absolute top and bottom scroll boundaries in pixels.
         // These are crucial for clamping the scroll position and creating the "rubber band" effect.
         // This must be re-run whenever `formattedOptions.length` changes.
-        minTranslateY = _getTargetYForIndexUnbound($$(formattedOptions).length - 1); // The Y-position for the last item.
-        maxTranslateY = _getTargetYForIndexUnbound(0); // The Y-position for the first item.
+        minTranslateY = _getTargetYForIndexUnbound($$(formattedOptions).length - 1) // The Y-position for the last item.
+        maxTranslateY = _getTargetYForIndexUnbound(0) // The Y-position for the first item.
 
         // --- Step 3: Re-align the UI ---
 
         // After all calculations are updated, re-snap the wheeler to the current `selectedIndex`.
         // This ensures that if the list of options changes, the visual position of the
         // selected item remains correctly centered in the viewport.
-        snapToIndex($$(selectedIndex));
+        snapToIndex($$(selectedIndex))
 
         // Example debug log to see the results of the layout calculation.
         // console.log(`Layout Updated: count=${itemCount}, h=${viewportHeight}, pad=${paddingItemCount}, minY=${minTranslateY}, maxY=${maxTranslateY}`);
-    });
+    })
     // #endregion
 
 
@@ -737,7 +737,7 @@ const Wheeler = defaults(def, (props) => {
      * Example: If `itemHeight` is 36px and `itemCount` is 5, the `viewportHeight` will be 180px.
      * This value is used to set the `height` style of the main scrolling container.
      */
-    const viewportHeight = useMemo(() => $$(itemHeight) * $$(itemCount));
+    const viewportHeight = useMemo(() => $$(itemHeight) * $$(itemCount))
 
 
     // --- 2. `indicatorTop` ---
@@ -766,7 +766,7 @@ const Wheeler = defaults(def, (props) => {
      * |                     |
      * +---------------------+
      */
-    const indicatorTop = useMemo(() => ($$(viewportHeight) - $$(itemHeight)) / 2);
+    const indicatorTop = useMemo(() => ($$(viewportHeight) - $$(itemHeight)) / 2)
 
     // #region Get Target Y
 
@@ -804,7 +804,7 @@ const Wheeler = defaults(def, (props) => {
         // `indicatorTop` line, we must apply a negative `translateY` to the entire `<ul>`. The value
         // of this translation is the difference between the target line and the item's natural offset.
 
-        return $$(indicatorTop) - (index + $$(paddingItemCount)) * $$(itemHeight);
+        return $$(indicatorTop) - (index + $$(paddingItemCount)) * $$(itemHeight)
     }
 
     /**
@@ -828,7 +828,7 @@ const Wheeler = defaults(def, (props) => {
         // The formula is the same as the "unbound" version. It calculates the necessary
         // negative translation to move the item at `index` up to the `indicatorTop` line.
         // It relies on the memoized `indicatorTop`, `paddingItemCount`, and `itemHeight` to be up-to-date.
-        return $$(indicatorTop) - (index + $$(paddingItemCount)) * $$(itemHeight);
+        return $$(indicatorTop) - (index + $$(paddingItemCount)) * $$(itemHeight)
     }
     // #endregion
 
@@ -858,7 +858,7 @@ const Wheeler = defaults(def, (props) => {
         for (let i = 0; i < $$(paddingItemCount); i++) {
             // `yield` is like a temporary `return`. It produces one `<li>` element and pauses,
             // waiting to be called again to produce the next one.
-            yield <li class={['wheeler-item is-padding invisible', pickerItemCls]} style={{ height: () => `${$$(itemHeight)}px` }}></li>;
+            yield <li class={['wheeler-item is-padding invisible', pickerItemCls]} style={{ height: () => `${$$(itemHeight)}px` }}></li>
         }
 
         // --- Phase 2: Render the Actual Data Items ---
@@ -873,7 +873,7 @@ const Wheeler = defaults(def, (props) => {
                 // This function doesn't care if it's yielding a simple text `<li>` for single-select
                 // mode or a complex `<li>` with a checkbox for multi-select mode. It just
                 // executes the pre-assigned renderer.
-                yield <option.component {...{ index, value: option, itemHeight }} />;
+                yield <option.component {...{ index, value: option, itemHeight }} />
             }
         }
 
@@ -882,7 +882,7 @@ const Wheeler = defaults(def, (props) => {
         // the actual content. They provide the necessary scrollable area to allow the
         // *last* real item in the list to be moved up and centered in the viewport.
         for (let i = 0; i < $$(paddingItemCount); i++) {
-            yield <li class={['wheeler-item is-padding invisible', pickerItemCls]} style={{ height: `${$$(itemHeight)}px` }}></li>;
+            yield <li class={['wheeler-item is-padding invisible', pickerItemCls]} style={{ height: `${$$(itemHeight)}px` }}></li>
         }
     }
     // #endregion
@@ -909,7 +909,7 @@ const Wheeler = defaults(def, (props) => {
         // --- Guard Clause ---
         // If the `list` element hasn't been rendered and attached to its ref yet,
         // we cannot manipulate its style. Exit early to prevent errors.
-        if (!$$(list)) return;
+        if (!$$(list)) return
 
         // --- Step 1: Clamp the position ---
         // This is the most critical logic in this function. It ensures the list
@@ -917,26 +917,26 @@ const Wheeler = defaults(def, (props) => {
         // The pattern `Math.max(min, Math.min(max, value))` is a standard way to "clamp" a value.
         // - `Math.min(maxTranslateY, y)`: First, ensure `y` is not greater than the maximum allowed Y.
         // - `Math.max(minTranslateY, ...)`: Then, ensure the result is not less than the minimum allowed Y.
-        currentY = Math.max(minTranslateY, Math.min(maxTranslateY, y));
+        currentY = Math.max(minTranslateY, Math.min(maxTranslateY, y))
 
         // --- Step 2: Apply the transform to the DOM element ---
         // This is what physically moves the list on the screen. Using `transform: translateY`
         // is highly performant for animations as it typically runs on the GPU and doesn't
         // trigger expensive layout recalculations.
-        $$(list).style.transform = `translateY(${currentY}px)`;
+        $$(list).style.transform = `translateY(${currentY}px)`
 
         // --- Step 3: Update the visual styles of the items ---
         // After the list has moved, the item that is now in the center has changed.
         // This function call re-evaluates all the list items and applies the
         // 'is-near-center' styles (e.g., bold, colored, larger) to the correct one.
-        updateItemStyles();
+        updateItemStyles()
     }
     // #endregion
 
 
     // A variable to hold the timeout ID for the current snap operation.
     // Used to prevent race conditions if `snapToIndex` is called multiple times in quick succession.
-    let snapToIndexTimeout = 0;
+    let snapToIndexTimeout = 0
 
     // #region Snap To Index
     /**
@@ -957,42 +957,42 @@ const Wheeler = defaults(def, (props) => {
         // --- Guard Clauses ---
         // If the list element isn't in the DOM, or if we're in multi-select mode, do nothing.
         // The snapping animation is only for the single-select "wheel" UI.
-        if (!$$(list)) return;
-        if ($$(multiple)) return;
+        if (!$$(list)) return
+        if ($$(multiple)) return
 
         // --- Step 1: Sanitize Input and Calculate Target Position ---
 
         // Clamp the incoming index to ensure it's within the valid bounds of the options array.
         // This prevents errors if a gesture calculation results in an out-of-bounds index.
-        const clampedIndex = Math.max(0, Math.min(index, $$(formattedOptions).length - 1));
+        const clampedIndex = Math.max(0, Math.min(index, $$(formattedOptions).length - 1))
 
         // Calculate the exact target `translateY` pixel value needed to center this item.
-        const targetY = getTargetYForIndex(clampedIndex);
+        const targetY = getTargetYForIndex(clampedIndex)
 
         // --- Step 2: Set Up and Trigger the CSS Transition ---
 
         if (immediate) {
             // For an immediate snap, remove the CSS transition. The movement will be instant.
             // This is used for initial setup or programmatic changes.
-            $$(list).style.transition = 'none';
+            $$(list).style.transition = 'none'
         } else {
             // For a user-initiated snap, apply a smooth ease-out transition.
-            $$(list).style.transition = 'transform 0.3s ease-out';
+            $$(list).style.transition = 'transform 0.3s ease-out'
         }
 
         // Apply the calculated position. The browser will now either jump or animate the list
         // to this `targetY` based on the transition style we just set.
-        setTranslateY(targetY);
+        setTranslateY(targetY)
 
         // --- Step 3: Handle Post-Animation State Updates using a Timeout ---
         // We use a `setTimeout` to execute code *after* the CSS animation has finished.
 
-        const timeoutDuration = immediate ? 10 : 310; // A duration slightly longer than the 300ms transition.
+        const timeoutDuration = immediate ? 10 : 310 // A duration slightly longer than the 300ms transition.
 
         // Debouncing: If another snap was already in progress, cancel its pending timeout.
         // This ensures that only the *last* requested snap action will finalize the state.
         if (snapToIndexTimeout !== 0) {
-            clearTimeout(snapToIndexTimeout);
+            clearTimeout(snapToIndexTimeout)
         }
 
         snapToIndexTimeout = setTimeout(() => {
@@ -1001,7 +1001,7 @@ const Wheeler = defaults(def, (props) => {
             // If we did an immediate snap, the transition is 'none'. Restore it now so
             // the *next* interaction will be animated.
             if ($$(list).style.transition === 'none') {
-                $$(list).style.transition = 'transform 0.3s ease-out';
+                $$(list).style.transition = 'transform 0.3s ease-out'
             }
 
             // **This is the official state update.**
@@ -1009,15 +1009,15 @@ const Wheeler = defaults(def, (props) => {
             // `selectedIndex`. This prevents other parts of the app from reacting to a
             // value that is still visually in transit.
             if ($$(selectedIndex) !== clampedIndex) {
-                selectedIndex(clampedIndex);
+                selectedIndex(clampedIndex)
             }
 
             // Do a final style update to ensure the centered item is correctly highlighted.
-            updateItemStyles();
+            updateItemStyles()
 
             // Reset the timeout ID to indicate that no snap is currently in progress.
-            snapToIndexTimeout = 0;
-        }, timeoutDuration);
+            snapToIndexTimeout = 0
+        }, timeoutDuration)
     }
     // #endregion
 
@@ -1036,36 +1036,36 @@ const Wheeler = defaults(def, (props) => {
         // --- Guard Clause ---
         // This visual effect is only for the single-select "wheel" UI. In multi-select mode,
         // selection is indicated by checkboxes, so we exit immediately.
-        if ($$(multiple)) return;
+        if ($$(multiple)) return
 
         // --- Step 1: Define the "Target Zone" ---
         // Calculate the absolute vertical center of the viewport in pixels.
         // For example, if the viewport is 180px tall, this will be 90px. This is our target line.
-        const centerViewportY = $$(viewportHeight) / 2;
+        const centerViewportY = $$(viewportHeight) / 2
 
         // --- Step 2: Get all the visible items ---
         // Get a live NodeList of all the *real* list items, excluding the invisible padding items
         // which are only there to provide scrolling space.
-        const listItems = $$(list).querySelectorAll('.wheeler-item:not(.is-padding)');
+        const listItems = $$(list).querySelectorAll('.wheeler-item:not(.is-padding)')
 
         // --- Step 3: Iterate and Check Each Item's Position ---
         listItems.forEach(item => {
             // --- A. Measure Positions ---
             // getBoundingClientRect() gives the size and position of an element relative to the
             // browser's main viewport (the entire visible window).
-            const itemRect = item.getBoundingClientRect();     // The item's position on the page.
-            const viewportRect = $$(viewport).getBoundingClientRect(); // The wheeler's viewport position on the page.
+            const itemRect = item.getBoundingClientRect()     // The item's position on the page.
+            const viewportRect = $$(viewport).getBoundingClientRect() // The wheeler's viewport position on the page.
 
             // --- B. Calculate the Item's Center Relative to Our Viewport ---
             // We need to know the item's position *inside* our scrolling container, not on the whole page.
             // 1. `(itemRect.top + itemRect.bottom) / 2`: Find the item's absolute vertical center on the page.
             // 2. `- viewportRect.top`: Subtract the starting position of our container.
             // This gives us the item's center coordinate relative to its scrolling parent.
-            const itemCenterRelativeToViewport = (itemRect.top + itemRect.bottom) / 2 - viewportRect.top;
+            const itemCenterRelativeToViewport = (itemRect.top + itemRect.bottom) / 2 - viewportRect.top
 
             // --- C. Calculate the Distance from the Ideal Center ---
             // Now we know how far this item's center is from the viewport's ideal center line.
-            const distanceFromCenter = Math.abs(itemCenterRelativeToViewport - centerViewportY);
+            const distanceFromCenter = Math.abs(itemCenterRelativeToViewport - centerViewportY)
 
             // --- D. Apply or Remove Styles Based on Proximity ---
             // This is the condition that determines if an item is "selected".
@@ -1073,13 +1073,13 @@ const Wheeler = defaults(def, (props) => {
             // an item's height) around the viewport's center.
             if (distanceFromCenter < $$(itemHeight) * 0.6) {
                 // If it's in the target zone, apply all the "selected" styles.
-                item.classList.add('is-near-center', 'opacity-100', 'font-bold', 'text-[#007bff]', 'scale-100');
+                item.classList.add('is-near-center', 'opacity-100', 'font-bold', 'text-[#007bff]', 'scale-100')
             } else {
                 // If it's *not* in the target zone, ensure all "selected" styles are removed.
                 // This is crucial for making sure only one item is highlighted at a time.
-                item.classList.remove('is-near-center', 'opacity-100', 'font-bold', 'text-[#007bff]', 'scale-100');
+                item.classList.remove('is-near-center', 'opacity-100', 'font-bold', 'text-[#007bff]', 'scale-100')
             }
-        });
+        })
     }
     // #endregion
 
@@ -1108,7 +1108,7 @@ const Wheeler = defaults(def, (props) => {
             // If so, we use the `clientY` from the first touch point in that array.
             // As a fallback (e.g., in a rare edge case), we return `startY`, which was
             // the last known position from the start of the drag.
-            return e.changedTouches?.[0]?.clientY ?? startY;
+            return e.changedTouches?.[0]?.clientY ?? startY
         }
 
         // --- Case 2: Handling ACTIVE touch gestures or mouse events ---
@@ -1118,13 +1118,13 @@ const Wheeler = defaults(def, (props) => {
         // at least one finger on the screen, we use the `clientY` of the first finger.
         // This is the standard way to track a single-finger drag on a touch device.
         if (e.touches?.length > 0) {
-            return e.touches[0].clientY;
+            return e.touches[0].clientY
         }
 
         // `e.clientY`: If `e.touches` does not exist, it means this is a mouse event
         // (specifically, a `PointerEvent`). For mouse events, the position is
         // available directly on the event object as `e.clientY`. This is the fallback.
-        return e.clientY;
+        return e.clientY
     }
     // #endregion
 
@@ -1147,8 +1147,8 @@ const Wheeler = defaults(def, (props) => {
         // we must cancel it immediately. This gives the user's new drag gesture
         // priority and prevents the UI from jumping unexpectedly.
         if ($$(wheelSnapTimeoutId)) {
-            clearTimeout($$(wheelSnapTimeoutId));
-            wheelSnapTimeoutId(null);
+            clearTimeout($$(wheelSnapTimeoutId))
+            wheelSnapTimeoutId(null)
         }
 
         // --- 2. Prevent Default Browser Actions ---
@@ -1157,39 +1157,39 @@ const Wheeler = defaults(def, (props) => {
         // For `touchstart`, we DON'T prevent default here. This allows the browser's native
         // scroll-vs-tap detection to work correctly. We will call `preventDefault` later
         // in `handleMove` once we're sure the user is dragging vertically.
-        if (e.type !== 'touchstart') e.preventDefault();
+        if (e.type !== 'touchstart') e.preventDefault()
 
         // --- 3. Initialize Gesture State ---
-        isDragging = true;  // The user is now actively dragging.
-        hasMoved = false;   // The user has not yet moved the pointer far enough to be a "drag".
+        isDragging = true  // The user is now actively dragging.
+        hasMoved = false   // The user has not yet moved the pointer far enough to be a "drag".
 
         // --- 4. Record Initial Conditions (The "Anchor Points") ---
         // These values are the reference points for all calculations in `handleMove`.
-        startY = getClientY(e);          // The starting Y-coordinate of the finger/mouse on the screen.
-        startTranslateY = currentY;      // The starting `translateY` position of the `<ul>` list.
-        startTime = Date.now();          // The timestamp of when the gesture began.
+        startY = getClientY(e)          // The starting Y-coordinate of the finger/mouse on the screen.
+        startTranslateY = currentY      // The starting `translateY` position of the `<ul>` list.
+        startTime = Date.now()          // The timestamp of when the gesture began.
 
         // --- 5. Initialize Velocity Tracking Variables ---
         // These are used in `handleMove` to calculate the speed of the drag for the "fling" effect.
-        lastMoveY = startY;
-        lastMoveTime = startTime;
-        velocity = 0;
+        lastMoveY = startY
+        lastMoveTime = startTime
+        velocity = 0
 
         // Record what kind of event started this gesture (e.g., 'touchstart').
-        eventType(e.type);
+        eventType(e.type)
 
         // --- 6. Prepare the DOM for Direct Manipulation ---
         // We MUST disable CSS transitions on the list element. If we don't, the list's
         // movement will lag behind the user's finger, feeling sluggish and broken.
         // The transition is only re-enabled in `handleEnd` for the final snap animation.
-        if ($$(list)) $$(list).style.transition = 'none';
+        if ($$(list)) $$(list).style.transition = 'none'
 
         // Provide immediate visual feedback to the user by changing the cursor.
-        if ($$(viewport)) $$(viewport).style.cursor = 'grabbing';
+        if ($$(viewport)) $$(viewport).style.cursor = 'grabbing'
 
         // --- 7. Cleanup ---
         // Cancel any stray animation frames from a previous, uncompleted gesture.
-        if ($$(rafId)) cancelAnimationFrame($$(rafId));
+        if ($$(rafId)) cancelAnimationFrame($$(rafId))
     }
     // #endregion
 
@@ -1209,30 +1209,30 @@ const Wheeler = defaults(def, (props) => {
     function handleMove(e: PointerEvent & TouchEvent) {
         // --- Guard Clause ---
         // If the `isDragging` flag is not set (i.e., `handleStart` was not called), do nothing.
-        if (!isDragging) return;
+        if (!isDragging) return
 
         // --- Step 1: Calculate Total Movement ---
         // Get the current Y-coordinate of the pointer.
-        const currentMoveY = getClientY(e);
+        const currentMoveY = getClientY(e)
         // Calculate the total distance moved since the start of the gesture.
-        const deltaY = currentMoveY - startY;
+        const deltaY = currentMoveY - startY
 
         // --- Step 2: Distinguish Between a "Click" and a "Drag" ---
         // This logic determines if the user has moved their finger far enough to
         // officially be considered "dragging" rather than just a "tap".
         if (!hasMoved && Math.abs(deltaY) > CLICK_THRESHOLD_PX) {
-            hasMoved = true;
+            hasMoved = true
         }
 
         // Once we've confirmed it's a drag (`hasMoved` is true), we prevent the default
         // browser action (like scrolling the whole page on a touch device).
         if (hasMoved && e.cancelable) {
-            e.preventDefault();
+            e.preventDefault()
         }
 
         // --- Step 3: Calculate the New List Position ---
         // The new position is the list's starting position plus the total distance moved.
-        let newY = startTranslateY + deltaY;
+        let newY = startTranslateY + deltaY
 
         // --- Step 4: Apply the "Rubber Band" Effect ---
         // If the user has dragged past the top or bottom boundaries, we apply resistance
@@ -1241,25 +1241,25 @@ const Wheeler = defaults(def, (props) => {
             if (newY > maxTranslateY) {
                 // If dragged past the top, the resistance is `(newY - maxTranslateY) * 0.3`.
                 // We only apply 30% of the "overscroll" distance.
-                newY = maxTranslateY + (newY - maxTranslateY) * 0.3;
+                newY = maxTranslateY + (newY - maxTranslateY) * 0.3
             } else if (newY < minTranslateY) {
                 // If dragged past the bottom, apply the same resistance logic.
-                newY = minTranslateY + (newY - minTranslateY) * 0.3;
+                newY = minTranslateY + (newY - minTranslateY) * 0.3
             }
         }
 
         // --- Step 5: Calculate Instantaneous Velocity ---
         // This is crucial for the "fling" effect in `handleEnd`. We calculate the speed
         // of the pointer (pixels per millisecond) over short time intervals.
-        const now = Date.now();
-        const timeDiff = now - lastMoveTime;
+        const now = Date.now()
+        const timeDiff = now - lastMoveTime
 
         // We only update the velocity every ~10ms to get a stable reading.
         if (timeDiff > 10) {
-            velocity = (currentMoveY - lastMoveY) / timeDiff;
+            velocity = (currentMoveY - lastMoveY) / timeDiff
             // Update the last known time and position for the next calculation.
-            lastMoveTime = now;
-            lastMoveY = currentMoveY;
+            lastMoveTime = now
+            lastMoveY = currentMoveY
         }
 
         // --- Step 6: Efficiently Update the DOM with `requestAnimationFrame` ---
@@ -1269,17 +1269,17 @@ const Wheeler = defaults(def, (props) => {
 
         // First, cancel any previously scheduled frame to avoid redundant updates.
         if ($$(rafId)) {
-            cancelAnimationFrame($$(rafId));
+            cancelAnimationFrame($$(rafId))
         }
 
         // Schedule the DOM update. This function will be executed just before the next repaint.
         rafId(requestAnimationFrame(() => {
-            currentY = newY; // Update the component's internal position state.
+            currentY = newY // Update the component's internal position state.
             // Apply the new position to the list element.
-            $$(list).style.transform = `translateY(${currentY}px)`;
+            $$(list).style.transform = `translateY(${currentY}px)`
             // Update the styles to highlight the newly centered item.
-            updateItemStyles();
-        }));
+            updateItemStyles()
+        }))
     }
     // #endregion
 
@@ -1300,18 +1300,18 @@ const Wheeler = defaults(def, (props) => {
         // --- Guard Clause ---
         // If no drag was in progress, there's nothing to do.
         if (!isDragging) {
-            return;
+            return
         }
 
         // --- Step 1: Cleanup and Reset State ---
-        isDragging = false; // The gesture is officially over.
+        isDragging = false // The gesture is officially over.
 
         // Revert the cursor back to its default "grab" state.
-        if ($$(viewport)) $$(viewport).style.cursor = 'grab';
+        if ($$(viewport)) $$(viewport).style.cursor = 'grab'
 
         // Cancel any pending animation frame from the last `handleMove` event.
         if ($$(rafId)) {
-            cancelAnimationFrame($$(rafId));
+            cancelAnimationFrame($$(rafId))
         }
 
         // --- Step 2: Determine if the Gesture was a Tap or a Drag ---
@@ -1321,26 +1321,26 @@ const Wheeler = defaults(def, (props) => {
         if (!hasMoved) {
             // --- Path A: The gesture was a TAP/CLICK ---
 
-            const targetElement = e.target as HTMLElement;
+            const targetElement = e.target as HTMLElement
             // Find the closest parent `<li>` that is a wheeler item.
-            const targetItem = targetElement.closest('.wheeler-item') as HTMLElement;
+            const targetItem = targetElement.closest('.wheeler-item') as HTMLElement
 
             // Check if we successfully found an item and it's not an invisible padding item.
             if (targetItem && !targetItem.classList.contains('is-padding')) {
                 // Get the index of the clicked item from its `data-index` attribute.
-                const clickedIndex = parseInt(targetItem.dataset.index, 10);
+                const clickedIndex = parseInt(targetItem.dataset.index, 10)
                 // If the index is a valid number, snap to that item.
                 if (!isNaN(clickedIndex) && clickedIndex >= 0 && clickedIndex < $$(formattedOptions).length) {
-                    snapToIndex(clickedIndex);
-                    return; // Done.
+                    snapToIndex(clickedIndex)
+                    return // Done.
                 }
             }
 
             // Fallback for a "missed" tap (e.g., user tapped between items).
             // We calculate which item is *currently* closest to the center and snap to it.
-            const idealIndexMiss = Math.round(($$(indicatorTop) - currentY) / $$(itemHeight)) - $$(paddingItemCount);
-            snapToIndex(idealIndexMiss);
-            return; // Done.
+            const idealIndexMiss = Math.round(($$(indicatorTop) - currentY) / $$(itemHeight)) - $$(paddingItemCount)
+            snapToIndex(idealIndexMiss)
+            return // Done.
         }
 
         // --- Path B: The gesture was a DRAG or FLING ---
@@ -1348,28 +1348,28 @@ const Wheeler = defaults(def, (props) => {
         // Case 1: The user released the pointer while outside the scroll boundaries.
         // In this case, we don't apply inertia; we just snap back to the nearest boundary.
         if (currentY > maxTranslateY || currentY < minTranslateY) {
-            const boundaryIndex = currentY > maxTranslateY ? 0 : $$(formattedOptions).length - 1;
-            snapToIndex(boundaryIndex);
+            const boundaryIndex = currentY > maxTranslateY ? 0 : $$(formattedOptions).length - 1
+            snapToIndex(boundaryIndex)
         } else {
             // Case 2: The user released inside the boundaries (a "fling").
             // Use the final velocity calculated in `handleMove` to simulate inertia.
 
             // Predict the "coasting" distance. The multiplier (120) is a magic number
             // that controls the "friction" of the fling. A higher number means less friction.
-            const inertiaDist = velocity * 120;
+            const inertiaDist = velocity * 120
 
             // Calculate the predicted final Y position after the fling.
-            const predictedY = currentY + inertiaDist;
+            const predictedY = currentY + inertiaDist
 
             // Convert that final Y position back into the closest item index.
-            const idealIndex = Math.round(($$(indicatorTop) - predictedY) / $$(itemHeight)) - $$(paddingItemCount);
+            const idealIndex = Math.round(($$(indicatorTop) - predictedY) / $$(itemHeight)) - $$(paddingItemCount)
 
             // Call `snapToIndex` to animate the list to its final resting place.
-            snapToIndex(idealIndex);
+            snapToIndex(idealIndex)
         }
 
         // Reset velocity for the next gesture.
-        velocity = 0;
+        velocity = 0
     }
     // #endregion
 
@@ -1389,41 +1389,41 @@ const Wheeler = defaults(def, (props) => {
         // --- Guard Clause ---
         // If the user is already dragging with the mouse, we prioritize the drag
         // gesture and ignore the scroll wheel event to prevent conflicts.
-        if (isDragging) return;
+        if (isDragging) return
 
         // --- Step 1: Hijack the Scroll Event ---
         // This is crucial. It prevents the default browser action, which would be
         // to scroll the entire page. We want to capture all scroll input for our component.
-        event.preventDefault();
+        event.preventDefault()
 
         // --- Step 2: Debounce the Snap-Back Animation ---
         // If a timeout to snap the wheel is already scheduled from the *previous* scroll tick,
         // we cancel it. This is the core of the debouncing logic. It ensures that the final
         // snap only happens *after* the user has completely stopped scrolling.
         if ($$(wheelSnapTimeoutId)) {
-            clearTimeout($$(wheelSnapTimeoutId));
+            clearTimeout($$(wheelSnapTimeoutId))
         }
 
         // For the duration of the scroll, we want direct, instant movement.
         // We remove the CSS transition to make the list follow the wheel ticks precisely.
-        if ($$(list)) $$(list).style.transition = 'none';
+        if ($$(list)) $$(list).style.transition = 'none'
 
         // --- Step 3: Calculate and Apply the Movement ---
         // `event.deltaY` contains the vertical scroll amount from the browser.
         // We multiply it by a factor (0.5) to control the scroll "sensitivity".
         // A smaller number makes the wheel move less per scroll tick.
-        const scrollAmount = event.deltaY * 0.5;
+        const scrollAmount = event.deltaY * 0.5
 
         // Calculate the new Y-position of the list. We subtract the scroll amount because
         // a positive deltaY (scrolling down) should move the list content up.
-        const newY = currentY - scrollAmount;
+        const newY = currentY - scrollAmount
 
         // Use our central function to apply the new position to the DOM, which also
         // handles clamping the position within the boundaries.
-        setTranslateY(newY);
+        setTranslateY(newY)
 
         // Record that the last interaction was a 'wheel' event.
-        eventType(event.type);
+        eventType(event.type)
 
         // --- Step 4: Schedule the Final Snap ---
         // After moving the list for the current tick, we schedule the snap-to-center
@@ -1433,14 +1433,14 @@ const Wheeler = defaults(def, (props) => {
             // This code only runs if the user has paused scrolling for 150ms.
 
             // Calculate which item index is currently closest to the center line.
-            const idealIndex = Math.round(($$(indicatorTop) - currentY) / $$(itemHeight)) - $$(paddingItemCount);
+            const idealIndex = Math.round(($$(indicatorTop) - currentY) / $$(itemHeight)) - $$(paddingItemCount)
 
             // Trigger the smooth animation to snap to that ideal index.
-            snapToIndex(idealIndex);
+            snapToIndex(idealIndex)
 
             // Reset the timeout ID to indicate that no snap is pending.
-            wheelSnapTimeoutId(null);
-        }, 150));
+            wheelSnapTimeoutId(null)
+        }, 150))
     }
     // #endregion
 
@@ -1472,14 +1472,14 @@ const Wheeler = defaults(def, (props) => {
 
         // Attach the `handleMove` function to the `pointermove` event for the entire document.
         // Now, as long as the component is mounted, it will listen for pointer movements anywhere on the page.
-        document.addEventListener('pointermove', handleMove as any);
+        document.addEventListener('pointermove', handleMove as any)
 
         // Attach the `handleEnd` function to the `pointerup` event for the entire document.
         // This ensures that the gesture is correctly finalized and cleaned up, even if the user
         // releases their mouse button far outside the component's area.
         // The `e => handleEnd` syntax is used here to ensure a fresh reference to handleEnd if it were to change,
         // although in this specific component it is stable.
-        document.addEventListener('pointerup', handleEnd);
+        document.addEventListener('pointerup', handleEnd)
 
         // --- Cleanup Phase ---
         // The function returned by `useEffect` is the "cleanup" function. It is called
@@ -1489,10 +1489,10 @@ const Wheeler = defaults(def, (props) => {
             // If we don't, we will create a "memory leak". The `handleMove` and `handleEnd`
             // functions would continue to exist and fire on user interactions even after the
             // component is gone, leading to errors and unpredictable behavior.
-            document.removeEventListener('pointermove', handleMove as any);
-            document.removeEventListener('pointerup', handleEnd);
-        };
-    });
+            document.removeEventListener('pointermove', handleMove as any)
+            document.removeEventListener('pointerup', handleEnd)
+        }
+    })
     // #endregion
 
 
@@ -1513,22 +1513,22 @@ const Wheeler = defaults(def, (props) => {
         // --- Guard Clause 1: Mode Check ---
         // This logic is only for single-select mode. If the component is in multi-select
         // mode (`multiple` is true), we exit immediately.
-        if ($$(multiple)) return;
+        if ($$(multiple)) return
 
         // --- Guard Clause 2: Performance Optimization ---
         // This is a crucial check to prevent infinite loops. `preValue` stores the value
         // from the last time this effect ran. If the current `value` is the same as the
         // last one we processed, it means no meaningful change has occurred, so we can
         // safely exit and avoid redundant calculations.
-        if ($$(value) === preValue) return;
+        if ($$(value) === preValue) return
 
         // If the value *has* changed, we update `preValue` to the new value for the next run.
-        preValue = $$(value);
+        preValue = $$(value)
 
         // --- Step 1: Find the Corresponding Index ---
         // We search through the `formattedOptions` array to find the index of the item
         // whose `value` property matches the new external `value`.
-        const foundIndex = $$(formattedOptions).findIndex(opt => opt.value === $$(value));
+        const foundIndex = $$(formattedOptions).findIndex(opt => opt.value === $$(value))
 
         // `foundIndex` will be -1 if no matching item is found.
 
@@ -1537,9 +1537,9 @@ const Wheeler = defaults(def, (props) => {
         // from the current `selectedIndex`. This is another optimization to prevent
         // unnecessary re-renders if the index is already correct.
         if ($$(selectedIndex) !== foundIndex) {
-            selectedIndex(foundIndex);
+            selectedIndex(foundIndex)
         }
-    });
+    })
     // #endregion
 
 
@@ -1561,31 +1561,31 @@ const Wheeler = defaults(def, (props) => {
      */
     useEffect(() => {
         // Only snap for single-select mode
-        if ($$(multiple)) return;
+        if ($$(multiple)) return
 
         // Only snap when visible
         if (!$$(visibleProp)) {
             // Reset the flag when hidden so it will snap again when shown
-            hasInitialSnapped(false);
-            return;
+            hasInitialSnapped(false)
+            return
         }
 
         // Only snap once per visibility cycle
-        if ($$(hasInitialSnapped)) return;
+        if ($$(hasInitialSnapped)) return
 
         // Recalculate selectedIndex from the current value to ensure sync
-        const currentValue = $$(value);
-        const foundIndex = $$(formattedOptions).findIndex(opt => opt.value === currentValue);
+        const currentValue = $$(value)
+        const foundIndex = $$(formattedOptions).findIndex(opt => opt.value === currentValue)
 
         if (foundIndex !== -1 && foundIndex !== $$(selectedIndex)) {
-            selectedIndex(foundIndex);
+            selectedIndex(foundIndex)
         }
 
         // Perform the initial snap with the correct index
-        const indexToSnap = foundIndex !== -1 ? foundIndex : $$(selectedIndex);
-        snapToIndex(indexToSnap, true);
-        hasInitialSnapped(true);
-    });
+        const indexToSnap = foundIndex !== -1 ? foundIndex : $$(selectedIndex)
+        snapToIndex(indexToSnap, true)
+        hasInitialSnapped(true)
+    })
     // #endregion
 
     // #region Handle Index Updates
@@ -1602,18 +1602,18 @@ const Wheeler = defaults(def, (props) => {
     useEffect(() => {
         // --- Guard Clause 1: Mode Check ---
         // This logic is exclusively for single-select mode.
-        if ($$(multiple)) return;
+        if ($$(multiple)) return
 
         // --- Guard Clause 2: Prevent Infinite Loops ---
         // `oriIndex` stores the last `selectedIndex` we processed. If the index hasn't changed,
         // we exit immediately. This is critical to stop the component from re-triggering this
         // effect over and over.
         if ($$(oriIndex) === $$(selectedIndex)) {
-            return;
+            return
         }
 
         // If the index *has* changed, update our tracker for the next run.
-        oriIndex($$(selectedIndex));
+        oriIndex($$(selectedIndex))
 
         // --- Step 1: Update the Parent's Value (Propagate Change Outwards) ---
         // This block checks if the external `value` is out of sync with our new internal `selectedIndex`.
@@ -1621,7 +1621,7 @@ const Wheeler = defaults(def, (props) => {
         // First, a safety check to ensure the selected index is valid before trying to access the array.
         if ($$(selectedIndex) < 0 || $$(selectedIndex) >= $$(formattedOptions).length) {
             // Handle cases where the index is invalid (e.g., -1).
-            console.warn(`Index "${$$(selectedIndex)}" out of bounds during value update.`);
+            console.warn(`Index "${$$(selectedIndex)}" out of bounds during value update.`)
         } else if ($$(value) !== $$(formattedOptions)[$$(selectedIndex)].value) {
             // The internal selection has changed and is different from the current external value.
 
@@ -1640,7 +1640,7 @@ const Wheeler = defaults(def, (props) => {
 
                 // In all other cases (click, fling, or default behavior), we update the value.
                 // This now DIRECTLY updates the parent's observable.
-                value($$(formattedOptions)[$$(selectedIndex)].value);
+                value($$(formattedOptions)[$$(selectedIndex)].value)
             }
         }
 
@@ -1649,15 +1649,15 @@ const Wheeler = defaults(def, (props) => {
 
         if ($$(selectedIndex) >= 0 && $$(selectedIndex) < $$(formattedOptions).length) {
             // If the index is valid, command the UI to animate to that position.
-            snapToIndex($$(selectedIndex));
+            snapToIndex($$(selectedIndex))
         } else {
             // If the index is invalid (e.g., -1 means "no selection"), we log a warning.
             // A potential improvement here could be to snap to a default position like index 0.
-            console.warn(`Index "${$$(selectedIndex)}" is out of bounds for snapping.`);
+            console.warn(`Index "${$$(selectedIndex)}" is out of bounds for snapping.`)
             // Optionally reset to a known safe state.
             // selectedIndex(-1); // This could be added if you want to enforce no selection on error.
         }
-    });
+    })
     // #endregion
 
     const wheeler = $<HTMLDivElement>()
@@ -1686,7 +1686,7 @@ const Wheeler = defaults(def, (props) => {
             // When the component is hidden, we must clear this cache. This ensures that
             // the next time it becomes visible, the sync function will run fresh,
             // even if the `value` prop hasn't changed in the interim.
-            preValue = null;
+            preValue = null
 
             // --- B. Unregister from Global State ---
             // `ActiveWheelers` is a global observable array tracking all visible wheelers.
@@ -1694,11 +1694,11 @@ const Wheeler = defaults(def, (props) => {
             if ($$(ActiveWheelers).some(w => w === wheeler)) {
                 // If it is, we update the global array by filtering this instance out.
                 // This correctly notifies the rest of the application that this wheeler is no longer active.
-                ActiveWheelers($$(ActiveWheelers).filter(w => w !== wheeler));
+                ActiveWheelers($$(ActiveWheelers).filter(w => w !== wheeler))
             }
 
             // We're done with the "hide" logic, so we exit the effect.
-            return;
+            return
         }
 
         // --- Path 2: The component is being shown (or is already visible) ---
@@ -1708,21 +1708,21 @@ const Wheeler = defaults(def, (props) => {
         // This prevents adding duplicates on subsequent re-renders while it remains visible.
         if ($$(ActiveWheelers).filter(w => w === wheeler).length === 0) {
             // If it's not present, we add it to the global list.
-            ActiveWheelers([...$$(ActiveWheelers), wheeler]);
+            ActiveWheelers([...$$(ActiveWheelers), wheeler])
         }
 
         // --- B. Re-synchronize Data ---
         // When the wheeler becomes visible, the external `value` prop may have changed
         // while it was hidden. We call `value2chk()` to force a re-sync between the
         // `value` prop and the internal checkbox states, ensuring the UI is up-to-date.
-        value2chk();
+        value2chk()
 
         // The original cleanup function was likely intended to unregister the wheeler
         // when the component is fully unmounted from the DOM. The logic inside the
         // `if (!$$(visible))` block now handles this more explicitly when visibility changes.
         // A `return () => { ... }` could still be useful for final cleanup on unmount,
         // but the current implementation covers the primary use case.
-    });
+    })
     // #endregion
 
     // #region Click Away Logic
@@ -1746,7 +1746,7 @@ const Wheeler = defaults(def, (props) => {
             // and the parent component's `oriValue` remains unchanged from before
             // the wheeler was opened.
             // visible(false); // Just hide, no save.
-            hide();
+            hide()
         }
 
 
@@ -1762,7 +1762,7 @@ const Wheeler = defaults(def, (props) => {
             // that is specifically listening for `ok` to become true. This keeps the commit
             // logic centralized.
             if (isObservable(ok)) {
-                ok(true);
+                ok(true)
             }
 
             // Method B: Direct commit (when there's no "OK" flow).
@@ -1771,20 +1771,20 @@ const Wheeler = defaults(def, (props) => {
             // with the wheeler's current internal `value`.
             // The original `// if (!ok)` comment suggests this is the intended fallback.
             else if (isObservable(oriValue)) {
-                oriValue($$(value));
+                oriValue($$(value))
             }
 
             // After triggering the save (either directly or indirectly), we hide the component.
             // Note: If using the `ok(true)` method, the other `useEffect` will also call
             // `visible(false)`, but calling it here ensures the component always closes.
             // visible(false);
-            hide();
+            hide()
         }
 
         // NOTE: The props `cancelOnBlur` and `commitOnBlur` are likely intended to be
         // used mutually exclusively. If both were true, `commitOnBlur` would run last
         // and take precedence.
-    });
+    })
     // #endregion
 
     // #region Search Logic
@@ -1802,40 +1802,40 @@ const Wheeler = defaults(def, (props) => {
         // --- Guard Clause: Handle empty input ---
         // If the search text is empty, there's nothing to search for.
         if (!searchText) {
-            return;
+            return
         }
 
         // Prepare the search text for case-insensitive comparison.
-        const lowercasedSearchText = searchText.toLowerCase();
+        const lowercasedSearchText = searchText.toLowerCase()
 
         // --- Step 1: Find the first matching option ---
         // Use the `.find()` method correctly to get the first matching element.
         // We search against the `label` property, which is guaranteed to be a string.
         const foundOption = $$(formattedOptions).find(option => {
             // Ensure the label is a string before calling .toLowerCase() for type safety.
-            const label = String(option.label).toLowerCase();
-            return label.includes(lowercasedSearchText);
-        });
+            const label = String(option.label).toLowerCase()
+            return label.includes(lowercasedSearchText)
+        })
 
         // --- Step 2: Handle the result ---
         if (foundOption) {
             // If a matching option was found...
-            const newValue = foundOption.value;
+            const newValue = foundOption.value
 
             // Update the internal `value` state of the component.
-            value(newValue);
+            value(newValue)
 
             // Update the external `oriValue` prop to notify the parent component.
             // This will trigger the `useEffect` that listens for value changes
             // and snaps the wheeler to the correct index.
             if (isObservable(oriValue)) {
-                (oriValue as any)(newValue);
+                (oriValue as any)(newValue)
             }
         } else {
             // If no match was found, provide feedback to the user.
             // In a real application, this could be a more subtle UI message
             // instead of a blocking alert.
-            console.warn(`Wheeler search: No results found for "${searchText}"`);
+            console.warn(`Wheeler search: No results found for "${searchText}"`)
             // alert("No results found");
         }
     }
@@ -1843,24 +1843,24 @@ const Wheeler = defaults(def, (props) => {
 
     // #region Placeholder Text Logic
     const placeholderText = useMemo(() => {
-        const customPlaceholder = $$(searchPlaceholder);
+        const customPlaceholder = $$(searchPlaceholder)
 
         // Priority 1: Use the user-provided `searchPlaceholder` if it exists.
         if (customPlaceholder) {
-            return customPlaceholder;
+            return customPlaceholder
         }
 
         // Priority 2: If no custom placeholder, try to derive one from the header.
         if (header) {
-            const headerContent = header(value);
+            const headerContent = header(value)
             if (typeof headerContent === 'string' && headerContent.length > 0) {
-                return `Enter ${headerContent.toLowerCase()}`;
+                return `Enter ${headerContent.toLowerCase()}`
             }
         }
 
         // Priority 3: If all else fails, use the default fallback text.
-        return "Search...";
-    });
+        return "Search..."
+    })
     // #endregion
 
     // #region Header With Search
@@ -1931,7 +1931,7 @@ const Wheeler = defaults(def, (props) => {
                 }
             </div>
         </>
-    );
+    )
     // #endregion
 
 
@@ -1974,11 +1974,11 @@ const Wheeler = defaults(def, (props) => {
                 class={["wheeler-widget fixed inset-x-0 bottom-0 z-[100] w-full bg-white", $$(cls)]}
                 {...otherProps}
             > */}
-            <div ref={wheeler} class={() => ['wheeler-widget z-[100]', $$(cls), "fixed inset-x-0 bottom-0 w-full z-20 bg-white"]}>
+            <div ref={wheeler} class={() => ['wheeler-widget z-[100]', $$(cls), "fixed inset-x-0 bottom-0 w-full z-200 bg-white"]}>
                 <WheelerContent />
             </div>
         </Portal>
-    </>;
+    </>
 
     const renderAsInline = () => (
         <div
@@ -1989,13 +1989,13 @@ const Wheeler = defaults(def, (props) => {
         >
             <WheelerContent />
         </div>
-    );
+    )
 
     // --- Main Return Logic ---
     return () => {
         // If visible, check the `bottom` prop to decide which render function to use.
-        return !$$(isVisible) ? null : $$(bottom) ? renderAsPopup() : renderAsInline();
-    };
+        return !$$(isVisible) ? null : $$(bottom) ? renderAsPopup() : renderAsInline()
+    }
     // return <>
     //     {() => !$$(visibleProp) ? null :
     //         $$(bottom) ?
@@ -2007,7 +2007,7 @@ const Wheeler = defaults(def, (props) => {
     //                         </>
     //                         : null
     //                 }
-    //                 <div ref={wheeler} class={() => ['wheeler-widget z-[100]', $$(cls), "fixed inset-x-0 bottom-0 w-full z-20 bg-white"]}>
+    //                 <div ref={wheeler} class={() => ['wheeler-widget z-[100]', $$(cls), "fixed inset-x-0 bottom-0 w-full z-200 bg-white"]}>
     //                     {/* {
     //                         () => header ?
     //                             <>
@@ -2099,7 +2099,7 @@ const Wheeler = defaults(def, (props) => {
 export { Wheeler }
 
 // NOTE: Register the custom element
-customElement('wui-wheeler', Wheeler);
+customElement('wui-wheeler', Wheeler)
 
 // NOTE: Add the custom element to the JSX namespace
 declare module 'woby' {
