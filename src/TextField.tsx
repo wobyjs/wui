@@ -106,7 +106,7 @@ const TextField = defaults(def, (props) => {
 
 	const { cls, class: cn, children, effect, assignOnEnter, value, inputType, placeholder, disabled, onChange, onKeyUp, label, ...otherProps } = props
 
-	const baseClass = "m-[20px] relative z-0"
+	const baseClass = "relative z-0"
 
 
 
@@ -158,7 +158,7 @@ const TextField = defaults(def, (props) => {
 
 			<span class="focus-border focus-bg pointer-events-none"><i></i></span>
 
-			{() => $$(label) ? <label class="pointer-events-none">{label}</label> : null}
+			{() => $$(label) ? <label class="">{label}</label> : null}
 
 			{/* if data-adnorment= end is exists render here */}
 			{/* {() => child().end} */}

@@ -31,7 +31,7 @@ const sideBarDef = () => ({
 const SideBar = defaults(sideBarDef, (props) => {
     const { class: cn, cls, children, open, contentRef, width, mask, ...otherProps } = props
 
-    const BASE_CLASS = `fixed h-full top-0 left-0 overflow-x-hidden transition-all duration-500 ease-in-out flex items-start z-[1000]`
+    const BASE_CLASS = `fixed h-full top-0 left-0 overflow-x-hidden transition-all duration-500 ease-in-out flex items-start z-[10]`
 
     const sidebarWidth = useMemo(() => {
         if (!$$(open)) return '0px'
@@ -83,7 +83,7 @@ const SideBar = defaults(sideBarDef, (props) => {
      *
      * BENEFITS:
      * 1. Stacking Context: It now lives at the top level of the DOM, which means its `z-index` 
-     *    (z-[1000]) will reliably place it on top of *everything* else on the page. We don't have
+     *    (z-[10]) will reliably place it on top of *everything* else on the page. We don't have
      *    to worry about a parent `div` somewhere else having a weird `transform` or `z-index`
      *    that could hide our sidebar.
      * 2. Positioning: Its `position: fixed` works relative to the browser viewport, which is exactly
@@ -97,7 +97,11 @@ const SideBar = defaults(sideBarDef, (props) => {
                 style={{ width: sidebarWidth }}
                 {...otherProps}
             >
-                <slot>{children}</slot>
+                <slot>
+                    <div class='flex flex-col justify-end'>
+                        {children}
+                    </div>
+                </slot>
             </div>
         )
     }
@@ -110,8 +114,8 @@ const SideBar = defaults(sideBarDef, (props) => {
             *
             * WHY NOT IN THE SAME PORTAL AS THE SIDEBAR?
             * Because they have different `z-index` values.
-            *   - The Overlay has `z-[999]`.
-            *   - The Sidebar has `z-[1000]`.
+            *   - The Overlay has `z-[5]`.
+            *   - The Sidebar has `z-[10]`.
             * This ensures the sidebar menu (`z-10`) always appears *on top of* the overlay (`z-999`).
             * If they were siblings inside the same parent `div`, managing their stacking order
             * would be more complex and less reliable. Using two separate Portals keeps their
@@ -122,7 +126,7 @@ const SideBar = defaults(sideBarDef, (props) => {
             {
                 () => $$(mask) && $$(open) && (
                     <div
-                        class="fixed inset-0 bg-black/50 z-[999] transition-opacity duration-500"
+                        class="fixed inset-0 bg-black/50 z-[5] transition-opacity duration-500"
                         onClick={() => isObservable(open) && open(false)}
                     />)
             }
@@ -241,7 +245,7 @@ export default SideBar
 //     return [<div class="h-full w-0 fixed overflow-x-hidden transition-[0.5s] left-0 top-0" style={{ width }}>
 //         {children}
 //     </div>,
-//     <div class={['absolute h-full w-full z-[999] bg-[#000] opacity-50', () => $$(disableBackground) && $$(open) ? 'visible' : 'hidden']} onClick={() => open(p => !p)}
+//     <div class={['absolute h-full w-full z-[5] bg-[#000] opacity-50', () => $$(disableBackground) && $$(open) ? 'visible' : 'hidden']} onClick={() => open(p => !p)}
 //         style={{ height: () => $$(contentRef)?.offsetHeight }}></div>
 //     ]
 // }
