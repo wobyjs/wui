@@ -30,7 +30,6 @@ const ToggleButton = defaults(def, (props) => {
     } = props
 
 
-    // const baseStyles = "inline-flex items-center justify-center relative box-border cursor-pointer select-none align-middle leading-[1.75] tracking-[0.02857em] border m-0 border-[rgba(0,0,0,0.12)] px-3 py-1 rounded"
     const baseStyles = "inline-flex items-center justify-center px-2 py-1 rounded text-sm cursor-pointer select-none transition-colors duration-150 border border-transparent"
 
     const handleClick = (e: MouseEvent) => {

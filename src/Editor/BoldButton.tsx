@@ -2,10 +2,96 @@ import { Button } from '../Button'
 import BoldIcon from '../icons/bold' // Renamed for clarity if Bold is a type/component elsewhere
 import { applyStyle, range, getCurrentRange } from './utils'
 import { useEditor } from './undoredo' // useUndoRedo not directly needed here anymore
-import { $, $$, useEffect } from 'woby'
-import { useSelection } from '@woby/use'
+import { $, $$, customElement, defaults, ElementAttributes, Observable, useEffect } from 'woby'
 
-export const BoldButton = () => {
+const def = () => ({
+    buttonType: $("outlined" as "text" | "contained" | "outlined" | "icon"),
+    title: $("Bold"),
+    cls: $(""),
+    disabled: $(false) as Observable<boolean>,
+})
+
+
+const BoldButton = defaults(def, (props) => {
+    const { buttonType: btnType, title, cls, disabled, ...otherProps } = props as any
+
+    const editorNode = useEditor()
+    const isActive = $(false)
+
+    useEffect(() => {
+        const editor = $$(editorNode)
+
+        if (!editor) return
+
+        const updateState = () => {
+            if (document.activeElement === editor || editor.contains(document.activeElement)) {
+                try {
+                    isActive(document.queryCommandState('bold'))
+                } catch (e) {
+                    isActive(false)
+                }
+            }
+        }
+
+        document.addEventListener('selectionchange', updateState)
+        updateState()
+
+        return () => document.removeEventListener('selectionchange', updateState)
+    })
+
+    const handleClick = (e: any) => {
+        e.preventDefault() // Prevent button from stealing focus
+
+        // Handle custom onClick if passed
+        if (otherProps.onClick) {
+            otherProps.onClick(e)
+            return
+        }
+
+        // Use CSS spans (<span style="font-weight: bold">) instead of <b> tags
+        document.execCommand('styleWithCSS', false, 'true')
+
+        // Execute Native Bold Command
+        document.execCommand('bold', false)
+
+        // Update state immediately
+        isActive(document.queryCommandState('bold'))
+    }
+
+    return (
+        <Button
+            type={btnType}
+            title={title}
+            cls={[
+                cls, "size-fit",
+                () => $$(isActive) ? '!bg-slate-200' : ''
+            ]}
+            aria-pressed={() => $$(isActive) ? "true" : "false"}
+            disabled={disabled}
+            onClick={handleClick}
+            {...otherProps}
+        >
+            <BoldIcon />
+        </Button>
+    )
+}) as typeof BoldButton
+
+export { BoldButton }
+
+// Register Custom Element
+customElement('wui-bold-button', BoldButton)
+
+declare module 'woby' {
+    namespace JSX {
+        interface IntrinsicElements {
+            'wui-bold-button': ElementAttributes<typeof BoldButton>
+        }
+    }
+}
+
+export default BoldButton
+
+export const BoldButton_ = () => {
     const isActive = $(false)
     const editorNode = useEditor()
 
@@ -68,12 +154,14 @@ export const BoldButton = () => {
         // If not, a direct call to update isActive might be needed here.
     }
 
-    return <Button
-        buttonType='outlined' cls='h-8 w-8' class={() => $$(isActive) ? '!bg-slate-200' : ''} // Example selected class
-        aria-pressed={isActive}
-        onClick={handleClick}
-        title="Bold"
-    >
-        <BoldIcon />
-    </Button>
+    return (
+        <Button
+            buttonType='outlined' class={['h-8 w-8', () => $$(isActive) ? '!bg-slate-200' : '']} // Example selected class
+            aria-pressed={isActive}
+            onClick={handleClick}
+            title="Bold"
+        >
+            <BoldIcon />
+        </Button>
+    )
 }
