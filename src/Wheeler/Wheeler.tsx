@@ -28,20 +28,21 @@ export const def = () => ({
 })
 
 const Wheeler = defaults(def, (props) => {
-    const { options, itemHeight: ih, itemCount: vic, value: oriValue, cls, header, ok, visible: visibleProp, mask, bottom = $$(mask), all, cancelOnBlur, commitOnBlur, searchable, searchPlaceholder, changeValueOnClickOnly, ...otherProps } = props
+    const { options, itemHeight: ih, itemCount: vic, value: oriValue, cls, header, ok: okProp, visible: visibleProp, mask, bottom = $($$(mask)), all, cancelOnBlur, commitOnBlur, searchable, searchPlaceholder, changeValueOnClickOnly, ...otherProps } = props
 
     const itemHeight = use(ih, 36)
     const itemCount = use(vic, 5)
-    const value = oriValue
-    const isVisible = $($$(visibleProp))
+    const value = use(oriValue, null)
+    const isVisible = use(visibleProp, false)
+    const ok = use(okProp, false)
 
-    // This handles the "top-down" data flow.
-    useEffect(() => {
-        const propValue = $$(visibleProp)
-        if (propValue !== $$(isVisible)) {
-            isVisible(propValue)
-        }
-    })
+    // // This handles the "top-down" data flow.
+    // useEffect(() => {
+    //     const propValue = $$(visibleProp)
+    //     if (propValue !== $$(isVisible)) {
+    //         isVisible(propValue)
+    //     }
+    // })
 
     const hide = () => {
         isVisible(false)
@@ -299,23 +300,17 @@ const Wheeler = defaults(def, (props) => {
         // This is the core "commit" action. It takes the Wheeler's internal,
         // potentially modified `value`, and pushes it up to the original `oriValue`
         // observable that was passed in from the parent component.
-        if (isObservable(oriValue)) {
-            oriValue($$(value))
-        }
+        oriValue($$(value))
 
         // --- Action 2: Reset the Trigger ---
         // After committing the value, we immediately reset the `ok` signal back to `false`.
         // This is crucial to prevent the effect from running in an infinite loop.
         // It makes the `ok` signal a one-time "event" rather than a persistent state.
-        if (isObservable(ok)) {
-            ok(false)
-        }
+        ok(false)
 
         // --- Action 3: Close the Component ---
         // Finally, we hide the Wheeler component by setting the `visible` observable to `false`.
-        if (isObservable(isVisible)) {
-            isVisible(false)
-        }
+        isVisible(false)
     })
     // #endregion
 
