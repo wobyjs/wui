@@ -151,9 +151,38 @@ declare module 'woby' {
 export default FontSize
 
 
+const fontSizeValue = useMemo((): string => {
+    let fontSize = '16px' // Default font size
+    const currentRange = getCurrentRange()
+    if (currentRange) {
+        let parentElement = currentRange.commonAncestorContainer as HTMLElement
+        // If the commonAncestorContainer is a text node, get its parent element
+        if (parentElement.nodeType === Node.TEXT_NODE) {
+            parentElement = parentElement.parentElement
+        }
 
-
-
+        if (parentElement && parentElement.nodeType === Node.ELEMENT_NODE) {
+            // Ensure we are within the editor bounds if possible
+            const editorDiv = $$(useEditor())
+            if (editorDiv && editorDiv.contains(parentElement)) {
+                const computedStyle = window.getComputedStyle(parentElement)
+                fontSize = computedStyle.fontSize || fontSize
+            } else if (!editorDiv) { // Fallback if editor context not available yet
+                const computedStyle = window.getComputedStyle(parentElement)
+                fontSize = computedStyle.fontSize || fontSize
+            }
+            // If parentElement is not inside editor, keep default? Or check editor itself?
+        }
+    } else {
+        // Fallback or initial state if no range is selected (e.g., editor itself)
+        const editorDiv = $$(useEditor()) // Read editor observable dependency
+        if (editorDiv) {
+            const computedStyle = window.getComputedStyle(editorDiv)
+            fontSize = computedStyle.fontSize || fontSize
+        }
+    }
+    return fontSize
+})
 
 
 // Define the function that accepts a size string like "12px", "2rem", or "large"
