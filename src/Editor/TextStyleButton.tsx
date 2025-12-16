@@ -17,7 +17,6 @@ const def = () => ({
 })
 
 const TextStyleButton = defaults(def, (props) => {
-    // FIX: Cast 'props as any' to allow extra HTML attributes (like onClick) in otherProps
     const { type, buttonType: btnType, title, cls, disabled, children, ...otherProps } = props as any
 
     const editorNode = useEditor()

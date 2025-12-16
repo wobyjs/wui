@@ -1,5 +1,3 @@
-
-import { applyStyle, getCurrentRange } from './utils'
 import { $, $$, defaults, useEffect, customElement, type ElementAttributes, type Observable } from "woby"
 import { Button } from '../Button'
 import UnderlineIcon from '../icons/underline'
@@ -80,7 +78,6 @@ const UnderlineButton = defaults(def, (props) => {
 
 export { UnderlineButton }
 
-// Register Custom Element
 customElement('wui-underline-button', UnderlineButton)
 
 declare module 'woby' {
@@ -92,64 +89,3 @@ declare module 'woby' {
 }
 
 export default UnderlineButton
-
-export const UnderlineButton__ = () => {
-    const isActive = $(false)
-    const editorNode = useEditor()
-
-    useEffect(() => {
-        const currentEditorNode = $$(editorNode)
-        const nativeRange = getCurrentRange()
-
-        if (!currentEditorNode || !nativeRange) {
-            isActive(false)
-            return
-        }
-
-        let nodeToCheck = nativeRange.startContainer
-        if (nodeToCheck.nodeType === Node.TEXT_NODE) {
-            nodeToCheck = nodeToCheck.parentElement
-        }
-
-        let foundStyle = false
-        while (nodeToCheck && nodeToCheck !== currentEditorNode && nodeToCheck instanceof HTMLElement) {
-            const style = window.getComputedStyle(nodeToCheck)
-            if (style.textDecorationLine === 'underline') { // Check for underline
-                foundStyle = true
-                break
-            }
-            nodeToCheck = nodeToCheck.parentElement
-        }
-
-        if (!foundStyle && nodeToCheck === currentEditorNode && nodeToCheck instanceof HTMLElement) {
-            const style = window.getComputedStyle(nodeToCheck)
-            if (style.textDecorationLine === 'underline') { // Check for underline
-                foundStyle = true
-            }
-        }
-
-        isActive(foundStyle)
-    })
-
-    const handleClick = () => {
-        applyStyle((element) => {
-            const p = window.getComputedStyle(element?.parentElement)
-            const before = window.getComputedStyle(element)
-            element.style.textDecorationLine = before.textDecorationLine.includes('underline') ? 'none' : 'underline'
-            const after = window.getComputedStyle(element)
-            // If parent has the same text-decoration, remove it from the element to inherit
-            if (p.textDecorationLine === after.textDecorationLine) {
-                element.style.textDecorationLine = ''
-            }
-        })
-    }
-
-    return <Button
-        buttonType='outlined' class={['h-8 w-8', () => $$(isActive) ? '!bg-slate-200' : '']}
-        aria-pressed={isActive}
-        onClick={handleClick}
-        title="Underline" // Updated title
-    >
-        <UnderlineIcon />
-    </Button>
-}
