@@ -7,7 +7,7 @@ const DefaultBtn = () => { return (<Button>Default Button</Button>) }
 
 const TextBtn = () => { return (<Button type="text">Text Button</Button>) }
 
-const ContainedBtn = () => { return (<Button type="contained" cls="!px-2 !py-1 !rounded-[4px]">Contained Button</Button>) }
+const ContainedBtn = () => { return (<Button type="contained" buttonClass="!px-2 !py-1 !rounded-[4px]">Contained Button</Button>) }
 
 const OutlinedBtn = () => { return (<Button type="outlined">Outlined Button</Button>) }
 
