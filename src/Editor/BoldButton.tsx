@@ -19,23 +19,55 @@ const BoldButton = defaults(def, (props) => {
     const isActive = $(false)
 
     useEffect(() => {
+        // 1. ACCESS DOM ELEMENT
+        // $$() unwraps the Woby observable to get the actual HTML <div> element
+        // of the editor so we can check against it.
         const editor = $$(editorNode)
 
+        // 2. SAFETY CHECK
+        // If the editor component hasn't rendered yet or is missing, stop here
+        // to prevent crashes (cannot read properties of null).
         if (!editor) return
 
+        // 3. DEFINE LOGIC FUNCTION
+        // We create a function to check the current state. We don't run it yet,
+        // just defining what should happen when the cursor moves.
         const updateState = () => {
+
+            // 4. CHECK FOCUS
+            // document.activeElement is the item currently selected on the page.
+            // We ensure the user is actually inside OUR editor (or a child element like <p> inside it)
+            // so the button doesn't light up when selecting text elsewhere on the page.
             if (document.activeElement === editor || editor.contains(document.activeElement)) {
                 try {
+                    // 5. QUERY BROWSER NATIVE STATE
+                    // 'document.queryCommandState' asks the browser: 
+                    // "Is the text at the current cursor position BOLD?"
+                    // It returns TRUE or FALSE.
+                    // We pass that result directly to 'isActive', which updates the button UI.
                     isActive(document.queryCommandState('bold'))
                 } catch (e) {
+                    // 6. ERROR HANDLING
+                    // If the browser throws an error (edge case), default to "Not Active".
                     isActive(false)
                 }
             }
         }
 
+        // 7. ATTACH EVENT LISTENER
+        // 'selectionchange' fires whenever the cursor moves or text is highlighted.
+        // We tell the document to run our 'updateState' function every time this happens.
         document.addEventListener('selectionchange', updateState)
+
+        // 8. INITIAL RUN
+        // We run the function manually once right now to ensure the button state 
+        // is correct immediately on load, without waiting for the user to click first.
         updateState()
 
+        // 9. CLEANUP FUNCTION
+        // This runs when the component unmounts (is removed from screen).
+        // We MUST remove the event listener to prevent memory leaks and errors
+        // where the code tries to update a button that no longer exists.
         return () => document.removeEventListener('selectionchange', updateState)
     })
 
@@ -78,7 +110,6 @@ const BoldButton = defaults(def, (props) => {
 
 export { BoldButton }
 
-// Register Custom Element
 customElement('wui-bold-button', BoldButton)
 
 declare module 'woby' {
@@ -90,78 +121,3 @@ declare module 'woby' {
 }
 
 export default BoldButton
-
-export const BoldButton_ = () => {
-    const isActive = $(false)
-    const editorNode = useEditor()
-
-    useEffect(() => {
-        if (!$$(editorNode) || !$$(range)) {
-            isActive(false)
-            return
-        }
-
-        const currentRange = getCurrentRange()
-        if (!currentRange) {
-            isActive(false)
-            return
-        }
-        let nodeToCheck = currentRange.startContainer
-        if (nodeToCheck.nodeType === Node.TEXT_NODE) {
-            nodeToCheck = nodeToCheck.parentElement
-        }
-
-        let foundStyle = false
-        while (nodeToCheck && nodeToCheck !== $$(editorNode) && nodeToCheck instanceof HTMLElement) {
-            const style = window.getComputedStyle(nodeToCheck)
-            if (style.fontWeight === 'bold' || parseInt(style.fontWeight, 10) >= 700) {
-                foundStyle = true
-                break
-            }
-            // If it's a span and doesn't have the style, continue up.
-            // If it's a block and doesn't have the style, the style is not considered active from this point.
-            // However, for bold/italic, it's common to check up to the editor root or first block.
-            // The current loop structure does this.
-            nodeToCheck = nodeToCheck.parentElement
-        }
-
-        // Check editor root itself if style not found in descendants and nodeToCheck became editorNode
-        if (!foundStyle && nodeToCheck === $$(editorNode) && nodeToCheck instanceof HTMLElement) {
-            const style = window.getComputedStyle(nodeToCheck)
-            if (style.fontWeight === 'bold' || parseInt(style.fontWeight, 10) >= 700) {
-                foundStyle = true
-            }
-        }
-
-        isActive(foundStyle)
-    }) // Woby's useEffect will auto-track $$(currentRange$) and $$(editorDiv)
-
-    const handleClick = () => {
-        applyStyle((element) => {
-            const p = window.getComputedStyle(element?.parentElement)
-            const before = window.getComputedStyle(element)
-            element.style.fontWeight = (before.fontWeight === 'bold' || parseInt(before.fontWeight, 10) >= 700) ? 'normal' : 'bold'
-            const after = window.getComputedStyle(element)
-            // If after applying, the style is the same as parent, effectively remove it (make it inherit)
-            if (p.fontWeight === after.fontWeight) {
-                element.style.fontWeight = ''
-            }
-        })
-        // Manually update isActive after click, as selectionchange might not fire immediately
-        // or the logic inside useEffect might need a re-evaluation based on the new DOM.
-        // A more robust way would be to ensure selectionchange fires and handles it.
-        // For now, let's assume the useEffect will correctly update.
-        // If not, a direct call to update isActive might be needed here.
-    }
-
-    return (
-        <Button
-            buttonType='outlined' class={['h-8 w-8', () => $$(isActive) ? '!bg-slate-200' : '']} // Example selected class
-            aria-pressed={isActive}
-            onClick={handleClick}
-            title="Bold"
-        >
-            <BoldIcon />
-        </Button>
-    )
-}
