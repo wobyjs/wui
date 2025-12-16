@@ -35,7 +35,7 @@ export const TextColorPicker = () => {
             {/* Button to apply the picked color */}
             <Button
                 buttonType='outlined'
-                class={["p-2 h-8"]}
+                cls={["p-2 h-8"]}
                 title="Text color"
                 onClick={applyPickedColor} // Apply color on button click
             >

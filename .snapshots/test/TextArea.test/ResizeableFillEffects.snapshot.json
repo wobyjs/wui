@@ -1,0 +1,4 @@
+{
+  "props": {},
+  "html": "<div><div class=\"space-y-2\"><h3 class=\"font-bold text-gray-500 uppercase\">Fill Effect Resizeable TextArea (Effect 10 - 15)</h3><div class=\"m-[20px] relative z-0 inline-block overflow-visible\"><textarea class=\"focus:[outline:none] border border-solid border-[#ccc] px-[15px] py-[7px] bg-transparent relative w-full z-10 [&~span]:absolute [&~span]:left-0 [&~span]:top-0 [&~span]:w-full [&~span]:h-full [&~span]:bg-[#ededed] [&~span]:opacity-0 [&~span]:duration-[0.5s] [&~span]:z-0 [&:focus~span]:opacity-100 [&:focus~span]:duration-[0.5s] resize w-[300px] h-[100px] block\" placeholder=\"Fill Effect Textarea...\"></textarea><span class=\"focus-border focus-bg pointer-events-none\"><i></i></span><!----><!----></div></div></div>"
+}

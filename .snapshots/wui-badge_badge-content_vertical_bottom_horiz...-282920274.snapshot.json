@@ -1,4 +1,0 @@
-{
-  "props": {},
-  "html": "<slot-mocked> <wui-badge-mocked badge-content=\"◆\" vertical=\"bottom\" horizontal=\"right\" badge-class=\"bg-cyan-500\" snapshot=\"Bottom-Right-Custom-Badge\" cls=\"\"><div><span class=\"relative inline-flex align-middle shrink-0 m-4\"><span class=\"flex place-content-center items-center absolute box-border font-medium text-xs leading-none z-[1] text-white scale-100 [flex-flow:wrap] [transition:transform_225ms_cubic-bezier(0.4,0,0.2,1)0ms] translate-x-2/4 right-0 min-w-[20px] h-5 rounded-[10px] px-1 translate-y-2/4 origin-[100%_100%] bottom-0 bg-cyan-500\">◆</span><slot-mocked> <div class=\"w-10 h-10 bg-teal-500 rounded-full\"></div> </slot-mocked></span></div> <div class=\"w-10 h-10 bg-teal-500 rounded-full\"></div> </wui-badge-mocked> </slot-mocked>"
-}

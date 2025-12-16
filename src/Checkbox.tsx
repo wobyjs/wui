@@ -1,4 +1,4 @@
-import { $, $$, defaults, type JSX, customElement, type ElementAttributes, type ObservableMaybe, useEffect, StyleEncapsulationProps, HtmlBoolean } from "woby"
+import { $, $$, defaults, type JSX, customElement, type ElementAttributes, type ObservableMaybe, useEffect, StyleEncapsulationProps, HtmlBoolean, HtmlClass } from "woby"
 import "@woby/chk"
 import "./input.css"
 
@@ -7,13 +7,26 @@ type LabelPosition = "left" | "right" | "bottom" | "top"
 type CheckboxProps = JSX.InputHTMLAttributes<HTMLInputElement> & {
 	children?: ObservableMaybe<JSX.Child>
 	labelPosition?: ObservableMaybe<LabelPosition>
-	cls?: ObservableMaybe<string>
+	class?: ObservableMaybe<string>
 }
 
 const def = () => ({
 	children: $(null as JSX.Child),
 	labelPosition: $("left" as LabelPosition),
-	cls: $(""),
+	/** 
+	 * Custom CSS classes to apply to the checkbox.
+	 * 
+	 * Class override mechanism:
+	 * - `cls` prop: Used as the primary class, if undefined the default classes are used
+	 * - `class` prop (aliased as `cn`): Additional classes that patch/extend the given classes
+	 * 
+	 * Usage:
+	 * - When `cls` is undefined, the default classes are used
+	 * - User can override the default class by providing a `cls` prop
+	 * - `class` can be used to add additional classes to the component
+	 */
+	cls: $('', HtmlClass) as JSX.Class | undefined,
+	class: $('', HtmlClass) as JSX.Class | undefined,
 	// checked: $(false as boolean),
 	// disabled: $(false as boolean),
 	checked: $(false, HtmlBoolean) as ObservableMaybe<boolean>,
@@ -22,7 +35,7 @@ const def = () => ({
 })
 
 const Checkbox = defaults(def, (props) => {
-	const { children, labelPosition, cls, checked, disabled, id, ...otherProps } = props
+	const { class: cn, cls, children, labelPosition, checked, disabled, id, ...otherProps } = props
 
 	const before = () =>
 		$$(labelPosition) === "left" || $$(labelPosition) === "top" ?
@@ -35,7 +48,7 @@ const Checkbox = defaults(def, (props) => {
 	const line = () => ($$(labelPosition) === "top" || $$(labelPosition) === "bottom" ? <br /> : null)
 
 	return (
-		<div class={() => [(cls)]}>
+		<div class={[() => $$(cls) ? $$(cls) : "", cn]}>
 			{before}
 			{line}
 			<input id={id} type="checkbox" checked={checked} disabled={disabled} {...otherProps} />

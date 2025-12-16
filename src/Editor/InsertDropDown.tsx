@@ -108,7 +108,7 @@ export const InsertDropDown = () => {
             <div>
                 <Button
                     buttonType='outlined'
-                    class={["p-2 h-8"]}
+                    cls="p-2 h-8"
                     onClick={toggleDropdown}
                     title="Insert content"
                 >

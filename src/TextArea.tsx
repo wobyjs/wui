@@ -14,6 +14,7 @@ import {
     ObservableMaybe, $$, $, type JSX, isObservable, Observable,
     defaults, customElement, type ElementAttributes,
     HtmlBoolean, HtmlString, useMemo,
+    HtmlClass,
 } from 'woby'
 
 /* ------------------------------------------------------------------ */
@@ -72,7 +73,8 @@ type ResizeProps = "none" | "horizontal" | "vertical" | "both"
 /* ------------------------------------------------------------------ */
 
 const def = () => ({
-    cls: $("", HtmlString) as ObservableMaybe<string> | undefined,
+    cls: $('', HtmlClass) as JSX.Class | undefined,
+    class: $("", HtmlString) as ObservableMaybe<string> | undefined,
     children: $(null) as ObservableMaybe<JSX.Child> | undefined,
 
     /** Effect name like "effect19a", "effect7", etc. */
@@ -102,10 +104,10 @@ const def = () => ({
 /* ------------------------------------------------------------------ */
 
 const TextArea = defaults(def, (props) => {
-    const { cls, children, effect, assignOnEnter, value, placeholder, label, resize, onChange, onKeyUp, ...otherProps } = props
+    const { cls, class: cn, children, effect, assignOnEnter, value, placeholder, label, resize, onChange, onKeyUp, ...otherProps } = props
 
     // Wrapper: only positions span/label, allows overflow for floating label
-    const baseClass = "m-[20px] relative size-fit" //  z-0 inline-block overflow-visible
+    const baseClass = "relative size-fit" //  z-0 inline-block overflow-visible
 
     // Resize is applied to the TEXTAREA, not the wrapper
     const resizeStyle = useMemo(() => {
@@ -131,7 +133,7 @@ const TextArea = defaults(def, (props) => {
     }
 
     return (
-        <div class={() => [baseClass, cls]}>
+        <div class={() => [baseClass, () => $$(cls) ? $$(cls) : "", cn]}>
             {/* textarea defines the size and is resizable */}
             <textarea
                 style={() => ({ resize: resizeValue })}
@@ -240,7 +242,7 @@ export const TextAreaOriginal = ({
     const { onChange, onKeyUp, ...ps } = props
 
     return (
-        <div class={[(className ?? cls) ?? 'm-[20px]', 'relative']}>
+        <div class={[(className ?? cls) ?? '', 'relative']}>
             <textarea
                 class={effect ?? effect19a}
                 {...{ ...ps, type, placeholder }}

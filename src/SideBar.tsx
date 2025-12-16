@@ -1,12 +1,22 @@
-import { $, $$, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlNumber, HtmlString, ObservableMaybe, Portal, useEffect, useMemo, isObservable } from "woby"
+import { $, $$, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlNumber, HtmlString, ObservableMaybe, Portal, useEffect, useMemo, isObservable, HtmlClass } from "woby"
 
 
 // #region Sidebar Component
 const sideBarDef = () => ({
-    /** Custom CSS classes to apply to the sidebar container. */
-    cls: $(""),
-    class: $(""),
-    /** The content to be rendered inside the sidebar. */
+    /** 
+     * Custom CSS classes to apply to the sidebar container.
+     * 
+     * Class override mechanism:
+     * - `cls` prop: Used as the primary class, if undefined the default BASE_CLASS is used
+     * - `class` prop (aliased as `cn`): Additional classes that patch/extend the given class
+     * 
+     * Usage:
+     * - When `cls` is undefined, the default BASE_CLASS is used
+     * - User can override the default class by providing a `cls` prop
+     * - `class` can be used to add additional classes to the component
+     */
+    cls: $("", HtmlClass) as JSX.Class | undefined,
+    class: $("", HtmlClass) as JSX.Class | undefined,    /** The content to be rendered inside the sidebar. */
     children: $(null) as ObservableMaybe<JSX.Element>,
     /** A boolean observable to control whether the sidebar is open or closed. */
     open: $(false, HtmlBoolean) as ObservableMaybe<boolean>,
@@ -15,13 +25,13 @@ const sideBarDef = () => ({
     /** The width of the sidebar when it is open (e.g., '250px' or 250). */
     width: $('250px', HtmlString) as ObservableMaybe<string | number>,
     /** When true, a dark overlay will appear over the main content, which closes the sidebar on click. */
-    showOverlay: $(true, HtmlBoolean) as ObservableMaybe<boolean>,
+    mask: $(false, HtmlBoolean) as ObservableMaybe<boolean>,
 })
 
 const SideBar = defaults(sideBarDef, (props) => {
-    const { cls, class: cn, children, open, contentRef, width, showOverlay, ...otherProps } = props
+    const { class: cn, cls, children, open, contentRef, width, mask, ...otherProps } = props
 
-    const BASE_CLASS = "fixed h-full top-0 left-0 z-[1000] overflow-x-hidden transition-all duration-500 ease-in-out"
+    const BASE_CLASS = `fixed h-full top-0 left-0 overflow-x-hidden transition-all duration-500 ease-in-out flex items-start z-[10]`
 
     const sidebarWidth = useMemo(() => {
         if (!$$(open)) return '0px'
@@ -53,7 +63,7 @@ const SideBar = defaults(sideBarDef, (props) => {
         // `sidebarWidth` is a memoized value that reactively changes between '0px' (when closed)
         // and the full width (e.g., '250px') when open. By setting `marginLeft`, we "push"
         // the content element to the right to make space for the sidebar.
-        contentEl.style.marginLeft = $$(sidebarWidth)
+        // contentEl.style.marginLeft = $$(sidebarWidth)
 
         // 4. Ensure a Smooth Animation.
         // This line applies a CSS transition to the `marginLeft` property.
@@ -73,7 +83,7 @@ const SideBar = defaults(sideBarDef, (props) => {
      *
      * BENEFITS:
      * 1. Stacking Context: It now lives at the top level of the DOM, which means its `z-index` 
-     *    (z-[1000]) will reliably place it on top of *everything* else on the page. We don't have
+     *    (z-[10]) will reliably place it on top of *everything* else on the page. We don't have
      *    to worry about a parent `div` somewhere else having a weird `transform` or `z-index`
      *    that could hide our sidebar.
      * 2. Positioning: Its `position: fixed` works relative to the browser viewport, which is exactly
@@ -83,11 +93,15 @@ const SideBar = defaults(sideBarDef, (props) => {
     const SidebarComponent = () => {
         return (
             <div
-                class={[() => $$(cn) ?? BASE_CLASS, cls]}
+                class={[() => $$(cls) ? $$(cls) : BASE_CLASS, cn]}
                 style={{ width: sidebarWidth }}
                 {...otherProps}
             >
-                <slot>{children}</slot>
+                <slot>
+                    <div class='flex flex-col justify-end'>
+                        {children}
+                    </div>
+                </slot>
             </div>
         )
     }
@@ -100,9 +114,9 @@ const SideBar = defaults(sideBarDef, (props) => {
             *
             * WHY NOT IN THE SAME PORTAL AS THE SIDEBAR?
             * Because they have different `z-index` values.
-            *   - The Overlay has `z-[999]`.
-            *   - The Sidebar has `z-[1000]`.
-            * This ensures the sidebar menu (`z-1000`) always appears *on top of* the overlay (`z-999`).
+            *   - The Overlay has `z-[5]`.
+            *   - The Sidebar has `z-[10]`.
+            * This ensures the sidebar menu (`z-10`) always appears *on top of* the overlay (`z-999`).
             * If they were siblings inside the same parent `div`, managing their stacking order
             * would be more complex and less reliable. Using two separate Portals keeps their
             * stacking contexts clean and independent.
@@ -110,9 +124,9 @@ const SideBar = defaults(sideBarDef, (props) => {
         return <>
             {/* <Portal mount={document.body}> */}
             {
-                () => $$(showOverlay) && $$(open) && (
+                () => $$(mask) && $$(open) && (
                     <div
-                        class="fixed inset-0 bg-black/50 z-[999] transition-opacity duration-500"
+                        class="fixed inset-0 bg-black/50 z-[5] transition-opacity duration-500"
                         onClick={() => isObservable(open) && open(false)}
                     />)
             }
@@ -133,17 +147,28 @@ const SideBar = defaults(sideBarDef, (props) => {
 
 // #region Menu Item Component
 const menuItemDef = () => ({
-    cls: $(""),
-    class: $(""),
+    /** 
+     * Custom CSS classes to apply to the menu item.
+     * 
+     * Class override mechanism:
+     * - `cls` prop: Used as the primary class, if undefined the default class is used
+     * - `class` prop (aliased as `cn`): Additional classes that patch/extend the given class
+     * 
+     * Usage:
+     * - When `cls` is undefined, the default 'flex items-center w-full h-12 px-4 mt-2 rounded cursor-pointer' is used
+     * - User can override the default class by providing a `cls` prop
+     * - `class` can be used to add additional classes to the component
+     */
+    class: $('', HtmlClass) as JSX.Class | undefined,
+    cls: $('', HtmlClass) as JSX.Class | undefined,
     children: $(null as JSX.Child),
 })
 
-
 const MenuItem = defaults(menuItemDef, (props) => {
-    const { cls, class: cn, children, ...otherProps } = props
+    const { class: cn, cls, children, ...otherProps } = props
 
     return (
-        <a class={[() => $$(cn) ?? 'flex items-center w-full h-12 px-4 mt-2 rounded cursor-pointer', cls]} {...otherProps}>
+        <a class={[() => $$(cls) ? $$(cls) : 'flex items-center w-full h-12 px-4 mt-2 rounded cursor-pointer', cn]} {...otherProps}>
             {children}
         </a>
     )
@@ -153,15 +178,27 @@ const MenuItem = defaults(menuItemDef, (props) => {
 
 // #region Menu Text Component
 const menuTextDef = () => ({
-    cls: $(""),
+    /** 
+     * Custom CSS classes to apply to the menu text.
+     * 
+     * Class override mechanism:
+     * - `cls` prop: Used as the primary class, if undefined the default class is used
+     * - `class` prop (aliased as `cn`): Additional classes that patch/extend the given class
+     * 
+     * Usage:
+     * - When `cls` is undefined, the default 'ml-3 text-sm font-medium' is used
+     * - User can override the default class by providing a `cls` prop
+     * - `class` can be used to add additional classes to the component
+     */
+    cls: $('', HtmlClass) as JSX.Class | undefined,
+    class: $('', HtmlClass) as JSX.Class | undefined,
     children: $(null as JSX.Child),
 })
 
 const MenuText = defaults(menuTextDef, (props) => {
-    const { cls, children, ...otherProps } = props
-
+    const { class: cn, cls, children, ...otherProps } = props
     return (
-        <span class={['ml-3 text-sm font-medium', cls]} {...otherProps}>
+        <span class={[() => $$(cls) ? $$(cls) : 'ml-3 text-sm font-medium', cn]} {...otherProps}>
             {children}
         </span>
     )
@@ -208,7 +245,7 @@ export default SideBar
 //     return [<div class="h-full w-0 fixed overflow-x-hidden transition-[0.5s] left-0 top-0" style={{ width }}>
 //         {children}
 //     </div>,
-//     <div class={['absolute h-full w-full z-[999] bg-[#000] opacity-50', () => $$(disableBackground) && $$(open) ? 'visible' : 'hidden']} onClick={() => open(p => !p)}
+//     <div class={['absolute h-full w-full z-[5] bg-[#000] opacity-50', () => $$(disableBackground) && $$(open) ? 'visible' : 'hidden']} onClick={() => open(p => !p)}
 //         style={{ height: () => $$(contentRef)?.offsetHeight }}></div>
 //     ]
 // }

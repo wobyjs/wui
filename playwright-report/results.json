@@ -1,7 +1,7 @@
 {
   "config": {
-    "configFile": "D:\\Developments\\tslib\\@woby\\wui\\playwright.config.ts",
-    "rootDir": "D:/Developments/tslib/@woby/wui/playwright",
+    "configFile": "D:\\devGit\\@woby\\wui\\playwright.config.ts",
+    "rootDir": "D:/devGit/@woby/wui/playwright",
     "forbidOnly": false,
     "fullyParallel": true,
     "globalSetup": null,
@@ -10,9 +10,7 @@
     "grep": {},
     "grepInvert": null,
     "maxFailures": 0,
-    "metadata": {
-      "actualWorkers": 1
-    },
+    "metadata": {},
     "preserveOutput": "always",
     "reporter": [
       [
@@ -39,15 +37,13 @@
     "quiet": false,
     "projects": [
       {
-        "outputDir": "D:/Developments/tslib/@woby/wui/test-results",
+        "outputDir": "D:/devGit/@woby/wui/test-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {
-          "actualWorkers": 1
-        },
+        "metadata": {},
         "id": "",
         "name": "",
-        "testDir": "D:/Developments/tslib/@woby/wui/playwright",
+        "testDir": "D:/devGit/@woby/wui/playwright",
         "testIgnore": [],
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
@@ -59,7 +55,7 @@
     "updateSnapshots": "missing",
     "updateSourceMethod": "patch",
     "version": "1.56.1",
-    "workers": 7,
+    "workers": 4,
     "webServer": {
       "command": "pnpm dev",
       "url": "http://localhost:5175",
@@ -68,59 +64,17 @@
       "stderr": "pipe"
     }
   },
-  "suites": [
+  "suites": [],
+  "errors": [
     {
-      "title": "NumberField\\numberfield.spec.ts",
-      "file": "NumberField/numberfield.spec.ts",
-      "column": 0,
-      "line": 0,
-      "specs": [
-        {
-          "title": "number field component should have correct attributes",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 30000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 1874,
-                  "errors": [],
-                  "stdout": [
-                    {
-                      "text": "Number field components have correct attributes\n"
-                    }
-                  ],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2025-11-21T13:52:07.257Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "bee823fe291f31a4bab6-9a9434a2e9496010fd15",
-          "file": "NumberField/numberfield.spec.ts",
-          "line": 83,
-          "column": 5
-        }
-      ]
+      "message": "Error: Process from config.webServer was not able to start. Exit code: 1",
+      "stack": "Error: Process from config.webServer was not able to start. Exit code: 1"
     }
   ],
-  "errors": [],
   "stats": {
-    "startTime": "2025-11-21T13:52:05.247Z",
-    "duration": 10515.938,
-    "expected": 1,
+    "startTime": "2025-11-24T07:41:34.455Z",
+    "duration": 46011.568999999996,
+    "expected": 0,
     "skipped": 0,
     "unexpected": 0,
     "flaky": 0

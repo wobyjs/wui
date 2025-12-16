@@ -1,4 +1,0 @@
-{
-  "props": {},
-  "html": "<div><div class=\"number-input inline-flex border-2 border-solid border-[#ddd] box-border [&_*]:box-border\"><button class=\" bg-transparent items-center justify-center cursor-pointer relative m-0 border-[none] [outline:none] [-webkit-appearance:none] disabled:bg-[#d9dbda] \">-</button><input class=\"quantity [-webkit-appearance:textfield] [-moz-appearance:textfield] [appearance:textfield] [&::-webkit-inner-spin-button]:[-webkit-appearance:none] [&::-webkit-outer-spin-button]:[-webkit-appearance:none] text-center p-2 border-solid border-[0_2px]\" type=\"number\" min=\"0\" max=\"100\" step=\"1\" disabled=\"\"></input><button class=\"bg-transparent items-center justify-center cursor-pointer relative m-0 border-[none] [outline:none] [-webkit-appearance:none] disabled:bg-[#d9dbda] plus\">+</button><!----></div></div>"
-}

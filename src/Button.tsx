@@ -1,5 +1,5 @@
 //@ts-ignore
-import { $, $$, defaults, type JSX, isObservable, customElement, type ElementAttributes, type Observable, type CustomElementChildren, type StyleEncapsulationProps, useEffect, HtmlBoolean, ObservableMaybe, HtmlString } from "woby"
+import { $, $$, defaults, type JSX, isObservable, customElement, type ElementAttributes, type Observable, type CustomElementChildren, type StyleEncapsulationProps, useEffect, HtmlBoolean, ObservableMaybe, HtmlClass } from "woby"
 import '@woby/chk'
 import './input.css'
 
@@ -133,14 +133,24 @@ const def = () => ({
     children: $("Button"),
     checked: $(false, HtmlBoolean) as ObservableMaybe<boolean> | undefined,
     disabled: $(false, HtmlBoolean) as ObservableMaybe<boolean> | undefined,
-    cls: $(""),
+    /** 
+     * Custom CSS classes to apply to the button.
+     * 
+     * Class override mechanism:
+     * - `cls` prop: Used as the primary class, if undefined the default variant class is used
+     * - `class` prop (aliased as `cn`): Additional classes that patch/extend the given class
+     * 
+     * Usage:
+     * - When `cls` is undefined, the default variant class is used
+     * - User can override the default class by providing a `cls` prop
+     * - `class` can be used to add additional classes to the component
+     */
+    cls: $('', HtmlClass) as JSX.Class | undefined,
+    class: $('', HtmlClass) as JSX.Class | undefined,
     onClick: undefined,
 })
-
 const Button = defaults(def, (props) => {
-    const { children, cls, type: buttonType, buttonFunction, checked, disabled, onClick, ...otherProps } = props
-
-    // Create reactive displayText observable with proper type
+    const { children, cls, class: cn, type: buttonType, buttonFunction, checked, disabled, onClick, ...otherProps } = props    // Create reactive displayText observable with proper type
     const displayText = $<string>('')
 
     // Handle both slot elements (HTML custom elements) and regular children (TSX)
@@ -186,7 +196,7 @@ const Button = defaults(def, (props) => {
                 }
             }}
             disabled={disabled}
-            class={[() => variant[$$(buttonType)], cls]}
+            class={[() => $$(cls) ? $$(cls) : variant[$$(buttonType)], cn]}
             {...otherProps}
         >
             {children}
@@ -205,7 +215,7 @@ const Button = defaults(def, (props) => {
 export { Button }
 
 // NOTE: Register the custom element
-customElement('wui-button', Button);
+customElement('wui-button', Button)
 
 // NOTE: Add the custom element to the JSX namespace
 declare module 'woby' {

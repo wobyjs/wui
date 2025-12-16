@@ -34,11 +34,11 @@
 // }
 
 // const def = () => ({
-//     cls: $(""),
+//     cls: $('', HtmlClass) as ObservableMaybe<JSX.Class>|undefined,
 //     children: $("" as JSX.Child),
 //     color: $("primary" as Color),
-//     bgClass: $(""),
-//     textClass: $(""),
+//     bgclass: $('', HtmlClass) as ObservableMaybe<JSX.Class>|undefined,
+//     textclass: $('', HtmlClass) as ObservableMaybe<JSX.Class>|undefined,
 //     elevation: $(2 as 0 | 1 | 2 | 3 | 4),
 //     position: $("fixed" as Position),
 //     edge: $("top" as Edge),
@@ -248,7 +248,7 @@
 // #endregion
 
 // #region Using tw Appbar
-import { $, $$, defaults, type JSX, customElement, type ElementAttributes, type ObservableMaybe, useEffect, HtmlBoolean } from "woby"
+import { $, $$, defaults, type JSX, customElement, type ElementAttributes, type ObservableMaybe, useEffect, HtmlBoolean, HtmlClass } from "woby"
 import "@woby/chk"
 import "./input.css"
 
@@ -256,7 +256,20 @@ type Position = "fixed" | "sticky" | "static"
 type Edge = "top" | "bottom"
 
 const def = () => ({
-    cls: $("") as ObservableMaybe<string>,
+    /** 
+     * Custom CSS classes to apply to the appbar.
+     * 
+     * Class override mechanism:
+     * - `cls` prop: Used as the primary class, if undefined the default variant classes are used
+     * - `class` prop (aliased as `cn`): Additional classes that patch/extend the given classes
+     * 
+     * Usage:
+     * - When `cls` is undefined, the default variant classes are used
+     * - User can override the default class by providing a `cls` prop
+     * - `class` can be used to add additional classes to the component
+     */
+    cls: $('', HtmlClass) as JSX.Class | undefined,
+    class: $("", HtmlClass) as JSX.Class | undefined,
     children: $(""),
     type: $("default"),
     position: $("fixed" as Position),
@@ -268,7 +281,7 @@ const variantStyle = {
 }
 
 const Appbar = defaults(def, (props) => {
-    const { cls, type: variant, position, edge, children, ...otherProps } = props
+    const { class: cn, cls, type: variant, position, edge, children, ...otherProps } = props
 
 
     const getPositionClass = () => {
@@ -346,11 +359,7 @@ const Appbar = defaults(def, (props) => {
     return (
         <header
             // ref={(e: any) => (el = e)}
-            class={[
-                () => variantStyle[$$(variant)],
-                () => getPositionClass(),
-                cls
-            ]}
+            class={[() => $$(cls) ? $$(cls) : variantStyle[$$(variant)], () => getPositionClass(), cn]}
             {...otherProps}
         >
             {/* <pre>

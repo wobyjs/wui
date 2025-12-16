@@ -1,0 +1,4 @@
+{
+  "props": {},
+  "html": "<slot-mocked> <wui-toggle-button-mocked on-class=\"bg-blue-500 text-white\" off-class=\"bg-gray-200 text-black\" snapshot-name=\"On-Off-Class-ToggleButton\" cls=\"\"><button class=\"inline-flex items-center justify-center relative box-border cursor-pointer select-none align-middle font-medium text-sm px-5 py-2.5 rounded transition-colors duration-200 border bg-gray-200 text-black\" type=\"button\"><slot-mocked> Toggle </slot-mocked></button> Toggle </wui-toggle-button-mocked> </slot-mocked>"
+}

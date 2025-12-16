@@ -1,4 +1,4 @@
-import { $, $$, defaults, type JSX, isObservable, customElement, type ElementAttributes, type Observable, type ObservableMaybe, type CustomElementChildren, type StyleEncapsulationProps, useEffect, useMemo } from "woby"
+import { $, $$, defaults, type JSX, isObservable, customElement, type ElementAttributes, type Observable, type ObservableMaybe, type CustomElementChildren, type StyleEncapsulationProps, useEffect, useMemo, HtmlClass } from "woby"
 import '@woby/chk'
 import './input.css'
 
@@ -7,17 +7,30 @@ type Variant = "circular" | "rounded" | "square" | "custom"
 
 // Define the Avatar props type
 type AvatarProps = {
-    src?: ObservableMaybe<string | null>;
-    alt?: ObservableMaybe<string>;
-    children?: ObservableMaybe<JSX.Child> & CustomElementChildren;
-    class?: ObservableMaybe<string>;
-    size?: ObservableMaybe<Size>;
-    variant?: ObservableMaybe<Variant>;
+    src?: ObservableMaybe<string | null>
+    alt?: ObservableMaybe<string>
+    children?: ObservableMaybe<JSX.Child> & CustomElementChildren
+    class?: ObservableMaybe<string>
+    size?: ObservableMaybe<Size>
+    variant?: ObservableMaybe<Variant>
 }
 
 // Default props
 const def = () => ({
-    cls: $(""),
+    /** 
+     * Custom CSS classes to apply to the avatar.
+     * 
+     * Class override mechanism:
+     * - `cls` prop: Used as the primary class, if undefined the default variant classes are used
+     * - `class` prop (aliased as `cn`): Additional classes that patch/extend the given classes
+     * 
+     * Usage:
+     * - When `cls` is undefined, the default variant classes are used
+     * - User can override the default class by providing a `cls` prop
+     * - `class` can be used to add additional classes to the component
+     */
+    cls: $('', HtmlClass) as JSX.Class | undefined,
+    class: $('', HtmlClass) as JSX.Class | undefined,
     src: $(null as string | null),
     alt: $("Avatar"),
     children: $(null as JSX.Child),
@@ -28,11 +41,11 @@ const def = () => ({
 const BASE_CLASS =
     "relative flex items-center justify-center align-middle select-none leading-none overflow-hidden shrink-0 text-white m-0 bg-[rgb(189,189,189)]"
 
-const variantStyle = {
-    circular: [BASE_CLASS, "rounded-full"].join(" ").trim(),
-    rounded: [BASE_CLASS, "rounded-xl"].join(" ").trim(),
-    square: [BASE_CLASS, "rounded-md"].join(" ").trim(),
-}
+const variantStyle = (cls: JSX.Class) => ({
+    circular: [cls ? cls : BASE_CLASS, " rounded-full"],
+    rounded: [cls ? cls : BASE_CLASS, " rounded-xl"],
+    square: [cls ? cls : BASE_CLASS, "rounded-md"],
+})
 
 const sizeStyle = {
     xs: "w-6 h-6 text-xs",
@@ -42,7 +55,7 @@ const sizeStyle = {
 }
 
 const Avatar = defaults(def, (props) => {
-    const { cls, src: src, alt: alt, children, size, type: variant, ...otherProps } = props
+    const { class: cn, cls, src, alt, children, size, type: variant, ...otherProps } = props
 
     // normalise src / alt into observables
     const srcObs = isObservable(src) ? (src as ObservableMaybe<string | null>) : $(src as string | null)
@@ -59,15 +72,9 @@ const Avatar = defaults(def, (props) => {
         return children ?? (a ? a[0] : "")
     })
 
-
-
     return (
         <div
-            class={[
-                () => variantStyle[$$(variant)],
-                () => sizeStyle[$$(size)],
-                cls
-            ]}
+            class={[() => (variantStyle($$(cls))[$$(variant)]), cn]}
             {...otherProps}
         >
             {child}
@@ -79,7 +86,7 @@ const Avatar = defaults(def, (props) => {
 }) as typeof Avatar
 
 // NOTE: Register the custom element
-customElement('wui-avatar', Avatar);
+customElement('wui-avatar', Avatar)
 
 // NOTE: Add the custom element to the JSX namespace
 declare module 'woby' {

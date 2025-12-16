@@ -1,20 +1,22 @@
-import { $, $$, ElementAttributes, HtmlString, Observable, ObservableMaybe, customElement, defaults, isObservable, useEffect, type JSX } from "woby"
+import { $, $$, ElementAttributes, HtmlClass, HtmlString, Observable, ObservableMaybe, customElement, defaults, isObservable, useEffect, type JSX } from "woby"
 import { Button } from "./Button"
 
 const defTabs = () => ({
-	cls: $(""),
+	cls: $('', HtmlClass) as JSX.Class | undefined,
+	class: $('', HtmlClass) as JSX.Class | undefined,
 	activeTag: $("", HtmlString) as ObservableMaybe<string>,
 	children: $(null) as JSX.Child
 })
 
 const defTab = () => ({
-	cls: $(""),
+	cls: $('', HtmlClass) as JSX.Class | undefined,
+	class: $('', HtmlClass) as JSX.Class | undefined,
 	title: $("", HtmlString) as ObservableMaybe<string>,
 	children: $(null) as JSX.Child
 })
 
 const Tabs = defaults(defTabs, (props) => {
-	const { cls, activeTag, children, ...otherProps } = props
+	const { cls, class: cn, activeTag, children, ...otherProps } = props
 
 	// 1. State
 	const currentTab = (isObservable(activeTag) ? activeTag : $(activeTag || "")) as Observable<string>
@@ -99,7 +101,7 @@ const Tabs = defaults(defTabs, (props) => {
 
 	return (
 		<div
-			class={cls}
+			class={[() => $$(cls) ? $$(cls) : "", cn]}
 			{...otherProps}
 			ref={mainRef}
 		>
@@ -143,11 +145,11 @@ const Tabs = defaults(defTabs, (props) => {
 }) as typeof Tabs
 
 const Tab = defaults(defTab, (props) => {
-	const { title, children, cls, ...otherProps } = props
+	const { title, children, cls, class: cn, ...otherProps } = props
 
 	return (
 		<div
-			class={cls}
+			class={[() => $$(cls) ? $$(cls) : "", cn]}
 			{...otherProps}
 			data-tab-title={$$(title)}
 			title={$$(title)}

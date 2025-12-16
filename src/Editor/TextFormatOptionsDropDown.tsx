@@ -72,7 +72,7 @@ export const TextFormatOptionsDropDown = () => {
             <div>
                 <Button
                     buttonType='outlined'
-                    class={["p-2"]}
+                    cls="p-2"
                     onClick={toggleDropdown}
                     title="More text formats"
                 >

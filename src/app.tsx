@@ -903,17 +903,17 @@ export function App() {
         const selectedFruitWithSearch_2 = $('Elderberry')
         const selectedFruitWithSearch_3 = $('Elderberry')
 
-        const visibleFruit = $(true)
-        const visibleNumber = $(true)
-        const visibleCarId = $(true)
-        const visibleFlavor = $(true)
-        const visibleFruitWithCustomItem = $(true)
-        const visibleFlavorWithCustomStyle = $(true)
-        const visibleFruitWithSearch_1 = $(true)
-        const visibleFruitWithSearch_2 = $(true)
-        const visibleFruitWithSearch_3 = $(true)
-        const visibleFruitWithHeader = $(true)
-        const visibleMultipleFruits = $(true)
+        const visibleFruit = $(false)
+        const visibleNumber = $(false)
+        const visibleCarId = $(false)
+        const visibleFlavor = $(false)
+        const visibleFruitWithCustomItem = $(false)
+        const visibleFlavorWithCustomStyle = $(false)
+        const visibleFruitWithSearch_1 = $(false)
+        const visibleFruitWithSearch_2 = $(false)
+        const visibleFruitWithSearch_3 = $(false)
+        const visibleFruitWithHeader = $(false)
+        const visibleMultipleFruits = $(false)
 
         const displayValue = useMemo(() => {
             return formatOptionDisplay($$(selectedCarId), JSON_CAR_DATA)
@@ -1994,7 +1994,7 @@ export function App() {
 
         // 2. Configuration State (Observables to change props dynamically)
         const sidebarWidth = $(280)
-        const showOverlay = $(true)
+        const mask = $(true)
         const demoTitle = $("Default Configuration")
 
         // 3. Helper functions to switch modes
@@ -2006,22 +2006,22 @@ export function App() {
                 switch (mode) {
                     case 'default':
                         sidebarWidth(280)
-                        showOverlay(true)
+                        mask(true)
                         demoTitle("Default Configuration")
                         break
                     case 'no-overlay':
                         sidebarWidth(280)
-                        showOverlay(false)
+                        mask(false)
                         demoTitle("No Overlay (Click Toggle to Close)")
                         break
                     case 'wide':
                         sidebarWidth(450)
-                        showOverlay(true)
+                        mask(true)
                         demoTitle("Wide Sidebar (450px)")
                         break
                     case 'narrow':
                         sidebarWidth(80)
-                        showOverlay(true)
+                        mask(true)
                         demoTitle("Narrow / Icon Mode (80px)")
                         break
                 }
@@ -2049,15 +2049,15 @@ export function App() {
                 This forces the 'fixed' sidebar to be contained within this div 
                 instead of the entire browser window.
             */}
-            <div class="relative w-full h-[600px] border border-gray-300 rounded-lg overflow-hidden bg-gray-50 shadow-inner" style={{ transform: 'scale(1)' }}>
+            <div class="relative w-full h-[600px] border border-gray-300 rounded-lg overflow-hidden bg-gray-50 shadow-inner flex items-start" style={{ transform: 'scale(1)' }}>
 
                 {/* --- The Sidebar Component --- */}
                 <SideBar
                     open={isOpen}
                     contentRef={contentRef}
                     width={sidebarWidth}
-                    showOverlay={showOverlay}
-                    cls="bg-gray-800 text-white"
+                    mask={mask}
+                    cls="bg-gray-800 text-white flex items-start"
                 >
                     <div class="flex flex-col h-full">
                         {/* Sidebar Header */}
@@ -2134,7 +2134,7 @@ export function App() {
                                 <p class="text-blue-700 text-sm">
                                     <strong>Current settings:</strong><br />
                                     Width: {sidebarWidth}px<br />
-                                    Overlay: {() => $$(showOverlay) ? 'Enabled' : 'Disabled'}
+                                    Overlay: {() => $$(mask) ? 'Enabled' : 'Disabled'}
                                 </p>
                             </div>
 
@@ -2929,7 +2929,6 @@ Placeholder: ${$$(showPlaceholder)} ("${$$(placeholderTxt)}")
     }
     // #endregion
 
-
     // #region Text Field Demo
     const textFieldDemo = () => {
         return <>
@@ -2938,50 +2937,50 @@ Placeholder: ${$$(showPlaceholder)} ("${$$(placeholderTxt)}")
                 <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
                     <h3 class="text-lg font-semibold mb-4 uppercase">Border Effect</h3>
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
-                        <TextField effect="effect1" placeholder="Effect 1" />
-                        <TextField effect="effect2" placeholder="Effect 2" />
-                        <TextField effect="effect3" placeholder="Effect 3" />
+                        <TextField effect="effect1" placeholder="Effect 1" class='m-[20px]' />
+                        <TextField effect="effect2" placeholder="Effect 2" class='m-[20px]' />
+                        <TextField effect="effect3" placeholder="Effect 3" class='m-[20px]' />
 
-                        <TextField effect="effect4" placeholder="Effect 4" />
-                        <TextField effect="effect5" placeholder="Effect 5" />
-                        <TextField effect="effect6" placeholder="Effect 6" />
+                        <TextField effect="effect4" placeholder="Effect 4" class='m-[20px]' />
+                        <TextField effect="effect5" placeholder="Effect 5" class='m-[20px]' />
+                        <TextField effect="effect6" placeholder="Effect 6" class='m-[20px]' />
 
-                        <TextField effect="effect7" placeholder="Effect 7" />
-                        <TextField effect="effect8" placeholder="Effect 8" />
-                        <TextField effect="effect9" placeholder="Effect 9" />
+                        <TextField effect="effect7" placeholder="Effect 7" class='m-[20px]' />
+                        <TextField effect="effect8" placeholder="Effect 8" class='m-[20px]' />
+                        <TextField effect="effect9" placeholder="Effect 9" class='m-[20px]' />
                     </div>
 
                     <h3 class="text-lg font-semibold mb-4 uppercase">Background Effect</h3>
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
-                        <TextField effect="effect10" placeholder="Effect 10" />
-                        <TextField effect="effect11" placeholder="Effect 11" />
-                        <TextField effect="effect12" placeholder="Effect 12" />
+                        <TextField effect="effect10" placeholder="Effect 10" class='m-[20px]' />
+                        <TextField effect="effect11" placeholder="Effect 11" class='m-[20px]' />
+                        <TextField effect="effect12" placeholder="Effect 12" class='m-[20px]' />
 
-                        <TextField effect="effect13" placeholder="Effect 13" />
-                        <TextField effect="effect14" placeholder="Effect 14" />
-                        <TextField effect="effect15" placeholder="Effect 15" />
+                        <TextField effect="effect13" placeholder="Effect 13" class='m-[20px]' />
+                        <TextField effect="effect14" placeholder="Effect 14" class='m-[20px]' />
+                        <TextField effect="effect15" placeholder="Effect 15" class='m-[20px]' />
                     </div>
 
                     <h3 class="text-lg font-semibold mb-4 uppercase">Input With Label Effect</h3>
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
-                        <TextField effect="effect16" label="Effect 16" />
-                        <TextField effect="effect17" label="Effect 17" />
-                        <TextField effect="effect18" label="Effect 18" />
+                        <TextField effect="effect16" label="Effect 16" class='m-[20px]' />
+                        <TextField effect="effect17" label="Effect 17" class='m-[20px]' />
+                        <TextField effect="effect18" label="Effect 18" class='m-[20px]' />
 
-                        <TextField effect="effect19" label="Effect 19" />
-                        <TextField effect="effect20" label="Effect 20" />
-                        <TextField effect="effect21" label="Effect 21" />
+                        <TextField effect="effect19" label="Effect 19" class='m-[20px]' />
+                        <TextField effect="effect20" label="Effect 20" class='m-[20px]' />
+                        <TextField effect="effect21" label="Effect 21" class='m-[20px]' />
 
-                        <TextField effect="effect22" label="Effect 22" />
-                        <TextField effect="effect23" label="Effect 23" />
-                        <TextField effect="effect24" label="Effect 24" />
+                        <TextField effect="effect22" label="Effect 22" class='m-[20px]' />
+                        <TextField effect="effect23" label="Effect 23" class='m-[20px]' />
+                        <TextField effect="effect24" label="Effect 24" class='m-[20px]' />
                     </div>
 
                     <h3 class="text-lg font-semibold mb-4 uppercase">Alternative Label Effects</h3>
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
-                        <TextField effect="effect19a" label="Effect 19a" />
-                        <TextField effect="effect20a" label="Effect 20a" />
-                        <TextField effect="effect21a" label="Effect 21a" />
+                        <TextField effect="effect19a" label="Effect 19a" class='m-[20px]' />
+                        <TextField effect="effect20a" label="Effect 20a" class='m-[20px]' />
+                        <TextField effect="effect21a" label="Effect 21a" class='m-[20px]' />
 
                     </div>
                 </div>

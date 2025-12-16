@@ -156,7 +156,7 @@ const FontSize = defaults(def, (props) => {
             title="Font size"
 
             onFocus={handleInputChange}
-            onBlur={handleInputChange}
+            onBlur={handleInputBlur}
 
             disabled={() => !$$(editable)}
             readOnly={() => !$$(editable)}
@@ -172,7 +172,6 @@ const FontSize = defaults(def, (props) => {
             {increaseSizeBtn}
         </div>
     )
-
 }) as typeof FontSize
 
 export { FontSize }

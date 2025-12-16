@@ -1,4 +1,0 @@
-{
-  "props": {},
-  "html": "<slot-mocked> <wui-toggle-button-mocked checked=\"true\" snapshot-name=\"Checked-ToggleButton\" off-class=\"text-[rgba(0,0,0,0.54)] hover:no-underline hover:bg-[rgba(0,0,0,0.04)]\" cls=\"\"><button class=\"rounded-tr-none rounded-br-none inline-flex items-center justify-center relative box-border cursor-pointer select-none align-middle leading-[1.75] tracking-[0.02857em] uppercase border m-0 border-[rgba(0,0,0,0.12)] [outline:0] text-[#1976d2] bg-[rgba(25,118,210,0.08)] hover:bg-[rgba(25,118,210,0.12)]\"><slot-mocked>Toggle</slot-mocked></button>Toggle</wui-toggle-button-mocked> </slot-mocked>"
-}

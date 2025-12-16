@@ -1,0 +1,4 @@
+{
+  "props": {},
+  "html": "<slot-mocked> <wui-toggle-button-mocked snapshot-name=\"Default-ToggleButton\">Toggle</wui-toggle-button-mocked> </slot-mocked>"
+}

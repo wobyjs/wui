@@ -1,4 +1,0 @@
-{
-  "props": {},
-  "html": "<slot-mocked> <wui-collapse-mocked snapshot-name=\"Open-Collapse-Html\" open=\"true\" background=\"\" cls=\"\"><div class=\"overflow-hidden transition-height duration-200 ease-in-out bg-[#ccc]\"><div class=\"h-fit\"><slot-mocked> <div class=\"p-4 bg-blue-100\"> <p>This collapse is explicitly set to open.</p> <p>The content should be visible.</p> </div> </slot-mocked></div></div> <div class=\"p-4 bg-blue-100\"> <p>This collapse is explicitly set to open.</p> <p>The content should be visible.</p> </div> </wui-collapse-mocked> </slot-mocked>"
-}

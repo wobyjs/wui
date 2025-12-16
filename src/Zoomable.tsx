@@ -1,5 +1,5 @@
 import { useEventListener } from "@woby/use"
-import { createContext, customElement, defaults, ElementAttributes, HtmlNumber, HtmlString, Observable, useContext, useEffect, useMemo, type ObservableMaybe } from "woby"
+import { createContext, customElement, defaults, ElementAttributes, HtmlClass, HtmlNumber, HtmlString, Observable, useContext, useEffect, useMemo, type ObservableMaybe } from "woby"
 import { $, $$ } from "woby"
 
 
@@ -15,7 +15,8 @@ const imgStyles = {
 }
 
 const def = () => ({
-    cls: $(""),
+    cls: $('', HtmlClass) as JSX.Class | undefined,
+    class: $('', HtmlClass) as JSX.Class | undefined,
     children: $(null),
     minScale: $(1, HtmlNumber) as ObservableMaybe<number>,
     maxScale: $(5, HtmlNumber) as ObservableMaybe<number>,
@@ -29,7 +30,8 @@ const def = () => ({
 })
 
 const defImg = () => ({
-    cls: $(""),
+    cls: $('', HtmlClass) as JSX.Class | undefined,
+    class: $('', HtmlClass) as JSX.Class | undefined,
     children: $(null),
     type: $("default", HtmlString) as ObservableMaybe<string>,
     alt: $("Image", HtmlString) as ObservableMaybe<string>,
@@ -42,7 +44,7 @@ export const useZoomable = () => useContext(ZoomableContext)
 
 const Zoomable = defaults(def, (props) => {
 
-    const { cls, children, minScale, maxScale, type, height, width, scale, x: translateX, y: translateY,...otherProps } = props
+    const { cls, class: cn, children, minScale, maxScale, type, height, width, scale, x: translateX, y: translateY, ...otherProps } = props
 
     const containerRef = $<HTMLDivElement>(null)
     const wrapperRef = $<HTMLDivElement>(null) // NEW: Ref for the inner wrapper
@@ -288,7 +290,8 @@ const Zoomable = defaults(def, (props) => {
                 () => zoomableStyles[$$(type)],
                 () => $$(isDown) ? "is-dragging cursor-grabbing" : "cursor-grab",
                 () => $$(pointerType) ? `pointer-${$$(pointerType)}` : "",
-                cls
+                () => $$(cls) ? $$(cls) : "",
+                cn
             ]}
             style={{
                 width: () => getSize($$(width)),
@@ -316,12 +319,12 @@ const Zoomable = defaults(def, (props) => {
 const Img = defaults(defImg, (props) => {
     // We just render the image. 
     // The Parent (Zoomable) handles the 'transform' via the wrapper div.
-    const { cls, type, alt, src, ...otherProps } = props
+    const { cls, class: cn, type, alt, src, ...otherProps } = props
 
     return (
         <>
             <img
-                class={[() => imgStyles[$$(type)], cls]}
+                class={[() => imgStyles[$$(type)], () => $$(cls) ? $$(cls) : "", cn]}
                 alt={alt}
                 src={src}
                 {...otherProps as any}

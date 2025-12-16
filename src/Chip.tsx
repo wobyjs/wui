@@ -1,4 +1,4 @@
-import { $, $$, defaults, type JSX, customElement, type ElementAttributes, type ObservableMaybe, useEffect, StyleEncapsulationProps, isObservable, Observable, HtmlBoolean } from "woby"
+import { $, $$, defaults, type JSX, customElement, type ElementAttributes, type ObservableMaybe, useEffect, StyleEncapsulationProps, isObservable, Observable, HtmlBoolean, HtmlClass } from "woby"
 import "@woby/chk"
 import "./input.css"
 import DeleteIcon from "./icons/delete_icon"
@@ -7,14 +7,27 @@ const def = () => ({
     avatar: $(null as JSX.Child),
     deleteIcon: $(<DeleteIcon /> as JSX.Element),
     children: $(null as JSX.Child),
-    cls: $(""),
+    /** 
+     * Custom CSS classes to apply to the chip.
+     * 
+     * Class override mechanism:
+     * - `cls` prop: Used as the primary class, if undefined the default classes are used
+     * - `class` prop (aliased as `cn`): Additional classes that patch/extend the given classes
+     * 
+     * Usage:
+     * - When `cls` is undefined, the default classes are used
+     * - User can override the default class by providing a `cls` prop
+     * - `class` can be used to add additional classes to the component
+     */
+    cls: $('', HtmlClass) as JSX.Class | undefined,
+    class: $('', HtmlClass) as JSX.Class | undefined,
     deletable: $(false, HtmlBoolean) as ObservableMaybe<boolean> | undefined,
     visible: $(true, HtmlBoolean) as ObservableMaybe<boolean> | undefined,
     onDelete: undefined as ((e: JSX.TargetedMouseEvent<HTMLDivElement>) => void) | undefined,
 })
 
 const Chip = defaults(def, (props) => {
-    const { avatar, deleteIcon, children, cls, deletable, visible, onDelete, ...otherProps } = props
+    const { class: cn, cls, avatar, deleteIcon, children, deletable, visible, onDelete, ...otherProps } = props
 
     // Create internal visible state if not provided as observable
     const internalVisible = isObservable(visible) ? visible : $(visible ?? true)
@@ -62,31 +75,28 @@ const Chip = defaults(def, (props) => {
                     </div>
                 )
             } else {
-                return null;
+                return null
             }
         }
 
         return (
             <div
-                class={() => [baseClass, $$(cls)].join(" ")}
+                class={[() => $$(cls) ? $$(cls) : baseClass, cn]}
                 tabIndex={0}
                 role="button"
                 {...otherProps}
             >
-
                 <span class="overflow-hidden text-ellipsis whitespace-nowrap px-3 py-1 inline-flex items-center gap-1">
                     {children}
-                    {/* <pre class="rounded-[4px] items-center border border-black-500 m-2 p-4"> */}
-                    {/* <p class="underline font-bold mb-2">Chip props</p> */}
-                    {/* <p class="font-bold my-2">Children: <span class="text-blue-500">{children}</span></p> */}
-                    {/* <p class="font-bold my-2">Class: <span class="text-blue-500">{() => $$(className)}</span></p> */}
-                    {/* <p class="font-bold my-2">Deletable: <span class="text-blue-500">{() => $$(deletable).toString()}</span></p> */}
-                    {/* <p class="font-bold my-2">Visible: <span class="text-blue-500">{() => $$(visible).toString()}</span></p> */}
-                    {/* </pre> */}
+                    {/* <pre class="rounded-[4px] items-center border border-black-500 m-2 p-4">
+						<p class="underline font-bold mb-2">Chip props</p>
+						<p class="font-bold my-2">Children: <span class="text-blue-500">{children}</span></p>
+						<p class="font-bold my-2">Class: <span class="text-blue-500">{() => $$(className)}</span></p>
+						<p class="font-bold my-2">Deletable: <span class="text-blue-500">{() => $$(deletable).toString()}</span></p>
+						<p class="font-bold my-2">Visible: <span class="text-blue-500">{() => $$(visible).toString()}</span></p>
+					</pre> */}
                 </span>
-
                 {isDeletable}
-
             </div>
         )
     }

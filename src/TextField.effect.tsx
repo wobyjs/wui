@@ -2,7 +2,7 @@
 
 /* necessary to give position: relative to parent. */
 //input[type='text']
-const inputText = "text-[#333] w-full box-border tracking-[1px]";
+const inputText = "text-[#333] w-full box-border tracking-[1px]"
 
 // #region Underline Effects 1-3
 const underline = "focus:[outline:none] border-0 px-0 py-[7px] border-b border-solid border-b-[#ccc] w-full"
@@ -92,9 +92,9 @@ export const effect3 = [
 
 // #region Box Effects 4-6
 const box =
-    "focus:[outline:none] pt-[5px] px-0 pb-[7px] border-0 border-b border-b-solid border-transparent border-b-[#ccc] duration-[0.4s] w-full h-full";
+    "focus:[outline:none] pt-[5px] px-0 pb-[7px] border-0 border-b border-b-solid border-transparent border-b-[#ccc] duration-[0.4s] w-full h-full"
 const focusBox =
-    "focus:w-full focus:pt-[5px] focus:px-3.5 focus:pb-[7px] focus:duration-[0.4s]";
+    "focus:w-full focus:pt-[5px] focus:px-3.5 focus:pb-[7px] focus:duration-[0.4s]"
 
 export const effect4 = [
     box,
@@ -162,7 +162,7 @@ export const effect6 = [
 
 // #region Outline Effects 7-9
 const outline =
-    "focus:[outline:none] border border-solid border-[#ccc] px-3.5 py-2 duration-[0.4s] w-full";
+    "focus:[outline:none] border border-solid border-[#ccc] px-3.5 py-2 duration-[0.4s] w-full"
 
 
 export const effect7 = [
@@ -389,7 +389,7 @@ export const effect7__ = `${outline}
 
 // #region Fill Effects 10-15
 const fill =
-    "focus:[outline:none] border border-solid border-[#ccc] px-[15px] py-[7px] bg-transparent relative w-full z-10";
+    "focus:[outline:none] border border-solid border-[#ccc] px-[15px] py-[7px] bg-transparent relative w-full z-10"
 
 export const effect10 = [
     fill,
@@ -572,7 +572,7 @@ export const effect15 = [
 
 
 // #region Labeled Underline Effects 16-18
-const underlineWithLabel = "focus:[outline:none] border-0 px-0 py-2 border-b border-solid border-[#ccc] bg-transparent z-10 w-full";
+const underlineWithLabel = "focus:[outline:none] border-0 px-0 py-2 border-b border-solid border-[#ccc] bg-transparent z-10 w-full"
 const underlineLabel = [
     /* ---------- label (base) ---------- */
     "[&~label]:absolute",
@@ -597,7 +597,9 @@ const underlineLabel = [
     "[&:not(:placeholder-shown)~label]:text-[12px]",
     "[&:not(:placeholder-shown)~label]:text-[#4caf50]",
     "[&:not(:placeholder-shown)~label]:duration-[0.3s]",
-].join(" ");
+    "[&:focus~label]:cursor-default",
+
+].join(" ")
 
 export const effect16 = [
     underlineWithLabel,
@@ -617,7 +619,6 @@ export const effect16 = [
 
     "[&:not(:placeholder-shown)~span]:w-full",
     "[&:not(:placeholder-shown)~span]:duration-[0.4s]",
-
 
 ].join(' ')
 
@@ -695,7 +696,7 @@ export const effect18 = [
 
 
 // #region Labeled Box Effects 19-21
-const boxWithLabel = "focus:[outline:none] border border-solid border-[#ccc] px-3.5 py-2 duration-[0.4s] bg-transparent z-10 w-full";
+const boxWithLabel = "focus:[outline:none] border border-solid border-[#ccc] px-3.5 py-2 duration-[0.4s] bg-transparent z-10 w-full"
 
 const boxLabel = [
     /* ---------- label (base) ---------- */
@@ -720,6 +721,7 @@ const boxLabel = [
     "[&:not(:placeholder-shown)~label]:left-0",
     "[&:not(:placeholder-shown)~label]:text-[#4caf50]",
     "[&:not(:placeholder-shown)~label]:duration-[0.3s]",
+    "[&:focus~label]:cursor-default",
 ].join(" ")
 
 
@@ -813,7 +815,6 @@ export const effect19 = [
 
 export const effect20 = [
     boxWithLabel,
-
     boxLabel,
 
     /* ---------- span ::before / ::after (base) ---------- */
@@ -896,9 +897,7 @@ export const effect20 = [
 ].join(" ")
 
 export const effect21 = [
-
     boxWithLabel,
-
     boxLabel,
 
     /* ---------- span ::before / ::after (base) ---------- */
@@ -999,7 +998,6 @@ export const effect21 = [
 const fillWithLabel = "focus:[outline:none] px-3.5 py-2 border border-solid border-[#ccc] relative bg-transparent z-10 w-full"
 
 const fillLabel = [
-
     /* ---------- label (base) ---------- */
     "[&~label]:absolute",
     "[&~label]:left-3.5",
@@ -1023,6 +1021,7 @@ const fillLabel = [
     "[&:not(:placeholder-shown)~label]:left-0",
     "[&:not(:placeholder-shown)~label]:text-[#333]",
     "[&:not(:placeholder-shown)~label]:duration-[0.3s]",
+    "[&:focus~label]:cursor-default",
 ].join(" ")
 
 export const effect22 = [
@@ -1105,7 +1104,6 @@ export const effect23 = [
 
 export const effect24 = [
     fillWithLabel, fillLabel,
-
 
     /* ---------- span ::before / ::after (base) ---------- */
     "[&~span]:before:content-['']",
@@ -1207,7 +1205,7 @@ const chipLabelBase = [
     "[&:not(:placeholder-shown)~label]:z-10",
     "[&:not(:placeholder-shown)~label]:py-1",
     "[&:not(:placeholder-shown)~label]:px-1",
-].join(" ");
+].join(" ")
 
 
 export const effect19a = [

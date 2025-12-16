@@ -8,11 +8,11 @@ import {
 	effect22, effect23, effect24,
 	effect19a, effect20a, effect21a,
 } from './TextField.effect'
-import { ObservableMaybe, $$, $, type JSX, isObservable, Observable, defaults, customElement, type ElementAttributes, HtmlBoolean, HtmlString, useMemo } from 'woby'
+import { ObservableMaybe, $$, $, type JSX, isObservable, Observable, defaults, customElement, type ElementAttributes, HtmlBoolean, HtmlString, useMemo, HtmlClass, useEffect } from 'woby'
 
 //https://codepen.io/maheshambure21/pen/EozKKy
 
-type INPUT_TYPE = "text" | "password" | "email" | "number" | "tel" | "url" | "search" | "date" | "datetime-local" | "month" | "week" | "time" | "color";
+type INPUT_TYPE = "text" | "password" | "email" | "number" | "tel" | "url" | "search" | "date" | "datetime-local" | "month" | "week" | "time" | "color"
 
 const effectMap: Record<string, string> = {
 	// Underline Effects
@@ -60,7 +60,8 @@ const effectMap: Record<string, string> = {
 }
 
 const def = () => ({
-	cls: $(""),
+	class: $('', HtmlClass) as JSX.Class | undefined,
+	cls: $('', HtmlClass) as JSX.Class | undefined,
 	children: $(null),
 	effect: $("effect19a", HtmlString) as ObservableMaybe<string> | undefined,
 	assignOnEnter: $(false, HtmlBoolean) as ObservableMaybe<boolean> | undefined,
@@ -72,6 +73,7 @@ const def = () => ({
 	onKeyUp: undefined as ((e: any) => void) | undefined,
 
 	label: $("", HtmlString) as ObservableMaybe<string> | undefined,
+	ref: undefined as ((el: HTMLInputElement) => void) | undefined,
 })
 
 /**
@@ -103,11 +105,26 @@ const def = () => ({
  */
 const TextField = defaults(def, (props) => {
 
-	const { cls, children, effect, assignOnEnter, value, inputType, placeholder, disabled, onChange, onKeyUp, label, ...otherProps } = props
+	const { cls, class: cn, children, effect, assignOnEnter, value, inputType, placeholder, disabled, onChange, onKeyUp, label, ref, ...otherProps } = props
 
-	const baseClass = "m-[20px] relative z-0"
+	const baseClass = "relative z-0"
 
+	const inputRef = $<HTMLInputElement | null>(null)
 
+	useEffect(() => {
+		if (ref && $$(inputRef)) {
+			ref($$(inputRef)!)
+		}
+	})
+
+	// // Expose focus method to forward focus to the input element
+	// Object.assign(props, {
+	// 	focus: () => {
+	// 		if (inputRef()) {
+	// 			inputRef()!.focus()
+	// 		}
+	// 	}
+	// })
 
 	// write me logic to check adnorment is exists or not
 	// const child = useMemo(() => {
@@ -127,18 +144,28 @@ const TextField = defaults(def, (props) => {
 	// })
 
 	const effectStyle = useMemo(() => {
-		const effectName = $$(effect);
-		return effectMap[effectName] || "";
+		const effectName = $$(effect)
+		return effectMap[effectName] || ""
 	})
 
-	return (
-		<div class={[baseClass, cls]}>
+	const handleFocus = () => {
+		if (inputRef()) {
+			inputRef()!.focus()
+		}
+	}
 
+	return (
+		<div
+			class={[baseClass, () => $$(cls) ? $$(cls) : "", cn]}
+			tabIndex={-1}
+			onFocus={handleFocus}
+		>
 
 			{/* if data-adnorment= start is exists render here */}
 			{/* {() => child().start} */}
 
 			<input
+				ref={inputRef}
 				class={effectStyle}
 				value={value}
 				disabled={disabled}
@@ -157,7 +184,7 @@ const TextField = defaults(def, (props) => {
 
 			<span class="focus-border focus-bg pointer-events-none"><i></i></span>
 
-			{() => $$(label) ? <label class="pointer-events-none">{label}</label> : null}
+			{() => $$(label) ? <label class="cursor-text">{label}</label> : null}
 
 			{/* if data-adnorment= end is exists render here */}
 			{/* {() => child().end} */}
@@ -169,7 +196,7 @@ const TextField = defaults(def, (props) => {
 
 
 const defAdornment = () => ({
-	cls: $(""),
+	cls: $('', HtmlClass) as JSX.Class | undefined,
 	children: $(null),
 })
 
@@ -186,14 +213,14 @@ const StartAdornment = defaults(defAdornment, (props) => {
 }) as typeof StartAdornment
 
 const defEndAdnorment = () => ({
-	cls: $(""),
+	cls: $('', HtmlClass) as JSX.Class | undefined,
 	children: $(null),
 })
 
 const EndAdornment = defaults(defAdornment, (props) => {
 	const { cls, children, ...otherProps } = props
 
-	const baseClass = "flex h-[0.01em] max-h-[2em] items-center whitespace-nowrap text-[rgba(0,0,0,0.54)] ml-2";
+	const baseClass = "flex h-[0.01em] max-h-[2em] items-center whitespace-nowrap text-[rgba(0,0,0,0.54)] ml-2"
 
 	return (
 		<div class={[baseClass, cls]} data-adnorment="end" {...otherProps}>
@@ -214,7 +241,7 @@ customElement('wui-end-adornment', EndAdornment)
 declare module 'woby' {
 	namespace JSX {
 		interface IntrinsicElements {
-			'wui-text-field': ElementAttributes<typeof TextField>,
+			'wui-text-field': ElementAttributes<typeof TextField> & { focus?: () => void },
 			'wui-start-adornment': ElementAttributes<typeof StartAdornment>,
 			'wui-end-adornment': ElementAttributes<typeof EndAdornment>,
 		}

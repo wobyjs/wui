@@ -8,7 +8,7 @@ import { BoldButton } from './BoldButton'
 import { ItalicButton } from './ItalicButton'
 import { UnderlineButton } from './UnderlineButton' // Added UnderlineButton
 import { EditorContext, UndoRedo, useUndoRedo } from './undoredo'
-import { FontSizeInput } from './FontSize' // Changed from Increase/Decrease
+import { FontSizeInput } from './FontSizeCopy' // Changed from Increase/Decrease
 import { BulletListButton, NumberedListButton } from './List'
 // import { Indent, Outdent } from './Indent' // Will be part of TextAlignDropDown
 
@@ -155,9 +155,9 @@ export const Editor = ({ onChange, children }: EditorProps) => {
                                         <NumberedListButton />
                                         {/* CheckListButton would go here */}
 
-                                        <Button buttonType='outlined' onClick={() => undo()} title="Undo" disabled={(() => $$(undos).length === 0)}><UndoIcon /></Button>
-                                        <Button buttonType='outlined' onClick={() => redo()} title="Redo" disabled={(() => $$(redos).length === 0)}><RedoIcon /></Button>
-                                        <Button buttonType='outlined' onClick={() => {
+                                        <Button type='outlined' onClick={() => undo()} title="Undo" disabled={(() => $$(undos).length === 0)}><UndoIcon /></Button>
+                                        <Button type='outlined' onClick={() => redo()} title="Redo" disabled={(() => $$(redos).length === 0)}><RedoIcon /></Button>
+                                        <Button type='outlined' onClick={() => {
                                             const editorNode = $$(editor)
                                             if (!editorNode) return
 
