@@ -1,8 +1,11 @@
 //@ts-ignore
-import { $, $$, defaults, type JSX, isObservable, customElement, type ElementAttributes, type Observable, type CustomElementChildren, type StyleEncapsulationProps, useEffect, HtmlBoolean, ObservableMaybe } from "woby"
+import { $, $$, defaults, type JSX, isObservable, customElement, type ElementAttributes, type Observable, type CustomElementChildren, type StyleEncapsulationProps, useEffect, HtmlBoolean, ObservableMaybe, HtmlString } from "woby"
 import '@woby/chk'
 import './input.css'
 
+
+export type ButtonStyles = "text" | "contained" | "outlined" | "icon" | "custom";
+export type ButtonFunction = "button" | "submit" | "reset";
 
 const variant = {
     text: `inline-flex items-center justify-center relative box-border bg-transparent cursor-pointer select-none align-middle no-underline 
@@ -125,8 +128,8 @@ const variantStyles = {
 }
 
 const def = () => ({
-    type: $("contained"),
-    buttonFunction: $("button"),
+    type: $("contained", HtmlString) as ObservableMaybe<string>,
+    buttonFunction: $("button", HtmlString) as ObservableMaybe<ButtonFunction>,
     children: $("Button"),
     checked: $(false, HtmlBoolean) as ObservableMaybe<boolean> | undefined,
     disabled: $(false, HtmlBoolean) as ObservableMaybe<boolean> | undefined,
@@ -170,7 +173,7 @@ const Button = defaults(def, (props) => {
 
     return (
         <button
-            type={() => $$(buttonFunction) as "button" | "submit" | "reset"}
+            type={() => $$(buttonFunction) as ButtonFunction}
             onClick={(e) => {
                 // Call the provided onClick handler if it exists
                 if (onClick) {
