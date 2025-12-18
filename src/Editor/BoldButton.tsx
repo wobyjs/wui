@@ -1,14 +1,14 @@
-import { Button } from '../Button'
+import { Button, ButtonStyles } from '../Button'
 import BoldIcon from '../icons/bold' // Renamed for clarity if Bold is a type/component elsewhere
 import { applyStyle, range, getCurrentRange } from './utils'
 import { useEditor } from './undoredo' // useUndoRedo not directly needed here anymore
-import { $, $$, customElement, defaults, ElementAttributes, Observable, useEffect } from 'woby'
+import { $, $$, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlString, Observable, ObservableMaybe, useEffect } from 'woby'
 
 const def = () => ({
-    buttonType: $("outlined" as "text" | "contained" | "outlined" | "icon"),
-    title: $("Bold"),
+    buttonType: $("outlined", HtmlString) as ObservableMaybe<ButtonStyles>,
+    title: $("Bold", HtmlString) as ObservableMaybe<string>,
     cls: $(""),
-    disabled: $(false) as Observable<boolean>,
+    disabled: $(false, HtmlBoolean) as Observable<boolean>,
 })
 
 
@@ -94,7 +94,7 @@ const BoldButton = defaults(def, (props) => {
         <Button
             type={btnType}
             title={title}
-            cls={[
+            class={[
                 cls, "size-fit",
                 () => $$(isActive) ? '!bg-slate-200' : ''
             ]}

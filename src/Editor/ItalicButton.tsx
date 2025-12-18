@@ -64,7 +64,7 @@ const ItalicButton = defaults(def, (props) => {
         <Button
             type={btnType}
             title={title}
-            cls={[
+            class={[
                 cls, "size-fit",
                 () => $$(isActive) ? '!bg-slate-200' : ''
             ]}

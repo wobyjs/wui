@@ -112,7 +112,7 @@ const TextStyleButton = defaults(def, (props) => {
         <Button
             type={btnType}
             title={displayTitle}
-            cls={[
+            class={[
                 cls, "size-fit",
                 () => $$(isActive) ? '!bg-slate-200' : ''
             ]}
