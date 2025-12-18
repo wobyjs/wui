@@ -108,7 +108,7 @@ declare module 'woby' {
 
 export default AlignButton
 
-const applyTextAlign = (alignment: 'left' | 'center' | 'right', editor: Observable<HTMLDivElement>) => {
+export const applyTextAlign = (alignment: 'left' | 'center' | 'right', editor: Observable<HTMLDivElement>) => {
     // Get selection directly from window to ensure it's current
     const windowSelection = window.getSelection()
     if (!windowSelection || windowSelection.rangeCount === 0) {

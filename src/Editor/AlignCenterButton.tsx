@@ -1,27 +1,28 @@
-import { $, $$, defaults, type JSX, isObservable, customElement, type ElementAttributes, type Observable, type CustomElementChildren, type StyleEncapsulationProps, useEffect, HtmlClass } from "woby"
+import { $, $$, defaults, type JSX, isObservable, customElement, type ElementAttributes, type Observable, type CustomElementChildren, type StyleEncapsulationProps, useEffect, HtmlClass, HtmlString, ObservableMaybe, HtmlBoolean } from "woby"
 import '@woby/chk'
 import '../input.css'
 
-import { Button } from '../Button'
+import { Button, ButtonStyles } from '../Button'
 import AlignCenter from '../icons/align_center'
 import { useEditor } from './undoredo'
-import { applyTextAlign } from './AlignLeftButton'
+import { applyTextAlign } from './AlignButton'
 
 // Default props
 const def = () => ({
-    buttonType: $("outlined" as "text" | "contained" | "outlined" | "icon"),
-    title: $("Align Center"),
+    buttonType: $("outlined", HtmlString) as ObservableMaybe<ButtonStyles>,
+    title: $("Align Center", HtmlString) as ObservableMaybe<string>,
     cls: $('', HtmlClass) as JSX.Class | undefined,
     class: $('', HtmlClass) as JSX.Class | undefined,
-    disabled: $(false) as Observable<boolean>,
+    disabled: $(false, HtmlBoolean) as Observable<boolean>,
 })
+
 const AlignCenterButton = defaults(def, (props) => {
     const { buttonType, title, cls, class: cn, disabled, ...otherProps } = props
     const editor = useEditor()
 
     return (
         <Button
-            buttonType={buttonType}
+            type={buttonType}
             title={title}
             class={[() => $$(cls) ? $$(cls) : "", cn]}
             disabled={disabled}
@@ -34,21 +35,7 @@ const AlignCenterButton = defaults(def, (props) => {
         </Button>
     )
 }) as typeof AlignCenterButton & StyleEncapsulationProps
-// const AlignCenterButton = () => {
-//     const editor = useEditor()
 
-//     return (
-//         <Button 
-//             buttonType='outlined' 
-//             title="Align Center"
-//             onClick={() => {
-//                 applyTextAlign('center', editor)
-//             }}
-//         >
-//             <AlignCenter />
-//         </Button>
-//     )
-// }
 
 export { AlignCenterButton }
 
@@ -65,21 +52,3 @@ declare module 'woby' {
 }
 
 export default AlignCenterButton
-
-// #region Original AlignCenterButton
-// import { Button } from '../Button'
-// import AlignCenter from '../icons/align_center'
-// import { useEditor } from './undoredo' // Removed useUndoRedo
-// import { applyTextAlign } from './AlignLeftButton'
-
-// export const AlignCenterButton = () => {
-//     // const { undos, saveDo } = useUndoRedo() // Removed
-//     const editor = useEditor()
-
-//     return <Button buttonType='outlined' onClick={() => {
-//         // saveDo(undos) // Removed: MutationObserver in Editor.tsx should now handle this
-
-//         applyTextAlign('center', editor)
-//     }} title="Align Center"><AlignCenter /></Button>
-// }
-// #endregion
