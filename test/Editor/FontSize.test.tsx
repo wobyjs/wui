@@ -3,7 +3,7 @@ import { $ } from 'woby'
 import { FontSize } from '../../src/Editor/FontSize'
 import { EditorContext, UndoRedo } from '../../src/Editor/undoredo'
 
-const SampleFontSize = () => {
+const FontSizeDemo = () => {
     const editorRef = $({} as HTMLDivElement)
     return <>
         <EditorContext.Provider value={editorRef}>
@@ -23,5 +23,5 @@ const SampleFontSize = () => {
 }
 
 export {
-    SampleFontSize,
+    FontSizeDemo,
 }
