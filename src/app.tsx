@@ -37,6 +37,7 @@ import { TextFormatOptionsDropDown } from './Editor/TextFormatOptionsDropDown'
 import { TextColorPicker } from './Editor/TextColorPicker'
 import { TextBackgroundColorPicker } from './Editor/TextBackgroundColorPicker'
 import { Indent } from './Editor/Indent'
+import { ListButton } from './Editor/List'
 
 const isDev = typeof import.meta.env !== 'undefined' && import.meta.env.DEV
 
@@ -101,6 +102,9 @@ export function App() {
                     </a>
                     <a href="#indent" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
                         Indent
+                    </a>
+                    <a href="#listbutton" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                        List
                     </a>
                     <a href="#card" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
                         Card
@@ -599,6 +603,35 @@ export function App() {
         </>
     }
     // #endregion
+
+    // #region List Button Demo
+    const listButtonDemo = () => {
+        return <>
+            <h2 id="listbutton" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">List Demo</h2>
+            <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                <EditorContext.Provider value={editorRef}>
+                    <UndoRedo>
+                        <div class="mb-4">
+                            <div class="flex gap-4 items-center my-2 border border-gray-300 rounded p-4">
+                                <ListButton mode="bullet" />
+                                <ListButton mode="number" />
+                            </div>
+                            <div
+                                ref={editorRef}
+                                contentEditable
+                                class="border border-gray-300 rounded p-4 min-h-[200px] mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            >
+                                <p>Select this text and try the List Buttons above!</p>
+                                <p>You can create bullet or numbered lists.</p>
+                            </div>
+                        </div>
+                    </UndoRedo>
+                </EditorContext.Provider>
+            </div>
+        </>
+    }
+    // #endregion
+
 
     // #endregion
 
@@ -3587,6 +3620,7 @@ underline:  ${$$(isUnderline)}`}
                 {textColorPickerDemo}
                 {textBackgroundColorPickerDemo}
                 {indentDemo}
+                {listButtonDemo}
 
                 {cardDemo}
                 {checkboxDemo}

@@ -21,6 +21,7 @@
     <script type="module" src="../src/Editor/TextColorPicker.tsx"></script>
     <script type="module" src="../src/Editor/TextBackgroundColorPicker.tsx"></script>
     <script type="module" src="../src/Editor/Indent.tsx"></script>
+    <script type="module" src="../src/Editor/List.tsx"></script>
     <script type="module" src="../src/Card.tsx"></script>
     <script type="module" src="../src/Checkbox.tsx"></script>
     <script type="module" src="../src/Chip.tsx"></script>
@@ -127,6 +128,10 @@
             <a href="#indent"
                 class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
                 Indent
+            </a>
+            <a href="#listbutton"
+                class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                List Button
             </a>
             <a href="#card"
                 class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
@@ -603,6 +608,28 @@
     </template>
     <!-- #endregion -->
 
+    <!-- #region list button -->
+    <template id="list-button-demo">
+        <h2 id="listbutton" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">List Button Demo</h2>
+        <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+            <EditorContext.Provider value={editorRef}>
+                <UndoRedo>
+                    <div class="mb-4">
+                        <div class="flex gap-4 items-center my-2">
+                            <wui-list-button mode="bullet"></wui-list-button>
+                            <wui-list-button mode="number"></wui-list-button>
+                        </div>
+                        <div ref={editorRef} contentEditable
+                            class="border border-gray-300 rounded p-4 min-h-[200px] mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <p>Select this text and try the List Buttons above!</p>
+                            <p>You can create bullet or numbered lists.</p>
+                        </div>
+                    </div>
+                </UndoRedo>
+            </EditorContext.Provider>
+        </div>
+    </template>
+    <!-- #endregion -->
 
     <!-- #endregion -->
 
@@ -2544,6 +2571,7 @@ Underline:<span id="debug-toggle-underline">false</span></pre>
                 'text-color-picker-demo',
                 'text-background-color-picker-demo',
                 'indent-demo',
+                'list-button-demo',
 
                 'card-demo',
                 'checkbox-demo',
