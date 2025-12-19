@@ -1,4 +1,4 @@
-import { $, $$, JSX, Observable, ObservableMaybe, ObservableReadonly, Context, defaults, HtmlString, customElement, ElementAttributes } from 'woby'
+import { $, $$, JSX, Observable, ObservableMaybe, ObservableReadonly, Context, defaults, HtmlString, customElement, ElementAttributes, isObservable } from 'woby'
 import { Button, ButtonStyles } from '../Button'
 import { EditorContext, useEditor, useUndoRedo } from './undoredo'
 import { applyStyle } from './utils' // Import applyStyle
@@ -24,7 +24,11 @@ const TextColorPicker = defaults(def, (props) => {
     // Updates selectedColor when the color input changes
     const handleNativeColorInputChange = (e: JSX.TargetedEvent<HTMLInputElement, Event>) => {
         const newColor = e.currentTarget.value
-        selectedColor(newColor)
+        if (isObservable(selectedColor)) {
+            selectedColor(newColor)
+        }
+
+        // selectedColor(newColor)
         applyPickedColor()
     }
 

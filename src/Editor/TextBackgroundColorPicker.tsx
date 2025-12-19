@@ -24,7 +24,10 @@ const TextBackgroundColorPicker = defaults(def, (props) => {
     // Updates selectedBgColor when the color input changes
     const handleNativeBgColorInputChange = (e: JSX.TargetedEvent<HTMLInputElement, Event>) => {
         const newColor = e.currentTarget.value
-        selectedBgColor(newColor)
+        if (isObservable(selectedBgColor)) {
+            selectedBgColor(newColor)
+        }
+
         applyPickedBgColor() // Apply color immediately after input change
     }
 
