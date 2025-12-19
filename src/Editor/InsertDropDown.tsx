@@ -1,8 +1,10 @@
-import { $, $$, JSX, Observable } from 'woby'
+import { $, $$, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlString, JSX, Observable, ObservableMaybe } from 'woby'
 import { Button } from '../Button'
 import { EditorContext, useUndoRedo } from './undoredo'
 import { useOnClickOutside } from '@woby/use'
 import { range, getCurrentRange } from './utils' // Import getCurrentRange
+import KeyboardDownArrow from '../icons/keyboard_down_arrow'
+import Plus from '../icons/plus'
 
 // Icons - placeholders, replace with actual SVGs or components
 const HorizontalRuleIcon = () => <span>HR</span>
@@ -14,11 +16,14 @@ const GifIcon = () => <span>GIF</span>
 // Re-implement or import insertImage and insertTable if they are not globally accessible
 // For now, assuming they might be passed via context or props if needed, or re-implemented simply.
 
+// #region Insert Actions
 const execInsertHorizontalRule = () => {
-    document.execCommand('insertHorizontalRule', false)
+    // document.execCommand('insertHorizontalRule', false)
+    const hrWithClasses = '<hr class="my-4 mx-auto border-gray-400" />'
+    document.execCommand('insertHTML', false, hrWithClasses)
 }
 
-const execInsertImage = () => {
+const execInsertImage_ = () => {
     const r = getCurrentRange()
     if (!r) return
     const imageUrl = prompt('Enter image URL:')
@@ -31,7 +36,23 @@ const execInsertImage = () => {
     r.insertNode(imgElement)
 }
 
-const execInsertTable = () => {
+const execInsertImage = () => {
+    const selection = window.getSelection()
+    if (!selection || selection.rangeCount === 0) return
+    const range = selection.getRangeAt(0)
+
+    const imageUrl = prompt('Enter image URL:')
+    if (!imageUrl) return
+
+    selection.removeAllRanges()
+    selection.addRange(range)
+
+    const imgHtml = `<img src="${imageUrl}" class="max-w-full h-auto my-2" />`
+
+    document.execCommand('insertHTML', false, imgHtml)
+}
+
+const execInsertTable_ = () => {
     const r = getCurrentRange()
     if (!r) return
     const rowsStr = prompt('Enter number of rows:', '2')
@@ -65,8 +86,53 @@ const execInsertTable = () => {
     }
 }
 
+const execInsertTable = () => {
+    // 1. Capture selection before Prompt steals focus
+    const selection = window.getSelection()
+    if (!selection || selection.rangeCount === 0) return
+    const range = selection.getRangeAt(0)
 
-const insertOptions = [
+    const rowsStr = prompt('Enter number of rows:', '2')
+    // If user cancels, stop immediately
+    if (rowsStr === null) return
+
+    const colsStr = prompt('Enter number of columns:', '3')
+    if (colsStr === null) return
+
+    const rows = parseInt(rowsStr, 10)
+    const cols = parseInt(colsStr, 10)
+
+    if (isNaN(rows) || isNaN(cols) || rows <= 0 || cols <= 0) {
+        alert('Invalid number of rows or columns.')
+        return
+    }
+
+    // 2. Restore Selection
+    // The prompts caused the editor to lose focus. We must restore it
+    // so execCommand knows where to put the table.
+    selection.removeAllRanges()
+    selection.addRange(range)
+
+    // 3. Build HTML String
+    // Added 'w-full' to make the table expand to fit the editor
+    let tableHTML = '<table class="w-full border-collapse border border-gray-400 my-2"><tbody>'
+
+    for (let i = 0; i < rows; i++) {
+        tableHTML += '<tr>'
+        for (let j = 0; j < cols; j++) {
+            // Added min-w-[50px] so empty cells are clickable/visible
+            tableHTML += '<td class="border border-gray-300 p-2 min-w-[50px]">&nbsp;</td>'
+        }
+        tableHTML += '</tr>'
+    }
+    tableHTML += '</tbody></table><br>' // Add <br> so user can click/type after table
+
+    // 4. Insert Safe HTML
+    document.execCommand('insertHTML', false, tableHTML)
+}
+// #endregion
+
+const INSERT_OPTIONS = [
     { label: 'Horizontal Rule', action: execInsertHorizontalRule, icon: HorizontalRuleIcon },
     // { label: 'Page Break', action: () => console.log('Insert Page Break (TODO)'), icon: () => <span>PB</span> },
     { label: 'Image', action: execInsertImage, icon: ImageIcon },
@@ -84,7 +150,16 @@ const insertOptions = [
     // { label: 'Figma Document', action: () => console.log('Insert Figma (TODO)'), icon: () => <span>Fig</span> },
 ]
 
-export const InsertDropDown = () => {
+const def = () => ({
+    cls: $(""),
+    class: $(""),
+    disabled: $(false, HtmlBoolean) as ObservableMaybe<boolean>
+})
+
+const InsertDropDown = defaults(def, (props) => {
+
+    const { cls, class: className, disabled, ...otherProps } = props
+
     const editor = $(EditorContext)
     // const { undos, saveDo } = useUndoRedo() // Removed as saveDo is handled by MutationObserver
     const isOpen = $(false)
@@ -103,47 +178,77 @@ export const InsertDropDown = () => {
         isOpen(false)
     }
 
+    const DropDownMenu = () => {
+        return (
+            <div
+                class="origin-top-left absolute left-0 mt-2 w-64 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10 max-h-80 overflow-y-auto"
+                role="menu"
+                aria-orientation="vertical"
+                aria-labelledby="insert-menu-button"
+                onMouseDown={(e) => {
+                    e.stopPropagation() // Prevents the menu from closing immediately
+                    e.preventDefault()  // Prevents the editor from losing focus
+                }}
+            >
+                <div class="py-1" role="none">
+                    {INSERT_OPTIONS.map(opt => (
+                        <Button
+                            type='outlined'
+                            cls="w-full flex items-center text-gray-700 px-4 py-2 text-sm hover:bg-gray-100 hover:text-gray-900"
+                            role="menuitem"
+                            onClick={(e) => { e.preventDefault(); handleSelectOption(opt.action) }}
+                        >
+                            <span class="w-1/5 flex justify-center shrink-0">
+                                <opt.icon />
+                            </span>
+
+                            <span class="w-4/5 text-left truncate">
+                                {opt.label}
+                            </span>
+                        </Button>
+                    ))}
+                </div>
+            </div>
+        )
+    }
+    const BASE_BTN = "size-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-black hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500"
+
     return (
-        <div className="relative inline-block text-left" ref={dropdownRef}>
+        <div class="relative inline-block text-left" ref={dropdownRef}>
             <div>
                 <Button
-                    buttonType='outlined'
-                    cls="p-2 h-8"
+                    type='outlined'
+                    cls={() => [BASE_BTN]}
                     onClick={toggleDropdown}
                     title="Insert content"
+                    disabled={disabled}
                 >
-                    {/* Placeholder Icon for Insert */}
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                    </svg>
-                    <svg className="ml-1 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                        <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                    </svg>
+                    <span class="text-center truncate">
+                        <Plus class="size-5" />
+                    </span>
+                    <span class="flex justify-end">
+                        <KeyboardDownArrow class="-mr-1 ml-2 h-5 w-5" />
+                    </span>
                 </Button>
             </div>
 
             {() => $$(isOpen) && (
-                <div
-                    className="origin-top-left absolute left-0 mt-2 w-64 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10 max-h-80 overflow-y-auto"
-                    role="menu"
-                    aria-orientation="vertical"
-                    aria-labelledby="insert-menu-button"
-                >
-                    <div className="py-1" role="none">
-                        {insertOptions.map(opt => (
-                            <a
-                                href="#"
-                                className="text-gray-700 group flex items-center px-4 py-2 text-sm hover:bg-gray-100 hover:text-gray-900"
-                                role="menuitem"
-                                onClick={(e) => { e.preventDefault(); handleSelectOption(opt.action) }}
-                            >
-                                <opt.icon />
-                                <span className="ml-3">{opt.label}</span>
-                            </a>
-                        ))}
-                    </div>
-                </div>
+                <DropDownMenu />
             )}
         </div>
     )
+})
+
+export { InsertDropDown }
+
+customElement('wui-insert-dropdown', InsertDropDown)
+
+declare module 'woby' {
+    namespace JSX {
+        interface IntrinsicElements {
+            'wui-insert-dropdown': ElementAttributes<typeof InsertDropDown>
+        }
+    }
 }
+
+export default InsertDropDown
