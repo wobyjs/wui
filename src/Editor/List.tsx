@@ -1,108 +1,148 @@
-import { $$, Observable, } from 'woby'
-import { Button } from '../Button'
+import { $, $$, customElement, defaults, ElementAttributes, HtmlString, Observable, ObservableMaybe, } from 'woby'
+import { Button, ButtonStyles } from '../Button'
 import ListBulleted from '../icons/list_bulleted'
 import ListNumbered from '../icons/list_numbered'
-import { expandRange, cloneAttributes, isTags, getElementsInRange } from './utils'
-import { useEditor } from './undoredo' // Removed useUndoRedo
+import { useEditor } from './undoredo'
 
-const semanticTags = ['TABLE', 'TBODY', 'THEAD', 'TFOOT', 'TR', 'TD', 'IMG', 'BLOCKQUOTE',
-    'ARTICLE', 'ASIDE', 'DETAILS', 'FIGCAPTION', 'FIGURE', 'FOOTER', 'HEADER', 'MAIN', 'MARK', 'NAV', 'SECTION', 'SUMMARY', 'TIME',
-]
-
+/**
+ * Inserts a list (UL or OL) and applies the specified CSS classes.
+ */
 const insertList = (
-    editor: Observable<HTMLDivElement>,
-    tag: 'ol' | 'ul' = 'ul',
-    className = 'list-inside',
-    liClass = 'list-disc'
+    editorObs: HTMLElement | null | undefined,
+    listTag: 'ul' | 'ol',
+    className: string
 ) => {
-    const r = expandRange()
-    if (!r) return
+    // 1. Resolve Editor Root
+    // We try to use the passed editor object first (if Context works)
+    let root = (editorObs instanceof HTMLElement) ? editorObs : null
 
-    const selectedBlocks = getElementsInRange(r, editor)
-    if (selectedBlocks.length === 0) return
+    const selection = window.getSelection()
 
-    const liClassList = liClass.split(' ')
-    const newList = document.createElement(tag)
-    newList.className = className
+    // Fallback: If no root from context, find it via selection
+    if (!root) {
+        if (!selection || selection.rangeCount === 0) return
 
-    const parentList = selectedBlocks[0].closest?.('ul,ol')
-    const selectedLis = selectedBlocks.filter(el => el.tagName === 'LI' && el.closest('ul,ol') === parentList)
+        let node = selection.getRangeAt(0).commonAncestorContainer
+        if (node.nodeType === Node.TEXT_NODE) node = node.parentNode!
 
-    // Case 1: Selection within one list
-    if (selectedLis.length > 0 && parentList) {
-        const isSameType = parentList.tagName.toLowerCase() === tag
-
-        if (isSameType) {
-            // Just toggle class
-            selectedLis.forEach(li => {
-                li.classList.remove('list-disc', 'list-decimal')
-                li.classList.add(...liClassList)
-            })
-        } else {
-            // Nest a new list with cloned selected <li>s
-            const nestedList = document.createElement(tag)
-            nestedList.className = className
-
-            selectedLis.forEach(li => {
-                const cloned = li.cloneNode(true) as HTMLElement
-                cloned.classList.remove('list-disc', 'list-decimal')
-                cloned.classList.add(...liClassList)
-                nestedList.appendChild(cloned)
-            })
-
-            const wrapperLi = document.createElement('li')
-            wrapperLi.appendChild(nestedList)
-
-            // Insert before first selected <li>
-            parentList.insertBefore(wrapperLi, selectedLis[0])
-
-            // Remove selected <li>s after insertion
-            selectedLis.forEach(li => li.remove())
-        }
-        return
+        // Find the editable wrapper
+        root = (node as HTMLElement).closest('[contenteditable="true"]') as HTMLElement
     }
 
-    // Case 2: Generic block wrapping
-    for (const block of selectedBlocks) {
-        if (block.tagName === 'TABLE' || block.closest('table')) {
-            const li = document.createElement('li')
-            li.classList.add(...liClassList)
-            li.appendChild(block.cloneNode(true))
-            cloneAttributes(li, block)
-            newList.appendChild(li)
-            block.remove()
-        } else {
-            const li = document.createElement('li')
-            li.classList.add(...liClassList)
-            li.append(...Array.from(block.childNodes)) // move children
-            cloneAttributes(li, block)
-            newList.appendChild(li)
-            block.remove()
+    if (!root) return
+
+    // 2. Ensure Focus & Execute
+    // Focus is required for execCommand to target the correct area
+    root.focus()
+
+    const command = listTag === 'ul' ? 'insertUnorderedList' : 'insertOrderedList'
+    document.execCommand(command, false)
+
+    // 3. Apply Styling (Primary Method)
+    // We search UP from the current cursor position to find the new list element
+    const newSelection = window.getSelection()
+    if (newSelection && newSelection.rangeCount > 0) {
+        const range = newSelection.getRangeAt(0)
+        let current = range.commonAncestorContainer
+
+        // Traverse up to find the UL/OL
+        let depth = 0
+        while (current && current !== root && depth < 20) {
+            if (current.nodeType === Node.ELEMENT_NODE) {
+                const el = current as HTMLElement
+                const tag = el.tagName.toLowerCase()
+
+                if (tag === 'ul' || tag === 'ol') {
+                    el.className = className
+                    break
+                }
+            }
+            current = current.parentNode
+            depth++
         }
     }
 
-    r.deleteContents()
-    r.insertNode(newList)
+    // 4. Styling Fallback (Crucial for Empty Lines)
+    // Sometimes selection logic fails on empty nodes. This ensures ALL lists have style.
+    // We look for any UL/OL in the root that doesn't have our Tailwind classes yet.
+    const rawLists = root.querySelectorAll(`${listTag}:not([class*="list-"])`)
+    rawLists.forEach(l => l.className = className)
 }
 
+type ListMode = "bullet" | "number"
 
+const def = () => ({
+    cls: $(""),
+    class: $(""),
+    buttonType: $("outlined", HtmlString) as ObservableMaybe<ButtonStyles>,
+    mode: $("bullet", HtmlString) as ObservableMaybe<ListMode>,
+})
 
-export const BulletListButton = () => {
-    // const { undos, saveDo } = useUndoRedo() // Removed
+const ListButton = defaults(def, (props) => {
+    const { class: cn, cls, mode, buttonType: btnType, ...otherProps } = props
+
     const editor = useEditor()
 
-    return <Button buttonType='outlined' onClick={() => {
-        // saveDo(undos) // Removed: MutationObserver in Editor.tsx should now handle this
-        insertList(editor, 'ul', 'list-inside list-disc')
-    }} title="Bulleted List"><ListBulleted /></Button>
+    // Reactive Icon
+    const icon = () => {
+        const m = $$(mode)
+        if (m === "bullet") return <ListBulleted class="text-black size-6" />
+        if (m === "number") return <ListNumbered class="text-black size-6" />
+        return <ListBulleted class="text-black size-6" />
+    }
+
+    // Reactive Title
+    const title = () => {
+        const m = $$(mode)
+        if (m === "bullet") return "Bulleted List"
+        if (m === "number") return "Numbered List"
+        return "List"
+    }
+
+    const handleClick = (e: MouseEvent) => {
+        e.preventDefault(); // Stop button from stealing focus
+
+        // Unwrap editor before passing
+        const currentEditor = $$(editor) as HTMLElement | null
+
+        switch ($$(mode)) {
+            case "bullet":
+                insertList(currentEditor, 'ul', 'list-inside list-disc')
+                break
+            case "number":
+                insertList(currentEditor, 'ol', 'list-inside list-decimal')
+                break
+        }
+    }
+
+    const handleMouseDown = (e: MouseEvent) => {
+        e.preventDefault(); // Prevent focus loss on click
+    }
+
+    return (
+        <Button
+            type={btnType}
+            onClick={handleClick}
+            onMouseDown={handleMouseDown}
+            title={title}
+            class={[cls, cn]}
+            {...otherProps}
+        >
+            {icon}
+        </Button>
+    )
+})
+
+export { ListButton }
+
+customElement('wui-list-button', ListButton)
+
+declare module 'woby' {
+    namespace JSX {
+        interface IntrinsicElements {
+            'wui-list-button': ElementAttributes<typeof ListButton>
+        }
+    }
 }
 
-export const NumberedListButton = () => {
-    // const { undos, saveDo } = useUndoRedo() // Removed
-    const editor = useEditor()
-
-    return <Button buttonType='outlined' onClick={() => {
-        // saveDo(undos) // Removed: MutationObserver in Editor.tsx should now handle this
-        insertList(editor, 'ol', 'list-inside', 'list-decimal')
-    }} title="Numbered List"><ListNumbered /></Button>
-}
+export default ListButton
