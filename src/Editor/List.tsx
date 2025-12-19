@@ -1,73 +1,8 @@
-import { $, $$, customElement, defaults, ElementAttributes, HtmlString, Observable, ObservableMaybe, } from 'woby'
+import { $, $$, customElement, defaults, ElementAttributes, HtmlString, ObservableMaybe, useEffect, } from 'woby'
 import { Button, ButtonStyles } from '../Button'
 import ListBulleted from '../icons/list_bulleted'
 import ListNumbered from '../icons/list_numbered'
 import { useEditor } from './undoredo'
-
-/**
- * Inserts a list (UL or OL) and applies the specified CSS classes.
- */
-const insertList = (
-    editorObs: HTMLElement | null | undefined,
-    listTag: 'ul' | 'ol',
-    className: string
-) => {
-    // 1. Resolve Editor Root
-    // We try to use the passed editor object first (if Context works)
-    let root = (editorObs instanceof HTMLElement) ? editorObs : null
-
-    const selection = window.getSelection()
-
-    // Fallback: If no root from context, find it via selection
-    if (!root) {
-        if (!selection || selection.rangeCount === 0) return
-
-        let node = selection.getRangeAt(0).commonAncestorContainer
-        if (node.nodeType === Node.TEXT_NODE) node = node.parentNode!
-
-        // Find the editable wrapper
-        root = (node as HTMLElement).closest('[contenteditable="true"]') as HTMLElement
-    }
-
-    if (!root) return
-
-    // 2. Ensure Focus & Execute
-    // Focus is required for execCommand to target the correct area
-    root.focus()
-
-    const command = listTag === 'ul' ? 'insertUnorderedList' : 'insertOrderedList'
-    document.execCommand(command, false)
-
-    // 3. Apply Styling (Primary Method)
-    // We search UP from the current cursor position to find the new list element
-    const newSelection = window.getSelection()
-    if (newSelection && newSelection.rangeCount > 0) {
-        const range = newSelection.getRangeAt(0)
-        let current = range.commonAncestorContainer
-
-        // Traverse up to find the UL/OL
-        let depth = 0
-        while (current && current !== root && depth < 20) {
-            if (current.nodeType === Node.ELEMENT_NODE) {
-                const el = current as HTMLElement
-                const tag = el.tagName.toLowerCase()
-
-                if (tag === 'ul' || tag === 'ol') {
-                    el.className = className
-                    break
-                }
-            }
-            current = current.parentNode
-            depth++
-        }
-    }
-
-    // 4. Styling Fallback (Crucial for Empty Lines)
-    // Sometimes selection logic fails on empty nodes. This ensures ALL lists have style.
-    // We look for any UL/OL in the root that doesn't have our Tailwind classes yet.
-    const rawLists = root.querySelectorAll(`${listTag}:not([class*="list-"])`)
-    rawLists.forEach(l => l.className = className)
-}
 
 type ListMode = "bullet" | "number"
 
@@ -82,6 +17,7 @@ const ListButton = defaults(def, (props) => {
     const { class: cn, cls, mode, buttonType: btnType, ...otherProps } = props
 
     const editor = useEditor()
+    const isActive = $(false)
 
     // Reactive Icon
     const icon = () => {
@@ -99,24 +35,94 @@ const ListButton = defaults(def, (props) => {
         return "List"
     }
 
-    const handleClick = (e: MouseEvent) => {
-        e.preventDefault(); // Stop button from stealing focus
+    useEffect(() => {
+        const editorEl = $$(editor)
+        const currentMode = $$(mode)
+        const targetTag = currentMode === 'bullet' ? 'UL' : 'OL'
 
-        // Unwrap editor before passing
-        const currentEditor = $$(editor) as HTMLElement | null
+        const updateState = () => {
+            let state = false
 
-        switch ($$(mode)) {
-            case "bullet":
-                insertList(currentEditor, 'ul', 'list-inside list-disc')
-                break
-            case "number":
-                insertList(currentEditor, 'ol', 'list-inside list-decimal')
-                break
+            // METHOD A: Native Command State (Try this first)
+            try {
+                const command = currentMode === 'bullet' ? 'insertUnorderedList' : 'insertOrderedList'
+                if (document.queryCommandState(command)) {
+                    state = true
+                }
+            } catch (e) { }
+
+            // METHOD B: Manual DOM Check (Fallback & robustness)
+            // If native check failed (or returned false), we verify the DOM manually.
+            // This ensures the button lights up even if focus is slightly ambiguous.
+            if (!state) {
+                const sel = window.getSelection()
+                if (sel && sel.rangeCount > 0) {
+                    let node: Node | null = sel.getRangeAt(0).commonAncestorContainer
+                    if (node.nodeType === Node.TEXT_NODE) node = node.parentElement
+
+                    if (node instanceof HTMLElement) {
+                        // Find the CLOSEST list parent (either UL or OL)
+                        // We use 'ul, ol' to find the immediate parent list type.
+                        // This prevents highlighting Bullet button if we are inside an OL that is nested in a UL.
+                        const closestList = node.closest('ul, ol')
+
+                        if (closestList && closestList.tagName === targetTag) {
+                            // Verify this list is actually inside our editor (if we know the editor)
+                            if (editorEl) {
+                                if (editorEl.contains(closestList)) state = true
+                            } else {
+                                // If no editor context (Web Component), just trust the selection
+                                state = true
+                            }
+                        }
+                    }
+                }
+            }
+
+            isActive(state)
         }
+
+        document.addEventListener('selectionchange', updateState)
+        document.addEventListener('mouseup', updateState)
+        document.addEventListener('keyup', updateState)
+
+        // Run once on mount
+        updateState()
+
+        return () => {
+            document.removeEventListener('selectionchange', updateState)
+            document.removeEventListener('mouseup', updateState)
+            document.removeEventListener('keyup', updateState)
+        }
+    })
+
+    const handleClick = (e: MouseEvent) => {
+        e.preventDefault()
+
+        const editorEl = $$(editor)
+        const buttonMode = $$(mode)
+
+        // Ensure we don't force inline styles, we want classes
+        document.execCommand('styleWithCSS', false, 'false')
+
+        if (buttonMode === "bullet") {
+            insertList(editorEl, 'ul', 'list-disc', 'list-decimal')
+        } else {
+            insertList(editorEl, 'ol', 'list-decimal', 'list-disc')
+        }
+
+        // Force update UI state immediately
+        // (Short timeout allows the DOM to update first)
+        setTimeout(() => {
+            // Manually trigger a check
+            const evt = new Event('selectionchange')
+            document.dispatchEvent(evt)
+        }, 10)
     }
 
     const handleMouseDown = (e: MouseEvent) => {
-        e.preventDefault(); // Prevent focus loss on click
+        e.preventDefault()
+        e.stopPropagation()
     }
 
     return (
@@ -125,7 +131,13 @@ const ListButton = defaults(def, (props) => {
             onClick={handleClick}
             onMouseDown={handleMouseDown}
             title={title}
-            class={[cls, cn]}
+            class={[
+                cls,
+                cn,
+                // Active State Styling
+                () => $$(isActive) ? '!bg-slate-200' : ''
+            ]}
+            aria-pressed={() => $$(isActive) ? "true" : "false"}
             {...otherProps}
         >
             {icon}
@@ -146,3 +158,64 @@ declare module 'woby' {
 }
 
 export default ListButton
+
+
+// #region insertList - Handle list insertion and styling
+const insertList = (editor: any, listTag: 'ul' | 'ol', classToAdd: string, classToRemove: string) => {
+    const selection = window.getSelection()
+    if (!selection || selection.rangeCount === 0) return
+
+    // 1. Resolve Editor Root
+    let root: HTMLElement | null = (editor instanceof HTMLElement) ? editor : null
+
+    if (!root) {
+        let node: Node | null = selection.getRangeAt(0).commonAncestorContainer
+        if (node.nodeType === Node.TEXT_NODE) node = node.parentElement
+        if (node instanceof HTMLElement) {
+            root = node.isContentEditable
+                ? node
+                : node.closest('[contenteditable="true"]') as HTMLElement
+        }
+    }
+
+    if (!root || !(root instanceof HTMLElement)) return
+
+    // 2. Ensure Focus
+    if (document.activeElement !== root && !root.contains(document.activeElement)) {
+        root.focus()
+    }
+
+    // 3. Execute Command
+    const command = listTag === 'ul' ? 'insertUnorderedList' : 'insertOrderedList'
+    document.execCommand(command, false)
+
+    // 4. Apply Styling & Cleanup
+    const newSelection = window.getSelection()
+    if (newSelection && newSelection.rangeCount > 0) {
+        let node: Node | null = newSelection.getRangeAt(0).commonAncestorContainer
+        if (node.nodeType === Node.TEXT_NODE) node = node.parentElement
+
+        if (node instanceof HTMLElement) {
+            const listEl = node.closest(listTag)
+            if (listEl && root.contains(listEl)) {
+                // Force remove opposing class to fix visual bugs during swap
+                listEl.classList.remove(classToRemove)
+                listEl.classList.add('list-inside', classToAdd)
+                return
+            }
+        }
+    }
+
+    // 5. Fallback Cleanup
+    const wrongLists = root.querySelectorAll(`${listTag}.${classToRemove}`)
+    wrongLists.forEach(l => {
+        l.classList.remove(classToRemove)
+        l.classList.add('list-inside', classToAdd)
+    })
+
+    const bareLists = root.querySelectorAll(`${listTag}:not(.${classToAdd})`)
+    bareLists.forEach(l => {
+        l.classList.add('list-inside', classToAdd)
+    })
+}
+// #endregion
