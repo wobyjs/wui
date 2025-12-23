@@ -9,7 +9,7 @@ import { applyTextAlign } from './AlignButton'
 
 // Default props
 const def = () => ({
-    buttonType: $("outlined", HtmlString) as ObservableMaybe<ButtonStyles>,
+    type: $("outlined", HtmlString) as ObservableMaybe<ButtonStyles>,
     title: $("Align Center", HtmlString) as ObservableMaybe<string>,
     cls: $('', HtmlClass) as JSX.Class | undefined,
     class: $('', HtmlClass) as JSX.Class | undefined,
@@ -17,7 +17,7 @@ const def = () => ({
 })
 
 const AlignCenterButton = defaults(def, (props) => {
-    const { buttonType, title, cls, class: cn, disabled, ...otherProps } = props
+    const { type: buttonType, title, cls, class: cn, disabled, ...otherProps } = props
     const editor = useEditor()
 
     return (
@@ -34,15 +34,13 @@ const AlignCenterButton = defaults(def, (props) => {
             <AlignCenter />
         </Button>
     )
-}) as typeof AlignCenterButton & StyleEncapsulationProps
+}) as typeof AlignCenterButton
 
 
 export { AlignCenterButton }
 
-// NOTE: Register the custom element
 customElement('wui-align-center-button', AlignCenterButton)
 
-// NOTE: Add the custom element to the JSX namespace
 declare module 'woby' {
     namespace JSX {
         interface IntrinsicElements {
