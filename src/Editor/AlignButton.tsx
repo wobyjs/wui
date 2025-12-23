@@ -1,28 +1,29 @@
-import { $, $$, defaults, type JSX, isObservable, customElement, type ElementAttributes, type Observable, type CustomElementChildren, type StyleEncapsulationProps, useEffect, HtmlClass } from "woby"
+import { $, $$, defaults, type JSX, isObservable, customElement, type ElementAttributes, type Observable, type CustomElementChildren, type StyleEncapsulationProps, useEffect, HtmlClass, HtmlString, ObservableMaybe, HtmlBoolean } from "woby"
 import '@woby/chk'
 import '../input.css'
 
-import { Button } from '../Button'
+import { Button, ButtonStyles } from '../Button'
 import { useEditor } from './undoredo'
 import { findBlockParent, getCurrentRange } from './utils'
 import AlignCenter from '../icons/align_center'
 import AlignLeft from '../icons/align_left'
 import AlignRight from '../icons/align_right'
+import AlignJustify from '../icons/align_justify'
 
-type ContentAlign = 'start' | 'center' | 'end'
+
+type ContentAlign = 'left' | 'center' | 'right' | 'justify'
 
 // Default props
 const def = () => ({
-    type: $("outlined" as "text" | "contained" | "outlined" | "icon"),
-    title: $("Align Center"),
+    type: $("outlined", HtmlString) as ObservableMaybe<ButtonStyles>,
+    title: $("Align Center", HtmlString) as ObservableMaybe<string>,
     cls: $('', HtmlClass) as JSX.Class | undefined,
     class: $('', HtmlClass) as JSX.Class | undefined,
-    disabled: $(false) as Observable<boolean>,
-    children: $(<AlignCenter />) as Observable<JSX.Element>,
-    contentAlign: $("center" as ContentAlign),
+    disabled: $(false, HtmlBoolean) as ObservableMaybe<boolean>,
+    mode: $("center", HtmlString) as ObservableMaybe<ContentAlign>,
 })
 const AlignButton = defaults(def, (props) => {
-    const { type: buttonType, title, cls, class: cn, disabled, children, contentAlign, ...otherProps } = props as any
+    const { type: buttonType, title, cls, class: cn, disabled, mode, ...otherProps } = props as any
     const editor = useEditor()
 
     // Extract onClick from otherProps if provided
@@ -30,13 +31,14 @@ const AlignButton = defaults(def, (props) => {
 
     // Content alignment logic
     const alignmentMap = {
-        'start': { icon: <AlignLeft />, align: 'left' as const, defaultTitle: 'Align Left' },
+        'left': { icon: <AlignLeft />, align: 'left' as const, defaultTitle: 'Align Left' },
         'center': { icon: <AlignCenter />, align: 'center' as const, defaultTitle: 'Align Center' },
-        'end': { icon: <AlignRight />, align: 'right' as const, defaultTitle: 'Align Right' },
+        'right': { icon: <AlignRight />, align: 'right' as const, defaultTitle: 'Align Right' },
+        'justify': { icon: <AlignJustify />, align: 'justify' as const, defaultTitle: 'Align justify' },
     }
 
     const currentAlignment = () => {
-        const align = $$(contentAlign)
+        const align = $$(mode)
         return alignmentMap[align as keyof typeof alignmentMap]
     }
 
@@ -45,59 +47,39 @@ const AlignButton = defaults(def, (props) => {
     }
 
     const displayTitle = () => {
-        const titleValue = $$(title)
-
-        // If title is customized (not default), use it
-        if (titleValue !== "Align Center") {
-            return titleValue
-        }
-
-        // Use mapped title for alignment
         return currentAlignment().defaultTitle
     }
 
     const handleClick = (e: any) => {
-        // CRITICAL: Prevent the button from taking focus and clearing the selection
         e.preventDefault()
 
-        // console.log('AlignButton clicked!', { contentAlign: $$(contentAlign), editor: $$(editor) })
-
-        // If custom onClick is provided, use it
         if (customOnClick) {
-            // console.log('Using custom onClick')
             customOnClick(e)
             return
         }
 
-        // Apply alignment
         const alignment = currentAlignment().align
-        // console.log('Applying alignment:', alignment)
-        applyTextAlign(alignment as 'left' | 'center' | 'right', editor)
+        applyTextAlign(alignment as ContentAlign, editor)
     }
 
     return (
-        <div>
-            {/* <p style={"margin-bottom: 10px; color: black;"}>Content Align: <span style={"font-weight: bold; color: blue;"}>{contentAlign}</span></p> */}
-            <Button
-                type={buttonType}
-                title={displayTitle}
-                class={[() => $$(cls) ? $$(cls) : "", cn]}
-                disabled={disabled}
-                onClick={handleClick}
-                {...otherProps}
-            >
-                {displayIcon}
-            </Button>
-        </div>
-
+        <Button
+            type={buttonType}
+            title={displayTitle}
+            class={[() => $$(cls) ? $$(cls) : "", cn]}
+            disabled={disabled}
+            onClick={handleClick}
+            {...otherProps}
+        >
+            {displayIcon}
+        </Button>
     )
 }) as typeof AlignButton
 
 export { AlignButton }
-// NOTE: Register the custom element
+
 customElement('wui-align-button', AlignButton)
 
-// NOTE: Add the custom element to the JSX namespace
 declare module 'woby' {
     namespace JSX {
         interface IntrinsicElements {
@@ -108,7 +90,7 @@ declare module 'woby' {
 
 export default AlignButton
 
-export const applyTextAlign = (alignment: 'left' | 'center' | 'right', editor: Observable<HTMLDivElement>) => {
+export const applyTextAlign = (alignment: ContentAlign, editor: Observable<HTMLDivElement>) => {
     // Get selection directly from window to ensure it's current
     const windowSelection = window.getSelection()
     if (!windowSelection || windowSelection.rangeCount === 0) {
