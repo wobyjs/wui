@@ -9,12 +9,12 @@ const TextStylesDemo = () => {
     const editorRef = $({} as HTMLDivElement)
     return (
         <EditorContext.Provider value={editorRef}>
-            <UndoRedo>
+            {/* <UndoRedo> */}
                 <div class="mb-4">
                     <div class="flex gap-4 items-center my-2 border border-gray-300 rounded p-4">
-                        <TextStyleButton cls="text-black" type="bold" />
-                        <TextStyleButton cls="text-black" type="italic" />
-                        <TextStyleButton cls="text-black" type="underline" />
+                        <TextStyleButton class="text-black" type="bold" />
+                        <TextStyleButton class="text-black" type="italic" />
+                        <TextStyleButton class="text-black" type="underline" />
                     </div>
                     <div contentEditable class="border border-gray-300 rounded p-4 min-h-[200px] mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
                         <p>Select this text and try the Bold Buttons below!</p>
@@ -22,7 +22,7 @@ const TextStylesDemo = () => {
                     </div>
 
                 </div>
-            </UndoRedo>
+            {/* </UndoRedo> */}
         </EditorContext.Provider>
     )
 }
