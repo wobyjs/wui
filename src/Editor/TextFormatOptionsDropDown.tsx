@@ -1,5 +1,5 @@
-import { $, $$, customElement, defaults, ElementAttributes, HtmlNumber, HtmlString, JSX, Observable, ObservableMaybe } from 'woby'
-import { Button } from '../Button'
+import { $, $$, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlClass, HtmlNumber, HtmlString, JSX, Observable, ObservableMaybe } from 'woby'
+import { Button, ButtonStyles } from '../Button'
 import { EditorContext, useUndoRedo } from './undoredo'
 import { useOnClickOutside } from '@woby/use'
 import { getCurrentRange, getSelectedText, replaceSelectedText } from './utils'
@@ -127,13 +127,17 @@ const FORMAT_OPTIONS = [
 // type TextFormat = 'strikethrough' | 'subscript' | 'superscript' | 'highlight' | 'clear' | 'lowercase' | 'uppercase' | 'capitalize'
 
 const def = () => ({
-    cls: $(''),
-    class: $(''),
+    cls: $('', HtmlClass) as JSX.Class | undefined,
+    class: $('', HtmlClass) as JSX.Class | undefined,
+    buttonType: $("outlined", HtmlString) as ObservableMaybe<ButtonStyles>,
+    disabled: $(false, HtmlBoolean) as ObservableMaybe<boolean>,
 })
 
 const TextFormatOptionsDropDown = defaults(def, (props) => {
 
-    const { class: cn, cls, ...otherProps } = props
+    const { class: cn, cls, buttonType: btnType, disabled, ...otherProps } = props
+
+    const BASE_BTN = "size-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-black hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500"
 
     const editor = $(EditorContext)
     // const { undos, saveDo } = useUndoRedo()
@@ -186,33 +190,31 @@ const TextFormatOptionsDropDown = defaults(def, (props) => {
         )
     }
 
-    const BASE_BTN = "size-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-black hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500"
-
-    const KeybordDropDownArrow = () => {
-        return <KeyboardDownArrow class="-mr-1 ml-2 h-5 w-5" />
-    }
 
     return (
         <div class={() => ["relative inline-block text-left", cls]} ref={dropdownRef}>
             <div>
                 <Button
-                    type='outlined'
-                    cls={() => [BASE_BTN]}
+                    type={btnType}
+                    // cls={() => [BASE_BTN]}
+                    class={() => [
+                        () => $$(cls) ? $$(cls) : BASE_BTN, cn,
+                    ]}
                     onClick={toggleDropdown}
                     title="More text formats"
+                    disabled={disabled}
+                    {...otherProps}
                 >
                     <span class="text-center truncate">
                         <CaseTransformIcon />
                     </span>
                     <span class="flex justify-end">
-                        {KeybordDropDownArrow}
+                        <KeyboardDownArrow class="-mr-1 ml-2 h-5 w-5" />
                     </span>
                 </Button>
             </div>
 
-            {() => $$(isOpen) && (
-                <DropdownMenu />
-            )}
+            {() => $$(isOpen) && (<DropdownMenu />)}
         </div>
     )
 })
