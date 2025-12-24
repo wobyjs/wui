@@ -2,18 +2,19 @@ import { Button, ButtonStyles } from '../Button'
 import BoldIcon from '../icons/bold' // Renamed for clarity if Bold is a type/component elsewhere
 import { applyStyle, range, getCurrentRange } from './utils'
 import { useEditor } from './undoredo' // useUndoRedo not directly needed here anymore
-import { $, $$, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlString, Observable, ObservableMaybe, useEffect } from 'woby'
+import { $, $$, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlClass, HtmlString, Observable, ObservableMaybe, useEffect } from 'woby'
 
 const def = () => ({
     buttonType: $("outlined", HtmlString) as ObservableMaybe<ButtonStyles>,
     title: $("Bold", HtmlString) as ObservableMaybe<string>,
-    cls: $(""),
+    cls: $('', HtmlClass) as JSX.Class | undefined,
+    class: $('', HtmlClass) as JSX.Class | undefined,
     disabled: $(false, HtmlBoolean) as Observable<boolean>,
 })
 
 
 const BoldButton = defaults(def, (props) => {
-    const { buttonType: btnType, title, cls, disabled, ...otherProps } = props as any
+    const { buttonType: btnType, title, cls, class: cn, disabled, ...otherProps } = props
 
     const editorNode = useEditor()
     const isActive = $(false)
@@ -75,10 +76,10 @@ const BoldButton = defaults(def, (props) => {
         e.preventDefault() // Prevent button from stealing focus
 
         // Handle custom onClick if passed
-        if (otherProps.onClick) {
-            otherProps.onClick(e)
-            return
-        }
+        // if (otherProps.onClick) {
+        //     otherProps.onClick(e)
+        //     return
+        // }
 
         // Use CSS spans (<span style="font-weight: bold">) instead of <b> tags
         document.execCommand('styleWithCSS', false, 'true')
@@ -94,10 +95,16 @@ const BoldButton = defaults(def, (props) => {
         <Button
             type={btnType}
             title={title}
-            class={[
-                cls, "size-fit",
+            // class={[
+            //     cls, "size-fit",
+            //     () => $$(isActive) ? '!bg-slate-200' : ''
+            // ]}
+
+            class={() => [
+                () => $$(cls) ? $$(cls) : cn,
                 () => $$(isActive) ? '!bg-slate-200' : ''
             ]}
+
             aria-pressed={() => $$(isActive) ? "true" : "false"}
             disabled={disabled}
             onClick={handleClick}
