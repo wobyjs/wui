@@ -1,4 +1,4 @@
-import { $, $$, customElement, defaults, ElementAttributes, HtmlString, JSX, Observable, ObservableMaybe, ObservableReadonly } from 'woby'
+import { $, $$, customElement, defaults, ElementAttributes, HtmlClass, HtmlString, JSX, Observable, ObservableMaybe, ObservableReadonly } from 'woby'
 import { Button, ButtonStyles } from '../Button'
 import { EditorContext, useEditor, useUndoRedo } from './undoredo'
 import { applyStyle } from './utils' // Import applyStyle
@@ -6,14 +6,16 @@ import FormatInkHighlighter from '../icons/format_ink_highlighter' // Import the
 import KeyboardDownArrow from '../icons/keyboard_down_arrow'
 
 const def = () => ({
-    cls: $(""),
-    class: $(""),
-    color: $("#ffff00", HtmlString) as ObservableMaybe<string>,
+    cls: $('', HtmlClass) as JSX.Class | undefined,
+    class: $('', HtmlClass) as JSX.Class | undefined,
+    color: $("#ffff00", HtmlString) as Observable<string>,
     buttonType: $("outlined", HtmlString) as ObservableMaybe<ButtonStyles>,
 })
 
 const TextBackgroundColorPicker = defaults(def, (props) => {
     const { class: cn, cls, color: selectedBgColor, buttonType: btnType, ...otherProps } = props
+
+    const BASE_BTN = "size-full inline-flex items-center justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-black hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500 cursor-pointer"
 
     const editor = useEditor() // Editor context, likely the contentEditable div
     const colorInputRef = $<HTMLInputElement>(null)
@@ -24,9 +26,7 @@ const TextBackgroundColorPicker = defaults(def, (props) => {
     // Updates selectedBgColor when the color input changes
     const handleNativeBgColorInputChange = (e: JSX.TargetedEvent<HTMLInputElement, Event>) => {
         const newColor = e.currentTarget.value
-        if (isObservable(selectedBgColor)) {
-            selectedBgColor(newColor)
-        }
+        selectedBgColor(newColor)
 
         applyPickedBgColor() // Apply color immediately after input change
     }
@@ -49,35 +49,22 @@ const TextBackgroundColorPicker = defaults(def, (props) => {
             $$(editor).dispatchEvent(new Event('input', { bubbles: true }))
         }
     }
-    // const applyPickedBgColor = () => {
-    //     if ($$(editor)) { // Ensure editor context is available
-    //         saveDo()
-    //         // Use applyStyle to set the background color
-    //         applyStyle((element) => {
-    //             element.style.backgroundColor = $$(selectedBgColor)
-    //             // If the new color is transparent or a "remove highlight" color, consider removing the style
-    //             // For simplicity, we'll just set it. To toggle off, user might pick a "no color" option or transparent.
-    //         })
-    //     }
-    // }
-
-    const BASE_BTN = "size-full inline-flex items-center justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-black hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500 cursor-pointer"
 
     const icons = () => {
         return <FormatInkHighlighter class="w-7 h-6" fill={selectedBgColor} />
-    }
-
-    const KeybordDropDownArrow = () => {
-        return <KeyboardDownArrow class="-mr-1 ml-2 size-5" />
     }
 
     return (
         <div class="relative inline-block text-left">
             <Button
                 type={btnType}
-                cls={() => [BASE_BTN]}
+                // cls={() => [BASE_BTN]}
+                class={() => [
+                    () => $$(cls) ? $$(cls) : BASE_BTN, cn,
+                ]}
                 title="Text background color"
                 onClick={applyPickedBgColor}
+                {...otherProps}
             >
                 <div class="flex flex-col items-center justify-center leading-none text-center truncate"
                     onClick={(e: MouseEvent) => {
@@ -104,7 +91,7 @@ const TextBackgroundColorPicker = defaults(def, (props) => {
                         colorInputRef()?.click()
                     }}
                 >
-                    {KeybordDropDownArrow}
+                    <KeyboardDownArrow class="-mr-1 ml-2 size-5" />
                 </div>
 
             </Button>
