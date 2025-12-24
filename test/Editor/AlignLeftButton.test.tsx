@@ -13,11 +13,12 @@ const AlignLeftButtonDemo = () => {
             {/* <UndoRedo> */}
             <div class="mb-4">
                 <div class="flex gap-4 items-center my-2 border border-gray-300 rounded p-4">
-                    <AlignLeftButton />
+                    <AlignLeftButton class="text-black" />
                 </div>
                 <div contentEditable class="border border-gray-300 rounded p-4 min-h-[200px] mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500 text-right">
                     <p>Select this text and try the Align Left Button!</p>
                     <p>You can make text left or not.</p>
+                    <br />
                     <p>Lorem ipsum dolor sit amet consectetur adipiscing elit. Quisque faucibus ex sapien vitae pellentesque sem placerat. In id cursus mi pretium tellus duis convallis. Tempus leo eu aenean sed diam urna tempor. Pulvinar vivamus fringilla lacus nec metus bibendum egestas. Iaculis massa nisl malesuada lacinia integer nunc posuere. Ut hendrerit semper vel class aptent taciti sociosqu. Ad litora torquent per conubia nostra inceptos himenaeos.</p>
                 </div>
             </div>
