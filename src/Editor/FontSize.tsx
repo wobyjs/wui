@@ -69,7 +69,7 @@ const applyFontSize = (newSize: string) => {
 
 const FontSize = defaults(def, (props) => {
     const { cls, buttonType, editable, fontSize, step, ...otherProps } = props as any
-    const buttonBaseClass = "w-1/5 justify-center px-2 py-1 border border-gray-300"
+    const BASE_BTN = "w-1/5 justify-center px-2 py-1 border border-gray-300"
 
 
     // #region Handle Font Size
@@ -92,7 +92,6 @@ const FontSize = defaults(def, (props) => {
         const newVal = Math.max($$(current) - $$(step))
         updateFontSize(newVal)
         handleApplyFontSize(newVal)
-        console.log("[FontSize] Decrease to", newVal)
     }
 
     const handleIncreaseSize = (e: any) => {
@@ -100,12 +99,10 @@ const FontSize = defaults(def, (props) => {
         const newVal = Math.max($$(current) + $$(step))
         updateFontSize(newVal)
         handleApplyFontSize(newVal)
-        console.log("[FontSize] Increase to", newVal)
     }
 
     const handleInputChange = (e: JSX.TargetedEvent<HTMLInputElement, Event>) => {
         const val = parseFloat(e.currentTarget.value)
-        console.log("[FontSize] Input changed to", val)
         if (!isNaN(val) && val > 0) {
             updateFontSize(val)
             handleApplyFontSize(val)
@@ -125,7 +122,7 @@ const FontSize = defaults(def, (props) => {
     const decreaseSizeBtn = () => (
         <Button
             type='outlined'
-            cls={() => [buttonBaseClass, "rounded-r-none"]}
+            cls={() => [BASE_BTN, "rounded-r-none"]}
             title="Decrease Font Size"
             onClick={handleDecreaseSize}
         >
@@ -136,7 +133,7 @@ const FontSize = defaults(def, (props) => {
     const increaseSizeBtn = () => (
         <Button
             type='outlined'
-            cls={() => [buttonBaseClass, "rounded-l-none"]}
+            cls={() => [BASE_BTN, "rounded-l-none"]}
             title="Increase Font Size"
             onClick={handleIncreaseSize}
         >
