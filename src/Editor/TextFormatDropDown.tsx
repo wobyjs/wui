@@ -1,223 +1,134 @@
-import { $, $$, JSX, useEffect } from 'woby'
-import { Button } from '../Button'
-import { EditorContext, useEditor } from './undoredo' // This context provides the contentEditable div ref
-import { convertToSemanticElement, getCurrentRange } from './utils' // Import getCurrentRange
+import { $, $$, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlString, JSX, ObservableMaybe, useEffect, useContext, Observable, HtmlClass } from 'woby'
+import { Button, ButtonStyles } from '../Button'
+import { EditorContext, useEditor } from './undoredo'
 import { useOnClickOutside } from '@woby/use'
+import KeyboardDownArrow from '../icons/keyboard_down_arrow'
 
-// Helper to get current block element info before modification
-const getCurrentBlockInfo = (editorDiv: HTMLElement | null, currentRange: Range | null): { tagName: string; element: HTMLElement } | null => {
-    if (!editorDiv || !currentRange) return null
-    // const selection = $$(reactiveRange) // Removed: Use passed currentRange
-    // if (!selection || selection.rangeCount === 0) return null // Removed
-    const range = currentRange // Use the passed-in reactive range
-    let node = range.commonAncestorContainer
 
-    // Ascend to find the nearest block-level parent or the element itself if it's a block
-    // and ensure it's within the editorDiv
-    while (node && node !== editorDiv.parentNode) { // Stop if we reach parent of editorDiv
+
+
+
+// #region Helper Functions
+const getCurrentBlockInfo = (root: HTMLElement, range: Range) => {
+    let node: Node | null = range.commonAncestorContainer
+    if (node.nodeType === Node.TEXT_NODE) {
+        node = node.parentElement
+    }
+
+    const blockTags = ['P', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'BLOCKQUOTE', 'PRE', 'DIV']
+
+    while (node && node !== root) {
         if (node.nodeType === Node.ELEMENT_NODE) {
             const el = node as HTMLElement
-            if (editorDiv.contains(el) || el === editorDiv) { // Check if element is within or is the editor
-                const displayStyle = window.getComputedStyle(el).display
-                if (['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'pre', 'li', 'div', 'article', 'section', 'aside', 'header', 'footer', 'main', 'blockquote'].includes(el.tagName.toLowerCase()) || displayStyle === 'block') {
-                    if (el.isContentEditable && el !== editorDiv && !editorDiv.contains(el.parentElement)) {
-                        // If el is contentEditable but not the main editor, and its parent is not in editor, skip (e.g. nested editor)
-                    } else if (el === editorDiv && range.commonAncestorContainer === editorDiv && range.startOffset === 0 && range.endOffset === editorDiv.childNodes.length) {
-                        // If the entire editor content is selected, and editor itself is a block, this might be it.
-                        // However, usually we want a child block. If editor has only one block child, prefer that.
-                        if (editorDiv.children.length === 1 && editorDiv.children[0].nodeType === Node.ELEMENT_NODE) {
-                            const singleChild = editorDiv.children[0] as HTMLElement
-                            const childDisplayStyle = window.getComputedStyle(singleChild).display
-                            if (['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'pre', 'li', 'div', 'article', 'section', 'aside', 'header', 'footer', 'main', 'blockquote'].includes(singleChild.tagName.toLowerCase()) || childDisplayStyle === 'block') {
-                                return { tagName: singleChild.tagName.toLowerCase(), element: singleChild }
-                            }
-                        }
-                    }
-                    return { tagName: el.tagName.toLowerCase(), element: el }
-                }
+            if (blockTags.includes(el.tagName)) {
+                return el
             }
         }
-        if (node === editorDiv) break // Don't go above the editor itself if node becomes editor
         node = node.parentNode
     }
-    // If no specific block found but selection is in editor, consider editor's direct children or a default P if empty
-    const currentSelectionFallback = window.getSelection() // Re-introduce selection for fallback logic, renamed variable
-    if (!currentSelectionFallback) return null // Guard against null selection
-
-    if (editorDiv && currentSelectionFallback.containsNode(editorDiv, true) && editorDiv.children.length > 0) {
-        // Try to find a block among children at selection point
-        let selectedNode = range.startContainer
-        while (selectedNode && selectedNode.parentNode !== editorDiv) {
-            selectedNode = selectedNode.parentNode
-        }
-        if (selectedNode && selectedNode.nodeType === Node.ELEMENT_NODE && ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'pre', 'blockquote'].includes((selectedNode as HTMLElement).tagName.toLowerCase())) {
-            return { tagName: (selectedNode as HTMLElement).tagName.toLowerCase(), element: selectedNode as HTMLElement }
-        }
-    } else if (editorDiv && editorDiv.children.length === 0 && editorDiv.isContentEditable) {
-        // If editor is empty, create and return a P tag
-        const p = document.createElement('p')
-        editorDiv.appendChild(p)
-        // Place caret inside
-        const newRange = document.createRange()
-        newRange.setStart(p, 0)
-        newRange.collapse(true)
-        // Need selection again here for manipulating ranges
-        const currentSelectionForRange = window.getSelection() // Renamed variable
-        if (!currentSelectionForRange) return null // Guard clause
-        currentSelectionForRange.removeAllRanges()
-        currentSelectionForRange.addRange(newRange)
-        return { tagName: 'p', element: p }
-    }
-
     return null
 }
 
-// Helper to manually apply block formatting
-const applyFormatBlock = (editorDiv: HTMLDivElement | null, targetTag: string, cls: string | undefined) => {
-    if (!editorDiv) return
+const applyFormatBlock = (editor: HTMLDivElement, tag: string, className: string) => {
+    const formatTag = `<${tag}>`
+    document.execCommand('formatBlock', false, formatTag)
 
     const selection = window.getSelection()
-    if (!selection || selection.rangeCount === 0) return
 
-    // Clone the range as operations below might modify it or the selection.
-    const range = selection.getRangeAt(0).cloneRange()
+    if (selection && selection.rangeCount > 0) {
+        const range = selection.getRangeAt(0)
+        let node: Node | null = range.commonAncestorContainer
+        if (node.nodeType === Node.TEXT_NODE) node = node.parentElement
 
-    // Get current block info for potential use in blockquote wrapping
-    // const originalBlockInfoSnapshot = getCurrentBlockInfo(editorDiv) // Keep if needed for complex scenarios
-
-    // Find the block element(s) to change.
-    let blockToTransform: HTMLElement | null = null
-    let container = range.commonAncestorContainer
-
-    while (container && container !== editorDiv.parentNode) {
-        if (container.nodeType === Node.ELEMENT_NODE && editorDiv.contains(container)) {
-            const el = container as HTMLElement
-            const displayStyle = window.getComputedStyle(el).display
-            if (['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'pre', 'blockquote', 'li', 'div', 'article', 'section', 'aside', 'header', 'footer', 'main'].includes(el.tagName.toLowerCase()) || displayStyle === 'block') {
-                if (el.parentNode === editorDiv || (el.parentNode !== editorDiv && editorDiv.contains(el.parentNode))) {
-                    blockToTransform = el
-                    break
-                } else if (el === editorDiv && !blockToTransform) {
-                    blockToTransform = el
+        // Traverse up to find the tag we just requested
+        while (node && node !== editor) {
+            if (node.nodeType === Node.ELEMENT_NODE) {
+                const el = node as HTMLElement
+                if (el.tagName.toLowerCase() === tag.toLowerCase()) {
+                    el.className = className
+                    return
                 }
             }
+            node = node.parentNode
         }
-        if (container === editorDiv) break
-        container = container.parentNode
     }
-
-    if (!blockToTransform && editorDiv.children.length === 0) {
-        blockToTransform = document.createElement('p')
-        editorDiv.appendChild(blockToTransform)
-        const tempRange = document.createRange()
-        tempRange.selectNodeContents(blockToTransform)
-        selection.removeAllRanges()
-        selection.addRange(tempRange)
-    } else if (!blockToTransform && editorDiv.children.length > 0 && range.commonAncestorContainer === editorDiv) {
-        const wrapper = document.createElement('p')
-        while (editorDiv.firstChild) {
-            wrapper.appendChild(editorDiv.firstChild)
-        }
-        editorDiv.appendChild(wrapper)
-        blockToTransform = wrapper
-        const tempRange = document.createRange()
-        tempRange.selectNodeContents(wrapper)
-        selection.removeAllRanges()
-        selection.addRange(tempRange)
-    }
-
-    if (!blockToTransform) {
-        // Pass the cloned range to getCurrentBlockInfo here as well
-        // Need to get the current selection again if we reached this fallback
-        const fallbackSelection = window.getSelection()
-        const fallbackRange = fallbackSelection && fallbackSelection.rangeCount > 0 ? fallbackSelection.getRangeAt(0) : null
-        const currentInfo = getCurrentBlockInfo(editorDiv, fallbackRange) // Pass range from fallback selection
-        if (currentInfo) blockToTransform = currentInfo.element
-    }
-
-    if (!blockToTransform) return
-
-    let elementToProcess = blockToTransform
-    if (blockToTransform === editorDiv) {
-        const newBlock = document.createElement(blockToTransform.tagName || 'div')
-        while (blockToTransform.firstChild) {
-            newBlock.appendChild(blockToTransform.firstChild)
-        }
-        blockToTransform.appendChild(newBlock)
-        elementToProcess = newBlock
-    }
-
-    // If the selected element is a UL or OL, apply the format to its LI children that are within the selection
-    if (elementToProcess.tagName.toLowerCase() === 'ul' || elementToProcess.tagName.toLowerCase() === 'ol') {
-        const selection = window.getSelection()
-        if (selection && selection.rangeCount > 0) {
-            const currentRange = selection.getRangeAt(0)
-            // Filter LI children that actually intersect with the current selection range
-            const selectedListItems = Array.from(elementToProcess.children).filter(child =>
-                child.tagName.toLowerCase() === 'li' && currentRange.intersectsNode(child)
-            ) as HTMLElement[]
-
-            if (selectedListItems.length > 0) {
-                selectedListItems.forEach(item => {
-                    convertToSemanticElement(item, targetTag, editorDiv, formatOptions)
-                })
-            }
-            // If no LIs were selected within the UL/OL, no action is taken on the LIs.
-            // The UL/OL itself is not converted by this block.
-        }
-        editorDiv.focus() // Or perhaps focus only if changes were made
-        return
-    }
-
-    // For single elements or non-list block elements, call convertToSemanticElement
-    // Pass the specific elementToProcess, targetTag, editorDiv, and formatOptions
-    convertToSemanticElement(elementToProcess, targetTag, editorDiv, formatOptions)
-    editorDiv.focus()
-
-    // Trigger onChange or other updates if necessary
-    // This might need to be handled within convertToSemanticElement or after it,
-    // depending on how state updates/event emissions are structured.
 }
+// #endregion
 
-
-// Dropdown items
-export const formatOptions = [
+// Dropdown items configuration
+export const FORMAT_OPTIONS = [
     { label: 'Normal', tag: 'p', hotkey: 'Ctrl+Alt+0', class: '' },
-    { label: 'Heading 1', tag: 'h1', hotkey: 'Ctrl+Alt+1', class: 'text-3xl font-bold' },
-    { label: 'Heading 2', tag: 'h2', hotkey: 'Ctrl+Alt+2', class: 'text-2xl font-semibold' },
-    { label: 'Heading 3', tag: 'h3', hotkey: 'Ctrl+Alt+3', class: 'text-xl font-medium' },
-    { label: 'Quote', tag: 'blockquote', hotkey: 'Ctrl+Alt+Q', class: 'text-[15px] text-[#65676b] ml-10 mr-0 mt-0 mb-2.5 pl-2 border-l-[#ced0d4] border-l-4 [border-left-style:solid] inline-block' },
-    { label: 'Code Block', tag: 'pre', hotkey: 'Ctrl+Alt+C', class: 'inline-block' },
+    { label: 'Heading 1', tag: 'h1', hotkey: 'Ctrl+Alt+1', class: 'text-3xl font-bold mb-4' },
+    { label: 'Heading 2', tag: 'h2', hotkey: 'Ctrl+Alt+2', class: 'text-2xl font-semibold mb-3' },
+    { label: 'Heading 3', tag: 'h3', hotkey: 'Ctrl+Alt+3', class: 'text-xl font-medium mb-2' },
+    { label: 'Quote', tag: 'blockquote', hotkey: 'Ctrl+Alt+Q', class: 'text-[15px] text-[#65676b] ml-10 mr-0 mt-0 mb-2.5 pl-2 border-l-[#ced0d4] border-l-4 border-solid inline-block italic' },
+    { label: 'Code Block', tag: 'pre', hotkey: 'Ctrl+Alt+C', class: 'bg-gray-100 p-2 rounded font-mono text-sm overflow-x-auto' },
 ]
+type TextFormatOptions = "Normal" | "Heading 1" | "Heading 2" | "Heading 3" | "Quote" | "Code Block"
 
-export const TextFormatDropDown = () => {
-    const editorRefCtxObservable = useEditor() // This is Observable<Observable<HTMLDivElement | null>>
-    const editorRefObs = $$(editorRefCtxObservable)      // This is Observable<HTMLDivElement | null>
+const def = () => ({
+    cls: $('', HtmlClass) as JSX.Class | undefined,
+    class: $('', HtmlClass) as JSX.Class | undefined,
+    disabled: $(false, HtmlBoolean) as ObservableMaybe<boolean>,
+    selectedFormat: $("Normal", HtmlString) as Observable<TextFormatOptions>,
+    buttonType: $("outlined", HtmlString) as ObservableMaybe<ButtonStyles>,
+})
+
+const TextFormatDropDown = defaults(def, (props) => {
+    const { cls, class: cn, disabled, selectedFormat, buttonType: btnType, ...otherProps } = props
+
+    const BASE_BTN = "size-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-black hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500 cursor-pointer"
+
+    // const editor = useContext(EditorContext)
+    // const editor = $(EditorContext)
+    const editor = useEditor()
 
     const isOpen = $(false)
-    const selectedFormat = $('Normal')
-    const dropdownRef = $<HTMLDivElement>(null) // This is Observable<HTMLDivElement | null>
+    const dropdownRef = $<HTMLDivElement>(null)
 
-    useOnClickOutside(dropdownRef, () => isOpen(false)) // Pass HTMLDivElement to useOnClickOutside
+    useOnClickOutside(dropdownRef, () => isOpen(false))
 
     const toggleDropdown = () => isOpen(!isOpen())
 
-    const handleSelectFormat = (tag: string, label: string, cls: string | undefined) => {
-        const editorDiv = $$(editorRefObs) // Get HTMLDivElement | null
+    const handleSelectFormat = (tag: string, label: TextFormatOptions, cls: string | undefined) => {
+
+        const editorDiv = $$(editor)
+        alert("Editor: " + editorDiv)
         if (editorDiv) {
-            applyFormatBlock(editorDiv, tag, cls)
             selectedFormat(label)
-            editorDiv.focus() // Ensure editor is focused after operation
+            applyFormatBlock(editorDiv, tag, cls)
+            isOpen(false)
+            editorDiv.focus()
         }
         isOpen(false)
     }
 
-    useEffect(() => {
-        const editorDiv = $$(editorRefObs) // Get HTMLDivElement | null
-        if (!editorDiv) return
+    const handleApplyCurrent = (e: MouseEvent) => {
+        e.preventDefault()
 
+        // Get the string currently displayed (e.g., "Heading 1")
+        const currentLabel = $$(selectedFormat)
+
+        // Find the full config object
+        const opt = FORMAT_OPTIONS.find(o => o.label === currentLabel)
+
+        if (opt) {
+            // Apply it
+            const editorDiv = $$(editor)
+            if (editorDiv) {
+                applyFormatBlock(editorDiv, opt.tag, opt.class)
+                editorDiv.focus()
+            }
+        }
+    }
+
+    // Handle Keyboard Shortcuts
+    useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
-            for (const opt of formatOptions) {
+            const editorDiv = $$(editor)
+            if (!editorDiv) return
+
+            for (const opt of FORMAT_OPTIONS) {
                 if (!opt.hotkey) continue
                 const parts = opt.hotkey.split('+')
                 const key = parts.pop()?.toUpperCase()
@@ -230,12 +141,13 @@ export const TextFormatDropDown = () => {
                     event.ctrlKey === ctrl && event.altKey === alt && event.shiftKey === shift
                 ) {
                     const target = event.target as HTMLElement
-                    const currentDropdownEl = $$(dropdownRef) // Get HTMLDivElement | null
-                    // Check if event is from within the editor or its toolbar/dropdowns
+                    const currentDropdownEl = $$(dropdownRef)
+
+                    // Check if event is relevant to this editor
                     if (editorDiv.contains(target) || target === editorDiv || currentDropdownEl?.contains(target)) {
                         event.preventDefault()
                         applyFormatBlock(editorDiv, opt.tag, opt.class)
-                        selectedFormat(opt.label)
+                        selectedFormat(opt.label as TextFormatOptions)
                         isOpen(false)
                         editorDiv.focus()
                         break
@@ -243,80 +155,125 @@ export const TextFormatDropDown = () => {
                 }
             }
         }
-        // Listen on document to catch events even if editor isn't directly focused but is active context
         document.addEventListener('keydown', handleKeyDown)
         return () => document.removeEventListener('keydown', handleKeyDown)
     })
 
-    // Update selectedFormat reactively based on selection changes
+    // Update Label based on Selection (Active State)
     useEffect(() => {
-        const editorDiv = $$(editorRefObs) // Get HTMLDivElement | null
-        if (!editorDiv) return
-
         const handleSelectionChange = () => {
-            const nativeRange = getCurrentRange()
-            if (nativeRange && editorDiv.contains(nativeRange.commonAncestorContainer)) { // Check if selection is within editor
-                const currentBlock = getCurrentBlockInfo(editorDiv, nativeRange) // Pass native range
-                if (currentBlock) {
-                    const matchedFormat = formatOptions.find(opt => opt.tag.toLowerCase() === currentBlock.tagName.toLowerCase())
-                    if (matchedFormat) {
-                        selectedFormat(matchedFormat.label)
+            const editorDiv = $$(editor)
+            if (!editorDiv) return
+
+            const selection = window.getSelection()
+            if (selection && selection.rangeCount > 0) {
+                const range = selection.getRangeAt(0)
+
+                // Ensure selection is inside editor
+                if (editorDiv.contains(range.commonAncestorContainer)) {
+                    const blockInfo = getCurrentBlockInfo(editorDiv, range)
+
+                    if (blockInfo) {
+                        const matched = FORMAT_OPTIONS.find(opt => opt.tag.toLowerCase() === blockInfo.tagName.toLowerCase())
+                        selectedFormat(matched ? matched.label as TextFormatOptions : 'Normal')
                     } else {
-                        const normalFormat = formatOptions.find(opt => opt.tag === 'p')
-                        selectedFormat(normalFormat ? normalFormat.label : 'Normal')
+                        selectedFormat('Normal')
                     }
-                } else {
-                    const normalFormat = formatOptions.find(opt => opt.tag === 'p')
-                    selectedFormat(normalFormat ? normalFormat.label : 'Normal')
                 }
-            } else {
-                // Handle cases where selection might be null or outside the editor
-                const normalFormat = formatOptions.find(opt => opt.tag === 'p')
-                selectedFormat(normalFormat ? normalFormat.label : 'Normal')
             }
         }
 
-        handleSelectionChange() // Call initially and whenever range changes
+        document.addEventListener('selectionchange', handleSelectionChange)
+        document.addEventListener('mouseup', handleSelectionChange)
+        document.addEventListener('keyup', handleSelectionChange)
+
+        // Initial check
+        handleSelectionChange()
+
+        return () => {
+            document.removeEventListener('selectionchange', handleSelectionChange)
+            document.removeEventListener('mouseup', handleSelectionChange)
+            document.removeEventListener('keyup', handleSelectionChange)
+        }
     })
 
+    const DropDownMenu = () => {
+        return (
+            <div
+                class="origin-top-left absolute left-0 mt-2 w-64 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10 max-h-80 overflow-y-auto"
+                role="menu"
+                aria-orientation="vertical"
+                aria-labelledby="menu-button"
+                onMouseDown={(e) => {
+                    e.stopPropagation()
+                    e.preventDefault() // Prevents editor blur when clicking scrollbar/padding
+                }}
+            >
+                <div class="py-1" role="none">
+                    {FORMAT_OPTIONS.map(opt => (
+                        <Button
+                            type='outlined'
+                            // Button handles click and basic hover styles
+                            cls="w-full block text-gray-700 px-4 py-2 text-sm hover:bg-gray-100 hover:text-gray-900 cursor-pointer"
+                            role="menuitem"
+                            onClick={(e) => { e.preventDefault(); handleSelectFormat(opt.tag, opt.label as TextFormatOptions, opt.class) }}
+                        >
+                            <div class="w-full flex items-center justify-between pointer-events-none">
+                                <span class="text-left truncate">
+                                    {opt.label}
+                                </span>
+
+                                <span class="text-xs text-right text-gray-500 shrink-0 ml-4">
+                                    {opt.hotkey}
+                                </span>
+                            </div>
+                        </Button>
+                    ))}
+                </div>
+            </div>
+        )
+    }
+
+
     return (
-        <div className="relative inline-block text-left" ref={dropdownRef}>
+        <div class={() => ["relative inline-block text-left", cls]} ref={dropdownRef}>
             <div>
                 <Button
-                    buttonType='outlined'
-                    cls="h-8 inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-black hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500"
-                    onClick={toggleDropdown}
+                    type={btnType}
+                    // cls={() => [BASE_BTN]}
+                    class={() => [
+                        () => $$(cls) ? $$(cls) : BASE_BTN, cn,
+                    ]}
+                    onClick={handleApplyCurrent}
                     title="Text format"
+                    {...otherProps}
                 >
-                    {() => $$(selectedFormat)}
-                    <svg className="-mr-1 ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                        <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                    </svg>
+                    <span class="text-center truncate">
+                        {() => $$(selectedFormat)}
+                    </span>
+                    <span class="flex justify-end">
+                        <KeyboardDownArrow class="-mr-1 ml-2 h-5 w-5" onClick={toggleDropdown} />
+                    </span>
                 </Button>
             </div>
 
             {() => $$(isOpen) && (
-                <div
-                    className="origin-top-left absolute left-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10"
-                    role="menu"
-                    aria-orientation="vertical"
-                    aria-labelledby="menu-button"
-                >
-                    <div className="py-1" role="none">
-                        {formatOptions.map(opt => (
-                            <a
-                                href="#"
-                                className="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100 hover:text-gray-900"
-                                role="menuitem"
-                                onClick={(e) => { e.preventDefault(); handleSelectFormat(opt.tag, opt.label, opt.class) }}
-                                title={opt.hotkey}
-                            >
-                                {opt.label} <span className="text-xs text-gray-500 ml-2">{opt.hotkey}</span>
-                            </a>
-                        ))}
-                    </div>
-                </div>
+                <DropDownMenu />
             )}
         </div>
     )
+})
+
+export { TextFormatDropDown }
+
+customElement('wui-text-format-drop-down', TextFormatDropDown)
+
+declare module 'woby' {
+    namespace JSX {
+        interface IntrinsicElements {
+            'wui-text-format-drop-down': ElementAttributes<typeof TextFormatDropDown>
+        }
+    }
 }
+
+export default TextFormatDropDown
