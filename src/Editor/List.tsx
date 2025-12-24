@@ -1,4 +1,4 @@
-import { $, $$, customElement, defaults, ElementAttributes, HtmlString, ObservableMaybe, useEffect, } from 'woby'
+import { $, $$, customElement, defaults, ElementAttributes, HtmlClass, HtmlString, ObservableMaybe, useEffect, } from 'woby'
 import { Button, ButtonStyles } from '../Button'
 import ListBulleted from '../icons/list_bulleted'
 import ListNumbered from '../icons/list_numbered'
@@ -7,8 +7,8 @@ import { useEditor } from './undoredo'
 type ListMode = "bullet" | "number"
 
 const def = () => ({
-    cls: $(""),
-    class: $(""),
+    cls: $('', HtmlClass) as JSX.Class | undefined,
+    class: $('', HtmlClass) as JSX.Class | undefined,
     buttonType: $("outlined", HtmlString) as ObservableMaybe<ButtonStyles>,
     mode: $("bullet", HtmlString) as ObservableMaybe<ListMode>,
 })
@@ -22,9 +22,9 @@ const ListButton = defaults(def, (props) => {
     // Reactive Icon
     const icon = () => {
         const m = $$(mode)
-        if (m === "bullet") return <ListBulleted class="text-black size-6" />
-        if (m === "number") return <ListNumbered class="text-black size-6" />
-        return <ListBulleted class="text-black size-6" />
+        if (m === "bullet") return <ListBulleted class="size-5" />
+        if (m === "number") return <ListNumbered class="size-5" />
+        return <ListBulleted class="size-5" />
     }
 
     // Reactive Title
@@ -131,12 +131,11 @@ const ListButton = defaults(def, (props) => {
             onClick={handleClick}
             onMouseDown={handleMouseDown}
             title={title}
-            class={[
-                cls,
-                cn,
-                // Active State Styling
+            class={() => [
+                () => $$(cls) ? $$(cls) : cn,
                 () => $$(isActive) ? '!bg-slate-200' : ''
             ]}
+
             aria-pressed={() => $$(isActive) ? "true" : "false"}
             {...otherProps}
         >
