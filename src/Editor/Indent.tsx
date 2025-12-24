@@ -1,4 +1,4 @@
-import { $, $$, defaults, type JSX, customElement, type ElementAttributes, type Observable, ObservableMaybe, HtmlString, HtmlNumber, HtmlClass } from "woby"
+import { $, $$, defaults, type JSX, customElement, type ElementAttributes, type Observable, ObservableMaybe, HtmlString, HtmlNumber, HtmlClass, HtmlBoolean } from "woby"
 import { Button, ButtonStyles } from '../Button'
 import { useEditor } from './undoredo'
 import IndentIcon from '../icons/indent'
@@ -8,25 +8,25 @@ type IndentMode = "increase" | "decrease"
 
 // Default props definition matching your other components
 const def = () => ({
-    buttonType: $("outlined" as ButtonStyles),
-    title: $("" as string),
+    buttonType: $("outlined", HtmlString) as ObservableMaybe<ButtonStyles>,
+    title: $("", HtmlString) as ObservableMaybe<string>,
     cls: $('', HtmlClass) as JSX.Class | undefined,
     class: $('', HtmlClass) as JSX.Class | undefined,
-    mode: $("increase" as IndentMode),
+    mode: $("increase", HtmlString) as ObservableMaybe<IndentMode>,
     step: $(1, HtmlNumber) as ObservableMaybe<number>,
-    disabled: $(false) as Observable<boolean>,
+    disabled: $(false, HtmlBoolean) as Observable<boolean>,
 })
 
 const Indent = defaults(def, (props) => {
-    const { buttonType, title, cls, class: cn, mode, step, disabled, ...otherProps } = props as any
+    const { buttonType, title, cls, class: cn, mode, step, disabled, ...otherProps } = props
 
     const editor = useEditor()
     const isDecrease = () => $$(mode) === 'decrease'
 
     // Determine Icon and Title based on mode
     const displayIcon = () => isDecrease()
-        ? <OutdentIcon class="size-6" />
-        : <IndentIcon class="size-6" />
+        ? <IndentIcon class="size-5" />
+        : <OutdentIcon class="size-5" />
 
     const displayTitle = () => {
         const t = $$(title)
@@ -47,7 +47,9 @@ const Indent = defaults(def, (props) => {
         <Button
             type={buttonType}
             title={displayTitle}
-            class={[cls, cn]}
+            class={() => [
+                () => $$(cls) ? $$(cls) : cn
+            ]}
             disabled={disabled}
             onClick={handleClick}
             {...otherProps}
