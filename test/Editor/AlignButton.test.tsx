@@ -17,10 +17,10 @@ const AlignButtonDemo = () => {
                 </div>
                 <p class="m-2 ">Enabled Button</p>
                 <div class="flex gap-4 items-center my-2 border border-gray-300 rounded p-4">
-                    <AlignButton mode="left" />
-                    <AlignButton mode="center" />
-                    <AlignButton mode="right" />
-                    <AlignButton mode="justify" />
+                    <AlignButton mode="left" cls="text-black" />
+                    <AlignButton mode="center" cls="text-black" />
+                    <AlignButton mode="right" cls="text-black" />
+                    <AlignButton mode="justify" cls="text-black" />
                 </div>
                 <div contentEditable class="border border-gray-300 rounded p-4 min-h-[200px] mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <p>Select this text and try the alignment buttons below!</p>
