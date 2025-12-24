@@ -30,10 +30,13 @@ const FontFamilyDropDown = defaults(def, (props) => {
 
     const { class: cn, cls, defaultIndex, ...otherProps } = props
 
+    const BASE_BTN = "size-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-black hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500 cursor-pointer"
+
     const editor = $(EditorContext)
     const isOpen = $(false)
     const selectedFont = $(FONT_FAMILY[$$(defaultIndex)].label) // Default to Arial
     const dropdownRef = $<HTMLDivElement>(null)
+
 
     useOnClickOutside(dropdownRef, () => isOpen(false))
 
@@ -108,11 +111,6 @@ const FontFamilyDropDown = defaults(def, (props) => {
         isOpen(false)
     }
 
-
-    const KeybordDropDownArrow = () => {
-        return <KeyboardDownArrow class="-mr-1 ml-2 h-5 w-5" />
-    }
-
     const DropDownMenu = () => {
         return (
             <div
@@ -130,7 +128,7 @@ const FontFamilyDropDown = defaults(def, (props) => {
                     {FONT_FAMILY.map(font => (
                         <Button
                             type="outlined"
-                            cls="w-full text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100 hover:text-gray-900"
+                            cls="w-full text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100 hover:text-gray-900 cursor-pointer"
                             role="menuitem"
                             onClick={(e) => { e.preventDefault(); handleSelectFont(font.value, font.label) }}
                             style={{ fontFamily: font.value }}
@@ -143,34 +141,60 @@ const FontFamilyDropDown = defaults(def, (props) => {
         )
     }
 
-    const BASE_BTN = "size-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-black hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500"
+    const handleApplyCurrent = (e: MouseEvent) => {
+        e.preventDefault()
+
+        const currentLabel = $$(selectedFont)
+        const font = FONT_FAMILY.find(f => f.label === currentLabel)
+
+        if (editor) {
+            applyFontFamily(font.value)
+        }
+    }
+
 
     return (
-        <div class={() => ["relative inline-block text-left", cls]} ref={dropdownRef}>
+        <div
+            class={() => [
+                () => $$(cls) ? $$(cls) : "relative inline-block text-left", cn,
+            ]} ref={dropdownRef}>
             <div>
                 <Button
                     type='outlined'
-                    cls={() => [BASE_BTN]}
-                    onClick={toggleDropdown}
+                    cls={() => [
+                        BASE_BTN
+                    ]}
+                    onClick={handleApplyCurrent}
                     title="Font family"
+                    {...otherProps}
                 >
                     <span class="text-center truncate">
                         {() => $$(selectedFont)}
                     </span>
                     <span class="flex justify-end">
-                        {KeybordDropDownArrow}
+                        <KeyboardDownArrow class="-mr-1 ml-2 h-5 w-5" onClick={toggleDropdown} />
                     </span>
                 </Button>
             </div>
 
-            {() => $$(isOpen) && (
-                <DropDownMenu />
-            )}
+            {() => $$(isOpen) && (<DropDownMenu />)}
         </div>
     )
 })
 
+export { FontFamilyDropDown }
 
+customElement('wui-font-family-drop-down', FontFamilyDropDown)
+
+declare module 'woby' {
+    namespace JSX {
+        interface IntrinsicElements {
+            'wui-font-family-drop-down': ElementAttributes<typeof FontFamilyDropDown>
+        }
+    }
+}
+
+export default FontFamilyDropDown
 
 // #region Font Family Drop Down Original Code
 const FontFamilyDropDown_ = () => {
@@ -271,17 +295,3 @@ const FontFamilyDropDown_ = () => {
 // #endregion
 
 
-export { FontFamilyDropDown }
-
-customElement('wui-font-family-drop-down', FontFamilyDropDown)
-
-// NOTE: Add the custom element to the JSX namespace
-declare module 'woby' {
-    namespace JSX {
-        interface IntrinsicElements {
-            'wui-font-family-drop-down': ElementAttributes<typeof FontFamilyDropDown>
-        }
-    }
-}
-
-export default FontFamilyDropDown
