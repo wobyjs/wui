@@ -17,15 +17,15 @@
     </woby-chk>
 
     <woby-chk name="Left Align Button">
-        <wui-align-button content-align="start" snapshot-name="Left-Align-Button" />
+        <wui-align-button mode="start" snapshot-name="Left-Align-Button" />
     </woby-chk>
 
     <woby-chk name="Center Align Button">
-        <wui-align-button content-align="center" snapshot-name="Center-Align-Button" />
+        <wui-align-button mode="center" snapshot-name="Center-Align-Button" />
     </woby-chk>
 
     <woby-chk name="Right Align Button">
-        <wui-align-button content-align="end" snapshot-name="Right-Align-Button" />
+        <wui-align-button mode="end" snapshot-name="Right-Align-Button" />
     </woby-chk>
 
     <woby-chk name="Disable Align Button">
@@ -35,28 +35,35 @@
     <woby-chk name="AlignButton">
         <div snapshot-name="AlignButtonTest" class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
             <EditorContext.Provider value={editorRef}>
-                <UndoRedo>
-                    <div class="mb-4">
-                        <p>Disabled Button</p>
-                        <div class="flex gap-4 items-center my-2">
-                            <wui-align-button content-align="start" disabled="true"></wui-align-button>
-                            <wui-align-button content-align="center" disabled="true"></wui-align-button>
-                            <wui-align-button content-align="end" disabled="true"></wui-align-button>
-                        </div>
-                        <p>Enabled Button</p>
-                        <div class="flex gap-4 items-center my-2">
-                            <wui-align-button content-align="start"></wui-align-button>
-                            <wui-align-button content-align="center"></wui-align-button>
-                            <wui-align-button content-align="end"></wui-align-button>
-                        </div>
-                        <div contentEditable
-                            class="border border-gray-300 rounded p-4 min-h-[200px] mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <p>Select this text and try the alignment buttons below!</p>
-                            <p>You can align start, center, or end.</p>
-                        </div>
-
+                <!-- <UndoRedo> -->
+                <div class="mb-4">
+                    <p>Disabled Button</p>
+                    <div class="flex gap-4 items-center my-2">
+                        <wui-align-button mode="left" disabled="true"></wui-align-button>
+                        <wui-align-button mode="center" disabled="true"></wui-align-button>
+                        <wui-align-button mode="right" disabled="true"></wui-align-button>
+                        <wui-align-button mode="justify" disabled="true"></wui-align-button>
                     </div>
-                </UndoRedo>
+                    <p>Enabled Button</p>
+                    <div class="flex gap-4 items-center my-2">
+                        <wui-align-button mode="left" class="text-black"></wui-align-button>
+                        <wui-align-button mode="center" class="text-black"></wui-align-button>
+                        <wui-align-button mode="right" class="text-black"></wui-align-button>
+                        <wui-align-button mode="justify" class="text-black"></wui-align-button>
+                    </div>
+                    <div contentEditable
+                        class="border border-gray-300 rounded p-4 min-h-[200px] mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <p>Select this text and try the alignment buttons below!</p>
+                        <p>You can align left, center, right, or justify.</p><br />
+                        <p>Lorem ipsum dolor sit amet consectetur adipiscing elit. Quisque faucibus ex sapien vitae
+                            pellentesque sem placerat. In id cursus mi pretium tellus duis convallis. Tempus leo eu
+                            aenean sed diam urna tempor. Pulvinar vivamus fringilla lacus nec metus bibendum egestas.
+                            Iaculis massa nisl malesuada lacinia integer nunc posuere. Ut hendrerit semper vel class
+                            aptent taciti sociosqu. Ad litora torquent per conubia nostra inceptos himenaeos.</p>
+                    </div>
+
+                </div>
+                <!-- </UndoRedo> -->
             </EditorContext.Provider>
         </div>
     </woby-chk>

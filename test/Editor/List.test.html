@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>List Component Test</title>
+    <link href="/node_modules/@woby/chk/dist/index.css" rel="stylesheet">
+    <script type="module" src="../../src/Editor/List.tsx"></script>
+</head>
+
+<body>
+    <link href="../dist/wui.css" rel="stylesheet">
+    <h2 class="text-[1.2em] pl-4 font-bold">List Component Test Suite</h2>
+
+    <woby-chk name="ListButton">
+        <div snapshot-name="ListButtonTest" class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+            <EditorContext.Provider value={editorRef}>
+                <UndoRedo>
+                    <div class="mb-4">
+                        <div class="flex gap-4 items-center my-2">
+                            <wui-list-button mode="bullet" class="text-black"></wui-list-button>
+                            <wui-list-button mode="number" class="text-black"></wui-list-button>
+                        </div>
+                        <div contentEditable
+                            class="border border-gray-300 rounded p-4 min-h-[200px] mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <p>Try selecting this text and click the List Buttons above!</p>
+                            <p>You can transform text into bullet lists or numbered lists.</p>
+                            <p>Test the functionality by highlighting any paragraph and clicking either button.</p>
+                        </div>
+                    </div>
+                </UndoRedo>
+            </EditorContext.Provider>
+        </div>
+    </woby-chk>
+
+</body>
+
+</html>

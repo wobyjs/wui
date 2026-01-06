@@ -1,19 +1,20 @@
-import { Button } from '../Button'
+import { Button, ButtonStyles } from '../Button'
 import ItalicIcon from '../icons/italic' // Renamed for clarity if Bold is a type/component elsewhere
 import { applyStyle, range, getCurrentRange } from './utils'
 import { useEditor } from './undoredo' // useUndoRedo not directly needed here anymore
-import { $, $$, customElement, defaults, ElementAttributes, Observable, useEffect } from 'woby'
+import { $, $$, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlClass, HtmlString, Observable, ObservableMaybe, useEffect } from 'woby'
 
 
 const def = () => ({
-    buttonType: $("outlined" as "text" | "contained" | "outlined" | "icon"),
-    title: $("Italic"),
-    cls: $(""),
-    disabled: $(false) as Observable<boolean>,
+    buttonType: $("outlined", HtmlString) as ObservableMaybe<ButtonStyles>,
+    title: $("Italic", HtmlString) as ObservableMaybe<string>,
+    cls: $('', HtmlClass) as JSX.Class | undefined,
+    class: $('', HtmlClass) as JSX.Class | undefined,
+    disabled: $(false, HtmlBoolean) as Observable<boolean>,
 })
 
 const ItalicButton = defaults(def, (props) => {
-    const { buttonType: btnType, title, cls, disabled, ...otherProps } = props as any
+    const { buttonType: btnType, title, cls, class: cn, disabled, ...otherProps } = props
 
     const editorNode = useEditor()
     const isActive = $(false)
@@ -45,10 +46,10 @@ const ItalicButton = defaults(def, (props) => {
     const handleClick = (e: any) => {
         e.preventDefault() // Prevent button from stealing focus
 
-        if (otherProps.onClick) {
-            otherProps.onClick(e)
-            return
-        }
+        // if (otherProps.onClick) {
+        //     otherProps.onClick(e)
+        //     return
+        // }
 
         // Ensure modern CSS styles (span style="font-style: italic") instead of <i> tags
         document.execCommand('styleWithCSS', false, 'true')
@@ -64,10 +65,11 @@ const ItalicButton = defaults(def, (props) => {
         <Button
             type={btnType}
             title={title}
-            cls={[
-                cls, "size-fit",
+            class={() => [
+                () => $$(cls) ? $$(cls) : cn,
                 () => $$(isActive) ? '!bg-slate-200' : ''
             ]}
+
             aria-pressed={() => $$(isActive) ? "true" : "false"}
             disabled={disabled}
             onClick={handleClick}

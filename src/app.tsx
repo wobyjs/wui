@@ -31,7 +31,14 @@ import { BoldButton } from './Editor/BoldButton'
 import { ItalicButton } from './Editor/ItalicButton'
 import { UnderlineButton } from './Editor/UnderlineButton'
 import { TextStyleButton } from './Editor/TextStyleButton'
-
+import { FontSize } from './Editor/FontSize'
+import { FontFamilyDropDown } from './Editor/FontFamilyDropDown'
+import { TextFormatOptionsDropDown } from './Editor/TextFormatOptionsDropDown'
+import { TextColorPicker } from './Editor/TextColorPicker'
+import { TextBackgroundColorPicker } from './Editor/TextBackgroundColorPicker'
+import { Indent } from './Editor/Indent'
+import { ListButton } from './Editor/List'
+import { InsertDropDown } from './Editor/InsertDropDown'
 
 const isDev = typeof import.meta.env !== 'undefined' && import.meta.env.DEV
 
@@ -75,6 +82,33 @@ export function App() {
                     </a>
                     <a href="#textstylebutton" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
                         TextStyleButton
+                    </a>
+                    <a href="#fontsize" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                        Font Size
+                    </a>
+                    <a href="#fontfamilydropdown" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                        Font Family
+                    </a>
+                    <a href="#textformatoptionsdropdown" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                        Text Format Options
+                    </a>
+                    <a href="#textcolorpicker" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                        Text Color Picker
+                    </a>
+                    <a href="#textbackgroundcolorpicker" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                        Text Background Color Picker
+                    </a>
+                    <a href="#textformatoptionsdropdown" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                        Text Format Options
+                    </a>
+                    <a href="#indent" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                        Indent
+                    </a>
+                    <a href="#listbutton" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                        List
+                    </a>
+                    <a href="#insertdropdown" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                        Insert Dropdown
                     </a>
                     <a href="#card" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
                         Card
@@ -224,10 +258,10 @@ export function App() {
                         <Avatar src="/sample-avatar.png" alt="Sample avatar" />
                     </div>
                     <div class="border border-gray-300 rounded-lg p-4 flex items-center justify-center min-h-[120px]">
-                        <Avatar cls="w-16 h-16 ring-2 ring-blue-500" src="/sample-avatar.png" />
+                        <Avatar class="w-16 h-16 ring-2 ring-blue-500" src="/sample-avatar.png" />
                     </div>
                     <div class="border border-gray-300 rounded-lg p-4 flex items-center justify-center min-h-[120px]">
-                        <Avatar cls="w-12 h-12 bg-purple-500">JL</Avatar>
+                        <Avatar class="w-12 h-12 bg-purple-500">JL</Avatar>
                     </div>
                 </div>
             </div>
@@ -307,6 +341,7 @@ export function App() {
 
     // #region Editor
 
+
     // #region AlignButton Demo
     const alignButtonDemo = () => {
         return <>
@@ -357,6 +392,29 @@ export function App() {
     }
     // #endregion
 
+    // #region Indent Demo
+    const indentDemo = () => {
+        return <>
+            <h2 id="indent" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Indent Demo</h2>
+            <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                <EditorContext.Provider value={editorRef}>
+                    <UndoRedo>
+                        <div class="mb-4">
+                            <div class="flex gap-4 items-center my-2">
+                                <Indent mode="increase" cls="text-black" />
+                                <Indent mode="decrease" cls="text-black" />
+                            </div>
+                            <div ref={editorRef} contentEditable class="border border-gray-300 rounded p-4 min-h-[200px] mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <p>Select this text and try the Indent Buttons below!</p>
+                                <p>You can make text indent.</p>
+                            </div>
+                        </div>
+                    </UndoRedo>
+                </EditorContext.Provider>
+            </div>
+        </>
+    }
+    // #endregion
 
     // #region Italic Button Demo
     const italicButtonDemo = () => {
@@ -430,6 +488,182 @@ export function App() {
         </>
     }
     // #endregion
+
+
+    // #region Font Size Demo
+    const fontSizeDemo = () => {
+        return <>
+            <h2 id="fontsize" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Font Size Demo</h2>
+            <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                <EditorContext.Provider value={editorRef}>
+                    <UndoRedo>
+                        <div class="mb-4">
+                            <div class="flex gap-4 items-center my-2">
+                                <FontSize cls="text-black" />
+                            </div>
+                            <div ref={editorRef} contentEditable class="border border-gray-300 rounded p-4 min-h-[200px] mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <p>Select this text and try the Font Size Buttons below!</p>
+                                <p>You can change the font size.</p>
+                            </div>
+                        </div>
+                    </UndoRedo>
+                </EditorContext.Provider>
+            </div>
+        </>
+    }
+    // #endregion
+
+
+    // #region Font Family Drop Down Demo
+    const fontFamilyDropDownDemo = () => {
+        return <>
+            <h2 id="fontfamilydropdown" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Font Family Drop Down Demo</h2>
+            <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                <EditorContext.Provider value={editorRef}>
+                    <UndoRedo>
+                        <div class="mb-4">
+                            <div class="flex gap-4 items-center my-2">
+                                <FontFamilyDropDown cls="my-2 py-2" defaultIndex={0} />
+                            </div>
+                            <div ref={editorRef} contentEditable class="border border-gray-300 rounded p-4 min-h-[200px] mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <p>Select this text and try the Font Family Drop Down above!</p>
+                                <p>You can change the font family.</p>
+                            </div>
+                        </div>
+                    </UndoRedo>
+                </EditorContext.Provider>
+            </div>
+        </>
+    }
+    // #endregion
+
+
+    // #region Text Format Options Drop Down Demo
+    const textFormatOptionsDropDownDemo = () => {
+        return <>
+            <h2 id="textformatoptionsdropdown" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Text Format Options Drop Down Demo</h2>
+            <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                <EditorContext.Provider value={editorRef}>
+                    <UndoRedo>
+                        <div class="mb-4">
+                            <div class="flex gap-4 items-center my-2">
+                                <TextFormatOptionsDropDown />
+                            </div>
+                            <div ref={editorRef} contentEditable class="border border-gray-300 rounded p-4 min-h-[200px] mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <p>Select this text and try the Text Format Options Drop Down above!</p>
+                                <p>You can change the text format options.</p>
+                            </div>
+                        </div>
+                    </UndoRedo>
+                </EditorContext.Provider>
+            </div>
+        </>
+    }
+    // #endregion
+
+
+    // #region Text Color Picker Demo
+    const textColorPickerDemo = () => {
+        return <>
+            <h2 id="textcolorpicker" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Text Color Picker Demo</h2>
+            <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                <EditorContext.Provider value={editorRef}>
+                    <UndoRedo>
+                        <div class="mb-4">
+                            <div class="flex gap-4 items-center my-2">
+                                <TextColorPicker />
+                            </div>
+                            <div ref={editorRef} contentEditable class="border border-gray-300 rounded p-4 min-h-[200px] mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <p>Select this text and try the Text Color Picker above!</p>
+                                <p>You can change the text color.</p>
+                            </div>
+                        </div>
+                    </UndoRedo>
+                </EditorContext.Provider>
+            </div>
+        </>
+    }
+    // #endregion
+
+    // #region Text Background Color Picker Demo
+    const textBackgroundColorPickerDemo = () => {
+        return <>
+            <h2 id="textbackgroundcolorpicker" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Text Background Color Picker Demo</h2>
+            <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                <EditorContext.Provider value={editorRef}>
+                    <UndoRedo>
+                        <div class="mb-4">
+                            <div class="flex gap-4 items-center my-2">
+                                <TextBackgroundColorPicker />
+                            </div>
+                            <div ref={editorRef} contentEditable class="border border-gray-300 rounded p-4 min-h-[200px] mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <p>Select this text and try the Text Background Color Picker above!</p>
+                                <p>You can change the text background color.</p>
+                            </div>
+                        </div>
+                    </UndoRedo>
+                </EditorContext.Provider>
+            </div>
+        </>
+    }
+    // #endregion
+
+    // #region List Button Demo
+    const listButtonDemo = () => {
+        return <>
+            <h2 id="listbutton" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">List Demo</h2>
+            <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                <EditorContext.Provider value={editorRef}>
+                    <UndoRedo>
+                        <div class="mb-4">
+                            <div class="flex gap-4 items-center my-2 border border-gray-300 rounded p-4">
+                                <ListButton mode="bullet" />
+                                <ListButton mode="number" />
+                            </div>
+                            <div
+                                ref={editorRef}
+                                contentEditable
+                                class="border border-gray-300 rounded p-4 min-h-[200px] mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            >
+                                <p>Select this text and try the List Buttons above!</p>
+                                <p>You can create bullet or numbered lists.</p>
+                            </div>
+                        </div>
+                    </UndoRedo>
+                </EditorContext.Provider>
+            </div>
+        </>
+    }
+    // #endregion
+
+    // #region Insert DropDown (Horizontal Rule, Image, Table)
+    const insertDropDownDemo = () => {
+        return <>
+            <h2 id="insertdropdown" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Insert Drop Down Demo</h2>
+            <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                <EditorContext.Provider value={editorRef}>
+                    <UndoRedo>
+                        <div class="mb-4">
+                            <div class="flex gap-4 items-center my-2 border border-gray-300 rounded p-4">
+                                <InsertDropDown />
+                            </div>
+                            <div
+                                ref={editorRef}
+                                contentEditable
+                                class="border border-gray-300 rounded p-4 min-h-[200px] mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            >
+                                <p>Click the Insert Dropdown above to add content!</p>
+                                <p>You can insert various elements like tables, images, or other components.</p>
+                                <p>Try selecting text and using the dropdown to enhance your content.</p>
+                            </div>
+                        </div>
+                    </UndoRedo>
+                </EditorContext.Provider>
+            </div>
+        </>
+    }
+    // #endregion
+
 
 
     // #endregion
@@ -3399,40 +3633,48 @@ underline:  ${$$(isUnderline)}`}
             </p>
 
             {/* Table of Contents Navigation */}
-            {tableOfContents()}
+            {tableOfContents}
 
             <div class="space-y-4">
-                {appbarDemo()}
-                {avatarDemo()}
-                {badgeDemo()}
-                {buttonDemo()}
+                {appbarDemo}
+                {avatarDemo}
+                {badgeDemo}
+                {buttonDemo}
 
                 {/* Editor */}
-                {alignButtonDemo()}
-                {boldButtonDemo()}
-                {italicButtonDemo()}
+                {alignButtonDemo}
+                {boldButtonDemo}
+                {italicButtonDemo}
                 {underlineButtonDemo}
-                {textStyleButtonDemo()}
+                {textStyleButtonDemo}
+                {fontSizeDemo}
+                {fontFamilyDropDownDemo}
+                {textFormatOptionsDropDownDemo}
+                {textColorPickerDemo}
+                {textBackgroundColorPickerDemo}
+                {indentDemo}
+                {listButtonDemo}
+                {insertDropDownDemo}
 
-                {cardDemo()}
-                {checkboxDemo()}
-                {chipDemo()}
-                {collapseDemo()}
-                {iconButtonDemo()}
-                {wheelerDemo()}
-                {multiWheelerDemo()}
-                {datetimeWheelerDemo()}
-                {fabDemo()}
-                {numberFieldDemo()}
-                {paperDemo()}
-                {sidebarDemo()}
-                {switchDemo()}
-                {tabsDemo()}
-                {textareaDemo()}
-                {textFieldDemo()}
-                {toggleButtonDemo()}
-                {toolbarDemo()}
-                {zoomableDemo()}
+                {cardDemo}
+                {checkboxDemo}
+                {chipDemo}
+                {collapseDemo}
+                {iconButtonDemo}
+                {wheelerDemo}
+                {multiWheelerDemo}
+                {datetimeWheelerDemo}
+                {fabDemo}
+                {numberFieldDemo}
+                {paperDemo}
+                {sidebarDemo}
+                {switchDemo}
+                {tabsDemo}
+                {textareaDemo}
+                {textFieldDemo}
+                {toggleButtonDemo}
+                {toolbarDemo}
+                {zoomableDemo}
             </div>
 
             <div class="mt-8 p-4 bg-gray-100 rounded">

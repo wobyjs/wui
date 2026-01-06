@@ -1,10 +1,7 @@
-import { $, $$, useEffect, isObservable, useTimeout, useInterval, Observable, ObservableMaybe, type JSX, defaults, customElement, type ElementAttributes, HtmlBoolean, useMemo, HtmlNumber, HtmlClass } from 'woby'
+import { $, $$, useEffect, isObservable, Observable, ObservableMaybe, type JSX, defaults, customElement, type ElementAttributes, HtmlBoolean, useMemo, HtmlNumber, HtmlClass } from 'woby'
 import { Button } from './Button'
 
-const btnCls = `
-bg-transparent items-center justify-center cursor-pointer relative m-0 border-[none] [outline:none] [-webkit-appearance:none]
-disabled:bg-[#d9dbda]
-`
+const btnCls = `bg-transparent items-center justify-center cursor-pointer relative m-0 border-[none] [outline:none] [-webkit-appearance:none] disabled:bg-[#d9dbda]`
 
 const def = () => ({
     /** Child elements to be rendered inside the number field */
@@ -52,11 +49,14 @@ const NumberField = defaults(def, (props) => {
 
     const inputRef = $<HTMLInputElement>()
 
-    const error = useMemo(() => (+$$(value) < +$$(min) || +$$(value) > +$$(max)))
+    const error = useMemo(() => {
+        if ($$(noMinMax)) return false
+        return +$$(value) < +$$(min) || +$$(value) > +$$(max)
+    })
 
     // Fix the disabled button logic to properly handle disabled state
-    const cantMin = () => $$(disabled) || ($$(value) <= $$(min) && $$(noRotate))
-    const cantMax = () => $$(disabled) || ($$(value) >= $$(max) && $$(noRotate))
+    const cantMin = () => $$(disabled) || (!$$(noMinMax) && $$(value) <= $$(min) && $$(noRotate))
+    const cantMax = () => $$(disabled) || (!$$(noMinMax) && $$(value) >= $$(max) && $$(noRotate))
 
     let pvalue: number
     const updated = () => {
@@ -64,8 +64,8 @@ const NumberField = defaults(def, (props) => {
         if ($$(disabled)) return
 
         if (pvalue === +$$(value)) return
-        // Fix: if noFix is true, don't fix the value regardless of noRotate
-        if ($$(noFix)) return
+        // If noFix OR noMinMax is true, don't perform automatic clamping/rotation
+        if ($$(noFix) || $$(noMinMax)) return
 
         if (+$$(value) < +$$(min))
             isObservable(value) && value($$(noRotate) ? +$$(min) : +$$(max))
@@ -85,9 +85,13 @@ const NumberField = defaults(def, (props) => {
         // When reactive is true, update the value directly
         // When reactive is false, update the value through the input
         if ($$(reactive) && isObservable(value)) {
-            (value as Observable)?.(+$$((value)) - +$$(step))
+            const newValue = +$$((value)) - +$$(step)
+                ; (value as Observable)?.(newValue)
+            // console.log("Decreased to:", newValue)
         } else if (!$$(reactive) && isObservable(value)) {
-            (value as Observable)?.((+$$(inputRef).valueAsNumber as any) - +$$(step))
+            const newValue = (+$$(inputRef).valueAsNumber as any) - +$$(step)
+                ; (value as Observable)?.(newValue)
+            // console.log("Decreased to:", newValue)
         }
         updated()
     }
@@ -99,113 +103,157 @@ const NumberField = defaults(def, (props) => {
         // When reactive is true, update the value directly
         // When reactive is false, update the value through the input
         if ($$(reactive) && isObservable(value)) {
-            (value as Observable)?.(+$$((value)) + +$$(step))
+            const newValue = +$$((value)) + +$$(step)
+                ; (value as Observable)?.(newValue)
+            // console.log("Increased to:", newValue)
         } else if (!$$(reactive) && isObservable(value)) {
-            (value as Observable)?.((+$$(inputRef).valueAsNumber as any) + +$$(step))
+            const newValue = (+$$(inputRef).valueAsNumber as any) + +$$(step)
+                ; (value as Observable)?.(newValue)
+            // console.log("Increased to:", newValue)
         }
         updated()
     }
 
-    let interval: ReturnType<typeof useInterval>
-    let timeout: ReturnType<typeof useTimeout>
+    // Use plain variables instead of observables to store timer IDs
+    // Storing in observables was causing reactivity issues that triggered re-renders
+    let intervalId: number | null = null
+    let timeoutId: number | null = null
 
     function startContinuousUpdate(isIncrement: boolean) {
+        // console.log("Start: Continuous Update");
+
         // Don't allow continuous update if disabled
         if ($$(disabled)) return
+
+        // Clear any existing timers first
+        stopUpdate()
 
         // Update immediately on press
         isIncrement ? inc() : dec()
 
         // Start interval to continue updating while pressed
-        timeout = useTimeout(() => {
-            interval = useInterval(() => {
+        // Use native setTimeout/setInterval to avoid reactive hook issues
+        timeoutId = setTimeout(() => {
+            // console.log("Timeout fired - starting interval");
+            intervalId = setInterval(() => {
+                // console.log("Interval tick - before update");
                 isIncrement ? inc() : dec()
+                // console.log("Interval tick - after update");
             }, 100)
+            // console.log("Interval created with ID:", intervalId);
         }, 200)
+        // console.log("Timeout created with ID:", timeoutId);
     }
 
     function stopUpdate() {
-        timeout?.()
-        interval?.()
+        // console.log("Stop: Continuous Update");
+        // console.log("Stopping - timeout ID:", timeoutId, "interval ID:", intervalId);
+
+        if (timeoutId !== null) {
+            // console.log("Clearing timeout:", timeoutId);
+            clearTimeout(timeoutId)
+            timeoutId = null
+        }
+        if (intervalId !== null) {
+            // console.log("Clearing interval:", intervalId);
+            clearInterval(intervalId)
+            intervalId = null
+        }
+        // console.log("Stop complete");
     }
 
+    // Add global pointerup listener as a safety net
+    useEffect(() => {
+        const handleGlobalPointerUp = () => {
+            if (intervalId !== null || timeoutId !== null) {
+                // console.log("Global PointerUp: Stopping update");
+                stopUpdate()
+            }
+        }
+
+        document.addEventListener('pointerup', handleGlobalPointerUp)
+        document.addEventListener('pointercancel', handleGlobalPointerUp)
+
+        return () => {
+            document.removeEventListener('pointerup', handleGlobalPointerUp)
+            document.removeEventListener('pointercancel', handleGlobalPointerUp)
+            // Clean up any remaining timers when component unmounts
+            stopUpdate()
+        }
+    })
+
     // return <div class={["number-input inline-flex border-2 border-solid border-[#ddd] box-border [&_*]:box-border", cls]}>
-    return <div class={[
-        "number-input inline-flex items-center bg-white border border-gray-300 rounded-lg transition-all duration-200",
-        "focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500", // Nice focus state
-        "divide-x divide-gray-200", // Subtle dividers between elements
-        { "bg-gray-100 opacity-70": disabled }, // Style for disabled state
-        () => $$(cls) ? $$(cls) : "",
-        cn
-    ]}>
-        <Button
-            // class={btnCls}
-            type="icon" cls="!rounded-none !rounded-l-md !w-10 !h-10"
-            buttonFunction="button"
-            onPointerDown={() => startContinuousUpdate(false)}
-            onPointerUp={stopUpdate}
-            onPointerLeave={stopUpdate}
-            disabled={cantMin}>
-            <span class="py-4 px-2 text-lg font-semibold">-</span>
-        </Button>
-        <input
-            ref={inputRef}
-            //     class={[`quantity  [-webkit-appearance:textfield] [-moz-appearance:textfield] [appearance:textfield]
-            // [&::-webkit-inner-spin-button]:[-webkit-appearance:none] [&::-webkit-outer-spin-button]:[-webkit-appearance:none]
-            // text-center p-2 border-solid border-[0_2px]
-            // `, { "text-[red]": error }]}
-            class={[
-                // Remove old borders and make input transparent and clean
-                "w-16 text-center border-none bg-transparent focus:outline-none focus:ring-0 text-lg font-semibold text-gray-700",
-                "[-moz-appearance:textfield] [&::-webkit-inner-spin-button]:hidden [&::-webkit-outer-spin-button]:hidden",
-                { "text-red-500": error }
-            ]}
-            type="number"
-            value={value}
-            min={min}
-            max={max}
-            step={step}
-            onChange={e => {
-                // Don't allow change if disabled
-                if ($$(disabled)) return
+    return (
+        <div class={[
+            "number-input inline-flex items-center bg-white border border-gray-300 rounded-lg transition-all duration-200",
+            "focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500", // Nice focus state
+            "divide-x divide-gray-200", // Subtle dividers between elements
+            { "bg-gray-100 opacity-70": disabled }, // Style for disabled state
+            () => $$(cls) ? $$(cls) : "",
+            cn
+        ]}>
+            <Button
+                // class={btnCls}
+                type="icon" cls="!rounded-none !rounded-l-md !w-10 !h-10 !border-r !border-gray-200 !bg-transparent"
+                buttonFunction="button"
+                onPointerDown={() => { startContinuousUpdate(false); }}
+                onPointerUp={stopUpdate}
+                onPointerLeave={stopUpdate}
+                disabled={cantMin}>
+                <span class="py-4 px-2 text-lg font-semibold">-</span>
+            </Button>
+            <input
+                ref={inputRef}
+                class={[
+                    "w-16 text-center border-none bg-transparent focus:outline-none focus:ring-0 text-lg font-semibold text-gray-700",
+                    "[-moz-appearance:textfield] [&::-webkit-inner-spin-button]:hidden [&::-webkit-outer-spin-button]:hidden",
+                    { "text-red-500": error }
+                ]}
+                type="number"
+                value={value}
+                min={() => $$(noMinMax) ? undefined : $$(min)} // min={min}
+                max={() => $$(noMinMax) ? undefined : $$(max)}// max={max}
+                step={step}
+                onChange={e => {
+                    // Don't allow change if disabled
+                    if ($$(disabled)) return
 
-                !$$(reactive) && isObservable(value) ? ((value as Observable)?.(e.target.valueAsNumber), onChange?.(e))
-                    : undefined
-                updated()
-            }}
-            onWheel={e => {
-                // Don't allow wheel if disabled
-                if ($$(disabled)) {
+                    !$$(reactive) && isObservable(value) ? ((value as Observable)?.(e.target.valueAsNumber), onChange?.(e))
+                        : undefined
+                    updated()
+                }}
+                onWheel={e => {
+                    // Don't allow wheel if disabled
+                    if ($$(disabled)) {
+                        e.preventDefault()
+                        return
+                    }
+
                     e.preventDefault()
-                    return
-                }
-
-                e.preventDefault()
-                Math.sign(e.deltaY) > 0 ? dec() : inc()
-            }}
-            {...otherProps}
-            disabled={disabled}
-        />
-        <Button
-            // class={[btnCls, "plus"]}
-            // cls="plus"
-            type="icon" cls="!rounded-none !rounded-r-md !w-10 !h-10"
-            onPointerDown={() => startContinuousUpdate(true)}
-            onPointerUp={stopUpdate}
-            onPointerLeave={stopUpdate}
-            disabled={cantMax}>
-            <span class="py-4 px-2 text-lg font-semibold">+</span>
-        </Button>
-        {children}
-    </div>
+                    Math.sign(e.deltaY) > 0 ? dec() : inc()
+                }}
+                {...otherProps}
+                disabled={disabled}
+            />
+            <Button
+                // class={[btnCls, "plus"]}
+                // cls="plus"
+                type="icon" cls="!rounded-none !rounded-r-md !w-10 !h-10 !border-l !border-gray-200 !bg-transparent"
+                onPointerDown={() => { startContinuousUpdate(true); }}
+                onPointerUp={stopUpdate}
+                onPointerLeave={stopUpdate}
+                disabled={cantMax} >
+                <span class="py-4 px-2 text-lg font-semibold">+</span>
+            </Button >
+            {children}
+        </div >
+    )
 }) as typeof NumberField & JSX.IntrinsicElements['div']
 
 export { NumberField }
 
-// Register as custom element
 customElement('wui-number-field', NumberField)
 
-// Add the custom element to the JSX namespace
 declare module 'woby' {
     namespace JSX {
         interface IntrinsicElements {

@@ -15,6 +15,14 @@
     <script type="module" src="../src/Editor/ItalicButton.tsx"></script>
     <script type="module" src="../src/Editor/UnderlineButton.tsx"></script>
     <script type="module" src="../src/Editor/TextStyleButton.tsx"></script>
+    <script type="module" src="../src/Editor/FontSize.tsx"></script>
+    <script type="module" src="../src/Editor/FontFamilyDropDown.tsx"></script>
+    <script type="module" src="../src/Editor/TextFormatOptionsDropDown.tsx"></script>
+    <script type="module" src="../src/Editor/TextColorPicker.tsx"></script>
+    <script type="module" src="../src/Editor/TextBackgroundColorPicker.tsx"></script>
+    <script type="module" src="../src/Editor/Indent.tsx"></script>
+    <script type="module" src="../src/Editor/List.tsx"></script>
+    <script type="module" src="../src/Editor/InsertDropDown.tsx"></script>
     <script type="module" src="../src/Card.tsx"></script>
     <script type="module" src="../src/Checkbox.tsx"></script>
     <script type="module" src="../src/Chip.tsx"></script>
@@ -97,6 +105,38 @@
             <a href="#textstylebutton"
                 class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
                 TextStyleButton
+            </a>
+            <a href="#fontsize"
+                class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                FontSize
+            </a>
+            <a href="#fontfamilydropdown"
+                class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                FontFamily
+            </a>
+            <a href="#textformatoptionsdropdown"
+                class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                Text Format Options
+            </a>
+            <a href="#textcolorpicker"
+                class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                Text Color Picker
+            </a>
+            <a href="#textbackgroundcolorpicker"
+                class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                Text Background Picker
+            </a>
+            <a href="#indent"
+                class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                Indent
+            </a>
+            <a href="#listbutton"
+                class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                List Button
+            </a>
+            <a href="#insertdropdown"
+                class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
+                Insert Dropdown
             </a>
             <a href="#card"
                 class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
@@ -227,10 +267,11 @@
                     <wui-avatar src="/sample-avatar.png" alt="Sample avatar"></wui-avatar>
                 </div>
                 <div class="border border-gray-300 rounded-lg p-4 flex items-center justify-center min-h-[120px]">
-                    <wui-avatar cls="ring-2 ring-blue-500" src="/sample-avatar.png"></wui-avatar>
+                    <wui-avatar class="ring-2 ring-blue-500 rounded-full" src="/sample-avatar.png"></wui-avatar>
                 </div>
                 <div class="border border-gray-300 rounded-lg p-4 flex items-center justify-center min-h-[120px]">
-                    <wui-avatar cls="bg-purple-500" size="md" variant="circular">JL</wui-avatar>
+                    <wui-avatar class="text-white bg-purple-500 rounded-full" size="md"
+                        variant="circular">JL</wui-avatar>
                 </div>
             </div>
         </div>
@@ -311,6 +352,7 @@
         </div>
     </template>
     <!-- #endregion -->
+
 
     <!-- #region Editor -->
 
@@ -432,6 +474,190 @@
     </template>
     <!-- #endregion -->
 
+
+    <!-- #region font size -->
+    <template id="font-size-demo">
+        <h2 id="fontsize" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Font Size Demo</h2>
+        <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+            <EditorContext.Provider value={editorRef}>
+                <UndoRedo>
+                    <div class="mb-4">
+                        <div class="flex gap-4 items-center my-2">
+                            <wui-font-size></wui-font-size>
+                        </div>
+                        <div ref={editorRef} contentEditable
+                            class="border border-gray-300 rounded p-4 min-h-[200px] mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <p>Select this text and try the font size!</p>
+                            <p>You can make text font size larger or smaller.</p>
+                        </div>
+                    </div>
+                </UndoRedo>
+            </EditorContext.Provider>
+        </div>
+    </template>
+    <!-- #endregion -->
+
+
+    <!-- #region font family drop down -->
+    <template id="font-family-drop-down-demo">
+        <h2 id="fontfamilydropdown" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Font Family Drop Down Demo</h2>
+        <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+            <EditorContext.Provider value={editorRef}>
+                <UndoRedo>
+                    <div class="mb-4">
+                        <div class="flex gap-4 items-center my-2">
+                            <wui-font-family-drop-down cls="my-2 py-2" default-index="1"></wui-font-family-drop-down>
+                        </div>
+                        <div ref={editorRef} contentEditable
+                            class="border border-gray-300 rounded p-4 min-h-[200px] mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <p>Select this text and try the font family drop down!</p>
+                            <p>You can make text font family different.</p>
+                        </div>
+                    </div>
+                </UndoRedo>
+            </EditorContext.Provider>
+        </div>
+    </template>
+    <!-- #endregion -->
+
+
+    <!-- #region text format options drop down -->
+    <template id="text-format-options-drop-down-demo">
+        <h2 id="textformatoptionsdropdown" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Text Format Options Drop
+            Down Demo</h2>
+        <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+            <EditorContext.Provider value={editorRef}>
+                <UndoRedo>
+                    <div class="mb-4">
+                        <div class="flex gap-4 items-center my-2">
+                            <wui-text-format-options-drop-down cls="my-2 py-2"></wui-text-format-options-drop-down>
+                        </div>
+                        <div ref={editorRef} contentEditable
+                            class="border border-gray-300 rounded p-4 min-h-[200px] mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <p>Select this text and try the text format options drop down!</p>
+                            <p>You can make text font format options different.</p>
+                        </div>
+                    </div>
+                </UndoRedo>
+            </EditorContext.Provider>
+        </div>
+    </template>
+    <!-- #endregion -->
+
+    <!-- #region text color picker -->
+    <template id="text-color-picker-demo">
+        <h2 id="textcolorpicker" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Text Color Picker Demo</h2>
+        <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+            <EditorContext.Provider value={editorRef}>
+                <UndoRedo>
+                    <div class="mb-4">
+                        <div class="flex gap-4 items-center my-2">
+                            <wui-text-color-picker></wui-text-color-picker>
+                        </div>
+                        <div ref={editorRef} contentEditable
+                            class="border border-gray-300 rounded p-4 min-h-[200px] mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <p>Select this text and try the text color!</p>
+                            <p>You can make text color.</p>
+                        </div>
+                    </div>
+                </UndoRedo>
+            </EditorContext.Provider>
+        </div>
+    </template>
+    <!-- #endregion -->
+
+
+    <!-- #region text background color picker -->
+    <template id="text-background-color-picker-demo">
+        <h2 id="textbackgroundcolorpicker" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Text Background Color
+            Picker Demo</h2>
+        <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+            <EditorContext.Provider value={editorRef}>
+                <UndoRedo>
+                    <div class="mb-4">
+                        <div class="flex gap-4 items-center my-2">
+                            <wui-text-background-color-picker></wui-text-background-color-picker>
+                        </div>
+                        <div ref={editorRef} contentEditable
+                            class="border border-gray-300 rounded p-4 min-h-[200px] mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <p>Select this text and try the text background color!</p>
+                            <p>You can make text background color.</p>
+                        </div>
+                    </div>
+                </UndoRedo>
+            </EditorContext.Provider>
+        </div>
+    </template>
+    <!-- #endregion -->
+
+    <!-- #region indent -->
+    <template id="indent-demo">
+        <h2 id="indent" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Indent Demo</h2>
+        <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+            <EditorContext.Provider value={editorRef}>
+                <UndoRedo>
+                    <div class="mb-4">
+                        <div class="flex gap-4 items-center my-2">
+                            <wui-indent mode="increase" cls="text-black"></wui-indent>
+                            <wui-indent mode="decrease" cls="text-black"></wui-indent>
+                        </div>
+                        <div ref={editorRef} contentEditable
+                            class="border border-gray-300 rounded p-4 min-h-[200px] mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <p>Select this text and try the indent!</p>
+                            <p>You can make text indent.</p>
+                        </div>
+                    </div>
+                </UndoRedo>
+            </EditorContext.Provider>
+        </div>
+    </template>
+    <!-- #endregion -->
+
+    <!-- #region list button -->
+    <template id="list-button-demo">
+        <h2 id="listbutton" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">List Button Demo</h2>
+        <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+            <EditorContext.Provider value={editorRef}>
+                <UndoRedo>
+                    <div class="mb-4">
+                        <div class="flex gap-4 items-center my-2">
+                            <wui-list-button mode="bullet"></wui-list-button>
+                            <wui-list-button mode="number"></wui-list-button>
+                        </div>
+                        <div ref={editorRef} contentEditable
+                            class="border border-gray-300 rounded p-4 min-h-[200px] mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <p>Select this text and try the List Buttons above!</p>
+                            <p>You can create bullet or numbered lists.</p>
+                        </div>
+                    </div>
+                </UndoRedo>
+            </EditorContext.Provider>
+        </div>
+    </template>
+    <!-- #endregion -->
+
+    <!-- #region insert dropdown (horizontal rule, image, table) -->
+    <template id="insert-dropdown-demo">
+        <h2 id="insertdropdown" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Insert Drop Down Demo</h2>
+        <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+            <EditorContext.Provider value={editorRef}>
+                <UndoRedo>
+                    <div class="mb-4">
+                        <div class="flex gap-4 items-center my-2">
+                            <wui-insert-dropdown></wui-insert-dropdown>
+                        </div>
+                        <div contentEditable
+                            class="border border-gray-300 rounded p-4 min-h-[200px] mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <p>Click the Insert Dropdown above to add content!</p>
+                            <p>You can insert various elements like tables, images, or other components.</p>
+                            <p>Try selecting text and using the dropdown to enhance your content.</p>
+                        </div>
+                    </div>
+                </UndoRedo>
+            </EditorContext.Provider>
+        </div>
+    </template>
+    <!-- #endregion -->
 
 
     <!-- #endregion -->
@@ -2361,12 +2587,21 @@ Underline:<span id="debug-toggle-underline">false</span></pre>
                 'avatar-demo',
                 'badge-demo',
                 'button-demo',
+
                 // Editor
                 'align-button-demo', // Add IDs for all your templates
                 'bold-button-demo',
                 'italic-button-demo',
                 'underline-button-demo',
                 'text-style-button-demo',
+                'font-size-demo',
+                'font-family-drop-down-demo',
+                'text-format-options-drop-down-demo',
+                'text-color-picker-demo',
+                'text-background-color-picker-demo',
+                'indent-demo',
+                'list-button-demo',
+                'insert-dropdown-demo',
 
                 'card-demo',
                 'checkbox-demo',

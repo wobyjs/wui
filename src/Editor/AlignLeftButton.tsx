@@ -1,37 +1,50 @@
-import { Observable, $$ } from 'woby'
-import { Button } from '../Button'
+import { Observable, $$, $, HtmlString, ObservableMaybe, HtmlClass, HtmlBoolean, defaults, StyleEncapsulationProps, customElement, ElementAttributes } from 'woby'
+import { Button, ButtonStyles } from '../Button'
 import AlignLeft from '../icons/align_left'
 import { useEditor } from './undoredo'
 import { findBlockParent, getCurrentRange } from './utils'
+import { applyTextAlign } from './AlignButton'
 
+// Default props
+const def = () => ({
+    buttonType: $("outlined", HtmlString) as ObservableMaybe<ButtonStyles>,
+    title: $("Align Left", HtmlString) as ObservableMaybe<string>,
+    cls: $('', HtmlClass) as JSX.Class | undefined,
+    class: $('', HtmlClass) as JSX.Class | undefined,
+    disabled: $(false, HtmlBoolean) as Observable<boolean>,
+})
 
-
-export const applyTextAlign = (alignment: 'left' | 'center' | 'right', editor: Observable<HTMLDivElement>) => {
-    const ranges = getCurrentRange()
-
-    if (!ranges) return
-
-    let parentElement = ranges.commonAncestorContainer as HTMLElement
-    if (parentElement.nodeType === 3)
-        parentElement = parentElement.parentElement as HTMLElement
-
-    if (!parentElement) return
-
-    const blockElement = findBlockParent(parentElement, editor)
-    if (blockElement)
-        blockElement.style.textAlign = alignment
-    else
-        if ($$(editor)) $$(editor).style.textAlign = alignment
-}
-
-
-export const AlignLeftButton = () => {
-    // const { undos, saveDo } = useUndoRedo() // Removed
+const AlignLeftButton = defaults(def, (props) => {
+    const { buttonType, title, cls, class: cn, disabled, ...otherProps } = props
     const editor = useEditor()
 
-    return <Button buttonType='outlined' onClick={() => {
-        // saveDo(undos) // Removed: MutationObserver in Editor.tsx should now handle this
+    return (
+        <Button
+            type={buttonType}
+            title={title}
+            class={[() => $$(cls) ? $$(cls) : "", cn]}
+            disabled={disabled}
+            onClick={() => {
+                applyTextAlign('left', editor)
+            }}
+            {...otherProps}
+        >
+            <AlignLeft />
+        </Button>
+    )
+}) as typeof AlignLeftButton & StyleEncapsulationProps
 
-        applyTextAlign('left', editor)
-    }} title="Align Left"><AlignLeft /></Button>
+
+export { AlignLeftButton }
+
+customElement('wui-align-left-button', AlignLeftButton)
+
+declare module 'woby' {
+    namespace JSX {
+        interface IntrinsicElements {
+            'wui-align-left-button': ElementAttributes<typeof AlignLeftButton>
+        }
+    }
 }
+
+export default AlignLeftButton

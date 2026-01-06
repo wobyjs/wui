@@ -1,108 +1,220 @@
-import { $$, Observable, } from 'woby'
-import { Button } from '../Button'
+import { $, $$, customElement, defaults, ElementAttributes, HtmlClass, HtmlString, ObservableMaybe, useEffect, } from 'woby'
+import { Button, ButtonStyles } from '../Button'
 import ListBulleted from '../icons/list_bulleted'
 import ListNumbered from '../icons/list_numbered'
-import { expandRange, cloneAttributes, isTags, getElementsInRange } from './utils'
-import { useEditor } from './undoredo' // Removed useUndoRedo
+import { useEditor } from './undoredo'
 
-const semanticTags = ['TABLE', 'TBODY', 'THEAD', 'TFOOT', 'TR', 'TD', 'IMG', 'BLOCKQUOTE',
-    'ARTICLE', 'ASIDE', 'DETAILS', 'FIGCAPTION', 'FIGURE', 'FOOTER', 'HEADER', 'MAIN', 'MARK', 'NAV', 'SECTION', 'SUMMARY', 'TIME',
-]
+type ListMode = "bullet" | "number"
 
-const insertList = (
-    editor: Observable<HTMLDivElement>,
-    tag: 'ol' | 'ul' = 'ul',
-    className = 'list-inside',
-    liClass = 'list-disc'
-) => {
-    const r = expandRange()
-    if (!r) return
+const def = () => ({
+    cls: $('', HtmlClass) as JSX.Class | undefined,
+    class: $('', HtmlClass) as JSX.Class | undefined,
+    buttonType: $("outlined", HtmlString) as ObservableMaybe<ButtonStyles>,
+    mode: $("bullet", HtmlString) as ObservableMaybe<ListMode>,
+})
 
-    const selectedBlocks = getElementsInRange(r, editor)
-    if (selectedBlocks.length === 0) return
+const ListButton = defaults(def, (props) => {
+    const { class: cn, cls, mode, buttonType: btnType, ...otherProps } = props
 
-    const liClassList = liClass.split(' ')
-    const newList = document.createElement(tag)
-    newList.className = className
+    const editor = useEditor()
+    const isActive = $(false)
 
-    const parentList = selectedBlocks[0].closest?.('ul,ol')
-    const selectedLis = selectedBlocks.filter(el => el.tagName === 'LI' && el.closest('ul,ol') === parentList)
-
-    // Case 1: Selection within one list
-    if (selectedLis.length > 0 && parentList) {
-        const isSameType = parentList.tagName.toLowerCase() === tag
-
-        if (isSameType) {
-            // Just toggle class
-            selectedLis.forEach(li => {
-                li.classList.remove('list-disc', 'list-decimal')
-                li.classList.add(...liClassList)
-            })
-        } else {
-            // Nest a new list with cloned selected <li>s
-            const nestedList = document.createElement(tag)
-            nestedList.className = className
-
-            selectedLis.forEach(li => {
-                const cloned = li.cloneNode(true) as HTMLElement
-                cloned.classList.remove('list-disc', 'list-decimal')
-                cloned.classList.add(...liClassList)
-                nestedList.appendChild(cloned)
-            })
-
-            const wrapperLi = document.createElement('li')
-            wrapperLi.appendChild(nestedList)
-
-            // Insert before first selected <li>
-            parentList.insertBefore(wrapperLi, selectedLis[0])
-
-            // Remove selected <li>s after insertion
-            selectedLis.forEach(li => li.remove())
-        }
-        return
+    // Reactive Icon
+    const icon = () => {
+        const m = $$(mode)
+        if (m === "bullet") return <ListBulleted class="size-5" />
+        if (m === "number") return <ListNumbered class="size-5" />
+        return <ListBulleted class="size-5" />
     }
 
-    // Case 2: Generic block wrapping
-    for (const block of selectedBlocks) {
-        if (block.tagName === 'TABLE' || block.closest('table')) {
-            const li = document.createElement('li')
-            li.classList.add(...liClassList)
-            li.appendChild(block.cloneNode(true))
-            cloneAttributes(li, block)
-            newList.appendChild(li)
-            block.remove()
+    // Reactive Title
+    const title = () => {
+        const m = $$(mode)
+        if (m === "bullet") return "Bulleted List"
+        if (m === "number") return "Numbered List"
+        return "List"
+    }
+
+    useEffect(() => {
+        const editorEl = $$(editor)
+        const currentMode = $$(mode)
+        const targetTag = currentMode === 'bullet' ? 'UL' : 'OL'
+
+        const updateState = () => {
+            let state = false
+
+            // METHOD A: Native Command State (Try this first)
+            try {
+                const command = currentMode === 'bullet' ? 'insertUnorderedList' : 'insertOrderedList'
+                if (document.queryCommandState(command)) {
+                    state = true
+                }
+            } catch (e) { }
+
+            // METHOD B: Manual DOM Check (Fallback & robustness)
+            // If native check failed (or returned false), we verify the DOM manually.
+            // This ensures the button lights up even if focus is slightly ambiguous.
+            if (!state) {
+                const sel = window.getSelection()
+                if (sel && sel.rangeCount > 0) {
+                    let node: Node | null = sel.getRangeAt(0).commonAncestorContainer
+                    if (node.nodeType === Node.TEXT_NODE) node = node.parentElement
+
+                    if (node instanceof HTMLElement) {
+                        // Find the CLOSEST list parent (either UL or OL)
+                        // We use 'ul, ol' to find the immediate parent list type.
+                        // This prevents highlighting Bullet button if we are inside an OL that is nested in a UL.
+                        const closestList = node.closest('ul, ol')
+
+                        if (closestList && closestList.tagName === targetTag) {
+                            // Verify this list is actually inside our editor (if we know the editor)
+                            if (editorEl) {
+                                if (editorEl.contains(closestList)) state = true
+                            } else {
+                                // If no editor context (Web Component), just trust the selection
+                                state = true
+                            }
+                        }
+                    }
+                }
+            }
+
+            isActive(state)
+        }
+
+        document.addEventListener('selectionchange', updateState)
+        document.addEventListener('mouseup', updateState)
+        document.addEventListener('keyup', updateState)
+
+        // Run once on mount
+        updateState()
+
+        return () => {
+            document.removeEventListener('selectionchange', updateState)
+            document.removeEventListener('mouseup', updateState)
+            document.removeEventListener('keyup', updateState)
+        }
+    })
+
+    const handleClick = (e: MouseEvent) => {
+        e.preventDefault()
+
+        const editorEl = $$(editor)
+        const buttonMode = $$(mode)
+
+        // Ensure we don't force inline styles, we want classes
+        document.execCommand('styleWithCSS', false, 'false')
+
+        if (buttonMode === "bullet") {
+            insertList(editorEl, 'ul', 'list-disc', 'list-decimal')
         } else {
-            const li = document.createElement('li')
-            li.classList.add(...liClassList)
-            li.append(...Array.from(block.childNodes)) // move children
-            cloneAttributes(li, block)
-            newList.appendChild(li)
-            block.remove()
+            insertList(editorEl, 'ol', 'list-decimal', 'list-disc')
+        }
+
+        // Force update UI state immediately
+        // (Short timeout allows the DOM to update first)
+        setTimeout(() => {
+            // Manually trigger a check
+            const evt = new Event('selectionchange')
+            document.dispatchEvent(evt)
+        }, 10)
+    }
+
+    const handleMouseDown = (e: MouseEvent) => {
+        e.preventDefault()
+        e.stopPropagation()
+    }
+
+    return (
+        <Button
+            type={btnType}
+            onClick={handleClick}
+            onMouseDown={handleMouseDown}
+            title={title}
+            class={() => [
+                () => $$(cls) ? $$(cls) : cn,
+                () => $$(isActive) ? '!bg-slate-200' : ''
+            ]}
+
+            aria-pressed={() => $$(isActive) ? "true" : "false"}
+            {...otherProps}
+        >
+            {icon}
+        </Button>
+    )
+})
+
+export { ListButton }
+
+customElement('wui-list-button', ListButton)
+
+declare module 'woby' {
+    namespace JSX {
+        interface IntrinsicElements {
+            'wui-list-button': ElementAttributes<typeof ListButton>
+        }
+    }
+}
+
+export default ListButton
+
+
+// #region insertList - Handle list insertion and styling
+const insertList = (editor: any, listTag: 'ul' | 'ol', classToAdd: string, classToRemove: string) => {
+    const selection = window.getSelection()
+    if (!selection || selection.rangeCount === 0) return
+
+    // 1. Resolve Editor Root
+    let root: HTMLElement | null = (editor instanceof HTMLElement) ? editor : null
+
+    if (!root) {
+        let node: Node | null = selection.getRangeAt(0).commonAncestorContainer
+        if (node.nodeType === Node.TEXT_NODE) node = node.parentElement
+        if (node instanceof HTMLElement) {
+            root = node.isContentEditable
+                ? node
+                : node.closest('[contenteditable="true"]') as HTMLElement
         }
     }
 
-    r.deleteContents()
-    r.insertNode(newList)
+    if (!root || !(root instanceof HTMLElement)) return
+
+    // 2. Ensure Focus
+    if (document.activeElement !== root && !root.contains(document.activeElement)) {
+        root.focus()
+    }
+
+    // 3. Execute Command
+    const command = listTag === 'ul' ? 'insertUnorderedList' : 'insertOrderedList'
+    document.execCommand(command, false)
+
+    // 4. Apply Styling & Cleanup
+    const newSelection = window.getSelection()
+    if (newSelection && newSelection.rangeCount > 0) {
+        let node: Node | null = newSelection.getRangeAt(0).commonAncestorContainer
+        if (node.nodeType === Node.TEXT_NODE) node = node.parentElement
+
+        if (node instanceof HTMLElement) {
+            const listEl = node.closest(listTag)
+            if (listEl && root.contains(listEl)) {
+                // Force remove opposing class to fix visual bugs during swap
+                listEl.classList.remove(classToRemove)
+                listEl.classList.add('list-inside', classToAdd)
+                return
+            }
+        }
+    }
+
+    // 5. Fallback Cleanup
+    const wrongLists = root.querySelectorAll(`${listTag}.${classToRemove}`)
+    wrongLists.forEach(l => {
+        l.classList.remove(classToRemove)
+        l.classList.add('list-inside', classToAdd)
+    })
+
+    const bareLists = root.querySelectorAll(`${listTag}:not(.${classToAdd})`)
+    bareLists.forEach(l => {
+        l.classList.add('list-inside', classToAdd)
+    })
 }
-
-
-
-export const BulletListButton = () => {
-    // const { undos, saveDo } = useUndoRedo() // Removed
-    const editor = useEditor()
-
-    return <Button buttonType='outlined' onClick={() => {
-        // saveDo(undos) // Removed: MutationObserver in Editor.tsx should now handle this
-        insertList(editor, 'ul', 'list-inside list-disc')
-    }} title="Bulleted List"><ListBulleted /></Button>
-}
-
-export const NumberedListButton = () => {
-    // const { undos, saveDo } = useUndoRedo() // Removed
-    const editor = useEditor()
-
-    return <Button buttonType='outlined' onClick={() => {
-        // saveDo(undos) // Removed: MutationObserver in Editor.tsx should now handle this
-        insertList(editor, 'ol', 'list-inside', 'list-decimal')
-    }} title="Numbered List"><ListNumbered /></Button>
-}
+// #endregion

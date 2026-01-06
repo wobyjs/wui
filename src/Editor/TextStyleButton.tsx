@@ -1,5 +1,5 @@
-import { $, $$, defaults, type JSX, customElement, type ElementAttributes, type Observable, useEffect, type ObservableMaybe } from "woby"
-import { Button } from '../Button'
+import { $, $$, defaults, type JSX, customElement, type ElementAttributes, type Observable, useEffect, type ObservableMaybe, HtmlClass, HtmlString, HtmlBoolean } from "woby"
+import { Button, ButtonStyles } from '../Button'
 import { useEditor } from './undoredo'
 import BoldIcon from '../icons/bold'
 import ItalicIcon from '../icons/italic'
@@ -8,16 +8,17 @@ import UnderlineIcon from '../icons/underline'
 type TextStyleType = 'bold' | 'italic' | 'underline'
 
 const def = () => ({
-    type: $("bold" as TextStyleType),
-    buttonType: $("outlined" as "text" | "contained" | "outlined" | "icon"),
-    title: $("" as string),
-    cls: $(""),
-    disabled: $(false) as Observable<boolean>,
+    cls: $('', HtmlClass) as JSX.Class | undefined,
+    class: $('', HtmlClass) as JSX.Class | undefined,
+    type: $("bold", HtmlString) as ObservableMaybe<TextStyleType>,
+    buttonType: $("outlined", HtmlString) as ObservableMaybe<ButtonStyles>,
+    title: $("", HtmlString) as ObservableMaybe<string>,
+    disabled: $(false, HtmlBoolean) as Observable<boolean>,
     children: $(null) as ObservableMaybe<JSX.Element>,
 })
 
 const TextStyleButton = defaults(def, (props) => {
-    const { type, buttonType: btnType, title, cls, disabled, children, ...otherProps } = props as any
+    const { type, buttonType: btnType, title, cls, class: cn, disabled, children, ...otherProps } = props
 
     const editorNode = useEditor()
     const isActive = $(false)
@@ -90,11 +91,11 @@ const TextStyleButton = defaults(def, (props) => {
         e.preventDefault() // Stop button from stealing focus
 
         // Extract onClick from otherProps. Since we cast props to any, this is now safe.
-        const customOnClick = otherProps.onClick
-        if (customOnClick) {
-            customOnClick(e)
-            return
-        }
+        // const customOnClick = otherProps.onClick
+        // if (customOnClick) {
+        //     customOnClick(e)
+        //     return
+        // }
 
         const config = currentStyleConfig()
 
@@ -112,8 +113,8 @@ const TextStyleButton = defaults(def, (props) => {
         <Button
             type={btnType}
             title={displayTitle}
-            cls={[
-                cls, "size-fit",
+            class={() => [
+                [() => $$(cls) ? $$(cls) : "size-fit", cn],
                 () => $$(isActive) ? '!bg-slate-200' : ''
             ]}
             aria-pressed={() => $$(isActive) ? "true" : "false"}

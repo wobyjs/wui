@@ -1,17 +1,18 @@
-import { $, $$, defaults, useEffect, customElement, type ElementAttributes, type Observable } from "woby"
-import { Button } from '../Button'
+import { $, $$, defaults, useEffect, customElement, type ElementAttributes, type Observable, HtmlBoolean, HtmlClass, ObservableMaybe, HtmlString } from "woby"
+import { Button, ButtonStyles } from '../Button'
 import UnderlineIcon from '../icons/underline'
 import { useEditor } from './undoredo'
 
 const def = () => ({
-    buttonType: $("outlined" as "text" | "contained" | "outlined" | "icon"),
-    title: $("Underline"),
-    cls: $(""),
-    disabled: $(false) as Observable<boolean>,
+    cls: $('', HtmlClass) as JSX.Class | undefined,
+    class: $('', HtmlClass) as JSX.Class | undefined,
+    buttonType: $("outlined", HtmlString) as ObservableMaybe<ButtonStyles>,
+    title: $("Underline", HtmlString) as ObservableMaybe<string>,
+    disabled: $(false, HtmlBoolean) as Observable<boolean>,
 })
 
 const UnderlineButton = defaults(def, (props) => {
-    const { buttonType: btnType, title, cls, disabled, ...otherProps } = props as any
+    const { buttonType: btnType, title, cls, class: cn, disabled, ...otherProps } = props
 
     const editorNode = useEditor()
     const isActive = $(false)
@@ -43,10 +44,10 @@ const UnderlineButton = defaults(def, (props) => {
     const handleClick = (e: any) => {
         e.preventDefault() // Prevent button from stealing focus
 
-        if (otherProps.onClick) {
-            otherProps.onClick(e)
-            return
-        }
+        // if (otherProps.onClick) {
+        //     otherProps.onClick(e)
+        //     return
+        // }
 
         // Ensure modern CSS styles (span style="text-decoration: underline") instead of <u> tags
         document.execCommand('styleWithCSS', false, 'true')
@@ -62,8 +63,8 @@ const UnderlineButton = defaults(def, (props) => {
         <Button
             type={btnType}
             title={title}
-            cls={[
-                cls, "size-fit",
+            class={() => [
+                () => $$(cls) ? $$(cls) : "size-fit", cn,
                 () => $$(isActive) ? '!bg-slate-200' : ''
             ]}
             aria-pressed={() => $$(isActive) ? "true" : "false"}
