@@ -44,6 +44,10 @@ const Wheeler = defaults(def, (props) => {
     //     }
     // })
 
+    useEffect(() =>
+        console.log('Wheeler', 'visible', $$(isVisible))
+    )
+
     const hide = () => {
         isVisible(false)
         if (isObservable(visibleProp)) {
