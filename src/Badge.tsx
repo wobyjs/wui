@@ -1,4 +1,4 @@
-import { $, $$, defaults, type JSX, customElement, type ElementAttributes, type ObservableMaybe, type CustomElementChildren, isObservable, StyleEncapsulationProps, useEffect, HtmlClass } from "woby"
+import { $, $$, defaults, type JSX, customElement, type ElementAttributes, type ObservableMaybe, type CustomElementChildren, isObservable, StyleEncapsulationProps, useEffect, HtmlClass, HtmlString } from "woby"
 import '@woby/chk'
 import './input.css'
 
@@ -35,55 +35,55 @@ const def = () => ({
     class: $('', HtmlClass) as JSX.Class | undefined,
     children: $(null as JSX.Child),
     badgeContent: $(null as JSX.Child),
-    badgeClass: $("bg-[rgb(156,39,176)]" as JSX.Class),
-    vertical: $('top' as 'top' | 'bottom'),
-    horizontal: $('right' as HorizontalPosition),
+    badgeClass: $("bg-[rgb(156,39,176)]", HtmlClass) as JSX.Class | undefined, //$("bg-[rgb(156,39,176)]" as JSX.Class),
+    vertical: $('top', HtmlString) as ObservableMaybe<VerticalPosition>,
+    horizontal: $('right', HtmlString) as ObservableMaybe<HorizontalPosition>,
 })
 
 const Badge = defaults(def, (props) => {
-    console.log('Badge: props received:', props)
+    // console.log('Badge: props received:', props)
     const { class: cn, cls, children, badgeContent, badgeClass, vertical, horizontal, ...otherProps } = props
-    console.log('Badge: destructured props - badgeContent:', badgeContent, 'otherProps:', otherProps)
+    // console.log('Badge: destructured props - badgeContent:', badgeContent, 'otherProps:', otherProps)
 
     // Handle attribute and prop values
     useEffect(() => {
-        console.log('Badge: useEffect running')
+        // console.log('Badge: useEffect running')
         // First check if badgeContent is provided as a prop
         const contentValue = $$(badgeContent)
         if (contentValue) {
-            console.log('Badge: Using prop content value:', contentValue)
+            // console.log('Badge: Using prop content value:', contentValue)
             return
         }
 
         // If no prop value, check for the badge-content attribute from otherProps
         // For custom elements, attributes are passed in otherProps
         // HTML attributes with hyphens are converted to camelCase
-        console.log('Badge: Checking otherProps for badge content...')
-        console.log('Badge: otherProps keys:', Object.keys(otherProps))
+        // console.log('Badge: Checking otherProps for badge content...')
+        // console.log('Badge: otherProps keys:', Object.keys(otherProps))
 
         if (otherProps['badgeContent']) {
             badgeContent(otherProps['badgeContent'])
-            console.log('Badge: Using badgeContent attribute:', otherProps['badgeContent'])
+            // console.log('Badge: Using badgeContent attribute:', otherProps['badgeContent'])
         } else if (otherProps['badge-content']) {
             badgeContent(otherProps['badge-content'])
-            console.log('Badge: Using badge-content attribute:', otherProps['badge-content'])
+            // console.log('Badge: Using badge-content attribute:', otherProps['badge-content'])
         } else if (otherProps['children']) {
             // For HTML custom elements, content might be passed as children
             badgeContent(otherProps['children'])
-            console.log('Badge: Using children attribute:', otherProps['children'])
+            // console.log('Badge: Using children attribute:', otherProps['children'])
         } else {
             // For custom elements, we might need to access the attribute directly from the element
             // This is a fallback for when the attribute isn't properly passed through otherProps
-            console.log('Badge: No content found in props, otherProps:', otherProps)
+            // console.log('Badge: No content found in props, otherProps:', otherProps)
             // Try to access the attribute directly from the element
             // This is a workaround for cases where the attribute conversion is not working
-            console.log('Badge: Trying to access attribute directly from element')
+            // console.log('Badge: Trying to access attribute directly from element')
         }
     })
 
     const isEmpty = () => {
         const empty = !($$(badgeContent))
-        console.log('Badge: isEmpty check, badgeContent:', $$(badgeContent), 'result:', empty)
+        // console.log('Badge: isEmpty check, badgeContent:', $$(badgeContent), 'result:', empty)
         return empty
     }
 
@@ -91,28 +91,28 @@ const Badge = defaults(def, (props) => {
     const visibilityClass = () => {
         const empty = isEmpty()
         const visClass = empty ? 'hidden' : 'min-w-[20px] h-5 rounded-[10px] px-1'
-        console.log('Badge: visibilityClass, isEmpty:', empty, 'class:', visClass)
+        // console.log('Badge: visibilityClass, isEmpty:', empty, 'class:', visClass)
         return visClass
     }
 
     // Transform origin based on position
     const transformOriginClass = () => {
-        if (vertical() === 'top') {
-            return horizontal() === 'right'
+        if (vertical === 'top') {
+            return horizontal === 'right'
                 ? 'translate-x-2/4 -translate-y-2/4 origin-[100%_0%]'
                 : '-translate-x-2/4 -translate-y-2/4 origin-[0%_0%]'
         }
 
         // bottom
-        return horizontal() === 'right'
+        return horizontal === 'right'
             ? 'translate-x-2/4 translate-y-2/4 origin-[100%_100%]'
             : '-translate-x-2/4 translate-y-2/4 origin-[0%_100%]'
     }
 
     // Absolute positioning classes
     const positionClasses = () => {
-        const posClass = `${vertical() === 'top' ? 'top-0' : 'bottom-0'} ${horizontal() === 'right' ? 'right-0' : 'left-0'}`
-        console.log('Badge: positionClasses:', posClass)
+        const posClass = `${vertical === 'top' ? 'top-0' : 'bottom-0'} ${horizontal === 'right' ? 'right-0' : 'left-0'}`
+        // console.log('Badge: positionClasses:', posClass)
         return posClass
     }
 
@@ -129,13 +129,13 @@ const Badge = defaults(def, (props) => {
                             positionClasses(),
                             (badgeClass),
                         ].join(' ')
-                        console.log('Badge: span classes:', classes)
+                        // console.log('Badge: span classes:', classes)
                         return classes
                     }}
                 >
                     {() => {
                         const content = $$(badgeContent)
-                        console.log('Badge: rendering content:', content)
+                        // console.log('Badge: rendering content:', content)
                         return content
                     }}
                 </span>
