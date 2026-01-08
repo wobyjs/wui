@@ -1,4 +1,4 @@
-import { $, $$, defaults, type JSX, isObservable, customElement, type ElementAttributes, type Observable, type ObservableMaybe, type CustomElementChildren, type StyleEncapsulationProps, useEffect, useMemo, HtmlClass } from "woby"
+import { $, $$, defaults, type JSX, isObservable, customElement, type ElementAttributes, type Observable, type ObservableMaybe, type CustomElementChildren, type StyleEncapsulationProps, useEffect, useMemo, HtmlClass, HtmlString } from "woby"
 import '@woby/chk'
 import './input.css'
 
@@ -31,21 +31,22 @@ const def = () => ({
      */
     cls: $('', HtmlClass) as JSX.Class | undefined,
     class: $('', HtmlClass) as JSX.Class | undefined,
-    src: $(null as string | null),
-    alt: $("Avatar"),
-    children: $(null as JSX.Child),
-    size: $("md" as Size),                 // xs | sm | md | lg
-    type: $("circular"),
+    src: $('', HtmlString) as ObservableMaybe<string>,
+    alt: $("Avatar", HtmlString) as ObservableMaybe<string>,
+    // children: $(null, HtmlString) as JSX.Child,
+    children: $(null) as ObservableMaybe<JSX.Child>,
+    size: $("md" as Size) as ObservableMaybe<Size>,                 // xs | sm | md | lg
+    type: $("circular" as Variant) as ObservableMaybe<Variant>,
 })
 
 const BASE_CLASS =
-    "relative flex items-center justify-center align-middle select-none leading-none overflow-hidden shrink-0 text-white m-0 bg-[rgb(189,189,189)]"
+    "relative flex items-center justify-center align-middle select-none leading-none overflow-hidden shrink-0 m-0 bg-[rgb(189,189,189)] text-white"
 
-const variantStyle = (cls: JSX.Class) => ({
-    circular: [cls ? cls : BASE_CLASS, " rounded-full"],
-    rounded: [cls ? cls : BASE_CLASS, " rounded-xl"],
-    square: [cls ? cls : BASE_CLASS, "rounded-md"],
-})
+const variantStyle = {
+    circular: "rounded-full",
+    rounded: "rounded-xl",
+    square: "rounded-md",
+}
 
 const sizeStyle = {
     xs: "w-6 h-6 text-xs",
@@ -74,12 +75,17 @@ const Avatar = defaults(def, (props) => {
 
     return (
         <div
-            class={[() => (variantStyle($$(cls))[$$(variant)]), cn]}
+            class={() => [
+                variantStyle[$$(variant)],
+                sizeStyle[$$(size)],
+                $$(cls) != '' ? cls : BASE_CLASS,
+                cn,
+            ]}
             {...otherProps}
         >
             {child}
             {/* <pre>
-                <p>Class: <span>{className}</span></p>
+                <p>variant: <span>{variantStyle[$$(variant)]}</span></p>
             </pre> */}
         </div>
     )
