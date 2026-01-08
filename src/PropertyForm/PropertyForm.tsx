@@ -6,7 +6,7 @@ import { Button } from "../Button"
 type PropertyFormProps = {
 	obj: any
 	order?: string[]
-	className?: JSX.Class
+	class?: JSX.Class
 	textAlign?: string
 	onCommit?: () => void
 }
@@ -77,24 +77,28 @@ export const TableRow = (props) => {
 	const { optionName, children, indentLvl } = props
 
 	return (
-		<tr className="flex h-fit items-stretch">
-			<th className={`w-fit`}>
-				<button
-					className={"w-5 h-5"}>
-				</button>
+		<tr class="flex w-full items-stretch border-x border-b border-gray-200 bg-white first:border-t transition-colors hover:bg-gray-50/30">
+			<th class="flex w-[150px] shrink-0 items-center px-4 py-2 bg-gray-50/50 border-r border-gray-200 select-none">
+				<span class={`
+					${indent[indentLvl]} 
+					text-[10px] uppercase tracking-wider font-bold text-slate-500 
+					truncate pointer-events-none
+				`}>
+					{optionName.replace(/([A-Z])/g, ' $1')}
+				</span>
 			</th>
-			<th className={`w-[175px] outline-1 whitespace-nowrap text-left`}>
-				<span className={`${indent[indentLvl]}`}>{optionName}</span>
-			</th>
-			<td className="w-full outline-1">
-				{children}
+
+			<td class="flex flex-1 items-center px-4 py-1.5 min-h-[38px] text-sm text-slate-700">
+				<div class="w-full h-full flex items-center">
+					{children}
+				</div>
 			</td>
 		</tr>
 	)
 }
 export const PropertyForm = (props: PropertyFormProps) => {
 	changeEnumerable(props.obj)
-	const { obj, order, className, textAlign } = props
+	const { obj, order, class: className, textAlign } = props
 	const formUI = $$(Editors).map((e) => e())
 	const dashMatchReg = /^-([a-zA-Z].*)-$/
 
@@ -104,7 +108,7 @@ export const PropertyForm = (props: PropertyFormProps) => {
 			sortedKeys.splice(sortedKeys.indexOf("colLabel"), 1)
 		}
 
-		const form = sortedKeys.map((key) => {
+		const form_ = sortedKeys.map((key) => {
 			if (dashMatchReg.test(key)) {
 				return
 			}
@@ -148,18 +152,86 @@ export const PropertyForm = (props: PropertyFormProps) => {
 			]
 		})
 
+		const form = sortedKeys.map((key) => {
+			if (dashMatchReg.test(key) || key.includes("Obj") || key.startsWith("$")) return
+
+			const value = propertyData[key]
+
+			return (
+				<>
+					{title && <tr><td>{title}</td></tr>}
+
+					{/* 
+						{() => {
+							const actualValue = $$(value)
+							const isRenderable = actualValue !== undefined && !(actualValue instanceof HTMLElement)
+
+							return isRenderable ? (
+								<>
+									{formUI.map((formFields) => {
+										const { UI, renderCondition } = formFields
+										if (renderCondition(value, key)) {
+											return (
+												<UI
+													data={propertyData}
+													editorName={key}
+													value={value}
+													textAlign={textAlign}
+												/>
+											)
+										}
+									})}
+								</>
+							) : null
+						}}
+					*/}
+					{() => {
+						const actualValue = $$(value)
+
+						// ALLOW if it's not an HTMLElement OR if the property name is 'children'
+						const isRenderable = actualValue !== undefined && (
+							!(actualValue instanceof HTMLElement) || key === 'children'
+						)
+
+						if (!isRenderable) return null
+
+						return (
+							<>
+								{formUI.map((formFields) => {
+									const { UI, renderCondition } = formFields
+									// Pass 'key' so the editor knows which property it is looking at
+									if (renderCondition(value, key)) {
+										return <UI data={propertyData} editorName={key} value={value} />
+									}
+								})}
+							</>
+						)
+					}}
+				</>
+			)
+		})
+
 		return form
 	}
 
 	return (
 		//@ts-ignore
-		<div>
+		<div class="flex flex-col h-full">
 			<div
 				onClick={e => e.stopPropagation()}
-				class={["overflow-auto", () => (className ? className : "h-[300px] m-3")] as JSX.Class}
+				class={() => [
+					"rounded-lg border border-gray-200 overflow-hidden shadow-sm bg-white",
+					(className ? className : "m-3")
+				]}
 			>
-				<table class={`w-full table-bordered table-sm`}>
-					<tbody>{renderForm(obj, undefined, order)}</tbody>
+				<div class="px-4 py-2 bg-gray-50 border-b border-gray-200">
+					<h3 class="text-[11px] font-bold uppercase tracking-widest text-slate-400">
+						Component Properties
+					</h3>
+				</div>
+
+				<table class="w-full border-collapse table-sm">
+					<tbody class="flex flex-col">{renderForm(obj, undefined, order)}</tbody>
 				</table>
 			</div>
 			<div>

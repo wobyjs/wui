@@ -7,6 +7,7 @@ import { EditorProps } from "./EditorProps"
 import * as test from '../TextField.effect'
 
 export const StringEditor = () => {
+
 	const renderCondition = (value: ObservableMaybe<string>, key) => {
 		if ($$(value) == undefined) return false
 		const hexColorReg = /^#[0-9A-F]{6}$/i
@@ -37,8 +38,6 @@ export const StringEditor = () => {
 
 		return (
 			<TextField
-				className={"size-full"}
-				effect={""}
 				value={value}
 				assignOnEnter
 				disabled={!isObservable(value)}

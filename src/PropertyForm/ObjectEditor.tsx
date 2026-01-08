@@ -1,5 +1,4 @@
 /** @jsxImportSource woby */
-
 import { $, $$, ObservableMaybe, isObservable, useEffect } from "woby"
 import { Editors, UIProps, indent, skippedProperties } from "./PropertyForm"
 import { Collapse } from "../Collapse"
@@ -35,7 +34,7 @@ export const ObjectEditor = () => {
 				<tr className={"flex h-fit items-stretch"}>
 					<th className={`flex items-center whitespace-nowrap`}>{
 						<button
-							className={"w-5 h-5 cursor-pointer"}
+							class={"w-5 h-5 cursor-pointer"}
 							onClick={() =>
 								open(!$$(open))
 							}
@@ -49,7 +48,9 @@ export const ObjectEditor = () => {
 						</button>}
 					</th>
 					<th className={["w-full flex items-center justify-between outline-1 whitespace-nowrap text-left"]}>
-						<span className={["whitespace-nowrap", `${indent[indentLvl]}`]}>{() => $$(optionName)}</span>
+						<span className={() => ["whitespace-nowrap px-2 py-1", `${indent[indentLvl]}`]}>
+							{() => $$(optionName)}
+						</span>
 						{button}
 					</th>
 				</tr>
