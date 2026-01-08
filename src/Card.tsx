@@ -257,7 +257,7 @@ const CardContent = defaults(defCardContent, (props) => {
 
     return (
         <div class={[() => $$(cls) ? $$(cls) : [$$(padding)].join(" "), cn]} {...otherProps}>
-            {children()}
+            {children}
         </div>
     )
 }) as typeof CardContent & StyleEncapsulationProps
@@ -283,7 +283,7 @@ const CardActions = defaults(defCardAction, (props) => {
             class={[() => $$(cls) ? $$(cls) : ["flex items-center", justify(), $$(padding)].join(" "), cn]}
             {...otherProps}
         >
-            {children()}
+            {children}
         </div>
     )
 }) as typeof CardActions & StyleEncapsulationProps
