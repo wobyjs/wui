@@ -93,7 +93,7 @@ const TextFormatDropDown = defaults(def, (props) => {
     const handleSelectFormat = (tag: string, label: TextFormatOptions, cls: string | undefined) => {
 
         const editorDiv = $$(editor)
-        alert("Editor: " + editorDiv)
+        // alert("Editor: " + editorDiv)
         if (editorDiv) {
             selectedFormat(label)
             applyFormatBlock(editorDiv, tag, cls)
