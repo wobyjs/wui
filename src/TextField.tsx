@@ -1,3 +1,4 @@
+import { tw } from '@woby/styled'
 import {
 	effect1, effect2, effect3,
 	effect4, effect5, effect6,
@@ -62,8 +63,8 @@ const effectMap: Record<string, string> = {
 const def = () => ({
 	class: $('', HtmlClass) as JSX.Class | undefined,
 	cls: $('', HtmlClass) as JSX.Class | undefined,
-	children: $(null),
-	effect: $("effect19a", HtmlString) as ObservableMaybe<string> | undefined,
+	children: $(null as JSX.Child),
+	effect: $("", HtmlString) as ObservableMaybe<string> | undefined,
 	assignOnEnter: $(false, HtmlBoolean) as ObservableMaybe<boolean> | undefined,
 	value: $("", HtmlString) as ObservableMaybe<string> | undefined,
 	inputType: $("text", HtmlString) as ObservableMaybe<INPUT_TYPE> | undefined,
@@ -107,7 +108,8 @@ const TextField = defaults(def, (props) => {
 
 	const { cls, class: cn, children, effect, assignOnEnter, value, inputType, placeholder, disabled, onChange, onKeyUp, label, ref, ...otherProps } = props
 
-	const baseClass = "relative z-0"
+	const baseClass = "relative z-0 flex items-center"
+	const defaultStyle = "block w-full py-1.5 px-2 text-base text-gray-900 placeholder:text-gray-400 focus:border-blue-500 sm:text-sm/6 truncate"
 
 	const inputRef = $<HTMLInputElement | null>(null)
 
@@ -117,35 +119,9 @@ const TextField = defaults(def, (props) => {
 		}
 	})
 
-	// // Expose focus method to forward focus to the input element
-	// Object.assign(props, {
-	// 	focus: () => {
-	// 		if (inputRef()) {
-	// 			inputRef()!.focus()
-	// 		}
-	// 	}
-	// })
-
-	// write me logic to check adnorment is exists or not
-	// const child = useMemo(() => {
-	// 	// Flatten children to handle arrays/fragments
-	// 	const kids = [].concat($$(children) as any).flat().filter(Boolean);
-
-	// 	const start = kids.filter((k: any) => k.props?.['data-adornment'] === 'start');
-	// 	const end = kids.filter((k: any) => k.props?.['data-adornment'] === 'end');
-
-	// 	// Everything else (that isn't an adornment)
-	// 	const others = kids.filter((k: any) =>
-	// 		k.props?.['data-adornment'] !== 'start' &&
-	// 		k.props?.['data-adornment'] !== 'end'
-	// 	);
-
-	// 	return { start, end, others };
-	// })
-
 	const effectStyle = useMemo(() => {
 		const effectName = $$(effect)
-		return effectMap[effectName] || ""
+		return effectMap[effectName] || defaultStyle
 	})
 
 	const handleFocus = () => {
@@ -154,6 +130,55 @@ const TextField = defaults(def, (props) => {
 		}
 	}
 
+	const splitChildren = useMemo(() => {
+		const unwrapped = $$(children)
+		const allChildren = [].concat(unwrapped as any).flat().filter(Boolean)
+
+		const getAdornmentType = (child: any) => {
+			if (!child) return null
+
+			// 1. Direct check if the child is the function itself
+			if (child.adornmentType) return child.adornmentType
+
+			// 2. Check common Woby VNode locations for the component function
+			const fn = child.fn || child.component || (typeof child === 'function' ? child : null)
+			if (fn?.adornmentType) return fn.adornmentType
+
+			// 3. Reach into Symbols (This matches your screenshot perfectly)
+			// Your screenshot shows Symbol(CloneElement) -> Component -> adornmentType
+			const symbols = Object.getOwnPropertySymbols(child)
+			for (const sym of symbols) {
+				const internalData = child[sym]
+				if (internalData?.Component?.adornmentType) {
+					return internalData.Component.adornmentType
+				}
+			}
+
+			// 4. Fallback to props check
+			const p = child.props || (typeof child === 'function' ? child.props : null)
+			const typeFromProps = $$(p?.['data-adnorment'])
+			if (typeFromProps) return typeFromProps
+
+			return null
+		}
+
+		// Filter based on the resolved type
+		const start = allChildren.filter(c => getAdornmentType(c) === 'start')
+		const end = allChildren.filter(c => getAdornmentType(c) === 'end')
+		const others = allChildren.filter(c => {
+			const type = getAdornmentType(c)
+			return type !== 'start' && type !== 'end'
+		})
+
+		console.log("[TextField] Final Split Result:", {
+			start: start.length,
+			end: end.length,
+			others: others.length
+		})
+
+		return { start, end, others }
+	})
+
 	return (
 		<div
 			class={[baseClass, () => $$(cls) ? $$(cls) : "", cn]}
@@ -161,49 +186,73 @@ const TextField = defaults(def, (props) => {
 			onFocus={handleFocus}
 		>
 
-			{/* if data-adnorment= start is exists render here */}
-			{/* {() => child().start} */}
+			{/* Render Text Input Field */}
+			<div class="relative flex-1">
+				<div class="relative flex items-center w-full gap-2">
+					{
+						() => splitChildren().start.length ? (
+							<div class="shrink-0 whitespace-nowrap text-[rgba(0,0,0,0.54)]">
+								{splitChildren().start}
+							</div>
+						) : null
+					}
 
-			<input
-				ref={inputRef}
-				class={effectStyle}
-				value={value}
-				disabled={disabled}
-				type={inputType}
-				placeholder={placeholder}
+					<div class="relative flex-1 min-w-0">
+						<input
+							ref={inputRef}
+							class={() => [
+								effectStyle,
+							]}
+							value={value}
+							disabled={disabled}
+							type={inputType}
+							placeholder={placeholder}
 
-				{...otherProps}
+							{...otherProps}
 
-				onChange={(e) => {
-					!$$(assignOnEnter) && isObservable(value) ? (value?.(e.target.value), onChange?.(e)) : undefined
-				}}
-				onKeyUp={(e) => {
-					!$$(assignOnEnter) && isObservable(value) ? (value?.(e.target.value), onKeyUp?.(e)) : (e.key === "Enter" && isObservable(value) && value(e.target.value), onKeyUp?.(e))
-				}}
-			/>
+							onChange={(e) => {
+								!$$(assignOnEnter) && isObservable(value) ? (value?.(e.target.value), onChange?.(e)) : undefined
+							}}
+							onKeyUp={(e) => {
+								!$$(assignOnEnter) && isObservable(value) ? (value?.(e.target.value), onKeyUp?.(e)) : (e.key === "Enter" && isObservable(value) && value(e.target.value), onKeyUp?.(e))
+							}}
+						/>
+						<span class="focus-border focus-bg pointer-events-none"><i></i></span>
 
-			<span class="focus-border focus-bg pointer-events-none"><i></i></span>
+						{() => $$(label) ? <label class="cursor-text">{label}</label> : null}
+					</div>
 
-			{() => $$(label) ? <label class="cursor-text">{label}</label> : null}
 
-			{/* if data-adnorment= end is exists render here */}
-			{/* {() => child().end} */}
-			{/* {() => child().others} */}
-			{children}
+
+					{() => splitChildren().end.length ? (
+						<div class="shrink-0 whitespace-nowrap text-[rgba(0,0,0,0.54)]">
+							{splitChildren().end}
+						</div>
+					) : null}
+				</div>
+			</div>
 		</div>
 	)
 }) as typeof TextField
 
 
-const defAdornment = () => ({
+const defStartAdornment = () => ({
 	cls: $('', HtmlClass) as JSX.Class | undefined,
 	children: $(null),
+	'data-adnorment': 'start'
 })
 
-const StartAdornment = defaults(defAdornment, (props) => {
+const defEndAdnorment = () => ({
+	cls: $('', HtmlClass) as JSX.Class | undefined,
+	children: $(null),
+	'data-adnorment': 'end'
+})
+
+const StartAdornment = defaults(defStartAdornment, (props) => {
 	const { cls, children, ...otherProps } = props
 
-	const baseClass = "flex h-[0.01em] max-h-[2em] items-center whitespace-nowrap text-[rgba(0,0,0,0.54)] mr-2"
+	// const baseClass = "flex h-[0.01em] max-h-[2em] items-center whitespace-nowrap text-[rgba(0,0,0,0.54)] mr-2"
+	const baseClass = "flex h-[0.01em] max-h-[2em] items-center whitespace-nowrap text-[rgba(0,0,0,0.54)]"
 
 	return (
 		<div class={[baseClass, cls]} data-adnorment="start" {...otherProps}>
@@ -211,16 +260,13 @@ const StartAdornment = defaults(defAdornment, (props) => {
 		</div>
 	)
 }) as typeof StartAdornment
+StartAdornment.adornmentType = 'start'// as typeof StartAdornment
 
-const defEndAdnorment = () => ({
-	cls: $('', HtmlClass) as JSX.Class | undefined,
-	children: $(null),
-})
-
-const EndAdornment = defaults(defAdornment, (props) => {
+const EndAdornment = defaults(defEndAdnorment, (props) => {
 	const { cls, children, ...otherProps } = props
 
-	const baseClass = "flex h-[0.01em] max-h-[2em] items-center whitespace-nowrap text-[rgba(0,0,0,0.54)] ml-2"
+	// const baseClass = "flex h-[0.01em] max-h-[2em] items-center whitespace-nowrap text-[rgba(0,0,0,0.54)] ml-2"
+	const baseClass = "flex h-[0.01em] max-h-[2em] items-center whitespace-nowrap text-[rgba(0,0,0,0.54)]"
 
 	return (
 		<div class={[baseClass, cls]} data-adnorment="end" {...otherProps}>
@@ -228,9 +274,13 @@ const EndAdornment = defaults(defAdornment, (props) => {
 		</div>
 	)
 }) as typeof EndAdornment
+EndAdornment.adornmentType = 'end'
 
-
-export { TextField, StartAdornment, EndAdornment }
+export {
+	TextField,
+	StartAdornment,
+	EndAdornment
+}
 
 // Register as custom element
 customElement('wui-text-field', TextField)
