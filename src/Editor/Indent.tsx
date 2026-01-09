@@ -15,10 +15,11 @@ const def = () => ({
     mode: $("increase", HtmlString) as ObservableMaybe<IndentMode>,
     step: $(1, HtmlNumber) as ObservableMaybe<number>,
     disabled: $(false, HtmlBoolean) as Observable<boolean>,
+    identPx: $(20, HtmlNumber) as ObservableMaybe<number>,
 })
 
 const Indent = defaults(def, (props) => {
-    const { buttonType, title, cls, class: cn, mode, step, disabled, ...otherProps } = props
+    const { buttonType, title, cls, class: cn, mode, step, disabled, identPx, ...otherProps } = props
 
     const editor = useEditor()
     const isDecrease = () => $$(mode) === 'decrease'
@@ -38,9 +39,11 @@ const Indent = defaults(def, (props) => {
         e.preventDefault()
 
         const stepVal = $$(step) || 1
+        const pxVal = $$(identPx) || 40
 
         // Call the helper logic
-        applyIndent($$(editor), isDecrease(), stepVal)
+        applyIndent($$(editor), isDecrease(), stepVal, pxVal)
+        // applyIndent($$(editor), isDecrease(), stepVal)
     }
 
     return (
@@ -103,7 +106,7 @@ const getBlockParent = (node: Node | null, root: HTMLElement | null): HTMLElemen
     return null
 }
 
-const applyIndent = (editor: HTMLElement | null, isDecrease: boolean, stepMultiplier: number) => {
+const applyIndent = (editor: HTMLElement | null, isDecrease: boolean, stepMultiplier: number, indentAmount: number) => {
     const selection = window.getSelection()
     if (!selection || selection.rangeCount === 0) return
 
@@ -171,8 +174,8 @@ const applyIndent = (editor: HTMLElement | null, isDecrease: boolean, stepMultip
         document.execCommand(isDecrease ? 'outdent' : 'indent', false)
     } else {
         // Manual Margin Manipulation for standard blocks
-        const INDENT_PX = 40
-        const amount = INDENT_PX * stepMultiplier
+        // const INDENT_PX = 40
+        const amount = indentAmount * stepMultiplier
 
         targets.forEach(el => {
             const computed = window.getComputedStyle(el)
