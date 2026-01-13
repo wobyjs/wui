@@ -1,6 +1,6 @@
 import { $, $$, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlClass, HtmlNumber, HtmlString, JSX, Observable, ObservableMaybe } from 'woby'
 import { Button, ButtonStyles } from '../Button'
-import { EditorContext, useUndoRedo } from './undoredo'
+import { EditorContext, useEditor, useUndoRedo } from './undoredo'
 import { useOnClickOutside } from '@woby/use'
 import { getCurrentRange, getSelectedText, replaceSelectedText } from './utils'
 import KeyboardDownArrow from '../icons/keyboard_down_arrow'
@@ -139,7 +139,9 @@ const TextFormatOptionsDropDown = defaults(def, (props) => {
 
     const BASE_BTN = "size-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-black hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500"
 
-    const editor = $(EditorContext)
+    // const editor = $(EditorContext)
+    const editor = useEditor()
+
     // const { undos, saveDo } = useUndoRedo()
     const undoRedoContext = useUndoRedo()
     const saveDo = undoRedoContext ? undoRedoContext.saveDo : () => { } // No-op if missing
