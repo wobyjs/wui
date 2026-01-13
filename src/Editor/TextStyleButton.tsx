@@ -65,7 +65,7 @@ const TextStyleButton = defaults(def, (props) => {
         const currentType = $$(type)
         const config = styleMap[currentType]
 
-        if (!editor) return
+        if (!editor || typeof editor.contains !== 'function') return
 
         const updateState = () => {
             if (document.activeElement === editor || editor.contains(document.activeElement)) {

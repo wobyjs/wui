@@ -163,7 +163,7 @@ const TextFormatDropDown = defaults(def, (props) => {
     useEffect(() => {
         const handleSelectionChange = () => {
             const editorDiv = $$(editor)
-            if (!editorDiv) return
+            if (!editorDiv || typeof editorDiv.contains !== 'function') return
 
             const selection = window.getSelection()
             if (selection && selection.rangeCount > 0) {
