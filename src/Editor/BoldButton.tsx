@@ -28,7 +28,7 @@ const BoldButton = defaults(def, (props) => {
         // 2. SAFETY CHECK
         // If the editor component hasn't rendered yet or is missing, stop here
         // to prevent crashes (cannot read properties of null).
-        if (!editor) return
+        if (!editor || typeof editor.contains !== 'function') return
 
         // 3. DEFINE LOGIC FUNCTION
         // We create a function to check the current state. We don't run it yet,
@@ -74,12 +74,6 @@ const BoldButton = defaults(def, (props) => {
 
     const handleClick = (e: any) => {
         e.preventDefault() // Prevent button from stealing focus
-
-        // Handle custom onClick if passed
-        // if (otherProps.onClick) {
-        //     otherProps.onClick(e)
-        //     return
-        // }
 
         // Use CSS spans (<span style="font-weight: bold">) instead of <b> tags
         document.execCommand('styleWithCSS', false, 'true')

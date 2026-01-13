@@ -21,7 +21,7 @@ const UnderlineButton = defaults(def, (props) => {
     useEffect(() => {
         const editor = $$(editorNode)
 
-        if (!editor) return
+        if (!editor || typeof editor.contains !== 'function') return
 
         const updateState = () => {
             if (document.activeElement === editor || editor.contains(document.activeElement)) {
