@@ -486,6 +486,13 @@ export const getElementsInRange = (
     return results
 }
 
+/**
+ * Retrieves an array of HTML table cell elements (td/th) that intersect with the given range.
+ * 
+ * @param range - The current browser selection range.
+ * @param container - The Woby observable containing the editor root element.
+ * @returns An array of selected HTMLTableCellElement objects.
+ */
 export const getSelectedTableCells = (
     range: Range,
     container: Observable<HTMLDivElement>
@@ -512,6 +519,12 @@ export const getSelectedTableCells = (
     return selectedCells
 }
 
+/**
+ * Moves the selection focus to the adjacent table cell.
+ * 
+ * @param reverse - If true, moves to the previous cell (Shift+Tab behavior). 
+ *                  If false, moves to the next cell (Tab behavior).
+ */
 export function focusNextTableCell(reverse: boolean = false) {
     const selection = document.getSelection()
     if (!selection || !selection.focusNode) return

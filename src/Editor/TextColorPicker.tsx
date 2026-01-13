@@ -55,6 +55,7 @@ const TextColorPicker = defaults(def, (props) => {
                     () => $$(cls) ? $$(cls) : BASE_BTN, cn,
                 ]}
                 title="Text color"
+                onMouseDown={(e) => { e.preventDefault(); }}
                 onClick={applyPickedColor}
                 {...otherProps}
             >

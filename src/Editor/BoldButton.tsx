@@ -98,9 +98,9 @@ const BoldButton = defaults(def, (props) => {
                 () => $$(cls) ? $$(cls) : cn,
                 () => $$(isActive) ? '!bg-slate-200' : ''
             ]}
-
             aria-pressed={() => $$(isActive) ? "true" : "false"}
             disabled={disabled}
+            onMouseDown={(e) => { e.preventDefault(); }}
             onClick={handleClick}
             {...otherProps}
         >

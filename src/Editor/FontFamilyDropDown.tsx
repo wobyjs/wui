@@ -164,6 +164,7 @@ const FontFamilyDropDown = defaults(def, (props) => {
                     cls={() => [
                         BASE_BTN
                     ]}
+                    onMouseDown={(e) => { e.preventDefault() }}
                     onClick={handleApplyCurrent}
                     title="Font family"
                     {...otherProps}

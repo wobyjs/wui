@@ -119,6 +119,7 @@ const TextAlignDropDown = defaults(def, (props) => {
                                 cls="w-full text-gray-700 group flex items-center px-4 py-2 text-sm hover:bg-gray-100 hover:text-gray-900"
                                 key={item.label}
                                 role="menuitem"
+                                onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
                                 onClick={(e) => { e.preventDefault(); selectedFormat(item.label); handleSelectOption(item.action); }}
                                 title={item.hotkey}
                             >
@@ -141,6 +142,7 @@ const TextAlignDropDown = defaults(def, (props) => {
                     class={() => [
                         () => $$(cls) ? $$(cls) : BASE_BTN, cn,
                     ]}
+                    onMouseDown={(e) => { e.preventDefault(); }}
                     onClick={handleApplyCurrent}
                     title="Text format"
                     {...otherProps}
@@ -156,7 +158,10 @@ const TextAlignDropDown = defaults(def, (props) => {
                         }}
                     </span>
                     <span class="flex justify-end">
-                        <KeyboardDownArrow class="-mr-1 ml-2 h-5 w-5" onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleDropdown() }} />
+                        <KeyboardDownArrow class="-mr-1 ml-2 h-5 w-5"
+                            onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleDropdown() }}
+                        />
                     </span>
                 </Button>
             </div>

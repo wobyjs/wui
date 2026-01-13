@@ -72,6 +72,7 @@ const ItalicButton = defaults(def, (props) => {
 
             aria-pressed={() => $$(isActive) ? "true" : "false"}
             disabled={disabled}
+            onMouseDown={(e) => { e.preventDefault(); }}
             onClick={handleClick}
             {...otherProps}
         >

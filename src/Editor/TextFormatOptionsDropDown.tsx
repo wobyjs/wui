@@ -202,6 +202,7 @@ const TextFormatOptionsDropDown = defaults(def, (props) => {
                     class={() => [
                         () => $$(cls) ? $$(cls) : BASE_BTN, cn,
                     ]}
+                    onMouseDown={(e) => { e.preventDefault(); }}
                     onClick={toggleDropdown}
                     title="More text formats"
                     disabled={disabled}

@@ -63,6 +63,7 @@ const TextBackgroundColorPicker = defaults(def, (props) => {
                     () => $$(cls) ? $$(cls) : BASE_BTN, cn,
                 ]}
                 title="Text background color"
+                onMouseDown={(e) => { e.preventDefault(); }}
                 onClick={applyPickedBgColor}
                 {...otherProps}
             >

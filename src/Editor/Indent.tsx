@@ -36,8 +36,7 @@ const Indent = defaults(def, (props) => {
     }
 
     const handleClick = (e: any) => {
-        e.preventDefault()
-
+        e.preventDefault();
         const stepVal = $$(step) || 1
         const pxVal = $$(identPx) || 40
 
@@ -54,6 +53,7 @@ const Indent = defaults(def, (props) => {
                 () => $$(cls) ? $$(cls) : cn
             ]}
             disabled={disabled}
+            onMouseDown={(e) => { e.preventDefault(); e.stopPropagation() }}
             onClick={handleClick}
             {...otherProps}
         >
