@@ -22,6 +22,7 @@ const def = () => ({
     disabled: $(false, HtmlBoolean) as ObservableMaybe<boolean>,
     mode: $("center", HtmlString) as ObservableMaybe<ContentAlign>,
 })
+
 const AlignButton = defaults(def, (props) => {
     const { type: buttonType, title, cls, class: cn, disabled, mode, ...otherProps } = props as any
     const editor = useEditor()
