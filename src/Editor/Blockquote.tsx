@@ -1,9 +1,11 @@
 import { Button, ButtonStyles } from '../Button'
-import { $, $$, defaults, HtmlBoolean, HtmlClass, HtmlString, Observable, ObservableMaybe, useContext } from "woby"
-import { useEditor, useUndoRedo } from './undoredo'
+import { $, $$, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlClass, HtmlString, Observable, ObservableMaybe, useContext, useEffect } from "woby"
+import { useEditor } from './undoredo'
+import { getCurrentEditor, getActiveSelection, findBlockParent } from './utils'
 
-
-const QUOTE_CLASSES = "text-[15px] text-[#65676b] ml-10 mr-0 mt-0 mb-2.5 pl-2 border-l-[#ced0d4] border-l-4 border-solid inline-block italic"
+// change 'inline-block' to 'block'
+export const QUOTE_CLASSES = "text-[15px] text-[#65676b] ml-10 mr-0 mt-0 mb-2.5 pl-2 border-l-[#ced0d4] border-l-4 border-solid block italic"
+export const QUOTE_TAG = "blockquote"
 
 const def = () => ({
     buttonType: $("outlined", HtmlString) as ObservableMaybe<ButtonStyles>,
@@ -19,102 +21,79 @@ const Blockquote = defaults(def, (props) => {
     const { buttonType: btnType, title: buttonTitle, label: buttonLabel, cls, class: cn, disabled, ...otherProps } = props
 
     const editor = useEditor()
-    const { saveDo } = useUndoRedo()
+    const isActive = $(false)
 
-    // #region Helper Functions
-    const getCurrentBlockInfo = (root: HTMLElement, range: Range) => {
-        let node: Node | null = range.commonAncestorContainer
-        if (node.nodeType === Node.TEXT_NODE) {
-            node = node.parentElement
+    const toggleBlockquote = () => {
+        isActive(!$$(isActive))
+
+        const editorDiv = $$(editor) ?? $$(getCurrentEditor())
+
+        if (!editorDiv) { console.warn("[Blockquote] no editor found."); return; }
+
+        if (!$$(isActive)) {
+            applyFormatBlock(editorDiv, "p", "")
+        } else {
+            applyFormatBlock(editorDiv, QUOTE_TAG, QUOTE_CLASSES)
         }
-
-        const blockTags = ['P', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'BLOCKQUOTE', 'PRE', 'DIV']
-
-        while (node && node !== root) {
-            if (node.nodeType === Node.ELEMENT_NODE) {
-                const el = node as HTMLElement
-                if (blockTags.includes(el.tagName)) {
-                    return el
-                }
-            }
-            node = node.parentNode
-        }
-        return null
+        $$(editorDiv).focus()
     }
 
-    const applyFormatBlock = (editor: HTMLDivElement, tag: string, className: string) => {
-        const formatTag = `<${tag}>`
-        document.execCommand('formatBlock', false, formatTag)
+    /**
+     * Logic to check if the current cursor position is inside a blockquote
+     */
+    const updateActiveStatus = () => {
+        const editorDiv = $$(editor) ?? $$(getCurrentEditor())
+        if (!editorDiv) return
 
-        const selection = window.getSelection()
+        const selection = getActiveSelection(editorDiv)
 
         if (selection && selection.rangeCount > 0) {
             const range = selection.getRangeAt(0)
-            let node: Node | null = range.commonAncestorContainer
-            if (node.nodeType === Node.TEXT_NODE) node = node.parentElement
+            const block = getCurrentBlockInfo(editorDiv, range)
 
-            // Traverse up to find the tag we just requested
-            while (node && node !== editor) {
-                if (node.nodeType === Node.ELEMENT_NODE) {
-                    const el = node as HTMLElement
-                    if (el.tagName.toLowerCase() === tag.toLowerCase()) {
-                        el.className = className
-                        return
-                    }
-                }
-                node = node.parentNode
-            }
+            // Set active if the parent block matches our QUOTE_TAG
+            const isInsideQuote = block?.tagName.toLowerCase() === QUOTE_TAG.toLowerCase()
+            isActive(isInsideQuote)
+        } else {
+            isActive(false)
         }
     }
-    // #endregion
 
-    const toggleBlockquote_ = (e: MouseEvent) => {
-        e.preventDefault()
+    // Monitor selection changes
+    useEffect(() => {
+        // 1. Listen for global selection changes
+        document.addEventListener('selectionchange', updateActiveStatus)
 
-        const editorDiv = $$(editor)
+        // 2. Also listen for keyup/mouseup inside the editor for immediate feedback
+        const editorDiv = $$(editor) ?? $$(getCurrentEditor())
         if (editorDiv) {
-            applyFormatBlock(editorDiv, "blockquote", QUOTE_CLASSES)
-            editorDiv.focus()
+            editorDiv.addEventListener('keyup', updateActiveStatus)
+            editorDiv.addEventListener('mouseup', updateActiveStatus)
         }
-    }
 
-    const toggleBlockquote = (e: MouseEvent) => {
-        e.preventDefault()
-
-        const editorDiv = $$(editor)
-        const selection = window.getSelection()
-
-        if (editorDiv && selection && selection.rangeCount > 0) {
-            saveDo()
-
-            const range = selection.getRangeAt(0)
-            const currentBlock = getCurrentBlockInfo(editorDiv, range)
-
-            if (currentBlock && currentBlock.tagName === 'BLOCKQUOTE') {
-                applyFormatBlock(editorDiv, "p", "")
-            } else {
-                applyFormatBlock(editorDiv, "blockquote", QUOTE_CLASSES)
+        // Cleanup listeners
+        return () => {
+            document.removeEventListener('selectionchange', updateActiveStatus)
+            if (editorDiv) {
+                editorDiv.removeEventListener('keyup', updateActiveStatus)
+                editorDiv.removeEventListener('mouseup', updateActiveStatus)
             }
-
-            editorDiv.focus()
         }
-    }
+    })
 
     return (
         <Button
             type={btnType}
             disabled={disabled}
             title={buttonTitle}
-            onClick={(e) => {
-                e.preventDefault()
-                e.stopPropagation()
-                toggleBlockquote(e)
-            }}
+            class={() => [
+                () => $$(cls) ? $$(cls) : cn,
+                () => $$(isActive) ? '!bg-slate-200' : ''
+            ]}
+            onClick={toggleBlockquote}
+            onMouseDown={(e) => { e.preventDefault(); e.stopPropagation() }}
         >
             <span class="flex items-center gap-2">
-                {/* <svg class="size-4" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M14.017 21L14.017 18C14.017 16.8954 14.9124 16 16.017 16H19.017C19.5693 16 20.017 15.5523 20.017 15V9C20.017 8.44772 19.5693 8 19.017 8H15.017C14.4647 8 14.017 8.44772 14.017 9V13C14.017 13.5523 13.5693 14 13.017 14H12.017V21H14.017ZM6.017 21L6.017 18C6.017 16.8954 6.91238 16 8.017 16H11.017C11.5693 16 12.017 15.5523 12.017 15V9C12.017 8.44772 11.5693 8 11.017 8H7.017C6.46472 8 6.017 8.44772 6.017 9V13C6.017 13.5523 5.56928 14 5.017 14H4.017V21H6.017Z" />
-                </svg> */}
                 {buttonLabel}
             </span>
         </Button>
@@ -122,4 +101,66 @@ const Blockquote = defaults(def, (props) => {
 })
 
 export { Blockquote }
+
+customElement('wui-blockquote', Blockquote)
+
+declare module 'woby' {
+    namespace JSX {
+        interface IntrinsicElements {
+            'wui-blockquote': ElementAttributes<typeof Blockquote>
+        }
+    }
+}
+
+
 export default Blockquote
+
+
+// #region Helper Functions
+export const getCurrentBlockInfo = (root: HTMLElement, range: Range) => {
+    let node: Node | null = range.commonAncestorContainer
+    if (node.nodeType === Node.TEXT_NODE) {
+        node = node.parentElement
+    }
+
+    const blockTags = ['P', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'BLOCKQUOTE', 'PRE', 'DIV']
+
+    while (node && node !== root) {
+        if (node.nodeType === Node.ELEMENT_NODE) {
+            const el = node as HTMLElement
+            if (blockTags.includes(el.tagName)) {
+                return el
+            }
+        }
+        node = node.parentNode
+    }
+    return null
+}
+
+const applyFormatBlock = (editor: HTMLDivElement, tag: string, className: string) => {
+
+    const formatTag = `<${tag}>`
+    document.execCommand('formatBlock', false, formatTag)
+
+    const selection = getActiveSelection($$(editor))
+
+    if (selection && selection.rangeCount > 0) {
+        const range = selection.getRangeAt(0)
+        let node: Node | null = range.commonAncestorContainer
+
+        if (node.nodeType === Node.TEXT_NODE) node = node.parentElement
+
+        // Traverse up to find the tag we just requested
+        while (node && node !== editor) {
+            if (node.nodeType === Node.ELEMENT_NODE) {
+                const el = node as HTMLElement
+                if (el.tagName.toLowerCase() === tag.toLowerCase()) {
+                    el.className = className
+                    return
+                }
+            }
+            node = node.parentNode
+        }
+    }
+}
+// #endregion
