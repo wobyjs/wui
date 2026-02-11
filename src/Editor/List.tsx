@@ -279,7 +279,7 @@ const ListButton = defaults(def, (props) => {
 
     // #region Active State Detection
     useEffect(() => {
-        let editorEl = $$(editor) ?? getCurrentEditor()
+        let editorEl = $$(editor) ?? $$(getCurrentEditor())
         const currentMode = $$(mode)
 
         const updateState = () => {
@@ -342,8 +342,7 @@ const ListButton = defaults(def, (props) => {
     // #region Auto-Render on "Enter"
 
     useEffect(() => {
-        let editorEl = $$(editor) ?? getCurrentEditor()
-
+        let editorEl = $$(editor) ?? $$(getCurrentEditor())
         // Still add the safety check
         if (!editorEl) {
             console.error("[List] Cannot find editor element to observe")
@@ -388,7 +387,7 @@ const ListButton = defaults(def, (props) => {
     const handleClick = (e: MouseEvent) => {
         e.preventDefault()
 
-        let editorEl = $$(editor) ?? getCurrentEditor()
+        let editorEl = $$(editor) ?? $$(getCurrentEditor())
 
         // Ensure we don't force inline styles, we want classes
         document.execCommand('styleWithCSS', false, 'false')
