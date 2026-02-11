@@ -22,17 +22,15 @@ const Indent = defaults(def, (props) => {
     const { buttonType, title, cls, class: cn, mode, step, disabled, identPx, ...otherProps } = props
 
     const editor = useEditor()
-    const isDecrease = () => $$(mode) === 'decrease'
+    const isDecrease = $($$(mode) === 'decrease')
 
     // Determine Icon and Title based on mode
-    const displayIcon = () => isDecrease()
-        ? <IndentIcon class="size-5" />
-        : <OutdentIcon class="size-5" />
+    const displayIcon = () => $$(isDecrease) ? <IndentIcon class="size-5" /> : <OutdentIcon class="size-5" />
 
     const displayTitle = () => {
         const t = $$(title)
         if (t) return t
-        return isDecrease() ? "Decrease Indent" : "Increase Indent"
+        return $$(isDecrease) ? "Decrease Indent" : "Increase Indent"
     }
 
     const handleClick = (e: any) => {
@@ -40,8 +38,72 @@ const Indent = defaults(def, (props) => {
         const stepVal = $$(step) || 1
         const pxVal = $$(identPx) || 40
 
+
+        console.log("[Indent] handleClick - ", {
+            "editor": { "el": $$(editor), "type": typeof $$(editor) },
+            "isDecrease": $$(isDecrease),
+            "step": stepVal,
+            "identPx": pxVal,
+        })
+
+        let editorDiv = $$(editor)
+
+        if (typeof editorDiv == "string") {
+            console.warn("[Indent] editor is a string");
+            const selection = window.getSelection()
+            if (selection.rangeCount > 0) {
+                const range = selection.getRangeAt(0);
+                let node = range.startContainer;
+                let targetElement = node.nodeType === Node.ELEMENT_NODE ? node : node.parentElement;
+                let root = (targetElement as HTMLElement).closest('[contenteditable]');
+
+
+                console.groupCollapsed("[dev] ✨ before");
+                console.log("node - ", node);
+                console.log("target - ", {
+                    "target el": targetElement,
+                    "parent el": targetElement.parentElement,
+                    "has contenteditable": (targetElement as HTMLElement).hasAttribute("contenteditable"),
+                });
+                console.log("root - ", {
+                    "root": root,
+                    "has contenteditable": root.hasAttribute("contenteditable"),
+                });
+                console.groupEnd();
+
+                if (!(targetElement as HTMLElement).hasAttribute("contenteditable")) {
+                    while (targetElement && targetElement.parentElement !== root && targetElement.parentElement !== document.body) {
+                        targetElement = targetElement.parentElement;
+                    }
+                }
+
+
+                console.groupCollapsed("[dev] ✨ after");
+                console.log("node - ", node);
+                console.log("target - ", {
+                    "target el": targetElement,
+                    "parent el": targetElement.parentElement,
+                    "has contenteditable": (targetElement as HTMLElement).hasAttribute("contenteditable"),
+                });
+                console.log("root - ", {
+                    "root": root,
+                    "has contenteditable": root.hasAttribute("contenteditable"),
+                });
+                console.groupEnd();
+
+
+                const editorHost = (targetElement as HTMLElement).querySelector("wui-editor")
+                editorDiv = editorHost != undefined ? editorHost.shadowRoot.querySelector('[contenteditable]') as HTMLDivElement : targetElement as HTMLDivElement
+            }
+        }
+
+        console.log("[Indent] editor div - ", {
+            "editor": editorDiv,
+            "type": typeof editorDiv,
+        })
+
         // Call the helper logic
-        applyIndent($$(editor), isDecrease(), stepVal, pxVal)
+        applyIndent(editorDiv, $$(isDecrease), stepVal, pxVal)
         // applyIndent($$(editor), isDecrease(), stepVal)
     }
 
@@ -107,6 +169,9 @@ const getBlockParent = (node: Node | null, root: HTMLElement | null): HTMLElemen
 }
 
 const applyIndent = (editor: HTMLElement | null, isDecrease: boolean, stepMultiplier: number, indentAmount: number) => {
+
+    console.log("[Indent] applyIndent - ", { editor, isDecrease, stepMultiplier, indentAmount })
+
     const selection = window.getSelection()
     if (!selection || selection.rangeCount === 0) return
 
@@ -119,6 +184,7 @@ const applyIndent = (editor: HTMLElement | null, isDecrease: boolean, stepMultip
         if (node.nodeType === Node.TEXT_NODE) node = node.parentNode!
         root = (node as HTMLElement).closest('[contenteditable="true"]') as HTMLElement
     }
+
 
     // 2. IDENTIFY TARGET BLOCKS
     const blocks = new Set<HTMLElement>()
