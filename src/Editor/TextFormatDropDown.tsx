@@ -3,7 +3,8 @@ import { Button, ButtonStyles } from '../Button'
 import { EditorContext, useEditor } from './undoredo'
 import { useOnClickOutside } from '@woby/use'
 import KeyboardDownArrow from '../icons/keyboard_down_arrow'
-
+import { getCurrentEditor, getActiveSelection } from './utils'
+import { QUOTE_TAG, QUOTE_CLASSES } from './Blockquote'
 
 
 
@@ -33,7 +34,8 @@ const applyFormatBlock = (editor: HTMLDivElement, tag: string, className: string
     const formatTag = `<${tag}>`
     document.execCommand('formatBlock', false, formatTag)
 
-    const selection = window.getSelection()
+    // const selection = window.getSelection()
+    const selection = getActiveSelection(editor)
 
     if (selection && selection.rangeCount > 0) {
         const range = selection.getRangeAt(0)
@@ -61,7 +63,7 @@ export const FORMAT_OPTIONS = [
     { label: 'Heading 1', tag: 'h1', hotkey: 'Ctrl+Alt+1', class: 'text-3xl font-bold mb-4' },
     { label: 'Heading 2', tag: 'h2', hotkey: 'Ctrl+Alt+2', class: 'text-2xl font-semibold mb-3' },
     { label: 'Heading 3', tag: 'h3', hotkey: 'Ctrl+Alt+3', class: 'text-xl font-medium mb-2' },
-    { label: 'Quote', tag: 'blockquote', hotkey: 'Ctrl+Alt+Q', class: 'text-[15px] text-[#65676b] ml-10 mr-0 mt-0 mb-2.5 pl-2 border-l-[#ced0d4] border-l-4 border-solid inline-block italic' },
+    { label: 'Quote', tag: QUOTE_TAG, hotkey: 'Ctrl+Alt+Q', class: QUOTE_CLASSES },
     { label: 'Code Block', tag: 'pre', hotkey: 'Ctrl+Alt+C', class: 'bg-gray-100 p-2 rounded font-mono text-sm overflow-x-auto' },
 ]
 type TextFormatOptions = "Normal" | "Heading 1" | "Heading 2" | "Heading 3" | "Quote" | "Code Block"
@@ -79,8 +81,6 @@ const TextFormatDropDown = defaults(def, (props) => {
 
     const BASE_BTN = "size-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-black hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500 cursor-pointer"
 
-    // const editor = useContext(EditorContext)
-    // const editor = $(EditorContext)
     const editor = useEditor()
 
     const isOpen = $(false)
@@ -92,8 +92,8 @@ const TextFormatDropDown = defaults(def, (props) => {
 
     const handleSelectFormat = (tag: string, label: TextFormatOptions, cls: string | undefined) => {
 
-        const editorDiv = $$(editor)
-        // alert("Editor: " + editorDiv)
+        const editorDiv = $$(editor) ?? getCurrentEditor()
+
         if (editorDiv) {
             selectedFormat(label)
             applyFormatBlock(editorDiv, tag, cls)
@@ -104,7 +104,7 @@ const TextFormatDropDown = defaults(def, (props) => {
     }
 
     const handleApplyCurrent = (e: MouseEvent) => {
-        e.preventDefault()
+        e.preventDefault(); e.stopPropagation();
 
         // Get the string currently displayed (e.g., "Heading 1")
         const currentLabel = $$(selectedFormat)
@@ -114,7 +114,8 @@ const TextFormatDropDown = defaults(def, (props) => {
 
         if (opt) {
             // Apply it
-            const editorDiv = $$(editor)
+            const editorDiv = $$(editor) ?? getCurrentEditor()
+
             if (editorDiv) {
                 applyFormatBlock(editorDiv, opt.tag, opt.class)
                 editorDiv.focus()
@@ -123,9 +124,10 @@ const TextFormatDropDown = defaults(def, (props) => {
     }
 
     // Handle Keyboard Shortcuts
+    // #region useEffect for Keyboard Shortcuts
     useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
-            const editorDiv = $$(editor)
+            const editorDiv = $$(editor) ?? getCurrentEditor()
             if (!editorDiv) return
 
             for (const opt of FORMAT_OPTIONS) {
@@ -158,14 +160,25 @@ const TextFormatDropDown = defaults(def, (props) => {
         document.addEventListener('keydown', handleKeyDown)
         return () => document.removeEventListener('keydown', handleKeyDown)
     })
+    // #endregion
 
-    // Update Label based on Selection (Active State)
+
+
+
+    // #region useEffect for Selection Change
+    /**
+     * TEXT FORMAT TRACKER
+     * Listens for 'selectionchange', 'mouseup', and 'keyup' events to determine the current 
+     * block-level tag (H1, P, etc.) at the selection point. 
+     * If the selection is inside the editor, it maps the tag to a FORMAT_OPTION and updates the UI.
+     */
     useEffect(() => {
         const handleSelectionChange = () => {
-            const editorDiv = $$(editor)
+            const editorDiv = $$(editor) ?? getCurrentEditor()
             if (!editorDiv || typeof editorDiv.contains !== 'function') return
 
-            const selection = window.getSelection()
+            // const selection = window.getSelection()
+            const selection = getActiveSelection(editorDiv);
             if (selection && selection.rangeCount > 0) {
                 const range = selection.getRangeAt(0)
 
@@ -196,7 +209,9 @@ const TextFormatDropDown = defaults(def, (props) => {
             document.removeEventListener('keyup', handleSelectionChange)
         }
     })
+    // #endregion
 
+    // #region Drop Down Menu
     const DropDownMenu = () => {
         return (
             <div
@@ -233,6 +248,7 @@ const TextFormatDropDown = defaults(def, (props) => {
             </div>
         )
     }
+    // #endregion
 
 
     return (
@@ -240,11 +256,11 @@ const TextFormatDropDown = defaults(def, (props) => {
             <div>
                 <Button
                     type={btnType}
-                    // cls={() => [BASE_BTN]}
                     class={() => [
                         () => $$(cls) ? $$(cls) : BASE_BTN, cn,
                     ]}
                     onClick={handleApplyCurrent}
+                    onMouseDown={(e) => { e.preventDefault(); e.stopPropagation() }}
                     title="Text format"
                     {...otherProps}
                 >
@@ -252,7 +268,9 @@ const TextFormatDropDown = defaults(def, (props) => {
                         {() => $$(selectedFormat)}
                     </span>
                     <span class="flex justify-end">
-                        <KeyboardDownArrow class="-mr-1 ml-2 h-5 w-5" onClick={toggleDropdown} />
+                        <KeyboardDownArrow class="-mr-1 ml-2 h-5 w-5"
+                            onClick={toggleDropdown}
+                            onMouseDown={(e) => { e.preventDefault() }} />
                     </span>
                 </Button>
             </div>
