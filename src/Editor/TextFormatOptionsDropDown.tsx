@@ -4,6 +4,7 @@ import { EditorContext, useEditor, useUndoRedo } from './undoredo'
 import { useOnClickOutside } from '@woby/use'
 import { getCurrentRange, getSelectedText, replaceSelectedText } from './utils'
 import KeyboardDownArrow from '../icons/keyboard_down_arrow'
+import { getCurrentEditor, getActiveSelection } from './utils'
 
 // Icons (placeholders, replace with actual icons)
 const StrikethroughIcon = () => <span class="font-bold">S</span>
@@ -18,9 +19,11 @@ const applyFormat = (command: string, value?: string) => {
     document.execCommand(command, false, value)
 }
 
-const transformCase = (transformType: 'lowercase' | 'uppercase' | 'capitalize') => {
-    const selection = window.getSelection()
-    if (!selection || selection.rangeCount === 0) return
+const transformCase = (transformType: 'lowercase' | 'uppercase' | 'capitalize', editorDiv: HTMLDivElement) => {
+
+
+    const selection = getActiveSelection(editorDiv) // window.getSelection()
+    if (!selection || selection.rangeCount === 0) { return }
 
     const range = selection.getRangeAt(0).cloneRange()
     const selectedText = range.toString()
@@ -117,9 +120,9 @@ const FORMAT_OPTIONS = [
     { label: 'Superscript', hotkey: 'Ctrl+.', action: () => applyFormat('superscript'), icon: SuperscriptIcon },
     { label: 'Highlight', hotkey: '', action: () => applyFormat('hiliteColor', 'yellow'), icon: HighlightIcon }, // Default yellow highlight
     { label: 'Clear Formatting', hotkey: 'Ctrl+\\', action: () => applyFormat('removeFormat'), icon: ClearFormattingIcon },
-    { label: 'Lowercase', hotkey: 'Ctrl+Shift+1', action: () => transformCase('lowercase'), icon: CaseTransformIcon },
-    { label: 'Uppercase', hotkey: 'Ctrl+Shift+2', action: () => transformCase('uppercase'), icon: CaseTransformIcon },
-    { label: 'Capitalize', hotkey: 'Ctrl+Shift+3', action: () => transformCase('capitalize'), icon: CaseTransformIcon },
+    { label: 'Lowercase', hotkey: 'Ctrl+Shift+1', action: (editorDiv) => transformCase('lowercase', editorDiv), icon: CaseTransformIcon },
+    { label: 'Uppercase', hotkey: 'Ctrl+Shift+2', action: (editorDiv) => transformCase('uppercase', editorDiv), icon: CaseTransformIcon },
+    { label: 'Capitalize', hotkey: 'Ctrl+Shift+3', action: (editorDiv) => transformCase('capitalize', editorDiv), icon: CaseTransformIcon },
 ]
 
 
@@ -153,10 +156,13 @@ const TextFormatOptionsDropDown = defaults(def, (props) => {
 
     const toggleDropdown = () => isOpen(!isOpen())
 
-    const handleSelectOption = (action: () => void) => {
-        if ($$(editor)) {
+    const handleSelectOption = (action: (editor: HTMLDivElement) => void) => {
+
+        const editorDiv = $$(editor) ?? getCurrentEditor()
+
+        if (editorDiv) {
             saveDo()
-            action()
+            action(editorDiv)
         }
         isOpen(false)
     }
