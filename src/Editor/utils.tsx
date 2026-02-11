@@ -2,6 +2,121 @@ import { useOnClickOutside, useSelection } from '@woby/use'
 import { $, $$, useEffect, JSX, useMemo, Observable, createContext, useContext, ObservableMaybe } from 'woby'
 import { useEditor } from './undoredo'
 
+/**
+ * Normalizes the editor's DOM structure to ensure consistent block-level wrapping.
+ * 
+ * Logic:
+ * 1. Configures the browser to use <div> as the default paragraph separator.
+ * 2. If the editor is empty, seeds it with a <div><br></div> to ensure the first line 
+ *    is immediately wrapped in a block element.
+ * 3. Monitors 'input' events to detect and "heal" loose text nodes (raw text not 
+ *    contained in a tag) which are common in Chrome/Edge.
+ * 4. Uses `document.execCommand('formatBlock')` for healing to ensure the 
+ *    browser preserves the user's cursor position (caret) without jumping.
+ * 
+ * @param editor - An Observable or raw HTMLDivElement representing the editor surface.
+ */
+export const useBlockEnforcer = (editor: Observable<HTMLDivElement | undefined> | HTMLDivElement | undefined) => {
+    const el = $$(editor);
+
+    console.log("[useBlockEnforcer] editor - ", el)
+
+    if (!el) return;
+
+    // 1. Force DIVs on Enter
+    document.execCommand('defaultParagraphSeparator', false, 'div');
+
+    const ensureStructure = () => {
+        // CASE 1: Editor is totally empty
+        if (el.innerHTML.trim() === "" || el.innerHTML === "<br>") {
+            el.innerHTML = "<div><br></div>";
+            const range = document.createRange();
+            const sel = window.getSelection();
+            if (sel && el.firstChild) {
+                range.setStart(el.firstChild, 0);
+                range.collapse(true);
+                sel.removeAllRanges();
+                sel.addRange(range);
+            }
+            return;
+        }
+
+        // CASE 2: Loose text (The "I just typed 'a'" case)
+        // Check if the first child is a raw text node
+        if (el.firstChild && el.firstChild.nodeType === Node.TEXT_NODE) {
+            const sel = window.getSelection();
+            if (!sel) return;
+
+            // We don't use innerHTML here. 
+            // Instead, we tell the browser to wrap the current line in a div.
+            // This is "Native" and keeps the cursor exactly where it is.
+            document.execCommand('formatBlock', false, 'div');
+
+            // Chrome might add an ID or extra styles to the div, 
+            // we clean those up if necessary
+            if (el.firstChild instanceof HTMLElement) {
+                el.firstChild.removeAttribute('id');
+                el.firstChild.style.textAlign = ''; // Reset if it inherited something weird
+            }
+        }
+    };
+
+    ensureStructure();
+    el.addEventListener('input', ensureStructure);
+
+    return () => el.removeEventListener('input', ensureStructure);
+}
+
+/**
+ * Finds the actual editable <div> the user is typing in.
+ * 
+ * Logic:
+ * 1. Locates the cursor position.
+ * 2. Climbs up the DOM to find the [contenteditable] container.
+ * 3. If inside a <wui-editor>, it "pierces" the Shadow DOM to find the internal input area.
+ * 
+ * @returns The editable element or undefined.
+ */
+export const getCurrentEditor = () => {
+    let editorEl: HTMLDivElement | undefined = undefined
+
+    editorEl = document.querySelector('[contenteditable="true"]') ?? document.querySelector('[contenteditable=""]') ?? document.querySelector('div[contenteditable]')
+
+    const customElement = document.querySelector('wui-editor')
+    if (customElement?.shadowRoot && !editorEl) {
+        // Try to find the contenteditable element (editor) inside the custom element
+        editorEl = customElement.shadowRoot.querySelector('[contenteditable]') as HTMLDivElement
+    }
+
+    return $(editorEl)
+}
+
+/**
+ * Retrieves the active Selection object, correctly handling Shadow DOM encapsulation.
+ * 
+ * Standard `window.getSelection()` is "retargeted" by the browser when focus is inside 
+ * a Shadow DOM. This means it only reports the host element (e.g., <wui-editor>) 
+ * rather than the internal text nodes. 
+ * 
+ * This function identifies if the editor is inside a ShadowRoot and uses the 
+ * ShadowRoot-specific `getSelection()` method to "pierce" the boundary and 
+ * access the actual selection nodes.
+ * 
+ * @param editorEl - The element currently being edited.
+ * @returns The Selection object (shadow-aware) or null.
+ */
+export const getActiveSelection = (editorEl: HTMLElement) => {
+    // 1. Determine if the element is inside a ShadowRoot
+    const root = editorEl.getRootNode();
+
+    // 2. Get selection from ShadowRoot if applicable, otherwise window
+    const selection = (root instanceof ShadowRoot)
+        ? (root as any).getSelection() // Use the fix from the previous answer
+        : window.getSelection();
+
+    return selection;
+};
+
 export type SelectionState = {
     startContainerPath: number[]
     startOffset: number
