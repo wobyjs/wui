@@ -21,6 +21,7 @@ import { TextBackgroundColorPicker } from './TextBackgroundColorPicker' // Added
 import { TextFormatOptionsDropDown } from './TextFormatOptionsDropDown'
 import { InsertDropDown } from './InsertDropDown'
 import { TextAlignDropDown } from './TextAlignDropDown'
+import { UndoRedoButton } from './UndoRedoButton'
 
 
 interface EditorProps {
@@ -311,50 +312,12 @@ const EditorToolbar = ({ toolbarRef }) => {
             }
     }
 
-    const UndoButton = () => {
-        return (
-            <Button
-                type='outlined'
-                cls={() => [
-                    "border-none p-1.5 p-1.5 transition-all",
-                    "text-gray-700 hover:bg-gray-100 cursor-pointer",
-                    "disabled:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent"
-                ]}
-                onMouseDown={(e) => e.preventDefault()}
-                onClick={undo}
-                title="Undo"
-                disabled={(() => $$(undos).length === 1)}
-            >
-                <UndoIcon class="size-5" />
-            </Button>
-        )
-    }
-
-    const RedoButton = () => {
-        return (
-            <Button
-                type='outlined'
-                cls={() => [
-                    "border-none p-1.5 transition-all",
-                    "text-gray-700 hover:bg-gray-100 cursor-pointer",
-                    "disabled:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent"
-                ]}
-                onMouseDown={(e) => e.preventDefault()}
-                onClick={redo}
-                title="Redo"
-                disabled={(() => $$(redos).length === 0)}
-            >
-                <RedoIcon class="size-5" />
-            </Button>
-        )
-    }
-
     const FullToolbar = () => {
         return <>
             {/* Group 1: History */}
             <div class="flex items-center gap-0.5">
-                <UndoButton />
-                <RedoButton />
+                <UndoRedoButton mode="undo" />
+                <UndoRedoButton mode="redo" />
             </div>
 
             <Divider />
