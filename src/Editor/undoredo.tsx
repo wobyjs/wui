@@ -1,5 +1,5 @@
 import { useOnClickOutside, useSelection } from '@woby/use'
-import { $, $$, useEffect, JSX, useMemo, Observable, createContext, useContext, setRef } from 'woby'
+import { $, $$, useEffect, JSX, useMemo, Observable, createContext, useContext, setRef, customElement, defaults } from 'woby'
 
 // 1. CREATE THE EDITOR DATA STORE
 // createContext: Creates a "global" storage box so we don't have to pass props everywhere.
@@ -48,24 +48,25 @@ export type UndoRedoType = {
  * A Provider component that manages the history (undo/redo) for a contentEditable editor.
  * It must be placed inside an EditorContext.Provider.
  */
-export const UndoRedo = ({ children }: { children: JSX.Children }) => {
+// #region Undo Redo
+export const UndoRedo = ({ children, editor }: { children: JSX.Children, editor?: Observable<HTMLDivElement> }) => {
     // Local reactive state for the history stacks
     const undos = $([] as string[])
     const redos = $([] as string[])
+    const isInitialized = $(false)
 
-    // Grab the editor reference from the parent EditorContext
-    const editor = useEditor() // editor is Observable<HTMLDivElement>
+    // 2. Priority Logic: Use the prop if passed, otherwise fall back to context
+    const contextEditor = useEditor()
+    const activeEditor = editor || contextEditor
 
-    // Flag to ensure we only capture the 'initial state' once
-    const isInitialized = $(false) // isInitialized is Observable<boolean>
 
+    // #region initialize-editor-content
     /**
      * Effect: Runs automatically when the component mounts or dependencies change.
      * It captures the very first state of the editor (e.g., the "Lorem Ipsum" text).
      */
-    // #region initialize-editor-content
     useEffect(() => {
-        const currentEditor = $$(editor) // unwrap
+        const currentEditor = $$(activeEditor) // unwrap
         // Initialize only if editor is available and not already initialized
         if (currentEditor && !$$(isInitialized)) { // unwrap
             const initialContent = currentEditor.innerHTML
@@ -75,102 +76,57 @@ export const UndoRedo = ({ children }: { children: JSX.Children }) => {
     }) // No dependency array, Woby will auto-track $$(editor) and $$(isInitialized)
     // #endregion
 
+
+    // #region saveDO
     /**
      * saveDo: The "Snapshot" function.
      * Call this after any formatting change / new action (bold, indent, etc.) or significant typing.
      */
-    // #region saveDO (debug)
     const saveDo = () => {
-        const currentEditorInstance: HTMLDivElement = $$(editor)
+        // 1. Unwrap the observable
+        const el = $$(activeEditor)
 
-        // console.log("[saveDo] ", { "isInitialized": $$(isInitialized), "currentEditorInstance": currentEditorInstance, "currentEditor.innerHTML (type)": typeof currentEditorInstance.innerHTML });
-        console.log("[saveDo] currentEditorInstance: ", {
-            "currentEditorInstance": currentEditorInstance,
-            "innerHTML": currentEditorInstance.innerHTML,
-            "innerText": currentEditorInstance.innerText,
-            "outerHTML": currentEditorInstance.outerHTML,
-            "outerText": currentEditorInstance.outerText,
-        });
-
-
-        // ✅ Must be initialized AND must be a real element with string innerHTML
-        if (!$$(isInitialized) || !currentEditorInstance || typeof currentEditorInstance.innerHTML != "string") {
-            console.log("[saveDo] SKIP (not ready / not element)", {
-                // isInitialized: $$(isInitialized),
-                editorType: typeof currentEditorInstance,
-                // editorValue: currentEditorInstance,
-                innerHTMLType: typeof currentEditorInstance?.innerHTML,
-            })
+        if (typeof el === 'string' || !el || !(el instanceof Node)) {
+            console.warn("🛑 SKIP: Waiting for valid DOM Node...", el)
             return
         }
 
-        const currentContent: string = currentEditorInstance.innerHTML
+        // 2. Safely cast to HTMLElement since we passed the Node check
+        const element = el as HTMLElement;
+        const currentContent = element.innerHTML
         const u = $$(undos)
-        const last = u.length ? u[u.length - 1] : ""
 
-        if (last === currentContent) {
-            console.log("[saveDo] SKIP (duplicate)", {
-                undosLen: u.length,
-                preview: currentContent.slice(0, 120),
-            })
+        // 3. Initialization Logic
+        if (!$$(isInitialized)) {
+            undos([currentContent])
+            isInitialized(true)
             return
         }
 
-        const newUndos = [...u, currentContent]
-        undos(newUndos)
-        redos([])
-
-        console.log("[saveDo] ✅ SAVED", {
-            from: u.length,
-            to: newUndos.length,
-            lastPreview: last.slice(0, 80),
-            newPreview: currentContent.slice(0, 80),
-        })
-
-        // ✅ Show undo stack
-        console.table(
-            newUndos.map((html, i) => ({
-                i,
-                len: String(html).length,
-                preview: String(html).replace(/\s+/g, " ").trim().slice(0, 100),
-            }))
-        )
-
+        // 4. Check for changes
+        const last = u.length ? u[u.length - 1] : ""
+        if (last !== currentContent) {
+            undos([...u, currentContent])
+            redos([])
+            // console.log("[saveDo] ✅ Change detected. Saving to history.", currentContent)
+            // console.log("[saveDo] 🔹", { "undos": $$(undos).length, "redos": $$(redos).length })
+            // console.log("[saveDo] undos", $$(undos))
+        }
     }
     // #endregion
 
 
-    // #region original saveDo
-    // const saveDo = () => { // Renamed unredo parameter for clarity as it's always undos here
-    //     const currentEditorInstance = $$(editor) // Get the editor instance once
-    //     // Ensure editor is initialized and available before saving state
-    //         return
-    //     }
-    //     const currentContent = currentEditorInstance.innerHTML // Use the obtained instance
-    //     const u = $$(undos)
-
-    //     // If last saved state is the same as current, do nothing
-    //     if (u.length > 0 && u[u.length - 1] === currentContent) {
-    //         return
-    //     }
-
-    //     const newUndos = [...u, currentContent]
-    //     undos(newUndos)
-    //     redos([]) // New action clears redo stack
-    // }
-    // #endregion
-
+    // #region undo
     /**
      * undo: Reverts to the previous HTML snapshot.
      */
-    // #region undo
     const undo = () => {
         const u = $$(undos)
         const r = $$(redos)
 
         // If there's only the initial state (or fewer, though should not happen if initialized)
         // or editor is not available, can't undo.
-        if (u.length <= 1 || !$$(editor)) {
+        if (u.length <= 1 || !$$(activeEditor)) {
             return
         }
 
@@ -186,19 +142,20 @@ export const UndoRedo = ({ children }: { children: JSX.Children }) => {
         // The state to restore is now the last element of the modified 'u'.
         // This is guaranteed to exist because u.length was > 1, so after pop it's >= 1.
         const stateToRestore = u[u.length - 1]
-        $$(editor).innerHTML = stateToRestore
+        $$(activeEditor).innerHTML = stateToRestore
     }
     // #endregion
 
+
+    // #region redo
     /**
      * redo: Restores a snapshot that was previously undone.
      */
-    // #region redo
     const redo = () => {
         const u = $$(undos)
         const r = $$(redos)
 
-        if (r.length === 0 || !$$(editor)) {
+        if (r.length === 0 || !$$(activeEditor)) {
             return
         }
 
@@ -209,7 +166,7 @@ export const UndoRedo = ({ children }: { children: JSX.Children }) => {
         if (contentToRestoreAndMoveToUndo !== undefined) { // Ensure it's not undefined
             const newUndos = [...u, contentToRestoreAndMoveToUndo]
             undos(newUndos)
-            $$(editor).innerHTML = contentToRestoreAndMoveToUndo
+            $$(activeEditor).innerHTML = contentToRestoreAndMoveToUndo
         }
     }
     // #endregion
@@ -220,3 +177,5 @@ export const UndoRedo = ({ children }: { children: JSX.Children }) => {
     // Provide this bundle to all child components (Buttons, Toolbars, etc.)
     return <UndoRedoContext.Provider value={rf}>{children}</UndoRedoContext.Provider>
 }
+// #endregion
+
