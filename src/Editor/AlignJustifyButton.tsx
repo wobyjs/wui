@@ -1,7 +1,7 @@
 import { Button, ButtonStyles } from '../Button'
 import AlignJustify from '../icons/align_justify'
 import { useEditor } from './undoredo' // Removed useUndoRedo
-import { applyTextAlign, useAlignStatus } from './AlignButton'
+import { applyTextAlign, updateActiveStatus } from './AlignButton'
 import { $, $$, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlClass, HtmlString, Observable, ObservableMaybe, StyleEncapsulationProps, useEffect } from 'woby'
 import { getCurrentEditor, useBlockEnforcer } from './utils'
 
@@ -18,13 +18,40 @@ const def = () => ({
 const AlignJustifyButton = defaults(def, (props) => {
     const { buttonType, title, cls, class: cn, disabled, ...otherProps } = props
     const editor = useEditor()
-    
+
     const alignment = 'justify'
-    const isActive = useAlignStatus(alignment, editor);
-    // Enforce block-level structure in the editor to prevent loose text nodes.
-    // This ensures all content is wrapped in block elements (like <div>),
-    // which is essential for proper text alignment and formatting.
+    const isActive = $(false);
+
     useEffect(() => { useBlockEnforcer($$(editor) ?? $$(getCurrentEditor())) })
+
+    useEffect(() => {
+        // 1. Get the actual HTML Element
+        const el = editor ?? getCurrentEditor();
+        if (!el) return;
+
+        // 2. Create a stable reference for the handler
+        // This ensures addEventListener and removeEventListener refer to the SAME function
+        const handler = () => {
+            updateActiveStatus(alignment, isActive, el);
+        };
+
+        // 3. Attach listeners to the UNWRAPPED element 'el'
+        document.addEventListener('selectionchange', handler);
+        $$(el).addEventListener('click', handler);
+        $$(el).addEventListener('keyup', handler);
+        $$(el).addEventListener('mouseup', handler);
+
+        // Run initial check
+        handler();
+
+        return () => {
+            document.removeEventListener('selectionchange', handler);
+            $$(el).removeEventListener('click', handler);
+            $$(el).removeEventListener('keyup', handler);
+            $$(el).removeEventListener('mouseup', handler);
+        };
+    });
+
 
     const handleClick = (e: any) => {
         e.preventDefault()

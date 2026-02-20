@@ -3,7 +3,7 @@ import { Button, ButtonStyles } from '../Button'
 import AlignLeft from '../icons/align_left'
 import { useEditor } from './undoredo'
 import { findBlockParent, getCurrentEditor, getCurrentRange, useBlockEnforcer } from './utils'
-import { applyTextAlign, useAlignStatus } from './AlignButton'
+import { applyTextAlign, updateActiveStatus } from './AlignButton'
 
 // Default props
 const def = () => ({
@@ -19,11 +19,38 @@ const AlignLeftButton = defaults(def, (props) => {
     const editor = useEditor()
 
     const alignment = 'left'
-    const isActive = useAlignStatus(alignment, editor);
-    // Enforce block-level structure in the editor to prevent loose text nodes.
-    // This ensures all content is wrapped in block elements (like <div>),
-    // which is essential for proper text alignment and formatting.
+    const isActive = $(false);
+
+
     useEffect(() => { useBlockEnforcer($$(editor) ?? $$(getCurrentEditor())) })
+
+    useEffect(() => {
+        // 1. Get the actual HTML Element
+        const el = editor ?? getCurrentEditor();
+        if (!el) return;
+
+        // 2. Create a stable reference for the handler
+        // This ensures addEventListener and removeEventListener refer to the SAME function
+        const handler = () => {
+            updateActiveStatus(alignment, isActive, el);
+        };
+
+        // 3. Attach listeners to the UNWRAPPED element 'el'
+        document.addEventListener('selectionchange', handler);
+        $$(el).addEventListener('click', handler);
+        $$(el).addEventListener('keyup', handler);
+        $$(el).addEventListener('mouseup', handler);
+
+        // Run initial check
+        handler();
+
+        return () => {
+            document.removeEventListener('selectionchange', handler);
+            $$(el).removeEventListener('click', handler);
+            $$(el).removeEventListener('keyup', handler);
+            $$(el).removeEventListener('mouseup', handler);
+        };
+    });
 
     const handleClick = (e: any) => {
         e.preventDefault()

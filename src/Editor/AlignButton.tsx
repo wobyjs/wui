@@ -26,13 +26,45 @@ const def = () => ({
 
 const AlignButton = defaults(def, (props) => {
     const { type: buttonType, title, cls, class: cn, disabled, mode, ...otherProps } = props as any
-    const editor = useEditor()
 
-    const isActive = useAlignStatus($$(mode), editor);
-    // Enforce block-level structure in the editor to prevent loose text nodes.
-    // This ensures all content is wrapped in block elements (like <div>),
-    // which is essential for proper text alignment and formatting.
+    const editor = useEditor()
+    const isActive = $(false)
+
     useEffect(() => { useBlockEnforcer($$(editor) ?? $$(getCurrentEditor())) })
+
+    /**
+     * Effect: Alignment State Controller
+     * 
+     * Orchestrates the lifecycle of event listeners required to keep the alignment button 
+     * synchronized with the editor's content.
+     */
+    useEffect(() => {
+        // 1. Get the actual HTML Element
+        const el = editor ?? getCurrentEditor();
+        if (!el) return;
+
+        // 2. Create a stable reference for the handler
+        // This ensures addEventListener and removeEventListener refer to the SAME function
+        const handler = () => {
+            updateActiveStatus($$(mode), isActive, el);
+        };
+
+        // 3. Attach listeners to the UNWRAPPED element 'el'
+        document.addEventListener('selectionchange', handler);
+        $$(el).addEventListener('click', handler);
+        $$(el).addEventListener('keyup', handler);
+        $$(el).addEventListener('mouseup', handler);
+
+        // Run initial check
+        handler();
+
+        return () => {
+            document.removeEventListener('selectionchange', handler);
+            $$(el).removeEventListener('click', handler);
+            $$(el).removeEventListener('keyup', handler);
+            $$(el).removeEventListener('mouseup', handler);
+        };
+    });
 
     // Extract onClick from otherProps if provided
     const customOnClick = otherProps.onClick as ((e: any) => void) | undefined
@@ -70,6 +102,7 @@ const AlignButton = defaults(def, (props) => {
 
         applyTextAlign(alignment as ContentAlign, editorDiv)
         isActive(true)
+
         document.dispatchEvent(new Event('selectionchange'))
         $$(editorDiv).focus()
     }
@@ -143,66 +176,60 @@ export const applyTextAlign = (alignment: ContentAlign, editor: Observable<HTMLD
 }
 
 /**
- * Monitors the editor selection to determine if the current block matches a specific alignment.
+ * Logic: Alignment State Synchronizer
  * 
- * @param targetMode - The alignment to check for (e.g., 'left', 'center').
- * @param editor - The editor element observable.
- * @returns An Observable<boolean> representing the active state.
+ * Inspects the DOM structure at the current caret (cursor) position to determine 
+ * if the text alignment matches a specific target mode.
+ * 
+ * @param targetMode - The alignment string to check for (e.g., 'left', 'center', 'right', 'justify').
+ * @param isActive   - The Woby Observable boolean that drives the visual active state of the button.
+ * @param editor     - The Observable reference to the editor root element.
+ * 
+ * @returns The isActive observable, updated based on the detected block-level styles.
  */
-export const useAlignStatus = (targetMode: ObservableMaybe<ContentAlign>, editor: Observable<HTMLDivElement | undefined>) => {
-    const isActive = $(false);
+export const updateActiveStatus = (targetMode: string, isActive: Observable<boolean>, editor: Observable<HTMLDivElement>) => {
+    const modeValue = $$(targetMode);
+    const editorDiv = $$(editor);
 
-    const updateActiveStatus = () => {
-        const editorDiv = $$(editor) ?? $$(getCurrentEditor());
-        if (!editorDiv) return;
 
-        const selection = getActiveSelection(editorDiv);
+    if (!editorDiv) {
+        console.warn(`[useAlignStatus:${modeValue}] Editor div not found.`);
+        return;
+    }
 
-        if (selection && selection.rangeCount > 0) {
-            const range = selection.getRangeAt(0);
-            const block = getCurrentBlockInfo(editorDiv, range);
+    const selection = getActiveSelection(editorDiv);
 
-            if (!block) {
-                isActive(false);
-                return;
-            }
+    if (selection && selection.rangeCount > 0) {
+        const range = selection.getRangeAt(0);
+        const block = getCurrentBlockInfo(editorDiv, range);
 
-            // Handle default alignment: if style is empty, browser default is 'left'
-            const currentAlign = block.style.textAlign.toLowerCase();
-            const target = $$(targetMode).toLowerCase();
+        // console.groupCollapsed(`[useAlignStatus:${modeValue}] Update`);
 
-            isActive(currentAlign === target);
-        } else {
+        if (!block) {
+            // console.log("Verdict: No block element found at cursor.");
             isActive(false);
-        }
-    };
-
-    useEffect(() => {
-        // 1. Listen for global selection changes
-        document.addEventListener('selectionchange', updateActiveStatus);
-
-        // 2. Listen for editor-specific interactions
-        const editorDiv = $$(editor) ?? $$(getCurrentEditor());
-        if (editorDiv) {
-            editorDiv.addEventListener('click', updateActiveStatus);
-            editorDiv.addEventListener('keyup', updateActiveStatus);
-            editorDiv.addEventListener('mouseup', updateActiveStatus);
+            console.groupEnd();
+            return;
         }
 
-        // Run initial check
-        updateActiveStatus();
+        // Fallback to 'left' if style is empty, because that is the browser default
+        const currentAlign = block.style.textAlign.toLowerCase();
+        const target = modeValue.toLowerCase();
+        const isMatch = currentAlign === target;
 
-        // Cleanup listeners on unmount
-        return () => {
-            document.removeEventListener('selectionchange', updateActiveStatus);
-            if (editorDiv) {
-                editorDiv.removeEventListener('click', updateActiveStatus);
-                editorDiv.removeEventListener('keyup', updateActiveStatus);
-                editorDiv.removeEventListener('mouseup', updateActiveStatus);
-            }
-        };
-    });
+        // console.log("Information:", { target: target, detected: currentAlign, element: `<${block.tagName.toLowerCase()}>`, fullStyle: block.getAttribute('style'), isMatch: isMatch });
 
-    return isActive;
+        if ($$(isActive) !== isMatch) {
+            // console.log(`Action: Setting isActive to `, isMatch);
+            isActive(isMatch);
+        }
+
+        // console.groupEnd();
+    } else {
+        // No selection usually means the editor isn't focused
+        isActive(false);
+    }
+
+    return isActive
 };
 // #endregion
