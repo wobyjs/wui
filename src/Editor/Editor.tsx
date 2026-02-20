@@ -9,7 +9,7 @@ import { ItalicButton } from './ItalicButton'
 import { UnderlineButton } from './UnderlineButton' // Added UnderlineButton
 import { EditorContext, UndoRedo, useEditor, useUndoRedo } from './undoredo'
 import { FontSize } from './FontSize' // import { FontSizeInput } from './FontSizeCopy' // Changed from Increase/Decrease
-import { ListButton } from './List' // import { BulletListButton, NumberedListButton } from './List'
+import { List } from './List' // import { BulletListButton, NumberedListButton } from './List'
 import { Indent } from './Indent' // Will be part of TextAlignDropDown
 import { Blockquote } from './Blockquote'
 
@@ -93,53 +93,6 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, children }) =
 
     useEffect(() => {
         useBlockEnforcer($$(activeEditor) ?? $$(getCurrentEditor))
-        // const el = $$(activeEditor);
-        // if (!el) return;
-
-        // // 1. Force DIVs on Enter
-        // document.execCommand('defaultParagraphSeparator', false, 'div');
-
-        // const ensureStructure = () => {
-        //     // CASE 1: Editor is totally empty
-        //     if (el.innerHTML.trim() === "" || el.innerHTML === "<br>") {
-        //         el.innerHTML = "<div><br></div>";
-        //         const range = document.createRange();
-        //         const sel = window.getSelection();
-        //         if (sel && el.firstChild) {
-        //             range.setStart(el.firstChild, 0);
-        //             range.collapse(true);
-        //             sel.removeAllRanges();
-        //             sel.addRange(range);
-        //         }
-        //         return;
-        //     }
-
-        //     // CASE 2: Loose text (The "I just typed 'a'" case)
-        //     // Check if the first child is a raw text node
-        //     if (el.firstChild && el.firstChild.nodeType === Node.TEXT_NODE) {
-        //         const sel = window.getSelection();
-        //         if (!sel) return;
-
-        //         // We don't use innerHTML here. 
-        //         // Instead, we tell the browser to wrap the current line in a div.
-        //         // This is "Native" and keeps the cursor exactly where it is.
-        //         document.execCommand('formatBlock', false, 'div');
-
-        //         // Chrome might add an ID or extra styles to the div, 
-        //         // we clean those up if necessary
-        //         if (el.firstChild instanceof HTMLElement) {
-        //             el.firstChild.removeAttribute('id');
-        //             el.firstChild.style.textAlign = ''; // Reset if it inherited something weird
-        //         }
-        //     }
-        // };
-
-        // if ($$(isEditing)) {
-        //     ensureStructure();
-        //     el.addEventListener('input', ensureStructure);
-        // }
-
-        // return () => el.removeEventListener('input', ensureStructure);
     });
 
 
@@ -152,14 +105,7 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, children }) =
         if ($$(isEditing)) {
             const el = $$(activeEditor);
 
-            // console.log("[Editor Surface] auto-focus - ", {
-            //     "editor": el,
-            //     "typeof editor": typeof el
-            // })
-
-            if (el && document.activeElement !== el) {
-                el.focus();
-            }
+            if (el && document.activeElement !== el) { el.focus(); }
         }
     })
     // #endregion
@@ -181,9 +127,6 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, children }) =
 
         // Create observer to watch for all types of content changes
         const observer = new MutationObserver((mutations) => {
-            // Diagnostic logging (commented out for production)
-            // console.log("[EditorSurface] DOM Mutation detected by browser", mutations[0].type)
-
             // Save the current state to undo/redo history
             saveDo()
         })
@@ -258,7 +201,7 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, children }) =
     return (
         <div
             ref={activeEditor}
-            // contentEditable={$$(isEditing)}
+            data-editor-root
             contentEditable={() => $$(isEditing) ? true : false}
             onClick={handleEditorClick}
             onBlur={handleBlur}
@@ -351,9 +294,9 @@ const EditorToolbar = ({ toolbarRef }) => {
 
             {/* Group 5: Lists & Alignment */}
             <div class="flex items-center gap-0.5">
-                <ListButton mode="bullet" />
-                <ListButton mode="number" />
-                <ListButton mode="checkbox" />
+                <List mode="bullet" />
+                <List mode="number" />
+                <List mode="checkbox" />
                 <TextAlignDropDown />
                 <Indent mode="decrease" />
                 <Indent mode="increase" />
@@ -373,9 +316,9 @@ const EditorToolbar = ({ toolbarRef }) => {
     const DebugToolbar = () => {
         return <>
             <div class="flex items-center gap-0.5">
-                <ListButton mode="bullet" />
-                <ListButton mode="number" />
-                <ListButton mode="checkbox" />
+                <List mode="bullet" />
+                <List mode="number" />
+                <List mode="checkbox" />
             </div>
         </>
     }
@@ -458,8 +401,8 @@ const Editor = defaults(def, (props) => {
                         isEditing={isEditing}
                         handleEditorClick={handleEditorClick}
                         handleBlur={handleBlur}
+                        children={children}
                     >
-                        {children}
                     </EditorSurface>
                 </UndoRedo>
             </EditorContext.Provider>
@@ -595,8 +538,8 @@ export default Editor
 
 //                 {/* #region Group 5: Lists & Alignment */}
 //                 <div class="flex items-center gap-0.5">
-//                     <ListButton mode="bullet" />
-//                     <ListButton mode="number" />
+//                     <List mode="bullet" />
+//                     <List mode="number" />
 //                     <TextAlignDropDown />
 //                     <Indent mode="decrease" />
 //                     <Indent mode="increase" />
