@@ -1,8 +1,9 @@
 import { Button, ButtonStyles } from '../Button'
 import ItalicIcon from '../icons/italic' // Renamed for clarity if Bold is a type/component elsewhere
-import { applyStyle, range, getCurrentRange } from './utils'
 import { useEditor } from './undoredo' // useUndoRedo not directly needed here anymore
 import { $, $$, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlClass, HtmlString, Observable, ObservableMaybe, useEffect } from 'woby'
+import { getCurrentEditor } from './utils'
+import { updateStylesState } from './TextStyleButton'
 
 
 const def = () => ({
@@ -18,47 +19,37 @@ const ItalicButton = defaults(def, (props) => {
 
     const editorNode = useEditor()
     const isActive = $(false)
+    const command = "italic"
 
-    // 1. Monitor Selection State
+    /**
+     * Effect: Formatting State Controller
+     * 
+     * Manages the lifecycle of a document-level listener to keep the button's 
+     * visual state synchronized with the current text selection.
+     */
     useEffect(() => {
-        const editor = $$(editorNode)
+        const editor = editorNode ?? getCurrentEditor()
 
-        if (!editor || typeof editor.contains !== 'function') return
+        if (!$$(editor) || typeof $$(editor).contains !== 'function') return
 
-        const updateState = () => {
-            if (document.activeElement === editor || editor.contains(document.activeElement)) {
-                try {
-                    // Check if 'italic' is applied to the current selection
-                    isActive(document.queryCommandState('italic'))
-                } catch (e) {
-                    isActive(false)
-                }
-            }
-        }
+        const handler = () => { updateStylesState(isActive, editor, command) }
 
-        document.addEventListener('selectionchange', updateState)
-        updateState()
+        document.addEventListener('selectionchange', handler)
+        // Check initial state
+        handler()
 
-        return () => document.removeEventListener('selectionchange', updateState)
+        return () => document.removeEventListener('selectionchange', handler)
     })
 
-    // 2. Click Handler
-    const handleClick = (e: any) => {
-        e.preventDefault() // Prevent button from stealing focus
-
-        // if (otherProps.onClick) {
-        //     otherProps.onClick(e)
-        //     return
-        // }
-
+    const handleClick = () => {
         // Ensure modern CSS styles (span style="font-style: italic") instead of <i> tags
         document.execCommand('styleWithCSS', false, 'true')
 
         // Execute Native Italic Command
-        document.execCommand('italic', false)
+        document.execCommand(command, false)
 
         // Update state immediately
-        isActive(document.queryCommandState('italic'))
+        isActive(document.queryCommandState(command))
     }
 
     return (
@@ -69,7 +60,6 @@ const ItalicButton = defaults(def, (props) => {
                 () => $$(cls) ? $$(cls) : cn,
                 () => $$(isActive) ? '!bg-slate-200' : ''
             ]}
-
             aria-pressed={() => $$(isActive) ? "true" : "false"}
             disabled={disabled}
             onMouseDown={(e) => { e.preventDefault(); }}

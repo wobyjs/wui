@@ -4,13 +4,14 @@ import { useEditor } from './undoredo'
 import BoldIcon from '../icons/bold'
 import ItalicIcon from '../icons/italic'
 import UnderlineIcon from '../icons/underline'
+import { getCurrentEditor } from "./utils"
 
 type TextStyleType = 'bold' | 'italic' | 'underline'
 
 const def = () => ({
     cls: $('', HtmlClass) as JSX.Class | undefined,
     class: $('', HtmlClass) as JSX.Class | undefined,
-    type: $("bold", HtmlString) as ObservableMaybe<TextStyleType>,
+    mode: $("bold", HtmlString) as ObservableMaybe<TextStyleType>,
     buttonType: $("outlined", HtmlString) as ObservableMaybe<ButtonStyles>,
     title: $("", HtmlString) as ObservableMaybe<string>,
     disabled: $(false, HtmlBoolean) as Observable<boolean>,
@@ -18,7 +19,7 @@ const def = () => ({
 })
 
 const TextStyleButton = defaults(def, (props) => {
-    const { type, buttonType: btnType, title, cls, class: cn, disabled, children, ...otherProps } = props
+    const { mode, buttonType: btnType, title, cls, class: cn, disabled, children, ...otherProps } = props
 
     const editorNode = useEditor()
     const isActive = $(false)
@@ -43,8 +44,8 @@ const TextStyleButton = defaults(def, (props) => {
     }
 
     const currentStyleConfig = () => {
-        const t = $$(type)
-        return styleMap[t as keyof typeof styleMap]
+        const m = $$(mode)
+        return styleMap[m as keyof typeof styleMap]
     }
 
     const displayIcon = () => {
@@ -57,46 +58,29 @@ const TextStyleButton = defaults(def, (props) => {
         return currentStyleConfig().defaultTitle
     }
 
-    // ---------------------------------------------------------------------
-    // 1. STATE DETECTION 
-    // ---------------------------------------------------------------------
+
+    /**
+     * Effect: Style State Synchronization Controller
+     * 
+     * Synchronizes the visual "active" state of a formatting button (e.g., Bold, Italic) 
+     * with the actual text formatting at the current cursor position.
+     */
     useEffect(() => {
-        const editor = $$(editorNode)
-        const currentType = $$(type)
-        const config = styleMap[currentType]
+        const editor = editorNode ?? getCurrentEditor()
+        const config = styleMap[$$(mode)]
 
-        if (!editor || typeof editor.contains !== 'function') return
+        if (!$$(editor) || typeof $$(editor).contains !== 'function') return
 
-        const updateState = () => {
-            if (document.activeElement === editor || editor.contains(document.activeElement)) {
-                try {
-                    isActive(document.queryCommandState(config.command))
-                } catch (e) {
-                    isActive(false)
-                }
-            }
-        }
+        const handler = () => { updateStylesState(isActive, editor, config.command) }
 
-        document.addEventListener('selectionchange', updateState)
+        document.addEventListener('selectionchange', handler)
         // Check initial state
-        updateState()
+        handler()
 
-        return () => document.removeEventListener('selectionchange', updateState)
+        return () => document.removeEventListener('selectionchange', handler)
     })
 
-    // ---------------------------------------------------------------------
-    // 2. CLICK HANDLER
-    // ---------------------------------------------------------------------
-    const handleClick = (e: any) => {
-        e.preventDefault() // Stop button from stealing focus
-
-        // Extract onClick from otherProps. Since we cast props to any, this is now safe.
-        // const customOnClick = otherProps.onClick
-        // if (customOnClick) {
-        //     customOnClick(e)
-        //     return
-        // }
-
+    const handleClick = () => {
         const config = currentStyleConfig()
 
         // Use CSS styles (span style="...") instead of HTML tags (<b>)
@@ -120,6 +104,7 @@ const TextStyleButton = defaults(def, (props) => {
             aria-pressed={() => $$(isActive) ? "true" : "false"}
             disabled={disabled}
             onClick={handleClick}
+            onMouseDown={(e) => { e.preventDefault() }}
             {...otherProps}
         >
             {displayIcon}
@@ -140,3 +125,14 @@ declare module 'woby' {
 }
 
 export default TextStyleButton
+
+export const updateStylesState = (isActive: Observable<boolean>, editor: Observable<HTMLDivElement>, command: string) => {
+    const el = $$(editor)
+    if (document.activeElement === el || el.contains(document.activeElement)) {
+        try {
+            isActive(document.queryCommandState(command))
+        } catch (e) {
+            isActive(false)
+        }
+    }
+}

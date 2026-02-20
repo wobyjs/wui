@@ -2,6 +2,8 @@ import { $, $$, defaults, useEffect, customElement, type ElementAttributes, type
 import { Button, ButtonStyles } from '../Button'
 import UnderlineIcon from '../icons/underline'
 import { useEditor } from './undoredo'
+import { getCurrentEditor } from "./utils"
+import { updateStylesState } from "./TextStyleButton"
 
 const def = () => ({
     cls: $('', HtmlClass) as JSX.Class | undefined,
@@ -16,47 +18,37 @@ const UnderlineButton = defaults(def, (props) => {
 
     const editorNode = useEditor()
     const isActive = $(false)
+    const command = "underline"
 
-    // 1. Monitor Selection State
+    /**
+     * Effect: Formatting State Controller
+     * 
+     * Manages the lifecycle of a document-level listener to keep the button's 
+     * visual state synchronized with the current text selection.
+     */
     useEffect(() => {
-        const editor = $$(editorNode)
+        const editor = editorNode ?? getCurrentEditor()
 
-        if (!editor || typeof editor.contains !== 'function') return
+        if (!$$(editor) || typeof $$(editor).contains !== 'function') return
 
-        const updateState = () => {
-            if (document.activeElement === editor || editor.contains(document.activeElement)) {
-                try {
-                    // Check if 'underline' is applied to the current selection
-                    isActive(document.queryCommandState('underline'))
-                } catch (e) {
-                    isActive(false)
-                }
-            }
-        }
+        const handler = () => { updateStylesState(isActive, editor, command) }
 
-        document.addEventListener('selectionchange', updateState)
-        updateState()
+        document.addEventListener('selectionchange', handler)
+        // Check initial state
+        handler()
 
-        return () => document.removeEventListener('selectionchange', updateState)
+        return () => document.removeEventListener('selectionchange', handler)
     })
 
-    // 2. Click Handler
-    const handleClick = (e: any) => {
-        e.preventDefault() // Prevent button from stealing focus
-
-        // if (otherProps.onClick) {
-        //     otherProps.onClick(e)
-        //     return
-        // }
-
+    const handleClick = () => {
         // Ensure modern CSS styles (span style="text-decoration: underline") instead of <u> tags
         document.execCommand('styleWithCSS', false, 'true')
 
         // Execute Native Underline Command
-        document.execCommand('underline', false)
+        document.execCommand(command, false)
 
         // Update state immediately
-        isActive(document.queryCommandState('underline'))
+        isActive(document.queryCommandState(command))
     }
 
     return (
