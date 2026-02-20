@@ -5,31 +5,19 @@ import { useEditor } from './undoredo'
 /**
  * Normalizes the editor's DOM structure to ensure consistent block-level wrapping.
  * 
- * Logic:
- * 1. Configures the browser to use <div> as the default paragraph separator.
- * 2. If the editor is empty, seeds it with a <div><br></div> to ensure the first line 
- *    is immediately wrapped in a block element.
- * 3. Monitors 'input' events to detect and "heal" loose text nodes (raw text not 
- *    contained in a tag) which are common in Chrome/Edge.
- * 4. Uses `document.execCommand('formatBlock')` for healing to ensure the 
- *    browser preserves the user's cursor position (caret) without jumping.
- * 
  * @param editor - An Observable or raw HTMLDivElement representing the editor surface.
  */
 export const useBlockEnforcer = (editor: Observable<HTMLDivElement | undefined> | HTMLDivElement | undefined) => {
     const el = $$(editor);
-
-    console.log("[useBlockEnforcer] editor - ", el)
-
     if (!el) return;
 
     // 1. Force DIVs on Enter
-    document.execCommand('defaultParagraphSeparator', false, 'div');
+    document.execCommand('defaultParagraphSeparator', false, 'p');
 
     const ensureStructure = () => {
         // CASE 1: Editor is totally empty
         if (el.innerHTML.trim() === "" || el.innerHTML === "<br>") {
-            el.innerHTML = "<div><br></div>";
+            el.innerHTML = "<p><br></p>";
             const range = document.createRange();
             const sel = window.getSelection();
             if (sel && el.firstChild) {
@@ -50,7 +38,7 @@ export const useBlockEnforcer = (editor: Observable<HTMLDivElement | undefined> 
             // We don't use innerHTML here. 
             // Instead, we tell the browser to wrap the current line in a div.
             // This is "Native" and keeps the cursor exactly where it is.
-            document.execCommand('formatBlock', false, 'div');
+            document.execCommand('formatBlock', false, 'p');
 
             // Chrome might add an ID or extra styles to the div, 
             // we clean those up if necessary
@@ -70,22 +58,30 @@ export const useBlockEnforcer = (editor: Observable<HTMLDivElement | undefined> 
 /**
  * Finds the actual editable <div> the user is typing in.
  * 
- * Logic:
- * 1. Locates the cursor position.
- * 2. Climbs up the DOM to find the [contenteditable] container.
- * 3. If inside a <wui-editor>, it "pierces" the Shadow DOM to find the internal input area.
- * 
  * @returns The editable element or undefined.
  */
 export const getCurrentEditor = () => {
-    let editorEl: HTMLDivElement | undefined = undefined
+    // Priority 1: User-marked custom div or your component root
+    let editorEl = document.querySelector('[data-editor-root]') as HTMLDivElement
 
-    editorEl = document.querySelector('[contenteditable="true"]') ?? document.querySelector('[contenteditable=""]') ?? document.querySelector('div[contenteditable]')
+    // Priority 2: Shadow DOM piercing (if user put it inside a Web Component)
+    if (!editorEl) {
+        // Convert the NodeList to an Array so it is iterable
+        const allWCs = Array.from(document.querySelectorAll('*'));
+        for (const wc of allWCs) {
+            if (wc.shadowRoot) {
+                const found = wc.shadowRoot.querySelector('[data-editor-root]');
+                if (found) {
+                    editorEl = found as HTMLDivElement;
+                    break;
+                }
+            }
+        }
+    }
 
-    const customElement = document.querySelector('wui-editor')
-    if (customElement?.shadowRoot && !editorEl) {
-        // Try to find the contenteditable element (editor) inside the custom element
-        editorEl = customElement.shadowRoot.querySelector('[contenteditable]') as HTMLDivElement
+    // Priority 3: Fallback to the first active contenteditable
+    if (!editorEl) {
+        editorEl = document.querySelector('[contenteditable="true"]') as HTMLDivElement
     }
 
     return $(editorEl)
@@ -330,7 +326,8 @@ export const selectText = (element: HTMLElement, range: Range, t: string) => {
 
 // Complex applyStyle function to be restored
 export const applyStyle = (styleSetter: (element: HTMLElement) => void) => {
-    const editor = $$(useEditor())
+    console.groupCollapsed('[applyStyle] Applying styles...')
+    const editor = $$(useEditor()) ?? $$(getCurrentEditor())
     const currentWindowSelection = window.getSelection()
 
     if (!currentWindowSelection || currentWindowSelection.rangeCount === 0) {
@@ -346,7 +343,7 @@ export const applyStyle = (styleSetter: (element: HTMLElement) => void) => {
         return
     }
 
-    console.log('[applyStyle] Initial SelectionState:', JSON.stringify(initialSelectionState))
+    console.log('[applyStyle] Initial SelectionState:', initialSelectionState)
     console.log('[applyStyle] Initial GlobalRange:', initialGlobalRange)
 
     if (initialSelectionState.isCollapsed) {
@@ -514,7 +511,199 @@ export const applyStyle = (styleSetter: (element: HTMLElement) => void) => {
     }
     // Ensure editor focus if needed, though selection changes should handle it.
     // $$(useEditor())?.focus()
+    console.groupEnd()
 }
+
+// #region apply style original
+export const applyStyleOriginal = (styleSetter: (element: HTMLElement) => void) => {
+    console.groupCollapsed('[applyStyle] Applying styles...')
+    const editor = $$(useEditor()) ?? $$(getCurrentEditor())
+    const currentWindowSelection = window.getSelection()
+
+    if (!currentWindowSelection || currentWindowSelection.rangeCount === 0) {
+        console.warn('[applyStyle] No selection or range count is zero.')
+        return
+    }
+
+    const initialGlobalRange = currentWindowSelection.getRangeAt(0).cloneRange()
+    const initialSelectionState = getSelection(editor) // Snapshot before any changes
+
+    if (!initialSelectionState) {
+        console.warn('[applyStyle] Could not get initial selection state.')
+        return
+    }
+
+    console.log('[applyStyle] Initial SelectionState:', initialSelectionState)
+    console.log('[applyStyle] Initial GlobalRange:', initialGlobalRange)
+
+    if (initialSelectionState.isCollapsed) {
+        console.log('[applyStyle] Case: Initial selection is collapsed.')
+        // Try to determine if the cursor is within a word
+        const container = initialGlobalRange.startContainer
+        const offset = initialGlobalRange.startOffset
+        let wordRange: Range | null = null
+        let originalCursorOffsetInWord = -1
+
+        if (container.nodeType === Node.TEXT_NODE) {
+            const text = container.textContent || ""
+            let start = offset
+            let end = offset
+            // Expand left
+            while (start > 0 && /\w/.test(text[start - 1])) {
+                start--
+            }
+            // Expand right
+            while (end < text.length && /\w/.test(text[end])) {
+                end++
+            }
+
+            if (start !== end) { // Cursor is within a word
+                wordRange = document.createRange()
+                wordRange.setStart(container, start)
+                wordRange.setEnd(container, end)
+                originalCursorOffsetInWord = offset - start
+                console.log(`[applyStyle] Collapsed cursor in word: "${text.substring(start, end)}", original offset in word: ${originalCursorOffsetInWord}`)
+            }
+        }
+        // TODO: Add similar logic for ELEMENT_NODE if cursor is at boundary of elements that form a word
+
+        if (wordRange) {
+            // Scenario A: Cursor within a word (e.g., wo|rd)
+            console.log('[applyStyle] Scenario A: Styling word based on cursor.', wordRange.toString())
+            const spanElement = document.createElement('span')
+            try {
+                wordRange.surroundContents(spanElement) // Modifies DOM, may invalidate initialGlobalRange's container/offset for the original node
+                styleSetter(spanElement)
+
+                if (spanElement.getAttribute('style') === '' && !styleSetter.toString().includes('text-decoration')) {
+                    const parent = spanElement.parentNode
+                    if (parent) {
+                        while (spanElement.firstChild) {
+                            parent.insertBefore(spanElement.firstChild, spanElement)
+                        }
+                        parent.removeChild(spanElement)
+                    }
+                    console.log('[applyStyle] Word styled span was empty, unwrapped. Restoring original selection.')
+                    if (initialSelectionState) restoreSelection(initialSelectionState, editor)
+                } else {
+                    // Restore cursor to its original relative position within the styled word
+                    const textNodeInsideSpan = spanElement.firstChild
+                    if (textNodeInsideSpan && textNodeInsideSpan.nodeType === Node.TEXT_NODE && originalCursorOffsetInWord !== -1) {
+                        const newCursorOffset = Math.max(0, Math.min(originalCursorOffsetInWord, textNodeInsideSpan.textContent?.length ?? 0))
+                        const newRangeToRestore = document.createRange()
+                        newRangeToRestore.setStart(textNodeInsideSpan, newCursorOffset)
+                        newRangeToRestore.collapse(true)
+                        currentWindowSelection.removeAllRanges()
+                        currentWindowSelection.addRange(newRangeToRestore)
+                        console.log('[applyStyle] Restored cursor inside styled word at offset:', newCursorOffset)
+                    } else {
+                        console.warn('[applyStyle] Could not restore cursor precisely in word, falling back to initial state restoration.')
+                        if (initialSelectionState) restoreSelection(initialSelectionState, editor)
+                    }
+                }
+            } catch (e) {
+                console.error('[applyStyle] Error using surroundContents for word styling:', e, 'Falling back to extract/insert.')
+                // Fallback: More disruptive, use original range (which is collapsed)
+                const fallbackSpan = document.createElement('span')
+                const tempTextForStyle = document.createTextNode(wordRange.toString()) // Get the word text
+                fallbackSpan.appendChild(tempTextForStyle) // Apply style to a span with the word
+                styleSetter(fallbackSpan)
+
+                if (fallbackSpan.getAttribute('style') === '' && !styleSetter.toString().includes('text-decoration')) {
+                    if (initialSelectionState) restoreSelection(initialSelectionState, editor) // No style, just restore
+                } else {
+                    wordRange.deleteContents() // Delete the original word text
+                    wordRange.insertNode(fallbackSpan) // Insert the new styled span
+
+                    // Try to place cursor inside this new span
+                    const textNodeInFallbackSpan = fallbackSpan.firstChild
+                    if (textNodeInFallbackSpan && textNodeInFallbackSpan.nodeType === Node.TEXT_NODE && originalCursorOffsetInWord !== -1) {
+                        const newCursorOffset = Math.max(0, Math.min(originalCursorOffsetInWord, textNodeInFallbackSpan.textContent?.length ?? 0))
+                        const newRangeToRestore = document.createRange()
+                        newRangeToRestore.setStart(textNodeInFallbackSpan, newCursorOffset)
+                        newRangeToRestore.collapse(true)
+                        currentWindowSelection.removeAllRanges()
+                        currentWindowSelection.addRange(newRangeToRestore)
+                    } else {
+                        if (initialSelectionState) restoreSelection(initialSelectionState, editor) // Fallback
+                    }
+                }
+            }
+        } else {
+            // Scenario B: Cursor in whitespace, or between words
+            console.log('[applyStyle] Scenario B: Inserting new styled span for typing.')
+            const spanElement = document.createElement('span')
+            styleSetter(spanElement)
+
+            // Only insert if a style was actually applied or it's a non-attribute style like underline
+            if (spanElement.getAttribute('style') === '' && !styleSetter.toString().includes('text-decoration')) {
+                console.log('[applyStyle] No style effectively applied, not inserting empty span. Restoring original cursor.')
+                if (initialSelectionState) restoreSelection(initialSelectionState, editor)
+            } else {
+                spanElement.appendChild(document.createTextNode('\uFEFF')) // ZWNBSP
+                initialGlobalRange.insertNode(spanElement) // initialGlobalRange is collapsed here
+
+                const newCursorRange = document.createRange()
+                // Ensure spanElement.firstChild exists (the ZWNBSP text node)
+                const zwspNode = spanElement.firstChild
+                if (zwspNode && zwspNode.nodeType === Node.TEXT_NODE) {
+                    // Select the ZWNBSP node itself, so typing replaces it.
+                    newCursorRange.selectNode(zwspNode)
+                    // After replacement, the cursor is usually placed after the typed content by the browser.
+                    currentWindowSelection.removeAllRanges()
+                    currentWindowSelection.addRange(newCursorRange)
+                    console.log('[applyStyle] Inserted new styled span, ZWNBSP selected.')
+                } else {
+                    console.error('[applyStyle] Failed to find ZWNBSP node in new span. Restoring original selection.')
+                    if (initialSelectionState) restoreSelection(initialSelectionState, editor)
+                }
+            }
+        }
+    } else {
+        // Case: Initial selection is not collapsed (user selected a range)
+        console.log('[applyStyle] Case: Non-collapsed selection.')
+        const spanElement = document.createElement('span')
+        try {
+            initialGlobalRange.surroundContents(spanElement) // Use the original range
+            styleSetter(spanElement)
+            if (spanElement.getAttribute('style') === '' && !styleSetter.toString().includes('text-decoration')) {
+                const parent = spanElement.parentNode
+                if (parent) {
+                    while (spanElement.firstChild) {
+                        parent.insertBefore(spanElement.firstChild, spanElement)
+                    }
+                    parent.removeChild(spanElement)
+                }
+            }
+        } catch (e) {
+            console.warn("[applyStyle] surroundContents failed for non-collapsed selection, falling back to extract/insert.", e)
+            // Fallback to extractContents and insertNode
+            const extractedContents = initialGlobalRange.extractContents() // Modifies initialGlobalRange
+            spanElement.appendChild(extractedContents)
+            initialGlobalRange.insertNode(spanElement) // Inserts span at the start of where initialGlobalRange was
+            styleSetter(spanElement)
+            if (spanElement.getAttribute('style') === '' && !styleSetter.toString().includes('text-decoration')) {
+                // Unwrap the span by replacing it with its children
+                const parent = spanElement.parentNode
+                if (parent) {
+                    while (spanElement.firstChild) {
+                        parent.insertBefore(spanElement.firstChild, spanElement)
+                    }
+                    parent.removeChild(spanElement)
+                }
+            }
+        }
+        // Restore the original selection boundaries
+        if (initialSelectionState) {
+            restoreSelection(initialSelectionState, editor)
+            console.log('[applyStyle] Restored original non-collapsed selection state.')
+        }
+    }
+    // Ensure editor focus if needed, though selection changes should handle it.
+    // $$(useEditor())?.focus()
+    console.groupEnd()
+}
+// #endregion
 
 
 export const isTags = (node: HTMLElement, ...args: string[]) => args.some(t => node.nodeName === t)
