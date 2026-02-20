@@ -261,7 +261,7 @@ const syncAllLists = (root: HTMLElement) => {
 }
 
 
-const ListButton = defaults(def, (props) => {
+const List = defaults(def, (props) => {
     const { class: cn, cls, mode, buttonType: btnType, ...otherProps } = props
 
     const editor = useEditor()
@@ -424,17 +424,17 @@ const ListButton = defaults(def, (props) => {
     )
 })
 
-export { ListButton }
+export { List }
 
-customElement('wui-list-button', ListButton)
+customElement('wui-list', List)
 
 declare module 'woby' {
     namespace JSX {
         interface IntrinsicElements {
-            'wui-list-button': ElementAttributes<typeof ListButton>
+            'wui-list': ElementAttributes<typeof List>
         }
     }
 }
 
-export default ListButton
+export default List
 
