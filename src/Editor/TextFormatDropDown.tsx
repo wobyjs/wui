@@ -1,6 +1,6 @@
-import { $, $$, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlString, JSX, ObservableMaybe, useEffect, useContext, Observable, HtmlClass } from 'woby'
+import { $, $$, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlString, JSX, ObservableMaybe, useEffect, Observable, HtmlClass } from 'woby'
 import { Button, ButtonStyles } from '../Button'
-import { EditorContext, useEditor } from './undoredo'
+import { useEditor } from './undoredo'
 import { useOnClickOutside } from '@woby/use'
 import KeyboardDownArrow from '../icons/keyboard_down_arrow'
 import { getCurrentEditor, getActiveSelection } from './utils'
@@ -92,13 +92,13 @@ const TextFormatDropDown = defaults(def, (props) => {
 
     const handleSelectFormat = (tag: string, label: TextFormatOptions, cls: string | undefined) => {
 
-        const editorDiv = $$(editor) ?? getCurrentEditor()
+        const el = editor ?? getCurrentEditor()
 
-        if (editorDiv) {
+        if ($$(el)) {
             selectedFormat(label)
-            applyFormatBlock(editorDiv, tag, cls)
+            applyFormatBlock($$(el), tag, cls)
             isOpen(false)
-            editorDiv.focus()
+            $$(el).focus()
         }
         isOpen(false)
     }
@@ -114,11 +114,11 @@ const TextFormatDropDown = defaults(def, (props) => {
 
         if (opt) {
             // Apply it
-            const editorDiv = $$(editor) ?? getCurrentEditor()
+            const el = editor ?? getCurrentEditor()
 
-            if (editorDiv) {
-                applyFormatBlock(editorDiv, opt.tag, opt.class)
-                editorDiv.focus()
+            if ($$(el)) {
+                applyFormatBlock($$(el), opt.tag, opt.class)
+                $$(el).focus()
             }
         }
     }
@@ -127,9 +127,13 @@ const TextFormatDropDown = defaults(def, (props) => {
     // #region useEffect for Keyboard Shortcuts
     useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
-            const editorDiv = $$(editor) ?? getCurrentEditor()
-            if (!editorDiv) return
+            const el = editor ?? getCurrentEditor()
+            if (!$$(el)) {
+                // console.log('[TextFormatDropDown] No editor found, skipping hotkey')
+                return
+            }
 
+            // console.groupCollapsed('[TextFormatDropDown] Hotkey pressed:', event.key, `Ctrl:${event.ctrlKey} Alt:${event.altKey} Shift:${event.shiftKey}`)
             for (const opt of FORMAT_OPTIONS) {
                 if (!opt.hotkey) continue
                 const parts = opt.hotkey.split('+')
@@ -138,24 +142,49 @@ const TextFormatDropDown = defaults(def, (props) => {
                 const alt = parts.includes('Alt')
                 const shift = parts.includes('Shift')
 
-                if (
-                    key && event.key.toUpperCase() === key &&
-                    event.ctrlKey === ctrl && event.altKey === alt && event.shiftKey === shift
-                ) {
-                    const target = event.target as HTMLElement
+                // console.log(`[TextFormatDropDown] Checking hotkey: ${opt.hotkey} for format: ${opt.label}`)
+
+                if (key && event.key.toUpperCase() === key && event.ctrlKey === ctrl && event.altKey === alt && event.shiftKey === shift) {
+                    let target = event.target as HTMLElement
                     const currentDropdownEl = $$(dropdownRef)
 
+                    // console.log('[TextFormatDropDown] Hotkey matched!', {
+                    //     format: opt.label,
+                    //     hotkey: opt.hotkey,
+                    //     tag: opt.tag,
+                    //     targetTag: target.tagName,
+                    //     isInEditor: $$(el).contains(target),
+                    //     isEditor: target === $$(el),
+                    //     isInDropdown: currentDropdownEl?.contains(target)
+                    // })
+
+                    if (target.tagName.toLowerCase() === 'wui-editor') {
+                        const shadowRoot = (target as HTMLElement).shadowRoot
+                        if (shadowRoot) {
+                            const shadowEditor = shadowRoot.querySelector('[data-editor-root]') as HTMLElement
+                            if (shadowEditor) {
+                                // console.log("Redirecting target from wui-editor to shadow DOM contenteditable:", shadowEditor)
+                                target = shadowEditor as HTMLElement
+                            }
+                        }
+                    }
+
                     // Check if event is relevant to this editor
-                    if (editorDiv.contains(target) || target === editorDiv || currentDropdownEl?.contains(target)) {
+                    if ($$(el).contains(target) || target === $$(el) || currentDropdownEl?.contains(target)) {
+                        // console.log('[TextFormatDropDown] Applying format:', opt.tag)
                         event.preventDefault()
-                        applyFormatBlock(editorDiv, opt.tag, opt.class)
+                        applyFormatBlock($$(el), opt.tag, opt.class)
                         selectedFormat(opt.label as TextFormatOptions)
                         isOpen(false)
-                        editorDiv.focus()
+                        $$(el).focus()
+                        // console.groupEnd()
                         break
+                    } else {
+                        // console.log('[TextFormatDropDown] Target not in editor scope, ignoring')
                     }
                 }
             }
+            console.groupEnd()
         }
         document.addEventListener('keydown', handleKeyDown)
         return () => document.removeEventListener('keydown', handleKeyDown)
@@ -174,17 +203,17 @@ const TextFormatDropDown = defaults(def, (props) => {
      */
     useEffect(() => {
         const handleSelectionChange = () => {
-            const editorDiv = $$(editor) ?? getCurrentEditor()
-            if (!editorDiv || typeof editorDiv.contains !== 'function') return
+            const el = editor ?? getCurrentEditor()
+            if (!$$(el) || typeof $$(el).contains !== 'function') return
 
             // const selection = window.getSelection()
-            const selection = getActiveSelection(editorDiv);
+            const selection = getActiveSelection($$(el));
             if (selection && selection.rangeCount > 0) {
                 const range = selection.getRangeAt(0)
 
                 // Ensure selection is inside editor
-                if (editorDiv.contains(range.commonAncestorContainer)) {
-                    const blockInfo = getCurrentBlockInfo(editorDiv, range)
+                if ($$(el).contains(range.commonAncestorContainer)) {
+                    const blockInfo = getCurrentBlockInfo($$(el), range)
 
                     if (blockInfo) {
                         const matched = FORMAT_OPTIONS.find(opt => opt.tag.toLowerCase() === blockInfo.tagName.toLowerCase())
@@ -219,10 +248,7 @@ const TextFormatDropDown = defaults(def, (props) => {
                 role="menu"
                 aria-orientation="vertical"
                 aria-labelledby="menu-button"
-                onMouseDown={(e) => {
-                    e.stopPropagation()
-                    e.preventDefault() // Prevents editor blur when clicking scrollbar/padding
-                }}
+                onMouseDown={(e) => { e.stopPropagation(); e.preventDefault(); }}
             >
                 <div class="py-1" role="none">
                     {FORMAT_OPTIONS.map(opt => (
@@ -268,9 +294,7 @@ const TextFormatDropDown = defaults(def, (props) => {
                         {() => $$(selectedFormat)}
                     </span>
                     <span class="flex justify-end">
-                        <KeyboardDownArrow class="-mr-1 ml-2 h-5 w-5"
-                            onClick={toggleDropdown}
-                            onMouseDown={(e) => { e.preventDefault() }} />
+                        <KeyboardDownArrow class="-mr-1 ml-2 h-5 w-5" onClick={toggleDropdown} onMouseDown={(e) => { e.preventDefault(); }} />
                     </span>
                 </Button>
             </div>
