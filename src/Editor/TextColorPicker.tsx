@@ -1,7 +1,6 @@
-import { $, $$, JSX, Observable, ObservableMaybe, ObservableReadonly, Context, defaults, HtmlString, customElement, ElementAttributes, isObservable, HtmlClass } from 'woby'
+import { $, $$, JSX, Observable, ObservableMaybe, defaults, HtmlString, customElement, ElementAttributes, HtmlClass } from 'woby'
 import { Button, ButtonStyles } from '../Button'
-import { EditorContext, useEditor, useUndoRedo } from './undoredo'
-import { applyStyle } from './utils' // Import applyStyle
+import { useEditor } from './undoredo'
 import A from '../icons/a'
 import KeyboardDownArrow from '../icons/keyboard_down_arrow'
 
@@ -19,9 +18,6 @@ const TextColorPicker = defaults(def, (props) => {
 
     const editor = useEditor() // Editor context, likely the contentEditable div
     const colorInputRef = $<HTMLInputElement>(null)
-    // const { saveDo } = useUndoRedo()
-    const undoRedoContext = useUndoRedo()
-    const saveDo = undoRedoContext ? undoRedoContext.saveDo : () => { }
 
     // Updates selectedColor when the color input changes
     const handleNativeColorInputChange = (e: JSX.TargetedEvent<HTMLInputElement, Event>) => {
@@ -33,7 +29,6 @@ const TextColorPicker = defaults(def, (props) => {
     // Applies the selected color to the editor content
     const applyPickedColor = () => {
         const colorVal = $$(selectedColor)
-        saveDo()
         document.execCommand('styleWithCSS', false, 'true')
         document.execCommand('foreColor', false, colorVal)
         if ($$(editor)) {
@@ -41,16 +36,12 @@ const TextColorPicker = defaults(def, (props) => {
         }
     }
 
-
-    const icons = () => {
-        return <A class="w-7 h-6" fill={selectedColor} />
-    }
+    const icons = () => { return <A class="w-7 h-6" fill={selectedColor} /> }
 
     return (
         <div class="relative inline-block text-left">
             <Button
                 type={btnType}
-                // cls={() => [BASE_BTN]}
                 class={() => [
                     () => $$(cls) ? $$(cls) : BASE_BTN, cn,
                 ]}
@@ -59,13 +50,7 @@ const TextColorPicker = defaults(def, (props) => {
                 onClick={applyPickedColor}
                 {...otherProps}
             >
-                <div class="flex flex-col items-center justify-center leading-none text-center truncate"
-                    onClick={(e: MouseEvent) => {
-                        e.preventDefault
-                        e.stopPropagation
-                        applyPickedColor
-                    }}
-                >
+                <div class="flex flex-col items-center justify-center leading-none text-center truncate" onClick={(e: MouseEvent) => { e.preventDefault; e.stopPropagation; applyPickedColor; }}>
                     {icons}
                     <input
                         ref={colorInputRef}
@@ -77,13 +62,7 @@ const TextColorPicker = defaults(def, (props) => {
                     />
                 </div>
 
-                <div class="flex justify-end"
-                    onClick={(e) => {
-                        e.preventDefault()
-                        e.stopPropagation()
-                        colorInputRef()?.click()
-                    }}
-                >
+                <div class="flex justify-end" onClick={(e) => { e.preventDefault(); e.stopPropagation(); colorInputRef()?.click() }}>
                     <KeyboardDownArrow class="-mr-1 ml-2 size-5" />
                 </div>
 
