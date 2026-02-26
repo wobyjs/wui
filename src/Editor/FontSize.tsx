@@ -3,14 +3,14 @@ import { Button, ButtonStyles } from '../Button'
 import TextIncrease from '../icons/text_increase'
 import TextDecrease from '../icons/text_decrease'
 import { useEditor } from './undoredo'
-import { applyStyle, findBlockParent, getSelection, getCurrentEditor, getCurrentRange, restoreSelection, selectElement } from './utils'
+import { applyStyle, findBlockParent, getSelection, getCurrentEditor, getCurrentRange, restoreSelection, selectElement, getActiveSelection } from './utils'
 
 const def = () => ({
     cls: $('', HtmlClass) as JSX.Class | undefined,
     buttonType: $("outlined", HtmlString) as ObservableMaybe<ButtonStyles>,
     editable: $(false, HtmlBoolean) as Observable<boolean>,
     fontSize: $(16, HtmlNumber) as ObservableMaybe<number>,
-    step: $(1, HtmlNumber) as ObservableMaybe<number>,
+    step: $(5, HtmlNumber) as ObservableMaybe<number>,
 })
 
 const FontSize = defaults(def, (props) => {
@@ -20,74 +20,18 @@ const FontSize = defaults(def, (props) => {
 
     // #region Synchronization (Hooks)
     /**
-     * Monitors the DOM to remove empty "Ghost" spans and redundant "Onion" wrappers.
-     */
-    useEffect(() => {
-        const el = editor ?? getCurrentEditor();
-        if (!$$(el)) return;
-
-        const performEditorCleanup = () => {
-            const spans = Array.from($$(el).querySelectorAll('span'));
-            const { selection } = getSelection($$(el));
-
-            spans.forEach(span => {
-                // 0. Safety: Do not modify span if cursor is inside it
-                const isCursorInside = selection?.anchorNode && span.contains(selection.anchorNode);
-                if (isCursorInside) return;
-
-                // 1. Remove Ghost Spans (truly empty)
-                const isEmpty = span.childNodes.length === 0 || (span.textContent === '' && span.children.length === 0);
-                if (isEmpty) {
-                    console.warn('[Cleanup] Removing empty ghost span');
-                    span.remove();
-                    return;
-                }
-
-                // 2. Remove redundant font-size from onion wrappers
-                // (parent has no direct text but has children)
-                const hasDirectText = Array.from(span.childNodes).some(
-                    node => node.nodeType === Node.TEXT_NODE && node.textContent?.trim() !== ''
-                );
-
-                if (!hasDirectText && span.children.length > 0 && span.style.fontSize) {
-                    // Remove ONLY font-size
-                    span.style.removeProperty('font-size');
-
-                    // If no inline styles remain, remove style attribute entirely
-                    if (span.style.length === 0) { span.removeAttribute('style'); }
-                }
-
-                // 3. Remove completely useless spans
-                const hasAttributes = span.attributes.length > 0;
-
-                if (!hasAttributes) {
-                    // console.log('[Cleanup] Unwrapping useless span');
-                    span.replaceWith(...Array.from(span.childNodes));
-                }
-            });
-        };
-
-        const observer = new MutationObserver(performEditorCleanup);
-
-        observer.observe($$(el), { childList: true, subtree: true, characterData: true });
-
-        performEditorCleanup(); // Initial run
-
-        return () => observer.disconnect();
-    });
-
-    /**
     * Synchronizes the font size input field with the text at the user's cursor.
     */
     useEffect(() => {
-        const el = editor ?? getCurrentEditor();
-        if (!$$(el)) {
-            console.log('[FontSize] No editor found, skipping selection sync');
-            return;
-        }
-
         const syncWithSelection = () => {
-            const { selection } = getSelection($$(el));
+            const el = editor ?? getCurrentEditor();
+            if (!$$(el)) {
+                console.log('[FontSize] No editor found, skipping selection sync');
+                return;
+            }
+
+            const { selection, state } = getSelection($$(el));
+
             if (!selection?.rangeCount) return;
 
             const range = selection.getRangeAt(0);
@@ -99,7 +43,7 @@ const FontSize = defaults(def, (props) => {
             let smallestSize = $$(fontSize);
 
             // 1. Single cursor click (No text highlighted)
-            if (selection.isCollapsed || container.nodeType === Node.TEXT_NODE) {
+            if (state.isCollapsed || container.nodeType === Node.TEXT_NODE) {
                 const element = (container.nodeType === Node.TEXT_NODE ? container.parentElement : container) as HTMLElement;
                 if (element) {
                     const size = parseFloat(window.getComputedStyle(element).fontSize);
@@ -140,7 +84,7 @@ const FontSize = defaults(def, (props) => {
 
             // 3. Update the UI if we found a valid size
             if (smallestSize !== Infinity && $$(fontSize) !== smallestSize) {
-                // console.log(`[FontSize] 🆕 Updating observed font size from ${$$(fontSize)} to ${smallestSize}`);
+                console.log(`[FontSize] 🆕 Updating observed font size from ${$$(fontSize)} to ${smallestSize}`);
                 if (isObservable(fontSize)) {
                     fontSize(smallestSize);
                 }
@@ -160,6 +104,7 @@ const FontSize = defaults(def, (props) => {
         if (isNaN(size) || size <= 0) return;
         fontSize(size);
         applyFontSize(el, size + "px");
+        performEditorCleanup(el);
     };
     // #endregion
 
@@ -322,7 +267,8 @@ const removeNestedFontSizes = (rootElement: HTMLElement) => {
     styledElements.forEach(el => cleanFontSizeStyle(el as HTMLElement));
 
     // 2. Remove any spans that became useless (empty attributes)
-    unwrapUselessSpans(rootElement);
+    const spans = Array.from(rootElement.querySelectorAll('span')).reverse();
+    spans.forEach(unwrapIfUseless);
 };
 
 /**
@@ -337,9 +283,7 @@ const applyStyleToSpan = (span: HTMLElement, fontSize: string) => {
 
     // 3. Optimization: Flatten redundant spans
     // If the span contains ONLY another span with the same style, unwrap the inner one.
-    if (span.childNodes.length === 1 &&
-        span.firstElementChild?.tagName === 'SPAN') {
-
+    if (span.childNodes.length === 1 && span.firstElementChild?.tagName === 'SPAN') {
         const child = span.firstElementChild as HTMLElement;
         if (child.style.fontSize === fontSize || !child.style.fontSize) {
             // Move child content up to parent
@@ -351,6 +295,49 @@ const applyStyleToSpan = (span: HTMLElement, fontSize: string) => {
     }
 };
 
+/**
+ * The cleanup runs in reverse order (bottom-up) to handle nested spans efficiently.
+ * Skips spans where the cursor is currently positioned to prevent disruption.
+ * 
+ * @param editor - The editor element (Observable or direct HTMLDivElement reference)
+ */
+const performEditorCleanup = (editor: ObservableMaybe<HTMLDivElement>) => {
+    const el = editor ?? getCurrentEditor();
+
+    const spans = Array.from($$(el).querySelectorAll('span')).reverse();
+    const { selection } = getSelection($$(el));
+
+    spans.forEach(span => {
+        // 0. Safety: Do not modify span if cursor is inside it
+        const isCursorInside = selection?.anchorNode && span.contains(selection.anchorNode);
+        if (isCursorInside) return;
+
+        // 1. Remove Ghost Spans (truly empty)
+        const isEmpty = span.childNodes.length === 0 || (span.textContent === '' && span.children.length === 0);
+        if (isEmpty) {
+            console.warn('[Cleanup] Removing empty ghost span');
+            span.remove();
+            return;
+        }
+
+        // 2. Remove redundant font-size from onion wrappers
+        // (parent has no direct text but has children)
+        const hasDirectText = Array.from(span.childNodes).some(
+            node => node.nodeType === Node.TEXT_NODE && node.textContent?.trim() !== ''
+        );
+
+        if (!hasDirectText && span.children.length > 0 && span.style.fontSize) {
+            // Remove ONLY font-size
+            span.style.removeProperty('font-size');
+
+            // If no inline styles remain, remove style attribute entirely
+            if (span.style.length === 0) { span.removeAttribute('style'); }
+        }
+
+        // 3. Remove completely useless spans
+        unwrapIfUseless(span);
+    });
+};
 
 /**
  * Removes the font-size style from an element. 
@@ -358,7 +345,6 @@ const applyStyleToSpan = (span: HTMLElement, fontSize: string) => {
  */
 const cleanFontSizeStyle = (element: HTMLElement) => {
     element.style.fontSize = '';
-
     if (element.getAttribute('style') === '') {
         element.removeAttribute('style');
     }
@@ -368,18 +354,10 @@ const cleanFontSizeStyle = (element: HTMLElement) => {
  * unwraps spans that have no attributes (class, style, id, etc).
  * Processes in reverse (Bottom-Up) to handle nested empty spans in one pass.
  */
-const unwrapUselessSpans = (root: HTMLElement) => {
-    // 1. Get all spans
-    const spans = Array.from(root.querySelectorAll('span'));
-
-    // 2. Reverse the array so we process children before parents.
-    // This prevents the need for a while loop or re-scanning.
-    spans.reverse().forEach(span => {
-        if (!span.hasAttributes()) {
-            // Replace the span tag with its own children
-            span.replaceWith(...Array.from(span.childNodes));
-        }
-    });
+const unwrapIfUseless = (span: HTMLElement) => {
+    if (!span.hasAttributes()) {
+        span.replaceWith(...Array.from(span.childNodes));
+    }
 };
 // #endregion
 
@@ -390,9 +368,6 @@ const unwrapUselessSpans = (root: HTMLElement) => {
  */
 const getAffectedParagraphs = (editorDiv: HTMLElement, selection: Selection): HTMLParagraphElement[] => {
     const allParagraphs = editorDiv.querySelectorAll('p');
-
-    console.log("[FontSize] All Paragraphs: ", allParagraphs)
-
     const affectedParagraphs: HTMLParagraphElement[] = [];
 
     allParagraphs.forEach(p => {
@@ -441,12 +416,43 @@ const handleMultiParagraphSelection = (container: HTMLElement, selection: Select
             container = container.parentElement!;
         }
 
+        // 🚀 THE FIX: If container is P, check if we are actually fully inside a child SPAN
+        if (container.tagName === 'P') {
+            console.debug('[FontSize] 🔍 Container is P tag, checking for SPAN inside');
+
+            let startNode = pRange.startContainer;
+
+            // 🚀 CRITICAL FIX: If startContainer IS the paragraph, we need to grab the child node
+            if (startNode.nodeType === Node.ELEMENT_NODE && startNode === container) {
+                // "childNodes[startOffset]" gives us the exact node the selection starts at
+                const childIndex = pRange.startOffset;
+
+                // Check if there is a node at that index
+                if (childIndex < startNode.childNodes.length) {
+                    startNode = startNode.childNodes[childIndex];
+                }
+            }
+
+            // Case A: The selection starts inside a text node that is wrapped in a SPAN
+            let targetElement = startNode.nodeType === Node.TEXT_NODE ? startNode.parentElement : startNode as HTMLElement;
+
+            // Check if we found a SPAN
+            if (targetElement && targetElement.tagName === 'SPAN') {
+                const spanText = targetElement.textContent?.trim() || "";
+
+                if (spanText === selectedText.trim()) {
+                    console.debug('[FontSize] ✅ Text match! Using SPAN as container');
+                    container = targetElement;
+                }
+            }
+        }
+
         const isSpan = container.tagName === 'SPAN';
-        const isPerfectMatch = container.textContent?.trim() === selectedText.trim();
+        const isMatch = container.textContent?.trim() === selectedText.trim();
         let currentStyledSpan: HTMLElement;
 
         // 3. Apply Style Logic
-        if (isSpan && isPerfectMatch) {
+        if (isSpan && isMatch) {
             console.log(`[FontSize] #${index + 1}: updating existing span.`);
             applyStyleToSpan(container, newSize);
             currentStyledSpan = container;
@@ -473,3 +479,4 @@ const handleMultiParagraphSelection = (container: HTMLElement, selection: Select
 };
 
 // #endregion
+
