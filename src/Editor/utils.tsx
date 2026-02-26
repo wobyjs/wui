@@ -171,7 +171,14 @@ export function getSelection(container: HTMLElement): { selection: Selection, st
         ? (root as any).getSelection() // Use the fix from the previous answer
         : window.getSelection();
 
-    const range = selection?.getRangeAt(0);
+    if (!selection) return null;
+
+    if (selection.rangeCount === 0) {
+        // Return the selection, but state is null because there is no range to map
+        return { selection, state: null };
+    }
+
+    const range = selection.getRangeAt(0);
 
     const state = {
         startContainerPath: getNodePath(range.startContainer, container),
