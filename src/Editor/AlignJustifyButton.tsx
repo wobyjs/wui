@@ -1,9 +1,10 @@
+import { $, $$, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlClass, HtmlString, Observable, ObservableMaybe, useEffect } from 'woby'
 import { Button, ButtonStyles } from '../Button'
-import AlignJustify from '../icons/align_justify'
-import { useEditor } from './undoredo' // Removed useUndoRedo
 import { applyTextAlign, updateActiveStatus } from './AlignButton'
-import { $, $$, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlClass, HtmlString, Observable, ObservableMaybe, StyleEncapsulationProps, useEffect } from 'woby'
 import { getCurrentEditor, useBlockEnforcer } from './utils'
+import { useEditor } from './undoredo'
+import AlignJustify from '../icons/align_justify'
+
 
 
 // Default props
@@ -22,7 +23,10 @@ const AlignJustifyButton = defaults(def, (props) => {
     const alignment = 'justify'
     const isActive = $(false);
 
-    useEffect(() => { useBlockEnforcer($$(editor) ?? $$(getCurrentEditor())) })
+    useEffect(() => {
+        const el = editor ?? getCurrentEditor()
+        useBlockEnforcer($$(el))
+    })
 
     useEffect(() => {
         // 1. Get the actual HTML Element
@@ -52,14 +56,12 @@ const AlignJustifyButton = defaults(def, (props) => {
         };
     });
 
-
-    const handleClick = (e: any) => {
-        e.preventDefault()
-
+    const handleClick = () => {
         const editorDiv = editor || getCurrentEditor()
 
         applyTextAlign(alignment, editorDiv)
         isActive(true)
+
         document.dispatchEvent(new Event('selectionchange'))
         $$(editorDiv).focus()
     }
@@ -81,7 +83,7 @@ const AlignJustifyButton = defaults(def, (props) => {
             <AlignJustify />
         </Button>
     )
-}) as typeof AlignJustifyButton & StyleEncapsulationProps
+}) as typeof AlignJustifyButton
 
 
 export { AlignJustifyButton }

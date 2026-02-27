@@ -1,9 +1,9 @@
-import { Observable, $$, $, HtmlString, ObservableMaybe, HtmlClass, HtmlBoolean, defaults, StyleEncapsulationProps, customElement, ElementAttributes, useEffect } from 'woby'
+import { $, $$, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlClass, HtmlString, Observable, ObservableMaybe, useEffect } from 'woby'
 import { Button, ButtonStyles } from '../Button'
-import AlignLeft from '../icons/align_left'
-import { useEditor } from './undoredo'
-import { findBlockParent, getCurrentEditor, getCurrentRange, useBlockEnforcer } from './utils'
 import { applyTextAlign, updateActiveStatus } from './AlignButton'
+import { getCurrentEditor, useBlockEnforcer } from './utils'
+import { useEditor } from './undoredo'
+import AlignLeft from '../icons/align_left'
 
 // Default props
 const def = () => ({
@@ -21,8 +21,10 @@ const AlignLeftButton = defaults(def, (props) => {
     const alignment = 'left'
     const isActive = $(false);
 
-
-    useEffect(() => { useBlockEnforcer($$(editor) ?? $$(getCurrentEditor())) })
+    useEffect(() => {
+        const el = editor ?? getCurrentEditor()
+        useBlockEnforcer($$(el))
+    })
 
     useEffect(() => {
         // 1. Get the actual HTML Element
@@ -52,13 +54,12 @@ const AlignLeftButton = defaults(def, (props) => {
         };
     });
 
-    const handleClick = (e: any) => {
-        e.preventDefault()
-
+    const handleClick = () => {
         const editorDiv = editor || getCurrentEditor()
 
         applyTextAlign(alignment, editorDiv)
         isActive(true)
+
         document.dispatchEvent(new Event('selectionchange'))
         $$(editorDiv).focus()
     }
@@ -80,7 +81,7 @@ const AlignLeftButton = defaults(def, (props) => {
             <AlignLeft />
         </Button>
     )
-}) as typeof AlignLeftButton & StyleEncapsulationProps
+}) as typeof AlignLeftButton
 
 
 export { AlignLeftButton }

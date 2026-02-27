@@ -1,16 +1,13 @@
-import { $, $$, defaults, type JSX, isObservable, customElement, type ElementAttributes, type Observable, type CustomElementChildren, type StyleEncapsulationProps, useEffect, HtmlClass, HtmlString, ObservableMaybe, HtmlBoolean } from "woby"
-import '@woby/chk'
-import '../input.css'
-
+import { $, $$, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlClass, HtmlString, Observable, ObservableMaybe, useEffect } from 'woby'
 import { Button, ButtonStyles } from '../Button'
-import AlignCenter from '../icons/align_center'
-import { useEditor } from './undoredo'
 import { applyTextAlign, updateActiveStatus } from './AlignButton'
-import { getCurrentEditor, useBlockEnforcer } from "./utils"
+import { getCurrentEditor, useBlockEnforcer } from './utils'
+import { useEditor } from './undoredo'
+import AlignCenter from '../icons/align_center'
 
 // Default props
 const def = () => ({
-    type: $("outlined", HtmlString) as ObservableMaybe<ButtonStyles>,
+    buttonType: $("outlined", HtmlString) as ObservableMaybe<ButtonStyles>,
     title: $("Align Center", HtmlString) as ObservableMaybe<string>,
     cls: $('', HtmlClass) as JSX.Class | undefined,
     class: $('', HtmlClass) as JSX.Class | undefined,
@@ -18,13 +15,16 @@ const def = () => ({
 })
 
 const AlignCenterButton = defaults(def, (props) => {
-    const { type: buttonType, title, cls, class: cn, disabled, ...otherProps } = props
+    const { buttonType, title, cls, class: cn, disabled, ...otherProps } = props
     const editor = useEditor()
 
     const alignment = 'center'
     const isActive = $(false);
 
-    useEffect(() => { useBlockEnforcer($$(editor) ?? $$(getCurrentEditor())) })
+    useEffect(() => {
+        const el = editor ?? getCurrentEditor()
+        useBlockEnforcer($$(el))
+    })
 
     useEffect(() => {
         // 1. Get the actual HTML Element
@@ -54,13 +54,12 @@ const AlignCenterButton = defaults(def, (props) => {
         };
     });
 
-    const handleClick = (e: any) => {
-        e.preventDefault()
-
+    const handleClick = () => {
         const editorDiv = editor || getCurrentEditor()
 
         applyTextAlign(alignment, editorDiv)
         isActive(true)
+
         document.dispatchEvent(new Event('selectionchange'))
         $$(editorDiv).focus()
     }

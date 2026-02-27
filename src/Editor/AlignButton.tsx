@@ -1,10 +1,10 @@
-import { $, $$, defaults, type JSX, isObservable, customElement, type ElementAttributes, type Observable, type CustomElementChildren, type StyleEncapsulationProps, useEffect, HtmlClass, HtmlString, ObservableMaybe, HtmlBoolean } from "woby"
+import { $, $$, defaults, type JSX, customElement, type ElementAttributes, type Observable, useEffect, HtmlClass, HtmlString, ObservableMaybe, HtmlBoolean } from "woby"
 import '@woby/chk'
 import '../input.css'
 
 import { Button, ButtonStyles } from '../Button'
 import { useEditor } from './undoredo'
-import { findBlockParent, getActiveSelection, getCurrentEditor, useBlockEnforcer } from './utils'
+import { findBlockParent, getSelection, getCurrentEditor, useBlockEnforcer } from './utils'
 import AlignCenter from '../icons/align_center'
 import AlignLeft from '../icons/align_left'
 import AlignRight from '../icons/align_right'
@@ -13,6 +13,13 @@ import { getCurrentBlockInfo } from "./Blockquote"
 
 
 type ContentAlign = 'left' | 'center' | 'right' | 'justify'
+
+const ALIGNMENT_MAP = {
+    'left': { icon: <AlignLeft />, align: 'left' as const, defaultTitle: 'Align Left' },
+    'center': { icon: <AlignCenter />, align: 'center' as const, defaultTitle: 'Align Center' },
+    'right': { icon: <AlignRight />, align: 'right' as const, defaultTitle: 'Align Right' },
+    'justify': { icon: <AlignJustify />, align: 'justify' as const, defaultTitle: 'Align justify' },
+}
 
 // Default props
 const def = () => ({
@@ -30,13 +37,13 @@ const AlignButton = defaults(def, (props) => {
     const editor = useEditor()
     const isActive = $(false)
 
-    useEffect(() => { useBlockEnforcer($$(editor) ?? $$(getCurrentEditor())) })
+    useEffect(() => {
+        const el = editor ?? getCurrentEditor()
+        useBlockEnforcer($$(el))
+    })
 
     /**
      * Effect: Alignment State Controller
-     * 
-     * Orchestrates the lifecycle of event listeners required to keep the alignment button 
-     * synchronized with the editor's content.
      */
     useEffect(() => {
         // 1. Get the actual HTML Element
@@ -69,26 +76,14 @@ const AlignButton = defaults(def, (props) => {
     // Extract onClick from otherProps if provided
     const customOnClick = otherProps.onClick as ((e: any) => void) | undefined
 
-    // Content alignment logic
-    const alignmentMap = {
-        'left': { icon: <AlignLeft />, align: 'left' as const, defaultTitle: 'Align Left' },
-        'center': { icon: <AlignCenter />, align: 'center' as const, defaultTitle: 'Align Center' },
-        'right': { icon: <AlignRight />, align: 'right' as const, defaultTitle: 'Align Right' },
-        'justify': { icon: <AlignJustify />, align: 'justify' as const, defaultTitle: 'Align justify' },
-    }
-
     const currentAlignment = () => {
         const align = $$(mode)
-        return alignmentMap[align as keyof typeof alignmentMap]
+        return ALIGNMENT_MAP[align as keyof typeof ALIGNMENT_MAP]
     }
 
-    const displayIcon = () => {
-        return currentAlignment().icon
-    }
+    const displayIcon = () => { return currentAlignment().icon; }
 
-    const displayTitle = () => {
-        return currentAlignment().defaultTitle
-    }
+    const displayTitle = () => { return currentAlignment().defaultTitle; }
 
     const handleClick = (e: any) => {
         const editorDiv = editor || getCurrentEditor()
@@ -149,14 +144,12 @@ export default AlignButton
  */
 export const applyTextAlign = (alignment: ContentAlign, editor: Observable<HTMLDivElement>) => {
     // Get selection directly from window to ensure it's current
-    // const windowSelection = window.getSelection()
-    const windowSelection = getActiveSelection($$(editor))
+    // const windowSelection = getActiveSelection($$(editor))
+    const { selection } = getSelection($$(editor))
 
-    if (!windowSelection || windowSelection.rangeCount === 0) {
-        return
-    }
+    if (!selection || selection.rangeCount === 0) { return }
 
-    const ranges = windowSelection.getRangeAt(0)
+    const ranges = selection.getRangeAt(0)
     if (!ranges) return
 
     let parentElement = ranges.commonAncestorContainer as HTMLElement
@@ -191,13 +184,13 @@ export const updateActiveStatus = (targetMode: string, isActive: Observable<bool
     const modeValue = $$(targetMode);
     const editorDiv = $$(editor);
 
-
     if (!editorDiv) {
         console.warn(`[useAlignStatus:${modeValue}] Editor div not found.`);
         return;
     }
 
-    const selection = getActiveSelection(editorDiv);
+    // const selection = getActiveSelection(editorDiv);
+    const { selection } = getSelection(editorDiv);
 
     if (selection && selection.rangeCount > 0) {
         const range = selection.getRangeAt(0);
