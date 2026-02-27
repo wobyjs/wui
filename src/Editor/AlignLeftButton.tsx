@@ -1,14 +1,14 @@
 import { $, $$, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlClass, HtmlString, Observable, ObservableMaybe, useEffect } from 'woby'
 import { Button, ButtonStyles } from '../Button'
-import { applyTextAlign, updateActiveStatus } from './AlignButton'
+import { applyTextAlign, updateActiveStatus, ALIGNMENT_MAP } from './AlignButton'
 import { getCurrentEditor, useBlockEnforcer } from './utils'
 import { useEditor } from './undoredo'
-import AlignLeft from '../icons/align_left'
 
-// Default props
+const LEFT_MAP = ALIGNMENT_MAP.left
+
 const def = () => ({
     buttonType: $("outlined", HtmlString) as ObservableMaybe<ButtonStyles>,
-    title: $("Align Left", HtmlString) as ObservableMaybe<string>,
+    title: $(LEFT_MAP.defaultTitle, HtmlString) as ObservableMaybe<string>,
     cls: $('', HtmlClass) as JSX.Class | undefined,
     class: $('', HtmlClass) as JSX.Class | undefined,
     disabled: $(false, HtmlBoolean) as Observable<boolean>,
@@ -18,7 +18,7 @@ const AlignLeftButton = defaults(def, (props) => {
     const { buttonType, title, cls, class: cn, disabled, ...otherProps } = props
     const editor = useEditor()
 
-    const alignment = 'left'
+    const alignment = LEFT_MAP.align
     const isActive = $(false);
 
     useEffect(() => {
@@ -78,11 +78,10 @@ const AlignLeftButton = defaults(def, (props) => {
             onMouseDown={(e) => { e.preventDefault(); e.stopPropagation() }}
             {...otherProps}
         >
-            <AlignLeft />
+            {LEFT_MAP.icon}
         </Button>
     )
 }) as typeof AlignLeftButton
-
 
 export { AlignLeftButton }
 

@@ -1,14 +1,14 @@
 import { $, $$, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlClass, HtmlString, Observable, ObservableMaybe, useEffect } from 'woby'
 import { Button, ButtonStyles } from '../Button'
-import { applyTextAlign, updateActiveStatus } from './AlignButton'
+import { applyTextAlign, updateActiveStatus, ALIGNMENT_MAP } from './AlignButton'
 import { getCurrentEditor, useBlockEnforcer } from './utils'
 import { useEditor } from './undoredo'
-import AlignCenter from '../icons/align_center'
 
-// Default props
+const CENTER_MAP = ALIGNMENT_MAP.center
+
 const def = () => ({
     buttonType: $("outlined", HtmlString) as ObservableMaybe<ButtonStyles>,
-    title: $("Align Center", HtmlString) as ObservableMaybe<string>,
+    title: $(CENTER_MAP.defaultTitle, HtmlString) as ObservableMaybe<string>,
     cls: $('', HtmlClass) as JSX.Class | undefined,
     class: $('', HtmlClass) as JSX.Class | undefined,
     disabled: $(false, HtmlBoolean) as Observable<boolean>,
@@ -18,7 +18,7 @@ const AlignCenterButton = defaults(def, (props) => {
     const { buttonType, title, cls, class: cn, disabled, ...otherProps } = props
     const editor = useEditor()
 
-    const alignment = 'center'
+    const alignment = CENTER_MAP.align
     const isActive = $(false);
 
     useEffect(() => {
@@ -78,11 +78,10 @@ const AlignCenterButton = defaults(def, (props) => {
             onMouseDown={(e) => { e.preventDefault(); e.stopPropagation() }}
             {...otherProps}
         >
-            <AlignCenter />
+            {CENTER_MAP.icon}
         </Button>
     )
 }) as typeof AlignCenterButton
-
 
 export { AlignCenterButton }
 

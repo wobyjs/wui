@@ -1,20 +1,18 @@
 import { $, $$, defaults, type JSX, customElement, type ElementAttributes, type Observable, useEffect, HtmlClass, HtmlString, ObservableMaybe, HtmlBoolean } from "woby"
-import '@woby/chk'
-import '../input.css'
 
 import { Button, ButtonStyles } from '../Button'
 import { useEditor } from './undoredo'
 import { findBlockParent, getSelection, getCurrentEditor, useBlockEnforcer } from './utils'
+import { getCurrentBlockInfo } from "./Blockquote"
 import AlignCenter from '../icons/align_center'
 import AlignLeft from '../icons/align_left'
 import AlignRight from '../icons/align_right'
 import AlignJustify from '../icons/align_justify'
-import { getCurrentBlockInfo } from "./Blockquote"
 
 
 type ContentAlign = 'left' | 'center' | 'right' | 'justify'
 
-const ALIGNMENT_MAP = {
+export const ALIGNMENT_MAP = {
     'left': { icon: <AlignLeft />, align: 'left' as const, defaultTitle: 'Align Left' },
     'center': { icon: <AlignCenter />, align: 'center' as const, defaultTitle: 'Align Center' },
     'right': { icon: <AlignRight />, align: 'right' as const, defaultTitle: 'Align Right' },

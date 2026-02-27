@@ -1,16 +1,14 @@
 import { $, $$, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlClass, HtmlString, Observable, ObservableMaybe, useEffect } from 'woby'
 import { Button, ButtonStyles } from '../Button'
-import { applyTextAlign, updateActiveStatus } from './AlignButton'
+import { applyTextAlign, updateActiveStatus, ALIGNMENT_MAP } from './AlignButton'
 import { getCurrentEditor, useBlockEnforcer } from './utils'
 import { useEditor } from './undoredo'
-import AlignJustify from '../icons/align_justify'
 
+const JUSTIFY_MAP = ALIGNMENT_MAP.justify
 
-
-// Default props
 const def = () => ({
     buttonType: $("outlined", HtmlString) as ObservableMaybe<ButtonStyles>,
-    title: $("Align Justify", HtmlString) as ObservableMaybe<string>,
+    title: $(JUSTIFY_MAP.defaultTitle, HtmlString) as ObservableMaybe<string>,
     cls: $('', HtmlClass) as JSX.Class | undefined,
     class: $('', HtmlClass) as JSX.Class | undefined,
     disabled: $(false, HtmlBoolean) as Observable<boolean>,
@@ -20,7 +18,7 @@ const AlignJustifyButton = defaults(def, (props) => {
     const { buttonType, title, cls, class: cn, disabled, ...otherProps } = props
     const editor = useEditor()
 
-    const alignment = 'justify'
+    const alignment = JUSTIFY_MAP.align
     const isActive = $(false);
 
     useEffect(() => {
@@ -80,11 +78,10 @@ const AlignJustifyButton = defaults(def, (props) => {
             onMouseDown={(e) => { e.preventDefault(); e.stopPropagation() }}
             {...otherProps}
         >
-            <AlignJustify />
+            {JUSTIFY_MAP.icon}
         </Button>
     )
 }) as typeof AlignJustifyButton
-
 
 export { AlignJustifyButton }
 
