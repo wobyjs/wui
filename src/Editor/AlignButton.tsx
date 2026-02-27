@@ -1,14 +1,13 @@
-import { $, $$, defaults, type JSX, customElement, type ElementAttributes, type Observable, useEffect, HtmlClass, HtmlString, ObservableMaybe, HtmlBoolean } from "woby"
-
+import { $, $$, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlClass, HtmlString, Observable, ObservableMaybe, useEffect } from 'woby'
 import { Button, ButtonStyles } from '../Button'
-import { useEditor } from './undoredo'
 import { findBlockParent, getSelection, getCurrentEditor, useBlockEnforcer } from './utils'
+import { useEditor } from './undoredo'
 import { getCurrentBlockInfo } from "./Blockquote"
+import { getAffectedParagraphs } from "./FontSize"
 import AlignCenter from '../icons/align_center'
 import AlignLeft from '../icons/align_left'
 import AlignRight from '../icons/align_right'
 import AlignJustify from '../icons/align_justify'
-
 
 type ContentAlign = 'left' | 'center' | 'right' | 'justify'
 
@@ -93,6 +92,7 @@ const AlignButton = defaults(def, (props) => {
 
         const alignment = currentAlignment().align
 
+        console.log("[Align Button] editor div: ", $$(editorDiv))
         applyTextAlign(alignment as ContentAlign, editorDiv)
         isActive(true)
 
@@ -140,10 +140,8 @@ export default AlignButton
  * @param alignment - The target alignment direction ('left', 'center', 'right', or 'justify').
  * @param editor - The Observable representing the editor root element.
  */
-export const applyTextAlign = (alignment: ContentAlign, editor: Observable<HTMLDivElement>) => {
-    // Get selection directly from window to ensure it's current
-    // const windowSelection = getActiveSelection($$(editor))
-    const { selection } = getSelection($$(editor))
+export const applyTextAlign = (alignment: ContentAlign, container: Observable<HTMLDivElement>) => {
+    const { selection } = getSelection($$(container))
 
     if (!selection || selection.rangeCount === 0) { return }
 
@@ -151,19 +149,23 @@ export const applyTextAlign = (alignment: ContentAlign, editor: Observable<HTMLD
     if (!ranges) return
 
     let parentElement = ranges.commonAncestorContainer as HTMLElement
-    if (parentElement.nodeType === 3)
-        parentElement = parentElement.parentElement as HTMLElement
+    if (parentElement.nodeType === 3) parentElement = parentElement.parentElement as HTMLElement
 
     if (!parentElement) return
 
-    const blockElement = findBlockParent(parentElement, editor)
-    if (blockElement) {
-        blockElement.style.textAlign = alignment
-    } else {
-        if ($$(editor)) {
-            $$(editor).style.textAlign = alignment
+    const isRoot = parentElement.hasAttribute('data-editor-root');
+
+    const targets = isRoot ? getAffectedParagraphs($$(container), selection) : [parentElement];
+
+
+    targets.forEach((target, index) => {
+        const block = findBlockParent(target, container);
+        if (block) {
+            block.style.textAlign = alignment;
+        } else {
+            $$(container).style.textAlign = alignment;
         }
-    }
+    });
 }
 
 /**
@@ -187,7 +189,6 @@ export const updateActiveStatus = (targetMode: string, isActive: Observable<bool
         return;
     }
 
-    // const selection = getActiveSelection(editorDiv);
     const { selection } = getSelection(editorDiv);
 
     if (selection && selection.rangeCount > 0) {
