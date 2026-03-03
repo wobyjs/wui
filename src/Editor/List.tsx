@@ -271,9 +271,9 @@ const insertList = (editor: HTMLDivElement, listTag: 'ul' | 'ol', classToAdd: st
             for (let index = 0; index < liItems.length; index++) {
                 const li = liItems[index];
                 const block = selectedBlocks[index];
-                const classToAdd = block.className.split(' ');
+                const classToAdd = block.className == '' ? [] : block.className.split(' ');
 
-                li.classList.add(...classToAdd);
+                if (classToAdd.length > 0) li.classList.add(...classToAdd);
                 li.style.cssText = block.style.cssText;
             }
         }
@@ -383,7 +383,10 @@ const toggleListOff = (listEl: HTMLElement, mode: ListMode, editor: HTMLElement)
             p.classList.remove(...pClass)
         } else {
             p = document.createElement('p');
-            while (li.firstChild) p.appendChild(li.firstChild);
+            while (li.firstChild) { p.appendChild(li.firstChild) };
+            const classes = li.className == '' ? [] : li.className.split(' ');
+            if (classes.length > 0) p.classList.add(...classes)
+            p.style.cssText = li.style.cssText;
         }
         fragment.appendChild(p);
         lastNode = p;
