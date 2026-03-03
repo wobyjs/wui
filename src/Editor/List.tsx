@@ -2,7 +2,7 @@ import { $, $$, render, customElement, defaults, ElementAttributes, HtmlClass, H
 import { Button, ButtonStyles } from '../Button'
 import { useEditor } from './undoredo'
 import { Checkbox } from '../Checkbox'
-import { getSelection, getCurrentEditor, selectElement, restoreSelection, restoreRangePosition, getClosestElementFromSelection } from './utils'
+import { getSelection, getCurrentEditor, selectElement, restoreSelection, restoreRangePosition, getClosestElementFromSelection, BLOCK_TAGS } from './utils'
 import ListBulleted from '../icons/list_bulleted'
 import ListNumbered from '../icons/list_numbered'
 import ListCheckbox from '../icons/list_checkbox'
@@ -239,9 +239,44 @@ const insertList = (editor: HTMLDivElement, listTag: 'ul' | 'ol', classToAdd: st
         }
     } else {
         console.log('[List] ➕ Creating New List'); // CASE C: Create New List
+
+        console.log("[List] Before create new list. To check block class.")
+        const selectedBlocks: HTMLElement[] = [];
+        if (selection && selection.rangeCount > 0) {
+            if (selection.isCollapsed) {
+                const el = getClosestElementFromSelection(selection, BLOCK_TAGS);
+                if (el) selectedBlocks.push(el);
+            } else {
+                const allPossibleBlocks = editor.querySelectorAll(BLOCK_TAGS);
+                // 2. Filter them to find which ones are inside the selection
+                allPossibleBlocks.forEach(block => {
+                    if (selection.containsNode(block, true)) {
+                        selectedBlocks.push(block as HTMLElement);
+                    }
+                });
+            }
+        }
+
+
         const command = listTag === 'ul' ? 'insertUnorderedList' : 'insertOrderedList';
         document.execCommand(command, false);
+
+        console.log("[List] Unwrapping paragraphs")
         unwrapParagraph(editor, listTag);
+
+        console.log("[List] Restore class to blocks");
+        const currentBlock = getClosestElementFromSelection(selection, listTag);
+        const liItems = currentBlock.querySelectorAll('li');
+        if (liItems.length == selectedBlocks.length) {
+            for (let index = 0; index < liItems.length; index++) {
+                const li = liItems[index];
+                const block = selectedBlocks[index];
+                const classToAdd = block.className.split(' ');
+
+                li.classList.add(...classToAdd);
+                li.style.cssText = block.style.cssText;
+            }
+        }
     }
 
     // 4. Apply Styles & Components (Runs for Case B and C)
