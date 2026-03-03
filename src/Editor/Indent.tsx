@@ -1,8 +1,9 @@
-import { $, $$, defaults, type JSX, customElement, type ElementAttributes, type Observable, ObservableMaybe, HtmlString, HtmlNumber, HtmlClass, HtmlBoolean } from "woby"
+import { $, $$, defaults, type JSX, customElement, type ElementAttributes, type Observable, ObservableMaybe, HtmlString, HtmlNumber, HtmlClass, HtmlBoolean, useEffect } from "woby"
 import { Button, ButtonStyles } from '../Button'
 import { useEditor } from './undoredo'
 import IndentIcon from '../icons/indent'
 import OutdentIcon from '../icons/outdent'
+import { getActiveSelection, getCurrentEditor } from "./utils"
 
 type IndentMode = "increase" | "decrease"
 
@@ -15,14 +16,16 @@ const def = () => ({
     mode: $("increase", HtmlString) as ObservableMaybe<IndentMode>,
     step: $(1, HtmlNumber) as ObservableMaybe<number>,
     disabled: $(false, HtmlBoolean) as Observable<boolean>,
-    identPx: $(20, HtmlNumber) as ObservableMaybe<number>,
+    identPx: $(8, HtmlNumber) as ObservableMaybe<number>,
 })
 
 const Indent = defaults(def, (props) => {
     const { buttonType, title, cls, class: cn, mode, step, disabled, identPx, ...otherProps } = props
 
     const editor = useEditor()
-    const isDecrease = $($$(mode) === 'decrease')
+    const isDecrease = () => {
+        return $$(mode) == 'decrease'
+    }
 
     // Determine Icon and Title based on mode
     const displayIcon = () => $$(isDecrease) ? <IndentIcon class="size-5" /> : <OutdentIcon class="size-5" />
@@ -34,77 +37,21 @@ const Indent = defaults(def, (props) => {
     }
 
     const handleClick = (e: any) => {
-        e.preventDefault();
-        const stepVal = $$(step) || 1
-        const pxVal = $$(identPx) || 40
+        const stepVal = $$(step)
+        const pxVal = $$(identPx)
 
+        const el = editor ?? getCurrentEditor()
 
         console.log("[Indent] handleClick - ", {
-            "editor": { "el": $$(editor), "type": typeof $$(editor) },
+            "editor": { "el": $$(el), "type": typeof $$(el) },
+            "mode": $$(mode),
             "isDecrease": $$(isDecrease),
             "step": stepVal,
             "identPx": pxVal,
         })
 
-        let editorDiv = $$(editor)
-
-        if (typeof editorDiv == "string") {
-            console.warn("[Indent] editor is a string");
-            const selection = window.getSelection()
-            if (selection.rangeCount > 0) {
-                const range = selection.getRangeAt(0);
-                let node = range.startContainer;
-                let targetElement = node.nodeType === Node.ELEMENT_NODE ? node : node.parentElement;
-                let root = (targetElement as HTMLElement).closest('[contenteditable]');
-
-
-                console.groupCollapsed("[dev] ✨ before");
-                console.log("node - ", node);
-                console.log("target - ", {
-                    "target el": targetElement,
-                    "parent el": targetElement.parentElement,
-                    "has contenteditable": (targetElement as HTMLElement).hasAttribute("contenteditable"),
-                });
-                console.log("root - ", {
-                    "root": root,
-                    "has contenteditable": root.hasAttribute("contenteditable"),
-                });
-                console.groupEnd();
-
-                if (!(targetElement as HTMLElement).hasAttribute("contenteditable")) {
-                    while (targetElement && targetElement.parentElement !== root && targetElement.parentElement !== document.body) {
-                        targetElement = targetElement.parentElement;
-                    }
-                }
-
-
-                console.groupCollapsed("[dev] ✨ after");
-                console.log("node - ", node);
-                console.log("target - ", {
-                    "target el": targetElement,
-                    "parent el": targetElement.parentElement,
-                    "has contenteditable": (targetElement as HTMLElement).hasAttribute("contenteditable"),
-                });
-                console.log("root - ", {
-                    "root": root,
-                    "has contenteditable": root.hasAttribute("contenteditable"),
-                });
-                console.groupEnd();
-
-
-                const editorHost = (targetElement as HTMLElement).querySelector("wui-editor")
-                editorDiv = editorHost != undefined ? editorHost.shadowRoot.querySelector('[contenteditable]') as HTMLDivElement : targetElement as HTMLDivElement
-            }
-        }
-
-        console.log("[Indent] editor div - ", {
-            "editor": editorDiv,
-            "type": typeof editorDiv,
-        })
-
         // Call the helper logic
-        applyIndent(editorDiv, $$(isDecrease), stepVal, pxVal)
-        // applyIndent($$(editor), isDecrease(), stepVal)
+        applyIndent($$(el), $$(isDecrease), stepVal, pxVal)
     }
 
     return (
@@ -168,22 +115,36 @@ const getBlockParent = (node: Node | null, root: HTMLElement | null): HTMLElemen
     return null
 }
 
-const applyIndent = (editor: HTMLElement | null, isDecrease: boolean, stepMultiplier: number, indentAmount: number) => {
+export const applyIndent = (editor: HTMLElement, isDecrease: boolean, stepMultiplier: number, indentAmount: number) => {
 
-    console.log("[Indent] applyIndent - ", { editor, isDecrease, stepMultiplier, indentAmount })
+    console.groupCollapsed(`[Indent] ${isDecrease ? 'Decrease' : 'Increase'} indent by ${indentAmount * stepMultiplier}px`)
+    console.log("[Indent] Input:", { editor: editor?.tagName, isDecrease, stepMultiplier, indentAmount })
 
-    const selection = window.getSelection()
-    if (!selection || selection.rangeCount === 0) return
+    // const selection = window.getSelection()
+    const selection = getActiveSelection(editor)
+
+    if (!selection || selection.rangeCount === 0) {
+        console.log('[Indent] No selection or range, aborting')
+        console.groupEnd()
+        return
+    }
 
     const range = selection.getRangeAt(0)
+    console.log('[Indent] Range:', {
+        collapsed: range.collapsed,
+        startContainer: range.startContainer.nodeName,
+        endContainer: range.endContainer.nodeName
+    })
 
     // 1. RESOLVE ROOT: If 'editor' context is null (Custom Element issue), try to find it from selection
     let root = editor
-    if (!root) {
-        let node = range.commonAncestorContainer
-        if (node.nodeType === Node.TEXT_NODE) node = node.parentNode!
-        root = (node as HTMLElement).closest('[contenteditable="true"]') as HTMLElement
-    }
+    // if (!root) {
+    //     console.log('[Indent] No editor provided, searching from selection...')
+    //     let node = range.commonAncestorContainer
+    //     if (node.nodeType === Node.TEXT_NODE) node = node.parentNode!
+    //     root = (node as HTMLElement).closest('[contenteditable="true"]') as HTMLElement
+    //     console.log('[Indent] Found editor:', root?.tagName)
+    // }
 
 
     // 2. IDENTIFY TARGET BLOCKS
@@ -191,14 +152,21 @@ const applyIndent = (editor: HTMLElement | null, isDecrease: boolean, stepMultip
 
     // Add block at start of selection
     const startBlock = getBlockParent(range.startContainer, root)
-    if (startBlock) blocks.add(startBlock)
+    if (startBlock) {
+        blocks.add(startBlock)
+        console.log("[Indent] ℹ️ Start block:", { "tag": startBlock.tagName, "text": startBlock.textContent?.substring(0, 30) })
+    }
 
     // Add block at end of selection
     const endBlock = getBlockParent(range.endContainer, root)
-    if (endBlock) blocks.add(endBlock)
+    if (endBlock) {
+        blocks.add(endBlock)
+        console.log("[Indent] ℹ️ End block:", { "tag": endBlock.tagName, "text": endBlock.textContent?.substring(0, 30) })
+    }
 
     // If selection spans multiple nodes, find intermediate blocks
     if (!range.collapsed) {
+        console.log('[Indent] Multi-line selection detected, finding intermediate blocks...')
         let ancestor = range.commonAncestorContainer
         if (ancestor.nodeType === Node.TEXT_NODE) ancestor = ancestor.parentNode!
 
@@ -219,46 +187,57 @@ const applyIndent = (editor: HTMLElement | null, isDecrease: boolean, stepMultip
         let currentNode = walker.nextNode()
         while (currentNode) {
             blocks.add(currentNode as HTMLElement)
+            console.log('[Indent] Intermediate block:', (currentNode as HTMLElement).tagName)
             currentNode = walker.nextNode()
         }
     }
 
     // Convert Set to Array
     const targets = Array.from(blocks)
+    console.log(`[Indent] Total blocks to modify: ${targets.length}`)
 
     if (targets.length === 0) {
-        // Fallback: Just execute command if we couldn't find specific blocks
+        console.log('[Indent] No blocks found, using fallback execCommand')
         document.execCommand(isDecrease ? 'outdent' : 'indent', false)
+        console.groupEnd()
         return
     }
 
     // 3. APPLY LOGIC
     // Check if any target is a List Item. Native indentation is required for lists to handle UL/OL nesting.
     const hasListItems = targets.some(el => el.tagName === 'LI')
+    console.log('[Indent] Contains list items:', hasListItems)
 
-    if (hasListItems) {
-        document.execCommand(isDecrease ? 'outdent' : 'indent', false)
-    } else {
-        // Manual Margin Manipulation for standard blocks
-        // const INDENT_PX = 40
-        const amount = indentAmount * stepMultiplier
+    // if (hasListItems) {
+    //     console.log('[Indent] Using native execCommand for list items')
+    //     document.execCommand(isDecrease ? 'outdent' : 'indent', false)
+    // }
 
-        targets.forEach(el => {
-            const computed = window.getComputedStyle(el)
-            const currentMargin = parseInt(computed.marginLeft || '0', 10)
+    console.log('[Indent] Using manual margin manipulation')
+    // Manual Margin Manipulation for standard blocks
+    // const INDENT_PX = 40
+    const amount = indentAmount * stepMultiplier
 
-            let newMargin: number
-            if (isDecrease) {
-                newMargin = Math.max(0, currentMargin - amount)
-            } else {
-                newMargin = currentMargin + amount
-            }
+    targets.forEach((el, index) => {
+        const computed = window.getComputedStyle(el)
+        const currentMargin = parseInt(computed.marginLeft || '0', 10)
 
-            el.style.marginLeft = newMargin === 0 ? '' : `${newMargin}px`
-        })
+        let newMargin: number
+        if (isDecrease) {
+            newMargin = Math.max(0, currentMargin - amount)
+        } else {
+            newMargin = currentMargin + amount
+        }
+
+        console.log(`[Indent] Block ${index + 1}/${targets.length} (${el.tagName}): ${currentMargin}px → ${newMargin}px`)
+        el.style.marginLeft = newMargin === 0 ? '' : `${newMargin}px`
+    })
+    // Ensure focus remains on editor
+    if (root) {
+        root.focus()
+        console.log('[Indent] Focus restored to editor')
     }
 
-    // Ensure focus remains on editor
-    if (root) root.focus()
+    console.groupEnd()
 }
 // #endregion
