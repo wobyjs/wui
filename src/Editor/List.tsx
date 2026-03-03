@@ -2,10 +2,11 @@ import { $, $$, render, customElement, defaults, ElementAttributes, HtmlClass, H
 import { Button, ButtonStyles } from '../Button'
 import { useEditor } from './undoredo'
 import { Checkbox } from '../Checkbox'
-import { getSelection, getCurrentEditor } from './utils'
+import { getSelection, getCurrentEditor, selectElement, restoreSelection, restoreRangePosition, getClosestElementFromSelection } from './utils'
 import ListBulleted from '../icons/list_bulleted'
 import ListNumbered from '../icons/list_numbered'
 import ListCheckbox from '../icons/list_checkbox'
+import { getSelectedBlocks } from './AlignButton'
 
 // #region Types & Configuration
 type ListMode = "bullet" | "number" | "checkbox"
@@ -16,7 +17,16 @@ const LIST_CONFIG = {
     checkbox: { tag: 'ul', id: 'checkbox-wrapper', classToAdd: 'list-none', classToRemove: 'list-disc list-decimal', title: "Checkbox List", icon: <ListCheckbox class="size-5" /> }
 } as const;
 
-const DEFAULT_CLASSES = "list-outside text-wrap pl-6";
+// const DEFAULT_CLASSES = "list-outside text-wrap pl-6";
+const DEFAULT_CLASSES = "list-inside ml-6"
+const CHECKBOX_CLASSES = "inline-block align-baseline mr-2"
+const CHECKBOX_WRAPPER_ID = 'woby-checkbox-wrapper'
+const PARAGRAPH_CLASSES = "inline align-baseline";
+const WRAPPER_ID = {
+    bullet: 'bullet-wrapper',
+    number: 'number-wrapper',
+    checkbox: 'checkbox-wrapper'
+}
 
 const def = () => ({
     cls: $('', HtmlClass) as JSX.Class | undefined,
@@ -88,7 +98,6 @@ const List = defaults(def, (props) => {
                     state = false
                 }
             }
-
             isActive(state)
         }
 
@@ -128,25 +137,27 @@ const List = defaults(def, (props) => {
 
     const handleListMutations = (mutations: MutationRecord[]) => {
         // Optimization: Only run if we are currently in Checkbox mode!
-        if ($$(mode) !== 'checkbox') return
+        // if ($$(mode) !== 'checkbox') return
 
         mutations.forEach((mutation) => {
             // Check newly added nodes
             mutation.addedNodes.forEach((node) => {
                 // We only care about Elements (not text nodes)
                 if (node instanceof HTMLElement) {
-                    // Scenario 1: A single LI was added (e.g., Pressing Enter)
-                    if (node.tagName === 'LI') {
+                    if (node.tagName == 'LI') {
                         const parent = node.closest('ul')
-                        // Double check: Only render if parent is our specific checkbox wrapper
-                        if (parent && parent.id === 'checkbox-wrapper') {
-                            injectCheckbox(node)
-                        }
-                    }
+                        if (parent && parent.id == LIST_CONFIG['checkbox'].id) {
+                            // get all li tag
+                            const li = parent.querySelectorAll('li');
+                            li.forEach((el, index) => {
+                                const isContainCheckbox = el.querySelector(`#${CHECKBOX_WRAPPER_ID}`) != null ? true : false
+                                if (!isContainCheckbox) {
+                                    console.log(`[List] #${index + 1} Injecting checkbox for li`)
+                                    injectCheckbox(el)
+                                }
+                            })
 
-                    // Scenario 2: A whole UL was pasted or created (e.g., Paste or Undo)
-                    if (node.tagName === 'UL' && node.id === 'checkbox-wrapper') {
-                        node.querySelectorAll('li').forEach(li => injectCheckbox(li))
+                        }
                     }
                 }
             })
@@ -233,7 +244,7 @@ const insertList = (editor: HTMLDivElement, listTag: 'ul' | 'ol', classToAdd: st
         if (currentMode === mode) {
             // CASE A: Toggle Off (User clicked active mode)
             toggleListOff(existingList, mode, editor);
-            setTimeout(() => syncAllLists(root), 0);
+            // setTimeout(() => syncAllLists(root), 0);
             return; // Done, no styling needed
         } else {
             // CASE B: Switch Mode (User clicked different mode)
@@ -244,6 +255,8 @@ const insertList = (editor: HTMLDivElement, listTag: 'ul' | 'ol', classToAdd: st
         console.log('[List] ➕ Creating New List');
         const command = listTag === 'ul' ? 'insertUnorderedList' : 'insertOrderedList';
         document.execCommand(command, false);
+
+        unwrapParagraph(editor, listTag);
     }
 
     // 4. Apply Styles & Components (Runs for Case B and C)
@@ -251,44 +264,65 @@ const insertList = (editor: HTMLDivElement, listTag: 'ul' | 'ol', classToAdd: st
 };
 // #endregion
 
+const unwrapParagraph = (editor: HTMLDivElement, listTag: 'ul' | 'ol') => {
+    const postSelection = getSelection(editor);
+
+    if (postSelection && postSelection.selection.rangeCount > 0) {
+
+        // 1. Find the newly created list
+        const newList = getClosestElementFromSelection(postSelection.selection, listTag);
+
+        if (newList && newList.parentElement) {
+            const parentTag = newList.parentElement.tagName.toUpperCase();
+
+            if (parentTag === 'P') {
+                // 2. Unwrap <p> tag
+                console.log('[List] 🛠️ Unwrapping invalid parent <P>');
+                const parentElement = newList.parentElement;
+                const fragment = document.createDocumentFragment();
+
+                // Move everything out of the <P> and into the fragment
+                while (parentElement.firstChild) {
+                    fragment.appendChild(parentElement.firstChild);
+                }
+
+                // Destroy the <P> by replacing it with its own contents
+                parentElement.replaceWith(fragment);
+
+                // 3. Restore the exact cursor position
+                restoreRangePosition(postSelection.selection, postSelection.state.startContainer, postSelection.state.startOffset, postSelection.state.endContainer, postSelection.state.endOffset, postSelection.state.isCollapsed);
+            } else {
+                // It's not a P tag, so just log it as requested
+                console.log(`[List] ℹ️ Parent is <${parentTag}>, no unwrap needed.`);
+            }
+        }
+    }
+}
+
 // #region handleCheckbox - Handle checkbox injection and styling
 const injectCheckbox = (li: HTMLElement) => {
     console.groupCollapsed(`[injectCheckbox] Processing list item: ${li.textContent?.substring(0, 30)}`)
 
-    const existingWrapper = li.querySelector('.woby-checkbox-wrapper')
+    const existingWrapper = li.querySelector('#woby-checkbox-wrapper')
     if (existingWrapper) {
         console.log('[injectCheckbox] 🗑️ Removing existing checkbox wrapper')
         existingWrapper.remove()
     }
 
-    // 2. Style the LI to act as a normal block, but make room for the checkbox
-    // REMOVE flexbox styles so the browser can calculate the caret position correctly
-    li.style.display = 'list-item'
-    li.style.alignItems = '' // Clear old flex styles if any
-    li.style.gap = ''        // Clear old flex styles if any
-
-    // NEW LAYOUT: Use relative positioning and padding
-    li.style.position = 'relative'
-    li.style.paddingLeft = '28px' // Make room for the checkbox (adjust if your checkbox is wider)
-    li.style.marginBottom = '4px'
     console.log('[injectCheckbox] ✅ Applied list item styles (relative positioning, padding)')
 
     // 3. Create the container
     const wrapper = document.createElement('span')
-    wrapper.className = 'woby-checkbox-wrapper'
-    wrapper.contentEditable = 'false' // Critical
+    wrapper.className = CHECKBOX_CLASSES
+    wrapper.contentEditable = 'false'
     wrapper.style.userSelect = 'none'
+    wrapper.id = CHECKBOX_WRAPPER_ID
 
-    // 4. Position the checkbox absolutely inside the padded area
-    wrapper.style.position = 'absolute'
-    wrapper.style.left = '0'
-    wrapper.style.top = '2px' // Fine-tune this so it aligns vertically with the text
-
-    // 5. Insert at start
+    // 4. Insert at start
     li.prepend(wrapper)
     console.log('[injectCheckbox] 📦 Checkbox wrapper created and inserted at start of list item')
 
-    // 6. Render the Woby Component
+    // 5. Render the Woby Component
     render(<Checkbox />, wrapper)
     console.log('[injectCheckbox] ✅ Checkbox component rendered successfully')
     console.groupEnd()
@@ -296,30 +330,29 @@ const injectCheckbox = (li: HTMLElement) => {
 
 const removeCheckboxWrapper = (listEl: HTMLElement) => {
     console.groupCollapsed(`[removeCheckboxWrapper] Removing checkboxes from ${listEl.tagName}`)
-    const items = listEl.querySelectorAll('li')
+
+    const items: HTMLElement[] = [];
+
+    if (listEl.tagName == 'UL' || listEl.tagName == 'OL') {
+        const allList = listEl.querySelectorAll('li');
+        allList.forEach((li) => { items.push(li as HTMLElement); });
+    } else {
+        // current listEl is li tag.
+        listEl.tagName == 'LI' ? items.push(listEl) : null;
+    }
+
     console.log(`[removeCheckboxWrapper] Processing ${items.length} list items`)
 
     let removedCount = 0
 
     items.forEach((li, index) => {
-        const wrapper = li.querySelector('.woby-checkbox-wrapper')
+        const wrapper = li.querySelector('#woby-checkbox-wrapper')
 
         if (wrapper) {
             console.log(`[removeCheckboxWrapper] Removing wrapper from item ${index + 1}`)
             wrapper.remove()
             removedCount++
         }
-
-        // 4. CLEANUP STYLES
-        // Reset all the custom styles we applied so native bullets work correctly again.
-        li.style.position = ''
-        li.style.paddingLeft = ''
-        li.style.marginBottom = ''
-        li.style.display = ''
-
-        // Remove old flex properties just in case they were left over
-        li.style.alignItems = ''
-        li.style.gap = ''
 
         // If the style attribute is completely empty now, remove it entirely
         if (li.getAttribute('style') === '') {
@@ -332,7 +365,6 @@ const removeCheckboxWrapper = (listEl: HTMLElement) => {
 }
 
 const injectParagraph = (li: HTMLElement) => {
-
     if (li.querySelector(':scope > p')) {
         console.log('[injectParagraph] ⚠️ Already has <p> wrapper, skipping: ', li.textContent?.substring(0, 30));
         return;
@@ -348,6 +380,7 @@ const injectParagraph = (li: HTMLElement) => {
 
     while (li.firstChild) {
         p.appendChild(li.firstChild);
+        p.className = PARAGRAPH_CLASSES;
     }
 
     li.appendChild(p);
@@ -421,7 +454,7 @@ const syncAllLists = (root: HTMLElement) => {
 // #region Helper Function
 /** Helper to ensure the editor has focus and valid selection */
 const validateEditorState = (editor: HTMLDivElement): { root: HTMLElement, selection: Selection } | null => {
-    const { selection } = getSelection(editor);
+    const { selection, state } = getSelection(editor);
     if (!selection || selection.rangeCount === 0) return null;
 
     let root: HTMLElement | null = (editor instanceof HTMLElement) ? editor : null;
@@ -446,6 +479,7 @@ const validateEditorState = (editor: HTMLDivElement): { root: HTMLElement, selec
 /** Logic to turn a list BACK into paragraphs (Toggle Off) */
 const toggleListOff = (listEl: HTMLElement, mode: ListMode, editor: HTMLElement) => {
     console.log('[List] 🔄 Toggling OFF');
+    const { selection, state } = getSelection(editor);
 
     // 1. Cleanup Checkboxes
     if (mode === 'checkbox') removeCheckboxWrapper(listEl);
@@ -463,33 +497,38 @@ const toggleListOff = (listEl: HTMLElement, mode: ListMode, editor: HTMLElement)
     const listItems = listEl.querySelectorAll('li');
     let lastNode: HTMLElement | null = null;
 
-    listItems.forEach(li => {
+    const pClass = PARAGRAPH_CLASSES.split(' ').filter(c => c)
+
+    listItems.forEach((li, index) => {
         let p: HTMLElement;
         const child = li.firstElementChild;
 
-        // Reuse existing <p> or create new one
-        if (child && child.tagName === 'P') {
+        if (child && child.tagName == 'P') {
             p = child as HTMLElement;
+            p.classList.remove(...pClass)
         } else {
             p = document.createElement('p');
             while (li.firstChild) p.appendChild(li.firstChild);
         }
-
         fragment.appendChild(p);
         lastNode = p;
-    });
+    })
 
-    // 4. Replace List
     listEl.replaceWith(fragment);
 
-    // 5. Restore Cursor
-    if (lastNode) {
+    console.log("[List] Restoring selection:")
+    if (state && state.startContainer && state.startContainer.isConnected) {
+        console.log("[List] use restoreRangePosition")
+        restoreRangePosition(selection, state.startContainer, state.startOffset, state.endContainer, state.endOffset, state.isCollapsed)
+    } else if (lastNode && selection) {
+        console.log("[List] use range selection")
         const range = document.createRange();
-        const { selection: sel } = getSelection(editor);
         range.selectNodeContents(lastNode);
         range.collapse(false);
-        sel?.removeAllRanges();
-        sel?.addRange(range);
+        selection.removeAllRanges();
+        selection.addRange(range);
+    } else {
+        console.log("[List] no selection to restore")
     }
 };
 
@@ -497,40 +536,85 @@ const toggleListOff = (listEl: HTMLElement, mode: ListMode, editor: HTMLElement)
 const switchListMode = (listEl: HTMLElement, targetTag: string, editor: HTMLElement) => {
     console.log('[List] 🔄 Switching Mode');
 
-    // Cleanup old checkboxes if moving away from checkbox mode
-    if (listEl.id.includes('checkbox')) removeCheckboxWrapper(listEl);
+    // 1. Analyze Selection & Cleanup Checkboxes
+    const { selection: preSelection } = getSelection(editor)!;
+    const selectedItems: HTMLElement[] = [];
 
-    // Handle same-tag switching (e.g. UL -> UL for Bullet <-> Checkbox)
-    if (listEl.tagName.toLowerCase() === targetTag) {
-        console.log('[List] 🔄 Morphing list (Same Tag)');
-        const oppositeCommand = targetTag === 'ul' ? 'insertOrderedList' : 'insertUnorderedList';
-
-        // Native split hack
-        document.execCommand(oppositeCommand, false);
-
-        // Find the temp list
-        const { selection } = getSelection(editor);
-        let anchor = selection?.anchorNode;
-        if (anchor?.nodeType === Node.TEXT_NODE) anchor = anchor.parentElement;
-
-        const tempTag = targetTag === 'ul' ? 'ol' : 'ul';
-        const splitList = (anchor as HTMLElement)?.closest(tempTag);
-
-        if (splitList) {
-            const morphedList = document.createElement(targetTag);
-            while (splitList.firstChild) morphedList.appendChild(splitList.firstChild);
-            splitList.replaceWith(morphedList);
-
-            // Re-select for styling
-            const range = document.createRange();
-            range.selectNodeContents(morphedList);
-            range.collapse(false);
-            const { selection: sel } = getSelection(editor);
-            sel?.removeAllRanges();
-            sel?.addRange(range);
+    if (preSelection && preSelection.rangeCount > 0) {
+        if (preSelection.isCollapsed) {
+            const li = getClosestElementFromSelection(preSelection, 'li');
+            if (li) selectedItems.push(li);
+        } else {
+            const allLis = listEl.querySelectorAll('li');
+            allLis.forEach(li => {
+                if (preSelection.containsNode(li, true)) selectedItems.push(li);
+            });
         }
+    }
+
+    if (selectedItems.length === 0) return;
+
+    selectedItems.forEach((li) => {
+        const firstChildEl = li.firstElementChild;
+        const isCheckbox = firstChildEl && firstChildEl.id.includes(CHECKBOX_WRAPPER_ID);
+        if (isCheckbox) removeCheckboxWrapper(li);
+    });
+
+    // 2. Logic to Switch Modes
+
+    // Check if we are about to create a list next to another list of the same type
+    // e.g. Converting OL -> UL, but there is already a UL right above it.
+    const prev = listEl.previousElementSibling;
+    const next = listEl.nextElementSibling;
+    const isAdjacentToSameTag = (prev && prev.tagName === targetTag.toUpperCase()) || (next && next.tagName === targetTag.toUpperCase());
+
+    // 🚀 UNIFIED PATH: Use "Force Split" if tags match OR if auto-merge is likely
+    if (listEl.tagName.toLowerCase() === targetTag || isAdjacentToSameTag) {
+        console.log(`[List] Force Split Mode (Same tag or adjacent merge risk). Current: ${listEl.tagName.toLowerCase()}, Target: ${targetTag}`);
+
+        // Convert to the OPPOSITE type first (Temporary) to force a split
+        let tempTagName = listEl.tagName.toLowerCase();
+        if (listEl.tagName.toLowerCase() == targetTag) {
+            const oppositeCommand = targetTag === 'ul' ? 'insertOrderedList' : 'insertUnorderedList';
+            tempTagName = targetTag === 'ul' ? 'OL' : 'UL';
+            document.execCommand(oppositeCommand, false);
+        }
+
+        // 2. Find the Temp List
+        const { selection: postSelection } = getSelection(editor)!;
+        const tempList = getClosestElementFromSelection(postSelection, tempTagName);
+
+        if (tempList) {
+            console.log("[List] Found Temp List:", tempList);
+
+            // 🚀 Fix: Repair IDs for the bottom list (which lost them during split)
+            const topList = tempList.previousElementSibling as HTMLElement;
+            const bottomList = tempList.nextElementSibling as HTMLElement;
+
+            if (topList && bottomList && topList.tagName === listEl.tagName && bottomList.tagName === listEl.tagName) {
+                if (topList.id && !bottomList.id) {
+                    bottomList.id = topList.id; // Copy ID from top to bottom
+                }
+            }
+
+            // 3. Morph Temp List to Final List
+            const finalList = document.createElement(targetTag);
+            finalList.id = listEl.id === 'checkbox-wrapper' ? 'bullet-wrapper' : 'checkbox-wrapper';
+
+            while (tempList.firstChild) {
+                finalList.appendChild(tempList.firstChild);
+            }
+
+            tempList.replaceWith(finalList);
+
+            // 4. Update Selection
+            selectElement(finalList, preSelection);
+        }
+
     } else {
-        // Standard switching (UL <-> OL)
+        // Standard switching (e.g. UL -> OL with no adjacent OL)
+        // Safe to use native command without merging
+        console.log(`[List] Standard Switch (Different Tag, Safe)`);
         const command = targetTag === 'ul' ? 'insertUnorderedList' : 'insertOrderedList';
         document.execCommand(command, false);
     }
@@ -540,26 +624,14 @@ const switchListMode = (listEl: HTMLElement, targetTag: string, editor: HTMLElem
 const styleActiveList = (editor: HTMLElement, listTag: string, mode: ListMode, classes: { add: string, remove: string }) => {
     console.log('[List] 🎨 Styling List');
 
-    const { selection } = getSelection(editor);
+    let { selection, state } = getSelection(editor);
     if (!selection?.rangeCount) return;
 
-    // 0. Capture original selection
-    console.log('[List] 📸 Capturing original selection');
-    const originalRange = selection.getRangeAt(0).cloneRange();
-    console.log('[List] Original range:', {
-        startContainer: { node: originalRange.startContainer, offset: originalRange.startOffset, text: originalRange.startContainer.textContent },
-        endContainer: { node: originalRange.endContainer, offset: originalRange.endOffset, text: originalRange.endContainer.textContent },
-    });
-
-    let anchor = selection.anchorNode;
-    if (anchor?.nodeType === Node.TEXT_NODE) anchor = anchor.parentElement;
-
-    const listEl = (anchor as HTMLElement)?.closest(listTag);
-
+    const listEl = getClosestElementFromSelection(selection, listTag);
     if (!listEl) return;
 
     // 1. Set ID
-    listEl.id = mode === "bullet" ? "bullet-wrapper" : mode === "number" ? "number-wrapper" : "checkbox-wrapper";
+    listEl.id = mode === "bullet" ? WRAPPER_ID.bullet : mode === "number" ? WRAPPER_ID.number : WRAPPER_ID.checkbox;
 
     // 2. Apply Classes
     const toRemove = classes.remove.split(' ').filter(c => c);
@@ -569,42 +641,10 @@ const styleActiveList = (editor: HTMLElement, listTag: string, mode: ListMode, c
     listEl.classList.remove(...toRemove);
     listEl.classList.add(...defaultStyles, ...toAdd);
 
-    // 3. Components & Inner Wrapping
-    if (mode === "checkbox") {
-        listEl.querySelectorAll('li').forEach(li => injectCheckbox(li as HTMLElement));
-    } else {
-        removeCheckboxWrapper(listEl as HTMLElement);
-    }
-
-    // 4. Paragraph Wrapping (Safety)
-    listEl.querySelectorAll('li').forEach(li => injectParagraph(li as HTMLElement));
-
-    // 5. Restore original selection
-    console.log('[List] 🔄 Restoring original selection');
-    try {
-        selection.removeAllRanges();
-        selection.addRange(originalRange);
-        editor.focus();
-        console.log('[List] ✅ Selection restored successfully');
-    } catch (error) {
-        console.warn('[List] ⚠️ Failed to restore exact selection, falling back', error);
-
-        // Fallback: Try to restore to similar position
-        const newRange = document.createRange();
-        const targetLi = listEl.querySelector('li');
-
-        if (targetLi) {
-            const paragraph = targetLi.querySelector('p');
-            const targetNode = paragraph || targetLi;
-
-            newRange.selectNodeContents(targetNode);
-            newRange.collapse(false); // Collapse to end
-
-            selection.removeAllRanges();
-            selection.addRange(newRange);
-            editor.focus();
-            console.log('[List] ✅ Selection restored with fallback');
-        }
+    if (listEl.id == WRAPPER_ID.checkbox) {
+        const items = listEl.querySelectorAll('li');
+        items.forEach(item => injectCheckbox(item as HTMLElement));
     }
 };
+
 // #endregion
