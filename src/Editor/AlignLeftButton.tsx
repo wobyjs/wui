@@ -19,6 +19,9 @@ const AlignLeftButton = defaults(def, (props) => {
     const editor = useEditor()
 
     const alignment = LEFT_MAP.align
+    const toAdd = LEFT_MAP.classToAdd
+    const toRemove = LEFT_MAP.classToRemove
+
     const isActive = $(false);
 
     useEffect(() => {
@@ -57,7 +60,7 @@ const AlignLeftButton = defaults(def, (props) => {
     const handleClick = () => {
         const editorDiv = editor || getCurrentEditor()
 
-        applyTextAlign(alignment, editorDiv)
+        applyTextAlign(alignment, { toAdd, toRemove }, editorDiv)
         isActive(true)
 
         document.dispatchEvent(new Event('selectionchange'))

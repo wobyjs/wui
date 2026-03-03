@@ -1,6 +1,6 @@
 import { $, $$, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlClass, HtmlString, Observable, ObservableMaybe, useEffect } from 'woby'
 import { Button, ButtonStyles } from '../Button'
-import { findBlockParent, getSelection, getCurrentEditor, useBlockEnforcer } from './utils'
+import { findBlockParent, getSelection, getCurrentEditor, useBlockEnforcer, BLOCK_TAGS } from './utils'
 import { useEditor } from './undoredo'
 import { getCurrentBlockInfo } from "./Blockquote"
 import { getAffectedParagraphs } from "./FontSize"
@@ -12,10 +12,34 @@ import AlignJustify from '../icons/align_justify'
 type ContentAlign = 'left' | 'center' | 'right' | 'justify'
 
 export const ALIGNMENT_MAP = {
-    'left': { icon: <AlignLeft />, align: 'left' as const, defaultTitle: 'Align Left' },
-    'center': { icon: <AlignCenter />, align: 'center' as const, defaultTitle: 'Align Center' },
-    'right': { icon: <AlignRight />, align: 'right' as const, defaultTitle: 'Align Right' },
-    'justify': { icon: <AlignJustify />, align: 'justify' as const, defaultTitle: 'Align justify' },
+    'left': {
+        icon: <AlignLeft />,
+        align: 'left' as const,
+        defaultTitle: 'Align Left',
+        classToAdd: 'text-left',
+        classToRemove: 'text-center text-right text-justify'
+    },
+    'center': {
+        icon: <AlignCenter />,
+        align: 'center' as const,
+        defaultTitle: 'Align Center',
+        classToAdd: 'text-center',
+        classToRemove: 'text-left text-right text-justify'
+    },
+    'right': {
+        icon: <AlignRight />,
+        align: 'right' as const,
+        defaultTitle: 'Align Right',
+        classToAdd: 'text-right',
+        classToRemove: 'text-left text-center text-justify'
+    },
+    'justify': {
+        icon: <AlignJustify />,
+        align: 'justify' as const,
+        defaultTitle: 'Align Justify',
+        classToAdd: 'text-justify',
+        classToRemove: 'text-left text-center text-right'
+    },
 }
 
 // Default props
@@ -93,7 +117,7 @@ const AlignButton = defaults(def, (props) => {
         const alignment = currentAlignment().align
 
         console.log("[Align Button] editor div: ", $$(editorDiv))
-        applyTextAlign(alignment as ContentAlign, editorDiv)
+        applyTextAlign(alignment as ContentAlign, { toAdd: ALIGNMENT_MAP[alignment].classToAdd, toRemove: ALIGNMENT_MAP[alignment].classToRemove }, editorDiv)
         isActive(true)
 
         document.dispatchEvent(new Event('selectionchange'))
@@ -140,7 +164,7 @@ export default AlignButton
  * @param alignment - The target alignment direction ('left', 'center', 'right', or 'justify').
  * @param editor - The Observable representing the editor root element.
  */
-export const applyTextAlign = (alignment: ContentAlign, container: Observable<HTMLDivElement>) => {
+export const applyTextAlign = (alignment: ContentAlign, classes: { toAdd: string, toRemove: string }, container: Observable<HTMLDivElement>) => {
     const { selection } = getSelection($$(container))
 
     if (!selection || selection.rangeCount === 0) { return }
@@ -153,19 +177,22 @@ export const applyTextAlign = (alignment: ContentAlign, container: Observable<HT
 
     if (!parentElement) return
 
-    const isRoot = parentElement.hasAttribute('data-editor-root');
+    let selectedItems = getSelectedBlocks(parentElement, selection)
+    if (selectedItems.length == 0) {
+        selectedItems = [parentElement]
+    }
 
-    const targets = isRoot ? getAffectedParagraphs($$(container), selection) : [parentElement];
+    selectedItems.forEach((target, index) => {
+        console.log(`[Alignment] #${index + 1} Setting ${target.tagName.toLowerCase()} to ${alignment}`);
 
+        const toAdd = classes.toAdd.split(' ').filter(c => c);
+        const toRemove = classes.toRemove.split(' ').filter(c => c);
 
-    targets.forEach((target, index) => {
-        const block = findBlockParent(target, container);
-        if (block) {
-            block.style.textAlign = alignment;
-        } else {
-            $$(container).style.textAlign = alignment;
+        if (target instanceof HTMLElement) {
+            target.classList.add(...toAdd);
+            target.classList.remove(...toRemove);
         }
-    });
+    })
 }
 
 /**
@@ -204,10 +231,9 @@ export const updateActiveStatus = (targetMode: string, isActive: Observable<bool
             return;
         }
 
-        // Fallback to 'left' if style is empty, because that is the browser default
-        const currentAlign = block.style.textAlign.toLowerCase();
-        const target = modeValue.toLowerCase();
-        const isMatch = currentAlign === target;
+        const target_ = modeValue.toLowerCase() as keyof typeof ALIGNMENT_MAP;
+        const targetClass = ALIGNMENT_MAP[target_].classToAdd;
+        const isMatch = block.classList.contains(targetClass);
 
         // console.log("Information:", { target: target, detected: currentAlign, element: `<${block.tagName.toLowerCase()}>`, fullStyle: block.getAttribute('style'), isMatch: isMatch });
 
@@ -225,3 +251,42 @@ export const updateActiveStatus = (targetMode: string, isActive: Observable<bool
     return isActive
 };
 // #endregion
+
+/**
+ * Generic helper to find ALL selected block-level elements.
+ */
+export const getSelectedBlocks = (container: HTMLElement, selection: Selection | null): HTMLElement[] => {
+    const selectedBlocks: HTMLElement[] = [];
+
+    if (!selection || selection.rangeCount === 0) return selectedBlocks;
+
+    if (selection.isCollapsed) {
+        // Blinking Cursor: Find the closest block tag
+        let node = selection.anchorNode;
+        if (node?.nodeType === Node.TEXT_NODE) node = node.parentElement;
+
+        // closest() takes a CSS selector string!
+        const block = (node as HTMLElement)?.closest(BLOCK_TAGS);
+
+        if (block && container.contains(block)) {
+            selectedBlocks.push(block as HTMLElement);
+        }
+    } else {
+        // Highlighted Text: Find all block tags inside the container
+        // We use the comma-separated string to find P, H1, LI, etc. all at once
+        const allBlocks = container.querySelectorAll<HTMLElement>(BLOCK_TAGS);
+
+        allBlocks.forEach(block => {
+            // 'true' means include even if partially selected
+            if (selection.containsNode(block, true)) {
+
+                // Extra safety: Ignore the main editor root div itself
+                if (!block.hasAttribute('data-editor-root')) {
+                    selectedBlocks.push(block);
+                }
+            }
+        });
+    }
+
+    return selectedBlocks;
+};

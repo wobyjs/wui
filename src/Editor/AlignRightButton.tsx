@@ -19,6 +19,9 @@ const AlignRightButton = defaults(def, (props) => {
     const editor = useEditor()
 
     const alignment = RIGHT_MAP.align
+    const toAdd = RIGHT_MAP.classToAdd
+    const toRemove = RIGHT_MAP.classToRemove
+
     const isActive = $(false);
 
     useEffect(() => {
@@ -57,7 +60,7 @@ const AlignRightButton = defaults(def, (props) => {
     const handleClick = () => {
         const editorDiv = editor || getCurrentEditor()
 
-        applyTextAlign(alignment, editorDiv)
+        applyTextAlign(alignment, { toAdd, toRemove }, editorDiv)
         isActive(true)
 
         document.dispatchEvent(new Event('selectionchange'))

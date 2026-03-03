@@ -19,6 +19,9 @@ const AlignCenterButton = defaults(def, (props) => {
     const editor = useEditor()
 
     const alignment = CENTER_MAP.align
+    const toAdd = CENTER_MAP.classToAdd
+    const toRemove = CENTER_MAP.classToRemove
+
     const isActive = $(false);
 
     useEffect(() => {
@@ -57,7 +60,7 @@ const AlignCenterButton = defaults(def, (props) => {
     const handleClick = () => {
         const editorDiv = editor || getCurrentEditor()
 
-        applyTextAlign(alignment, editorDiv)
+        applyTextAlign(alignment, { toAdd, toRemove }, editorDiv)
         isActive(true)
 
         document.dispatchEvent(new Event('selectionchange'))

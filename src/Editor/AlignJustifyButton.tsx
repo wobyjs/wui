@@ -19,6 +19,9 @@ const AlignJustifyButton = defaults(def, (props) => {
     const editor = useEditor()
 
     const alignment = JUSTIFY_MAP.align
+    const toAdd = JUSTIFY_MAP.classToAdd
+    const toRemove = JUSTIFY_MAP.classToRemove
+    
     const isActive = $(false);
 
     useEffect(() => {
@@ -57,7 +60,7 @@ const AlignJustifyButton = defaults(def, (props) => {
     const handleClick = () => {
         const editorDiv = editor || getCurrentEditor()
 
-        applyTextAlign(alignment, editorDiv)
+        applyTextAlign(alignment, { toAdd, toRemove }, editorDiv)
         isActive(true)
 
         document.dispatchEvent(new Event('selectionchange'))
