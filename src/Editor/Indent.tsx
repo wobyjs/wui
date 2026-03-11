@@ -94,7 +94,7 @@ export const applyIndent = (editor: HTMLElement, isDecrease: boolean, stepMultip
     const selectedBlocks: HTMLElement[] = [];
     if (selection && selection.rangeCount > 0) {
         if (selection.isCollapsed) {
-            const el = getClosestElementFromSelection(selection, BLOCK_TAGS);
+            const el = getClosestElementFromSelection(selection, BLOCK_TAGS.join(','));
             if (el) selectedBlocks.push(el);
         } else {
             // SMART: Find the closest common parent of the highlight
@@ -103,10 +103,10 @@ export const applyIndent = (editor: HTMLElement, isDecrease: boolean, stepMultip
             if (ancestor.nodeType === Node.TEXT_NODE) ancestor = ancestor.parentElement!;
 
             // 🚀 OPTIMIZATION: Only search inside the ancestor, not the whole editor
-            const allPossibleBlocks = ancestor.querySelectorAll<HTMLElement>(BLOCK_TAGS);
+            const allPossibleBlocks = ancestor.querySelectorAll<HTMLElement>(BLOCK_TAGS.join(','));
 
             // If the ancestor ITSELF is a block tag, add it too!
-            if (ancestor.matches(BLOCK_TAGS) && !ancestor.hasAttribute('data-editor-root')) {
+            if (ancestor.matches(BLOCK_TAGS.join(',')) && !ancestor.hasAttribute('data-editor-root')) {
                 selectedBlocks.push(ancestor);
             }
 
