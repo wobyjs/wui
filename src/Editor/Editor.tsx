@@ -10,7 +10,7 @@ import { UnderlineButton } from './UnderlineButton' // Added UnderlineButton
 import { EditorContext, UndoRedo, useEditor, useUndoRedo } from './undoredo'
 import { FontSize } from './FontSize' // import { FontSizeInput } from './FontSizeCopy' // Changed from Increase/Decrease
 import { List } from './List' // import { BulletListButton, NumberedListButton } from './List'
-import { Indent } from './Indent' // Will be part of TextAlignDropDown
+import { applyIndent, Indent } from './Indent' // Will be part of TextAlignDropDown
 import { Blockquote } from './Blockquote'
 
 // New Imports
@@ -95,12 +95,11 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, children }) =
         useBlockEnforcer($$(activeEditor) ?? $$(getCurrentEditor))
     });
 
-
-    // #region Auto-focus Effect
     /**
      * Effect: Automatically focuses the editor element when editing mode is enabled.
      * This ensures the cursor is placed in the editor when the user clicks to start editing.
      */
+    // #region Auto-focus Effect
     useEffect(() => {
         if ($$(isEditing)) {
             const el = $$(activeEditor);
@@ -110,12 +109,12 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, children }) =
     })
     // #endregion
 
-    // #region Mutation Observer Effect
     /**
      * Effect: Sets up a MutationObserver to monitor all changes in the editor content.
      * This captures typing, formatting changes, node insertions/deletions, and attribute modifications
      * to ensure every edit is properly tracked in the undo/redo history.
      */
+    // #region Mutation Observer Effect
     useEffect(() => {
         const el = $$(activeEditor)
 
@@ -125,11 +124,9 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, children }) =
             return
         }
 
-        // Create observer to watch for all types of content changes
-        const observer = new MutationObserver((mutations) => {
-            // Save the current state to undo/redo history
-            saveDo()
-        })
+        // Create observer to watch for all types of content changes\
+        // Save the current state to undo/redo history
+        const observer = new MutationObserver((mutations) => { saveDo() })
 
         // Configure observer to catch all relevant changes
         observer.observe(el, {
@@ -150,30 +147,21 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, children }) =
     * - Ctrl+Z / Ctrl+Y: Triggers custom Undo/Redo logic.
     */
     const handleKeyDown = (e: KeyboardEvent) => {
-        // console.debug("[Editor Surface] keydown: ", { "ctrl": e.ctrlKey, "shift": e.shiftKey, "alt": e.altKey, "key": e.key });
-
         if (e.key === 'Tab') {
-            e.preventDefault()
-            e.stopPropagation()
-
+            e.preventDefault(); e.stopPropagation();
             if (isCaretInTableCell()) {
                 focusNextTableCell(e.shiftKey) // In table: Tab next cell, Shift+Tab previous
             } else {
-                document.execCommand(e.shiftKey ? 'outdent' : 'indent') // Normal text: indent/outdent
+                applyIndent($$(activeEditor), e.shiftKey, 1, 20) // document.execCommand(e.shiftKey ? 'outdent' : 'indent') // Normal text: indent/outdent
                 saveDo()
             }
         }
-
         if (e.ctrlKey) {
+            // e.preventDefault(); e.stopPropagation();
             switch (e.key.toLowerCase()) {
-                case 'z':
-                    undo()
-                    e.preventDefault();
-                    break
-                case 'y':
-                    redo()
-                    e.preventDefault()
-                    break
+                case 'z': undo(); break;
+                case 'y': redo(); break;
+                // case 'a': console.log("Select All"); break;
             }
         }
     }
@@ -186,10 +174,7 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, children }) =
         const sel = document.getSelection()
         if (!sel?.focusNode) return false
 
-        let el: HTMLElement | null =
-            sel.focusNode.nodeType === Node.ELEMENT_NODE
-                ? (sel.focusNode as HTMLElement)
-                : (sel.focusNode.parentElement)
+        let el: HTMLElement | null = sel.focusNode.nodeType === Node.ELEMENT_NODE ? (sel.focusNode as HTMLElement) : (sel.focusNode.parentElement)
 
         while (el) {
             if (el.tagName === 'TD' || el.tagName === 'TH') return true
@@ -217,16 +202,15 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, children }) =
 }
 // #endregion
 
-
-// #region Editor Toolbar
 /**
 * EditorToolbar: A sticky control hub that organizes text formatting, 
 * layout tools, and history management into logical functional groups. 
 * It interfaces with the UndoRedo system and ensures toolbar interactions 
 * do not disrupt the user's text selection.
 */
+// #region Editor Toolbar
 const EditorToolbar = ({ toolbarRef }) => {
-    const { redo, redos, undo, undos } = useUndoRedo()
+    const { redo, undo } = useUndoRedo()
 
     // Helper for vertical dividers
     const Divider = () => <div class="w-[1px] h-6 bg-gray-200 mx-1" />
@@ -234,24 +218,17 @@ const EditorToolbar = ({ toolbarRef }) => {
     const BASE_CLASS = "sticky top-0 z-10 bg-white border border-gray-200 rounded-t-lg p-1.5 flex items-center flex-wrap gap-1 shadow-sm mb-0"
 
     const handleToolbarKeyDown = (e: KeyboardEvent) => {
+        e.preventDefault(); e.stopPropagation();
+
         if (e.ctrlKey)
             switch (e.key) {
                 case 'z': undo(); break
                 case 'y': redo(); break
-                // case 89: redo(); break
             }
         else
             switch (e.key) {
-                // Tab key in toolbar itself, e.g. if a button is focused
                 case 'Tab':
-                    e.preventDefault()
-                    e.stopPropagation()
-                    // This context (toolbar) might not be appropriate for indent/outdent commands
-                    // Or, if it is, it should probably focus the editor first.
-                    // For now, let's assume it's intended to act on the editor content:
-                    document.execCommand(e.shiftKey ? 'outdent' : 'indent')
-                    return true
-                // case 89: redo(); break
+                    document.execCommand(e.shiftKey ? 'outdent' : 'indent'); return true
             }
     }
 
@@ -354,14 +331,6 @@ const Editor = defaults(def, (props) => {
         return _editor()
     }) as Observable<HTMLDivElement>
 
-    // const handleBlur = (e: JSX.FocusEventHandler<HTMLDivElement>) => {
-    //     setTimeout(() => {
-    //         if ($$(toolbarRef) && !$$(toolbarRef).contains(document.activeElement)) {
-    //             isEditing(false)
-    //         }
-    //     }, 0)
-    // }
-
     const handleBlur = (e?: FocusEvent) => {
         // We use a small timeout to let the browser update the focus state
         setTimeout(() => {
@@ -392,8 +361,42 @@ const Editor = defaults(def, (props) => {
 
     const handleEditorClick = () => { isEditing(true) }
 
+    const withoutToolbar = () => {
+        return (
+            <EditorContext.Provider value={editor}>
+                <UndoRedo>
+                    <EditorSurface
+                        isEditing={isEditing}
+                        handleEditorClick={handleEditorClick}
+                        handleBlur={handleBlur}
+                        children={children}
+                    >
+                    </EditorSurface>
+                </UndoRedo>
+            </EditorContext.Provider>
+        )
+    }
+
+    const withToolbar = () => {
+        return (
+            <EditorContext.Provider value={editor}>
+                <UndoRedo>
+                    {() => $$(isEditing) && $$(enableToolbar) && <EditorToolbar toolbarRef={toolbarRef} />}
+                    <EditorSurface
+                        isEditing={isEditing}
+                        handleEditorClick={handleEditorClick}
+                        handleBlur={handleBlur}
+                        children={children}
+                    >
+                    </EditorSurface>
+                </UndoRedo>
+            </EditorContext.Provider>
+        )
+    }
+
     return (
         <div ref={container}>
+            {/* {() => $$(enableToolbar) ? withToolbar : withoutToolbar} */}
             <EditorContext.Provider value={editor}>
                 <UndoRedo>
                     {() => $$(isEditing) && $$(enableToolbar) && <EditorToolbar toolbarRef={toolbarRef} />}
