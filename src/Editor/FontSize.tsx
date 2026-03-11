@@ -366,7 +366,7 @@ const unwrapIfUseless = (span: HTMLElement) => {
 /**
  * Finds all <p> tags in the editor that are currently highlighted by the user.
  */
-const getAffectedParagraphs = (editorDiv: HTMLElement, selection: Selection): HTMLParagraphElement[] => {
+export const getAffectedParagraphs = (editorDiv: HTMLElement, selection: Selection): HTMLParagraphElement[] => {
     const allParagraphs = editorDiv.querySelectorAll('p');
     const affectedParagraphs: HTMLParagraphElement[] = [];
 
