@@ -1,7 +1,7 @@
 import { Button, ButtonStyles } from '../Button'
 import { $, $$, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlClass, HtmlString, Observable, ObservableMaybe, useContext, useEffect } from "woby"
 import { useEditor } from './undoredo'
-import { getCurrentEditor, getActiveSelection, findBlockParent } from './utils'
+import { getCurrentEditor, getActiveSelection, getSelection, findBlockParent, BLOCK_TAGS, isSelectionInside } from './utils'
 
 // change 'inline-block' to 'block'
 export const QUOTE_CLASSES = "text-[15px] text-[#65676b] ml-10 mr-0 mt-0 mb-2.5 pl-2 border-l-[#ced0d4] border-l-4 border-solid block italic"
@@ -31,7 +31,7 @@ const Blockquote = defaults(def, (props) => {
         if (!editorDiv) { console.warn("[Blockquote] no editor found."); return; }
 
         if (!$$(isActive)) {
-            applyFormatBlock(editorDiv, "p", "")
+            unwrapBlockquote(editorDiv)
         } else {
             applyFormatBlock(editorDiv, QUOTE_TAG, QUOTE_CLASSES)
         }
@@ -45,18 +45,8 @@ const Blockquote = defaults(def, (props) => {
         const editorDiv = $$(editor) ?? $$(getCurrentEditor())
         if (!editorDiv) return
 
-        const selection = getActiveSelection(editorDiv)
-
-        if (selection && selection.rangeCount > 0) {
-            const range = selection.getRangeAt(0)
-            const block = getCurrentBlockInfo(editorDiv, range)
-
-            // Set active if the parent block matches our QUOTE_TAG
-            const isInsideQuote = block?.tagName.toLowerCase() === QUOTE_TAG.toLowerCase()
-            isActive(isInsideQuote)
-        } else {
-            isActive(false)
-        }
+        const isInsideBlockquote = isSelectionInside(editorDiv, QUOTE_TAG)
+        isActive(isInsideBlockquote);
     }
 
     // Monitor selection changes
@@ -117,50 +107,77 @@ export default Blockquote
 
 
 // #region Helper Functions
-export const getCurrentBlockInfo = (root: HTMLElement, range: Range) => {
-    let node: Node | null = range.commonAncestorContainer
-    if (node.nodeType === Node.TEXT_NODE) {
-        node = node.parentElement
-    }
-
-    const blockTags = ['P', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'BLOCKQUOTE', 'PRE', 'DIV']
-
-    while (node && node !== root) {
-        if (node.nodeType === Node.ELEMENT_NODE) {
-            const el = node as HTMLElement
-            if (blockTags.includes(el.tagName)) {
-                return el
-            }
-        }
-        node = node.parentNode
-    }
-    return null
-}
-
 const applyFormatBlock = (editor: HTMLDivElement, tag: string, className: string) => {
+    console.log("Apply Format Block")
+    const { selection } = getSelection(editor);
+    if (!selection || selection.rangeCount === 0) return;
 
-    const formatTag = `<${tag}>`
-    document.execCommand('formatBlock', false, formatTag)
+    const range = selection.getRangeAt(0)
 
-    const selection = getActiveSelection($$(editor))
+    const allBlocks = Array.from(editor.querySelectorAll(BLOCK_TAGS.join(',')));
+    const selectedBlocks = new Set<HTMLElement>();
 
-    if (selection && selection.rangeCount > 0) {
-        const range = selection.getRangeAt(0)
-        let node: Node | null = range.commonAncestorContainer
+    allBlocks.forEach(block => {
+        if (range.intersectsNode(block)) {
+            let element = block as HTMLElement;
 
-        if (node.nodeType === Node.TEXT_NODE) node = node.parentElement
-
-        // Traverse up to find the tag we just requested
-        while (node && node !== editor) {
-            if (node.nodeType === Node.ELEMENT_NODE) {
-                const el = node as HTMLElement
-                if (el.tagName.toLowerCase() === tag.toLowerCase()) {
-                    el.className = className
-                    return
+            if (element.tagName === 'LI') {
+                const parentList = element.closest('ul, ol');
+                if (parentList) {
+                    element = parentList as HTMLElement;
                 }
             }
-            node = node.parentNode
+
+            selectedBlocks.add(element);
         }
-    }
+    });
+
+    const blocksArray = Array.from(selectedBlocks);
+    if (blocksArray.length === 0) return;
+
+    // 1. Create the new container
+    const container = document.createElement(tag);
+    container.className = className;
+
+    // 2. Insert the container into the DOM before the first selected block
+    const firstBlock = blocksArray[0];
+    firstBlock.parentNode?.insertBefore(container, firstBlock);
+    console.log("First Block: ", firstBlock);
+
+    // 3. Move all selected blocks inside the new container
+    selectedBlocks.forEach(block => {
+        container.appendChild(block);
+    });
+
+    console.log("Successfully wrapped", blocksArray.length, "blocks in", tag);
 }
+
+const unwrapBlockquote = (editor: HTMLDivElement) => {
+    const { selection } = getSelection(editor);
+    if (!selection || selection.rangeCount === 0) return;
+
+    // 1. Find the parent blockquote of the current cursor position
+    const cursorNode = selection.anchorNode;
+    const blockquote = (cursorNode instanceof HTMLElement ? cursorNode : cursorNode?.parentElement)?.closest('blockquote');
+
+    if (!blockquote) {
+        console.log("No blockquote found to unwrap!");
+        return;
+    }
+
+    // 2. Unwrap the blockquote
+    const parent = blockquote.parentNode;
+    if (!parent) return;
+
+    // Move every child (P, UL, etc.) out of the blockquote 
+    // and place them right before the blockquote tag in the DOM
+    while (blockquote.firstChild) {
+        parent.insertBefore(blockquote.firstChild, blockquote);
+    }
+
+    // 3. Remove the empty blockquote
+    blockquote.remove();
+
+    console.log("Blockquote unwrapped successfully.");
+};
 // #endregion
