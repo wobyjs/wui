@@ -244,10 +244,10 @@ const insertList = (editor: HTMLDivElement, listTag: 'ul' | 'ol', classToAdd: st
         const selectedBlocks: HTMLElement[] = [];
         if (selection && selection.rangeCount > 0) {
             if (selection.isCollapsed) {
-                const el = getClosestElementFromSelection(selection, BLOCK_TAGS);
+                const el = getClosestElementFromSelection(selection, BLOCK_TAGS.join(','));
                 if (el) selectedBlocks.push(el);
             } else {
-                const allPossibleBlocks = editor.querySelectorAll(BLOCK_TAGS);
+                const allPossibleBlocks = editor.querySelectorAll(BLOCK_TAGS.join(','));
                 // 2. Filter them to find which ones are inside the selection
                 allPossibleBlocks.forEach(block => {
                     if (selection.containsNode(block, true)) {
