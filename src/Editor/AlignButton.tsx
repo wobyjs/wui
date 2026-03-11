@@ -1,9 +1,7 @@
 import { $, $$, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlClass, HtmlString, Observable, ObservableMaybe, useEffect } from 'woby'
 import { Button, ButtonStyles } from '../Button'
-import { findBlockParent, getSelection, getCurrentEditor, useBlockEnforcer, BLOCK_TAGS } from './utils'
+import { getSelection, getCurrentEditor, useBlockEnforcer, BLOCK_TAGS, getCurrentBlock } from './utils'
 import { useEditor } from './undoredo'
-import { getCurrentBlockInfo } from "./Blockquote"
-import { getAffectedParagraphs } from "./FontSize"
 import AlignCenter from '../icons/align_center'
 import AlignLeft from '../icons/align_left'
 import AlignRight from '../icons/align_right'
@@ -216,38 +214,18 @@ export const updateActiveStatus = (targetMode: string, isActive: Observable<bool
         return;
     }
 
-    const { selection } = getSelection(editorDiv);
-
-    if (selection && selection.rangeCount > 0) {
-        const range = selection.getRangeAt(0);
-        const block = getCurrentBlockInfo(editorDiv, range);
-
-        // console.groupCollapsed(`[useAlignStatus:${modeValue}] Update`);
-
-        if (!block) {
-            // console.log("Verdict: No block element found at cursor.");
-            isActive(false);
-            console.groupEnd();
-            return;
-        }
-
-        const target_ = modeValue.toLowerCase() as keyof typeof ALIGNMENT_MAP;
-        const targetClass = ALIGNMENT_MAP[target_].classToAdd;
-        const isMatch = block.classList.contains(targetClass);
-
-        // console.log("Information:", { target: target, detected: currentAlign, element: `<${block.tagName.toLowerCase()}>`, fullStyle: block.getAttribute('style'), isMatch: isMatch });
-
-        if ($$(isActive) !== isMatch) {
-            // console.log(`Action: Setting isActive to `, isMatch);
-            isActive(isMatch);
-        }
-
-        // console.groupEnd();
-    } else {
-        // No selection usually means the editor isn't focused
+    const block = getCurrentBlock(editorDiv);
+    if (!block) {
         isActive(false);
+        return;
     }
 
+    const alignmentClass = ALIGNMENT_MAP[modeValue.toLowerCase() as keyof typeof ALIGNMENT_MAP]?.classToAdd;
+    const isMatch = block.classList.contains(alignmentClass);
+
+    if ($$(isActive) !== isMatch) {
+        isActive(isMatch);
+    }
     return isActive
 };
 // #endregion
@@ -266,7 +244,7 @@ export const getSelectedBlocks = (container: HTMLElement, selection: Selection |
         if (node?.nodeType === Node.TEXT_NODE) node = node.parentElement;
 
         // closest() takes a CSS selector string!
-        const block = (node as HTMLElement)?.closest(BLOCK_TAGS);
+        const block = (node as HTMLElement)?.closest(BLOCK_TAGS.join(','));
 
         if (block && container.contains(block)) {
             selectedBlocks.push(block as HTMLElement);
@@ -274,7 +252,7 @@ export const getSelectedBlocks = (container: HTMLElement, selection: Selection |
     } else {
         // Highlighted Text: Find all block tags inside the container
         // We use the comma-separated string to find P, H1, LI, etc. all at once
-        const allBlocks = container.querySelectorAll<HTMLElement>(BLOCK_TAGS);
+        const allBlocks = container.querySelectorAll<HTMLElement>(BLOCK_TAGS.join(','));
 
         allBlocks.forEach(block => {
             // 'true' means include even if partially selected
