@@ -2,11 +2,11 @@ import { $, $$, render, customElement, defaults, ElementAttributes, HtmlClass, H
 import { Button, ButtonStyles } from '../Button'
 import { useEditor } from './undoredo'
 import { Checkbox } from '../Checkbox'
-import { getSelection, getCurrentEditor, selectElement, restoreSelection, restoreRangePosition, getClosestElementFromSelection, BLOCK_TAGS } from './utils'
+import { getSelection, getCurrentEditor, selectElement, restoreRangePosition, getClosestElementFromSelection, BLOCK_TAGS } from './utils'
 import ListBulleted from '../icons/list_bulleted'
 import ListNumbered from '../icons/list_numbered'
 import ListCheckbox from '../icons/list_checkbox'
-import { getSelectedBlocks } from './AlignButton'
+
 
 // #region Types & Configuration
 type ListMode = "bullet" | "number" | "checkbox"
