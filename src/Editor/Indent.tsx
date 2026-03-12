@@ -16,7 +16,7 @@ const def = () => ({
     mode: $("increase", HtmlString) as ObservableMaybe<IndentMode>,
     step: $(1, HtmlNumber) as ObservableMaybe<number>,
     disabled: $(false, HtmlBoolean) as Observable<boolean>,
-    identPx: $(8, HtmlNumber) as ObservableMaybe<number>,
+    identPx: $(20, HtmlNumber) as ObservableMaybe<number>,
 })
 
 const Indent = defaults(def, (props) => {
@@ -91,11 +91,25 @@ export const applyIndent = (editor: HTMLElement, isDecrease: boolean, stepMultip
         return
     }
 
-    const selectedBlocks: HTMLElement[] = [];
+    let selectedBlocks: HTMLElement[] = [];
     if (selection && selection.rangeCount > 0) {
         if (selection.isCollapsed) {
             const el = getClosestElementFromSelection(selection, BLOCK_TAGS.join(','));
-            if (el) selectedBlocks.push(el);
+            // console.log("closest element from selection: ", el)
+
+            if (el) {
+                if (el.tagName.toUpperCase() == "LI") {
+                    // console.log("Element is List Items, check the current list item is first items.")
+                    if (["UL", "OL"].includes(el.parentElement.tagName.toUpperCase()) && el.parentElement.firstElementChild == el) {
+                        selectedBlocks.push(el.parentElement)
+                    } else {
+                        // console.warn("List item is not the first item, cannot increase/decrease indent. apply nested list")
+                    }
+                } else {
+                    selectedBlocks.push(el)
+                }
+            }
+
         } else {
             // SMART: Find the closest common parent of the highlight
             const range = selection.getRangeAt(0);
@@ -107,7 +121,15 @@ export const applyIndent = (editor: HTMLElement, isDecrease: boolean, stepMultip
 
             // If the ancestor ITSELF is a block tag, add it too!
             if (ancestor.matches(BLOCK_TAGS.join(',')) && !ancestor.hasAttribute('data-editor-root')) {
-                selectedBlocks.push(ancestor);
+                if (!["UL", "OL", "LI"].includes(ancestor.tagName.toUpperCase())) {
+                    // console.log("Current ancestor is not a list item, pushing it to selectedBlocks", ancestor)
+                    selectedBlocks.push(ancestor)
+                } else if (["UL", "OL"].includes(ancestor.parentElement.tagName.toUpperCase()) && ancestor.parentElement.firstElementChild == ancestor) {
+                    // console.log("Current acestor is a list item, and it is the first item, pushing it to selectedBlocks", ancestor)
+                    selectedBlocks.push(ancestor.parentElement)
+                } else {
+                    console.warn("List item is not the first item, cannot increase/decrease indent. apply nested list")
+                }
             }
 
             allPossibleBlocks.forEach(block => {
@@ -117,7 +139,7 @@ export const applyIndent = (editor: HTMLElement, isDecrease: boolean, stepMultip
             });
         }
     }
-
+    selectedBlocks = selectedBlocks.filter(block => !['LI'].includes(block.tagName.toUpperCase()));
     const amount = indentAmount * stepMultiplier
 
     console.log(`[Indent] Total blocks to modify: ${selectedBlocks.length}`)
@@ -132,3 +154,4 @@ export const applyIndent = (editor: HTMLElement, isDecrease: boolean, stepMultip
 }
 
 // #endregion
+
