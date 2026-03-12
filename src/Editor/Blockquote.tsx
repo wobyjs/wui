@@ -1,7 +1,7 @@
 import { Button, ButtonStyles } from '../Button'
-import { $, $$, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlClass, HtmlString, Observable, ObservableMaybe, useContext, useEffect } from "woby"
+import { $, $$, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlClass, HtmlString, Observable, ObservableMaybe, useEffect } from "woby"
 import { useEditor } from './undoredo'
-import { getCurrentEditor, getActiveSelection, getSelection, findBlockParent, BLOCK_TAGS, isSelectionInside } from './utils'
+import { getCurrentEditor, getSelection, BLOCK_TAGS, isSelectionInside } from './utils'
 
 // change 'inline-block' to 'block'
 export const QUOTE_CLASSES = "text-[15px] text-[#65676b] ml-10 mr-0 mt-0 mb-2.5 pl-2 border-l-[#ced0d4] border-l-4 border-solid block italic"
