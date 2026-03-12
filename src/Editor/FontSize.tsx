@@ -1,9 +1,9 @@
-import { $, $$, Observable, JSX, useEffect, defaults, ObservableMaybe, HtmlNumber, HtmlString, customElement, ElementAttributes, HtmlBoolean, isObservable, useMemo, HtmlClass } from 'woby'
+import { $, $$, Observable, JSX, useEffect, defaults, ObservableMaybe, HtmlNumber, HtmlString, customElement, ElementAttributes, HtmlBoolean, isObservable, HtmlClass } from 'woby'
 import { Button, ButtonStyles } from '../Button'
 import TextIncrease from '../icons/text_increase'
 import TextDecrease from '../icons/text_decrease'
 import { useEditor } from './undoredo'
-import { applyStyle, findBlockParent, getSelection, getCurrentEditor, getCurrentRange, restoreSelection, selectElement, getActiveSelection } from './utils'
+import { getSelection, getCurrentEditor, restoreSelection, selectElement, BLOCK_TAGS } from './utils'
 
 const def = () => ({
     cls: $('', HtmlClass) as JSX.Class | undefined,
@@ -380,14 +380,29 @@ export const getAffectedParagraphs = (editorDiv: HTMLElement, selection: Selecti
 };
 
 /**
+ * Finds all block-level elements (p, h1–h6, li, blockquote, pre, div, ul, ol)
+ * inside the editor that intersect the current selection.
+ *
+ * This is the generalised version of getAffectedParagraphs — it covers every
+ * tag listed in BLOCK_TAGS, not just <p>, so callers that need to operate
+ * across headings, list items, blockquotes, etc. can use a single function.
+ *
+ * @param editor   - The root editor element.
+ * @param selection - The current browser Selection.
+ * @returns Ordered array of block elements that overlap the selection.
+ */
+export const getAffectedBlocks = (editor: HTMLElement, selection: Selection): HTMLElement[] => (Array.from(editor.querySelectorAll(BLOCK_TAGS.join(','))) as HTMLElement[]).filter(block => selection.containsNode(block, true) && block !== editor)
+
+/**
  * Handles the complex logic of applying font sizes across multiple paragraphs,
  * calculating intersecting ranges, wrapping spans, and restoring the selection.
  */
 const handleMultiParagraphSelection = (container: HTMLElement, selection: Selection, originalRange: Range, newSize: string) => {
     console.log("[FontSize] Handling multi-paragraph selection...");
 
-    const affectedParagraphs = getAffectedParagraphs(container, selection);
-    console.log(`[FontSize] Processing ${affectedParagraphs.length} paragraphs.`);
+    // const affectedParagraphs = getAffectedParagraphs(container, selection);
+    const affectedParagraphs = getAffectedBlocks(container, selection).filter(block => !['UL', 'OL'].includes(block.tagName.toUpperCase()));
+    console.log(`[FontSize] Processing ${affectedParagraphs.length} paragraphs.`, Array.from(affectedParagraphs));
 
     let firstStyledNode: HTMLElement | null = null;
     let lastStyledNode: HTMLElement | null = null;
