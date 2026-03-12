@@ -2,7 +2,7 @@ import { $, $$, customElement, defaults, ElementAttributes, HtmlClass, HtmlNumbe
 import { Button } from '../Button'
 import { EditorContext } from './undoredo'
 import { useOnClickOutside } from '@woby/use'
-import { range, getCurrentRange } from './utils' // Import getCurrentRange
+import { getCurrentRange } from './utils' // Import getCurrentRange
 import KeyboardDownArrow from '../icons/keyboard_down_arrow'
 
 const applyFontFamily = (fontName: string) => {
