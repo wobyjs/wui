@@ -2,6 +2,66 @@ import { useOnClickOutside, useSelection } from '@woby/use'
 import { $, $$, useEffect, JSX, useMemo, Observable, createContext, useContext, ObservableMaybe } from 'woby'
 import { useEditor } from './undoredo'
 
+export const BLOCK_TAGS = ['P', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'BLOCKQUOTE', 'PRE', 'DIV', 'LI', 'UL', 'OL']
+export const LIST_TAGS = ["UL", "OL"]
+export const LI_TAG = "LI"
+export const P_TAG = "P"
+
+/**
+ * Detects if the current selection is within a specific tag type.
+ * @param editor - The root editor element
+ * @param tagName - The tag to check for (e.g., 'BLOCKQUOTE')
+ */
+export const isSelectionInside = (editor: HTMLElement, tagName: string): boolean => {
+    const { selection } = getSelection(editor);
+    if (!selection || selection.rangeCount === 0) return false;
+
+    const range = selection.getRangeAt(0);
+
+    // Start from the specific node where the cursor is
+    let node: Node | null = range.startContainer;
+
+    // Walk up the DOM tree until we hit the root or find the tag
+    while (node && node !== editor && node !== document.body) {
+        if (node instanceof HTMLElement && node.tagName.toLowerCase() === tagName.toLowerCase()) {
+            return true;
+        }
+        node = node.parentNode;
+    }
+
+    return false;
+};
+
+/** Returns all block-level elements intersecting the provided selection range. */
+export const getSelectedBlocks = (container: HTMLElement, range: Range, blockTags: string[] = BLOCK_TAGS): HTMLElement[] => {
+    const allBlocks = Array.from(container.querySelectorAll(blockTags.join(',')));
+
+    // 2. Filter: Only return blocks that are actually inside the selection
+    return allBlocks.filter(block => {
+        // range.intersectsNode returns true if the block is even partially selected
+        return range.intersectsNode(block) && container.contains(block);
+    }) as HTMLElement[];
+};
+
+/** 
+ * Finds the nearest block element (P, H1, etc.) for the current selection.
+ */
+export const getCurrentBlock = (root: HTMLElement): HTMLElement | null => {
+    const { selection } = getSelection(root);
+    if (!selection || selection.rangeCount === 0) return null;
+
+    let node: Node | null = selection.anchorNode;
+    if (node?.nodeType === Node.TEXT_NODE) node = node.parentElement;
+
+    while (node && node !== root) {
+        if (node instanceof HTMLElement && BLOCK_TAGS.includes(node.tagName)) {
+            return node;
+        }
+        node = node.parentNode;
+    }
+    return null;
+};
+
 /**
  * Normalizes the editor's DOM structure to ensure consistent block-level wrapping.
  * 
@@ -14,7 +74,7 @@ export const useBlockEnforcer = (editor: Observable<HTMLDivElement | undefined> 
     // 1. Force DIVs on Enter
     document.execCommand('defaultParagraphSeparator', false, 'p');
 
-    const ensureStructure = () => {
+    const ensureStructure_ = () => {
         // CASE 1: Editor is totally empty
         if (el.innerHTML.trim() === "" || el.innerHTML === "<br>") {
             el.innerHTML = "<p><br></p>";
@@ -45,6 +105,42 @@ export const useBlockEnforcer = (editor: Observable<HTMLDivElement | undefined> 
             if (el.firstChild instanceof HTMLElement) {
                 el.firstChild.removeAttribute('id');
                 el.firstChild.style.textAlign = ''; // Reset if it inherited something weird
+            }
+        }
+    };
+
+    const ensureStructure = () => {
+        // CASE 1: Editor is totally empty
+        if (el.innerHTML.trim() === "" || el.innerHTML === "<br>") {
+            // 1. SAFELY CREATE NODES (Don't use innerHTML)
+            el.innerHTML = ""; // Clear out any invisible junk
+            const p = document.createElement('p');
+            p.appendChild(document.createElement('br'));
+            el.appendChild(p); // Safely attach to document
+
+            // 2. SAFELY SET CURSOR
+            const { selection: sel } = getSelection(el) || {};
+            if (sel) {
+                const range = document.createRange();
+                // Set the cursor inside the <p> tag, right before the <br>
+                range.setStart(p, 0);
+                range.collapse(true);
+                sel.removeAllRanges();
+                sel.addRange(range);
+            }
+            return;
+        }
+
+        // CASE 2: Loose text (The "I just typed 'a'" case)
+        if (el.firstChild && el.firstChild.nodeType === Node.TEXT_NODE) {
+            const { selection: sel } = getSelection(el) || {};
+            if (!sel) return;
+
+            document.execCommand('formatBlock', false, 'p');
+
+            if (el.firstChild instanceof HTMLElement) {
+                el.firstChild.removeAttribute('id');
+                el.firstChild.style.textAlign = '';
             }
         }
     };
@@ -88,32 +184,6 @@ export const getCurrentEditor = () => {
 }
 
 /**
- * Retrieves the active Selection object, correctly handling Shadow DOM encapsulation.
- * 
- * Standard `window.getSelection()` is "retargeted" by the browser when focus is inside 
- * a Shadow DOM. This means it only reports the host element (e.g., <wui-editor>) 
- * rather than the internal text nodes. 
- * 
- * This function identifies if the editor is inside a ShadowRoot and uses the 
- * ShadowRoot-specific `getSelection()` method to "pierce" the boundary and 
- * access the actual selection nodes.
- * 
- * @param editorEl - The element currently being edited.
- * @returns The Selection object (shadow-aware) or null.
- */
-export const getActiveSelection = (editorEl: HTMLElement) => {
-    // 1. Determine if the element is inside a ShadowRoot
-    const root = editorEl.getRootNode();
-
-    // 2. Get selection from ShadowRoot if applicable, otherwise window
-    const selection = (root instanceof ShadowRoot)
-        ? (root as any).getSelection() // Use the fix from the previous answer
-        : window.getSelection();
-
-    return selection;
-};
-
-/**
  * Utility: Forces the browser's live selection (blue highlight) 
  * to perfectly wrap the given HTML element.
  */
@@ -136,39 +206,94 @@ export const selectElement = (startElement: HTMLElement, selection: Selection | 
     selection.addRange(newRange);
 };
 
-export const selectElement_ = (element: HTMLElement, selection: Selection | null) => {
-    if (!element || !selection) return;
 
-    const newRange = document.createRange();
 
-    // Tell the range to surround the contents of our element
-    newRange.selectNodeContents(element);
+/**
+ * Utility: Finds the closest parent element of a specific tag type 
+ * starting from the current selection anchor.
+ */
+export const getClosestElementFromSelection = (selection: Selection | null, selector: string): HTMLElement | null => {
+    if (!selection || !selection.anchorNode) return null;
 
-    // Clear any existing highlights
-    selection.removeAllRanges();
+    let node = selection.anchorNode;
 
-    // Apply our new perfectly-wrapped highlight
-    selection.addRange(newRange);
+    // If the anchor is text, jump up to its parent element
+    if (node.nodeType === Node.TEXT_NODE) {
+        node = node.parentElement!;
+    }
+
+    // Use .closest() to find the target tag (e.g. 'ul', 'li', 'p')
+    return (node as HTMLElement)?.closest(selector) || null;
 };
 
 export type SelectionState = {
+    startContainer: Node
     startContainerPath: number[]
     startOffset: number
+    endContainer: Node
     endContainerPath: number[]
     endOffset: number
     isCollapsed: boolean
 }
 
 /**
+ * Utility: Restores a specific range position based on raw nodes and offsets.
+ * Used when DOM manipulation moves nodes but keeps references alive.
+ */
+export function restoreRangePosition(selection: Selection, start: { node: Node, offset: number }, end?: { node: Node, offset: number }): Range | null {
+    const newRange = document.createRange();
+
+    try {
+        newRange.setStart(start.node, start.offset);
+
+        if (end)
+            newRange.setEnd(end.node, end.offset);
+        else
+            newRange.collapse(true);
+
+        selection.removeAllRanges();
+        selection.addRange(newRange);
+
+        // Always return the range. The caller can use it or ignore it!
+        return newRange;
+
+    } catch (e) {
+        console.warn("[Utils] Failed to set selection range", e);
+        return null;
+    }
+
+}
+
+// export const restoreRangePosition = (selection: Selection, startNode: Node, startOffset: number, endNode?: Node, endOffset?: number, collapsed: boolean = true) => {
+//     const newRange = document.createRange();
+
+//     try {
+//         newRange.setStart(startNode, startOffset);
+
+//         if (collapsed) {
+//             newRange.collapse(true);
+//         } else if (endNode && endOffset !== undefined) {
+//             newRange.setEnd(endNode, endOffset);
+//         }
+
+//         selection.removeAllRanges();
+//         selection.addRange(newRange);
+//     } catch (e) {
+//         console.warn("[Utils] Failed to restore range position", e);
+//     }
+// };
+
+/**
  * Get selection state relative to a root node (default: document.body).
  */
-export function getSelection(container: HTMLElement): { selection: Selection, state: SelectionState } | null {
+export function getSelection(container?: HTMLElement): { selection: Selection, state: SelectionState } | null {
     // 1. Determine if the element is inside a ShadowRoot
-    const root = container.getRootNode();
+    // const root = container.getRootNode();
+    const root = container.getRootNode() ?? document.body
 
     // 2. Get selection from ShadowRoot if applicable, otherwise window
     const selection = (root instanceof ShadowRoot)
-        ? (root as any).getSelection() // Use the fix from the previous answer
+        ? (root as any).getSelection()
         : window.getSelection();
 
     if (!selection) return null;
@@ -181,11 +306,13 @@ export function getSelection(container: HTMLElement): { selection: Selection, st
     const range = selection.getRangeAt(0);
 
     const state = {
+        startContainer: range.startContainer,
         startContainerPath: getNodePath(range.startContainer, container),
         startOffset: range.startOffset,
+        endContainer: range.endContainer,
         endContainerPath: getNodePath(range.endContainer, container),
         endOffset: range.endOffset,
-        isCollapsed: range.collapsed,
+        isCollapsed: range.collapsed, // true: cursor places; false: selection range
     }
     // return selection;
     return { selection, state }
@@ -199,8 +326,10 @@ export function getSelection_bak(root?: Node): SelectionState | null {
     const range = selection.getRangeAt(0)
 
     return {
+        startContainer: range.startContainer,
         startContainerPath: getNodePath(range.startContainer, root),
         startOffset: range.startOffset,
+        endContainer: range.endContainer,
         endContainerPath: getNodePath(range.endContainer, root),
         endOffset: range.endOffset,
         isCollapsed: range.collapsed,
@@ -214,14 +343,14 @@ export function restoreSelection(state: SelectionState, root?: Node): void {
     root = root ?? $$(useEditor())
     const range = document.createRange()
 
-    console.log('[restoreSelection] Attempting to restore state:', state)
-    console.log('[restoreSelection] Root node:', root)
+    // console.log('[restoreSelection] Attempting to restore state:', state)
+    // console.log('[restoreSelection] Root node:', root)
 
     const startNode = getNodeFromPath(state.startContainerPath, root)
     const endNode = getNodeFromPath(state.endContainerPath, root)
 
-    console.log('[restoreSelection] Resolved startNode:', startNode, 'from path:', state.startContainerPath)
-    console.log('[restoreSelection] Resolved endNode:', endNode, 'from path:', state.endContainerPath)
+    // console.log('[restoreSelection] Resolved startNode:', startNode, 'from path:', state.startContainerPath)
+    // console.log('[restoreSelection] Resolved endNode:', endNode, 'from path:', state.endContainerPath)
 
     if (!startNode || !endNode) {
         console.error('[restoreSelection] Failed to resolve startNode or endNode. Aborting restoration.')
@@ -244,9 +373,9 @@ export function restoreSelection(state: SelectionState, root?: Node): void {
     }
 
     try {
-        console.log(`[restoreSelection] Setting start: Node=`, startNode, `Offset=`, clampedStartOffset, `(Original: ${state.startOffset}, Type: ${startNode.nodeType}, Node text/childNodes: "${startNode.nodeType === Node.TEXT_NODE ? startNode.textContent?.substring(0, 20) : startNode.childNodes.length}")`)
+        // console.log(`[restoreSelection] Setting start: Node=`, startNode, `Offset=`, clampedStartOffset, `(Original: ${state.startOffset}, Type: ${startNode.nodeType}, Node text/childNodes: "${startNode.nodeType === Node.TEXT_NODE ? startNode.textContent?.substring(0, 20) : startNode.childNodes.length}")`)
         range.setStart(startNode, clampedStartOffset)
-        console.log(`[restoreSelection] Setting end: Node=`, endNode, `Offset=`, clampedEndOffset, `(Original: ${state.endOffset}, Type: ${endNode.nodeType}, Node text/childNodes: "${endNode.nodeType === Node.TEXT_NODE ? endNode.textContent?.substring(0, 20) : endNode.childNodes.length}")`)
+        // console.log(`[restoreSelection] Setting end: Node=`, endNode, `Offset=`, clampedEndOffset, `(Original: ${state.endOffset}, Type: ${endNode.nodeType}, Node text/childNodes: "${endNode.nodeType === Node.TEXT_NODE ? endNode.textContent?.substring(0, 20) : endNode.childNodes.length}")`)
         range.setEnd(endNode, clampedEndOffset)
     } catch (e) {
         console.error('[restoreSelection] Error setting range start/end:', e, {
@@ -263,9 +392,9 @@ export function restoreSelection(state: SelectionState, root?: Node): void {
     if (selection) {
         selection.removeAllRanges()
         selection.addRange(range)
-        console.log('[restoreSelection] Selection restored successfully.')
+        // console.log('[restoreSelection] Selection restored successfully.')
     } else {
-        console.error('[restoreSelection] window.getSelection() returned null. Cannot restore selection.')
+        // console.error('[restoreSelection] window.getSelection() returned null. Cannot restore selection.')
     }
 }
 
