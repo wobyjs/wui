@@ -3,59 +3,8 @@ import { Button, ButtonStyles } from '../Button'
 import { useEditor } from './undoredo'
 import { useOnClickOutside } from '@woby/use'
 import KeyboardDownArrow from '../icons/keyboard_down_arrow'
-import { getCurrentEditor, getActiveSelection } from './utils'
+import { getCurrentEditor, getSelection } from './utils'
 import { QUOTE_TAG, QUOTE_CLASSES } from './Blockquote'
-
-
-
-
-// #region Helper Functions
-const getCurrentBlockInfo = (root: HTMLElement, range: Range) => {
-    let node: Node | null = range.commonAncestorContainer
-    if (node.nodeType === Node.TEXT_NODE) {
-        node = node.parentElement
-    }
-
-    const blockTags = ['P', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'BLOCKQUOTE', 'PRE', 'DIV']
-
-    while (node && node !== root) {
-        if (node.nodeType === Node.ELEMENT_NODE) {
-            const el = node as HTMLElement
-            if (blockTags.includes(el.tagName)) {
-                return el
-            }
-        }
-        node = node.parentNode
-    }
-    return null
-}
-
-const applyFormatBlock = (editor: HTMLDivElement, tag: string, className: string) => {
-    const formatTag = `<${tag}>`
-    document.execCommand('formatBlock', false, formatTag)
-
-    // const selection = window.getSelection()
-    const selection = getActiveSelection(editor)
-
-    if (selection && selection.rangeCount > 0) {
-        const range = selection.getRangeAt(0)
-        let node: Node | null = range.commonAncestorContainer
-        if (node.nodeType === Node.TEXT_NODE) node = node.parentElement
-
-        // Traverse up to find the tag we just requested
-        while (node && node !== editor) {
-            if (node.nodeType === Node.ELEMENT_NODE) {
-                const el = node as HTMLElement
-                if (el.tagName.toLowerCase() === tag.toLowerCase()) {
-                    el.className = className
-                    return
-                }
-            }
-            node = node.parentNode
-        }
-    }
-}
-// #endregion
 
 // Dropdown items configuration
 export const FORMAT_OPTIONS = [
@@ -207,7 +156,7 @@ const TextFormatDropDown = defaults(def, (props) => {
             if (!$$(el) || typeof $$(el).contains !== 'function') return
 
             // const selection = window.getSelection()
-            const selection = getActiveSelection($$(el));
+            const { selection } = getSelection($$(el));
             if (selection && selection.rangeCount > 0) {
                 const range = selection.getRangeAt(0)
 
@@ -319,3 +268,53 @@ declare module 'woby' {
 }
 
 export default TextFormatDropDown
+
+
+
+// #region Helper Functions
+const getCurrentBlockInfo = (root: HTMLElement, range: Range) => {
+    let node: Node | null = range.commonAncestorContainer
+    if (node.nodeType === Node.TEXT_NODE) {
+        node = node.parentElement
+    }
+
+    const blockTags = ['P', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'BLOCKQUOTE', 'PRE', 'DIV']
+
+    while (node && node !== root) {
+        if (node.nodeType === Node.ELEMENT_NODE) {
+            const el = node as HTMLElement
+            if (blockTags.includes(el.tagName)) {
+                return el
+            }
+        }
+        node = node.parentNode
+    }
+    return null
+}
+
+const applyFormatBlock = (editor: HTMLDivElement, tag: string, className: string) => {
+    const formatTag = `<${tag}>`
+    document.execCommand('formatBlock', false, formatTag)
+
+    // const selection = window.getSelection()
+    const { selection } = getSelection(editor)
+
+    if (selection && selection.rangeCount > 0) {
+        const range = selection.getRangeAt(0)
+        let node: Node | null = range.commonAncestorContainer
+        if (node.nodeType === Node.TEXT_NODE) node = node.parentElement
+
+        // Traverse up to find the tag we just requested
+        while (node && node !== editor) {
+            if (node.nodeType === Node.ELEMENT_NODE) {
+                const el = node as HTMLElement
+                if (el.tagName.toLowerCase() === tag.toLowerCase()) {
+                    el.className = className
+                    return
+                }
+            }
+            node = node.parentNode
+        }
+    }
+}
+// #endregion
