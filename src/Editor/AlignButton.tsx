@@ -1,6 +1,6 @@
 import { $, $$, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlClass, HtmlString, Observable, ObservableMaybe, useEffect } from 'woby'
 import { Button, ButtonStyles } from '../Button'
-import { getSelection, getCurrentEditor, useBlockEnforcer, BLOCK_TAGS, getCurrentBlock } from './utils'
+import { getSelection, getCurrentEditor, useBlockEnforcer, BLOCK_TAGS, getCurrentBlock, getSelectedBlocks } from './utils'
 import { useEditor } from './undoredo'
 import AlignCenter from '../icons/align_center'
 import AlignLeft from '../icons/align_left'
@@ -175,7 +175,8 @@ export const applyTextAlign = (alignment: ContentAlign, classes: { toAdd: string
 
     if (!parentElement) return
 
-    let selectedItems = getSelectedBlocks(parentElement, selection)
+    // let selectedItems = getSelectedBlocks(parentElement, selection)
+    let selectedItems = getSelectedBlocks(parentElement, ranges, BLOCK_TAGS.filter((tag) => !['UL', 'OL'].includes(tag)));
     if (selectedItems.length == 0) {
         selectedItems = [parentElement]
     }
@@ -233,38 +234,38 @@ export const updateActiveStatus = (targetMode: string, isActive: Observable<bool
 /**
  * Generic helper to find ALL selected block-level elements.
  */
-export const getSelectedBlocks = (container: HTMLElement, selection: Selection | null): HTMLElement[] => {
-    const selectedBlocks: HTMLElement[] = [];
+// export const getSelectedBlocks = (container: HTMLElement, selection: Selection | null): HTMLElement[] => {
+//     const selectedBlocks: HTMLElement[] = [];
 
-    if (!selection || selection.rangeCount === 0) return selectedBlocks;
+//     if (!selection || selection.rangeCount === 0) return selectedBlocks;
 
-    if (selection.isCollapsed) {
-        // Blinking Cursor: Find the closest block tag
-        let node = selection.anchorNode;
-        if (node?.nodeType === Node.TEXT_NODE) node = node.parentElement;
+//     if (selection.isCollapsed) {
+//         // Blinking Cursor: Find the closest block tag
+//         let node = selection.anchorNode;
+//         if (node?.nodeType === Node.TEXT_NODE) node = node.parentElement;
 
-        // closest() takes a CSS selector string!
-        const block = (node as HTMLElement)?.closest(BLOCK_TAGS.join(','));
+//         // closest() takes a CSS selector string!
+//         const block = (node as HTMLElement)?.closest(BLOCK_TAGS.join(','));
 
-        if (block && container.contains(block)) {
-            selectedBlocks.push(block as HTMLElement);
-        }
-    } else {
-        // Highlighted Text: Find all block tags inside the container
-        // We use the comma-separated string to find P, H1, LI, etc. all at once
-        const allBlocks = container.querySelectorAll<HTMLElement>(BLOCK_TAGS.join(','));
+//         if (block && container.contains(block)) {
+//             selectedBlocks.push(block as HTMLElement);
+//         }
+//     } else {
+//         // Highlighted Text: Find all block tags inside the container
+//         // We use the comma-separated string to find P, H1, LI, etc. all at once
+//         const allBlocks = container.querySelectorAll<HTMLElement>(BLOCK_TAGS.join(','));
 
-        allBlocks.forEach(block => {
-            // 'true' means include even if partially selected
-            if (selection.containsNode(block, true)) {
+//         allBlocks.forEach(block => {
+//             // 'true' means include even if partially selected
+//             if (selection.containsNode(block, true)) {
 
-                // Extra safety: Ignore the main editor root div itself
-                if (!block.hasAttribute('data-editor-root')) {
-                    selectedBlocks.push(block);
-                }
-            }
-        });
-    }
+//                 // Extra safety: Ignore the main editor root div itself
+//                 if (!block.hasAttribute('data-editor-root')) {
+//                     selectedBlocks.push(block);
+//                 }
+//             }
+//         });
+//     }
 
-    return selectedBlocks;
-};
+//     return selectedBlocks;
+// };
