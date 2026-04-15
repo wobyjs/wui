@@ -103,7 +103,7 @@ export const applyIndent = (editor: HTMLElement, isDecrease: boolean, stepMultip
                     if (["UL", "OL"].includes(el.parentElement.tagName.toUpperCase()) && el.parentElement.firstElementChild == el) {
                         selectedBlocks.push(el.parentElement)
                     } else {
-                        // console.warn("List item is not the first item, cannot increase/decrease indent. apply nested list")
+                        console.warn("List item is not the first item, cannot increase/decrease indent. apply nested list")
                     }
                 } else {
                     selectedBlocks.push(el)
