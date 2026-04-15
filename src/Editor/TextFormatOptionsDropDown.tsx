@@ -1,10 +1,9 @@
-import { $, $$, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlClass, HtmlNumber, HtmlString, JSX, Observable, ObservableMaybe, useEffect } from 'woby'
+import { $, $$, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlClass, HtmlString, JSX, Observable, ObservableMaybe, useEffect } from 'woby'
 import { Button, ButtonStyles } from '../Button'
-import { EditorContext, useEditor, useUndoRedo } from './undoredo'
+import { useEditor } from './undoredo'
 import { useOnClickOutside } from '@woby/use'
-import { getCurrentRange, getSelectedText, replaceSelectedText } from './utils'
 import KeyboardDownArrow from '../icons/keyboard_down_arrow'
-import { getCurrentEditor, getActiveSelection } from './utils'
+import { getCurrentEditor, getSelection } from './utils'
 
 import StrikethroughIcon from '../icons/strikethrough'
 
@@ -24,7 +23,7 @@ const applyFormat = (command: string, value?: string) => {
 
 const transformCase = (transformType: 'lowercase' | 'uppercase' | 'capitalize', editorDiv: HTMLDivElement) => {
 
-    const selection = getActiveSelection(editorDiv) // window.getSelection()
+    const { selection } = getSelection(editorDiv) // window.getSelection()
     if (!selection || selection.rangeCount === 0) { return }
 
     const range = selection.getRangeAt(0).cloneRange()
