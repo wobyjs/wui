@@ -1,9 +1,10 @@
-import { $, $$, defaults, type JSX, customElement, type ElementAttributes, HtmlClass, HtmlString, ObservableMaybe, HtmlBoolean, useEffect } from "woby"
+import { $, $$, defaults, type JSX, customElement, type ElementAttributes, HtmlClass, HtmlString, ObservableMaybe, HtmlBoolean, useEffect, Observable } from "woby"
 import { Button, ButtonStyles } from '../Button'
 import UndoIcon from '../icons/undo'
 import RedoIcon from '../icons/redo'
-import { useUndoRedo } from "./undoredo"
+import { EditorContext, UndoRedo, useEditor, useUndoRedo } from "./undoredo"
 
+// #region Undo Redo Button
 type UndoRedoMode = 'undo' | 'redo'
 
 const def = () => ({
@@ -16,15 +17,32 @@ const def = () => ({
 const UndoRedoButton = defaults(def, (props) => {
     // We don't destructure 'title' or 'disabled' here so we can control them dynamically
     const { mode, cls, class: cn, ...otherProps } = props
-    const { redo, redos, undo, undos } = useUndoRedo()
 
-    const isUndo = $($$(mode) === 'undo')
+    console.log('[UndoRedoButton] Attempting to use context...');
+    const undoRedoContext = useUndoRedo();
+    console.log('[UndoRedoButton] Context value:', undoRedoContext);
+
+    // Create default empty observables as fallback
+    const fallbackUndos = $([] as string[]);
+    const fallbackRedos = $([] as string[]);
+    const fallbackUndo = () => console.warn('[UndoRedoButton] Undo not available');
+    const fallbackRedo = () => console.warn('[UndoRedoButton] Redo not available');
+
+    // Use context values if available, otherwise use fallbacks
+    const redo = undoRedoContext?.redo || fallbackRedo;
+    const redos = undoRedoContext?.redos || fallbackRedos;
+    const undo = undoRedoContext?.undo || fallbackUndo;
+    const undos = undoRedoContext?.undos || fallbackUndos;
+
+    const isUndo = () => { return $$(mode) == 'undo' }
 
     // Dynamic Title
     const displayTitle = () => $$(isUndo) ? 'Undo' : 'Redo'
 
     // Dynamic Icon
-    const displayIcon = () => $$(isUndo) ? <UndoIcon class="size-5" /> : <RedoIcon class="size-5" />
+    const displayIcon = () => {
+        return $$(isUndo) ? <UndoIcon class="size-5" /> : <RedoIcon class="size-5" />
+    }
 
     // Dynamic Click Handler
     const handleClick = () => $$(isUndo) ? undo() : redo()
@@ -51,13 +69,64 @@ const UndoRedoButton = defaults(def, (props) => {
     )
 })
 
-export { UndoRedoButton }
+// #endregion
+
+
+// #region Editor Provider
+const editorProviderDef = () => ({
+    cls: $('', HtmlClass) as JSX.Class | undefined,
+    class: $('', HtmlClass) as JSX.Class | undefined,
+});
+
+/**
+ * EditorProvider Component
+ * 
+ * Creates and provides the EditorContext to all child components.
+ * This allows both the Toolbar (with UndoRedoButton) and EditorSurface 
+ * to access the same editor reference.
+ * 
+ * Usage:
+ * ```tsx
+ * <EditorProvider>
+ *   <Toolbar />
+ *   <EditorSurface />
+ * </EditorProvider>
+ * ```
+ */
+const EditorProvider = defaults(editorProviderDef, (props) => {
+    const { children } = props;
+
+    console.log('[EditorProvider] Initializing...');
+
+    // Create an observable to hold the editor reference
+    const editorRef = $<HTMLDivElement | null>(null);
+
+    console.log('[EditorProvider] Providing EditorContext...');
+    console.log('[EditorProvider] Initial editor value:', $$(editorRef));
+
+    return (
+        <EditorContext.Provider value={editorRef}>
+            <UndoRedo>
+                <UndoRedoButton mode="undo" />
+                <UndoRedoButton mode="redo" />
+                {children}
+            </UndoRedo>
+        </EditorContext.Provider>
+    );
+});
+// #endregion
+
+
+
+export { UndoRedoButton, EditorProvider }
 customElement('wui-undoredo-button', UndoRedoButton)
+customElement('wui-editor-provider', EditorProvider);
 
 declare module 'woby' {
     namespace JSX {
         interface IntrinsicElements {
             'wui-undoredo-button': ElementAttributes<typeof UndoRedoButton>
+            'wui-editor-provider': ElementAttributes<typeof EditorProvider>
         }
     }
 }

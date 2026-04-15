@@ -1,11 +1,12 @@
 /// <reference types="vite/client" />
 
-import { DEBUGGER, $, $$, useMemo, Observable, ObservableMaybe } from 'woby'
+
+import { DEBUGGER, $, $$, useMemo, Observable, ObservableMaybe, useEffect } from 'woby'
 import { Button } from './Button'
 import { Badge } from './Badge'
 import { Avatar } from './Avatar'
 import { AlignButton } from './Editor/AlignButton'
-import { EditorContext, UndoRedo } from './Editor/undoredo'
+import { EditorContext, UndoRedo, useUndoRedo } from './Editor/undoredo'
 import { Card, CardMedia, CardContent, CardActions } from './Card'
 import { Checkbox } from './Checkbox'
 import { Chip } from './Chip'
@@ -33,12 +34,22 @@ import { UnderlineButton } from './Editor/UnderlineButton'
 import { TextStyleButton } from './Editor/TextStyleButton'
 import { FontSize } from './Editor/FontSize'
 import { FontFamilyDropDown } from './Editor/FontFamilyDropDown'
-import { TextFormatOptionsDropDown } from './Editor/TextFormatOptionsDropDown'
+import { TextFormatDropDown } from './Editor/TextFormatDropDown'
+import { TextFormatOptionsDropDown, StrikethroughButton, SubscriptButton, SuperscriptButton, HighlightButton, ClearFormatButton, LowercaseButton, UppercaseButton, CapitalizeButton } from './Editor/TextFormatOptionsDropDown'
 import { TextColorPicker } from './Editor/TextColorPicker'
 import { TextBackgroundColorPicker } from './Editor/TextBackgroundColorPicker'
 import { Indent } from './Editor/Indent'
-import { ListButton } from './Editor/List'
+import { List } from './Editor/List'
 import { InsertDropDown } from './Editor/InsertDropDown'
+import { Editor } from './Editor/Editor'
+import { Blockquote } from './Editor/Blockquote'
+import { AlignLeftButton } from './Editor/AlignLeftButton'
+import { AlignCenterButton } from './Editor/AlignCenterButton'
+import { AlignRightButton } from './Editor/AlignRightButton'
+import { AlignJustifyButton } from './Editor/AlignJustifyButton'
+import { EditorProvider, UndoRedoButton } from './Editor/UndoRedoButton'
+import { useEditor } from './Editor/undoredo'
+
 
 const isDev = typeof import.meta.env !== 'undefined' && import.meta.env.DEV
 
@@ -46,8 +57,20 @@ if (isDev) {
     DEBUGGER.test = true
 }
 
-export function App() {
-    const editorRef = $(null as HTMLDivElement | null)
+function App() {
+    // const editorRef = $(null as HTMLDivElement | null)
+    const _editor = $<HTMLDivElement>(null)
+
+    const editorRef = ((...args: [HTMLDivElement?]) => {
+        if (args.length === 0) {
+            return _editor()
+        }
+        const val = args[0]
+        if (val instanceof HTMLElement) {
+            return _editor(val)
+        }
+        return _editor()
+    }) as Observable<HTMLDivElement>
 
 
     // #region Table Of Contents
@@ -617,8 +640,8 @@ export function App() {
                     <UndoRedo>
                         <div class="mb-4">
                             <div class="flex gap-4 items-center my-2 border border-gray-300 rounded p-4">
-                                <ListButton mode="bullet" />
-                                <ListButton mode="number" />
+                                <List mode="bullet" />
+                                <List mode="number" />
                             </div>
                             <div
                                 ref={editorRef}
@@ -667,7 +690,6 @@ export function App() {
 
 
     // #endregion
-
 
 
     // #region Card Demo
@@ -3163,6 +3185,7 @@ Placeholder: ${$$(showPlaceholder)} ("${$$(placeholderTxt)}")
     }
     // #endregion
 
+
     // #region Text Field Demo
     const textFieldDemo = () => {
         return <>
@@ -3354,7 +3377,6 @@ underline:  ${$$(isUnderline)}`}
     // #endregion
 
 
-
     // #region Toolbar Demo
     const toolbarDemo = () => {
         return <>
@@ -3466,6 +3488,7 @@ underline:  ${$$(isUnderline)}`}
         </>
     }
     // #endregion
+
 
     // #region Zoomable Demo
     const zoomableDemo = () => {
@@ -3622,7 +3645,6 @@ underline:  ${$$(isUnderline)}`}
     // #endregion 
 
 
-
     // #region Render
     return (
         <div class="p-8">
@@ -3691,3 +3713,291 @@ underline:  ${$$(isUnderline)}`}
     )
     // #endregion
 }
+
+// #region 🐞 Debug
+function Debug() {
+    const _editor = $<HTMLDivElement>(null)
+
+    const editor = ((...args: [HTMLDivElement?]) => {
+        if (args.length === 0) {
+            return _editor()
+        }
+        const val = args[0]
+        if (val instanceof HTMLElement) {
+            return _editor(val)
+        }
+        return _editor()
+    }) as Observable<HTMLDivElement>
+
+    const TextFormatDropDownDemo = () => {
+        return (
+            <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                <h1 class="text-2xl font-bold py-2">Text Format Drop Down Demo</h1>
+                <div class="mb-4">
+                    <div class="flex gap-4 items-center my-2 border border-gray-300 rounded p-4">
+                        <TextFormatDropDown />
+                    </div>
+                    <Editor enableToolbar={false} />
+                </div>
+            </div>
+        )
+    }
+
+    const BlockquoteDemo = () => {
+        return (
+            <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                <h1 class="text-2xl font-bold py-2">Blockquote Demo</h1>
+                <div class="mb-4">
+                    <div class="flex gap-4 items-center my-2 border border-gray-300 rounded p-4">
+                        <Blockquote />
+                    </div>
+                    <Editor enableToolbar={false} />
+                </div>
+            </div>
+        )
+    }
+
+    const EditorDemo = () => {
+        return (
+            <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                <h1 class="text-2xl font-bold py-2">Editor Demo</h1>
+                <div class="mb-4">
+                    <Editor />
+                </div>
+            </div>
+        )
+    }
+
+    const IndentDemo = () => {
+
+        const editor = $<HTMLDivElement>(null);
+
+        return (
+            <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                <h1 class="text-2xl font-bold py-2">Indent Demo</h1>
+                <EditorContext.Provider value={editor}>
+                    <UndoRedo>
+                        <div class="mb-4">
+                            <div class="flex gap-4 items-center my-2">
+                                <Indent mode="increase" cls="text-black" />
+                                <Indent mode="decrease" cls="text-black" />
+                            </div>
+                            <div ref={editor} contentEditable class="border border-gray-300 rounded p-4 min-h-[200px] mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+                            </div>
+                        </div>
+                    </UndoRedo>
+                </EditorContext.Provider>
+            </div>
+        )
+    }
+
+    const ListDemo = () => {
+        const useDivEditor = () => {
+            return (
+                <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                    <h1 class="text-2xl font-bold py-2">List Demo</h1>
+                    <EditorContext.Provider value={editor}>
+                        <UndoRedo>
+                            <div class="mb-4">
+                                <div class="flex gap-4 items-center my-2">
+                                    <List mode="bullet" />
+                                    <List mode="number" />
+                                    <List mode="checkbox" />
+                                </div>
+                                <div ref={editor} contentEditable class="border border-gray-300 rounded p-4 min-h-[200px] mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"></div>
+                            </div>
+                        </UndoRedo>
+                    </EditorContext.Provider>
+                </div>
+            )
+        }
+
+        const useEditorComponent = () => {
+            return (
+                <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                    <h1 class="text-2xl font-bold py-2">List Demo</h1>
+                    <div class="mb-4">
+                        <div class="flex gap-4 items-center my-2">
+                            <List mode="bullet" />
+                            <List mode="number" />
+                            <List mode="checkbox" />
+                        </div>
+                        <Editor enableToolbar={false} />
+                    </div>
+                </div>
+            )
+        }
+
+        return useDivEditor
+        // return useEditorComponent
+
+    }
+
+    const DebugDemoToolbar = () => {
+        return (
+            <div class="flex gap-4 items-center my-2 flex-wrap">
+                <AlignButton mode="left" />
+                <AlignButton mode="center" />
+                <AlignButton mode="right" />
+                <AlignButton mode="justify" />
+
+                {/* <AlignLeftButton />
+                <AlignCenterButton />
+                <AlignRightButton />
+                <AlignJustifyButton /> */}
+
+                <Blockquote />
+
+                <TextStyleButton mode="bold" />
+                <TextStyleButton mode="italic" />
+                <TextStyleButton mode="underline" />
+
+                <BoldButton />
+                <ItalicButton />
+                <UnderlineButton />
+
+                <FontFamilyDropDown />
+                <FontSize />
+                <Indent mode="increase" />
+                <Indent mode="decrease" />
+
+                <List mode="bullet" />
+                <List mode="number" />
+                <List mode="checkbox" />
+
+                <FontSize editable={true} />
+                <TextColorPicker />
+
+                <TextFormatDropDown />
+            </div>
+        )
+    }
+
+    const DebugDemoEditor = () => {
+        const useEditorSurface = () => {
+            return (
+                <Editor enableToolbar={false}>
+                    {/* <p>Lorem ipsum dolor sit amet consectetur adipiscing elit quisque faucibus ex sapien vitae pellentesque sem placerat in id cursus mi pretium tellus duis convallis tempus.</p> */}
+                    <p>This is a list sample 1</p>
+                    <p>This is a list sample 2</p>
+
+                    <p>This is a list sample 3</p>
+                    <p>This is a list sample 4</p>
+                </Editor>
+            )
+        }
+
+        const useDivEditor = () => {
+            const editorRef = useEditor();
+            return (
+                <div ref={editorRef} data-editor-root contentEditable class="border border-gray-300 rounded p-4 min-h-[200px] mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <p>Lorem ipsum dolor sit amet consectetur adipiscing elit quisque faucibus ex sapien vitae pellentesque sem placerat in id cursus mi pretium tellus duis convallis tempus.</p>
+                    <p>This is a list sample 2</p>
+                    <p>This is a list sample 3</p>
+                    <p>This is a list sample 4</p>
+                </div>
+            )
+        }
+
+        const debugEditorSurface = () => {
+            return (
+                <Editor enableToolbar={false}>
+
+                    {/* <ul id="bullet-wrapper" class="list-inside list-disc border border-red-500">
+                        <li class="text-left">This is a list 1
+                            <ol id="number-wrapper" class="list-inside list-decimal ml-8">
+                                <li class="text-left">This is a nested list 1.1</li>
+                                <li class="text-left">This is a nested list 1.2</li>
+                                <li class="text-left">This is a nested list 1.3</li>
+                            </ol>
+                        </li>
+                        <li class="text-left">This is a list 2</li>
+                        <li class="text-left">This is a list 3</li>
+                        <li class="text-left">This is a list 4</li>
+                    </ul> */}
+                    {/* <ol id="number-wrapper" class="list-inside list-decimal">
+                        <li class="text-left">This is a order list 1.1</li>
+                        <li class="text-left">This is a order list 1.2</li>
+                        <li class="text-left">This is a order list 1.3</li>
+                        <li class="text-left">This is a order list 1.4</li>
+                        <li class="text-left">This is a order list 1.5</li>
+                        <li class="text-left">This is a order list 1.6</li>
+                    </ol> */}
+                    <ul id="bullet-wrapper" class="list-inside list-disc">
+                        <li>This is a unorder list 1.1</li>
+                        <li>This is a unorder list 1.2</li>
+                        <li>This is a unorder list 1.3</li>
+                    </ul>
+                    <p>This is a paragraph 1.1</p>
+                    <p>This is a paragraph 1.2</p>
+                    <p>This is a paragraph 1.3</p>
+                    <ul id="bullet-wrapper" class="list-inside list-disc">
+                        <li>This is a unorder list 2.1</li>
+                        <li>This is a unorder list 2.2</li>
+                        <li>This is a unorder list 2.3</li>
+                    </ul>
+                    <p>This is a paragraph 2.1</p>
+                    <p>This is a paragraph 2.2</p>
+                    <p>This is a paragraph 2.3</p>
+                </Editor>
+            )
+        }
+
+        return debugEditorSurface
+    }
+
+    const DebugDemo = () => {
+        return (
+            <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                <h1 class="text-2xl font-bold py-2">Debug Demo</h1>
+                <div class="mb-4">
+                    <DebugDemoToolbar />
+                    <DebugDemoEditor />
+                </div>
+            </div>
+        )
+    }
+
+    return (
+        <div class="space-y-4">
+            {DebugDemo}
+            {EditorDemo}
+        </div>
+    )
+}
+
+const DebugTemplate = () => {
+    return (
+        <div class="p-8">
+            <h1 class="text-3xl font-bold mb-6">@woby/wui Component Library</h1>
+
+            <p class="mb-4">
+                Real page - Click <a href="/test" class="text-blue-600 hover:underline font-semibold">here</a> to load the test runner
+            </p>
+
+            <div class="space-y-4">
+                <Debug />
+            </div>
+
+            <div class="mt-8 p-4 bg-gray-100 rounded">
+                <p class="text-sm text-gray-600">💡 This is the main application view. The test runner at <code class="bg-gray-200 px-1 rounded">/test</code> will show snapshot tests for all components.</p>
+            </div>
+
+            <div class="mt-8">
+                <a href="/html-debug.html"
+                    class="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors">
+                    HTML Demo
+                </a>
+            </div>
+        </div>
+    )
+}
+// #endregion
+
+export {
+    App as App2,
+    DebugTemplate as App,
+}
+
+export default App
