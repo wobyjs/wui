@@ -3996,8 +3996,8 @@ const DebugTemplate = () => {
 // #endregion
 
 export {
-    App as App2,
-    DebugTemplate as App,
+    App as App,
+    DebugTemplate as App2,
 }
 
 export default App
