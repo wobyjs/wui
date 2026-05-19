@@ -403,6 +403,7 @@ const DateTimeWheeler = defaults(def, (props) => {
                     itemCount={itemCount}
                     cls={[WHEELER_WRAPPER_CLS, hasBorder ? br : null]}
                     bottom={false}
+                    cancelOnBlur={false}  // Disable inner Wheeler click-away, let DateTimeWheeler handle it
                 />
             )
         )
@@ -448,13 +449,12 @@ const DateTimeWheeler = defaults(def, (props) => {
                     $$(mask) && (
                         <div
                             class={['fixed inset-0 bg-black/50 h-full w-full z-[10] opacity-50']}
-                            onClick={() => $$(cancelOnBlur) && hide()}
                         />
                     )}
 
                 <div
                     ref={cont}
-                    class={[DATETIME_WHEELER_CLS, 'fixed inset-x-0 bottom-0 bg-white shadow-lg z-200']}
+                    class={[DATETIME_WHEELER_CLS, 'fixed inset-x-0 bottom-0 bg-white shadow-lg z-200 w-full']}
                 >
                     {component}
                 </div>

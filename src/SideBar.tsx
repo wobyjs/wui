@@ -57,13 +57,17 @@ const SideBar = defaults(sideBarDef, (props) => {
 
         // 2. Guard Clause: If no content element is provided, we can't do anything.
         // This prevents errors if `contentRef` is null or hasn't been attached yet.
-        if (!contentEl) return
+        if (!contentEl) {
+            console.log('[SideBar] contentRef is null')
+            return
+        }
 
         // 3. Apply the Sidebar's Width as a Margin.
         // `sidebarWidth` is a memoized value that reactively changes between '0px' (when closed)
         // and the full width (e.g., '250px') when open. By setting `marginLeft`, we "push"
         // the content element to the right to make space for the sidebar.
-        // contentEl.style.marginLeft = $$(sidebarWidth)
+        const width = $$(sidebarWidth)
+        contentEl.style.marginLeft = width
 
         // 4. Ensure a Smooth Animation.
         // This line applies a CSS transition to the `marginLeft` property.

@@ -170,12 +170,6 @@ const TextField = defaults(def, (props) => {
 			return type !== 'start' && type !== 'end'
 		})
 
-		console.log("[TextField] Final Split Result:", {
-			start: start.length,
-			end: end.length,
-			others: others.length
-		})
-
 		return { start, end, others }
 	})
 

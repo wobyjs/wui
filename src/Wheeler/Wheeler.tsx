@@ -44,9 +44,9 @@ const Wheeler = defaults(def, (props) => {
     //     }
     // })
 
-    useEffect(() =>
-        console.log('Wheeler', 'visible', $$(isVisible))
-    )
+    // useEffect(() =>
+    //     console.log('Wheeler', 'visible', $$(isVisible))
+    // )
 
     const hide = () => {
         isVisible(false)
@@ -1865,7 +1865,8 @@ const Wheeler = defaults(def, (props) => {
     // #region Header With Search
     const HeaderWithSearch = () => {
         // If no header prop is provided, render nothing.
-        if (!header) return null
+        // Use $$() to unwrap observable(undefined) which would otherwise be truthy.
+        if (!$$(header)) return null
 
         return (
             <div>
@@ -1953,27 +1954,7 @@ const Wheeler = defaults(def, (props) => {
     const renderAsPopup = () => <>
         <BackgroundOverlay />
         <Portal mount={document.body}>
-            {/* {$$(mask) && (
-                <div
-                    class="fixed inset-0 bg-black/50 z-50"
-                    // This uses the `hide` function pattern from MultiWheeler for consistency
-                    onClick={() => $$(cancelOnBlur) && hide()}
-                />
-            )} */}
-            {/* {
-                () => $$(mask) ?
-                    <>
-                        <div class={['fixed inset-0 bg-black/50 h-full w-full z-[00] opacity-50']} onClick={() => $$(cancelOnBlur) && hide()}/>
-                    </>
-                    : null
-            } */}
-            {/* <div
-                ref={wheeler}
-                // Combines the base popup styles with any custom classes from the `cls` prop
-                class={["wheeler-widget fixed inset-x-0 bottom-0 z-[100] w-full bg-white", $$(cls)]}
-                {...otherProps}
-            > */}
-            <div ref={wheeler} class={() => ['wheeler-widget z-[100]', $$(cls), "fixed inset-x-0 bottom-0 w-full z-200 bg-white"]}>
+            <div ref={wheeler} class={() => ['wheeler-widget z-[150]', $$(cls), "fixed inset-x-0 bottom-0 w-full z-200 bg-white"]}>
                 <WheelerContent />
             </div>
         </Portal>
