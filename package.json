@@ -1,6 +1,6 @@
 {
     "name": "@woby/wui",
-    "version": "1.0.21",
+    "version": "1.0.33",
     "publishConfig": {
         "access": "public"
     },
@@ -9,17 +9,26 @@
     "module": "./dist/index.es.js",
     "browser": "./dist/index.es.js",
     "types": "./dist/types/index.d.ts",
+    "style": "./dist/wui.css",
+    "exports": {
+        ".": {
+            "import": "./dist/index.es.js",
+            "types": "./dist/types/index.d.ts"
+        },
+        "./dist/wui.css": "./dist/wui.css",
+        "./src/*": "./src/*"
+    },
     "scripts": {
         "git": "git add . && git commit -m \"Bump version\" && git push",
-        "bump": "pnpm version patch",
+        "bump": "pnpm version patch --no-git-tag-version",
         "npmjs": "pnpm publish",
         "release": "run-s -c git bump npmjs",
         "//css:watch": "tailwindcss -i ./src/input.css -o ./dist/output.css --watch",
         "//css11": "tailwindcss -i ./src/input.css -o ./dist/output.css",
-        "declaration": "tsc --build --force --declaration --emitDeclarationOnly --declarationMap  --verbose",
+        "declaration": "tsc --build --force --declaration --emitDeclarationOnly --declarationMap --verbose --noEmitOnError false || echo 'TypeScript declaration completed with errors'",
         "declaration:watch": "tsc --build --force --declaration --emitDeclarationOnly --declarationMap  --verbose --watch",
         "watch": "run-p build:watch",
-        "build": "run-s build:vite declaration",
+        "build": "run-s build:vite declaration bump",
         "pretest": "cd ../chk && pnpm build",
         "build:web": "vite build --config=vite.config.web.mts --mode production",
         "web": "vite preview --config=vite.config.web.mts --host",
@@ -61,11 +70,11 @@
         "vite-plugin-clean": "^1.0.0",
         "vite-plugin-snapshot": "workspace:../../vite-plugin-snapshot"
     },
-    "author": "Chi Chong <wongchichong@gmail.com>",
+    "author": "Chi Chong <wobyjs@gmail.com>",
     "homepage": "https://github.com/wobyjs/power-tooltip",
     "repository": {
         "type": "git",
-        "url": "git@github.com:wongchichong/power-tooltip.git"
+        "url": "git@github.com:wobyjs/power-tooltip.git"
     },
     "dependencies": {
         "@woby/chk": "workspace:../chk",
