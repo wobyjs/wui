@@ -13,6 +13,7 @@
     "exports": {
         ".": {
             "import": "./dist/index.es.js",
+            "require": "./dist/index.es.js",
             "types": "./dist/types/index.d.ts"
         },
         "./dist/wui.css": "./dist/wui.css",
@@ -28,57 +29,40 @@
         "declaration": "tsc --build --force --declaration --emitDeclarationOnly --declarationMap --verbose --noEmitOnError false || echo 'TypeScript declaration completed with errors'",
         "declaration:watch": "tsc --build --force --declaration --emitDeclarationOnly --declarationMap  --verbose --watch",
         "watch": "run-p build:watch",
-        "build": "run-s build:vite declaration bump",
-        "pretest": "cd ../chk && pnpm build",
-        "build:web": "vite build --config=vite.config.web.mts --mode production",
-        "web": "vite preview --config=vite.config.web.mts --host",
-        "dev:only": "vite --config=vite.config.web.mts --force --mode dev --host",
-        "dev": "run-p dev:only",
-        "build:vite": "vite build",
-        "build:watch": "vite build --watch",
-        "preview": "vite preview --config=vite.config.web.mts  --host",
-        "docs:generate": "node scripts/generate-docs.js",
-        "docs:build": "echo \"Building documentation site\"",
-        "test": "vite --config=vite.config.web.mts --host",
-        "test:run": "echo \"Running tests\"",
-        "test:playwright": "playwright test",
-        "test:playwright:ui": "playwright test --ui"
+        "build:watch": "tsc --watch",
+        "build": "tsc && npm run css",
+        "css": "tailwindcss -i ./src/input.css -o ./dist/wui.css --minify",
+        "css:watch": "tailwindcss -i ./src/input.css -o ./dist/wui.css --watch",
+        "test": "vitest run",
+        "test:watch": "vitest watch"
     },
-    "keywords": [
-        "tooltip",
-        "notification",
-        "menu",
-        "woby",
-        "@woby/component"
-    ],
-    "license": "MIT",
-    "peerDependencies": {
-        "@woby/modal": "workspace:../modal",
-        "@woby/styled": "workspace:../styled",
-        "@woby/use": "workspace:../use",
-        "nanoid": "^3.3.7",
-        "woby": "workspace:../woby"
-    },
-    "devDependencies": {
-        "@playwright/test": "^1.56.1",
-        "@tailwindcss/vite": "^4.0.6",
-        "@types/node": "^24.9.1",
-        "playwright": "^1.56.1",
-        "tailwindcss": "^4.0.17",
-        "tailwindcss-elevation": "^2.0.0",
-        "vite": "6.1.0",
-        "vite-plugin-clean": "^1.0.0",
-        "vite-plugin-snapshot": "workspace:../../vite-plugin-snapshot"
-    },
-    "author": "Chi Chong <wobyjs@gmail.com>",
-    "homepage": "https://github.com/wobyjs/power-tooltip",
     "repository": {
         "type": "git",
-        "url": "git@github.com:wobyjs/power-tooltip.git"
+        "url": "git+https://github.com/axe-me/wui.git"
     },
+    "keywords": [
+        "voby",
+        "tooltip",
+        "menu",
+        "context-menu",
+        "dropdown",
+        "ui"
+    ],
+    "author": "axe-me",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/axe-me/wui/issues"
+    },
+    "homepage": "https://github.com/axe-me/wui#readme",
     "dependencies": {
-        "@woby/chk": "workspace:../chk",
-        "@woby/vite-plugin-test": "workspace:../vite-plugin-test",
-        "typescript": "5.7.3"
+        "@woby/use": "workspace:^",
+        "woby": "^1.58.40"
+    },
+    "devDependencies": {
+        "@types/node": "^25.9.1",
+        "npm-run-all": "^4.1.5",
+        "tailwindcss": "^4.3.0",
+        "typescript": "^6.0.3",
+        "vitest": "^4.1.7"
     }
 }
