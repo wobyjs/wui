@@ -74,7 +74,7 @@ type ResizeProps = "none" | "horizontal" | "vertical" | "both"
 
 const def = () => ({
     cls: $('', HtmlClass) as JSX.Class | undefined,
-    class: $("", HtmlString) as ObservableMaybe<string> | undefined,
+    class: $('', HtmlClass) as JSX.Class | undefined,
     children: $(null) as ObservableMaybe<JSX.Child> | undefined,
 
     /** Effect name like "effect19a", "effect7", etc. */
