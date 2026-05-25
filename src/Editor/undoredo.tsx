@@ -94,9 +94,12 @@ export const UndoRedo = ({ children, editor }: { children: JSX.Children, editor?
         const currentEditor = $$(activeEditor) // unwrap
         // Initialize only if editor is available and not already initialized
         if (currentEditor && !$$(isInitialized)) { // unwrap
-            const initialContent = currentEditor.innerHTML
+            // Get the host element for light DOM content
+            const host = currentEditor.getRootNode().host as HTMLElement | null
+            const initialContent = host ? host.innerHTML : currentEditor.innerHTML
             undos([initialContent]) // innerHTML should always be a string
             isInitialized(true) // set observable
+            console.log('[UndoRedo] Initialized with:', initialContent.substring(0, 100))
         }
     }) // No dependency array, Woby will auto-track $$(editor) and $$(isInitialized)
     // #endregion
@@ -122,13 +125,16 @@ export const UndoRedo = ({ children, editor }: { children: JSX.Children, editor?
             }
 
             const element = el as HTMLElement
-            const currentContent = element.innerHTML
+            // Get the host element for light DOM content
+            const host = element.getRootNode().host as HTMLElement | null
+            const currentContent = host ? host.innerHTML : element.innerHTML
             const u = $$(undos)
 
             // Initialization Logic
             if (!$$(isInitialized)) {
                 undos([currentContent])
                 isInitialized(true)
+                console.log('[UndoRedo] SaveDo initialized:', currentContent.substring(0, 100))
                 return
             }
 
@@ -145,6 +151,7 @@ export const UndoRedo = ({ children, editor }: { children: JSX.Children, editor?
 
                 undos(newUndos)
                 redos([]) // Clear redo stack on new action
+                console.log('[UndoRedo] Saved state:', newUndos.length, 'entries')
             }
         }, DEBOUNCE_MS)
     }

@@ -127,17 +127,36 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, children }) =
             return
         }
 
-        // Create observer to watch for all types of content changes\
-        // Save the current state to undo/redo history
-        const observer = new MutationObserver((mutations) => { saveDo() })
+        // Get the host element (light DOM parent) to watch light DOM mutations
+        // The actual user content is in light DOM, not shadow DOM
+        const host = el.getRootNode().host as HTMLElement | null
 
-        // Configure observer to catch all relevant changes
-        observer.observe(el, {
-            attributes: true,      // Watch for attribute changes (style, class, etc.)
-            childList: true,       // Watch for direct child node additions/removals
-            subtree: true,         // Watch for changes in all descendant nodes
-            characterData: true,   // Watch for text content changes
+        // Create observer to watch for all types of content changes
+        // Save the current state to undo/redo history
+        const observer = new MutationObserver((mutations) => {
+            // Debounce saveDo to prevent saving on every keystroke
+            saveDo()
         })
+
+        // Watch the host element for light DOM changes (the actual editor content)
+        if (host) {
+            observer.observe(host, {
+                attributes: true,
+                childList: true,
+                subtree: true,
+                characterData: true,
+            })
+            console.log("[EditorSurface] MutationObserver watching light DOM:", host.tagName)
+        }
+
+        // Also watch the shadow DOM slot for slot changes
+        observer.observe(el, {
+            attributes: true,
+            childList: true,
+            subtree: true,
+            characterData: true,
+        })
+        console.log("[EditorSurface] MutationObserver watching shadow DOM:", el.tagName)
 
         // Cleanup function to disconnect observer when component unmounts
         return () => { observer.disconnect() }
@@ -206,7 +225,7 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, children }) =
         <div
             ref={activeEditor}
             data-editor-root
-            contentEditable={() => $$(isEditing) ? true : false}
+            contentEditable={() => $$(isEditing) ? "true" : "false"}
             onClick={handleEditorClick}
             onBlur={handleBlur}
             onKeyDown={handleKeyDown}
