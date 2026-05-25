@@ -23,6 +23,9 @@ import { InsertDropDown } from './InsertDropDown'
 import { TextAlignDropDown } from './TextAlignDropDown'
 import { UndoRedoButton } from './UndoRedoButton'
 
+// StyleEngine imports for keyboard shortcuts
+import { applyBold, applyItalic, applyUnderline } from './StyleEngine'
+
 
 interface EditorProps {
     onChange?: (content: string) => void
@@ -145,6 +148,7 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, children }) =
     * handleKeyDown: Intercepts keyboard events to provide custom behavior.
     * - Tab: Navigates table cells OR indents paragraphs.
     * - Ctrl+Z / Ctrl+Y: Triggers custom Undo/Redo logic.
+    * - Ctrl+B / Ctrl+I / Ctrl+U: Bold, Italic, Underline via StyleEngine.
     */
     const handleKeyDown = (e: KeyboardEvent) => {
         if (e.key === 'Tab') {
@@ -161,6 +165,21 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, children }) =
             switch (e.key.toLowerCase()) {
                 case 'z': undo(); break;
                 case 'y': redo(); break;
+                case 'b':
+                    e.preventDefault();
+                    applyBold();
+                    saveDo();
+                    break;
+                case 'i':
+                    e.preventDefault();
+                    applyItalic();
+                    saveDo();
+                    break;
+                case 'u':
+                    e.preventDefault();
+                    applyUnderline();
+                    saveDo();
+                    break;
                 // case 'a': console.log("Select All"); break;
             }
         }

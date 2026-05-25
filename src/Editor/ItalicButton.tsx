@@ -1,9 +1,10 @@
 import { Button, ButtonStyles } from '../Button'
 import ItalicIcon from '../icons/italic' // Renamed for clarity if Bold is a type/component elsewhere
-import { useEditor } from './undoredo' // useUndoRedo not directly needed here anymore
+import { useEditor, useUndoRedo } from './undoredo' // useUndoRedo needed for saveDo
 import { $, $$, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlClass, HtmlString, Observable, ObservableMaybe, useEffect } from 'woby'
 import { getCurrentEditor } from './utils'
 import { updateStylesState } from './TextStyleButton'
+import { applyItalic } from './StyleEngine'
 
 
 const def = () => ({
@@ -18,13 +19,14 @@ const ItalicButton = defaults(def, (props) => {
     const { buttonType: btnType, title, cls, class: cn, disabled, ...otherProps } = props
 
     const editorNode = useEditor()
+    const { saveDo } = useUndoRedo()
     const isActive = $(false)
     const command = "italic"
 
     /**
      * Effect: Formatting State Controller
-     * 
-     * Manages the lifecycle of a document-level listener to keep the button's 
+     *
+     * Manages the lifecycle of a document-level listener to keep the button's
      * visual state synchronized with the current text selection.
      */
     useEffect(() => {
@@ -42,11 +44,11 @@ const ItalicButton = defaults(def, (props) => {
     })
 
     const handleClick = () => {
-        // Ensure modern CSS styles (span style="font-style: italic") instead of <i> tags
-        document.execCommand('styleWithCSS', false, 'true')
+        // Use StyleEngine's applyItalic instead of execCommand
+        applyItalic()
 
-        // Execute Native Italic Command
-        document.execCommand(command, false)
+        // Save to undo/redo history after applying style
+        saveDo()
 
         // Update state immediately
         isActive(document.queryCommandState(command))

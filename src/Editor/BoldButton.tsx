@@ -1,9 +1,10 @@
 import { Button, ButtonStyles } from '../Button'
 import BoldIcon from '../icons/bold' // Renamed for clarity if Bold is a type/component elsewhere
-import { useEditor } from './undoredo' // useUndoRedo not directly needed here anymore
+import { useEditor, useUndoRedo } from './undoredo' // useUndoRedo needed for saveDo
 import { $, $$, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlClass, HtmlString, Observable, ObservableMaybe, useEffect } from 'woby'
 import { getCurrentEditor } from './utils'
 import { updateStylesState } from './TextStyleButton'
+import { applyBold } from './StyleEngine'
 
 const def = () => ({
     buttonType: $("outlined", HtmlString) as ObservableMaybe<ButtonStyles>,
@@ -18,13 +19,14 @@ const BoldButton = defaults(def, (props) => {
     const { buttonType: btnType, title, cls, class: cn, disabled, ...otherProps } = props
 
     const editorNode = useEditor()
+    const { saveDo } = useUndoRedo()
     const isActive = $(false)
     const command = "bold"
 
     /**
      * Effect: Formatting State Controller
-     * 
-     * Manages the lifecycle of a document-level listener to keep the button's 
+     *
+     * Manages the lifecycle of a document-level listener to keep the button's
      * visual state synchronized with the current text selection.
      */
     useEffect(() => {
@@ -42,11 +44,11 @@ const BoldButton = defaults(def, (props) => {
     })
 
     const handleClick = () => {
-        // Use CSS spans (<span style="font-weight: bold">) instead of <b> tags
-        document.execCommand('styleWithCSS', false, 'true')
+        // Use StyleEngine's applyBold instead of execCommand
+        applyBold()
 
-        // Execute Native Bold Command
-        document.execCommand(command, false)
+        // Save to undo/redo history after applying style
+        saveDo()
 
         // Update state immediately
         isActive(document.queryCommandState(command))

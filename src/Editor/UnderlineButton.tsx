@@ -1,9 +1,10 @@
 import { $, $$, defaults, useEffect, customElement, type ElementAttributes, type Observable, HtmlBoolean, HtmlClass, ObservableMaybe, HtmlString } from "woby"
 import { Button, ButtonStyles } from '../Button'
 import UnderlineIcon from '../icons/underline'
-import { useEditor } from './undoredo'
+import { useEditor, useUndoRedo } from './undoredo'
 import { getCurrentEditor } from "./utils"
 import { updateStylesState } from "./TextStyleButton"
+import { applyUnderline } from './StyleEngine'
 
 const def = () => ({
     cls: $('', HtmlClass) as JSX.Class | undefined,
@@ -17,13 +18,14 @@ const UnderlineButton = defaults(def, (props) => {
     const { buttonType: btnType, title, cls, class: cn, disabled, ...otherProps } = props
 
     const editorNode = useEditor()
+    const { saveDo } = useUndoRedo()
     const isActive = $(false)
     const command = "underline"
 
     /**
      * Effect: Formatting State Controller
-     * 
-     * Manages the lifecycle of a document-level listener to keep the button's 
+     *
+     * Manages the lifecycle of a document-level listener to keep the button's
      * visual state synchronized with the current text selection.
      */
     useEffect(() => {
@@ -41,11 +43,11 @@ const UnderlineButton = defaults(def, (props) => {
     })
 
     const handleClick = () => {
-        // Ensure modern CSS styles (span style="text-decoration: underline") instead of <u> tags
-        document.execCommand('styleWithCSS', false, 'true')
+        // Use StyleEngine's applyUnderline instead of execCommand
+        applyUnderline()
 
-        // Execute Native Underline Command
-        document.execCommand(command, false)
+        // Save to undo/redo history after applying style
+        saveDo()
 
         // Update state immediately
         isActive(document.queryCommandState(command))
