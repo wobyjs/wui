@@ -229,8 +229,12 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, children }) =
             onKeyDown={handleKeyDown}
             class={() => [
                 $$(isEditing) ? 'border-blue-500 ring-2' : 'border-gray-200',
-                "p-6 my-4 rounded-xl border min-h-[250px] outline-none shadow-sm"
+                "p-6 my-4 rounded-xl border min-h-[250px] shadow-sm"
             ]}
+            style={() => ({
+                outline: 'none',
+                caretColor: 'auto'
+            })}
         >
             {children}
         </div>

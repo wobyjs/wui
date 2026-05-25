@@ -116,21 +116,84 @@ function expandToWord(range: Range): Range | null {
 
 /**
  * Apply style to a specific range
+ * Handles partial selections by properly splitting existing styled spans
  */
 function applyStyleToRange(range: Range, prop: string, value: string): void {
     const span = document.createElement('span')
-    // Use direct style property assignment instead of setProperty for compatibility
-    // Convert camelCase prop to kebab-case for CSS property
-    const cssProp = prop.replace(/[A-Z]/g, m => '-' + m.toLowerCase())
     span.style[prop as any] = value
 
-    try {
-        range.surroundContents(span)
-    } catch (e) {
-        const contents = range.extractContents()
-        span.appendChild(contents)
-        range.insertNode(span)
+    // Get the common ancestor and create a document fragment
+    const commonAncestor = range.commonAncestorContainer
+
+    // Collect all text nodes within the range
+    const textNodes: Text[] = []
+    const walker = document.createTreeWalker(
+        commonAncestor,
+        NodeFilter.SHOW_TEXT,
+        {
+            acceptNode: (node) => {
+                // Check if this text node intersects with the range
+                const nodeRange = document.createRange()
+                nodeRange.selectNode(node)
+                if (range.compareBoundaryPoints(Range.START_TO_END, nodeRange) <= 0) {
+                    return NodeFilter.FILTER_REJECT // Node is after range
+                }
+                if (range.compareBoundaryPoints(Range.END_TO_START, nodeRange) >= 0) {
+                    return NodeFilter.FILTER_REJECT // Node is before range
+                }
+                return NodeFilter.FILTER_ACCEPT
+            }
+        }
+    )
+
+    let node: Node | null
+    while ((node = walker.nextNode())) {
+        textNodes.push(node as Text)
     }
+
+    // Process each text node
+    textNodes.forEach(textNode => {
+        const nodeRange = document.createRange()
+        nodeRange.selectNode(textNode)
+
+        // Calculate intersection of range with this text node
+        const startOffset = range.compareBoundaryPoints(Range.START_TO_START, nodeRange) > 0
+            ? range.startOffset
+            : 0
+        const endOffset = range.compareBoundaryPoints(Range.END_TO_END, nodeRange) < 0
+            ? range.endOffset
+            : (textNode.textContent?.length || 0)
+
+        if (startOffset >= endOffset) return
+
+        // Create a new styled span for this text segment
+        const wrapper = document.createElement('span')
+        wrapper.style[prop as any] = value
+
+        // Split the text node at the boundaries
+        const parent = textNode.parentNode
+        if (!parent) return
+
+        const text = textNode.textContent || ''
+        const before = text.substring(0, startOffset)
+        const selected = text.substring(startOffset, endOffset)
+        const after = text.substring(endOffset)
+
+        // Insert the styled span with selected text
+        wrapper.textContent = selected
+
+        // Insert in order: before text, styled span, after text
+        if (after) {
+            parent.insertBefore(document.createTextNode(after), textNode)
+        }
+        parent.insertBefore(wrapper, textNode)
+        if (before) {
+            parent.insertBefore(document.createTextNode(before), wrapper)
+        }
+
+        // Remove original text node
+        parent.removeChild(textNode)
+    })
 }
 
 /**
