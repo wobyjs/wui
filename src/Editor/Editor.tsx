@@ -372,17 +372,21 @@ const Editor = defaults(def, (props) => {
     }) as Observable<HTMLDivElement>
 
     const handleBlur = (e?: FocusEvent) => {
+        // STATIC TOOLBAR FOR DEBUGGING: Keep toolbar always visible
+        // Uncomment the blur check logic when debugging is complete
+        return;
+
         // We use a small timeout to let the browser update the focus state
         setTimeout(() => {
             // 1. Get the element that is NOW focused
-            // We check 'relatedTarget' (where focus went) 
+            // We check 'relatedTarget' (where focus went)
             // and 'document.activeElement' (the host)
             const nextFocusedElement = e?.relatedTarget as Node;
             const containerEl = $$(container);
 
             /**
              * ✅ THE FIX:
-             * In a Custom Element, we need to know if the focus is still 
+             * In a Custom Element, we need to know if the focus is still
              * inside our 'container' div, even if it's in the Shadow DOM.
              */
             const isFocusStillInside =
