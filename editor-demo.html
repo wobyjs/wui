@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WUI Editor - Full Toolbar Demo</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: system-ui, -apple-system, sans-serif;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            margin: 0 0 10px 0;
+            font-size: 28px;
+            color: #1a1a1a;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
+        .debug-info {
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        .debug-info h3 {
+            margin: 0 0 10px 0;
+            font-size: 16px;
+            color: #333;
+        }
+        .debug-info code {
+            background: #e8e8e8;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+        #editor-root {
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            min-height: 300px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>WUI Rich Text Editor</h1>
+        <p class="subtitle">Full toolbar with Phase 1 infrastructure (SelectionManager, DOMNormalizer, StyleEngine)</p>
+
+        <div class="debug-info">
+            <h3>Debug Info</h3>
+            <div>
+                <strong>Phase 1 Status:</strong> <code id="phase1-status">Checking...</code>
+            </div>
+            <div>
+                <strong>SelectionManager:</strong> <code id="selection-manager-status">Not detected</code>
+            </div>
+            <div>
+                <strong>DOMNormalizer:</strong> <code id="dom-normalizer-status">Not detected</code>
+            </div>
+            <div>
+                <strong>StyleEngine:</strong> <code id="style-engine-status">Not detected</code>
+            </div>
+        </div>
+
+        <wui-editor enableToolbar="true" id="editor-root">
+            <p>Welcome to the WUI Rich Text Editor!</p>
+            <p>This is a <strong>full toolbar demo</strong> for debugging and verification.</p>
+            <p>Try the toolbar buttons above:</p>
+            <ul>
+                <li>Bold, Italic, Underline formatting</li>
+                <li>Font family and size selection</li>
+                <li>Text and background colors</li>
+                <li>Lists, alignment, and indentation</li>
+                <li>Undo/Redo history</li>
+            </ul>
+            <p><em>Select some text and test the formatting features!</em></p>
+        </wui-editor>
+
+        <div class="debug-info" style="margin-top: 30px;">
+            <h3>Console Logs</h3>
+            <div id="console-output" style="font-family: monospace; font-size: 12px; max-height: 200px; overflow-y: auto;">
+                <div style="color: #999;">Waiting for editor interactions...</div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import './src/index.tsx'
+
+        // Wait for custom element to be defined
+        await customElements.whenDefined('wui-editor')
+
+        const editor = document.querySelector('#editor-root')
+        const consoleOutput = document.getElementById('console-output')
+
+        // Intercept console methods for debug display
+        const originalLog = console.log
+        const originalWarn = console.warn
+        const originalError = console.error
+
+        function logToUI(type, args) {
+            const div = document.createElement('div')
+            div.style.color = type === 'error' ? '#d32f2f' : type === 'warn' ? '#f57c00' : '#333'
+            div.textContent = `[${new Date().toLocaleTimeString()}] ${args.map(a => typeof a === 'object' ? JSON.stringify(a) : a).join(' ')}`
+            consoleOutput.appendChild(div)
+            consoleOutput.scrollTop = consoleOutput.scrollHeight
+        }
+
+        console.log = (...args) => { originalLog(...args); logToUI('log', args) }
+        console.warn = (...args) => { originalWarn(...args); logToUI('warn', args) }
+        console.error = (...args) => { originalError(...args); logToUI('error', args) }
+
+        // Check Phase 1 infrastructure
+        setTimeout(async () => {
+            const phase1Status = document.getElementById('phase1-status')
+            const selectionManagerStatus = document.getElementById('selection-manager-status')
+            const domNormalizerStatus = document.getElementById('dom-normalizer-status')
+            const styleEngineStatus = document.getElementById('style-engine-status')
+
+            try {
+                // Check if modules are available
+                const editorModule = await import('./src/Editor/index.ts')
+
+                const hasSelectionManager = typeof editorModule.SelectionManager === 'function'
+                const hasDOMNormalizer = typeof editorModule.normalizeDOM === 'function'
+                const hasStyleEngine = typeof editorModule.applyBold === 'function'
+
+                phase1Status.textContent = '✓ Phase 1 Complete'
+                phase1Status.style.color = '#4caf50'
+
+                selectionManagerStatus.textContent = hasSelectionManager ? '✓ Available' : '✗ Missing'
+                selectionManagerStatus.style.color = hasSelectionManager ? '#4caf50' : '#d32f2f'
+
+                domNormalizerStatus.textContent = hasDOMNormalizer ? '✓ Available' : '✗ Missing'
+                domNormalizerStatus.style.color = hasDOMNormalizer ? '#4caf50' : '#d32f2f'
+
+                styleEngineStatus.textContent = hasStyleEngine ? '✓ Available' : '✗ Missing'
+                styleEngineStatus.style.color = hasStyleEngine ? '#4caf50' : '#d32f2f'
+
+                console.log('[Editor Demo] Phase 1 infrastructure check complete:', {
+                    SelectionManager: hasSelectionManager,
+                    DOMNormalizer: hasDOMNormalizer,
+                    StyleEngine: hasStyleEngine
+                })
+            } catch (err) {
+                phase1Status.textContent = '✗ Error loading modules'
+                phase1Status.style.color = '#d32f2f'
+                console.error('[Editor Demo] Failed to check Phase 1:', err)
+            }
+        }, 1000)
+
+        // Monitor editor interactions
+        if (editor) {
+            editor.addEventListener('focus', () => console.log('[Editor] Focus event'))
+            editor.addEventListener('blur', () => console.log('[Editor] Blur event'))
+            editor.addEventListener('input', () => console.log('[Editor] Input event'))
+            editor.addEventListener('keydown', (e) => {
+                if (e.ctrlKey || e.key === 'Tab') {
+                    console.log('[Editor] Keydown:', e.key, 'Ctrl:', e.ctrlKey, 'Shift:', e.shiftKey)
+                }
+            })
+
+            console.log('[Editor Demo] Full toolbar editor initialized')
+        }
+    </script>
+</body>
+</html>

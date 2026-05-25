@@ -39,3 +39,32 @@ Plans:
 - Visual tests pass for all scenarios
 
 ---
+
+## Phase 2: Basic Text Formatting
+
+**Goal**: Implement core inline formatting with DOM manipulation (no execCommand)
+
+**Deliverables**:
+- Bold, italic, underline, strikethrough toggle buttons
+- Font family dropdown with web-safe fonts
+- Font size dropdown (8-72px)
+- Text color and background color pickers
+- All operations work across all 6 selection scenarios
+
+**Why Second**: Basic formatting is the most common editor operation. Must prove the no-execCommand architecture works reliably.
+
+**Plans**: 2-3 plans (estimated)
+
+**Success Criteria**:
+- Toggle on/off works for all selection scenarios
+- Nested styles handled correctly (no redundant nesting)
+- Partial selections split spans correctly
+- Adjacent spans with same style merge automatically
+- Visual tests pass for all formatting operations
+
+---
+
+**Total Phases**: 12 (Phase 3-12 to be defined)
+**Next Phases**: Extended Inline Formatting, Paragraph & Alignment, Lists, Headings & Blockquotes, Clipboard Operations, Rich Content Insertion, Undo/Redo System, Keyboard Navigation, Touch Interactions, Accessibility & Polish
+
+---

@@ -184,7 +184,14 @@ export const UndoRedo = ({ children, editor }: { children: JSX.Children, editor?
         // The state to restore is now the last element of the modified 'u'.
         // This is guaranteed to exist because u.length was > 1, so after pop it's >= 1.
         const stateToRestore = u[u.length - 1]
-        $$(activeEditor).innerHTML = stateToRestore
+        // Restore to light DOM (host element) or shadow DOM as fallback
+        const el = $$(activeEditor) as HTMLElement
+        const host = el.getRootNode().host as HTMLElement | null
+        if (host) {
+            host.innerHTML = stateToRestore // Restore to light DOM
+        } else {
+            el.innerHTML = stateToRestore // Fallback to shadow DOM
+        }
     }
     // #endregion
 
@@ -208,7 +215,14 @@ export const UndoRedo = ({ children, editor }: { children: JSX.Children, editor?
         if (contentToRestoreAndMoveToUndo !== undefined) { // Ensure it's not undefined
             const newUndos = [...u, contentToRestoreAndMoveToUndo]
             undos(newUndos)
-            $$(activeEditor).innerHTML = contentToRestoreAndMoveToUndo
+            // Restore to light DOM (host element) or shadow DOM as fallback
+            const el = $$(activeEditor) as HTMLElement
+            const host = el.getRootNode().host as HTMLElement | null
+            if (host) {
+                host.innerHTML = contentToRestoreAndMoveToUndo // Restore to light DOM
+            } else {
+                el.innerHTML = contentToRestoreAndMoveToUndo // Fallback to shadow DOM
+            }
         }
     }
     // #endregion
