@@ -1,0 +1,10 @@
+declare const DefaultCheckBox: () => import("woby").Child;
+declare const LeftLabelCheckBox: () => import("woby").Child;
+declare const RightLabelCheckBox: () => import("woby").Child;
+declare const TopLabelCheckBox: () => import("woby").Child;
+declare const BottomLabelCheckBox: () => import("woby").Child;
+declare const CheckedCheckBox: () => import("woby").Child;
+declare const DisabledCheckBox: () => import("woby").Child;
+declare const DisabledCheckedCheckBox: () => import("woby").Child;
+declare const CustomClassCheckBox: () => import("woby").Child;
+export { DefaultCheckBox, LeftLabelCheckBox, RightLabelCheckBox, TopLabelCheckBox, BottomLabelCheckBox, CheckedCheckBox, DisabledCheckBox, DisabledCheckedCheckBox, CustomClassCheckBox };

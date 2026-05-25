@@ -1,7 +1,7 @@
 import { $, $$, customElement, defaults, ElementAttributes, HtmlClass, HtmlString, JSX, Observable, ObservableMaybe, useEffect } from 'woby'
 import { Button, ButtonStyles } from '../Button'
 import { EditorContext, useEditor, useUndoRedo } from './undoredo'
-import { useOnClickOutside } from '@woby/use'
+import { useOnClickOutside } from '@woby/use/browser'
 
 import AlignCenter from '../icons/align_center'
 import AlignLeft from '../icons/align_left'
@@ -68,11 +68,11 @@ const TextAlignDropDown = defaults(def, (props) => {
     const editor = useEditor()
     const { saveDo } = useUndoRedo()
     const isOpen = $(false)
-    const dropdownRef = $<HTMLDivElement>(null)
+    const dropdownRef = $<HTMLElement>(null)
 
     const BASE_BTN = "size-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-black hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500 cursor-pointer"
 
-    useOnClickOutside(dropdownRef, () => { isOpen(false) })
+    useOnClickOutside(dropdownRef as any, () => { isOpen(false) })
 
     const toggleDropdown = () => isOpen(!isOpen())
 
@@ -190,13 +190,13 @@ export const TextAlignDropDown_ = () => {
     const editor = $(EditorContext)
     const { undos, saveDo } = useUndoRedo()
     const isOpen = $(false)
-    const dropdownRef = $<HTMLDivElement>(null)
+    const dropdownRef = $<HTMLElement>(null)
     // const currentAlignment = $('Left Align') // TODO: Detect current alignment
 
 
     const BASE_BTN = "size-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-black hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500 cursor-pointer"
 
-    useOnClickOutside(dropdownRef, () => isOpen(false))
+    useOnClickOutside(dropdownRef as any, () => isOpen(false))
 
     const toggleDropdown = () => isOpen(!isOpen())
 

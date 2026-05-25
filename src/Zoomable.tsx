@@ -1,4 +1,4 @@
-import { useEventListener } from "@woby/use"
+import { useEventListener } from "@woby/use/browser"
 import { createContext, customElement, defaults, ElementAttributes, HtmlClass, HtmlNumber, HtmlString, Observable, useContext, useEffect, useMemo, type ObservableMaybe } from "woby"
 import { $, $$ } from "woby"
 

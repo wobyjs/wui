@@ -1,0 +1,18 @@
+{
+  "enabledMcpjsonServers": [
+    "chrome-devtools",
+    "context7",
+    "playwright",
+    "chrome-mcp-server"
+  ],
+  "disabledMcpjsonServers": [
+    "nodejs-debugger",
+    "github",
+    "@modelcontextprotocol/github",
+    "qgis",
+    "debugger",
+    "dap-proxy",
+    "google-drive",
+    "browsermcp"
+  ]
+}

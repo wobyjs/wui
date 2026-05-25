@@ -1,5 +1,5 @@
 import { $, $$, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlClass, HtmlNumber, HtmlString, isObservable, Observable, ObservableMaybe, Portal, useEffect, useMemo } from 'woby'
-import { use, useClickAway } from '@woby/use'
+import { use, useClickAway } from '@woby/use/browser'
 import { WheelerProps, WheelerItem } from './WheelerType'
 
 export const ActiveWheelers = $([])
@@ -1733,10 +1733,10 @@ const Wheeler = defaults(def, (props) => {
      * When an outside click is detected, the callback function is executed, which can
      * be configured to either "cancel" the selection or "commit" (save) it.
      *
-     * @param {Observable<HTMLDivElement>} wheeler - A ref to the main `<div>` of the wheeler component.
+     * @param {Observable<HTMLElement>} wheeler - A ref to the main `<div>` of the wheeler component.
      * @param {Function} callback - The function to run when a click outside `wheeler` occurs.
      */
-    useClickAway(wheeler, () => {
+    useClickAway(wheeler as any, () => {
         // --- Path 1: The "Cancel on Blur" Behavior ---
         // This block runs if the `cancelOnBlur` prop is true.
         if ($$(cancelOnBlur)) {
@@ -1851,7 +1851,8 @@ const Wheeler = defaults(def, (props) => {
 
         // Priority 2: If no custom placeholder, try to derive one from the header.
         if (header) {
-            const headerContent = header(value)
+            // @ts-ignore - header is FunctionMaybe<Child> which can be callable
+            const headerContent = $$(header)(value)
             if (typeof headerContent === 'string' && headerContent.length > 0) {
                 return `Enter ${headerContent.toLowerCase()}`
             }
@@ -1866,11 +1867,13 @@ const Wheeler = defaults(def, (props) => {
     const HeaderWithSearch = () => {
         // If no header prop is provided, render nothing.
         // Use $$() to unwrap observable(undefined) which would otherwise be truthy.
+        // @ts-ignore - header type narrowing issue
         if (!$$(header)) return null
 
         return (
             <div>
-                <div class='font-bold text-center'>{() => header(value)}</div>
+                {/* @ts-ignore - header callable issue */}
+                <div class='font-bold text-center'>{() => $$(header)(value)}</div>
 
                 {/* This conditional rendering is now correct with your `searchable` prop */}
                 {() => $$(searchable) && (

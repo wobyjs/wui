@@ -1,4 +1,4 @@
-import { $$, useEditor } from './undoredo'
+import { useEditor } from './undoredo'
 
 export type SelectionState = {
     startContainerPath: number[]

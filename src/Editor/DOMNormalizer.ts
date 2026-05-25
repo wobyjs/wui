@@ -23,13 +23,14 @@ export function mergeTextNodes(container: HTMLElement): void {
     let node: Node | null
     let prevNode: Text | null = null
 
-    while ((node = walker.nextNode() as Text)) {
+    while ((node = walker.nextNode())) {
+        const textNode = node as Text
         if (prevNode &&
-            prevNode.parentNode === node.parentNode &&
-            prevNode.nextSibling === node) {
-            toMerge.push(node)
+            prevNode.parentNode === textNode.parentNode &&
+            prevNode.nextSibling === textNode) {
+            toMerge.push(textNode)
         } else {
-            prevNode = node
+            prevNode = textNode
         }
     }
 

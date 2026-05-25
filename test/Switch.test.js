@@ -1,0 +1,68 @@
+import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "woby/jsx-runtime";
+import { $, $$ } from 'woby';
+import { Switch } from '../src/Switch';
+import { Button } from '../src/Button';
+const EffectSwitch = () => {
+    const s1 = $(false);
+    const s2 = $(false);
+    const s3 = $(false);
+    const s4 = $(false);
+    const s5 = $(false);
+    const s6 = $(false);
+    const s7 = $(false);
+    const s8 = $(false);
+    const s9 = $(false);
+    const s10 = $(false);
+    const s11 = $(false);
+    const s12 = $(false);
+    const s13 = $(false);
+    const s14 = $(false);
+    const s15 = $(false);
+    const s16 = $(false);
+    const s17 = $(false);
+    const s18 = $(false);
+    const globalState = $(false);
+    // Helper to toggle all
+    const toggleAll = () => {
+        const next = !$$(globalState);
+        s1(next);
+        s2(next);
+        s3(next);
+        s4(next);
+        s5(next);
+        s6(next);
+        s7(next);
+        s8(next);
+        s9(next);
+        s10(next);
+        s11(next);
+        s12(next);
+        s13(next);
+        s14(next);
+        s15(next);
+        s16(next);
+        s17(next);
+        s18(next);
+        globalState(next);
+    };
+    return _jsxs(_Fragment, { children: [_jsxs("div", { class: "flex justify-between items-center border-b pb-4 mb-4", children: [_jsx("h1", { class: "text-2xl font-bold text-gray-800", children: "Effect Switches" }), _jsxs(Button, { onClick: toggleAll, children: ["Toggle All (", () => $$(globalState) ? 'ON' : 'OFF', ")"] })] }), _jsxs("div", { class: "flex flex-wrap items-center justify-center grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-8 bg-gray-50 border border-gray-200 rounded-lg", children: [_jsxs("div", { class: "flex flex-col items-center", children: [_jsx("span", { class: "text-sm font-mono text-gray-500", children: "Effect 1" }), _jsx(Switch, { effect: "effect1", checked: s1, on: "I", off: "O" })] }), _jsxs("div", { class: "flex flex-col items-center", children: [_jsx("span", { class: "text-sm font-mono text-gray-500", children: "Effect 2" }), _jsx(Switch, { effect: "effect2", checked: s2 })] }), _jsxs("div", { class: "flex flex-col items-center", children: [_jsx("span", { class: "text-sm font-mono text-gray-500", children: "Effect 3" }), _jsx(Switch, { effect: "effect3", checked: s3 })] }), _jsxs("div", { class: "flex flex-col items-center", children: [_jsx("span", { class: "text-sm font-mono text-gray-500", children: "Effect 4" }), _jsx(Switch, { effect: "effect4", checked: s4 })] }), _jsxs("div", { class: "flex flex-col items-center", children: [_jsx("span", { class: "text-sm font-mono text-gray-500", children: "Effect 5" }), _jsx(Switch, { effect: "effect5", checked: s5 })] }), _jsxs("div", { class: "flex flex-col items-center", children: [_jsx("span", { class: "text-sm font-mono text-gray-500", children: "Effect 6" }), _jsx(Switch, { effect: "effect6", checked: s6 })] }), _jsxs("div", { class: "flex flex-col items-center", children: [_jsx("span", { class: "text-sm font-mono text-gray-500", children: "Effect 7" }), _jsx(Switch, { effect: "effect7", checked: s7 })] }), _jsxs("div", { class: "flex flex-col items-center", children: [_jsx("span", { class: "text-sm font-mono text-gray-500", children: "Effect 8" }), _jsx(Switch, { effect: "effect8", checked: s8 })] }), _jsxs("div", { class: "flex flex-col items-center", children: [_jsx("span", { class: "text-sm font-mono text-gray-500", children: "Effect 9" }), _jsx(Switch, { effect: "effect9", checked: s9 })] }), _jsxs("div", { class: "flex flex-col items-center", children: [_jsx("span", { class: "text-sm font-mono text-gray-500", children: "Effect 10" }), _jsx(Switch, { effect: "effect10", checked: s10 })] }), _jsxs("div", { class: "flex flex-col items-center", children: [_jsx("span", { class: "text-sm font-mono text-gray-500", children: "Effect 11" }), _jsx(Switch, { effect: "effect11", checked: s11 })] }), _jsxs("div", { class: "flex flex-col items-center", children: [_jsx("span", { class: "text-sm font-mono text-gray-500", children: "Effect 12" }), _jsx(Switch, { effect: "effect12", checked: s12 })] }), _jsxs("div", { class: "flex flex-col items-center", children: [_jsx("span", { class: "text-sm font-mono text-gray-500", children: "Effect 13" }), _jsx(Switch, { effect: "effect13", checked: s13 })] }), _jsxs("div", { class: "flex flex-col items-center", children: [_jsx("span", { class: "text-sm font-mono text-gray-500", children: "Effect 14" }), _jsx(Switch, { effect: "effect14", checked: s14 })] }), _jsxs("div", { class: "flex flex-col items-center", children: [_jsx("span", { class: "text-sm font-mono text-gray-500", children: "Effect 15" }), _jsx(Switch, { effect: "effect15", checked: s15 })] }), _jsxs("div", { class: "flex flex-col items-center", children: [_jsx("span", { class: "text-sm font-mono text-gray-500", children: "Effect 16" }), _jsx(Switch, { effect: "effect16", checked: s16 })] }), _jsxs("div", { class: "flex flex-col items-center", children: [_jsx("span", { class: "text-sm font-mono text-gray-500", children: "Effect 17" }), _jsx(Switch, { effect: "effect17", checked: s17 })] }), _jsxs("div", { class: "flex flex-col items-center", children: [_jsx("span", { class: "text-sm font-mono text-gray-500", children: "Effect 18" }), _jsx(Switch, { effect: "effect18", checked: s18 })] })] })] });
+};
+const StylesSwitch = () => {
+    const light = $(false);
+    const ios = $(false);
+    const flat = $(false);
+    const skewed = $(false);
+    const flip = $(false);
+    const globalState = $(false);
+    const toggleAll = () => {
+        const next = !$$(globalState);
+        light(next);
+        ios(next);
+        flat(next);
+        skewed(next);
+        flip(next);
+        globalState(next);
+    };
+    return _jsxs(_Fragment, { children: [_jsxs("div", { class: "flex justify-between items-center border-b pb-4 mb-4", children: [_jsx("h1", { class: "text-2xl font-bold text-gray-800", children: "Styles Switches" }), _jsxs(Button, { onClick: toggleAll, children: ["Toggle All (", () => $$(globalState) ? 'ON' : 'OFF', ")"] })] }), _jsxs("div", { class: "flex flex-wrap items-center justify-center grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-8 bg-gray-50 border border-gray-200 rounded-lg", children: [_jsxs("div", { class: "flex flex-col items-center", children: [_jsx("span", { class: "text-sm font-mono text-gray-500", children: "Light" }), _jsx(Switch, { effect: "light", checked: light, on: "I", off: "O" })] }), _jsxs("div", { class: "flex flex-col items-center", children: [_jsx("span", { class: "text-sm font-mono text-gray-500", children: "ios" }), _jsx(Switch, { effect: "ios", checked: ios, on: "I", off: "O" })] }), _jsxs("div", { class: "flex flex-col items-center", children: [_jsx("span", { class: "text-sm font-mono text-gray-500", children: "skewed" }), _jsx(Switch, { effect: "skewed", checked: skewed, on: "I", off: "O" })] }), _jsxs("div", { class: "flex flex-col items-center", children: [_jsx("span", { class: "text-sm font-mono text-gray-500", children: "flat" }), _jsx(Switch, { effect: "flat", checked: flat, on: "I", off: "O" })] }), _jsxs("div", { class: "flex flex-col items-center", children: [_jsx("span", { class: "text-sm font-mono text-gray-500", children: "flip" }), _jsx(Switch, { effect: "flip", checked: flip, on: "I", off: "O" })] })] })] });
+};
+export { EffectSwitch, StylesSwitch, };

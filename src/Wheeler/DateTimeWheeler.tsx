@@ -1,6 +1,6 @@
 /* @jsxImportSource woby */
 import { $, $$, Observable, ObservableMaybe, useEffect, useMemo, untrack, Portal, type JSX, isObservable, defaults, customElement, ElementAttributes } from 'woby'
-import { use, useClickAway, useViewportSize } from '@woby/use'
+import { use, useClickAway, useViewportSize } from '@woby/use/browser'
 import { Wheeler, def as wheelerDef } from './Wheeler' // Adjust path
 import { Button } from '../Button'
 import { pick } from '../helper/helper'
@@ -425,10 +425,10 @@ const DateTimeWheeler = defaults(def, (props) => {
         </div>
     ))
 
-    const cont = $<HTMLDivElement>()
+    const cont = $<HTMLElement>()
 
 
-    useClickAway(cont, () => {
+    useClickAway(cont as any, () => {
         if ($$(cancelOnBlur))
             hide() //just hide, no save
 

@@ -73,14 +73,7 @@
     "test/**/*",
     "index.test.ts"
   ],
-  // // HIGHLIGHT: only build source files (and any ambient types)
-  // "include": [
-  //     "src/**/*",
-  //     "types/**/*.d.ts",
-  //     "index.test.ts"
-  // ]
   "include": [
-    "src/**/*",
-    "index.test.ts",
+    "src/**/*"
   ]
 }

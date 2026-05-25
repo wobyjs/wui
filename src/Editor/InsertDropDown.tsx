@@ -1,7 +1,7 @@
 import { $, $$, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlString, JSX, Observable, ObservableMaybe } from 'woby'
 import { Button } from '../Button'
 import { EditorContext, useUndoRedo } from './undoredo'
-import { useOnClickOutside } from '@woby/use'
+import { useOnClickOutside } from '@woby/use/browser'
 import { range, getCurrentRange } from './utils' // Import getCurrentRange
 import KeyboardDownArrow from '../icons/keyboard_down_arrow'
 import Plus from '../icons/plus'
@@ -163,9 +163,9 @@ const InsertDropDown = defaults(def, (props) => {
     const editor = $(EditorContext)
     // const { undos, saveDo } = useUndoRedo() // Removed as saveDo is handled by MutationObserver
     const isOpen = $(false)
-    const dropdownRef = $<HTMLDivElement>(null)
+    const dropdownRef = $<HTMLElement>(null)
 
-    useOnClickOutside(dropdownRef, () => isOpen(false))
+    useOnClickOutside(dropdownRef as any, () => isOpen(false))
 
     const toggleDropdown = () => isOpen(!isOpen())
 

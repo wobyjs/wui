@@ -1,7 +1,7 @@
 import { $, $$, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlClass, HtmlString, JSX, Observable, ObservableMaybe, useEffect } from 'woby'
 import { Button, ButtonStyles } from '../Button'
 import { useEditor } from './undoredo'
-import { useOnClickOutside } from '@woby/use'
+import { useOnClickOutside } from '@woby/use/browser'
 import KeyboardDownArrow from '../icons/keyboard_down_arrow'
 import { getCurrentEditor, getSelection } from './utils'
 
@@ -21,7 +21,7 @@ const applyFormat = (command: string, value?: string) => {
     document.execCommand(command, false, value)
 }
 
-const transformCase = (transformType: 'lowercase' | 'uppercase' | 'capitalize', editorDiv: HTMLDivElement) => {
+const transformCase = (transformType: 'lowercase' | 'uppercase' | 'capitalize', editorDiv: HTMLElement) => {
 
     const { selection } = getSelection(editorDiv) // window.getSelection()
     if (!selection || selection.rangeCount === 0) { return }
@@ -117,7 +117,7 @@ const transformCase = (transformType: 'lowercase' | 'uppercase' | 'capitalize', 
 interface FormatOption {
     label: string;
     hotkey: string;
-    action: (editorDiv?: HTMLDivElement) => void;
+    action: (editorDiv?: HTMLElement) => void;
     icon: any;
 }
 
@@ -152,13 +152,13 @@ const TextFormatOptionsDropDown = defaults(def, (props) => {
 
     const editor = useEditor()
     const isOpen = $(false)
-    const dropdownRef = $<HTMLDivElement>(null)
+    const dropdownRef = $<HTMLElement>(null)
 
-    useOnClickOutside(dropdownRef, () => isOpen(false))
+    useOnClickOutside(dropdownRef as any, () => isOpen(false))
 
     const toggleDropdown = () => isOpen(!isOpen())
 
-    const handleSelectOption = (action: (editor?: HTMLDivElement) => void) => {
+    const handleSelectOption = (action: (editor?: HTMLElement) => void) => {
 
         const el = editor ?? getCurrentEditor()
 
@@ -464,7 +464,7 @@ declare module 'woby' {
 export default TextFormatOptionsDropDown
 
 // #region Helper
-function trackState(editor: ObservableMaybe<HTMLDivElement>, command: string, isActive: Observable<boolean>) {
+function trackState(editor: ObservableMaybe<HTMLElement>, command: string, isActive: Observable<boolean>) {
 
     const editorDiv = $$(editor)
 

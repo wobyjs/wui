@@ -1,4 +1,4 @@
-import { useOnClickOutside, useSelection } from '@woby/use'
+import { useOnClickOutside, useSelection } from '@woby/use/browser'
 import { $, $$, useEffect, JSX, useMemo, Observable, createContext, useContext, ObservableMaybe } from 'woby'
 import { useEditor } from './undoredo'
 

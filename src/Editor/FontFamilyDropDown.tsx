@@ -1,7 +1,7 @@
 import { $, $$, customElement, defaults, ElementAttributes, HtmlClass, HtmlNumber, JSX, ObservableMaybe, useEffect } from 'woby'
 import { Button } from '../Button'
 import { EditorContext } from './undoredo'
-import { useOnClickOutside } from '@woby/use'
+import { useOnClickOutside } from '@woby/use/browser'
 import { getCurrentRange } from './utils' // Import getCurrentRange
 import KeyboardDownArrow from '../icons/keyboard_down_arrow'
 
@@ -34,11 +34,11 @@ const FontFamilyDropDown = defaults(def, (props) => {
 
     const editor = $(EditorContext)
     const isOpen = $(false)
-    const selectedFont = $(FONT_FAMILY[$$(defaultIndex)].label) // Default to Arial
-    const dropdownRef = $<HTMLDivElement>(null)
+    const selectedFont = $(FONT_FAMILY[$$(defaultIndex)].label)
+    const dropdownRef = $<HTMLElement>(null)
 
 
-    useOnClickOutside(dropdownRef, () => isOpen(false))
+    useOnClickOutside(dropdownRef as any, () => isOpen(false))
 
     // Update selected font based on the shared range observable
     // Woby's useEffect runs this function automatically when dependent observables change
@@ -204,7 +204,7 @@ const FontFamilyDropDown_ = () => {
     const selectedFont = $(FONT_FAMILY[0].label) // Default to Arial
     const dropdownRef = $<HTMLDivElement>(null)
 
-    useOnClickOutside(dropdownRef, () => isOpen(false))
+    useOnClickOutside(dropdownRef as any, () => isOpen(false))
 
     // Update selected font based on the shared range observable
     useEffect(() => {

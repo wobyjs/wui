@@ -16,23 +16,19 @@
             "require": "./dist/index.es.js",
             "types": "./dist/types/index.d.ts"
         },
-        "./dist/wui.css": "./dist/wui.css",
-        "./src/*": "./src/*"
+        "./dist/wui.css": "./dist/wui.css"
     },
     "scripts": {
+        "dev": "vite",
         "git": "git add . && git commit -m \"Bump version\" && git push",
         "bump": "pnpm version patch --no-git-tag-version",
         "npmjs": "pnpm publish",
         "release": "run-s -c git bump npmjs",
-        "//css:watch": "tailwindcss -i ./src/input.css -o ./dist/output.css --watch",
-        "//css11": "tailwindcss -i ./src/input.css -o ./dist/output.css",
         "declaration": "tsc --build --force --declaration --emitDeclarationOnly --declarationMap --verbose --noEmitOnError false || echo 'TypeScript declaration completed with errors'",
         "declaration:watch": "tsc --build --force --declaration --emitDeclarationOnly --declarationMap  --verbose --watch",
         "watch": "run-p build:watch",
         "build:watch": "tsc --watch",
-        "build": "tsc && npm run css",
-        "css": "tailwindcss -i ./src/input.css -o ./dist/wui.css --minify",
-        "css:watch": "tailwindcss -i ./src/input.css -o ./dist/wui.css --watch",
+        "build": "vite build",
         "test": "vitest run",
         "test:watch": "vitest watch"
     },

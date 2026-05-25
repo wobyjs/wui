@@ -406,9 +406,9 @@ const insertList = (editor: HTMLDivElement, targetList: { tag: 'ul' | 'ol', clas
 
     console.groupEnd()
     return
-
-    // #region Case 1: Toggle/Switch List
-    if (isAllLI) {
+    // unreachable code below - intentionally disabled for now
+    // @ts-ignore
+    if (false as any) {
         const currentList = startElement.closest('ul, ol') as HTMLElement;
 
         const allItems = Array.from(currentList.children);

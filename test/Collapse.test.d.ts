@@ -1,0 +1,15 @@
+import { type JSX } from 'woby';
+declare const DefaultCollapse: () => JSX.Child;
+declare const OpenCollapse: () => JSX.Child;
+declare const ClosedCollapse: () => JSX.Child;
+declare const CollapseWithBackground: () => JSX.Child;
+declare const CollapseWithoutBackground: () => JSX.Child;
+declare const ToggleableCollapse: () => JSX.Child;
+declare const ToggleableCollapseWithoutBackground: () => JSX.Child;
+declare const OpenCollapseWithoutBackground: () => JSX.Child;
+declare const ClosedCollapseWithBackground: () => JSX.Child;
+declare const CustomStyledCollapse: () => JSX.Child;
+declare const CollapseWithComplexContent: () => JSX.Child;
+declare const MultipleCollapses: () => JSX.Child;
+declare const ComprehensiveCollapseTest: () => JSX.Child;
+export { DefaultCollapse, OpenCollapse, ClosedCollapse, CollapseWithBackground, CollapseWithoutBackground, ToggleableCollapse, ToggleableCollapseWithoutBackground, OpenCollapseWithoutBackground, ClosedCollapseWithBackground, CustomStyledCollapse, CollapseWithComplexContent, MultipleCollapses, ComprehensiveCollapseTest, };

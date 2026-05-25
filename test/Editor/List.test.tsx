@@ -1,6 +1,6 @@
 /** @jsxImportSource woby */
 import { $ } from 'woby'
-import { ListButton } from '../../src/Editor/List'
+import { List } from '../../src/Editor/List'
 import { EditorContext, UndoRedo } from '../../src/Editor/undoredo'
 
 
@@ -13,8 +13,8 @@ const ListButtonDemo = () => {
             {/* <UndoRedo> */}
             <div class="mb-4">
                 <div class="flex gap-4 items-center my-2 border border-gray-300 rounded p-4">
-                    <ListButton mode="bullet" class="text-black" />
-                    <ListButton mode="number" class="text-black" />
+                    <List mode="bullet" class="text-black" />
+                    <List mode="number" class="text-black" />
                 </div>
                 <div
                     contentEditable
