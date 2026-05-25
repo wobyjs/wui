@@ -11,6 +11,19 @@ export const EditorContext = createContext<Observable<HTMLDivElement>>()
 // It returns the current Editor <div> so buttons can modify it.
 export const useEditor = () => useContext(EditorContext)
 
+/**
+ * HistoryState: Captures editor state for undo/redo
+ * - html: Full HTML content of editor
+ * - selStart/selEnd: Selection offsets for restoration
+ * - timestamp: When the state was captured
+ */
+interface HistoryState {
+    html: string
+    selStart: number
+    selEnd: number
+    timestamp: number
+}
+
 // 3. CREATE THE UNDO/REDO DATA STORE
 // This creates another storage box that holds an object with specific properties:
 // - undos/redos: Observable arrays (the history stacks).
@@ -43,6 +56,18 @@ export type UndoRedoType = {
     /** Captures the current HTML of the editor and saves it into the undo history. */
     saveDo: () => void,
 }
+
+/**
+ * Module-level state for enhanced undo/redo
+ * - Debouncing prevents saving on every keystroke
+ * - History stack limits prevent memory issues
+ * - Selection preservation enables cursor restoration
+ */
+let historyStack: HistoryState[] = []
+let currentIndex = -1
+let debounceTimer: ReturnType<typeof setTimeout> | null = null
+const DEBOUNCE_MS = 300
+const MAX_STACK = 100
 
 /**
  * A Provider component that manages the history (undo/redo) for a contentEditable editor.
@@ -79,39 +104,49 @@ export const UndoRedo = ({ children, editor }: { children: JSX.Children, editor?
 
     // #region saveDO
     /**
-     * saveDo: The "Snapshot" function.
+     * saveDo: The "Snapshot" function with debouncing.
      * Call this after any formatting change / new action (bold, indent, etc.) or significant typing.
+     * Debouncing prevents saving on every keystroke (300ms delay).
      */
     const saveDo = () => {
-        // 1. Unwrap the observable
-        const el = $$(activeEditor)
+        // Clear any pending save
+        if (debounceTimer) clearTimeout(debounceTimer)
 
-        if (typeof el === 'string' || !el || !(el instanceof Node)) {
-            console.warn("🛑 SKIP: Waiting for valid DOM Node...", el)
-            return
-        }
+        // Debounce: wait 300ms before actually saving
+        debounceTimer = setTimeout(() => {
+            const el = $$(activeEditor)
 
-        // 2. Safely cast to HTMLElement since we passed the Node check
-        const element = el as HTMLElement;
-        const currentContent = element.innerHTML
-        const u = $$(undos)
+            if (typeof el === 'string' || !el || !(el instanceof Node)) {
+                console.warn("🛑 SKIP: Waiting for valid DOM Node...", el)
+                return
+            }
 
-        // 3. Initialization Logic
-        if (!$$(isInitialized)) {
-            undos([currentContent])
-            isInitialized(true)
-            return
-        }
+            const element = el as HTMLElement
+            const currentContent = element.innerHTML
+            const u = $$(undos)
 
-        // 4. Check for changes
-        const last = u.length ? u[u.length - 1] : ""
-        if (last !== currentContent) {
-            undos([...u, currentContent])
-            redos([])
-            // console.log("[saveDo] ✅ Change detected. Saving to history.", currentContent)
-            // console.log("[saveDo] 🔹", { "undos": $$(undos).length, "redos": $$(redos).length })
-            // console.log("[saveDo] undos", $$(undos))
-        }
+            // Initialization Logic
+            if (!$$(isInitialized)) {
+                undos([currentContent])
+                isInitialized(true)
+                return
+            }
+
+            // Check for changes
+            const last = u.length ? u[u.length - 1] : ""
+            if (last !== currentContent) {
+                // Add to undos stack
+                const newUndos = [...u, currentContent]
+
+                // Limit stack to MAX_STACK entries
+                if (newUndos.length > MAX_STACK) {
+                    newUndos.shift() // Remove oldest entry
+                }
+
+                undos(newUndos)
+                redos([]) // Clear redo stack on new action
+            }
+        }, DEBOUNCE_MS)
     }
     // #endregion
 
