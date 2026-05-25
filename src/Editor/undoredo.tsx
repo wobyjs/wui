@@ -1,4 +1,4 @@
-import { useOnClickOutside, useSelection } from '@woby/use'
+import { useOnClickOutside, useSelection } from '@woby/use/browser'
 import { $, $$, useEffect, JSX, useMemo, Observable, createContext, useContext, setRef, customElement, defaults } from 'woby'
 
 // 1. CREATE THE EDITOR DATA STORE

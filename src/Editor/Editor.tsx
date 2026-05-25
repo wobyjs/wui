@@ -1,4 +1,4 @@
-import { useOnClickOutside } from '@woby/use'
+import { useOnClickOutside } from '@woby/use/browser'
 import { $, $$, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlClass, JSX, Observable, ObservableMaybe, useEffect, useMemo } from 'woby' // Added useEffect
 import { Button } from '../Button'
 import UndoIcon from '../icons/undo'
