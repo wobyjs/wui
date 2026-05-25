@@ -119,13 +119,14 @@ function expandToWord(range: Range): Range | null {
  */
 function applyStyleToRange(range: Range, prop: string, value: string): void {
     const span = document.createElement('span')
-    span.style.setProperty(prop, value)
+    // Use direct style property assignment instead of setProperty for compatibility
+    // Convert camelCase prop to kebab-case for CSS property
+    const cssProp = prop.replace(/[A-Z]/g, m => '-' + m.toLowerCase())
+    span.style[prop as any] = value
 
     try {
         range.surroundContents(span)
     } catch (e) {
-        // surroundContents fails if range crosses element boundaries
-        // Fall back to extract/insert
         const contents = range.extractContents()
         span.appendChild(contents)
         range.insertNode(span)

@@ -146,7 +146,6 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, children }) =
                 subtree: true,
                 characterData: true,
             })
-            console.log("[EditorSurface] MutationObserver watching light DOM:", host.tagName)
         }
 
         // Also watch the shadow DOM slot for slot changes
@@ -156,7 +155,6 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, children }) =
             subtree: true,
             characterData: true,
         })
-        console.log("[EditorSurface] MutationObserver watching shadow DOM:", el.tagName)
 
         // Cleanup function to disconnect observer when component unmounts
         return () => { observer.disconnect() }
