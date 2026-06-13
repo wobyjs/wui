@@ -44,11 +44,58 @@ export function safeGetSelection(): Selection | null {
 }
 
 /**
- * Get the first range from selection with safe fallback
+ * Clone a StaticRange (from getComposedRanges) to a live Range.
+ * selection.addRange() only accepts live Range — StaticRange is not accepted.
  */
-export function safeGetRange(): Range | null {
-    const sel = safeGetSelection()
-    if (!sel || sel.rangeCount === 0) return null
+function staticRangeToLiveRange(sr: StaticRange): Range {
+    const range = document.createRange()
+    range.setStart(sr.startContainer, sr.startOffset)
+    range.setEnd(sr.endContainer, sr.endOffset)
+    return range
+}
+
+/**
+ * Get the first range from selection, shadow-DOM-aware.
+ * Pass shadowRoot to pierce the shadow boundary via getComposedRanges.
+ * Falls back to getRangeAt(0) for same-document usage or older browsers.
+ *
+ * D-01: shadow root must be passed by all callers operating inside wui-editor.
+ */
+export function safeGetRange(shadowRoot?: ShadowRoot): Range | null {
+    const sel = window.getSelection()
+    if (!sel) return null
+
+    // Path 1: shadow-DOM-aware (Chrome 137+, Firefox 142+, Safari 17+)
+    if (shadowRoot && typeof (sel as any).getComposedRanges === 'function') {
+        const composed: StaticRange[] = (sel as any).getComposedRanges({ shadowRoots: [shadowRoot] })
+        if (composed.length > 0) {
+            return staticRangeToLiveRange(composed[0])
+        }
+        return null
+    }
+
+    // Dev-mode warning when shadow root provided but API unavailable
+    if (shadowRoot && typeof (sel as any).getComposedRanges !== 'function') {
+        if (typeof process !== 'undefined' && process.env?.NODE_ENV !== 'production') {
+            console.warn('[BrowserCompat] getComposedRanges not supported; shadow DOM selection may be inaccurate. Requires Chrome 137+, Firefox 142+, Safari 17+.')
+        }
+    }
+
+    // Path 2: rangeCount=0 recovery for backspace/delete edge cases (kept intact)
+    if (sel.rangeCount === 0) {
+        if (sel.focusNode) {
+            try {
+                const range = document.createRange()
+                range.setStart(sel.focusNode, sel.focusOffset)
+                range.collapse(true)
+                return range
+            } catch (e) {
+                return null
+            }
+        }
+        return null
+    }
+
     return sel.getRangeAt(0)
 }
 
@@ -149,7 +196,20 @@ export function getSelectionInfo(root: HTMLElement): {
         }
     }
 
-    const range = sel.getRangeAt(0)
+    const rootNode = root.getRootNode()
+    const sr = rootNode instanceof ShadowRoot ? rootNode : undefined
+    const range = safeGetRange(sr)
+    if (!range) {
+        return {
+            collapsed: true,
+            direction: 'none' as const,
+            startContainer: null,
+            endContainer: null,
+            startOffset: 0,
+            endOffset: 0,
+            hasSelection: false
+        }
+    }
 
     return {
         collapsed: range.collapsed,
