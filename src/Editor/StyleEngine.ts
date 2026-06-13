@@ -289,6 +289,9 @@ export function applyStyle(prop: string, value: string): void {
     const sel = safeGetSelection()
     if (!sel) return
 
+    // D-08: capture selection text before DOM mutation for post-restoration verification
+    const selectionTextBefore = sel.toString()
+
     // Save original selection as offsets BEFORE any DOM operations
     const savedSelection = saveSelectionAsOffsets(range)
 
@@ -323,13 +326,19 @@ export function applyStyle(prop: string, value: string): void {
         normalizeDOM(normalizeTarget)
     }
 
-    // Restore selection from saved offsets
+    // D-08: restore selection, then verify
     if (savedSelection.editorRoot && savedSelection.startOffset >= 0 && savedSelection.endOffset >= 0) {
         restoreSelectionFromOffsets(
             savedSelection.editorRoot,
             savedSelection.startOffset,
             savedSelection.endOffset
         )
+        const selectionTextAfter = window.getSelection()?.toString() ?? ''
+        if (selectionTextBefore !== selectionTextAfter && selectionTextBefore.trim() !== '') {
+            console.warn('[applyStyle] Selection text changed after restore. Before:', JSON.stringify(selectionTextBefore), 'After:', JSON.stringify(selectionTextAfter))
+        }
+    } else if (!savedSelection.editorRoot) {
+        console.warn('[applyStyle] Could not find editor root for selection restoration — cursor may be lost')
     }
 }
 
@@ -545,6 +554,9 @@ export function removeStyle(prop: string, savedSelection?: { editorRoot: HTMLEle
 
     const sel = safeGetSelection()
     if (!sel) return
+
+    // D-08: capture for post-restore verification
+    const selectionTextBefore = sel.toString()
 
     // Save original selection if not provided
     if (!savedSelection) {
@@ -826,13 +838,19 @@ export function removeStyle(prop: string, savedSelection?: { editorRoot: HTMLEle
         console.log('[removeStyle] After normalizeDOM:', normalizeTarget.innerHTML)
     }
 
-    // Restore selection from saved offsets
+    // D-08: restore and verify
     if (savedSelection.editorRoot && savedSelection.startOffset >= 0 && savedSelection.endOffset >= 0) {
         restoreSelectionFromOffsets(
             savedSelection.editorRoot,
             savedSelection.startOffset,
             savedSelection.endOffset
         )
+        const selectionTextAfter = window.getSelection()?.toString() ?? ''
+        if (selectionTextBefore !== selectionTextAfter && selectionTextBefore.trim() !== '') {
+            console.warn('[removeStyle] Selection text changed after restore. Before:', JSON.stringify(selectionTextBefore), 'After:', JSON.stringify(selectionTextAfter))
+        }
+    } else if (!savedSelection.editorRoot) {
+        console.warn('[removeStyle] Could not find editor root for selection restoration — cursor may be lost')
     }
 }
 
