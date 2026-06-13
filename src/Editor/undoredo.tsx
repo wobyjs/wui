@@ -85,9 +85,10 @@ export const UndoRedo = ({ children, editor }: { children: JSX.Children, editor?
         const currentEditor = $$(activeEditor) // unwrap
         // Initialize only if editor is available and not already initialized
         if (currentEditor && !$$(isInitialized)) { // unwrap
-            // Get the host element for light DOM content
-            const host = currentEditor.getRootNode().host as HTMLElement | null
-            const initialContent = host ? host.innerHTML : currentEditor.innerHTML
+            // Capture shadow DOM innerHTML — that is where contentEditable lives and where
+            // formatting (bold/italic/etc.) is applied. host.innerHTML (light DOM) never
+            // reflects formatting changes, so it cannot be used as the source of truth.
+            const initialContent = currentEditor.innerHTML
             undos([initialContent]) // innerHTML should always be a string
             isInitialized(true) // set observable
             console.log('[UndoRedo] Initialized with:', initialContent.substring(0, 100))
@@ -116,9 +117,8 @@ export const UndoRedo = ({ children, editor }: { children: JSX.Children, editor?
             }
 
             const element = el as HTMLElement
-            // Get the host element for light DOM content
-            const host = element.getRootNode().host as HTMLElement | null
-            const currentContent = host ? host.innerHTML : element.innerHTML
+            // Capture shadow DOM innerHTML — formatting lives here, not in light DOM (host).
+            const currentContent = element.innerHTML
             const u = $$(undos)
 
             // Initialization Logic
@@ -175,14 +175,11 @@ export const UndoRedo = ({ children, editor }: { children: JSX.Children, editor?
         // The state to restore is now the last element of the modified 'u'.
         // This is guaranteed to exist because u.length was > 1, so after pop it's >= 1.
         const stateToRestore = u[u.length - 1]
-        // Restore to light DOM (host element) or shadow DOM as fallback
+        // Restore directly to shadow DOM — formatting was captured from there.
+        // Restoring host.innerHTML (light DOM) triggers syncChildren which would
+        // overwrite the formatted shadow DOM with plain light DOM content.
         const el = $$(activeEditor) as HTMLElement
-        const host = el.getRootNode().host as HTMLElement | null
-        if (host) {
-            host.innerHTML = stateToRestore // Restore to light DOM
-        } else {
-            el.innerHTML = stateToRestore // Fallback to shadow DOM
-        }
+        el.innerHTML = stateToRestore
     }
     // #endregion
 
@@ -206,14 +203,9 @@ export const UndoRedo = ({ children, editor }: { children: JSX.Children, editor?
         if (contentToRestoreAndMoveToUndo !== undefined) { // Ensure it's not undefined
             const newUndos = [...u, contentToRestoreAndMoveToUndo]
             undos(newUndos)
-            // Restore to light DOM (host element) or shadow DOM as fallback
+            // Restore directly to shadow DOM — same source of truth as saveDo.
             const el = $$(activeEditor) as HTMLElement
-            const host = el.getRootNode().host as HTMLElement | null
-            if (host) {
-                host.innerHTML = contentToRestoreAndMoveToUndo // Restore to light DOM
-            } else {
-                el.innerHTML = contentToRestoreAndMoveToUndo // Fallback to shadow DOM
-            }
+            el.innerHTML = contentToRestoreAndMoveToUndo
         }
     }
     // #endregion
