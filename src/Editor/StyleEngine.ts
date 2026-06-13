@@ -656,6 +656,25 @@ export function removeStyle(prop: string, savedSelection?: { editorRoot: HTMLEle
         }
     }
 
+    // If no spans found by walking DOWN, the style may come from an ancestor span.
+    // This handles nested structures like <span style="font-weight:bold"><span style="font-style:italic">text</span></span>
+    // where removeStyle is called on a selection whose immediate parent has no inline bold.
+    if (spansToProcess.length === 0) {
+        let ancestor: Node | null = range.commonAncestorContainer
+        if (ancestor.nodeType === Node.TEXT_NODE) ancestor = ancestor.parentNode
+        const editorRootForAncestor = findEditorRoot(range.commonAncestorContainer)
+        while (ancestor && ancestor !== editorRootForAncestor) {
+            if (ancestor instanceof HTMLSpanElement) {
+                const styleValue = ancestor.style.getPropertyValue(cssProp)
+                if (styleValue) {
+                    spansToProcess.push({ span: ancestor, cssProp })
+                    break
+                }
+            }
+            ancestor = ancestor.parentNode
+        }
+    }
+
     console.log('[removeStyle] Total spans to process:', spansToProcess.length)
 
     // Process each span: split at selection boundaries and remove style from middle
