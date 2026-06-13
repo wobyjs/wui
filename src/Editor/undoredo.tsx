@@ -1,5 +1,6 @@
 import { useOnClickOutside, useSelection } from '@woby/use/browser'
 import { $, $$, useEffect, JSX, useMemo, Observable, createContext, useContext, setRef, customElement, defaults } from 'woby'
+import type { FocusManager } from './FocusManager'
 
 // 1. CREATE THE EDITOR DATA STORE
 // createContext: Creates a "global" storage box so we don't have to pass props everywhere.
@@ -11,18 +12,9 @@ export const EditorContext = createContext<Observable<HTMLDivElement>>()
 // It returns the current Editor <div> so buttons can modify it.
 export const useEditor = () => useContext(EditorContext)
 
-/**
- * HistoryState: Captures editor state for undo/redo
- * - html: Full HTML content of editor
- * - selStart/selEnd: Selection offsets for restoration
- * - timestamp: When the state was captured
- */
-interface HistoryState {
-    html: string
-    selStart: number
-    selEnd: number
-    timestamp: number
-}
+// FocusManager context — toolbar buttons call beginCommand/endCommand to preserve selection
+export const FocusManagerContext = createContext<FocusManager>()
+export const useFocusManager = () => useContext(FocusManagerContext)
 
 // 3. CREATE THE UNDO/REDO DATA STORE
 // This creates another storage box that holds an object with specific properties:
@@ -58,14 +50,10 @@ export type UndoRedoType = {
 }
 
 /**
- * Module-level state for enhanced undo/redo
+ * Module-level constants for enhanced undo/redo
  * - Debouncing prevents saving on every keystroke
  * - History stack limits prevent memory issues
- * - Selection preservation enables cursor restoration
  */
-let historyStack: HistoryState[] = []
-let currentIndex = -1
-let debounceTimer: ReturnType<typeof setTimeout> | null = null
 const DEBOUNCE_MS = 300
 const MAX_STACK = 100
 
@@ -79,6 +67,9 @@ export const UndoRedo = ({ children, editor }: { children: JSX.Children, editor?
     const undos = $([] as string[])
     const redos = $([] as string[])
     const isInitialized = $(false)
+
+    // D-06: debounceTimer inside component closure prevents cross-instance timer sharing
+    let debounceTimer: ReturnType<typeof setTimeout> | null = null
 
     // 2. Priority Logic: Use the prop if passed, otherwise fall back to context
     const contextEditor = useEditor()
