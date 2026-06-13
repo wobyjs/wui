@@ -148,7 +148,7 @@ function findEditorRoot(node: Node): HTMLElement | null {
 /**
  * Check if all nodes in a range have a specific style
  */
-function hasStyleInRange(range: Range, prop: string, value: string): boolean {
+export function hasStyleInRange(range: Range, prop: string, value: string): boolean {
     // For collapsed range, check if cursor is in styled text
     if (range.collapsed) {
         return hasStyle(range.startContainer, prop, value)

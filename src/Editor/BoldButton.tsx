@@ -1,6 +1,6 @@
 import { Button, ButtonStyles } from '../Button'
 import BoldIcon from '../icons/bold' // Renamed for clarity if Bold is a type/component elsewhere
-import { useEditor, useUndoRedo } from './undoredo' // useUndoRedo needed for saveDo
+import { useEditor, useUndoRedo, useFocusManager } from './undoredo' // useUndoRedo needed for saveDo
 import { $, $$, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlClass, HtmlString, Observable, ObservableMaybe, useEffect } from 'woby'
 import { getCurrentEditor } from './utils'
 import { updateStylesState } from './TextStyleButton'
@@ -44,14 +44,10 @@ const BoldButton = defaults(def, (props) => {
     })
 
     const handleClick = () => {
-        // Use StyleEngine's applyBold instead of execCommand
         applyBold()
-
-        // Save to undo/redo history after applying style
         saveDo()
-
-        // Update state immediately
-        isActive(document.queryCommandState(command))
+        // D-05: updateStylesState via selectionchange handles active state.
+        // queryCommandState removed — it is shadow-DOM-blind.
     }
 
     return (

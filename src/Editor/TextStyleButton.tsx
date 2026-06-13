@@ -5,6 +5,17 @@ import BoldIcon from '../icons/bold'
 import ItalicIcon from '../icons/italic'
 import UnderlineIcon from '../icons/underline'
 import { getCurrentEditor } from "./utils"
+import { safeGetRange } from './BrowserCompat'
+import { hasStyleInRange, applyBold, applyItalic, applyUnderline, applyStrikethrough } from './StyleEngine'
+
+// Map command names to CSS property+value pairs for StyleEngine detection.
+// D-05: replaces queryCommandState which is shadow-DOM-blind.
+const COMMAND_STYLE_MAP: Record<string, { prop: string; value: string }> = {
+    bold: { prop: 'fontWeight', value: 'bold' },
+    italic: { prop: 'fontStyle', value: 'italic' },
+    underline: { prop: 'textDecorationLine', value: 'underline' },
+    strikethrough: { prop: 'textDecorationLine', value: 'line-through' },
+}
 
 type TextStyleType = 'bold' | 'italic' | 'underline'
 
@@ -82,15 +93,16 @@ const TextStyleButton = defaults(def, (props) => {
 
     const handleClick = () => {
         const config = currentStyleConfig()
-
-        // Use CSS styles (span style="...") instead of HTML tags (<b>)
-        document.execCommand('styleWithCSS', false, 'true')
-
-        // Apply command
-        document.execCommand(config.command, false)
-
-        // Force update state
-        isActive(document.queryCommandState(config.command))
+        // D-05: use StyleEngine instead of deprecated execCommand
+        const applyMap: Record<string, () => void> = {
+            bold: applyBold,
+            italic: applyItalic,
+            underline: applyUnderline,
+            strikethrough: applyStrikethrough,
+        }
+        const applyFn = applyMap[config.command]
+        if (applyFn) applyFn()
+        // Active state is updated via selectionchange — no queryCommandState call
     }
 
     return (
@@ -126,13 +138,45 @@ declare module 'woby' {
 
 export default TextStyleButton
 
-export const updateStylesState = (isActive: Observable<boolean>, editor: Observable<HTMLDivElement>, command: string) => {
+export const updateStylesState = (
+    isActive: Observable<boolean>,
+    editor: Observable<HTMLDivElement>,
+    command: string
+) => {
     const el = $$(editor)
-    if (document.activeElement === el || el.contains(document.activeElement)) {
-        try {
-            isActive(document.queryCommandState(command))
-        } catch (e) {
+    if (!el || typeof el.contains !== 'function') {
+        isActive(false)
+        return
+    }
+
+    // Only update when editor has focus (same guard as before)
+    if (document.activeElement !== el && !el.contains(document.activeElement)) {
+        // Editor doesn't have direct focus — check shadow root
+        const rootNode = el.getRootNode()
+        const shadowRoot = rootNode instanceof ShadowRoot ? rootNode : null
+        if (shadowRoot && !shadowRoot.contains(document.activeElement)) {
             isActive(false)
+            return
         }
+    }
+
+    const rootNode = el.getRootNode()
+    const sr = rootNode instanceof ShadowRoot ? rootNode : undefined
+    const range = safeGetRange(sr)
+    if (!range) {
+        isActive(false)
+        return
+    }
+
+    const entry = COMMAND_STYLE_MAP[command]
+    if (!entry) {
+        isActive(false)
+        return
+    }
+
+    try {
+        isActive(hasStyleInRange(range, entry.prop, entry.value))
+    } catch (e) {
+        isActive(false)
     }
 }

@@ -43,14 +43,10 @@ const UnderlineButton = defaults(def, (props) => {
     })
 
     const handleClick = () => {
-        // Use StyleEngine's applyUnderline instead of execCommand
         applyUnderline()
-
-        // Save to undo/redo history after applying style
         saveDo()
-
-        // Update state immediately
-        isActive(document.queryCommandState(command))
+        // D-05: updateStylesState via selectionchange handles active state.
+        // queryCommandState removed — it is shadow-DOM-blind.
     }
 
     return (
