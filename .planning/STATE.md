@@ -5,8 +5,8 @@
 ## Project Status
 
 **Current Phase**: Phase 18 - Editor Comprehensive Fix
-**Next Action**: Execute Phase 18 Wave 2 (18-02-PLAN.md)
-**Overall Progress**: 100% (Wave 1 complete: shadow-DOM selection, computed styles, cross-block offsets fixed)
+**Next Action**: Execute Phase 18 Wave 3 (18-03-PLAN.md)
+**Overall Progress**: 100% (Wave 2 complete: queryCommandState removed, debounceTimer scoped, isSyncing guard, selection verification)
 
 ## Memory
 
@@ -21,6 +21,10 @@
 - D-01: safeGetRange upgraded with optional shadowRoot param using getComposedRanges (Chrome 137+, Firefox 142+, Safari 17+)
 - D-02: getComputedStyles replaced with window.getComputedStyle to detect semantic elements (<strong>, <em>, <b>, <i>)
 - D-04: saveSelectionAsOffsets anchors to editor root for editor-root-relative global character offsets, enabling cross-block selection restoration
+- D-05: queryCommandState replaced with hasStyleInRange via COMMAND_STYLE_MAP in all buttons — shadow-DOM-blind API removed
+- D-06: debounceTimer moved into UndoRedo component closure for per-instance scoping; dead historyStack/currentIndex removed
+- D-07: isSyncing flag added inside useEffect closure to prevent MutationObserver re-entrancy in syncChildren
+- D-08: selectionTextBefore captured before DOM mutation in applyStyle/removeStyle; warning logged if restoration changes selection text
 - D-11: staticRangeToLiveRange helper converts StaticRange to live Range
 - All features are critical - no skipping, no partial implementations
 - All operations must work across all 6 selection scenarios
@@ -48,7 +52,7 @@
 - [x] Phase 16: Editor interaction bugs resolved
 
 ### In Progress
-- Phase 18 Wave 2: Core formatting fixes (applyStyleToRange, toggleStyle semantics, block-format)
+- Phase 18 Wave 3: Remaining comprehensive fixes (18-03-PLAN.md)
 
 ### Blocked
 - None
@@ -71,7 +75,7 @@
 | 12. Accessibility & Polish | ✅ Complete | 100% | None |
 | 16. Editor Interaction Bugs | ✅ Complete | 100% | None |
 | 17. Focus/Blur Architecture | ✅ Complete | 100% | None |
-| 18. Editor Comprehensive Fix | 🔄 In Progress | 33% | None (Wave 1 done) |
+| 18. Editor Comprehensive Fix | 🔄 In Progress | 66% | None (Wave 2 done) |
 
 ## Metrics
 
@@ -101,4 +105,4 @@
 
 ---
 
-*Last updated: 2026-05-31 after Phase 16 completion - Editor fully functional*
+*Last updated: 2026-06-13 after Phase 18 Wave 2 completion - queryCommandState removed, debounce scoped, sync guard added, selection verification added*
