@@ -131,6 +131,21 @@ function getBlockParent(node: Node): HTMLElement | null {
 }
 
 /**
+ * Walk up to the [data-editor-root] element.
+ * D-04: used as stable anchor for global character offset calculations.
+ */
+function findEditorRoot(node: Node): HTMLElement | null {
+    let current: Node | null = node
+    while (current) {
+        if (current instanceof HTMLElement && current.dataset && 'editorRoot' in current.dataset) {
+            return current
+        }
+        current = current.parentNode
+    }
+    return null
+}
+
+/**
  * Check if all nodes in a range have a specific style
  */
 function hasStyleInRange(range: Range, prop: string, value: string): boolean {
@@ -169,118 +184,94 @@ function hasStyleInRange(range: Range, prop: string, value: string): boolean {
 }
 
 /**
- * Save selection as offsets from a stable anchor (parent block)
- * This allows restoration even when text nodes are replaced
+ * Save selection as global character offsets from the editor root.
+ * D-04: editor-root-relative offsets survive cross-block selections and span wrapping.
+ * Returns { editorRoot: null } if editor root cannot be found.
  */
 function saveSelectionAsOffsets(range: Range): {
-    block: HTMLElement | null
+    editorRoot: HTMLElement | null
     startOffset: number
     endOffset: number
 } {
-    const block = getBlockParent(range.commonAncestorContainer)
-    if (!block) {
-        return { block: null, startOffset: 0, endOffset: 0 }
-    }
+    const editorRoot = findEditorRoot(range.commonAncestorContainer)
+    if (!editorRoot) return { editorRoot: null, startOffset: 0, endOffset: 0 }
 
-    // Calculate text offsets from block start
-    const walker = document.createTreeWalker(block, NodeFilter.SHOW_TEXT, null)
+    const walker = document.createTreeWalker(editorRoot, NodeFilter.SHOW_TEXT, null)
     let currentOffset = 0
     let startOffset = -1
     let endOffset = -1
-
     let node: Node | null
+
     while ((node = walker.nextNode())) {
         const textNode = node as Text
-        const nodeLength = textNode.textContent?.length || 0
+        const len = textNode.textContent?.length ?? 0
 
-        if (node === range.startContainer) {
+        if (startOffset === -1 && node === range.startContainer) {
             startOffset = currentOffset + range.startOffset
         }
-        if (node === range.endContainer) {
+        if (endOffset === -1 && node === range.endContainer) {
             endOffset = currentOffset + range.endOffset
         }
 
-        currentOffset += nodeLength
+        currentOffset += len
+        if (startOffset !== -1 && endOffset !== -1) break
     }
 
-    return { block, startOffset, endOffset }
+    if (startOffset === -1) startOffset = 0
+    if (endOffset === -1) endOffset = startOffset
+
+    return { editorRoot, startOffset, endOffset }
 }
 
 /**
- * Restore selection from saved offsets
+ * Restore selection from global character offsets saved by saveSelectionAsOffsets.
+ * D-04: walks from the editor root, not from a block parent.
  */
 function restoreSelectionFromOffsets(
-    block: HTMLElement,
+    editorRoot: HTMLElement,
     startOffset: number,
     endOffset: number
 ): void {
     const sel = safeGetSelection()
     if (!sel) return
 
-    const walker = document.createTreeWalker(block, NodeFilter.SHOW_TEXT, null)
+    const walker = document.createTreeWalker(editorRoot, NodeFilter.SHOW_TEXT, null)
     let currentOffset = 0
     let startNode: Text | null = null
     let startNodeOffset = 0
     let endNode: Text | null = null
     let endNodeOffset = 0
-
     let node: Node | null
+
     while ((node = walker.nextNode())) {
         const textNode = node as Text
-        const nodeLength = textNode.textContent?.length || 0
+        const len = textNode.textContent?.length ?? 0
 
-        // Find start position
-        // Special handling for boundary cases:
-        // - If startOffset is exactly at the END of this node (startOffset == currentOffset + nodeLength),
-        //   we should use the NEXT text node with offset 0
-        // - But we can't look ahead in TreeWalker, so we remember this and fix it after the loop
-        if (startNode === null && startOffset >= currentOffset && startOffset < currentOffset + nodeLength) {
+        if (startNode === null && startOffset >= currentOffset && startOffset <= currentOffset + len) {
             startNode = textNode
             startNodeOffset = startOffset - currentOffset
         }
-
-        // Find end position (endOffset is exclusive)
-        // If endOffset equals exactly currentOffset + nodeLength, it's AT the end of this node
-        // For exclusive end, we want this node with offset = nodeLength
-        if (endNode === null && endOffset > currentOffset && endOffset <= currentOffset + nodeLength) {
+        if (endNode === null && endOffset >= currentOffset && endOffset <= currentOffset + len) {
             endNode = textNode
             endNodeOffset = endOffset - currentOffset
         }
 
-        currentOffset += nodeLength
-    }
-
-    // Fix boundary case: if startOffset was at exact end of a node but we didn't find it
-    // This means startOffset == currentOffset after loop (at start of virtual next node)
-    // In this case, use endNode with offset 0 if available, or create a range at end of last node
-    if (startNode === null && endNode !== null) {
-        // startOffset was at boundary - use the same node as endNode with offset 0
-        // This handles cases like: select "word" where start=5 (end of "Test ") and end=9 (end of "word")
-        startNode = endNode
-        startNodeOffset = 0
-        console.log('[restoreSelectionFromOffsets] Fixed boundary: startNode set to endNode with offset 0')
+        currentOffset += len
+        if (startNode !== null && endNode !== null) break
     }
 
     if (startNode && endNode) {
-        const newRange = document.createRange()
-        newRange.setStart(startNode, startNodeOffset)
-        newRange.setEnd(endNode, endNodeOffset)
-
-        sel.removeAllRanges()
-        sel.addRange(newRange)
-        console.log('[restoreSelectionFromOffsets] Restored selection:', {
-            startNode: startNode.textContent,
-            startOffset: startNodeOffset,
-            endNode: endNode.textContent,
-            endOffset: endNodeOffset
-        })
+        try {
+            const newRange = document.createRange()
+            newRange.setStart(startNode, startNodeOffset)
+            newRange.setEnd(endNode, endNodeOffset)
+            sel.removeAllRanges()
+            sel.addRange(newRange)
+        } catch (e) {
+            console.warn('[restoreSelectionFromOffsets] Failed to restore selection:', e)
+        }
     } else {
-        console.log('[restoreSelectionFromOffsets] FAILED to restore selection:', {
-            startNodeFound: !!startNode,
-            endNodeFound: !!endNode,
-            startOffset,
-            endOffset
-        })
+        console.warn('[restoreSelectionFromOffsets] Could not find nodes for offsets:', { startOffset, endOffset, startNodeFound: !!startNode, endNodeFound: !!endNode })
     }
 }
 
@@ -327,15 +318,15 @@ export function applyStyle(prop: string, value: string): void {
     }
 
     // Normalize after operation
-    const block = getBlockParent(range.commonAncestorContainer)
-    if (block) {
-        normalizeDOM(block)
+    const normalizeTarget = getBlockParent(range.commonAncestorContainer) ?? findEditorRoot(range.commonAncestorContainer)
+    if (normalizeTarget) {
+        normalizeDOM(normalizeTarget)
     }
 
     // Restore selection from saved offsets
-    if (savedSelection.block && savedSelection.startOffset >= 0 && savedSelection.endOffset >= 0) {
+    if (savedSelection.editorRoot && savedSelection.startOffset >= 0 && savedSelection.endOffset >= 0) {
         restoreSelectionFromOffsets(
-            savedSelection.block,
+            savedSelection.editorRoot,
             savedSelection.startOffset,
             savedSelection.endOffset
         )
@@ -546,7 +537,7 @@ function insertStyledEmptySpan(prop: string, value: string): void {
  * Remove a style property from the current selection
  * Properly unwraps styled spans and restores selection
  */
-export function removeStyle(prop: string, savedSelection?: { block: HTMLElement | null, startOffset: number, endOffset: number }): void {
+export function removeStyle(prop: string, savedSelection?: { editorRoot: HTMLElement | null, startOffset: number, endOffset: number }): void {
     // D-01: derive shadow root from active selection focus node to enable getComposedRanges path
     const focusSr = getEditorShadowRoot(window.getSelection()?.focusNode)
     const range = safeGetRange(focusSr)
@@ -828,17 +819,17 @@ export function removeStyle(prop: string, savedSelection?: { block: HTMLElement 
         }
     })
 
-    const block = getBlockParent(range.commonAncestorContainer)
-    if (block) {
-        console.log('[removeStyle] Before normalizeDOM:', block.innerHTML)
-        normalizeDOM(block)
-        console.log('[removeStyle] After normalizeDOM:', block.innerHTML)
+    const normalizeTarget = getBlockParent(range.commonAncestorContainer) ?? findEditorRoot(range.commonAncestorContainer)
+    if (normalizeTarget) {
+        console.log('[removeStyle] Before normalizeDOM:', normalizeTarget.innerHTML)
+        normalizeDOM(normalizeTarget)
+        console.log('[removeStyle] After normalizeDOM:', normalizeTarget.innerHTML)
     }
 
     // Restore selection from saved offsets
-    if (savedSelection.block && savedSelection.startOffset >= 0 && savedSelection.endOffset >= 0) {
+    if (savedSelection.editorRoot && savedSelection.startOffset >= 0 && savedSelection.endOffset >= 0) {
         restoreSelectionFromOffsets(
-            savedSelection.block,
+            savedSelection.editorRoot,
             savedSelection.startOffset,
             savedSelection.endOffset
         )
@@ -990,9 +981,9 @@ export function applyTextAlign(align: string): void {
     normalizeDOM(block)
 
     // Restore selection from saved offsets
-    if (savedSelection.block && savedSelection.startOffset >= 0 && savedSelection.endOffset >= 0) {
+    if (savedSelection.editorRoot && savedSelection.startOffset >= 0 && savedSelection.endOffset >= 0) {
         restoreSelectionFromOffsets(
-            savedSelection.block,
+            savedSelection.editorRoot,
             savedSelection.startOffset,
             savedSelection.endOffset
         )
@@ -1200,9 +1191,9 @@ export function applyIndent(isDecrease: boolean, amount: number = 20): void {
     normalizeDOM(block)
 
     // Restore selection from saved offsets
-    if (savedSelection.block && savedSelection.startOffset >= 0 && savedSelection.endOffset >= 0) {
+    if (savedSelection.editorRoot && savedSelection.startOffset >= 0 && savedSelection.endOffset >= 0) {
         restoreSelectionFromOffsets(
-            savedSelection.block,
+            savedSelection.editorRoot,
             savedSelection.startOffset,
             savedSelection.endOffset
         )
@@ -1238,9 +1229,9 @@ export function applyList(mode: 'bullet' | 'number' | 'checkbox'): void {
     console.log(`[applyList] Mode: ${mode}, Range: ${range.toString()}`)
 
     // Restore selection from saved offsets
-    if (savedSelection.block && savedSelection.startOffset >= 0 && savedSelection.endOffset >= 0) {
+    if (savedSelection.editorRoot && savedSelection.startOffset >= 0 && savedSelection.endOffset >= 0) {
         restoreSelectionFromOffsets(
-            savedSelection.block,
+            savedSelection.editorRoot,
             savedSelection.startOffset,
             savedSelection.endOffset
         )
