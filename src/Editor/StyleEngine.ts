@@ -18,14 +18,16 @@ export type StyleProperty =
     | 'fontSize'
 
 /**
- * Get all computed styles from a node
+ * Get computed styles from a node, including UA stylesheet and inherited values.
+ * D-02: window.getComputedStyle resolves <strong>, <em>, <b>, <i> correctly.
+ * node.style only returned inline styles — semantic elements were invisible.
  */
 function getComputedStyles(node: Node): CSSStyleDeclaration {
     if (node instanceof HTMLElement) {
-        return node.style
+        return window.getComputedStyle(node)
     }
     if (node instanceof Text && node.parentElement) {
-        return node.parentElement.style
+        return window.getComputedStyle(node.parentElement)
     }
     return {} as CSSStyleDeclaration
 }
@@ -924,14 +926,14 @@ export function applyItalic(): void {
  * Apply text-decoration underline
  */
 export function applyUnderline(): void {
-    applyStyle('textDecoration', 'underline')
+    applyStyle('textDecorationLine', 'underline')
 }
 
 /**
  * Apply text-decoration strikethrough
  */
 export function applyStrikethrough(): void {
-    applyStyle('textDecoration', 'line-through')
+    applyStyle('textDecorationLine', 'line-through')
 }
 
 /**
