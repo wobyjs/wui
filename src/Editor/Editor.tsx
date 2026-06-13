@@ -7,11 +7,13 @@ import { getCurrentRange, expandRange, getElementsInRange, getSelectedTableCells
 import { BoldButton } from './BoldButton'
 import { ItalicButton } from './ItalicButton'
 import { UnderlineButton } from './UnderlineButton' // Added UnderlineButton
-import { EditorContext, UndoRedo, useEditor, useUndoRedo } from './undoredo'
+import { EditorContext, UndoRedo, useEditor, useUndoRedo, FocusManagerContext } from './undoredo'
 import { FontSize } from './FontSize' // import { FontSizeInput } from './FontSizeCopy' // Changed from Increase/Decrease
-import { List } from './List' // import { BulletListButton, NumberedListButton } from './List'
-import { applyIndent, Indent } from './Indent' // Will be part of TextAlignDropDown
+import { List } from './List'
+import { Indent } from './Indent' // Will be part of TextAlignDropDown
+import { applyIndent as applyIndentStyle } from './StyleEngine' // Import applyIndent from StyleEngine instead
 import { Blockquote } from './Blockquote'
+import { FocusManager } from './FocusManager'
 
 // New Imports
 import { TextFormatDropDown, FORMAT_OPTIONS as editorFormatOptions } from './TextFormatDropDown' // Import formatOptions
@@ -113,6 +115,141 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, children }) =
     // #endregion
 
     /**
+     * Effect: Clones light DOM content into shadow DOM for contentEditable compatibility.
+     * contentEditable only works on content in the same DOM tree, so slotted light DOM
+     * content cannot be edited. This effect clones the light DOM children into shadow DOM.
+     */
+    // #region Light DOM to Shadow DOM Sync
+    useEffect(() => {
+        const el = $$(activeEditor)
+        if (!el || !(el instanceof HTMLElement)) {
+            console.warn("[EditorSurface] Light DOM sync skipped: el is not a valid HTMLElement", el)
+            return
+        }
+
+        // Get the host element (light DOM parent)
+        const host = el.getRootNode().host as HTMLElement | null
+        if (!host) {
+            console.warn("[EditorSurface] Light DOM sync skipped: no host element")
+            return
+        }
+
+        // Clone light DOM children into shadow DOM div
+        // This is necessary because contentEditable only works on content in the same DOM tree
+
+        // D-07: re-entrancy guard prevents MutationObserver feedback cycle.
+        // MUST be inside useEffect closure (not component scope) — each effect instance owns its flag.
+        let isSyncing = false
+
+        const syncChildren = () => {
+            // D-07: prevent re-entrant sync from MutationObserver feedback loops
+            if (isSyncing) return
+            isSyncing = true
+            try {
+            // Save current selection before clearing content
+            const sel = window.getSelection()
+            let savedRange: Range | null = null
+            let savedAnchorPath: string | null = null
+            let savedFocusPath: string | null = null
+            let savedAnchorOffset: number = 0
+            let savedFocusOffset: number = 0
+
+            if (sel && sel.rangeCount > 0) {
+                savedRange = sel.getRangeAt(0)
+
+                // Get path to anchor and focus nodes for restoration after clone
+                const getPathToNode = (node: Node, root: Element): string => {
+                    const path: number[] = []
+                    let current = node
+                    while (current && current !== root) {
+                        const parent = current.parentNode
+                        if (!parent) break
+                        const index = Array.from(parent.childNodes).indexOf(current as ChildNode)
+                        path.unshift(index)
+                        current = parent
+                    }
+                    return path.join('/')
+                }
+
+                savedAnchorPath = getPathToNode(savedRange.startContainer, el)
+                savedFocusPath = getPathToNode(savedRange.endContainer, el)
+                savedAnchorOffset = savedRange.startOffset
+                savedFocusOffset = savedRange.endOffset
+            }
+
+            // Remove slot element if it exists
+            const slot = el.querySelector('slot')
+            if (slot) slot.remove()
+
+            // Clear existing content in shadow DOM div (except already processed content)
+            // We'll rebuild it from light DOM
+            while (el.firstChild) {
+                el.removeChild(el.firstChild)
+            }
+
+            // Clone light DOM children into shadow DOM
+            const lightChildren = Array.from(host.children)
+            lightChildren.forEach(child => {
+                // Don't clone script tags or style tags
+                if (child.tagName !== 'SCRIPT' && child.tagName !== 'STYLE') {
+                    el.appendChild(child.cloneNode(true))
+                }
+            })
+
+            // Restore selection after content sync
+            if (savedAnchorPath && savedFocusPath && sel) {
+                const getNodeFromPath = (path: string, root: Element): Node | null => {
+                    const indices = path.split('/').map(Number)
+                    let current: Node = root
+                    for (const index of indices) {
+                        if (!current.childNodes || index >= current.childNodes.length) {
+                            return null
+                        }
+                        current = current.childNodes[index]
+                    }
+                    return current
+                }
+
+                const anchorNode = getNodeFromPath(savedAnchorPath, el)
+                const focusNode = getNodeFromPath(savedFocusPath, el)
+
+                if (anchorNode && focusNode) {
+                    try {
+                        const newRange = document.createRange()
+                        newRange.setStart(anchorNode, Math.min(savedAnchorOffset, anchorNode.textContent?.length || 0))
+                        newRange.setEnd(focusNode, Math.min(savedFocusOffset, focusNode.textContent?.length || 0))
+                        sel.removeAllRanges()
+                        sel.addRange(newRange)
+                    } catch (e) {
+                        // Range restoration failed - this is okay, selection may have been invalid
+                        console.warn('[Editor] Could not restore selection after sync:', e)
+                    }
+                }
+            }
+            } finally {
+                isSyncing = false
+            }
+        }
+
+        // Initial sync
+        syncChildren()
+
+        // Watch light DOM for changes and sync to shadow DOM
+        const observer = new MutationObserver(() => {
+            syncChildren()
+        })
+
+        observer.observe(host, {
+            childList: true,
+            subtree: true,
+            characterData: true,
+        })
+
+        return () => observer.disconnect()
+    })
+    // #endregion
+
+    /**
      * Effect: Sets up a MutationObserver to monitor all changes in the editor content.
      * This captures typing, formatting changes, node insertions/deletions, and attribute modifications
      * to ensure every edit is properly tracked in the undo/redo history.
@@ -127,28 +264,13 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, children }) =
             return
         }
 
-        // Get the host element (light DOM parent) to watch light DOM mutations
-        // The actual user content is in light DOM, not shadow DOM
-        const host = el.getRootNode().host as HTMLElement | null
-
-        // Create observer to watch for all types of content changes
-        // Save the current state to undo/redo history
+        // Watch shadow DOM element for content changes (content is now cloned into shadow DOM)
         const observer = new MutationObserver((mutations) => {
             // Debounce saveDo to prevent saving on every keystroke
             saveDo()
         })
 
-        // Watch the host element for light DOM changes (the actual editor content)
-        if (host) {
-            observer.observe(host, {
-                attributes: true,
-                childList: true,
-                subtree: true,
-                characterData: true,
-            })
-        }
-
-        // Also watch the shadow DOM slot for slot changes
+        // Watch the shadow DOM element for changes
         observer.observe(el, {
             attributes: true,
             childList: true,
@@ -166,17 +288,44 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, children }) =
     * - Tab: Navigates table cells OR indents paragraphs.
     * - Ctrl+Z / Ctrl+Y: Triggers custom Undo/Redo logic.
     * - Ctrl+B / Ctrl+I / Ctrl+U: Bold, Italic, Underline via StyleEngine.
+    * - Backspace/Delete: Ensure native deletion works (especially for mobile/double-tap).
     */
     const handleKeyDown = (e: KeyboardEvent) => {
         if (e.key === 'Tab') {
+            console.log('[Editor] Tab key pressed, shiftKey:', e.shiftKey)
             e.preventDefault(); e.stopPropagation();
             if (isCaretInTableCell()) {
                 focusNextTableCell(e.shiftKey) // In table: Tab next cell, Shift+Tab previous
             } else {
-                applyIndent($$(activeEditor), e.shiftKey, 1, 20) // document.execCommand(e.shiftKey ? 'outdent' : 'indent') // Normal text: indent/outdent
+                console.log('[Editor] Applying indent, isDecrease:', e.shiftKey)
+                applyIndentStyle(e.shiftKey, 20) // Normal text: Tab=indent, Shift+Tab=outdent
                 saveDo()
             }
         }
+
+        // Handle Backspace/Delete to ensure they work after double-tap/double-click
+        // The browser should handle this natively, but we ensure selection exists
+        if (e.key === 'Backspace' || e.key === 'Delete') {
+            // Let browser handle natively, but ensure we have a valid selection
+            const sel = window.getSelection()
+            if (!sel || sel.rangeCount === 0) {
+                // No selection - browser might be confused after double-tap
+                // Try to get focus node and create a range
+                if (sel && sel.focusNode) {
+                    try {
+                        const range = document.createRange()
+                        range.setStart(sel.focusNode, sel.focusOffset)
+                        range.collapse(true)
+                        sel.removeAllRanges()
+                        sel.addRange(range)
+                    } catch (err) {
+                        console.warn('[Editor] Failed to fix selection for backspace:', err)
+                    }
+                }
+            }
+            // Don't preventDefault - let browser handle the deletion natively
+        }
+
         if (e.ctrlKey) {
             // e.preventDefault(); e.stopPropagation();
             switch (e.key.toLowerCase()) {
@@ -223,7 +372,7 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, children }) =
         <div
             ref={activeEditor}
             data-editor-root
-            contentEditable={() => $$(isEditing) ? "true" : "false"}
+            contentEditable={() => $$(isEditing) ? true : false}
             onClick={handleEditorClick}
             onBlur={handleBlur}
             onKeyDown={handleKeyDown}
@@ -236,7 +385,7 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, children }) =
                 caretColor: 'auto'
             })}
         >
-            {children}
+            {/* Children are cloned from light DOM into shadow DOM via the sync effect */}
         </div>
     )
 }
@@ -358,6 +507,7 @@ const Editor = defaults(def, (props) => {
     const isEditing = $(false)
     const container = $<HTMLDivElement>(null)
     const toolbarRef = $<HTMLDivElement>(null)
+    const focusManager = new FocusManager()
 
     const _editor = $<HTMLDivElement>(null)
     const editor = ((...args: [HTMLDivElement?]) => {
@@ -371,34 +521,33 @@ const Editor = defaults(def, (props) => {
         return _editor()
     }) as Observable<HTMLDivElement>
 
+    // Attach FocusManager once both editor and toolbar elements exist
+    useEffect(() => {
+        const editorEl = $$(editor)
+        const toolbarEl = $$(toolbarRef)
+        if (editorEl && toolbarEl) {
+            focusManager.attach(editorEl, toolbarEl)
+            return () => focusManager.detach()
+        }
+    })
+
     const handleBlur = (e?: FocusEvent) => {
-        // STATIC TOOLBAR FOR DEBUGGING: Keep toolbar always visible
-        // Uncomment the blur check logic when debugging is complete
-        return;
+        // FocusManager handles blur via capture-phase listener.
+        // This handler only sets isEditing=false when focus truly leaves the component.
+        if (focusManager.isFocused) return // Focus is still in editor/toolbar
 
-        // We use a small timeout to let the browser update the focus state
         setTimeout(() => {
-            // 1. Get the element that is NOW focused
-            // We check 'relatedTarget' (where focus went)
-            // and 'document.activeElement' (the host)
-            const nextFocusedElement = e?.relatedTarget as Node;
-            const containerEl = $$(container);
-
-            /**
-             * ✅ THE FIX:
-             * In a Custom Element, we need to know if the focus is still
-             * inside our 'container' div, even if it's in the Shadow DOM.
-             */
+            const nextFocusedElement = e?.relatedTarget as Node
+            const containerEl = $$(container)
             const isFocusStillInside =
                 (containerEl && containerEl.contains(document.activeElement)) ||
-                (containerEl && containerEl.contains(nextFocusedElement));
+                (containerEl && containerEl.contains(nextFocusedElement))
 
             if (!isFocusStillInside) {
-                console.log("[Editor] Focus actually left the component. Closing toolbar.");
-                isEditing(false);
+                isEditing(false)
             }
-        }, 50);
-    };
+        }, 50)
+    }
 
 
     // useOnClickOutside(container, () => handleBlur(null),)
@@ -440,19 +589,20 @@ const Editor = defaults(def, (props) => {
 
     return (
         <div ref={container}>
-            {/* {() => $$(enableToolbar) ? withToolbar : withoutToolbar} */}
-            <EditorContext.Provider value={editor}>
-                <UndoRedo>
-                    {() => $$(isEditing) && $$(enableToolbar) && <EditorToolbar toolbarRef={toolbarRef} />}
-                    <EditorSurface
-                        isEditing={isEditing}
-                        handleEditorClick={handleEditorClick}
-                        handleBlur={handleBlur}
-                        children={children}
-                    >
-                    </EditorSurface>
-                </UndoRedo>
-            </EditorContext.Provider>
+            <FocusManagerContext.Provider value={focusManager}>
+                <EditorContext.Provider value={editor}>
+                    <UndoRedo>
+                        {() => $$(isEditing) && $$(enableToolbar) && <EditorToolbar toolbarRef={toolbarRef} />}
+                        <EditorSurface
+                            isEditing={isEditing}
+                            handleEditorClick={handleEditorClick}
+                            handleBlur={handleBlur}
+                            children={children}
+                        >
+                        </EditorSurface>
+                    </UndoRedo>
+                </EditorContext.Provider>
+            </FocusManagerContext.Provider>
         </div >
     )
 })
