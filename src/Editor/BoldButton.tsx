@@ -20,6 +20,7 @@ const BoldButton = defaults(def, (props) => {
 
     const editorNode = useEditor()
     const { saveDo } = useUndoRedo()
+    const focusManager = useFocusManager()
     const isActive = $(false)
     const command = "bold"
 
@@ -44,7 +45,10 @@ const BoldButton = defaults(def, (props) => {
     })
 
     const handleClick = () => {
+        // D-09: Use FocusManager to preserve selection across button click
+        focusManager.beginCommand()
         applyBold()
+        focusManager.endCommand()
         saveDo()
         // D-05: updateStylesState via selectionchange handles active state.
         // queryCommandState removed — it is shadow-DOM-blind.

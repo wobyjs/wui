@@ -1,6 +1,6 @@
 import { Button, ButtonStyles } from '../Button'
 import ItalicIcon from '../icons/italic' // Renamed for clarity if Bold is a type/component elsewhere
-import { useEditor, useUndoRedo } from './undoredo' // useUndoRedo needed for saveDo
+import { useEditor, useUndoRedo, useFocusManager } from './undoredo' // useUndoRedo needed for saveDo
 import { $, $$, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlClass, HtmlString, Observable, ObservableMaybe, useEffect } from 'woby'
 import { getCurrentEditor } from './utils'
 import { updateStylesState } from './TextStyleButton'
@@ -20,6 +20,7 @@ const ItalicButton = defaults(def, (props) => {
 
     const editorNode = useEditor()
     const { saveDo } = useUndoRedo()
+    const focusManager = useFocusManager()
     const isActive = $(false)
     const command = "italic"
 
@@ -44,7 +45,10 @@ const ItalicButton = defaults(def, (props) => {
     })
 
     const handleClick = () => {
+        // D-09: Use FocusManager to preserve selection across button click
+        focusManager.beginCommand()
         applyItalic()
+        focusManager.endCommand()
         saveDo()
         // D-05: updateStylesState via selectionchange handles active state.
         // queryCommandState removed — it is shadow-DOM-blind.

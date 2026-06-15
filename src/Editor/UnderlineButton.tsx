@@ -1,7 +1,7 @@
 import { $, $$, defaults, useEffect, customElement, type ElementAttributes, type Observable, HtmlBoolean, HtmlClass, ObservableMaybe, HtmlString } from "woby"
 import { Button, ButtonStyles } from '../Button'
 import UnderlineIcon from '../icons/underline'
-import { useEditor, useUndoRedo } from './undoredo'
+import { useEditor, useUndoRedo, useFocusManager } from './undoredo'
 import { getCurrentEditor } from "./utils"
 import { updateStylesState } from "./TextStyleButton"
 import { applyUnderline } from './StyleEngine'
@@ -19,6 +19,7 @@ const UnderlineButton = defaults(def, (props) => {
 
     const editorNode = useEditor()
     const { saveDo } = useUndoRedo()
+    const focusManager = useFocusManager()
     const isActive = $(false)
     const command = "underline"
 
@@ -43,7 +44,10 @@ const UnderlineButton = defaults(def, (props) => {
     })
 
     const handleClick = () => {
+        // D-09: Use FocusManager to preserve selection across button click
+        focusManager.beginCommand()
         applyUnderline()
+        focusManager.endCommand()
         saveDo()
         // D-05: updateStylesState via selectionchange handles active state.
         // queryCommandState removed — it is shadow-DOM-blind.
