@@ -123,20 +123,21 @@ Plans:
 **Plans**: 3 plans in 3 waves
 
 Plans:
-- [ ] 18-01-PLAN.md — Wave 1: BrowserCompat (D-01) + StyleEngine (D-02, D-03, D-04) + FocusManager (D-11)
-- [ ] 18-02-PLAN.md — Wave 2: Button active states (D-05) + UndoRedo scoping (D-06) + syncChildren guard (D-07) + selection retention (D-08)
+- [x] 18-01-PLAN.md — Wave 1: BrowserCompat (D-01) + StyleEngine (D-02, D-03, D-04) + FocusManager (D-11)
+- [x] 18-02-PLAN.md — Wave 2: Button active states (D-05) + UndoRedo scoping (D-06) + syncChildren guard (D-07) + selection retention (D-08, D-09)
 - [ ] 18-03-PLAN.md — Wave 3: MCP evaluate_script test suite covering all 7 permutation dimensions
 
 **Requirements**:
-- [ED-01] Shadow DOM selection uses getComposedRanges throughout
-- [ED-02] Computed styles detect semantic elements for toggle logic
-- [ED-03] Style toggle matches MS Word / Google Docs semantics
-- [ED-04] Cross-block selections handled with editor-root-relative offsets
-- [ED-05] Button active states never use queryCommandState
-- [ED-06] Multiple editor instances have independent undo/redo state
-- [ED-07] syncChildren cannot trigger re-entrant sync cycles
-- [ED-08] Selection preserved identically before and after style application
-- [ED-09] All 7 test dimensions pass via MCP evaluate_script
+- [x] [ED-01] Shadow DOM selection uses getComposedRanges throughout
+- [x] [ED-02] Computed styles detect semantic elements for toggle logic
+- [x] [ED-03] Style toggle matches MS Word / Google Docs semantics
+- [x] [ED-04] Cross-block selections handled with editor-root-relative offsets
+- [x] [ED-05] Button active states never use queryCommandState
+- [x] [ED-06] Multiple editor instances have independent undo/redo state
+- [x] [ED-07] syncChildren cannot trigger re-entrant sync cycles
+- [x] [ED-08] Selection preserved identically before and after style application
+- [x] [ED-09] FocusManager integrated into all toolbar buttons (manual test verified 2026-06-15)
+- [ ] [ED-10] All 7 test dimensions pass via MCP evaluate_script
 
 **Success Criteria**:
 - Bold/italic/underline toggle behaves identically to Google Docs for all selection types
