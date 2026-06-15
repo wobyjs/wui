@@ -44,9 +44,15 @@ const ItalicButton = defaults(def, (props) => {
         return () => document.removeEventListener('selectionchange', handler)
     })
 
-    const handleClick = () => {
-        // D-09: Use FocusManager to preserve selection across button click
+    const handleMouseDown = (e: MouseEvent) => {
+        e.preventDefault()
+        // D-09: Cache selection BEFORE browser can move focus and clear it
+        // onMouseDown fires before focus shift, onClick fires after
         focusManager.beginCommand()
+    }
+
+    const handleClick = () => {
+        // D-09: Apply formatting, selection already cached by onMouseDown
         applyItalic()
         focusManager.endCommand()
         saveDo()
@@ -64,7 +70,7 @@ const ItalicButton = defaults(def, (props) => {
             ]}
             aria-pressed={() => $$(isActive) ? "true" : "false"}
             disabled={disabled}
-            onMouseDown={(e) => { e.preventDefault(); }}
+            onMouseDown={handleMouseDown}
             onClick={handleClick}
             {...otherProps}
         >

@@ -27,7 +27,12 @@
       "Bash(Get-Content \"C:\\\\Users\\\\wongc\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\D--Developments-tslib--woby-wui\\\\654d0bf2-1e1a-42a2-b17e-0e828462d88e\\\\tasks\\\\bunrb04s7.output\")",
       "Bash(Select-String -Pattern \"3\\\\.4\")",
       "Bash(Select-Object -First 5)",
-      "Bash(git add *)"
+      "Bash(git add *)",
+      "Bash(git commit -m 'fix\\(StyleEngine\\): preserve selection after DOM normalization using text-based restoration *)",
+      "mcp__chrome-devtools__get_console_message",
+      "mcp__chrome-devtools__take_snapshot",
+      "Bash(git commit -m 'fix\\(Editor\\): use FocusManager in formatting buttons to preserve selection *)",
+      "Bash(git commit -m 'fix\\(Editor\\): cache selection in onMouseDown before focus shift *)"
     ]
   },
   "enabledMcpjsonServers": [
