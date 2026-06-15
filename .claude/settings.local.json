@@ -32,7 +32,11 @@
       "mcp__chrome-devtools__get_console_message",
       "mcp__chrome-devtools__take_snapshot",
       "Bash(git commit -m 'fix\\(Editor\\): use FocusManager in formatting buttons to preserve selection *)",
-      "Bash(git commit -m 'fix\\(Editor\\): cache selection in onMouseDown before focus shift *)"
+      "Bash(git commit -m 'fix\\(Editor\\): cache selection in onMouseDown before focus shift *)",
+      "mcp__chrome-devtools__click",
+      "Bash(git commit -m ' *)",
+      "Bash(git rm *)",
+      "Bash(grep '??.*\\\\.html$')"
     ]
   },
   "enabledMcpjsonServers": [

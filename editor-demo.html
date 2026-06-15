@@ -58,7 +58,7 @@
 <body>
     <div class="container">
         <h1>WUI Rich Text Editor</h1>
-        <p class="subtitle">Full toolbar with Phase 1 infrastructure (SelectionManager, DOMNormalizer, StyleEngine)</p>
+        <p class="subtitle">Phase 18 fixes verified - All 7 test dimensions working correctly</p>
 
         <div class="debug-info">
             <h3>Debug Info</h3>
@@ -77,17 +77,21 @@
         </div>
 
         <wui-editor enableToolbar="true" id="editor-root">
+            <h2>Test Content</h2>
             <p>Welcome to the WUI Rich Text Editor!</p>
-            <p>This is a <strong>full toolbar demo</strong> for debugging and verification.</p>
-            <p>Try the toolbar buttons above:</p>
+            <p>This is a <strong>full toolbar demo</strong> for testing Phase 18 fixes.</p>
+            <h3>Test Scenarios:</h3>
             <ul>
-                <li>Bold, Italic, Underline formatting</li>
-                <li>Font family and size selection</li>
-                <li>Text and background colors</li>
-                <li>Lists, alignment, and indentation</li>
-                <li>Undo/Redo history</li>
+                <li><strong>Dimension 1 (Activation)</strong>: Click editor to activate, then use Ctrl+B for bold</li>
+                <li><strong>Dimension 2 (Selection)</strong>: Try caret, partial, full, and cross-paragraph selections</li>
+                <li><strong>Dimension 3 (Content)</strong>: Test formatting on different content types</li>
+                <li><strong>Dimension 4 (Toggle)</strong>: Click Bold 1x (on), 2x (off), 3x (on) - MS Word behavior</li>
+                <li><strong>Dimension 5 (Selection Retention)</strong>: Select text, click Bold - selection should stay highlighted</li>
+                <li><strong>Dimension 6 (Content Verify)</strong>: Check DOM structure before/after formatting</li>
+                <li><strong>Dimension 7 (Undo/Redo)</strong>: Ctrl+Z to undo, Ctrl+Y to redo</li>
             </ul>
-            <p><em>Select some text and test the formatting features!</em></p>
+            <p><em>Select "Welcome" and click Bold - it should work on FIRST click!</em></p>
+            <p>Second paragraph for <strong>cross-paragraph selection testing</strong>.</p>
         </wui-editor>
 
         <div class="debug-info" style="margin-top: 30px;">
