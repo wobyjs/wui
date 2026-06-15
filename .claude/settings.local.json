@@ -1,4 +1,35 @@
 {
+  "permissions": {
+    "allow": [
+      "mcp__chrome-devtools__evaluate_script",
+      "Skill(superpowers:brainstorming)",
+      "Skill(dom)",
+      "Skill(woby-dev)",
+      "Skill(gsd-plan-phase)",
+      "WebSearch",
+      "mcp__chrome-devtools__navigate_page",
+      "mcp__chrome-devtools__list_pages",
+      "mcp__chrome-devtools__take_screenshot",
+      "mcp__chrome-devtools__list_console_messages",
+      "PowerShell(Stop-Process *)",
+      "PowerShell(Get-WmiObject *)",
+      "PowerShell(Start-Process \"C:\\\\Program Files\\\\Google\\\\Chrome\\\\Application\\\\chrome.exe\" -ArgumentList \"--remote-debugging-port=9223\",\"--user-data-dir=C:\\\\chrome-profiles\\\\profile-qmdj-2\" -WindowStyle Normal)",
+      "PowerShell(Start-Sleep -Seconds 2; \\(Invoke-WebRequest -Uri \"http://127.0.0.1:9223/json/version\" -UseBasicParsing -ErrorAction SilentlyContinue\\).Content)",
+      "PowerShell(\\(Invoke-WebRequest -Uri \"http://127.0.0.1:9223/json/version\" -UseBasicParsing -ErrorAction SilentlyContinue\\).Content)",
+      "PowerShell(\\(Invoke-WebRequest -Uri \"http://127.0.0.1:9222/json/version\" -UseBasicParsing -ErrorAction SilentlyContinue\\).Content; Write-Host \"---\"; \\(Invoke-WebRequest -Uri \"http://127.0.0.1:9223/json/version\" -UseBasicParsing -ErrorAction SilentlyContinue\\).Content)",
+      "PowerShell(Start-Process \"C:\\\\Program Files\\\\Google\\\\Chrome\\\\Application\\\\chrome.exe\" -ArgumentList \"--remote-debugging-port=9223\",\"--user-data-dir=C:\\\\chrome-profiles\\\\profile-qmdj-2\" -WindowStyle Normal; Start-Sleep -Seconds 2; \\(Invoke-WebRequest -Uri \"http://127.0.0.1:9223/json/version\" -UseBasicParsing -ErrorAction SilentlyContinue\\).Content | ConvertFrom-Json | Select-Object Browser, webSocketDebuggerUrl)",
+      "PowerShell(Start-Sleep -Seconds 3; \\(Invoke-WebRequest -Uri \"http://127.0.0.1:9223/json/version\" -UseBasicParsing -ErrorAction SilentlyContinue\\).Content)",
+      "PowerShell(Get-Process *)",
+      "Bash(pnpm dev *)",
+      "PowerShell($chrome = Start-Process \"C:\\\\Program Files\\\\Google\\\\Chrome\\\\Application\\\\chrome.exe\" -ArgumentList \"--remote-debugging-port=9223\",\"--user-data-dir=C:\\\\chrome-profiles\\\\profile-qmdj-2\",\"http://localhost:5176/editor-demo.html\" -WindowStyle Normal -PassThru; Write-Host \"Chrome PID: $\\($chrome.Id\\)\"; Start-Sleep -Seconds 3; \\(Invoke-WebRequest -Uri \"http://127.0.0.1:9223/json/list\" -UseBasicParsing -ErrorAction SilentlyContinue\\).Content | ConvertFrom-Json | Select-Object -First 1 | Select-Object id, url, title)",
+      "PowerShell(Start-Sleep -Seconds 2; \\(Invoke-WebRequest -Uri \"http://127.0.0.1:9223/json/list\" -UseBasicParsing -ErrorAction SilentlyContinue\\).Content)",
+      "mcp__context7__resolve-library-id",
+      "Bash(Get-Content \"C:\\\\Users\\\\wongc\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\D--Developments-tslib--woby-wui\\\\654d0bf2-1e1a-42a2-b17e-0e828462d88e\\\\tasks\\\\bunrb04s7.output\")",
+      "Bash(Select-String -Pattern \"3\\\\.4\")",
+      "Bash(Select-Object -First 5)",
+      "Bash(git add *)"
+    ]
+  },
   "enabledMcpjsonServers": [
     "chrome-devtools",
     "context7",

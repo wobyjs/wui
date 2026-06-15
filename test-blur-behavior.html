@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blur Behavior Test - Human-Like Iteration</title>
+    <script type="module">
+        import './src/Editor/index.ts';
+    </script>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h2 {
+            margin-top: 0;
+            color: #333;
+        }
+        wui-editor {
+            display: block;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            min-height: 200px;
+        }
+        #blur-log {
+            background: #1e1e1e;
+            color: #0f0;
+            font-family: 'Courier New', monospace;
+            padding: 15px;
+            border-radius: 4px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+        .log-entry {
+            margin-bottom: 5px;
+            padding: 3px 0;
+            border-bottom: 1px solid #333;
+        }
+        .log-entry.blur {
+            color: #f44;
+        }
+        .log-entry.focus {
+            color: #4f4;
+        }
+        .log-entry.selection {
+            color: #44f;
+        }
+        .log-entry.click {
+            color: #ff4;
+        }
+        .timestamp {
+            color: #888;
+        }
+        #test-controls {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e3f2fd;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            font-size: 14px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            background: #2196f3;
+            color: white;
+        }
+        button:hover {
+            background: #1976d2;
+        }
+        #selection-info {
+            background: #fff3e0;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <h1>Blur Behavior Investigation - Human-Like Testing</h1>
+
+    <div class="test-section">
+        <h2>Editor with Blur Monitoring</h2>
+        <wui-editor id="test-editor" enableToolbar="true">
+            <p>Welcome to the WUI Rich Text Editor!</p>
+            <p>This is a test to investigate blur behavior when clicking toolbar buttons.</p>
+            <p>Try selecting text and clicking formatting buttons.</p>
+        </wui-editor>
+    </div>
+
+    <div class="test-section">
+        <h2>Event Log (Real-Time Monitoring)</h2>
+        <div id="blur-log"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test Controls</h2>
+        <div id="test-controls">
+            <button id="clear-log">Clear Log</button>
+            <button id="simulate-click">Simulate Toolbar Click</button>
+            <button id="get-selection">Get Current Selection</button>
+            <button id="create-selection">Create Test Selection</button>
+        </div>
+        <div id="selection-info">
+            Selection status will appear here...
+        </div>
+    </div>
+
+    <script>
+        const editor = document.getElementById('test-editor');
+        const logContainer = document.getElementById('blur-log');
+        const selectionInfo = document.getElementById('selection-info');
+
+        let logId = 0;
+
+        function addLog(message, type = 'info') {
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.id = `log-${logId++}`;
+
+            const timestamp = new Date().toISOString().substr(11, 12);
+            const timestampSpan = document.createElement('span');
+            timestampSpan.className = 'timestamp';
+            timestampSpan.textContent = `[${timestamp}] `;
+
+            entry.appendChild(timestampSpan);
+            entry.appendChild(document.createTextNode(message));
+
+            logContainer.appendChild(entry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+
+            return entry.id;
+        }
+
+        function getSelectionInfo() {
+            const sel = window.getSelection();
+            if (!sel || sel.rangeCount === 0) {
+                return { hasSelection: false, text: '', range: null };
+            }
+
+            const range = sel.getRangeAt(0);
+            const text = sel.toString();
+
+            return {
+                hasSelection: text.length > 0,
+                text: text,
+                startOffset: range.startOffset,
+                endOffset: range.endOffset,
+                collapsed: range.collapsed
+            };
+        }
+
+        function updateSelectionInfo() {
+            const info = getSelectionInfo();
+            if (info.hasSelection) {
+                selectionInfo.textContent = `Selection: "${info.text}", Start: ${info.startOffset}, End: ${info.endOffset}, Collapsed: ${info.collapsed}`;
+            } else {
+                selectionInfo.textContent = 'No selection or cursor position only';
+            }
+        }
+
+        // Wait for editor to be ready
+        const waitForEditor = () => {
+            return new Promise((resolve) => {
+                const check = () => {
+                    if (editor.shadowRoot) {
+                        const editableRoot = editor.shadowRoot.querySelector('[data-editor-root]');
+                        if (editableRoot) {
+                            resolve(editableRoot);
+                            return;
+                        }
+                    }
+                    setTimeout(check, 100);
+                };
+                check();
+            });
+        };
+
+        waitForEditor().then((editableRoot) => {
+            addLog('Editor initialized and ready', 'info');
+
+            // Monitor all events on editable root
+            const events = ['blur', 'focus', 'focusin', 'focusout', 'mousedown', 'mouseup', 'click'];
+
+            events.forEach(eventType => {
+                editableRoot.addEventListener(eventType, (e) => {
+                    const info = getSelectionInfo();
+                    addLog(
+                        `${eventType.toUpperCase()} on editable root - Selection: ${info.hasSelection ? `"${info.text}"` : 'none'}`,
+                        eventType === 'blur' ? 'blur' : eventType === 'focus' ? 'focus' : 'info'
+                    );
+                }, true); // Capture phase
+            });
+
+            // Monitor selection changes
+            document.addEventListener('selectionchange', () => {
+                const info = getSelectionInfo();
+                if (info.hasSelection) {
+                    addLog(`Selection changed: "${info.text}"`, 'selection');
+                }
+                updateSelectionInfo();
+            });
+
+            // Monitor toolbar clicks
+            const toolbar = editor.shadowRoot.querySelector('.editor-toolbar');
+            if (toolbar) {
+                toolbar.addEventListener('mousedown', (e) => {
+                    addLog(`MOUSEDOWN on toolbar - target: ${e.target.tagName}${e.target.title ? ` (${e.target.title})` : ''}`, 'click');
+                }, true);
+
+                toolbar.addEventListener('click', (e) => {
+                    addLog(`CLICK on toolbar - target: ${e.target.tagName}${e.target.title ? ` (${e.target.title})` : ''}`, 'click');
+                }, true);
+            }
+
+            // Test controls
+            document.getElementById('clear-log').addEventListener('click', () => {
+                logContainer.innerHTML = '';
+                logId = 0;
+            });
+
+            document.getElementById('get-selection').addEventListener('click', () => {
+                const info = getSelectionInfo();
+                addLog(`Manual check - Selection: ${info.hasSelection ? `"${info.text}"` : 'none'}`, 'selection');
+            });
+
+            document.getElementById('create-selection').addEventListener('click', () => {
+                // Create selection in first paragraph
+                const firstP = editableRoot.querySelector('p');
+                if (firstP && firstP.firstChild) {
+                    const range = document.createRange();
+                    range.setStart(firstP.firstChild, 0);
+                    range.setEnd(firstP.firstChild, 7); // Select "Welcome"
+
+                    const sel = window.getSelection();
+                    sel.removeAllRanges();
+                    sel.addRange(range);
+
+                    addLog('Created test selection: "Welcome"', 'selection');
+                    updateSelectionInfo();
+                }
+            });
+
+            document.getElementById('simulate-click').addEventListener('click', () => {
+                // Find Bold button
+                const buttons = toolbar.querySelectorAll('button');
+                const boldButton = Array.from(buttons).find(btn =>
+                    btn.getAttribute('title')?.includes('Bold')
+                );
+
+                if (boldButton) {
+                    addLog('SIMULATING: mousedown on Bold button', 'click');
+
+                    // Dispatch mousedown
+                    boldButton.dispatchEvent(new MouseEvent('mousedown', {
+                        bubbles: true,
+                        cancelable: true,
+                        view: window
+                    }));
+
+                    addLog('SIMULATING: click on Bold button', 'click');
+
+                    // Dispatch click
+                    boldButton.dispatchEvent(new MouseEvent('click', {
+                        bubbles: true,
+                        cancelable: true,
+                        view: window
+                    }));
+
+                    setTimeout(() => {
+                        const info = getSelectionInfo();
+                        addLog(`AFTER CLICK - Selection: ${info.hasSelection ? `"${info.text}"` : 'none'}`, 'selection');
+                        updateSelectionInfo();
+                    }, 100);
+                } else {
+                    addLog('ERROR: Could not find Bold button', 'blur');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

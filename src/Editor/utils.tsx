@@ -34,13 +34,36 @@ export const isSelectionInside = (editor: HTMLElement, tagName: string): boolean
 
 /** Returns all block-level elements intersecting the provided selection range. */
 export const getSelectedBlocks = (container: HTMLElement, range: Range, blockTags: string[] = BLOCK_TAGS): HTMLElement[] => {
-    const allBlocks = Array.from(container.querySelectorAll(blockTags.join(',')));
+    // Handle slotted content: if container is in shadow DOM with a slot, query the host's children
+    let allBlocks: Element[];
+    const root = container.getRootNode();
+
+    if (root instanceof ShadowRoot) {
+        // Container is in shadow DOM - check if there's a slot element
+        const slot = root.querySelector('slot');
+        if (slot) {
+            // Query the assigned (light DOM) elements
+            const host = root.host as HTMLElement;
+            allBlocks = Array.from(host.querySelectorAll(blockTags.join(',')));
+            console.log('[getSelectedBlocks] Shadow DOM detected, querying light DOM via host. Found:', allBlocks.length, 'blocks');
+        } else {
+            // No slot, query shadow DOM
+            allBlocks = Array.from(container.querySelectorAll(blockTags.join(',')));
+        }
+    } else {
+        // Regular DOM
+        allBlocks = Array.from(container.querySelectorAll(blockTags.join(',')));
+    }
 
     // 2. Filter: Only return blocks that are actually inside the selection
-    return allBlocks.filter(block => {
+    const result = allBlocks.filter(block => {
         // range.intersectsNode returns true if the block is even partially selected
-        return range.intersectsNode(block) && container.contains(block);
+        return range.intersectsNode(block);
     }) as HTMLElement[];
+
+    console.log('[getSelectedBlocks] Filtered to', result.length, 'blocks in range. Tags:', result.map(b => b.tagName).join(', '));
+
+    return result;
 };
 
 /** 
@@ -287,14 +310,10 @@ export function restoreRangePosition(selection: Selection, start: { node: Node, 
  * Get selection state relative to a root node (default: document.body).
  */
 export function getSelection(container?: HTMLElement): { selection: Selection, state: SelectionState } | null {
-    // 1. Determine if the element is inside a ShadowRoot
-    // const root = container.getRootNode();
-    const root = container.getRootNode() ?? document.body
-
-    // 2. Get selection from ShadowRoot if applicable, otherwise window
-    const selection = (root instanceof ShadowRoot)
-        ? (root as any).getSelection()
-        : window.getSelection();
+    // CRITICAL: In Woby custom elements with slots, user content is in light DOM.
+    // Even though the editor container (data-editor-root) is in shadow DOM,
+    // the selection is on the light DOM content. We must ALWAYS use window.getSelection().
+    const selection = window.getSelection();
 
     if (!selection) return null;
 

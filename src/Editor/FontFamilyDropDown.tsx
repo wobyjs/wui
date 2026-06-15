@@ -1,13 +1,10 @@
 import { $, $$, customElement, defaults, ElementAttributes, HtmlClass, HtmlNumber, JSX, ObservableMaybe, useEffect } from 'woby'
 import { Button } from '../Button'
-import { EditorContext } from './undoredo'
+import { EditorContext, useUndoRedo } from './undoredo'
 import { useOnClickOutside } from '@woby/use/browser'
-import { getCurrentRange } from './utils' // Import getCurrentRange
+import { getCurrentRange } from './utils'
+import { applyFontFamily as applyFontFamilyStyle } from './StyleEngine'
 import KeyboardDownArrow from '../icons/keyboard_down_arrow'
-
-const applyFontFamily = (fontName: string) => {
-    document.execCommand('fontName', false, fontName)
-}
 
 const FONT_FAMILY = [
     { label: 'Arial', value: 'Arial, Helvetica, sans-serif' },
@@ -36,6 +33,7 @@ const FontFamilyDropDown = defaults(def, (props) => {
     const isOpen = $(false)
     const selectedFont = $(FONT_FAMILY[$$(defaultIndex)].label)
     const dropdownRef = $<HTMLElement>(null)
+    const { saveDo } = useUndoRedo()
 
 
     useOnClickOutside(dropdownRef as any, () => isOpen(false))
@@ -104,10 +102,9 @@ const FontFamilyDropDown = defaults(def, (props) => {
     const toggleDropdown = () => isOpen(!isOpen())
 
     const handleSelectFont = (fontValue: string, fontLabel: string) => {
-        if (editor) {
-            applyFontFamily(fontValue)
-            selectedFont(fontLabel)
-        }
+        applyFontFamilyStyle(fontValue)
+        selectedFont(fontLabel)
+        saveDo()
         isOpen(false)
     }
 
@@ -147,8 +144,9 @@ const FontFamilyDropDown = defaults(def, (props) => {
         const currentLabel = $$(selectedFont)
         const font = FONT_FAMILY.find(f => f.label === currentLabel)
 
-        if (editor) {
-            applyFontFamily(font.value)
+        if (font) {
+            applyFontFamilyStyle(font.value)
+            saveDo()
         }
     }
 
@@ -158,13 +156,11 @@ const FontFamilyDropDown = defaults(def, (props) => {
             class={() => [
                 () => $$(cls) ? $$(cls) : "relative inline-block text-left", cn,
             ]} ref={dropdownRef}>
-            <div>
+            <div class="flex">
                 <Button
                     type='outlined'
-                    cls={() => [
-                        BASE_BTN
-                    ]}
-                    onMouseDown={(e) => { e.preventDefault() }}
+                    cls={() => [BASE_BTN]}
+                    onMouseDown={(e) => { e.preventDefault(); e.stopPropagation() }}
                     onClick={handleApplyCurrent}
                     title="Font family"
                     {...otherProps}
@@ -172,9 +168,15 @@ const FontFamilyDropDown = defaults(def, (props) => {
                     <span class="text-center truncate">
                         {() => $$(selectedFont)}
                     </span>
-                    <span class="flex justify-end">
-                        <KeyboardDownArrow class="-mr-1 ml-2 h-5 w-5" onClick={toggleDropdown} />
-                    </span>
+                </Button>
+                <Button
+                    type='outlined'
+                    class="size-full inline-flex justify-center items-center rounded-md border border-gray-300 shadow-sm bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500 cursor-pointer px-2"
+                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleDropdown(); }}
+                    onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                    title="Toggle dropdown"
+                >
+                    <KeyboardDownArrow class="h-5 w-5" />
                 </Button>
             </div>
 

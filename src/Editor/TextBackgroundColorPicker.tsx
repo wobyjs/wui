@@ -3,6 +3,7 @@ import { Button, ButtonStyles } from '../Button'
 import { useEditor, useUndoRedo } from './undoredo'
 import FormatInkHighlighter from '../icons/format_ink_highlighter' // Import the highlighter icon
 import KeyboardDownArrow from '../icons/keyboard_down_arrow'
+import { applyBackgroundColor } from './StyleEngine'
 
 const def = () => ({
     cls: $('', HtmlClass) as JSX.Class | undefined,
@@ -17,6 +18,7 @@ const TextBackgroundColorPicker = defaults(def, (props) => {
     const BASE_BTN = "size-full inline-flex items-center justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-black hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500 cursor-pointer"
 
     const editor = useEditor() // Editor context, likely the contentEditable div
+    const { saveDo } = useUndoRedo() // Undo/redo context
     const colorInputRef = $<HTMLInputElement>(null)
 
     // Updates selectedBgColor when the color input changes
@@ -29,16 +31,19 @@ const TextBackgroundColorPicker = defaults(def, (props) => {
 
     // Applies the selected color to the editor content
     const applyPickedBgColor = () => {
+        // Sync from input element if available (fixes default color issue)
+        const colorInputEl = colorInputRef()
+        if (colorInputEl) {
+            selectedBgColor(colorInputEl.value)
+        }
+
         const colorVal = $$(selectedBgColor)
 
-        // 1. Force CSS style output (<span style="background-color: ...">)
-        document.execCommand('styleWithCSS', false, 'true')
+        // Use StyleEngine instead of execCommand
+        applyBackgroundColor(colorVal)
+        saveDo() // Save to undo/redo history
 
-        // 2. Apply Background Color (hiliteColor)
-        // This keeps text inline and doesn't break paragraphs
-        document.execCommand('hiliteColor', false, colorVal)
-
-        // 3. Notify Editor
+        // Notify Editor
         if ($$(editor)) {
             $$(editor).dispatchEvent(new Event('input', { bubbles: true }))
         }

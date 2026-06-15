@@ -3,7 +3,9 @@ import { Button, ButtonStyles } from '../Button'
 import TextIncrease from '../icons/text_increase'
 import TextDecrease from '../icons/text_decrease'
 import { useEditor } from './undoredo'
-import { getSelection, getCurrentEditor, restoreSelection, selectElement, BLOCK_TAGS } from './utils'
+import { getCurrentEditor } from './utils'
+import { applyFontSize as applyFontSizeStyle } from './StyleEngine'
+import { safeGetSelection, safeGetRange } from './BrowserCompat'
 
 const def = () => ({
     cls: $('', HtmlClass) as JSX.Class | undefined,
@@ -30,11 +32,11 @@ const FontSize = defaults(def, (props) => {
                 return;
             }
 
-            const { selection, state } = getSelection($$(el));
+            const selection = safeGetSelection();
+            const range = safeGetRange();
 
-            if (!selection?.rangeCount) return;
+            if (!selection || !range) return;
 
-            const range = selection.getRangeAt(0);
             const container = range.commonAncestorContainer;
 
             // Security: Make sure the selection is actually inside the editor
@@ -43,7 +45,7 @@ const FontSize = defaults(def, (props) => {
             let smallestSize = $$(fontSize);
 
             // 1. Single cursor click (No text highlighted)
-            if (state.isCollapsed || container.nodeType === Node.TEXT_NODE) {
+            if (range.collapsed || container.nodeType === Node.TEXT_NODE) {
                 const element = (container.nodeType === Node.TEXT_NODE ? container.parentElement : container) as HTMLElement;
                 if (element) {
                     const size = parseFloat(window.getComputedStyle(element).fontSize);
@@ -100,16 +102,16 @@ const FontSize = defaults(def, (props) => {
 
     // #region Actions (Internal Logic)
     const applyNewSize = (size: number) => {
-        const el = editor ?? getCurrentEditor();
+        console.log('[FontSize] applyNewSize called, size:', size)
         if (isNaN(size) || size <= 0) return;
         fontSize(size);
-        applyFontSize(el, size + "px");
-        performEditorCleanup(el);
+        applyFontSizeStyle(size + "px");
     };
     // #endregion
 
     // #region Event Handlers
     const onStepClick = (delta: number) => (e: MouseEvent) => {
+        console.log('[FontSize] onStepClick called, delta:', delta)
         e.preventDefault(); // Prevent losing focus
         applyNewSize(Math.max(1, $$(fontSize) + delta));
     };
@@ -173,325 +175,4 @@ declare module 'woby' {
 }
 
 export default FontSize
-
-/**
- * Main function to handle font size application
- */
-const applyFontSize = (editor: ObservableMaybe<HTMLDivElement>, newSize: string) => {
-    const editorDiv = $$(editor);
-    const { selection } = getSelection(editorDiv);
-
-    if (!selection || selection.rangeCount === 0 || !editorDiv) return;
-
-    console.groupCollapsed(`[FontSize] Applying: ${newSize}`);
-
-    const range = selection.getRangeAt(0);
-    const selectedText = selection.toString();
-
-    // 1. Identify the closest element container
-    let container = range.commonAncestorContainer as HTMLElement;
-    if (container.nodeType === Node.TEXT_NODE) {
-        container = container.parentElement!;
-    }
-
-    // 2. Determine state: Is it already a span? Does it match exactly?
-    const isSpan = container.tagName == 'SPAN';
-    const isMatch = container.textContent.trim() == selectedText.trim();
-    const isContainer = container.hasAttribute('data-editor-root')
-    const isList = container.tagName == 'UL' || container.tagName == 'OL';
-
-    console.log("[FontSize] Context: ", {
-        "container": { "tag": container.tagName, "text": container.textContent.trim() },
-        "selection": { "text": selectedText.trim() },
-        "isSpan": isSpan,
-        "isMatch": isMatch,
-        "isContainer": isContainer,
-        "isList": isList,
-    })
-
-    if (isContainer || isList) {
-        // Path A: Complex Multi-Paragraph selection
-        handleMultiParagraphSelection(container, selection, range, newSize);
-    } else if (isSpan && isMatch) {
-        // Path B: Simple exact span match
-        console.log("[FontSize] Exact span match. Updating style.");
-        container.style.fontSize = newSize;
-        removeNestedFontSizes(container);
-    } else {
-        // Path C: Partial selection or non-span
-        console.log("[FontSize] Partial selection or non-span. Creating new wrapper.");
-        const newSpan = createSpan(selection);
-        if (newSpan) {
-            applyStyleToSpan(newSpan, newSize);
-        }
-    }
-
-    const { state: newState } = getSelection(editorDiv);
-    restoreSelection(newState, editorDiv);
-
-    console.groupEnd();
-};
-
-// #region Helper Function
-/**
- * Wraps the current selection in a clean <span> tag and returns it.
- */
-const createSpan = (selection: Selection): HTMLSpanElement | null => {
-
-    if (!selection || selection.rangeCount === 0 || selection.isCollapsed) return null;
-
-    const range = selection.getRangeAt(0);
-
-    // 1. Extract content
-    const contents = range.extractContents();
-
-    // 2. Create wrapper
-    const span = document.createElement('span');
-    span.appendChild(contents);
-
-    // 3. Insert into DOM
-    range.insertNode(span);
-
-    // update the selection to wrap the new span
-    selectElement(span, selection)
-
-    return span;
-};
-
-/**
- * Function to clean up nested font sizes and empty wrappers.
- */
-const removeNestedFontSizes = (rootElement: HTMLElement) => {
-    // 1. Remove specific font-size styles
-    const styledElements = rootElement.querySelectorAll('[style*="font-size"]');
-    styledElements.forEach(el => cleanFontSizeStyle(el as HTMLElement));
-
-    // 2. Remove any spans that became useless (empty attributes)
-    const spans = Array.from(rootElement.querySelectorAll('span')).reverse();
-    spans.forEach(unwrapIfUseless);
-};
-
-/**
- * Applies the font size to a specific span and cleans up internal redundancy.
- */
-const applyStyleToSpan = (span: HTMLElement, fontSize: string) => {
-    // 1. Apply the style
-    span.style.fontSize = fontSize;
-
-    // 2. Clean up nested/conflicting font sizes inside
-    removeNestedFontSizes(span);
-
-    // 3. Optimization: Flatten redundant spans
-    // If the span contains ONLY another span with the same style, unwrap the inner one.
-    if (span.childNodes.length === 1 && span.firstElementChild?.tagName === 'SPAN') {
-        const child = span.firstElementChild as HTMLElement;
-        if (child.style.fontSize === fontSize || !child.style.fontSize) {
-            // Move child content up to parent
-            while (child.firstChild) {
-                span.appendChild(child.firstChild);
-            }
-            child.remove();
-        }
-    }
-};
-
-/**
- * The cleanup runs in reverse order (bottom-up) to handle nested spans efficiently.
- * Skips spans where the cursor is currently positioned to prevent disruption.
- * 
- * @param editor - The editor element (Observable or direct HTMLDivElement reference)
- */
-const performEditorCleanup = (editor: ObservableMaybe<HTMLDivElement>) => {
-    const el = editor ?? getCurrentEditor();
-
-    const spans = Array.from($$(el).querySelectorAll('span')).reverse();
-    const { selection } = getSelection($$(el));
-
-    spans.forEach(span => {
-        // 0. Safety: Do not modify span if cursor is inside it
-        const isCursorInside = selection?.anchorNode && span.contains(selection.anchorNode);
-        if (isCursorInside) return;
-
-        // 1. Remove Ghost Spans (truly empty)
-        const isEmpty = span.childNodes.length === 0 || (span.textContent === '' && span.children.length === 0);
-        if (isEmpty) {
-            console.warn('[Cleanup] Removing empty ghost span');
-            span.remove();
-            return;
-        }
-
-        // 2. Remove redundant font-size from onion wrappers
-        // (parent has no direct text but has children)
-        const hasDirectText = Array.from(span.childNodes).some(
-            node => node.nodeType === Node.TEXT_NODE && node.textContent?.trim() !== ''
-        );
-
-        if (!hasDirectText && span.children.length > 0 && span.style.fontSize) {
-            // Remove ONLY font-size
-            span.style.removeProperty('font-size');
-
-            // If no inline styles remain, remove style attribute entirely
-            if (span.style.length === 0) { span.removeAttribute('style'); }
-        }
-
-        // 3. Remove completely useless spans
-        unwrapIfUseless(span);
-    });
-};
-
-/**
- * Removes the font-size style from an element. 
- * If the style attribute becomes empty, removes the attribute entirely.
- */
-const cleanFontSizeStyle = (element: HTMLElement) => {
-    element.style.fontSize = '';
-    if (element.getAttribute('style') === '') {
-        element.removeAttribute('style');
-    }
-};
-
-/**
- * unwraps spans that have no attributes (class, style, id, etc).
- * Processes in reverse (Bottom-Up) to handle nested empty spans in one pass.
- */
-const unwrapIfUseless = (span: HTMLElement) => {
-    if (!span.hasAttributes()) {
-        span.replaceWith(...Array.from(span.childNodes));
-    }
-};
-// #endregion
-
-// #region Helper: Multi-Paragraph Font Sizing
-
-/**
- * Finds all <p> tags in the editor that are currently highlighted by the user.
- */
-export const getAffectedParagraphs = (editorDiv: HTMLElement, selection: Selection): HTMLParagraphElement[] => {
-    const allParagraphs = editorDiv.querySelectorAll('p');
-    const affectedParagraphs: HTMLParagraphElement[] = [];
-
-    allParagraphs.forEach(p => {
-        if (selection.containsNode(p, true)) {
-            affectedParagraphs.push(p);
-        }
-    });
-
-    return affectedParagraphs;
-};
-
-/**
- * Finds all block-level elements (p, h1–h6, li, blockquote, pre, div, ul, ol)
- * inside the editor that intersect the current selection.
- *
- * This is the generalised version of getAffectedParagraphs — it covers every
- * tag listed in BLOCK_TAGS, not just <p>, so callers that need to operate
- * across headings, list items, blockquotes, etc. can use a single function.
- *
- * @param editor   - The root editor element.
- * @param selection - The current browser Selection.
- * @returns Ordered array of block elements that overlap the selection.
- */
-export const getAffectedBlocks = (editor: HTMLElement, selection: Selection): HTMLElement[] => (Array.from(editor.querySelectorAll(BLOCK_TAGS.join(','))) as HTMLElement[]).filter(block => selection.containsNode(block, true) && block !== editor)
-
-/**
- * Handles the complex logic of applying font sizes across multiple paragraphs,
- * calculating intersecting ranges, wrapping spans, and restoring the selection.
- */
-const handleMultiParagraphSelection = (container: HTMLElement, selection: Selection, originalRange: Range, newSize: string) => {
-    console.log("[FontSize] Handling multi-paragraph selection...");
-
-    // const affectedParagraphs = getAffectedParagraphs(container, selection);
-    const affectedParagraphs = getAffectedBlocks(container, selection).filter(block => !['UL', 'OL'].includes(block.tagName.toUpperCase()));
-    console.log(`[FontSize] Processing ${affectedParagraphs.length} paragraphs.`, Array.from(affectedParagraphs));
-
-    let firstStyledNode: HTMLElement | null = null;
-    let lastStyledNode: HTMLElement | null = null;
-
-    affectedParagraphs.forEach((p, index) => {
-        // 1. Create a Range specific to THIS paragraph's selection
-        const pRange = document.createRange();
-        pRange.selectNodeContents(p);
-
-        // Adjust the range start/end to match the user's selection
-        if (originalRange.compareBoundaryPoints(Range.START_TO_START, pRange) > 0) {
-            pRange.setStart(originalRange.startContainer, originalRange.startOffset);
-        }
-        if (originalRange.compareBoundaryPoints(Range.END_TO_END, pRange) < 0) {
-            pRange.setEnd(originalRange.endContainer, originalRange.endOffset);
-        }
-
-        const selectedText = pRange.toString();
-        console.log(`[FontSize] #${index + 1}: "${selectedText}" inside <${p.tagName}>`);
-
-        if (!selectedText.trim()) return; // Skip empty selections
-
-        // 2. Identify Context for this specific paragraph
-        let container = pRange.commonAncestorContainer as HTMLElement;
-        if (container.nodeType === Node.TEXT_NODE) {
-            container = container.parentElement!;
-        }
-
-        // 🚀 THE FIX: If container is P, check if we are actually fully inside a child SPAN
-        if (container.tagName === 'P') {
-            console.debug('[FontSize] 🔍 Container is P tag, checking for SPAN inside');
-
-            let startNode = pRange.startContainer;
-
-            // 🚀 CRITICAL FIX: If startContainer IS the paragraph, we need to grab the child node
-            if (startNode.nodeType === Node.ELEMENT_NODE && startNode === container) {
-                // "childNodes[startOffset]" gives us the exact node the selection starts at
-                const childIndex = pRange.startOffset;
-
-                // Check if there is a node at that index
-                if (childIndex < startNode.childNodes.length) {
-                    startNode = startNode.childNodes[childIndex];
-                }
-            }
-
-            // Case A: The selection starts inside a text node that is wrapped in a SPAN
-            let targetElement = startNode.nodeType === Node.TEXT_NODE ? startNode.parentElement : startNode as HTMLElement;
-
-            // Check if we found a SPAN
-            if (targetElement && targetElement.tagName === 'SPAN') {
-                const spanText = targetElement.textContent?.trim() || "";
-
-                if (spanText === selectedText.trim()) {
-                    console.debug('[FontSize] ✅ Text match! Using SPAN as container');
-                    container = targetElement;
-                }
-            }
-        }
-
-        const isSpan = container.tagName === 'SPAN';
-        const isMatch = container.textContent?.trim() === selectedText.trim();
-        let currentStyledSpan: HTMLElement;
-
-        // 3. Apply Style Logic
-        if (isSpan && isMatch) {
-            console.log(`[FontSize] #${index + 1}: updating existing span.`);
-            applyStyleToSpan(container, newSize);
-            currentStyledSpan = container;
-        } else {
-            console.log(`[FontSize] #${index + 1}: creating new span wrapper.`);
-            const contents = pRange.extractContents();
-            const span = document.createElement('span');
-            span.appendChild(contents);
-            pRange.insertNode(span);
-
-            applyStyleToSpan(span, newSize);
-            currentStyledSpan = span;
-        }
-
-        // 4. Track modifications for selection restoration
-        if (!firstStyledNode) firstStyledNode = currentStyledSpan;
-        lastStyledNode = currentStyledSpan;
-    });
-
-    // 5. Restore Exact Selection
-    if (firstStyledNode && lastStyledNode) {
-        selectElement(firstStyledNode, selection, lastStyledNode); // Stretches the highlight!
-    }
-};
-
-// #endregion
 

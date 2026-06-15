@@ -1,6 +1,6 @@
 import { $, $$, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlClass, HtmlString, Observable, ObservableMaybe, useEffect } from 'woby'
 import { Button, ButtonStyles } from '../Button'
-import { applyTextAlign, updateActiveStatus, ALIGNMENT_MAP } from './AlignButton'
+import { applyTextAlign as applyTextAlignStyle, updateActiveStatus, ALIGNMENT_MAP } from './AlignButton'
 import { getCurrentEditor, useBlockEnforcer } from './utils'
 import { useEditor } from './undoredo'
 
@@ -58,13 +58,8 @@ const AlignJustifyButton = defaults(def, (props) => {
     });
 
     const handleClick = () => {
-        const editorDiv = editor || getCurrentEditor()
-
-        applyTextAlign(alignment, { toAdd, toRemove }, editorDiv)
+        applyTextAlignStyle(alignment)
         isActive(true)
-
-        document.dispatchEvent(new Event('selectionchange'))
-        $$(editorDiv).focus()
     }
 
     return (

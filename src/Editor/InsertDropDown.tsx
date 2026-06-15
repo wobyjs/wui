@@ -215,20 +215,28 @@ const InsertDropDown = defaults(def, (props) => {
 
     return (
         <div class="relative inline-block text-left" ref={dropdownRef}>
-            <div>
+            <div class="flex">
                 <Button
                     type='outlined'
                     cls={() => [BASE_BTN]}
                     onClick={toggleDropdown}
                     title="Insert content"
                     disabled={disabled}
+                    onMouseDown={(e) => { e.preventDefault(); e.stopPropagation() }}
                 >
                     <span class="text-center truncate">
                         <Plus class="size-5" />
                     </span>
-                    <span class="flex justify-end">
-                        <KeyboardDownArrow class="-mr-1 ml-2 h-5 w-5" />
-                    </span>
+                </Button>
+                <Button
+                    type='outlined'
+                    class="size-full inline-flex justify-center items-center rounded-md border border-gray-300 shadow-sm bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500 cursor-pointer px-2"
+                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleDropdown(); }}
+                    onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                    title="Toggle dropdown"
+                    disabled={disabled}
+                >
+                    <KeyboardDownArrow class="h-5 w-5" />
                 </Button>
             </div>
 

@@ -1,8 +1,9 @@
 import { $, $$, JSX, Observable, ObservableMaybe, defaults, HtmlString, customElement, ElementAttributes, HtmlClass } from 'woby'
 import { Button, ButtonStyles } from '../Button'
-import { useEditor } from './undoredo'
+import { useEditor, useUndoRedo } from './undoredo'
 import A from '../icons/a'
 import KeyboardDownArrow from '../icons/keyboard_down_arrow'
+import { applyTextColor } from './StyleEngine'
 
 const def = () => ({
     cls: $('', HtmlClass) as JSX.Class | undefined,
@@ -17,6 +18,7 @@ const TextColorPicker = defaults(def, (props) => {
     const BASE_BTN = "size-full inline-flex items-center justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-black hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500 cursor-pointer"
 
     const editor = useEditor() // Editor context, likely the contentEditable div
+    const { saveDo } = useUndoRedo() // Undo/redo context
     const colorInputRef = $<HTMLInputElement>(null)
 
     // Updates selectedColor when the color input changes
@@ -28,9 +30,15 @@ const TextColorPicker = defaults(def, (props) => {
 
     // Applies the selected color to the editor content
     const applyPickedColor = () => {
+        // Sync from input element if available (fixes default color issue)
+        const colorInputEl = colorInputRef()
+        if (colorInputEl) {
+            selectedColor(colorInputEl.value)
+        }
+
         const colorVal = $$(selectedColor)
-        document.execCommand('styleWithCSS', false, 'true')
-        document.execCommand('foreColor', false, colorVal)
+        applyTextColor(colorVal) // Use StyleEngine instead of execCommand
+        saveDo() // Save to undo/redo history
         if ($$(editor)) {
             $$(editor).dispatchEvent(new Event('input', { bubbles: true }))
         }

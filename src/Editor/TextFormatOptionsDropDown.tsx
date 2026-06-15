@@ -1,9 +1,10 @@
 import { $, $$, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlClass, HtmlString, JSX, Observable, ObservableMaybe, useEffect } from 'woby'
 import { Button, ButtonStyles } from '../Button'
-import { useEditor } from './undoredo'
+import { useEditor, useUndoRedo } from './undoredo'
 import { useOnClickOutside } from '@woby/use/browser'
 import KeyboardDownArrow from '../icons/keyboard_down_arrow'
 import { getCurrentEditor, getSelection } from './utils'
+import { applyStyle, applyBackgroundColor, removeFormat } from './StyleEngine'
 
 import StrikethroughIcon from '../icons/strikethrough'
 
@@ -17,8 +18,24 @@ const ClearFormattingIcon = () => <span class="font-bold">Tx</span>
 const CaseTransformIcon = () => <span class="font-bold">Aa</span>
 
 
-const applyFormat = (command: string, value?: string) => {
-    document.execCommand(command, false, value)
+const applyStrikethrough = () => {
+    applyStyle('textDecoration', 'line-through')
+}
+
+const applySubscript = () => {
+    applyStyle('verticalAlign', 'sub')
+}
+
+const applySuperscript = () => {
+    applyStyle('verticalAlign', 'super')
+}
+
+const applyHighlight = (color: string) => {
+    applyBackgroundColor(color)
+}
+
+const clearFormatting = () => {
+    removeFormat()
 }
 
 const transformCase = (transformType: 'lowercase' | 'uppercase' | 'capitalize', editorDiv: HTMLElement) => {
@@ -123,11 +140,11 @@ interface FormatOption {
 
 
 export const FORMAT_OPTIONS: FormatOption[] = [
-    { label: 'Strikethrough', hotkey: 'Ctrl+Shift+S', action: () => applyFormat('strikeThrough'), icon: Strikethrough },
-    { label: 'Subscript', hotkey: 'Ctrl+,', action: () => applyFormat('subscript'), icon: SubscriptIcon },
-    { label: 'Superscript', hotkey: 'Ctrl+.', action: () => applyFormat('superscript'), icon: SuperscriptIcon },
-    { label: 'Highlight', hotkey: '', action: () => applyFormat('hiliteColor', 'yellow'), icon: HighlightIcon }, // Default yellow highlight
-    { label: 'Clear Formatting', hotkey: 'Ctrl+\\', action: () => applyFormat('removeFormat'), icon: ClearFormattingIcon },
+    { label: 'Strikethrough', hotkey: 'Ctrl+Shift+S', action: applyStrikethrough, icon: Strikethrough },
+    { label: 'Subscript', hotkey: 'Ctrl+,', action: applySubscript, icon: SubscriptIcon },
+    { label: 'Superscript', hotkey: 'Ctrl+.', action: applySuperscript, icon: SuperscriptIcon },
+    { label: 'Highlight', hotkey: '', action: () => applyHighlight('yellow'), icon: HighlightIcon },
+    { label: 'Clear Formatting', hotkey: 'Ctrl+\\', action: clearFormatting, icon: ClearFormattingIcon },
     { label: 'Lowercase', hotkey: 'Ctrl+Shift+1', action: (editorDiv) => transformCase('lowercase', editorDiv), icon: CaseTransformIcon },
     { label: 'Uppercase', hotkey: 'Ctrl+Shift+2', action: (editorDiv) => transformCase('uppercase', editorDiv), icon: CaseTransformIcon },
     { label: 'Capitalize', hotkey: 'Ctrl+Shift+3', action: (editorDiv) => transformCase('capitalize', editorDiv), icon: CaseTransformIcon },
@@ -153,6 +170,7 @@ const TextFormatOptionsDropDown = defaults(def, (props) => {
     const editor = useEditor()
     const isOpen = $(false)
     const dropdownRef = $<HTMLElement>(null)
+    const { saveDo } = useUndoRedo()
 
     useOnClickOutside(dropdownRef as any, () => isOpen(false))
 
@@ -164,6 +182,7 @@ const TextFormatOptionsDropDown = defaults(def, (props) => {
 
         if ($$(el)) {
             action($$(el))
+            saveDo()
         }
         isOpen(false)
     }
@@ -240,8 +259,9 @@ const StrikethroughButton = defaults(def_Strikethrough, (props) => {
 
     const editor = useEditor()
     const isActive = $(false)
+    const { saveDo } = useUndoRedo()
     const format = FORMAT_OPTIONS.find(f => f.label === 'Strikethrough')
-    const action = () => format.action()
+    const action = () => { format.action(); saveDo(); }
     const displayIcon = () => format.icon
 
     useEffect(() => {
@@ -268,8 +288,9 @@ const SubscriptButton = defaults(def_Subscript, (props) => {
 
     const editor = useEditor()
     const isActive = $(false)
+    const { saveDo } = useUndoRedo()
     const format = FORMAT_OPTIONS.find(f => f.label === 'Subscript')
-    const action = () => format.action()
+    const action = () => { format.action(); saveDo(); }
     const displayIcon = () => format.icon
 
     useEffect(() => {
@@ -296,8 +317,9 @@ const SuperscriptButton = defaults(def_Superscript, (props) => {
 
     const editor = useEditor()
     const isActive = $(false)
+    const { saveDo } = useUndoRedo()
     const format = FORMAT_OPTIONS.find(f => f.label === 'Superscript')
-    const action = () => format.action()
+    const action = () => { format.action(); saveDo(); }
     const displayIcon = () => format.icon
 
     useEffect(() => {
@@ -325,8 +347,9 @@ const HighlightButton = defaults(def_Highlight, (props) => {
 
     const editor = useEditor()
     const isActive = $(false)
+    const { saveDo } = useUndoRedo()
     const format = FORMAT_OPTIONS.find(f => f.label === 'Highlight')
-    const action = () => applyFormat('hiliteColor', $$(highlightColor))
+    const action = () => { applyHighlight($$(highlightColor)); saveDo(); }
     const displayIcon = () => format.icon
 
     useEffect(() => {
@@ -351,8 +374,9 @@ const def_ClearFormat = () => ({
 const ClearFormatButton = defaults(def_ClearFormat, (props) => {
     const { buttonType: btnType, title, cls, class: cn, disabled, ...otherProps } = props
     const isActive = false
+    const { saveDo } = useUndoRedo()
     const format = FORMAT_OPTIONS.find(f => f.label === 'Clear Formatting')
-    const action = () => format.action()
+    const action = () => { format.action(); saveDo(); }
     const displayIcon = () => format.icon
 
     return formatButton(btnType, title, cls, cn, isActive, disabled, action, displayIcon, otherProps)
@@ -375,11 +399,13 @@ const LowercaseButton = defaults(def_Lowercase, (props) => {
     const editor = useEditor()
 
     const isActive = false
+    const { saveDo } = useUndoRedo()
     const format = FORMAT_OPTIONS.find(f => f.label === 'Lowercase')
     const action = () => {
         const el = editor || getCurrentEditor()
         if (!$$(el)) return
         format.action($$(el))
+        saveDo()
     }
     const displayIcon = () => format.icon
     return formatButton(btnType, title, cls, cn, isActive, disabled, action, displayIcon, otherProps)
@@ -401,11 +427,13 @@ const UppercaseButton = defaults(def_Uppercase, (props) => {
     const editor = useEditor()
 
     const isActive = false
+    const { saveDo } = useUndoRedo()
     const format = FORMAT_OPTIONS.find(f => f.label === 'Uppercase')
     const action = () => {
         const el = editor || getCurrentEditor()
         if (!$$(el)) return
         format.action($$(el))
+        saveDo()
     }
     const displayIcon = () => format.icon
     return formatButton(btnType, title, cls, cn, isActive, disabled, action, displayIcon, otherProps)
@@ -427,11 +455,13 @@ const CapitalizeButton = defaults(def_Capitalize, (props) => {
     const editor = useEditor()
 
     const isActive = false
+    const { saveDo } = useUndoRedo()
     const format = FORMAT_OPTIONS.find(f => f.label === 'Capitalize')
     const action = () => {
         const el = editor || getCurrentEditor()
         if (!$$(el)) return
         format.action($$(el))
+        saveDo()
     }
     const displayIcon = () => format.icon
     return formatButton(btnType, title, cls, cn, isActive, disabled, action, displayIcon, otherProps)

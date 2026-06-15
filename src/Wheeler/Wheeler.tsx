@@ -1866,14 +1866,12 @@ const Wheeler = defaults(def, (props) => {
     // #region Header With Search
     const HeaderWithSearch = () => {
         // If no header prop is provided, render nothing.
-        // Use $$() to unwrap observable(undefined) which would otherwise be truthy.
-        // @ts-ignore - header type narrowing issue
-        if (!$$(header)) return null
+        // header is a regular function prop, not an observable
+        if (!header) return null
 
         return (
             <div>
-                {/* @ts-ignore - header callable issue */}
-                <div class='font-bold text-center'>{() => $$(header)(value)}</div>
+                <div class='font-bold text-center'>{header(value)}</div>
 
                 {/* This conditional rendering is now correct with your `searchable` prop */}
                 {() => $$(searchable) && (

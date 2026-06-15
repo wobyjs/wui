@@ -136,13 +136,13 @@ const TextAlignDropDown = defaults(def, (props) => {
 
     return (
         <div class={() => ["relative inline-block text-left", cls]} ref={dropdownRef}>
-            <div>
+            <div class="flex">
                 <Button
                     type={btnType}
                     class={() => [
                         () => $$(cls) ? $$(cls) : BASE_BTN, cn,
                     ]}
-                    onMouseDown={(e) => { e.preventDefault(); }}
+                    onMouseDown={(e) => { e.preventDefault(); e.stopPropagation() }}
                     onClick={handleApplyCurrent}
                     title="Text format"
                     {...otherProps}
@@ -157,12 +157,15 @@ const TextAlignDropDown = defaults(def, (props) => {
                             return <AlignLeftIcon />
                         }}
                     </span>
-                    <span class="flex justify-end">
-                        <KeyboardDownArrow class="-mr-1 ml-2 h-5 w-5"
-                            onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
-                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleDropdown() }}
-                        />
-                    </span>
+                </Button>
+                <Button
+                    type={btnType}
+                    class="size-full inline-flex justify-center items-center rounded-md border border-gray-300 shadow-sm bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500 cursor-pointer px-2"
+                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleDropdown(); }}
+                    onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                    title="Toggle dropdown"
+                >
+                    <KeyboardDownArrow class="h-5 w-5" />
                 </Button>
             </div>
 

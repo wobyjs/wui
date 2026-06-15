@@ -1,10 +1,11 @@
 import { $, $$, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlString, JSX, ObservableMaybe, useEffect, Observable, HtmlClass } from 'woby'
 import { Button, ButtonStyles } from '../Button'
-import { useEditor } from './undoredo'
+import { useEditor, useUndoRedo } from './undoredo'
 import { useOnClickOutside } from '@woby/use/browser'
 import KeyboardDownArrow from '../icons/keyboard_down_arrow'
 import { getCurrentEditor, getSelection } from './utils'
 import { QUOTE_TAG, QUOTE_CLASSES } from './Blockquote'
+import { applyFormatBlock as applyFormatBlockStyle } from './StyleEngine'
 
 // Dropdown items configuration
 export const FORMAT_OPTIONS = [
@@ -34,21 +35,16 @@ const TextFormatDropDown = defaults(def, (props) => {
 
     const isOpen = $(false)
     const dropdownRef = $<HTMLElement>(null)
+    const { saveDo } = useUndoRedo()
 
     useOnClickOutside(dropdownRef as any, () => isOpen(false))
 
     const toggleDropdown = () => isOpen(!isOpen())
 
     const handleSelectFormat = (tag: string, label: TextFormatOptions, cls: string | undefined) => {
-
-        const el = editor ?? getCurrentEditor()
-
-        if ($$(el)) {
-            selectedFormat(label)
-            applyFormatBlock($$(el), tag, cls)
-            isOpen(false)
-            $$(el).focus()
-        }
+        applyFormatBlockStyle(tag, cls)
+        selectedFormat(label)
+        saveDo()
         isOpen(false)
     }
 
@@ -62,13 +58,8 @@ const TextFormatDropDown = defaults(def, (props) => {
         const opt = FORMAT_OPTIONS.find(o => o.label === currentLabel)
 
         if (opt) {
-            // Apply it
-            const el = editor ?? getCurrentEditor()
-
-            if ($$(el)) {
-                applyFormatBlock($$(el), opt.tag, opt.class)
-                $$(el).focus()
-            }
+            applyFormatBlockStyle(opt.tag, opt.class)
+            saveDo()
         }
     }
 
@@ -122,7 +113,8 @@ const TextFormatDropDown = defaults(def, (props) => {
                     if ($$(el).contains(target) || target === $$(el) || currentDropdownEl?.contains(target)) {
                         // console.log('[TextFormatDropDown] Applying format:', opt.tag)
                         event.preventDefault()
-                        applyFormatBlock($$(el), opt.tag, opt.class)
+                        applyFormatBlockStyle(opt.tag, opt.class)
+                        saveDo()
                         selectedFormat(opt.label as TextFormatOptions)
                         isOpen(false)
                         $$(el).focus()
@@ -228,7 +220,7 @@ const TextFormatDropDown = defaults(def, (props) => {
 
     return (
         <div class={() => ["relative inline-block text-left", cls]} ref={dropdownRef}>
-            <div>
+            <div class="flex">
                 <Button
                     type={btnType}
                     class={() => [
@@ -242,9 +234,15 @@ const TextFormatDropDown = defaults(def, (props) => {
                     <span class="text-center truncate">
                         {() => $$(selectedFormat)}
                     </span>
-                    <span class="flex justify-end">
-                        <KeyboardDownArrow class="-mr-1 ml-2 h-5 w-5" onClick={toggleDropdown} onMouseDown={(e) => { e.preventDefault(); }} />
-                    </span>
+                </Button>
+                <Button
+                    type={btnType}
+                    class="size-full inline-flex justify-center items-center rounded-md border border-gray-300 shadow-sm bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500 cursor-pointer px-2"
+                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleDropdown(); }}
+                    onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                    title="Toggle dropdown"
+                >
+                    <KeyboardDownArrow class="h-5 w-5" />
                 </Button>
             </div>
 
@@ -270,7 +268,6 @@ declare module 'woby' {
 export default TextFormatDropDown
 
 
-
 // #region Helper Functions
 const getCurrentBlockInfo = (root: HTMLElement, range: Range) => {
     let node: Node | null = range.commonAncestorContainer
@@ -290,31 +287,5 @@ const getCurrentBlockInfo = (root: HTMLElement, range: Range) => {
         node = node.parentNode
     }
     return null
-}
-
-const applyFormatBlock = (editor: HTMLDivElement, tag: string, className: string) => {
-    const formatTag = `<${tag}>`
-    document.execCommand('formatBlock', false, formatTag)
-
-    // const selection = window.getSelection()
-    const { selection } = getSelection(editor)
-
-    if (selection && selection.rangeCount > 0) {
-        const range = selection.getRangeAt(0)
-        let node: Node | null = range.commonAncestorContainer
-        if (node.nodeType === Node.TEXT_NODE) node = node.parentElement
-
-        // Traverse up to find the tag we just requested
-        while (node && node !== editor) {
-            if (node.nodeType === Node.ELEMENT_NODE) {
-                const el = node as HTMLElement
-                if (el.tagName.toLowerCase() === tag.toLowerCase()) {
-                    el.className = className
-                    return
-                }
-            }
-            node = node.parentNode
-        }
-    }
 }
 // #endregion

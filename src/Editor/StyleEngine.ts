@@ -326,13 +326,19 @@ export function applyStyle(prop: string, value: string): void {
         normalizeDOM(normalizeTarget)
     }
 
-    // D-08: restore selection, then verify
-    if (savedSelection.editorRoot && savedSelection.startOffset >= 0 && savedSelection.endOffset >= 0) {
-        restoreSelectionFromOffsets(
-            savedSelection.editorRoot,
-            savedSelection.startOffset,
-            savedSelection.endOffset
-        )
+    // D-08: restore selection by finding the same text content in normalized DOM
+    // After normalization, text nodes may have been merged, so we need to find
+    // the text content that was previously selected and re-select it
+    if (savedSelection.editorRoot && selectionTextBefore) {
+        const found = findAndSelectText(savedSelection.editorRoot, selectionTextBefore)
+        if (!found) {
+            // Fallback: restore using offsets (may not work correctly after normalization)
+            restoreSelectionFromOffsets(
+                savedSelection.editorRoot,
+                savedSelection.startOffset,
+                savedSelection.endOffset
+            )
+        }
         const selectionTextAfter = window.getSelection()?.toString() ?? ''
         if (selectionTextBefore !== selectionTextAfter && selectionTextBefore.trim() !== '') {
             console.warn('[applyStyle] Selection text changed after restore. Before:', JSON.stringify(selectionTextBefore), 'After:', JSON.stringify(selectionTextAfter))
@@ -340,6 +346,43 @@ export function applyStyle(prop: string, value: string): void {
     } else if (!savedSelection.editorRoot) {
         console.warn('[applyStyle] Could not find editor root for selection restoration — cursor may be lost')
     }
+}
+
+/**
+ * Find and select text content in editor after DOM normalization
+ * Returns true if found and selected, false otherwise
+ */
+function findAndSelectText(editorRoot: HTMLElement, textToFind: string): boolean {
+    if (!textToFind) return false
+
+    const walker = document.createTreeWalker(editorRoot, NodeFilter.SHOW_TEXT, null)
+    let node: Node | null
+
+    while ((node = walker.nextNode())) {
+        const textNode = node as Text
+        const text = textNode.textContent || ''
+        const index = text.indexOf(textToFind)
+
+        if (index !== -1) {
+            // Found the text! Select it.
+            const sel = safeGetSelection()
+            if (!sel) return false
+
+            try {
+                const newRange = document.createRange()
+                newRange.setStart(textNode, index)
+                newRange.setEnd(textNode, index + textToFind.length)
+                sel.removeAllRanges()
+                sel.addRange(newRange)
+                return true
+            } catch (e) {
+                console.warn('[findAndSelectText] Failed to select text:', e)
+                return false
+            }
+        }
+    }
+
+    return false
 }
 
 /**
@@ -857,13 +900,19 @@ export function removeStyle(prop: string, savedSelection?: { editorRoot: HTMLEle
         console.log('[removeStyle] After normalizeDOM:', normalizeTarget.innerHTML)
     }
 
-    // D-08: restore and verify
-    if (savedSelection.editorRoot && savedSelection.startOffset >= 0 && savedSelection.endOffset >= 0) {
-        restoreSelectionFromOffsets(
-            savedSelection.editorRoot,
-            savedSelection.startOffset,
-            savedSelection.endOffset
-        )
+    // D-08: restore selection by finding the same text content in normalized DOM
+    // After normalization, text nodes may have been merged, so we need to find
+    // the text content that was previously selected and re-select it
+    if (savedSelection.editorRoot && selectionTextBefore) {
+        const found = findAndSelectText(savedSelection.editorRoot, selectionTextBefore)
+        if (!found) {
+            // Fallback: restore using offsets (may not work correctly after normalization)
+            restoreSelectionFromOffsets(
+                savedSelection.editorRoot,
+                savedSelection.startOffset,
+                savedSelection.endOffset
+            )
+        }
         const selectionTextAfter = window.getSelection()?.toString() ?? ''
         if (selectionTextBefore !== selectionTextAfter && selectionTextBefore.trim() !== '') {
             console.warn('[removeStyle] Selection text changed after restore. Before:', JSON.stringify(selectionTextBefore), 'After:', JSON.stringify(selectionTextAfter))

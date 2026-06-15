@@ -1,6 +1,6 @@
 import { $, $$, render, customElement, defaults, ElementAttributes, HtmlClass, HtmlString, ObservableMaybe, useEffect, } from 'woby'
 import { Button, ButtonStyles } from '../Button'
-import { useEditor } from './undoredo'
+import { useEditor, useUndoRedo } from './undoredo'
 import { Checkbox } from '../Checkbox'
 import { getSelection, getCurrentEditor, getClosestElementFromSelection, BLOCK_TAGS, getSelectedBlocks, restoreRangePosition, LIST_TAGS, LI_TAG, P_TAG } from './utils'
 import ListBulleted from '../icons/list_bulleted'
@@ -38,6 +38,7 @@ const List = defaults(def, (props) => {
     const { class: cn, cls, mode, buttonType: btnType, ...otherProps } = props
 
     const editor = useEditor()
+    const { saveDo } = useUndoRedo()
     const isActive = $(false)
 
     // Reactive Icon
@@ -170,6 +171,8 @@ const List = defaults(def, (props) => {
 
         // insertList($$(el), listProps().tag, listProps().classToAdd, listProps().classToRemove, $$(mode))
         insertList($$(el), { tag: listProps().tag, classes: { add: listProps().classToAdd, remove: listProps().classToRemove }, id: listProps().id }, $$(mode))
+
+        saveDo()
 
         // Force update UI state immediately
         // (Short timeout allows the DOM to update first)
@@ -317,7 +320,12 @@ export const ListService = {
 const insertList = (editor: HTMLDivElement, targetList: { tag: 'ul' | 'ol', classes: { add: string, remove: string }, id }, mode: ListMode) => {
     console.group("[List] Inserting List (mode: " + mode + ")");
     const { selection, state } = getSelection(editor);
-    if (!selection?.rangeCount) return;
+
+    if (!selection?.rangeCount) {
+        console.log("[List] No selection range available.");
+        console.groupEnd();
+        return;
+    }
 
     let range = selection.getRangeAt(0);
 
@@ -369,9 +377,10 @@ const insertList = (editor: HTMLDivElement, targetList: { tag: 'ul' | 'ol', clas
     let action: string | null = null
 
     // selected items is all <li> tag
+    let currentList: HTMLElement | null = null
     if (isAllLI) {
         console.log("📌 Selected Items is all <li> tags.")
-        const currentList = startElement.closest('ul, ol') as HTMLElement;
+        currentList = startElement.closest('ul, ol') as HTMLElement;
         const items = Array.from(currentList.children) as HTMLLIElement[];
         console.log("Current List: ", currentList)
 
@@ -405,12 +414,19 @@ const insertList = (editor: HTMLDivElement, targetList: { tag: 'ul' | 'ol', clas
     console.log("Action: ", action)
 
     console.groupEnd()
-    return
-    // unreachable code below - intentionally disabled for now
-    // @ts-ignore
-    if (false as any) {
-        const currentList = startElement.closest('ul, ol') as HTMLElement;
 
+    // Continue with list manipulation
+    if (!currentList) {
+        currentList = startElement.closest('ul, ol') as HTMLElement;
+    }
+
+    // CRITICAL FIX: Only process list operations if we have an existing list
+    // For creating new lists, jump to Case 3
+    if (!currentList) {
+        console.log("No existing list found. Will create new list.");
+    }
+
+    if (currentList) {
         const allItems = Array.from(currentList.children);
         const selectedItems = getSelectedBlocks(editor, range, ['LI', 'P']);
 
@@ -435,9 +451,9 @@ const insertList = (editor: HTMLDivElement, targetList: { tag: 'ul' | 'ol', clas
         console.groupEnd()
 
         // #region Toggle Off List
-        if (currentList.id === targetList.id && !isPerformMergeList) {
+        if (currentList!.id === targetList.id && !isPerformMergeList) {
             console.groupCollapsed("Case 1: Toggle Off")
-            ListService.splitList(currentList, targetItems, afterItems, (items) => {
+            ListService.splitList(currentList!, targetItems, afterItems, (items) => {
                 return items.map((li, index) => {
                     console.log(`\t#${index + 1}. ${li.textContent} `)
 
@@ -454,15 +470,15 @@ const insertList = (editor: HTMLDivElement, targetList: { tag: 'ul' | 'ol', clas
         // #endregion
 
         // #region Switch Tag List
-        else if (currentList.id !== targetList.id) {
+        else if (currentList!.id !== targetList.id) {
             console.groupCollapsed("Case 1: Partial Switch Tag / Mixed Tag")
             if (state.isCollapsed) {
                 console.log("Case 1: Switch Tag (entire list)")
-                ListService.switchTag(currentList, targetList.tag, targetList);
+                ListService.switchTag(currentList!, targetList.tag, targetList);
             } else {
                 console.log("Case 1: Switch Tag (selected items)")
 
-                ListService.splitList(currentList, targetItems, afterItems, (items) => {
+                ListService.splitList(currentList!, targetItems, afterItems, (items) => {
                     const middle = document.createElement(targetList.tag.toUpperCase());
                     middle.id = targetList.id;
                     middle.className = targetList.classes.add;
@@ -483,17 +499,15 @@ const insertList = (editor: HTMLDivElement, targetList: { tag: 'ul' | 'ol', clas
             console.groupEnd()
         }
         // #endregion
-    }
-    // #endregion
 
-    // #region Case 2: Append/Split List (The Surgery)
-    else if (startElement.tagName == "LI" || endElement.tagName == "LI") {
-        console.groupCollapsed("CASE 2: Append/Split List (The Surgery)");
-        console.log("Range Selection either start or end is a list tag.");
+        // #region Case 2: Append/Split List (The Surgery)
+        else if (startElement.tagName == "LI" || endElement.tagName == "LI") {
+            console.groupCollapsed("CASE 2: Append/Split List (The Surgery)");
+            console.log("Range Selection either start or end is a list tag.");
 
-        const currentList = startElement.tagName == "LI" ? startElement.closest('ul, ol') : endElement.closest('ul, ol');
+            const currentList = startElement.tagName == "LI" ? startElement.closest('ul, ol') : endElement.closest('ul, ol');
 
-        if (currentList.id && currentList.id == targetList.id) {
+            if (currentList.id && currentList.id == targetList.id) {
             console.groupCollapsed("Add into same list");
             const selectedBlocks = getSelectedBlocks(editor, range, BLOCK_TAGS.filter((tag) => ['P', 'LI'].includes(tag)))
 
@@ -584,13 +598,19 @@ const insertList = (editor: HTMLDivElement, targetList: { tag: 'ul' | 'ol', clas
         console.groupEnd();
     }
     // #endregion
+    } // End of if (currentList)
 
     // #region  Case 3: Create New List
     else {
         console.groupCollapsed("CASE 3: Create New List");
         console.log("Range Selection neither start nor end is a list tag.");
 
-        const previousSibling = startElement.previousElementSibling as HTMLElement | null;
+        // Get the actual selected blocks first
+        let selectedBlocks = getSelectedBlocks(editor, range);
+
+        // Use the first selected block as reference, not startElement
+        const firstBlock = selectedBlocks[0];
+        const previousSibling = firstBlock?.previousElementSibling as HTMLElement | null;
         const isList = ["UL", "OL"].includes(previousSibling?.tagName.toUpperCase() ?? "");
 
         // Path A: Join existing list
@@ -622,8 +642,12 @@ const insertList = (editor: HTMLDivElement, targetList: { tag: 'ul' | 'ol', clas
             newList.id = targetList.id;
             newList.className = targetList.classes.add;
 
-            // 4. Insert before/after
-            previousSibling ? previousSibling.after(newList) : startElement.before(newList);
+            // 4. Insert before/after - use firstBlock if available, otherwise startElement
+            if (firstBlock) {
+                previousSibling ? previousSibling.after(newList) : firstBlock.before(newList);
+            } else {
+                previousSibling ? previousSibling.after(newList) : startElement.before(newList);
+            }
 
             // 5. Process blocks
             selectedBlocks.forEach((block, index) => {

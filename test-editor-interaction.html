@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editor Test - Phase 16</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-section h2 {
+            margin-top: 0;
+            color: #333;
+        }
+        .instructions {
+            background: #e3f2fd;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+        .status {
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .pass { color: green; }
+        .fail { color: red; }
+    </style>
+</head>
+<body>
+    <h1>Editor Interaction Test - Phase 16</h1>
+
+    <div class="test-section">
+        <h2>Test 1: Backspace/Delete Keys</h2>
+        <div class="instructions">
+            <p><strong>Instructions:</strong></p>
+            <ol>
+                <li>Click inside the editor below to enable editing</li>
+                <li>Type some text (e.g., "Hello World")</li>
+                <li>Press Backspace key - text before cursor should be deleted</li>
+                <li>Press Delete key - text after cursor should be deleted</li>
+            </ol>
+        </div>
+        <wui-editor enableToolbar>
+            <p>Test paragraph for backspace/delete testing.</p>
+        </wui-editor>
+        <div class="status" id="status1">Status: Testing...</div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 2: Text Alignment</h2>
+        <div class="instructions">
+            <p><strong>Instructions:</strong></p>
+            <ol>
+                <li>Click inside the editor below to enable editing</li>
+                <li>Select some text or place cursor in a paragraph</li>
+                <li>Click "Align Center" button in toolbar</li>
+                <li>Text should center-align</li>
+                <li>Try "Align Right" and "Align Left" buttons</li>
+            </ol>
+        </div>
+        <wui-editor enableToolbar>
+            <p>This paragraph should be able to be aligned left, center, right, or justified.</p>
+            <p>Second paragraph for testing alignment across multiple paragraphs.</p>
+        </wui-editor>
+        <div class="status" id="status2">Status: Testing...</div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 3: Indent/Outdent</h2>
+        <div class="instructions">
+            <p><strong>Instructions:</strong></p>
+            <ol>
+                <li>Click inside the editor below to enable editing</li>
+                <li>Place cursor in a paragraph</li>
+                <li>Click "Increase Indent" button (Indent icon)</li>
+                <li>Paragraph should indent (padding/margin increases)</li>
+                <li>Click "Decrease Indent" button (Outdent icon)</li>
+                <li>Paragraph should outdent (padding/margin decreases)</li>
+            </ol>
+        </div>
+        <wui-editor enableToolbar>
+            <p>This paragraph should be able to be indented and outdented.</p>
+            <p>Second paragraph for testing indent on multiple paragraphs.</p>
+        </wui-editor>
+        <div class="status" id="status3">Status: Testing...</div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 4: All Toolbar Buttons</h2>
+        <div class="instructions">
+            <p><strong>Instructions:</strong></p>
+            <ol>
+                <li>Test all formatting buttons: Bold, Italic, Underline</li>
+                <li>Test Font Family dropdown</li>
+                <li>Test Font Size</li>
+                <li>Test Text Color and Background Color pickers</li>
+                <li>Test Bullet List, Number List, Checkbox List</li>
+                <li>Test Blockquote button</li>
+            </ol>
+        </div>
+        <wui-editor enableToolbar>
+            <p>Test paragraph with various formatting options available in the toolbar.</p>
+            <p>Second paragraph for testing formatting across multiple paragraphs.</p>
+        </wui-editor>
+        <div class="status" id="status4">Status: Testing...</div>
+    </div>
+
+    <script type="module">
+        import './src/Editor/Editor.tsx'
+        import './src/Editor/BoldButton.tsx'
+        import './src/Editor/ItalicButton.tsx'
+        import './src/Editor/UnderlineButton.tsx'
+        import './src/Editor/List.tsx'
+        import './src/Editor/Indent.tsx'
+        import './src/Editor/AlignButton.tsx'
+        import './src/Editor/TextAlignDropDown.tsx'
+        import './src/Editor/FontFamilyDropDown.tsx'
+        import './src/Editor/FontSize.tsx'
+        import './src/Editor/TextColorPicker.tsx'
+        import './src/Editor/TextBackgroundColorPicker.tsx'
+        import './src/Editor/Blockquote.tsx'
+        import './src/Editor/TextFormatDropDown.tsx'
+
+        // Wait for editors to render
+        setTimeout(() => {
+            document.querySelectorAll('.status').forEach(status => {
+                status.textContent = 'Status: Ready for testing';
+                status.classList.add('pass');
+            });
+        }, 1000);
+    </script>
+</body>
+</html>

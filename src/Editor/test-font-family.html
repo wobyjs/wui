@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Font Family & Remaining Buttons Test</title>
+    <script type="module">
+        import './Editor.tsx'
+
+        // Test helper
+        window.testEditor = {
+            verifyComputedStyle: (selector, property) => {
+                const el = document.querySelector(selector)
+                if (!el) return { error: 'Element not found' }
+                const computed = window.getComputedStyle(el)
+                return {
+                    element: el.tagName,
+                    classes: el.className,
+                    [property]: computed[property]
+                }
+            },
+
+            clickButton: (selector) => {
+                const btn = document.querySelector(selector)
+                if (!btn) return { error: 'Button not found' }
+                btn.click()
+                return { clicked: true }
+            },
+
+            selectText: (startOffset, endOffset, containerSelector = 'p') => {
+                const container = document.querySelector(containerSelector)
+                if (!container) return { error: 'Container not found' }
+
+                const range = document.createRange()
+                const textNode = container.firstChild
+                range.setStart(textNode, startOffset)
+                range.setEnd(textNode, endOffset)
+
+                const sel = window.getSelection()
+                sel.removeAllRanges()
+                sel.addRange(range)
+
+                return {
+                    selected: true,
+                    text: range.toString()
+                }
+            },
+
+            logHTML: () => {
+                const editor = document.querySelector('[contenteditable="true"]')
+                return {
+                    innerHTML: editor?.innerHTML,
+                    lightDOM: editor?.querySelector('slot')?.assignedNodes().map(n => n.outerHTML || n.textContent).join('\n')
+                }
+            }
+        }
+
+        console.log('Test helpers loaded. Access via window.testEditor')
+    </script>
+</head>
+<body class="p-8 bg-gray-100 min-h-screen">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold mb-6">Font Family & Remaining Buttons Test</h1>
+
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">Test Instructions</h2>
+            <div class="space-y-2 text-sm">
+                <p>✅ <strong>Font Family</strong> - Test Arial, Courier New, Georgia, Times New Roman</p>
+                <p>✅ <strong>Strikethrough</strong> - Test text-decoration: line-through</p>
+                <p>✅ <strong>Subscript/Superscript</strong> - Test vertical-align</p>
+                <p>✅ <strong>Alignment</strong> - Test Left, Center, Right, Justify</p>
+                <p>✅ <strong>Indent/Outdent</strong> - Test margin-left changes</p>
+                <p>✅ <strong>Blockquote</strong> - Test blockquote wrapping</p>
+            </div>
+        </div>
+
+        <wui-editor>
+            <h1 class="text-2xl font-bold mb-4">Font Family Test Section</h1>
+
+            <p class="mb-3">First paragraph for font family testing - select this entire paragraph and apply different fonts.</p>
+
+            <p class="mb-3">Second paragraph for partial selection testing. We'll select "partial selection" words only and apply Courier New font.</p>
+
+            <h2 class="text-xl font-semibold mb-3 mt-6">List Tests</h2>
+
+            <ul class="list-disc ml-6 mb-4">
+                <li class="mb-1">Bullet list item one - test font family on entire list item</li>
+                <li class="mb-1">Bullet list item two - test Georgia font</li>
+                <li class="mb-1">Bullet list item three - nested testing</li>
+            </ul>
+
+            <ol class="list-decimal ml-6 mb-4">
+                <li class="mb-1">Numbered item one - test Times New Roman</li>
+                <li class="mb-1">Numbered item two - partial selection font change</li>
+                <li class="mb-1">Numbered item three - cross-format test</li>
+            </ol>
+
+            <blockquote class="border-l-4 border-gray-400 pl-4 italic mb-4">
+                <p class="mb-0">Blockquote paragraph for font family testing - should apply font to entire blockquote content.</p>
+            </blockquote>
+
+            <h2 class="text-xl font-semibold mb-3 mt-6">Cross-Format Tests</h2>
+
+            <p class="mb-3 font-bold">Bold text paragraph - apply Georgia font to see if nested spans work correctly.</p>
+
+            <p class="mb-3 italic">Italic text paragraph - apply Courier New font combined with italic style.</p>
+
+            <p class="mb-3 underline">Underlined text paragraph - apply Times New Roman font combined with underline.</p>
+
+            <h2 class="text-xl font-semibold mb-3 mt-6">Strikethrough & Subscript/Superscript Tests</h2>
+
+            <p class="mb-3">Strikethrough test paragraph - select and apply strikethrough formatting.</p>
+
+            <p class="mb-3">Subscript test paragraph - select "subscript" word and make it subscript.</p>
+
+            <p class="mb-3">Superscript test paragraph - select "superscript" word and make it superscript.</p>
+
+            <h2 class="text-xl font-semibold mb-3 mt-6">Alignment Tests</h2>
+
+            <p class="mb-3">Left aligned paragraph - test left alignment button.</p>
+
+            <p class="mb-3">Center aligned paragraph - test center alignment button.</p>
+
+            <p class="mb-3">Right aligned paragraph - test right alignment button.</p>
+
+            <p class="mb-3">Justify aligned paragraph - this paragraph has enough text to test justify alignment properly. Justify should spread text evenly across the width.</p>
+
+            <h2 class="text-xl font-semibold mb-3 mt-6">Nested & Complex Tests</h2>
+
+            <div class="mb-4">
+                <p class="mb-2">Paragraph with <strong class="font-bold">bold text inside</strong> - select entire paragraph and apply Arial.</p>
+
+                <p class="mb-2">Paragraph with <em class="italic">italic text inside</em> - select entire paragraph and apply Courier New.</p>
+
+                <p class="mb-2">Paragraph with <u class="underline">underlined text inside</u> - select entire paragraph and apply Georgia.</p>
+            </div>
+
+            <p class="mb-3 text-red-500">Red colored text paragraph - apply font family to see if color is preserved.</p>
+
+            <p class="mb-3 bg-yellow-200">Yellow background paragraph - apply font family to see if background is preserved.</p>
+
+            <h2 class="text-xl font-semibold mb-3 mt-6">Font Size Combined with Font Family</h2>
+
+            <p class="mb-3 text-lg">Large text paragraph - apply Courier New font to see if size is preserved.</p>
+
+            <p class="mb-3 text-sm">Small text paragraph - apply Georgia font to see if size is preserved.</p>
+        </wui-editor>
+
+        <div class="mt-6 bg-gray-50 rounded p-4">
+            <p class="text-sm text-gray-600">
+                <strong>Note:</strong> Use browser console to run verification commands.
+                Example: <code>window.testEditor.verifyComputedStyle('span', 'fontFamily')</code>
+            </p>
+        </div>
+    </div>
+</body>
+</html>

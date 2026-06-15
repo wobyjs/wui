@@ -1,7 +1,8 @@
 import { $, $$, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlClass, HtmlString, Observable, ObservableMaybe, useEffect } from 'woby'
 import { Button, ButtonStyles } from '../Button'
-import { getSelection, getCurrentEditor, useBlockEnforcer, BLOCK_TAGS, getCurrentBlock, getSelectedBlocks } from './utils'
+import { getCurrentEditor, useBlockEnforcer, BLOCK_TAGS, getCurrentBlock, getSelectedBlocks } from './utils'
 import { useEditor } from './undoredo'
+import { applyTextAlign as applyTextAlignStyle } from './StyleEngine'
 import AlignCenter from '../icons/align_center'
 import AlignLeft from '../icons/align_left'
 import AlignRight from '../icons/align_right'
@@ -105,21 +106,14 @@ const AlignButton = defaults(def, (props) => {
     const displayTitle = () => { return currentAlignment().defaultTitle; }
 
     const handleClick = (e: any) => {
-        const editorDiv = editor || getCurrentEditor()
-
         if (customOnClick) {
             customOnClick(e)
             return
         }
 
         const alignment = currentAlignment().align
-
-        console.log("[Align Button] editor div: ", $$(editorDiv))
-        applyTextAlign(alignment as ContentAlign, { toAdd: ALIGNMENT_MAP[alignment].classToAdd, toRemove: ALIGNMENT_MAP[alignment].classToRemove }, editorDiv)
+        applyTextAlignStyle(alignment)
         isActive(true)
-
-        document.dispatchEvent(new Event('selectionchange'))
-        $$(editorDiv).focus()
     }
 
     return (

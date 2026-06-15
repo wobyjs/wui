@@ -18,30 +18,44 @@ export function mergeTextNodes(container: HTMLElement): void {
         null
     )
 
-    const toMerge: Text[] = []
+    // Collect all consecutive text node sequences
+    const sequences: Text[][] = []
+    let currentSequence: Text[] = []
+    let lastNode: Text | null = null
 
     let node: Node | null
-    let prevNode: Text | null = null
-
     while ((node = walker.nextNode())) {
         const textNode = node as Text
-        if (prevNode &&
-            prevNode.parentNode === textNode.parentNode &&
-            prevNode.nextSibling === textNode) {
-            toMerge.push(textNode)
+
+        if (lastNode &&
+            lastNode.parentNode === textNode.parentNode &&
+            lastNode.nextSibling === textNode) {
+            // Continue current sequence
+            currentSequence.push(textNode)
         } else {
-            prevNode = textNode
+            // Start new sequence
+            if (currentSequence.length > 0) {
+                sequences.push(currentSequence)
+            }
+            currentSequence = [textNode]
         }
+        lastNode = textNode
     }
 
-    // Merge nodes (reverse order to maintain indices)
-    for (let i = toMerge.length - 1; i >= 0; i--) {
-        const nodeToMerge = toMerge[i]
-        if (prevNode && prevNode.parentNode === nodeToMerge.parentNode) {
-            prevNode.textContent += nodeToMerge.textContent
-            nodeToMerge.remove()
-        }
+    // Don't forget the last sequence
+    if (currentSequence.length > 1) {
+        sequences.push(currentSequence)
     }
+
+    // Merge each sequence from end to start
+    sequences.forEach(sequence => {
+        // Merge all into the first node
+        const firstNode = sequence[0]
+        for (let i = 1; i < sequence.length; i++) {
+            firstNode.textContent += sequence[i].textContent
+            sequence[i].remove()
+        }
+    })
 }
 
 /**
@@ -94,6 +108,7 @@ function replaceWithChildren(el: HTMLElement): void {
  * Unwrap redundant nested spans
  * Example: <span style="bold"><span style="bold">text</span></span>
  * Should become: <span style="bold">text</span>
+ * BUT: <span style="bold"><span style="italic">text</span></span> should NOT be unwrapped
  */
 export function unwrapRedundantSpans(container: HTMLElement): void {
     const selector = 'span[style], strong, em, b, i, u, s'
@@ -110,9 +125,10 @@ export function unwrapRedundantSpans(container: HTMLElement): void {
 
             if (!parent) return
 
-            // Check if parent has same style
-            if (parent.tagName === htmlEl.tagName ||
-                (parent.hasAttribute('style') && hasIdenticalStyles(parent as HTMLElement, htmlEl))) {
+            // Check if parent has same style - only unwrap if styles are identical
+            // This handles: <b><b>text</b></b> → <b>text</b>
+            // But NOT: <span style="bold"><span style="italic">text</span></span>
+            if (parent.hasAttribute('style') && hasIdenticalStyles(parent as HTMLElement, htmlEl)) {
                 replaceWithChildren(htmlEl)
                 changed = true
             }

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test: Double-Click/Tap Selection + Backspace</title>
+    <style>
+        body {
+            font-family: system-ui, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-box {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .instructions {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+        .console-log {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            margin-top: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        wui-editor {
+            border: 2px solid #e0e0e0;
+            min-height: 150px;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test: Double-Click/Tap Selection + Backspace</h1>
+
+    <div class="test-box">
+        <h2>Desktop: Double-Click to Select Word</h2>
+        <div class="instructions">
+            <ol>
+                <li>Click inside editor (turns blue)</li>
+                <li>Double-click on the word "Hello" to select it</li>
+                <li>Press Backspace key</li>
+                <li>The word "Hello" should be deleted</li>
+            </ol>
+        </div>
+        <wui-editor enableToolbar="true">
+            <p>Hello World - double-click on "Hello" to select it</p>
+        </wui-editor>
+        <div class="console-log" id="log1"></div>
+    </div>
+
+    <div class="test-box">
+        <h2>Mobile: Double-Tap to Select Word</h2>
+        <div class="instructions">
+            <ol>
+                <li>Tap inside editor to activate</li>
+                <li>Double-tap on the word "Test" to select it</li>
+                <li>Tap backspace/delete key on mobile keyboard</li>
+                <li>The word "Test" should be deleted</li>
+            </ol>
+        </div>
+        <wui-editor enableToolbar="true">
+            <p>Test Paragraph - double-tap "Test" word then press backspace</p>
+        </wui-editor>
+        <div class="console-log" id="log2"></div>
+    </div>
+
+    <div class="test-box">
+        <h2>Control: Manual Selection + Backspace</h2>
+        <div class="instructions">
+            <ol>
+                <li>Click inside editor</li>
+                <li>Manually drag to select the word "Manual"</li>
+                <li>Press Backspace</li>
+                <li>Should delete successfully</li>
+            </ol>
+        </div>
+        <wui-editor enableToolbar="true">
+            <p>Manual selection test - drag to select "Manual" word</p>
+        </wui-editor>
+        <div class="console-log" id="log3"></div>
+    </div>
+
+    <script type="module">
+        import './src/index.tsx'
+        import { safeGetRange, safeGetSelection } from './src/Editor/BrowserCompat.ts'
+
+        await customElements.whenDefined('wui-editor')
+
+        function logSelectionState(editorNum) {
+            const logDiv = document.getElementById(`log${editorNum}`)
+            const sel = window.getSelection()
+            const range = safeGetRange()
+
+            const entry = document.createElement('div')
+            const time = new Date().toLocaleTimeString()
+            const text = `[${time}] Selection: ${sel ? 'yes' : 'null'}, rangeCount: ${sel?.rangeCount ?? 'N/A'}, Range: ${range ? 'yes' : 'null'}, collapsed: ${range?.collapsed ?? 'N/A'}`
+            entry.textContent = text
+            logDiv.appendChild(entry)
+        }
+
+        document.addEventListener('selectionchange', () => {
+            console.log('[SelectionChange] Event fired')
+            for (let i = 1; i <= 3; i++) {
+                try { logSelectionState(i) } catch {}
+            }
+        })
+
+        document.querySelectorAll('wui-editor').forEach((editor, index) => {
+            editor.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' || e.key === 'Delete') {
+                    console.log(`[Editor ${index + 1}] ${e.key} key pressed`)
+                    logSelectionState(index + 1)
+                }
+            })
+
+            editor.addEventListener('dblclick', (e) => {
+                console.log(`[Editor ${index + 1}] Double-click detected`)
+                setTimeout(() => logSelectionState(index + 1), 100)
+            })
+        })
+
+        console.log('[Test] Page loaded. Test double-click/tap + backspace.')
+    </script>
+</body>
+</html>

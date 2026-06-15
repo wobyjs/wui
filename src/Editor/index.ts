@@ -14,8 +14,11 @@ export { BrowserInfo, safeGetSelection, safeGetRange, normalizeRange, getDirecti
 export { normalizeDOM, mergeTextNodes, removeEmptySpans, unwrapRedundantSpans, mergeAdjacentSpans, normalizeBlockBoundaries } from './DOMNormalizer'
 
 // Style Engine
-export { applyStyle, removeStyle, toggleStyle, applyBold, applyItalic, applyUnderline, applyStrikethrough, applyTextColor, applyBackgroundColor, applyFontFamily, applyFontSize } from './StyleEngine'
+export { applyStyle, removeStyle, toggleStyle, applyBold, applyItalic, applyUnderline, applyStrikethrough, applyTextColor, applyBackgroundColor, applyFontFamily, applyFontSize, applyIndent } from './StyleEngine'
 
 // Utility functions
 export { getSelection, restoreSelection, getCurrentRange, expandRange, getSelectedBlocks, getCurrentBlock } from './utils'
 export { applyStyle as applyStyleLegacy } from './utils'
+
+// Focus management
+export { FocusManager } from './FocusManager'
