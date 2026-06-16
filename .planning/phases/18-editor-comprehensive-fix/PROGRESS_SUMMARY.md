@@ -113,6 +113,30 @@
 - No console errors ✅
 - UndoRedo functioning correctly ✅
 
+### Critical Bug Fix (2026-06-16) ✅
+
+**Problem**: Selection jumped to wrong text occurrence after formatting
+- Selecting "paragraph" in "cross-paragraph selection testing", clicking underline
+- Selection jumped to "paragraph" in "Second paragraph for" (WRONG)
+- Bold button required double-click to work
+
+**Root Cause**: `findAndSelectText()` found FIRST occurrence of text in DOM tree
+- Text-based search has no way to know WHICH occurrence was actually modified
+- `saveSelectionAsOffsets()` was used as FALLBACK, but should be PRIMARY
+
+**Fix**: Reversed priority in `applyStyle()` and `removeStyle()`:
+1. Try `restoreSelectionFromOffsets()` FIRST (accurate, uses character offsets)
+2. Verify restoration by checking `selection.toString()` matches original text
+3. If mismatch or failure, fall back to `findAndSelectText()`
+
+**Verification** (Chrome DevTools MCP, 2026-06-16):
+- ✅ Select "paragraph" in "cross-paragraph selection testing" → underline → correct location
+- ✅ Bold works on FIRST click (not double-click)
+- ✅ Selection preserved after button clicks
+- ✅ No console errors
+
+**Commit**: 65597d3
+
 ## Next Steps
 
 1. Run Wave 3 MCP test suite (18-03-PLAN.md)
@@ -126,3 +150,4 @@
 2. **Consolidate early** - Should have updated editor-demo.html instead of creating test-editor-interaction.html
 3. **Manual testing still valuable** - Automated tests missed the FocusManager fix (synthetic events)
 4. **Chrome DevTools MCP powerful** - Real mouse interactions, not synthetic events, catch real bugs
+5. **Text-based selection restoration is ambiguous** - When same text appears multiple times, need offset-based restoration instead
