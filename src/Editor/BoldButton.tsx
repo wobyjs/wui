@@ -22,6 +22,7 @@ const BoldButton = defaults(def, (props) => {
     const { saveDo } = useUndoRedo()
     const focusManager = useFocusManager()
     const isActive = $(false)
+    const isMixed = $(false)
     const command = "bold"
 
     /**
@@ -35,7 +36,7 @@ const BoldButton = defaults(def, (props) => {
 
         if (!$$(editor) || typeof $$(editor).contains !== 'function') return
 
-        const handler = () => { updateStylesState(isActive, editor, command) }
+        const handler = () => { updateStylesState(isActive, editor, command, isMixed) }
 
         document.addEventListener('selectionchange', handler)
         // Check initial state
@@ -66,9 +67,10 @@ const BoldButton = defaults(def, (props) => {
             title={title}
             class={() => [
                 () => $$(cls) ? $$(cls) : cn,
-                () => $$(isActive) ? '!bg-slate-200' : ''
+                () => $$(isActive) ? '!bg-slate-200' : '',
+                () => $$(isMixed) ? '!bg-slate-100 opacity-60' : ''
             ]}
-            aria-pressed={() => $$(isActive) ? "true" : "false"}
+            aria-pressed={() => $$(isActive) ? "true" : $$(isMixed) ? "mixed" : "false"}
             disabled={disabled}
             onMouseDown={handleMouseDown}
             onClick={handleClick}

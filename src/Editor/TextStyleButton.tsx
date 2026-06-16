@@ -6,7 +6,7 @@ import ItalicIcon from '../icons/italic'
 import UnderlineIcon from '../icons/underline'
 import { getCurrentEditor } from "./utils"
 import { safeGetRange } from './BrowserCompat'
-import { hasStyleInRange, applyBold, applyItalic, applyUnderline, applyStrikethrough } from './StyleEngine'
+import { getStyleStateInRange, applyBold, applyItalic, applyUnderline, applyStrikethrough } from './StyleEngine'
 
 // Map command names to CSS property+value pairs for StyleEngine detection.
 // D-05: replaces queryCommandState which is shadow-DOM-blind.
@@ -34,6 +34,7 @@ const TextStyleButton = defaults(def, (props) => {
 
     const editorNode = useEditor()
     const isActive = $(false)
+    const isMixed = $(false)
 
     // Configuration for each style
     const styleMap = {
@@ -72,8 +73,8 @@ const TextStyleButton = defaults(def, (props) => {
 
     /**
      * Effect: Style State Synchronization Controller
-     * 
-     * Synchronizes the visual "active" state of a formatting button (e.g., Bold, Italic) 
+     *
+     * Synchronizes the visual "active" state of a formatting button (e.g., Bold, Italic)
      * with the actual text formatting at the current cursor position.
      */
     useEffect(() => {
@@ -82,7 +83,7 @@ const TextStyleButton = defaults(def, (props) => {
 
         if (!$$(editor) || typeof $$(editor).contains !== 'function') return
 
-        const handler = () => { updateStylesState(isActive, editor, config.command) }
+        const handler = () => { updateStylesState(isActive, editor, config.command, isMixed) }
 
         document.addEventListener('selectionchange', handler)
         // Check initial state
@@ -111,9 +112,10 @@ const TextStyleButton = defaults(def, (props) => {
             title={displayTitle}
             class={() => [
                 [() => $$(cls) ? $$(cls) : "size-fit", cn],
-                () => $$(isActive) ? '!bg-slate-200' : ''
+                () => $$(isActive) ? '!bg-slate-200' : '',
+                () => $$(isMixed) ? '!bg-slate-100 opacity-60' : ''
             ]}
-            aria-pressed={() => $$(isActive) ? "true" : "false"}
+            aria-pressed={() => $$(isActive) ? "true" : $$(isMixed) ? "mixed" : "false"}
             disabled={disabled}
             onClick={handleClick}
             onMouseDown={(e) => { e.preventDefault() }}
@@ -141,42 +143,70 @@ export default TextStyleButton
 export const updateStylesState = (
     isActive: Observable<boolean>,
     editor: Observable<HTMLDivElement>,
-    command: string
+    command: string,
+    isMixed?: Observable<boolean>
 ) => {
+    console.log('[updateStylesState] Called for command:', command)
     const el = $$(editor)
     if (!el || typeof el.contains !== 'function') {
+        console.log('[updateStylesState] No editor or invalid')
         isActive(false)
+        if (isMixed) isMixed(false)
         return
     }
 
     // Only update when editor has focus (same guard as before)
+    // NOTE: For shadow DOM, document.activeElement returns the shadow host, not the internal focused element
+    const rootNode = el.getRootNode()
+    const shadowRoot = rootNode instanceof ShadowRoot ? rootNode : null
+
     if (document.activeElement !== el && !el.contains(document.activeElement)) {
         // Editor doesn't have direct focus — check shadow root
-        const rootNode = el.getRootNode()
-        const shadowRoot = rootNode instanceof ShadowRoot ? rootNode : null
-        if (shadowRoot && !shadowRoot.contains(document.activeElement)) {
+        if (shadowRoot) {
+            // For shadow DOM: check if the shadow host is active and contains focused elements
+            const shadowHostActive = document.activeElement === el.getRootNode().host ||
+                                     (shadowRoot.host && document.activeElement === shadowRoot.host)
+
+            if (!shadowHostActive && !shadowRoot.contains(document.activeElement)) {
+                console.log('[updateStylesState] Editor not focused, activeElement:', document.activeElement.tagName || document.activeElement)
+                isActive(false)
+                if (isMixed) isMixed(false)
+                return
+            }
+        } else {
+            console.log('[updateStylesState] Editor not focused (no shadow), activeElement:', document.activeElement.tagName || document.activeElement)
             isActive(false)
+            if (isMixed) isMixed(false)
             return
         }
     }
 
-    const rootNode = el.getRootNode()
-    const sr = rootNode instanceof ShadowRoot ? rootNode : undefined
+    const sr = shadowRoot || (rootNode instanceof ShadowRoot ? rootNode : undefined)
     const range = safeGetRange(sr)
     if (!range) {
+        console.log('[updateStylesState] No range found')
         isActive(false)
+        if (isMixed) isMixed(false)
         return
     }
 
     const entry = COMMAND_STYLE_MAP[command]
     if (!entry) {
+        console.log('[updateStylesState] No entry for command:', command)
         isActive(false)
+        if (isMixed) isMixed(false)
         return
     }
 
+    console.log('[updateStylesState] Checking range, calling getStyleStateInRange...')
     try {
-        isActive(hasStyleInRange(range, entry.prop, entry.value))
+        const state = getStyleStateInRange(range, entry.prop, entry.value)
+        console.log('[updateStylesState] Style state:', state, 'for prop:', entry.prop)
+        isActive(state === 'all')
+        if (isMixed) isMixed(state === 'mixed')
     } catch (e) {
+        console.error('[updateStylesState] Error:', e)
         isActive(false)
+        if (isMixed) isMixed(false)
     }
 }

@@ -37,7 +37,9 @@
       "Bash(git commit -m ' *)",
       "Bash(git rm *)",
       "Bash(grep '??.*\\\\.html$')",
-      "Bash(pnpm build *)"
+      "Bash(pnpm build *)",
+      "Bash(git commit *)",
+      "Bash(Start-Sleep *)"
     ]
   },
   "enabledMcpjsonServers": [

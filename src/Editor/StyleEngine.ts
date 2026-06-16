@@ -18,6 +18,56 @@ export type StyleProperty =
     | 'fontSize'
 
 /**
+ * Get the style property associated with a semantic element
+ * Returns the CSS property name that this semantic element represents
+ */
+function getSemanticElementStyle(tagName: string): string | null {
+    const semanticMap: Record<string, string> = {
+        'strong': 'font-weight',
+        'b': 'font-weight',
+        'em': 'font-style',
+        'i': 'font-style',
+        'u': 'text-decoration-line',
+    }
+    return semanticMap[tagName.toLowerCase()] || null
+}
+
+/**
+ * Convert a semantic element (<strong>, <em>, <u>) to a <span> with inline style
+ * Preserves any existing inline styles and moves children to the span
+ */
+function convertSemanticElementToSpan(element: HTMLElement): HTMLSpanElement {
+    const span = document.createElement('span')
+    const tagName = element.tagName.toLowerCase()
+
+    // Copy any existing inline styles
+    if (element.style.cssText) {
+        span.style.cssText = element.style.cssText
+    }
+
+    // Add the semantic style as inline style
+    if (tagName === 'strong' || tagName === 'b') {
+        span.style.fontWeight = 'bold'
+    } else if (tagName === 'em' || tagName === 'i') {
+        span.style.fontStyle = 'italic'
+    } else if (tagName === 'u') {
+        span.style.textDecorationLine = 'underline'
+    }
+
+    // Move all children to the span
+    while (element.firstChild) {
+        span.appendChild(element.firstChild)
+    }
+
+    // Replace the semantic element with the span
+    element.parentNode?.replaceChild(span, element)
+
+    console.log('[convertSemanticElementToSpan] Converted', tagName, 'to span with style:', span.style.cssText)
+
+    return span
+}
+
+/**
  * Get computed styles from a node, including UA stylesheet and inherited values.
  * D-02: window.getComputedStyle resolves <strong>, <em>, <b>, <i> correctly.
  * node.style only returned inline styles — semantic elements were invisible.
@@ -146,17 +196,16 @@ function findEditorRoot(node: Node): HTMLElement | null {
 }
 
 /**
- * Check if all nodes in a range have a specific style
+ * Check style state in a range (tri-state for button UI)
+ * Returns: 'all' | 'nonemixed'
  */
-export function hasStyleInRange(range: Range, prop: string, value: string): boolean {
+export function getStyleStateInRange(range: Range, prop: string, value: string): 'all' | 'none' | 'mixed' {
     // For collapsed range, check if cursor is in styled text
     if (range.collapsed) {
-        return hasStyle(range.startContainer, prop, value)
+        return hasStyle(range.startContainer, prop, value) ? 'all' : 'none'
     }
 
-    // For non-collapsed range, check if ALL text nodes have the style
-    // IMPORTANT: TreeWalker only walks CHILDREN of the root node
-    // If commonAncestorContainer is a TEXT node, we need to use its parent
+    // For non-collapsed range, check all text nodes
     let container = range.commonAncestorContainer
     if (container.nodeType === Node.TEXT_NODE) {
         container = container.parentNode || container
@@ -169,18 +218,38 @@ export function hasStyleInRange(range: Range, prop: string, value: string): bool
     )
 
     let node: Node | null
-    let hasAnyText = false
+    let hasStyled = false
+    let hasUnstyled = false
+
     while ((node = walker.nextNode())) {
         if (range.intersectsNode(node)) {
-            hasAnyText = true
-            if (!hasStyle(node, prop, value)) {
-                return false
+            if (hasStyle(node, prop, value)) {
+                hasStyled = true
+            } else {
+                hasUnstyled = true
+            }
+
+            // Early exit if we find both
+            if (hasStyled && hasUnstyled) {
+                return 'mixed'
             }
         }
     }
 
-    // If no text nodes found, return false
-    return hasAnyText
+    // No text nodes found
+    if (!hasStyled && !hasUnstyled) {
+        return 'none'
+    }
+
+    return hasStyled ? 'all' : 'none'
+}
+
+/**
+ * Check if all nodes in a range have a specific style (legacy boolean version)
+ */
+export function hasStyleInRange(range: Range, prop: string, value: string): boolean {
+    const state = getStyleStateInRange(range, prop, value)
+    return state === 'all'
 }
 
 /**
@@ -611,6 +680,13 @@ export function removeStyle(prop: string, savedSelection?: { editorRoot: HTMLEle
         savedSelection = saveSelectionAsOffsets(range)
     }
 
+    // CRITICAL: Save selection character offsets BEFORE any semantic element conversion
+    // After DOM manipulation, the browser may corrupt the range object
+    const selectionStartOffset = range.startOffset
+    const selectionEndOffset = range.endOffset
+    const selectionStartContainer = range.startContainer
+    const selectionTextContent = sel.toString()
+
     if (range.collapsed) {
         // For collapsed selection: find current style at cursor and unwrap
         const container = range.startContainer
@@ -704,19 +780,46 @@ export function removeStyle(prop: string, savedSelection?: { editorRoot: HTMLEle
         }
     }
 
-    // If no spans found by walking DOWN, the style may come from an ancestor span.
-    // This handles nested structures like <span style="font-weight:bold"><span style="font-style:italic">text</span></span>
+    // If no spans found by walking DOWN, the style may come from an ancestor span OR semantic element.
+    // This handles nested structures like:
+    // - <span style="font-weight:bold"><span style="font-style:italic">text</span></span>
+    // - <strong><span style="font-style:italic">text</span></strong>
     // where removeStyle is called on a selection whose immediate parent has no inline bold.
     if (spansToProcess.length === 0) {
         let ancestor: Node | null = range.commonAncestorContainer
         if (ancestor.nodeType === Node.TEXT_NODE) ancestor = ancestor.parentNode
         const editorRootForAncestor = findEditorRoot(range.commonAncestorContainer)
+
         while (ancestor && ancestor !== editorRootForAncestor) {
-            if (ancestor instanceof HTMLSpanElement) {
-                const styleValue = ancestor.style.getPropertyValue(cssProp)
-                if (styleValue) {
-                    spansToProcess.push({ span: ancestor, cssProp })
-                    break
+            // Check for semantic elements (strong, em, u) that need conversion to spans
+            if (ancestor instanceof HTMLElement) {
+                const tagName = ancestor.tagName.toLowerCase()
+                const semanticStyle = getSemanticElementStyle(tagName)
+
+                if (semanticStyle) {
+                    console.log('[removeStyle] Found semantic element:', tagName, 'with style:', semanticStyle)
+
+                    // Check if this semantic element has the style we're removing
+                    const computedStyle = window.getComputedStyle(ancestor)
+                    const computedValue = computedStyle.getPropertyValue(cssProp)
+
+                    // For font-weight: strong/b have fontWeight='700' (bold)
+                    // For font-style: em/i have fontStyle='italic'
+                    // For text-decoration: u has textDecoration='underline'
+                    if (computedValue && computedValue !== 'normal' && computedValue !== 'none') {
+                        console.log('[removeStyle] Semantic element has target style:', computedValue)
+                        // Convert semantic element to span with inline style
+                        const span = convertSemanticElementToSpan(ancestor as HTMLElement)
+                        spansToProcess.push({ span, cssProp })
+                        break
+                    }
+                } else if (ancestor instanceof HTMLSpanElement) {
+                    // Regular span with inline style
+                    const styleValue = ancestor.style.getPropertyValue(cssProp)
+                    if (styleValue) {
+                        spansToProcess.push({ span: ancestor, cssProp })
+                        break
+                    }
                 }
             }
             ancestor = ancestor.parentNode
@@ -728,6 +831,10 @@ export function removeStyle(prop: string, savedSelection?: { editorRoot: HTMLEle
     // Process each span: split at selection boundaries and remove style from middle
     spansToProcess.forEach(({ span, cssProp }) => {
         console.log('[removeStyle] Processing span:', span.textContent?.substring(0, 20))
+
+        // CRITICAL: After semantic element conversion, use the ORIGINAL range offsets
+        // The text node in the new span is the same content, just moved
+        // So the offsets should still be valid
 
         // Get the text node inside the span
         const textNode = span.firstChild
@@ -749,17 +856,31 @@ export function removeStyle(prop: string, savedSelection?: { editorRoot: HTMLEle
         })
 
         console.log('[removeStyle] range:', {
-            startContainer: range.startContainer.textContent?.substring(0, 10),
-            startOffset: range.startOffset,
-            endContainer: range.endContainer.textContent?.substring(0, 10),
-            endOffset: range.endOffset
+            startContainer: selectionStartContainer.textContent?.substring(0, 10),
+            startOffset: selectionStartOffset,
+            endContainer: selectionStartContainer.textContent?.substring(0, 10),
+            endOffset: selectionEndOffset,
+            selectionText: selectionTextContent
         })
 
-        // Compare boundary points
-        const startToStart = range.compareBoundaryPoints(Range.START_TO_START, spanRange)
-        const startToEnd = range.compareBoundaryPoints(Range.START_TO_END, spanRange)
-        const endToStart = range.compareBoundaryPoints(Range.END_TO_START, spanRange)
-        const endToEnd = range.compareBoundaryPoints(Range.END_TO_END, spanRange)
+        // Compare boundary points using the saved offsets
+        // We need to create a NEW range that points to the NEW text node (in the converted span)
+        // but uses the SAME character offsets
+        const newSelectionRange = document.createRange()
+        try {
+            newSelectionRange.setStart(textNode, selectionStartOffset)
+            newSelectionRange.setEnd(textNode, selectionEndOffset)
+        } catch (e) {
+            console.warn('[removeStyle] Failed to create new selection range:', e)
+            // Fallback: use the original range
+            newSelectionRange.setStart(range.startContainer, range.startOffset)
+            newSelectionRange.setEnd(range.endContainer, range.endOffset)
+        }
+
+        const startToStart = newSelectionRange.compareBoundaryPoints(Range.START_TO_START, spanRange)
+        const startToEnd = newSelectionRange.compareBoundaryPoints(Range.START_TO_END, spanRange)
+        const endToStart = newSelectionRange.compareBoundaryPoints(Range.END_TO_START, spanRange)
+        const endToEnd = newSelectionRange.compareBoundaryPoints(Range.END_TO_END, spanRange)
 
         console.log('[removeStyle] Boundary comparisons:', {
             startToStart,
@@ -783,8 +904,8 @@ export function removeStyle(prop: string, savedSelection?: { editorRoot: HTMLEle
         console.log('[removeStyle] startsInside:', startsInside, 'endsInside:', endsInside)
 
         // If selection fully contains the span, just remove the style
-        if (range.compareBoundaryPoints(Range.START_TO_START, spanRange) <= 0 &&
-            range.compareBoundaryPoints(Range.END_TO_END, spanRange) >= 0) {
+        if (newSelectionRange.compareBoundaryPoints(Range.START_TO_START, spanRange) <= 0 &&
+            newSelectionRange.compareBoundaryPoints(Range.END_TO_END, spanRange) >= 0) {
             console.log('[removeStyle] Selection fully contains span - removing entire style')
 
             // Entire span is selected - remove style
@@ -818,12 +939,12 @@ export function removeStyle(prop: string, savedSelection?: { editorRoot: HTMLEle
 
             console.log('[removeStyle] Text:', text, 'length:', text.length)
 
-            // Calculate which parts are selected
-            const rangeRelStart = range.compareBoundaryPoints(Range.START_TO_START, spanRange) > 0
-                ? range.startOffset
+            // Calculate which parts are selected using the new selection range
+            const rangeRelStart = newSelectionRange.compareBoundaryPoints(Range.START_TO_START, spanRange) > 0
+                ? newSelectionRange.startOffset
                 : 0
-            const rangeRelEnd = range.compareBoundaryPoints(Range.END_TO_END, spanRange) < 0
-                ? range.endOffset
+            const rangeRelEnd = newSelectionRange.compareBoundaryPoints(Range.END_TO_END, spanRange) < 0
+                ? newSelectionRange.endOffset
                 : text.length
 
             console.log('[removeStyle] rangeRelStart:', rangeRelStart, 'rangeRelEnd:', rangeRelEnd)
@@ -999,6 +1120,7 @@ export function toggleStyle(prop: string, value: string): void {
  * Apply font-weight bold
  */
 export function applyBold(): void {
+    console.log('[applyBold] Called')
     applyStyle('fontWeight', 'bold')
 }
 
