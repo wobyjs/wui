@@ -350,10 +350,18 @@ function restoreSelectionFromOffsets(
  * Replaces execCommand('bold') etc.
  */
 export function applyStyle(prop: string, value: string): void {
+    console.log('[applyStyle] Called for:', prop, value)
     // D-01: derive shadow root from active selection focus node to enable getComposedRanges path
-    const focusSr = getEditorShadowRoot(window.getSelection()?.focusNode)
+    const focusNode = window.getSelection()?.focusNode
+    console.log('[applyStyle] Focus node:', focusNode?.nodeName, focusNode?.nodeType, focusNode?.getRootNode?.()?.constructor?.name)
+    const focusSr = getEditorShadowRoot(focusNode)
+    console.log('[applyStyle] Shadow root:', focusSr ? 'found' : 'none')
     const range = safeGetRange(focusSr)
-    if (!range) return
+    console.log('[applyStyle] Range:', range ? 'found' : 'null')
+    if (!range) {
+        console.warn('[applyStyle] No range found - returning early')
+        return
+    }
 
     const sel = safeGetSelection()
     if (!sel) return

@@ -39,7 +39,12 @@
       "Bash(grep '??.*\\\\.html$')",
       "Bash(pnpm build *)",
       "Bash(git commit *)",
-      "Bash(Start-Sleep *)"
+      "Bash(Start-Sleep *)",
+      "Bash(dv eval *)",
+      "Bash(dv console *)",
+      "Bash(dv snapshot *)",
+      "Bash(dv navigate *)",
+      "Bash(dv screenshot *)"
     ]
   },
   "enabledMcpjsonServers": [

@@ -179,6 +179,11 @@ export function mergeAdjacentSpans(container: HTMLElement): void {
 
             // Check if styles match
             if (hasIdenticalStyles(span as HTMLElement, next)) {
+                // Don't merge if there's a space at the boundary (preserves word separation)
+                const spanEnds = span.textContent?.endsWith(' ') ?? false
+                const nextStarts = next.textContent?.startsWith(' ') ?? false
+                if (spanEnds || nextStarts) return
+
                 // Move children from next to current
                 while (next.firstChild) {
                     span.appendChild(next.firstChild)
