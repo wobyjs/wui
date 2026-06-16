@@ -396,27 +396,23 @@ export function applyStyle(prop: string, value: string): void {
     }
 
     // D-08: Restore selection after DOM normalization
-    // PRIORITY: Use offset-based restoration FIRST (more accurate), fall back to text search if it fails
-    if (savedSelection.editorRoot && savedSelection.startOffset >= 0 && savedSelection.endOffset >= 0) {
-        // Try offset-based restoration first (handles multiple occurrences of same text)
+    // HYBRID APPROACH: Use offset hint + text search to disambiguate multiple occurrences
+    if (selectionTextBefore && selectionTextBefore.trim() !== '') {
+        // Non-collapsed selection: use text-based restoration with offset hint
+        // The hint helps find the correct occurrence when text appears multiple times
+        const offsetHint = savedSelection.startOffset >= 0 ? savedSelection.startOffset : undefined
+        const found = findAndSelectText(savedSelection.editorRoot, selectionTextBefore, offsetHint)
+        if (!found) {
+            console.warn('[applyStyle] Text-based restoration failed for:', JSON.stringify(selectionTextBefore))
+        }
+    } else if (savedSelection.editorRoot && savedSelection.startOffset >= 0 && savedSelection.endOffset >= 0) {
+        // Collapsed selection (caret only): use offset-based restoration
+        // Safe because caret position doesn't depend on surrounding structure
         restoreSelectionFromOffsets(
             savedSelection.editorRoot,
             savedSelection.startOffset,
             savedSelection.endOffset
         )
-
-        // Verify restoration succeeded by checking if selection matches original text
-        const selAfter = safeGetSelection()
-        const selectionTextAfter = selAfter?.toString() ?? ''
-        if (selectionTextBefore === selectionTextAfter) {
-            // Success! Selection restored to correct location
-        } else if (selectionTextBefore && selectionTextBefore.trim() !== '') {
-            // Offset restoration selected wrong text - fall back to text search
-            const found = findAndSelectText(savedSelection.editorRoot, selectionTextBefore)
-            if (!found) {
-                console.warn('[applyStyle] Selection restoration failed: both offset and text-based methods failed. Before:', JSON.stringify(selectionTextBefore), 'After:', JSON.stringify(selectionTextAfter))
-            }
-        }
     } else if (!savedSelection.editorRoot) {
         console.warn('[applyStyle] Could not find editor root for selection restoration — cursor may be lost')
     }
@@ -424,35 +420,85 @@ export function applyStyle(prop: string, value: string): void {
 
 /**
  * Find and select text content in editor after DOM normalization
+ * Uses approximate offset hint to disambiguate multiple occurrences
  * Returns true if found and selected, false otherwise
  */
-function findAndSelectText(editorRoot: HTMLElement, textToFind: string): boolean {
+function findAndSelectText(
+    editorRoot: HTMLElement,
+    textToFind: string,
+    approximateOffsetHint?: number
+): boolean {
     if (!textToFind) return false
 
     const walker = document.createTreeWalker(editorRoot, NodeFilter.SHOW_TEXT, null)
     let node: Node | null
+    let currentOffset = 0
+    let closestMatch: { node: Text; index: number; offset: number } | null = null
 
     while ((node = walker.nextNode())) {
         const textNode = node as Text
         const text = textNode.textContent || ''
-        const index = text.indexOf(textToFind)
+        const len = text.length
+        let searchStart = 0
 
-        if (index !== -1) {
-            // Found the text! Select it.
-            const sel = safeGetSelection()
-            if (!sel) return false
+        // Find all occurrences in this text node
+        while (searchStart < text.length) {
+            const index = text.indexOf(textToFind, searchStart)
+            if (index === -1) break
 
-            try {
-                const newRange = document.createRange()
-                newRange.setStart(textNode, index)
-                newRange.setEnd(textNode, index + textToFind.length)
-                sel.removeAllRanges()
-                sel.addRange(newRange)
-                return true
-            } catch (e) {
-                console.warn('[findAndSelectText] Failed to select text:', e)
-                return false
+            const occurrenceOffset = currentOffset + index
+
+            // If we have an offset hint, find the closest match
+            if (approximateOffsetHint !== undefined && approximateOffsetHint >= 0) {
+                if (closestMatch === null) {
+                    closestMatch = { node: textNode, index, offset: occurrenceOffset }
+                } else {
+                    // Keep the match closest to the hint
+                    const currentDistance = Math.abs(closestMatch.offset - approximateOffsetHint)
+                    const newDistance = Math.abs(occurrenceOffset - approximateOffsetHint)
+                    if (newDistance < currentDistance) {
+                        closestMatch = { node: textNode, index, offset: occurrenceOffset }
+                    }
+                }
+            } else {
+                // No offset hint - select first occurrence (old behavior)
+                const sel = safeGetSelection()
+                if (!sel) return false
+
+                try {
+                    const newRange = document.createRange()
+                    newRange.setStart(textNode, index)
+                    newRange.setEnd(textNode, index + textToFind.length)
+                    sel.removeAllRanges()
+                    sel.addRange(newRange)
+                    return true
+                } catch (e) {
+                    console.warn('[findAndSelectText] Failed to select text:', e)
+                    return false
+                }
             }
+
+            searchStart = index + 1
+        }
+
+        currentOffset += len
+    }
+
+    // If we have a closest match (from offset hint), select it
+    if (closestMatch) {
+        const sel = safeGetSelection()
+        if (!sel) return false
+
+        try {
+            const newRange = document.createRange()
+            newRange.setStart(closestMatch.node, closestMatch.index)
+            newRange.setEnd(closestMatch.node, closestMatch.index + textToFind.length)
+            sel.removeAllRanges()
+            sel.addRange(newRange)
+            return true
+        } catch (e) {
+            console.warn('[findAndSelectText] Failed to select text:', e)
+            return false
         }
     }
 
@@ -1027,27 +1073,23 @@ export function removeStyle(prop: string, savedSelection?: { editorRoot: HTMLEle
     }
 
     // D-08: Restore selection after DOM normalization
-    // PRIORITY: Use offset-based restoration FIRST (more accurate), fall back to text search if it fails
-    if (savedSelection.editorRoot && savedSelection.startOffset >= 0 && savedSelection.endOffset >= 0) {
-        // Try offset-based restoration first (handles multiple occurrences of same text)
+    // HYBRID APPROACH: Use offset hint + text search to disambiguate multiple occurrences
+    if (selectionTextBefore && selectionTextBefore.trim() !== '') {
+        // Non-collapsed selection: use text-based restoration with offset hint
+        // The hint helps find the correct occurrence when text appears multiple times
+        const offsetHint = savedSelection.startOffset >= 0 ? savedSelection.startOffset : undefined
+        const found = findAndSelectText(savedSelection.editorRoot, selectionTextBefore, offsetHint)
+        if (!found) {
+            console.warn('[removeStyle] Text-based restoration failed for:', JSON.stringify(selectionTextBefore))
+        }
+    } else if (savedSelection.editorRoot && savedSelection.startOffset >= 0 && savedSelection.endOffset >= 0) {
+        // Collapsed selection (caret only): use offset-based restoration
+        // Safe because caret position doesn't depend on surrounding structure
         restoreSelectionFromOffsets(
             savedSelection.editorRoot,
             savedSelection.startOffset,
             savedSelection.endOffset
         )
-
-        // Verify restoration succeeded by checking if selection matches original text
-        const selAfter = safeGetSelection()
-        const selectionTextAfter = selAfter?.toString() ?? ''
-        if (selectionTextBefore === selectionTextAfter) {
-            // Success! Selection restored to correct location
-        } else if (selectionTextBefore && selectionTextBefore.trim() !== '') {
-            // Offset restoration selected wrong text - fall back to text search
-            const found = findAndSelectText(savedSelection.editorRoot, selectionTextBefore)
-            if (!found) {
-                console.warn('[removeStyle] Selection restoration failed: both offset and text-based methods failed. Before:', JSON.stringify(selectionTextBefore), 'After:', JSON.stringify(selectionTextAfter))
-            }
-        }
     } else if (!savedSelection.editorRoot) {
         console.warn('[removeStyle] Could not find editor root for selection restoration — cursor may be lost')
     }
