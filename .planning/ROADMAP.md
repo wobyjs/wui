@@ -135,15 +135,18 @@ Plans:
 - [x] [ED-05] Button active states never use queryCommandState
 - [x] [ED-06] Multiple editor instances have independent undo/redo state
 - [x] [ED-07] syncChildren cannot trigger re-entrant sync cycles
-- [x] [ED-08] Selection preserved identically before and after style application
+- [x] [ED-08] Selection preserved identically before and after style application (FIXED: priority reversed to offset-first, text-search-fallback)
 - [x] [ED-09] FocusManager integrated into all toolbar buttons (manual test verified 2026-06-15)
+- [x] [ED-08-CRITICAL-FIX] Selection restoration uses correct occurrence (offset-based first, verified 2026-06-16)
 - [ ] [ED-10] All 7 test dimensions pass via MCP evaluate_script
 
 **Success Criteria**:
-- Bold/italic/underline toggle behaves identically to Google Docs for all selection types
-- Selection is never cleared after toolbar button click
+- Bold/italic/underline toggle behaves identically to Google Docs for all selection types ✅ VERIFIED 2026-06-16
+- Bold works on FIRST click ✅ VERIFIED 2026-06-16
+- Selection is never cleared after toolbar button click ✅ VERIFIED 2026-06-16
+- Selection restored to CORRECT text occurrence (not first match) ✅ VERIFIED 2026-06-16
 - Undo reverses every formatting operation; redo restores precisely
 - All MCP evaluate_script tests log [TEST] &lt;name&gt;: PASS
-- No console errors during any formatting operation
+- No console errors during any formatting operation ✅ VERIFIED 2026-06-16
 
 ---
