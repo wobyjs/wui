@@ -981,11 +981,108 @@ export function removeStyle(prop: string, savedSelection?: { editorRoot: HTMLEle
             console.log('[removeStyle] Partial selection - splitting span')
 
             // Partial selection - need to split the span
-            const textNode = span.firstChild
-            if (!textNode || textNode.nodeType !== Node.TEXT_NODE) {
-                console.log('[removeStyle] ERROR: No text node in span')
+            const firstChild = span.firstChild
+            if (!firstChild || firstChild.nodeType !== Node.TEXT_NODE) {
+                console.log('[removeStyle] Span has nested elements - using special handling')
+
+                // When span contains nested elements, we need to find the selected child element(s)
+                // and remove the style only from those, preserving it on the rest
+
+                // Get all direct children of the span
+                const children = Array.from(span.childNodes)
+
+                // Find which children intersect with the selection
+                // For simplicity, if ANY child is selected, we split around it
+                // A more precise implementation would check each child's position relative to the selection
+
+                // Create three parts: before selected child(ren), selected child(ren), after selected child(ren)
+                const parent = span.parentNode
+                if (!parent) return
+
+                const fragment = document.createDocumentFragment()
+
+                // Clone span for "before" part (keep style)
+                const beforeSpan = span.cloneNode(false) as HTMLSpanElement
+                beforeSpan.removeAttribute('id')
+
+                // Selected part - remove the style property
+                const selectedSpan = span.cloneNode(false) as HTMLSpanElement
+                selectedSpan.removeAttribute('id')
+                selectedSpan.style.removeProperty(cssProp)
+                if (!selectedSpan.getAttribute('style')) {
+                    selectedSpan.removeAttribute('style')
+                }
+
+                // Clone span for "after" part (keep style)
+                const afterSpan = span.cloneNode(false) as HTMLSpanElement
+                afterSpan.removeAttribute('id')
+
+                // Distribute children based on selection
+                // For nested case like <span bold>full <u><em>toolbar</em></u> demo</span>
+                // When removing bold from "toolbar":
+                // - beforeSpan gets "full " text node
+                // - selectedSpan gets <u><em>toolbar</em></u> element
+                // - afterSpan gets " demo" text node
+
+                let foundSelectionStart = false
+                let foundSelectionEnd = false
+
+                for (const child of children) {
+                    // Check if this child contains or is part of the selection
+                    const childText = child.textContent || ''
+                    const isInsideSelection = childText.includes(selectionTextContent)
+
+                    if (!foundSelectionStart && isInsideSelection) {
+                        foundSelectionStart = true
+                        // This child (or its descendant) is selected
+                        if (selectedSpan) {
+                            selectedSpan.appendChild(child.cloneNode(true))
+                        }
+                    } else if (foundSelectionStart && !foundSelectionEnd) {
+                        // Check if selection continues in this child
+                        if (isInsideSelection || (selectionTextContent && childText.includes(selectionTextContent.substring(0, 10)))) {
+                            selectedSpan.appendChild(child.cloneNode(true))
+                        } else {
+                            foundSelectionEnd = true
+                            afterSpan.appendChild(child.cloneNode(true))
+                        }
+                    } else if (!foundSelectionStart) {
+                        // Before selection
+                        beforeSpan.appendChild(child.cloneNode(true))
+                    } else {
+                        // After selection
+                        afterSpan.appendChild(child.cloneNode(true))
+                    }
+                }
+
+                // Add parts to fragment (only if they have content)
+                if (beforeSpan.childNodes.length > 0) {
+                    fragment.appendChild(beforeSpan)
+                }
+
+                // Unwrap selected span if it has no style/attributes
+                if (selectedSpan.childNodes.length > 0) {
+                    if (!selectedSpan.hasAttribute('style') && !selectedSpan.className && !selectedSpan.id) {
+                        // Move children directly to fragment
+                        while (selectedSpan.firstChild) {
+                            fragment.appendChild(selectedSpan.firstChild)
+                        }
+                    } else {
+                        fragment.appendChild(selectedSpan)
+                    }
+                }
+
+                if (afterSpan.childNodes.length > 0) {
+                    fragment.appendChild(afterSpan)
+                }
+
+                // Replace original span with fragment
+                parent.replaceChild(fragment, span)
+                console.log('[removeStyle] Replaced span with nested elements handling')
                 return
             }
+
+            const textNode = firstChild
 
             const text = textNode.textContent || ''
             const spanStart = 0
