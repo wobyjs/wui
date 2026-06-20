@@ -141,9 +141,32 @@ function normalizeFontWeight(value: string): string {
  * Check if a node has a specific style property with a value
  */
 function hasStyle(node: Node, prop: string, value: string): boolean {
-    const styles = getComputedStyles(node)
-    // Convert camelCase to CSS property name (e.g., 'fontWeight' -> 'font-weight')
+    // For text-decoration-line, we need to check the entire ancestor chain
+    // because text-decoration is NOT inherited in CSS
     const cssProp = prop.replace(/([A-Z])/g, '-$1').toLowerCase()
+
+    if (cssProp === 'text-decoration' || cssProp === 'text-decoration-line') {
+        // Walk up the tree to find if any ancestor has the text-decoration
+        let current: Node | null = node;
+        while (current) {
+            if (current instanceof HTMLElement) {
+                const el = current as HTMLElement;
+                const styleValue = el.style.getPropertyValue('text-decoration-line') ||
+                                   el.style.getPropertyValue('text-decoration');
+                if (styleValue.includes(value)) {
+                    return true;
+                }
+            }
+            current = current.parentNode;
+        }
+        // Also check computed style from immediate parent
+        const styles = getComputedStyles(node);
+        const currentValue = styles.getPropertyValue('text-decoration-line') ||
+                            styles.getPropertyValue('text-decoration');
+        return currentValue.includes(value);
+    }
+
+    const styles = getComputedStyles(node)
 
     // Normalize color values for comparison
     if (cssProp === 'color' || cssProp === 'background-color') {
@@ -903,6 +926,31 @@ export function removeStyle(prop: string, savedSelection?: { editorRoot: HTMLEle
         }
     }
 
+    // Also check for semantic elements that intersect with the selection range
+    // This handles cases like <strong>full tool<span>bar demo</span></strong>
+    // where "bar demo" is selected but "full tool" is not
+    if (searchContainer instanceof HTMLElement) {
+        const semanticElements = searchContainer.querySelectorAll('strong, b, em, i, u')
+        for (const el of semanticElements) {
+            if (!range.intersectsNode(el)) continue
+
+            const tagName = el.tagName.toLowerCase()
+            const semanticStyle = getSemanticElementStyle(tagName)
+
+            if (semanticStyle === cssProp) {
+                // This semantic element contributes to the style we're removing
+                // Check if it's already in our list (was converted from ancestor walk)
+                const alreadyProcessed = spansToProcess.some(s => s.span === el)
+                if (!alreadyProcessed) {
+                    console.log('[removeStyle] Found intersecting semantic element:', tagName)
+                    // Convert to span and add to process list
+                    const span = convertSemanticElementToSpan(el as HTMLElement)
+                    spansToProcess.push({ span, cssProp })
+                }
+            }
+        }
+    }
+
     console.log('[removeStyle] Total spans to process:', spansToProcess.length)
 
     // Process each span: split at selection boundaries and remove style from middle
@@ -932,16 +980,16 @@ export function removeStyle(prop: string, savedSelection?: { editorRoot: HTMLEle
             // We should split the outer span while preserving inner styling
 
             // Find which child contains the selection (including deeply nested elements)
-            // After semantic element conversion, the range might be stale
-            // Use the saved selectionStartContainer which was captured before DOM changes
-            const selectionAnchor = selectionStartContainer
+            // CRITICAL: Use the LIVE range, not the saved selectionStartContainer.
+            // The saved container may point to a node that was wrapped/replaced during
+            // previous style operations. The browser maintains the live range correctly.
+            const liveRangeForNested = range.cloneRange()
+            const selectionAnchor = liveRangeForNested.startContainer
             let selectedChild: Node | null = null
 
             for (const child of Array.from(span.childNodes)) {
                 // Check if this child or any of its descendants contains the selection anchor
                 // We need to handle deeply nested structures like: span > italic-span > underline-span > text
-                // Note: contains() checks if the node is a descendant, but after DOM manipulation
-                // the reference might be to a node that's still in the tree
                 if (child.contains(selectionAnchor)) {
                     selectedChild = child
                     break
