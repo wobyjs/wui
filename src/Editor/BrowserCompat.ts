@@ -62,10 +62,21 @@ function staticRangeToLiveRange(sr: StaticRange): Range {
  * D-01: shadow root must be passed by all callers operating inside wui-editor.
  */
 export function safeGetRange(shadowRoot?: ShadowRoot): Range | null {
+    // Path 0: For shadow DOM, prefer shadow.getSelection() which returns
+    // the correct range inside the shadow tree. getComposedRanges can return
+    // ranges that include parent text node boundaries incorrectly.
+    if (shadowRoot) {
+        const shadowSel = shadowRoot.getSelection()
+        if (shadowSel && shadowSel.rangeCount > 0) {
+            return shadowSel.getRangeAt(0)
+        }
+    }
+
     const sel = window.getSelection()
     if (!sel) return null
 
     // Path 1: shadow-DOM-aware (Chrome 137+, Firefox 142+, Safari 17+)
+    // Only use as fallback if shadow.getSelection() is not available
     if (shadowRoot && typeof (sel as any).getComposedRanges === 'function') {
         const composed: StaticRange[] = (sel as any).getComposedRanges({ shadowRoots: [shadowRoot] })
         if (composed.length > 0) {
