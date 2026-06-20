@@ -7,6 +7,23 @@ function getEditorShadowRoot(node?: Node | null): ShadowRoot | undefined {
     return root instanceof ShadowRoot ? root : undefined
 }
 
+/**
+ * Find the WUI Editor shadow root by querying for the editor element.
+ * This is more reliable than deriving from window.getSelection().focusNode
+ * because the focusNode may be outside the shadow DOM when selection is set
+ * programmatically or in certain browser states.
+ */
+function findEditorShadowRoot(): ShadowRoot | undefined {
+    // Try to find the wui-editor element
+    const editor = document.querySelector('wui-editor')
+    if (editor?.shadowRoot) {
+        return editor.shadowRoot
+    }
+    // Fallback: try to derive from selection focus node
+    const focusNode = window.getSelection()?.focusNode
+    return getEditorShadowRoot(focusNode)
+}
+
 export type StyleProperty =
     | 'fontWeight'
     | 'fontStyle'
@@ -351,10 +368,8 @@ function restoreSelectionFromOffsets(
  */
 export function applyStyle(prop: string, value: string): void {
     console.log('[applyStyle] Called for:', prop, value)
-    // D-01: derive shadow root from active selection focus node to enable getComposedRanges path
-    const focusNode = window.getSelection()?.focusNode
-    console.log('[applyStyle] Focus node:', focusNode?.nodeName, focusNode?.nodeType, focusNode?.getRootNode?.()?.constructor?.name)
-    const focusSr = getEditorShadowRoot(focusNode)
+    // D-01: Find editor shadow root directly (more reliable than focusNode derivation)
+    const focusSr = findEditorShadowRoot()
     console.log('[applyStyle] Shadow root:', focusSr ? 'found' : 'none')
     const range = safeGetRange(focusSr)
     console.log('[applyStyle] Range:', range ? 'found' : 'null')
@@ -412,6 +427,14 @@ export function applyStyle(prop: string, value: string): void {
         const found = findAndSelectText(savedSelection.editorRoot, selectionTextBefore, offsetHint)
         if (!found) {
             console.warn('[applyStyle] Text-based restoration failed for:', JSON.stringify(selectionTextBefore))
+            // Fall back to offset-based restoration for cross-paragraph selections
+            if (savedSelection.editorRoot && savedSelection.startOffset >= 0 && savedSelection.endOffset >= 0) {
+                restoreSelectionFromOffsets(
+                    savedSelection.editorRoot,
+                    savedSelection.startOffset,
+                    savedSelection.endOffset
+                )
+            }
         }
     } else if (savedSelection.editorRoot && savedSelection.startOffset >= 0 && savedSelection.endOffset >= 0) {
         // Collapsed selection (caret only): use offset-based restoration
@@ -718,8 +741,8 @@ function insertStyledEmptySpan(prop: string, value: string): void {
  * Properly unwraps styled spans and restores selection
  */
 export function removeStyle(prop: string, savedSelection?: { editorRoot: HTMLElement | null, startOffset: number, endOffset: number }): void {
-    // D-01: derive shadow root from active selection focus node to enable getComposedRanges path
-    const focusSr = getEditorShadowRoot(window.getSelection()?.focusNode)
+    // D-01: Find editor shadow root directly (more reliable than focusNode derivation)
+    const focusSr = findEditorShadowRoot()
     const range = safeGetRange(focusSr)
     if (!range) return
 
@@ -886,15 +909,115 @@ export function removeStyle(prop: string, savedSelection?: { editorRoot: HTMLEle
     spansToProcess.forEach(({ span, cssProp }) => {
         console.log('[removeStyle] Processing span:', span.textContent?.substring(0, 20))
 
-        // CRITICAL: After semantic element conversion, use the ORIGINAL range offsets
-        // The text node in the new span is the same content, just moved
-        // So the offsets should still be valid
+        // CRITICAL: After semantic element conversion, the span may have nested elements
+        // We need to check if the span has ONLY a single text child
 
         // Get the text node inside the span
         const textNode = span.firstChild
-        if (!textNode || textNode.nodeType !== Node.TEXT_NODE) {
-            console.log('[removeStyle] ERROR: No text node in span')
-            span.style.removeProperty(cssProp)
+
+        // Check if the span has ONLY a single text child (simple case)
+        const hasOnlySingleTextChild = textNode &&
+            textNode.nodeType === Node.TEXT_NODE &&
+            span.childNodes.length === 1
+
+        if (!hasOnlySingleTextChild) {
+            console.log('[removeStyle] Span has nested elements or multiple children - using nested element handling')
+            // The span contains nested elements or multiple children
+            // This happens when a semantic element like <strong> contains mixed content
+            // e.g., <strong>text <em>selected</em> more text</strong>
+            // We need to find the selected portion within the nested structure
+
+            // For now, we need to handle the case where selection is inside nested spans
+            // The selection is inside one of the child elements
+            // We should split the outer span while preserving inner styling
+
+            // Find which child contains the selection (including deeply nested elements)
+            // After semantic element conversion, the range might be stale
+            // Use the saved selectionStartContainer which was captured before DOM changes
+            const selectionAnchor = selectionStartContainer
+            let selectedChild: Node | null = null
+
+            for (const child of Array.from(span.childNodes)) {
+                // Check if this child or any of its descendants contains the selection anchor
+                // We need to handle deeply nested structures like: span > italic-span > underline-span > text
+                // Note: contains() checks if the node is a descendant, but after DOM manipulation
+                // the reference might be to a node that's still in the tree
+                if (child.contains(selectionAnchor)) {
+                    selectedChild = child
+                    break
+                }
+            }
+
+            if (selectedChild) {
+                console.log('[removeStyle] Found selected child:', selectedChild.nodeName || selectedChild.textContent?.substring(0, 20))
+
+                // Determine which children are before, selected, and after
+                const children = Array.from(span.childNodes)
+                const selectedIdx = children.indexOf(selectedChild)
+
+                // Build the new structure:
+                // - before: children before selected, wrapped in span with current style
+                // - selected: the selected child WITHOUT the current style (unwrap if needed)
+                // - after: children after selected, wrapped in span with current style
+
+                const parent = span.parentNode
+                if (!parent) return
+
+                const fragment = document.createDocumentFragment()
+
+                // Add "before" children
+                if (selectedIdx > 0) {
+                    const beforeSpan = span.cloneNode(false) as HTMLSpanElement
+                    beforeSpan.removeAttribute('id')
+                    for (let i = 0; i < selectedIdx; i++) {
+                        beforeSpan.appendChild(children[i].cloneNode(true))
+                    }
+                    if (beforeSpan.childNodes.length > 0) {
+                        fragment.appendChild(beforeSpan)
+                    }
+                }
+
+                // Add "selected" child - UNWRAPPED from the bold style
+                // This is the key: we're removing the font-weight from this portion
+                const selectedClone = selectedChild.cloneNode(true)
+                fragment.appendChild(selectedClone)
+
+                // Add "after" children
+                if (selectedIdx < children.length - 1) {
+                    const afterSpan = span.cloneNode(false) as HTMLSpanElement
+                    afterSpan.removeAttribute('id')
+                    for (let i = selectedIdx + 1; i < children.length; i++) {
+                        afterSpan.appendChild(children[i].cloneNode(true))
+                    }
+                    if (afterSpan.childNodes.length > 0) {
+                        fragment.appendChild(afterSpan)
+                    }
+                }
+
+                // Replace original span with fragment
+                parent.replaceChild(fragment, span)
+                console.log('[removeStyle] Replaced span with nested structure handling')
+
+                // Normalize to merge adjacent text nodes
+                normalizeDOM(parent as HTMLElement)
+            } else {
+                // Fallback: just remove the style property
+                console.log('[removeStyle] Could not find selected child, removing style from entire span')
+                span.style.removeProperty(cssProp)
+                if (!span.getAttribute('style')) {
+                    span.removeAttribute('style')
+                }
+                // Unwrap if no attributes remain
+                if (!span.hasAttribute('style') && !span.className && !span.id) {
+                    const parent = span.parentNode
+                    if (parent) {
+                        while (span.firstChild) {
+                            parent.insertBefore(span.firstChild, span)
+                        }
+                        parent.removeChild(span)
+                    }
+                }
+            }
             return
         }
 
@@ -1186,6 +1309,14 @@ export function removeStyle(prop: string, savedSelection?: { editorRoot: HTMLEle
         const found = findAndSelectText(savedSelection.editorRoot, selectionTextBefore, offsetHint)
         if (!found) {
             console.warn('[removeStyle] Text-based restoration failed for:', JSON.stringify(selectionTextBefore))
+            // Fall back to offset-based restoration for cross-paragraph selections
+            if (savedSelection.editorRoot && savedSelection.startOffset >= 0 && savedSelection.endOffset >= 0) {
+                restoreSelectionFromOffsets(
+                    savedSelection.editorRoot,
+                    savedSelection.startOffset,
+                    savedSelection.endOffset
+                )
+            }
         }
     } else if (savedSelection.editorRoot && savedSelection.startOffset >= 0 && savedSelection.endOffset >= 0) {
         // Collapsed selection (caret only): use offset-based restoration
@@ -1219,8 +1350,8 @@ function getDefaultStyleValue(prop: string): string {
  * Toggle a style on/off based on current selection state
  */
 export function toggleStyle(prop: string, value: string): void {
-    // D-01: derive shadow root from active selection focus node to enable getComposedRanges path
-    const focusSr = getEditorShadowRoot(window.getSelection()?.focusNode)
+    // D-01: Find editor shadow root directly (more reliable than focusNode derivation)
+    const focusSr = findEditorShadowRoot()
     const range = safeGetRange(focusSr)
     if (!range) return
 
@@ -1324,8 +1455,8 @@ export function applyFontSize(size: string): void {
  * Apply text-align
  */
 export function applyTextAlign(align: string): void {
-    // D-01: derive shadow root from active selection focus node to enable getComposedRanges path
-    const focusSr = getEditorShadowRoot(window.getSelection()?.focusNode)
+    // D-01: Find editor shadow root directly (more reliable than focusNode derivation)
+    const focusSr = findEditorShadowRoot()
     const range = safeGetRange(focusSr)
     if (!range) return
 
@@ -1494,8 +1625,8 @@ export function removeFormat(): void {
  * Increases or decreases text-indent property
  */
 export function applyIndent(isDecrease: boolean, amount: number = 20): void {
-    // D-01: derive shadow root from active selection focus node to enable getComposedRanges path
-    const focusSr = getEditorShadowRoot(window.getSelection()?.focusNode)
+    // D-01: Find editor shadow root directly (more reliable than focusNode derivation)
+    const focusSr = findEditorShadowRoot()
     const range = safeGetRange(focusSr)
     if (!range) return
 
@@ -1572,8 +1703,8 @@ const BLOCK_TAGS = ['P', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'LI', 'BLOCKQUOTE',
  * Converts selected blocks to list items or toggles existing lists
  */
 export function applyList(mode: 'bullet' | 'number' | 'checkbox'): void {
-    // D-01: derive shadow root from active selection focus node to enable getComposedRanges path
-    const focusSr = getEditorShadowRoot(window.getSelection()?.focusNode)
+    // D-01: Find editor shadow root directly (more reliable than focusNode derivation)
+    const focusSr = findEditorShadowRoot()
     const range = safeGetRange(focusSr)
     if (!range) return
 
