@@ -1021,7 +1021,16 @@ export function removeStyle(prop: string, savedSelection?: { editorRoot: HTMLEle
             return
         }
 
-        // Create a range for the span's text content (character-level)
+        // CRITICAL: Use the CURRENT live range, not saved offsets
+        // After DOM manipulation (italic, underline applied), the saved offsets
+        // are relative to the ORIGINAL text nodes which no longer exist in the same form.
+        // The browser maintains the live range correctly across DOM changes.
+        const liveRange = range.cloneRange()
+
+        // Get the text content of the text node
+        const text = textNode.textContent || ''
+
+        // Create a range for the span's text content
         const spanRange = document.createRange()
         spanRange.selectNodeContents(textNode)
 
@@ -1032,32 +1041,27 @@ export function removeStyle(prop: string, savedSelection?: { editorRoot: HTMLEle
             endOffset: spanRange.endOffset
         })
 
-        console.log('[removeStyle] range:', {
-            startContainer: selectionStartContainer.textContent?.substring(0, 10),
-            startOffset: selectionStartOffset,
-            endContainer: selectionStartContainer.textContent?.substring(0, 10),
-            endOffset: selectionEndOffset,
-            selectionText: selectionTextContent
+        console.log('[removeStyle] liveRange:', {
+            startContainer: liveRange.startContainer.textContent?.substring(0, 10),
+            startOffset: liveRange.startOffset,
+            endContainer: liveRange.endContainer.textContent?.substring(0, 10),
+            endOffset: liveRange.endOffset
         })
 
-        // Compare boundary points using the saved offsets
-        // We need to create a NEW range that points to the NEW text node (in the converted span)
-        // but uses the SAME character offsets
-        const newSelectionRange = document.createRange()
-        try {
-            newSelectionRange.setStart(textNode, selectionStartOffset)
-            newSelectionRange.setEnd(textNode, selectionEndOffset)
-        } catch (e) {
-            console.warn('[removeStyle] Failed to create new selection range:', e)
-            // Fallback: use the original range
-            newSelectionRange.setStart(range.startContainer, range.startOffset)
-            newSelectionRange.setEnd(range.endContainer, range.endOffset)
+        // Check intersection using the live range
+        // intersectsNode checks if the range intersects with the node at all
+        if (!liveRange.intersectsNode(span)) {
+            console.log('[removeStyle] Live range does not intersect span - skipping')
+            return
         }
 
-        const startToStart = newSelectionRange.compareBoundaryPoints(Range.START_TO_START, spanRange)
-        const startToEnd = newSelectionRange.compareBoundaryPoints(Range.START_TO_END, spanRange)
-        const endToStart = newSelectionRange.compareBoundaryPoints(Range.END_TO_START, spanRange)
-        const endToEnd = newSelectionRange.compareBoundaryPoints(Range.END_TO_END, spanRange)
+        // Calculate the intersection between live range and span range
+        // We need to determine: what portion of THIS span is selected?
+
+        const startToStart = liveRange.compareBoundaryPoints(Range.START_TO_START, spanRange)
+        const startToEnd = liveRange.compareBoundaryPoints(Range.START_TO_END, spanRange)
+        const endToStart = liveRange.compareBoundaryPoints(Range.END_TO_START, spanRange)
+        const endToEnd = liveRange.compareBoundaryPoints(Range.END_TO_END, spanRange)
 
         console.log('[removeStyle] Boundary comparisons:', {
             startToStart,
@@ -1066,23 +1070,50 @@ export function removeStyle(prop: string, savedSelection?: { editorRoot: HTMLEle
             endToEnd
         })
 
-        // Check if selection starts inside this span (at character level)
-        // NOTE: Browser has inverted comparison results for START_TO_END and END_TO_START
-        // For selection [3,7] inside span [0,10]:
-        //   START_TO_START: 1 (3 vs 0) - correct, selection starts after span
-        //   START_TO_END: 1 (3 vs 10) - inverted! Should be -1
-        //   END_TO_START: -1 (7 vs 0) - inverted! Should be 1
-        //   END_TO_END: -1 (7 vs 10) - correct, selection ends before span
-        // So for "starts inside": startToStart > 0 && startToEnd > 0 (both positive means selection is after span start but comparison is inverted for end)
-        // And for "ends inside": endToStart < 0 && endToEnd < 0 (endToStart inverted to negative)
-        const startsInside = startToStart > 0 && startToEnd > 0  // selection starts inside span
-        const endsInside = endToStart < 0 && endToEnd < 0       // selection ends inside span
+        // Determine the selected portion within THIS span:
+        // - If liveRange starts before span: selection starts at 0
+        // - If liveRange starts inside span: selection starts at the offset
+        // - If liveRange ends after span: selection ends at text.length
+        // - If liveRange ends inside span: selection ends at the offset
 
-        console.log('[removeStyle] startsInside:', startsInside, 'endsInside:', endsInside)
+        let selStart: number, selEnd: number
 
-        // If selection fully contains the span, just remove the style
-        if (newSelectionRange.compareBoundaryPoints(Range.START_TO_START, spanRange) <= 0 &&
-            newSelectionRange.compareBoundaryPoints(Range.END_TO_END, spanRange) >= 0) {
+        if (startToStart <= 0) {
+            // Selection starts before or at the start of this span
+            selStart = 0
+        } else {
+            // Selection starts inside this span
+            // We need to find the offset within THIS text node
+            // The liveRange.startContainer might be a different text node
+            if (liveRange.startContainer === textNode) {
+                selStart = liveRange.startOffset
+            } else {
+                // Selection starts in a different text node that intersects this span
+                // This can happen when the selection spans multiple text nodes
+                // In this case, the selection fully contains this text node
+                selStart = 0
+            }
+        }
+
+        if (endToEnd >= 0) {
+            // Selection ends after or at the end of this span
+            selEnd = text.length
+        } else {
+            // Selection ends inside this span
+            if (liveRange.endContainer === textNode) {
+                selEnd = liveRange.endOffset
+            } else {
+                // Selection ends in a different text node
+                selEnd = text.length
+            }
+        }
+
+        console.log('[removeStyle] Calculated selection within span:', { selStart, selEnd, textLength: text.length })
+
+        // Check if selection fully contains the span
+        const selectionFullyContainsSpan = selStart === 0 && selEnd === text.length
+
+        if (selectionFullyContainsSpan) {
             console.log('[removeStyle] Selection fully contains span - removing entire style')
 
             // Entire span is selected - remove style
@@ -1100,7 +1131,7 @@ export function removeStyle(prop: string, savedSelection?: { editorRoot: HTMLEle
                     parent.removeChild(span)
                 }
             }
-        } else if (startsInside || endsInside) {
+        } else if (selStart < selEnd) {
             console.log('[removeStyle] Partial selection - splitting span')
 
             // Partial selection - need to split the span
@@ -1205,42 +1236,8 @@ export function removeStyle(prop: string, savedSelection?: { editorRoot: HTMLEle
                 return
             }
 
-            const textNode = firstChild
-
-            const text = textNode.textContent || ''
-            const spanStart = 0
-            const spanEnd = text.length
-
-            console.log('[removeStyle] Text:', text, 'length:', text.length)
-
-            // Calculate which parts are selected using the new selection range
-            const rangeRelStart = newSelectionRange.compareBoundaryPoints(Range.START_TO_START, spanRange) > 0
-                ? newSelectionRange.startOffset
-                : 0
-            const rangeRelEnd = newSelectionRange.compareBoundaryPoints(Range.END_TO_END, spanRange) < 0
-                ? newSelectionRange.endOffset
-                : text.length
-
-            console.log('[removeStyle] rangeRelStart:', rangeRelStart, 'rangeRelEnd:', rangeRelEnd)
-
-            // Clamp values
-            const selStart = Math.max(0, Math.min(rangeRelStart, text.length))
-            const selEnd = Math.max(0, Math.min(rangeRelEnd, text.length))
-
-            console.log('[removeStyle] selStart:', selStart, 'selEnd:', selEnd)
-
-            if (selStart >= selEnd) {
-                console.log('[removeStyle] ERROR: Invalid selection range')
-                return
-            }
-
-            const parent = span.parentNode
-            if (!parent) {
-                console.log('[removeStyle] ERROR: No parent')
-                return
-            }
-
             // Split into up to 3 parts: before, selected, after
+            // Use selStart and selEnd calculated from live range above
             const beforeText = text.substring(0, selStart)
             const selectedText = text.substring(selStart, selEnd)
             const afterText = text.substring(selEnd)
@@ -1251,22 +1248,25 @@ export function removeStyle(prop: string, savedSelection?: { editorRoot: HTMLEle
                 after: afterText
             })
 
+            const parent = span.parentNode
+            if (!parent) {
+                console.log('[removeStyle] ERROR: No parent')
+                return
+            }
+
             // Create fragments - ALWAYS wrap all parts in spans to prevent merge issues
-            // The normalizeDOM/mergeAdjacentSpans only merges adjacent SPANS, not text nodes
-            // So text adjacent to a span with same style will NOT be absorbed
             const fragment = document.createDocumentFragment()
 
             if (beforeText) {
                 const beforeSpan = span.cloneNode() as HTMLSpanElement
-                beforeSpan.removeAttribute('id') // Don't clone IDs
+                beforeSpan.removeAttribute('id')
                 beforeSpan.textContent = beforeText
                 fragment.appendChild(beforeSpan)
                 console.log('[removeStyle] Added before span:', beforeText)
             }
 
             if (selectedText) {
-                // Selected portion - always wrap in a span to prevent text absorption
-                // Even without styles, the span prevents mergeAdjacentSpans from absorbing it
+                // Selected portion - remove the style
                 const selectedSpan = document.createElement('span')
                 selectedSpan.textContent = selectedText
                 fragment.appendChild(selectedSpan)
@@ -1275,7 +1275,7 @@ export function removeStyle(prop: string, savedSelection?: { editorRoot: HTMLEle
 
             if (afterText) {
                 const afterSpan = span.cloneNode() as HTMLSpanElement
-                afterSpan.removeAttribute('id') // Don't clone IDs
+                afterSpan.removeAttribute('id')
                 afterSpan.textContent = afterText
                 fragment.appendChild(afterSpan)
                 console.log('[removeStyle] Added after span:', afterText)
@@ -1287,9 +1287,7 @@ export function removeStyle(prop: string, savedSelection?: { editorRoot: HTMLEle
             parent.replaceChild(fragment, span)
             console.log('[removeStyle] Replaced original span')
         } else {
-            console.log('[removeStyle] WARNING: Span intersects but not inside?')
-            // Selection doesn't intersect this span properly - shouldn't happen
-            span.style.removeProperty(cssProp)
+            console.log('[removeStyle] WARNING: Invalid selection range in span')
         }
     })
 
