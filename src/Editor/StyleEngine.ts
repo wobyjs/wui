@@ -445,10 +445,14 @@ export function applyStyle(prop: string, value: string): void {
     let wrapper: HTMLElement | null = null
 
     if (range.collapsed) {
-        // D-12: Caret formatting - insert empty styled span for typing (MS Word behavior)
-        // Do NOT expand to word - caret means "activate style for future typing"
-        insertStyledEmptySpan(prop, value, focusSr)
-        return
+        // Expand to word if cursor is on a word, otherwise insert empty styled span
+        const wordRange = expandToWord(range)
+        if (wordRange && !wordRange.collapsed) {
+            wrapper = applyStyleToRange(wordRange, prop, value)
+        } else {
+            insertStyledEmptySpan(prop, value, focusSr)
+            return
+        }
     } else {
         wrapper = applyStyleToRange(range, prop, value)
     }
