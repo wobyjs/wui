@@ -310,10 +310,21 @@ export function restoreRangePosition(selection: Selection, start: { node: Node, 
  * Get selection state relative to a root node (default: document.body).
  */
 export function getSelection(container?: HTMLElement): { selection: Selection, state: SelectionState } | null {
-    // CRITICAL: In Woby custom elements with slots, user content is in light DOM.
-    // Even though the editor container (data-editor-root) is in shadow DOM,
-    // the selection is on the light DOM content. We must ALWAYS use window.getSelection().
-    const selection = window.getSelection();
+    // D-16: When the editor is in shadow DOM (content cloned from light DOM via syncChildren),
+    // we need to use shadowRoot.getSelection() to get the correct selection.
+    // The content is in shadow DOM after syncChildren clones light DOM children.
+    let selection: Selection | null = null
+
+    if (container) {
+        const root = container.getRootNode()
+        if (root instanceof ShadowRoot) {
+            selection = root.getSelection()
+        }
+    }
+
+    if (!selection) {
+        selection = window.getSelection()
+    }
 
     if (!selection) return null;
 

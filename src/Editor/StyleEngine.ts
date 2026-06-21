@@ -1584,10 +1584,11 @@ export function applyTextAlign(align: string): void {
  * This wraps the selection in the specified block element with optional class
  */
 export function applyFormatBlock(tag: string, className?: string): void {
-    const range = safeGetRange()
+    const focusSr = findEditorShadowRoot()
+    const range = safeGetRange(focusSr)
     if (!range) return
 
-    const sel = safeGetSelection()
+    const sel = focusSr ? focusSr.getSelection() : safeGetSelection()
     if (!sel) return
 
     // Find block parent
@@ -1658,10 +1659,11 @@ export function applyFormatBlock(tag: string, className?: string): void {
  * This removes all span elements with inline styles within the selection
  */
 export function removeFormat(): void {
-    const range = safeGetRange()
+    const focusSr = findEditorShadowRoot()
+    const range = safeGetRange(focusSr)
     if (!range) return
 
-    const sel = safeGetSelection()
+    const sel = focusSr ? focusSr.getSelection() : safeGetSelection()
     if (!sel) return
 
     if (range.collapsed) {
