@@ -425,15 +425,13 @@ export function applyStyle(prop: string, value: string): void {
     const selectionTextBefore = sel.toString()
 
     // Save original selection as offsets BEFORE any DOM operations
-    const savedSelection = saveSelectionAsOffsets(range)
+    // D-17: For collapsed ranges, save BEFORE expandToWord so we can restore the
+    // original caret position after formatting. expandToWord may expand to word,
+    // but we want caret to stay at original position, not the expanded range.
+    let savedSelection = saveSelectionAsOffsets(range)
 
     // Check if style already exists on selection (toggle check)
     const styleAlreadyApplied = hasStyleInRange(range, prop, value)
-    console.log('[applyStyle] styleAlreadyApplied:', styleAlreadyApplied, 'prop:', prop, 'value:', value)
-    console.log('[applyStyle] range.collapsed:', range.collapsed)
-    if (range.collapsed) {
-        console.log('[applyStyle] range.startContainer:', range.startContainer.nodeName, range.startContainer.textContent?.substring(0, 20))
-    }
 
     if (styleAlreadyApplied) {
         // Toggle OFF: Remove the style
@@ -443,12 +441,14 @@ export function applyStyle(prop: string, value: string): void {
 
     // Toggle ON: Apply the style
     let wrapper: HTMLElement | null = null
+    let isCollapsedCaret = false
 
     if (range.collapsed) {
         // Expand to word if cursor is on a word, otherwise insert empty styled span
         const wordRange = expandToWord(range)
         if (wordRange && !wordRange.collapsed) {
             wrapper = applyStyleToRange(wordRange, prop, value)
+            isCollapsedCaret = true
         } else {
             insertStyledEmptySpan(prop, value, focusSr)
             return
@@ -464,8 +464,17 @@ export function applyStyle(prop: string, value: string): void {
     }
 
     // D-08: Restore selection after DOM normalization
-    // HYBRID APPROACH: Use offset hint + text search to disambiguate multiple occurrences
-    if (selectionTextBefore && selectionTextBefore.trim() !== '') {
+    if (isCollapsedCaret) {
+        // D-17: After expand-to-word formatting, restore to ORIGINAL caret position
+        // (not the expanded word range). The original offsets were saved before expansion.
+        if (savedSelection.editorRoot && savedSelection.startOffset >= 0) {
+            restoreSelectionFromOffsets(
+                savedSelection.editorRoot,
+                savedSelection.startOffset,
+                savedSelection.endOffset
+            )
+        }
+    } else if (selectionTextBefore && selectionTextBefore.trim() !== '') {
         // Non-collapsed selection: use text-based restoration with offset hint
         // The hint helps find the correct occurrence when text appears multiple times
         const offsetHint = savedSelection.startOffset >= 0 ? savedSelection.startOffset : undefined
@@ -835,15 +844,19 @@ export function removeStyle(prop: string, savedSelection?: { editorRoot: HTMLEle
     if (range.collapsed) {
         // For collapsed selection: find current style at cursor and unwrap
         const container = range.startContainer
-        console.log('[removeStyle] Collapsed range, container:', container.nodeName, container.textContent?.substring(0, 20))
-        console.log('[removeStyle] hasStyle check:', hasStyle(container, prop, ''))
         if (hasStyle(container, prop, '')) {
+            // Save caret position as text offset before unwrapping
+            const savedSel = saveSelectionAsOffsets(range)
+            const editorRoot = savedSel.editorRoot
+
             // Find the styled span containing the cursor
             let node: Node | null = container
             while (node && node.parentElement) {
                 const el = node.parentElement
                 if (el instanceof HTMLElement && el.tagName === 'SPAN') {
-                    el.style.removeProperty(prop)
+                    // CSSStyleDeclaration.removeProperty expects kebab-case CSS property name
+                    const cssProp = prop.replace(/([A-Z])/g, '-$1').toLowerCase()
+                    el.style.removeProperty(cssProp)
                     if (!el.getAttribute('style')) {
                         el.removeAttribute('style')
                     }
@@ -860,6 +873,11 @@ export function removeStyle(prop: string, savedSelection?: { editorRoot: HTMLEle
                     break
                 }
                 node = node.parentElement
+            }
+
+            // Restore caret position after DOM unwrap
+            if (editorRoot && savedSel.startOffset >= 0) {
+                restoreSelectionFromOffsets(editorRoot, savedSel.startOffset, savedSel.endOffset)
             }
         }
         return
