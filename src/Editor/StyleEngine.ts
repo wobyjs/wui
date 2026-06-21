@@ -153,7 +153,7 @@ function hasStyle(node: Node, prop: string, value: string): boolean {
                 const el = current as HTMLElement;
                 const styleValue = el.style.getPropertyValue('text-decoration-line') ||
                                    el.style.getPropertyValue('text-decoration');
-                if (styleValue.includes(value)) {
+                if (!value || styleValue.includes(value)) {
                     return true;
                 }
             }
@@ -163,10 +163,27 @@ function hasStyle(node: Node, prop: string, value: string): boolean {
         const styles = getComputedStyles(node);
         const currentValue = styles.getPropertyValue('text-decoration-line') ||
                             styles.getPropertyValue('text-decoration');
+        if (!value) return currentValue !== 'none' && !!currentValue
         return currentValue.includes(value);
     }
 
     const styles = getComputedStyles(node)
+
+    // Empty value means "check if the property has any non-default value"
+    if (!value) {
+        const currentValue = styles.getPropertyValue(cssProp)
+        // Check if property is set to something other than default/normal
+        if (cssProp === 'font-weight') {
+            return normalizeFontWeight(currentValue) !== '400'
+        }
+        if (cssProp === 'font-style') {
+            return currentValue !== 'normal'
+        }
+        if (cssProp === 'text-decoration' || cssProp === 'text-decoration-line') {
+            return currentValue !== 'none' && !!currentValue
+        }
+        return !!currentValue
+    }
 
     // Normalize color values for comparison
     if (cssProp === 'color' || cssProp === 'background-color') {
@@ -224,7 +241,7 @@ function getBlockParent(node: Node): HTMLElement | null {
  * Walk up to the [data-editor-root] element.
  * D-04: used as stable anchor for global character offset calculations.
  */
-function findEditorRoot(node: Node): HTMLElement | null {
+export function findEditorRoot(node: Node): HTMLElement | null {
     let current: Node | null = node
     while (current) {
         if (current instanceof HTMLElement && current.dataset && 'editorRoot' in current.dataset) {
@@ -297,7 +314,7 @@ export function hasStyleInRange(range: Range, prop: string, value: string): bool
  * D-04: editor-root-relative offsets survive cross-block selections and span wrapping.
  * Returns { editorRoot: null } if editor root cannot be found.
  */
-function saveSelectionAsOffsets(range: Range): {
+export function saveSelectionAsOffsets(range: Range): {
     editorRoot: HTMLElement | null
     startOffset: number
     endOffset: number
@@ -336,7 +353,7 @@ function saveSelectionAsOffsets(range: Range): {
  * Restore selection from global character offsets saved by saveSelectionAsOffsets.
  * D-04: walks from the editor root, not from a block parent.
  */
-function restoreSelectionFromOffsets(
+export function restoreSelectionFromOffsets(
     editorRoot: HTMLElement,
     startOffset: number,
     endOffset: number
@@ -412,6 +429,11 @@ export function applyStyle(prop: string, value: string): void {
 
     // Check if style already exists on selection (toggle check)
     const styleAlreadyApplied = hasStyleInRange(range, prop, value)
+    console.log('[applyStyle] styleAlreadyApplied:', styleAlreadyApplied, 'prop:', prop, 'value:', value)
+    console.log('[applyStyle] range.collapsed:', range.collapsed)
+    if (range.collapsed) {
+        console.log('[applyStyle] range.startContainer:', range.startContainer.nodeName, range.startContainer.textContent?.substring(0, 20))
+    }
 
     if (styleAlreadyApplied) {
         // Toggle OFF: Remove the style
@@ -423,14 +445,10 @@ export function applyStyle(prop: string, value: string): void {
     let wrapper: HTMLElement | null = null
 
     if (range.collapsed) {
-        // Expand to word if cursor is in middle of word
-        const wordRange = expandToWord(range)
-        if (!wordRange || wordRange.collapsed) {
-            // Insert styled empty span at cursor for typing
-            insertStyledEmptySpan(prop, value)
-            return
-        }
-        wrapper = applyStyleToRange(wordRange, prop, value)
+        // D-12: Caret formatting - insert empty styled span for typing (MS Word behavior)
+        // Do NOT expand to word - caret means "activate style for future typing"
+        insertStyledEmptySpan(prop, value, focusSr)
+        return
     } else {
         wrapper = applyStyleToRange(range, prop, value)
     }
@@ -737,16 +755,39 @@ function applyStyleToRange(range: Range, prop: string, value: string): HTMLEleme
 /**
  * Insert an empty styled span at cursor position
  * Used for typing with active style
+ * D-14: Must use shadowRoot.getSelection() for shadow DOM editors
  */
-function insertStyledEmptySpan(prop: string, value: string): void {
-    const sel = safeGetSelection()
+function insertStyledEmptySpan(prop: string, value: string, shadowRoot?: ShadowRoot): void {
+    // D-14: For shadow DOM, use shadowRoot.getSelection() which correctly
+    // returns the selection inside the shadow tree
+    let sel: Selection | null = null
+    if (shadowRoot) {
+        sel = shadowRoot.getSelection()
+    }
+    if (!sel) {
+        sel = safeGetSelection()
+    }
+
     if (!sel || sel.rangeCount === 0) return
 
     const range = sel.getRangeAt(0)
 
     const span = document.createElement('span')
-    span.style.setProperty(prop, value)
+    // D-15: Use direct style property assignment for better compatibility
+    // setProperty works but requires the CSS property name (font-weight vs fontWeight)
+    // Using direct assignment is more reliable for camelCase JS property names
+    if (prop === 'fontWeight') {
+        span.style.fontWeight = value
+    } else if (prop === 'fontStyle') {
+        span.style.fontStyle = value
+    } else if (prop === 'textDecoration') {
+        span.style.textDecoration = value
+    } else {
+        span.style.setProperty(prop, value)
+    }
     span.appendChild(document.createTextNode('﻿')) // ZWNBSP
+
+    console.log('[insertStyledEmptySpan] Created span:', span.outerHTML)
 
     range.insertNode(span)
 
@@ -790,6 +831,8 @@ export function removeStyle(prop: string, savedSelection?: { editorRoot: HTMLEle
     if (range.collapsed) {
         // For collapsed selection: find current style at cursor and unwrap
         const container = range.startContainer
+        console.log('[removeStyle] Collapsed range, container:', container.nodeName, container.textContent?.substring(0, 20))
+        console.log('[removeStyle] hasStyle check:', hasStyle(container, prop, ''))
         if (hasStyle(container, prop, '')) {
             // Find the styled span containing the cursor
             let node: Node | null = container

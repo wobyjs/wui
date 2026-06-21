@@ -1,6 +1,8 @@
 import { useOnClickOutside, useSelection } from '@woby/use/browser'
 import { $, $$, useEffect, JSX, useMemo, Observable, createContext, useContext, setRef, customElement, defaults } from 'woby'
 import type { FocusManager } from './FocusManager'
+import { saveSelectionAsOffsets, restoreSelectionFromOffsets, findEditorRoot } from './StyleEngine'
+import { safeGetSelection } from './BrowserCompat'
 
 // 1. CREATE THE EDITOR DATA STORE
 // createContext: Creates a "global" storage box so we don't have to pass props everywhere.
@@ -58,14 +60,25 @@ const DEBOUNCE_MS = 300
 const MAX_STACK = 100
 
 /**
+ * History entry type - stores content and selection for restoration
+ */
+type HistoryEntry = {
+    content: string
+    selection?: {
+        startOffset: number
+        endOffset: number
+    }
+}
+
+/**
  * A Provider component that manages the history (undo/redo) for a contentEditable editor.
  * It must be placed inside an EditorContext.Provider.
  */
 // #region Undo Redo
 export const UndoRedo = ({ children, editor }: { children: JSX.Children, editor?: Observable<HTMLDivElement> }) => {
     // Local reactive state for the history stacks
-    const undos = $([] as string[])
-    const redos = $([] as string[])
+    const undos = $([] as HistoryEntry[])
+    const redos = $([] as HistoryEntry[])
     const isInitialized = $(false)
 
     // D-06: debounceTimer inside component closure prevents cross-instance timer sharing
@@ -89,7 +102,7 @@ export const UndoRedo = ({ children, editor }: { children: JSX.Children, editor?
             // formatting (bold/italic/etc.) is applied. host.innerHTML (light DOM) never
             // reflects formatting changes, so it cannot be used as the source of truth.
             const initialContent = currentEditor.innerHTML
-            undos([initialContent]) // innerHTML should always be a string
+            undos([{ content: initialContent }]) // initial state has no selection
             isInitialized(true) // set observable
             console.log('[UndoRedo] Initialized with:', initialContent.substring(0, 100))
         }
@@ -102,6 +115,7 @@ export const UndoRedo = ({ children, editor }: { children: JSX.Children, editor?
      * saveDo: The "Snapshot" function with debouncing.
      * Call this after any formatting change / new action (bold, indent, etc.) or significant typing.
      * Debouncing prevents saving on every keystroke (300ms delay).
+     * D-13: Also saves selection state for restoration after undo/redo.
      */
     const saveDo = () => {
         // Clear any pending save
@@ -121,19 +135,33 @@ export const UndoRedo = ({ children, editor }: { children: JSX.Children, editor?
             const currentContent = element.innerHTML
             const u = $$(undos)
 
+            // D-13: Capture selection state for restoration after undo/redo
+            const sel = safeGetSelection()
+            let selectionData: { startOffset: number, endOffset: number } | undefined = undefined
+            if (sel && sel.rangeCount > 0) {
+                const range = sel.getRangeAt(0)
+                const savedSel = saveSelectionAsOffsets(range)
+                if (savedSel.editorRoot) {
+                    selectionData = {
+                        startOffset: savedSel.startOffset,
+                        endOffset: savedSel.endOffset
+                    }
+                }
+            }
+
             // Initialization Logic
             if (!$$(isInitialized)) {
-                undos([currentContent])
+                undos([{ content: currentContent, selection: selectionData }])
                 isInitialized(true)
                 console.log('[UndoRedo] SaveDo initialized:', currentContent.substring(0, 100))
                 return
             }
 
             // Check for changes
-            const last = u.length ? u[u.length - 1] : ""
+            const last = u.length ? u[u.length - 1].content : ""
             if (last !== currentContent) {
                 // Add to undos stack
-                const newUndos = [...u, currentContent]
+                const newUndos = [...u, { content: currentContent, selection: selectionData }]
 
                 // Limit stack to MAX_STACK entries
                 if (newUndos.length > MAX_STACK) {
@@ -152,6 +180,7 @@ export const UndoRedo = ({ children, editor }: { children: JSX.Children, editor?
     // #region undo
     /**
      * undo: Reverts to the previous HTML snapshot.
+     * D-13: Also restores selection if it was saved with the snapshot.
      */
     const undo = () => {
         const u = $$(undos)
@@ -163,12 +192,31 @@ export const UndoRedo = ({ children, editor }: { children: JSX.Children, editor?
             return
         }
 
-        const contentToMoveToRedo = u.pop() // Removes last element and returns it
+        // D-13: Save current selection to the redo stack entry before moving
+        const sel = safeGetSelection()
+        let currentSelection: { startOffset: number, endOffset: number } | undefined = undefined
+        if (sel && sel.rangeCount > 0) {
+            const range = sel.getRangeAt(0)
+            const savedSel = saveSelectionAsOffsets(range)
+            if (savedSel.editorRoot) {
+                currentSelection = {
+                    startOffset: savedSel.startOffset,
+                    endOffset: savedSel.endOffset
+                }
+            }
+        }
+
+        const entryToMoveToRedo = u.pop() // Removes last element and returns it
+        // Add current selection to the redo entry
+        const redoEntry = entryToMoveToRedo ? {
+            content: entryToMoveToRedo.content,
+            selection: currentSelection
+        } : undefined
 
         undos([...u]) // Update undos stack (already modified by pop)
 
-        if (contentToMoveToRedo !== undefined) { // Ensure it's not undefined
-            const newRedos = [...r, contentToMoveToRedo]
+        if (redoEntry !== undefined) { // Ensure it's not undefined
+            const newRedos = [...r, redoEntry]
             redos(newRedos)
         }
 
@@ -179,7 +227,19 @@ export const UndoRedo = ({ children, editor }: { children: JSX.Children, editor?
         // Restoring host.innerHTML (light DOM) triggers syncChildren which would
         // overwrite the formatted shadow DOM with plain light DOM content.
         const el = $$(activeEditor) as HTMLElement
-        el.innerHTML = stateToRestore
+        el.innerHTML = stateToRestore.content
+
+        // D-13: Restore selection if saved with the snapshot
+        if (stateToRestore.selection) {
+            const editorRoot = findEditorRoot(el)
+            if (editorRoot) {
+                restoreSelectionFromOffsets(
+                    editorRoot,
+                    stateToRestore.selection.startOffset,
+                    stateToRestore.selection.endOffset
+                )
+            }
+        }
     }
     // #endregion
 
@@ -187,6 +247,7 @@ export const UndoRedo = ({ children, editor }: { children: JSX.Children, editor?
     // #region redo
     /**
      * redo: Restores a snapshot that was previously undone.
+     * D-13: Also restores selection if it was saved with the snapshot.
      */
     const redo = () => {
         const u = $$(undos)
@@ -196,16 +257,47 @@ export const UndoRedo = ({ children, editor }: { children: JSX.Children, editor?
             return
         }
 
-        const contentToRestoreAndMoveToUndo = r.pop() // Removes last element and returns it
+        // D-13: Save current selection to the undo stack entry before moving
+        const sel = safeGetSelection()
+        let currentSelection: { startOffset: number, endOffset: number } | undefined = undefined
+        if (sel && sel.rangeCount > 0) {
+            const range = sel.getRangeAt(0)
+            const savedSel = saveSelectionAsOffsets(range)
+            if (savedSel.editorRoot) {
+                currentSelection = {
+                    startOffset: savedSel.startOffset,
+                    endOffset: savedSel.endOffset
+                }
+            }
+        }
+
+        const entryToRestore = r.pop() // Removes last element and returns it
 
         redos([...r]) // Update redos stack (already modified by pop)
 
-        if (contentToRestoreAndMoveToUndo !== undefined) { // Ensure it's not undefined
-            const newUndos = [...u, contentToRestoreAndMoveToUndo]
+        if (entryToRestore !== undefined) { // Ensure it's not undefined
+            // Add current selection to the undo entry
+            const undoEntry = {
+                content: entryToRestore.content,
+                selection: currentSelection
+            }
+            const newUndos = [...u, undoEntry]
             undos(newUndos)
             // Restore directly to shadow DOM — same source of truth as saveDo.
             const el = $$(activeEditor) as HTMLElement
-            el.innerHTML = contentToRestoreAndMoveToUndo
+            el.innerHTML = entryToRestore.content
+
+            // D-13: Restore selection if saved with the snapshot
+            if (entryToRestore.selection) {
+                const editorRoot = findEditorRoot(el)
+                if (editorRoot) {
+                    restoreSelectionFromOffsets(
+                        editorRoot,
+                        entryToRestore.selection.startOffset,
+                        entryToRestore.selection.endOffset
+                    )
+                }
+            }
         }
     }
     // #endregion

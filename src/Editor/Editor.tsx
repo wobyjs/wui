@@ -372,12 +372,12 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, children }) =
         <div
             ref={activeEditor}
             data-editor-root
-            contentEditable={() => $$(isEditing) ? true : false}
+            contentEditable={true}
             onClick={handleEditorClick}
             onBlur={handleBlur}
             onKeyDown={handleKeyDown}
             class={() => [
-                $$(isEditing) ? 'border-blue-500 ring-2' : 'border-gray-200',
+                'border-blue-500 ring-2',
                 "p-6 my-4 rounded-xl border min-h-[250px] shadow-sm"
             ]}
             style={() => ({
@@ -592,7 +592,7 @@ const Editor = defaults(def, (props) => {
             <FocusManagerContext.Provider value={focusManager}>
                 <EditorContext.Provider value={editor}>
                     <UndoRedo>
-                        {() => $$(isEditing) && $$(enableToolbar) && <EditorToolbar toolbarRef={toolbarRef} />}
+                        {() => $$(enableToolbar) && <EditorToolbar toolbarRef={toolbarRef} />}
                         <EditorSurface
                             isEditing={isEditing}
                             handleEditorClick={handleEditorClick}
