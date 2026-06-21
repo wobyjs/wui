@@ -32,8 +32,11 @@ const FontSize = defaults(def, (props) => {
                 return;
             }
 
+            const rootNode = $$(el).getRootNode()
+            const shadowRoot = rootNode instanceof ShadowRoot ? rootNode : undefined
+
             const selection = safeGetSelection();
-            const range = safeGetRange();
+            const range = safeGetRange(shadowRoot);
 
             if (!selection || !range) return;
 
