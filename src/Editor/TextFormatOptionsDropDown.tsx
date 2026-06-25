@@ -1,10 +1,10 @@
 import { $, $$, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlClass, HtmlString, JSX, Observable, ObservableMaybe, useEffect } from 'woby'
 import { Button, ButtonStyles } from '../Button'
 import { useEditor, useUndoRedo } from './undoredo'
-import { useOnClickOutside } from '@woby/use/browser'
+import { useOnClickOutside } from '@woby/use'
 import KeyboardDownArrow from '../icons/keyboard_down_arrow'
 import { getCurrentEditor, getSelection } from './utils'
-import { applyStyle, applyBackgroundColor, removeFormat } from './StyleEngine'
+import { applyStyle, applyBackgroundColor, removeFormat, saveSelectionAsOffsets, restoreSelectionFromOffsets, findEditorRoot } from './StyleEngine'
 
 import StrikethroughIcon from '../icons/strikethrough'
 
@@ -39,11 +39,31 @@ const clearFormatting = () => {
 }
 
 const transformCase = (transformType: 'lowercase' | 'uppercase' | 'capitalize', editorDiv: HTMLElement) => {
+    // editorDiv is the [data-editor-root] content div, need to find the host element with shadow root
+    // The host element is the parent wui-editor custom element that has the shadowRoot
+    const hostElement = editorDiv?.closest('wui-editor') || (editorDiv?.parentNode as Element)?.host || document.querySelector('wui-editor')
+    const shadowRoot = hostElement?.shadowRoot
 
-    const { selection } = getSelection(editorDiv) // window.getSelection()
-    if (!selection || selection.rangeCount === 0) { return }
+    const sel = shadowRoot ? shadowRoot.getSelection() : window.getSelection()
+    if (!sel || sel.rangeCount === 0) { return }
 
-    const range = selection.getRangeAt(0).cloneRange()
+    const range = sel.getRangeAt(0).cloneRange()
+
+    // For collapsed (caret) selection, expand to current word
+    if (range.collapsed) {
+        const textNode = range.startContainer
+        if (textNode.nodeType !== Node.TEXT_NODE) return
+        const text = textNode.textContent || ''
+        let start = range.startOffset
+        let end = range.endOffset
+        // Expand to word boundaries
+        while (start > 0 && /\w/.test(text[start - 1])) start--
+        while (end < text.length && /\w/.test(text[end])) end++
+        if (start === end) return
+        range.setStart(textNode, start)
+        range.setEnd(textNode, end)
+    }
+
     const selectedText = range.toString()
     if (!selectedText) return
 
@@ -75,8 +95,8 @@ const transformCase = (transformType: 'lowercase' | 'uppercase' | 'capitalize', 
         const newRange = document.createRange()
         newRange.setStart(textNode, range.startOffset)
         newRange.setEnd(textNode, range.startOffset + transform(selected).length)
-        selection.removeAllRanges()
-        selection.addRange(newRange)
+        sel.removeAllRanges()
+        sel.addRange(newRange)
         return
     }
 
@@ -127,8 +147,8 @@ const transformCase = (transformType: 'lowercase' | 'uppercase' | 'capitalize', 
     })
 
     // Restore the original selection range
-    selection.removeAllRanges()
-    selection.addRange(range)
+    sel.removeAllRanges()
+    sel.addRange(range)
 }
 
 interface FormatOption {
@@ -172,17 +192,42 @@ const TextFormatOptionsDropDown = defaults(def, (props) => {
     const dropdownRef = $<HTMLElement>(null)
     const { saveDo } = useUndoRedo()
 
+    // Cache selection when dropdown opens - clicking menu items changes selection
+    // The saved selection includes the editorRoot from saveSelectionAsOffsets()
+    const savedSelection = $<{ editorRoot: HTMLElement | null; startOffset: number; endOffset: number } | null>(null)
+
     useOnClickOutside(dropdownRef as any, () => isOpen(false))
 
-    const toggleDropdown = () => isOpen(!isOpen())
+    const toggleDropdown = () => {
+        const opening = !isOpen()
+        if (opening) {
+            // Save selection BEFORE opening dropdown
+            const editorHost = document.querySelector('wui-editor')
+            const shadowRoot = editorHost?.shadowRoot
+            const sel = shadowRoot?.getSelection() || window.getSelection()
+
+            if (sel && sel.rangeCount > 0) {
+                const range = sel.getRangeAt(0)
+                savedSelection(saveSelectionAsOffsets(range))
+            }
+        }
+        isOpen(opening)
+    }
 
     const handleSelectOption = (action: (editor?: HTMLElement) => void) => {
-
         const el = editor ?? getCurrentEditor()
 
         if ($$(el)) {
+            // Use cached selection from when dropdown opened
+            const cachedSel = savedSelection()
+
             action($$(el))
             saveDo()
+
+            // Restore selection after action (for range selections only)
+            if (cachedSel && cachedSel.editorRoot && cachedSel.startOffset !== cachedSel.endOffset) {
+                restoreSelectionFromOffsets(cachedSel.editorRoot, cachedSel.startOffset, cachedSel.endOffset)
+            }
         }
         isOpen(false)
     }
