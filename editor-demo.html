@@ -158,6 +158,14 @@
                 const hasDOMNormalizer = typeof editorModule.normalizeDOM === 'function'
                 const hasStyleEngine = typeof editorModule.applyBold === 'function'
 
+                // Expose StyleEngine functions globally for testing
+                window.applyBold = editorModule.applyBold
+                window.applyItalic = editorModule.applyItalic
+                window.applyUnderline = editorModule.applyUnderline
+                window.applyStyle = editorModule.applyStyle
+                window.removeStyle = editorModule.removeStyle
+                window.toggleStyle = editorModule.toggleStyle
+
                 phase1Status.textContent = '✓ Phase 1 Complete'
                 phase1Status.style.color = '#4caf50'
 

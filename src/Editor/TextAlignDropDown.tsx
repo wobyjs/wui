@@ -10,6 +10,8 @@ import AlignJustify from '../icons/align_justify'
 import Indent from '../icons/indent'
 import Outdent from '../icons/outdent'
 import KeyboardDownArrow from '../icons/keyboard_down_arrow'
+import { applyTextAlign } from './StyleEngine'
+import { applyIndent as applyIndentStyle, applyListIndent } from './StyleEngine'
 
 // Icons - placeholders, replace with actual SVGs or components
 const AlignLeftIcon = () => <AlignLeft class="size-5" />
@@ -20,7 +22,41 @@ const OutdentIcon = () => <Outdent class="size-5" />
 const IndentIcon = () => <Indent class="size-5" />
 
 const applyAlignment = (command: string) => {
-    document.execCommand(command, false)
+    // Map execCommand names to CSS values
+    const alignMap: Record<string, string> = {
+        'justifyLeft': 'left',
+        'justifyCenter': 'center',
+        'justifyRight': 'right',
+        'justifyFull': 'justify'
+    }
+
+    if (alignMap[command]) {
+        applyTextAlign(alignMap[command])
+    } else if (command === 'indent' || command === 'outdent') {
+        // For indent/outdent, check if inside list
+        const editor = document.querySelector('wui-editor')
+        const shadow = editor?.shadowRoot
+        const sel = shadow?.getSelection()
+        const range = sel?.getRangeAt(0)
+
+        if (range) {
+            let node = range.commonAncestorContainer
+            while (node && node !== shadow) {
+                if (node instanceof HTMLElement) {
+                    const tag = node.tagName.toUpperCase()
+                    if (tag === 'LI' || tag === 'UL' || tag === 'OL') {
+                        // Use StyleEngine's applyListIndent for list items (ml-* classes)
+                        applyListIndent(command === 'outdent', 20)
+                        return
+                    }
+                }
+                node = node.parentNode
+            }
+        }
+
+        // Non-list: use StyleEngine
+        applyIndentStyle(command === 'outdent', 20)
+    }
 }
 
 interface AlignmentOptionItem {

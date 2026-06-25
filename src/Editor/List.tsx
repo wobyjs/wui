@@ -277,7 +277,7 @@ export const ListService = {
         listEl.remove();
     },
 
-    splitList: (currentList: HTMLElement, targetItems: HTMLElement[], afterItems: HTMLElement[], createMiddle: (targetItems: HTMLElement[]) => HTMLElement | HTMLElement[]) => {
+    splitList: (currentList: HTMLElement, targetItems: HTMLElement[], afterItems: HTMLElement[], createMiddle: (targetItems: HTMLElement[]) => HTMLElement | HTMLElement[]): HTMLElement | null => {
         // 1. Create the middle content (either a List or a Fragment of Paragraphs)
         const middleContent = createMiddle(targetItems);
 
@@ -307,6 +307,9 @@ export const ListService = {
 
         // 4. Cleanup empty list
         if (currentList.children.length === 0) currentList.remove();
+
+        // 5. Return the created middle content for further processing (e.g., checkbox injection)
+        return Array.isArray(middleContent) ? middleContent[0] : middleContent;
     }
 };
 // #endregion
@@ -428,7 +431,10 @@ const insertList = (editor: HTMLDivElement, targetList: { tag: 'ul' | 'ol', clas
 
     if (currentList) {
         const allItems = Array.from(currentList.children);
-        const selectedItems = getSelectedBlocks(editor, range, ['LI', 'P']);
+        // CRITICAL FIX: Only get selected items that are actually within this list
+        // getSelectedBlocks returns LIs from ALL lists, but we only want LIs from currentList
+        const allSelectedItems = getSelectedBlocks(editor, range, ['LI', 'P']);
+        const selectedItems = allSelectedItems.filter(item => currentList.contains(item));
 
         // 1. Identify indices for splitting
         const firstSelectedIndex = allItems.indexOf(selectedItems[0]);
@@ -460,6 +466,12 @@ const insertList = (editor: HTMLDivElement, targetList: { tag: 'ul' | 'ol', clas
                     const p = document.createElement('p');
                     if (li.className) p.className = li.className;
                     if (li.style.cssText) p.style.cssText = li.style.cssText;
+
+                    // CRITICAL FIX: Remove checkbox wrapper before moving children
+                    // Otherwise the checkbox wrapper gets moved to P, which is incorrect
+                    const checkboxWrapper = li.querySelector('.checklist-item-wrapper');
+                    if (checkboxWrapper) checkboxWrapper.remove();
+
                     while (li.firstChild) p.appendChild(li.firstChild);
                     li.remove();
                     return p;
@@ -472,13 +484,14 @@ const insertList = (editor: HTMLDivElement, targetList: { tag: 'ul' | 'ol', clas
         // #region Switch Tag List
         else if (currentList!.id !== targetList.id) {
             console.groupCollapsed("Case 1: Partial Switch Tag / Mixed Tag")
+            let newList: HTMLElement | null = null;
             if (state.isCollapsed) {
                 console.log("Case 1: Switch Tag (entire list)")
-                ListService.switchTag(currentList!, targetList.tag, targetList);
+                newList = ListService.switchTag(currentList!, targetList.tag, targetList);
             } else {
                 console.log("Case 1: Switch Tag (selected items)")
 
-                ListService.splitList(currentList!, targetItems, afterItems, (items) => {
+                newList = ListService.splitList(currentList!, targetItems, afterItems, (items) => {
                     const middle = document.createElement(targetList.tag.toUpperCase());
                     middle.id = targetList.id;
                     middle.className = targetList.classes.add;
@@ -495,6 +508,13 @@ const insertList = (editor: HTMLDivElement, targetList: { tag: 'ul' | 'ol', clas
                     })
                     return middle;
                 });
+            }
+
+            // CRITICAL FIX: Inject checkboxes when switching to checkbox mode
+            // LIs are moved (reparented), not added, so MutationObserver doesn't detect them
+            if (newList && targetList.id === 'checkbox-wrapper') {
+                console.log('[List] Injecting checkboxes after switch to checkbox mode');
+                newList.querySelectorAll('li').forEach(li => injectCheckbox(li as HTMLElement));
             }
             console.groupEnd()
         }
@@ -656,15 +676,36 @@ const insertList = (editor: HTMLDivElement, targetList: { tag: 'ul' | 'ol', clas
                     // If it's already an LI, move it directly
                     newList.appendChild(block);
                 } else if (block.tagName.toUpperCase() === 'UL' || block.tagName.toUpperCase() === 'OL') {
-                    // If it's a whole list, move all its LI children to our new list
-                    Array.from(block.querySelectorAll('li')).forEach(li => newList.appendChild(li));
-                    block.remove(); // Remove the old list container
+                    // CRITICAL FIX: Only move LI children that intersect with the range
+                    // Moving ALL children would incorrectly move items that are NOT in the selection
+                    const allLIs = Array.from(block.querySelectorAll('li')) as HTMLLIElement[];
+                    const intersectingLIs = allLIs.filter(li => range.intersectsNode(li));
+
+                    console.log(`\tList has ${allLIs.length} LIs, ${intersectingLIs.length} intersect with range`);
+
+                    if (intersectingLIs.length === allLIs.length) {
+                        // All items selected - move entire list
+                        intersectingLIs.forEach(li => newList.appendChild(li));
+                        block.remove();
+                    } else if (intersectingLIs.length > 0) {
+                        // Partial selection - only move intersecting LIs
+                        intersectingLIs.forEach(li => newList.appendChild(li));
+                        // Don't remove the list wrapper - it still has unselected items
+                    }
+                    // If no LIs intersect (shouldn't happen), do nothing
                 } else {
                     // Otherwise, convert P, H1, etc. to LI
                     newList.appendChild(ListService.convertBlockToLi(block));
                 }
             });
             console.log("Created a new list successfully.");
+
+            // CRITICAL FIX: Inject checkboxes when creating a new checkbox list
+            // LIs are added via appendChild, MutationObserver should detect but doesn't in some cases
+            if (targetList.id === 'checkbox-wrapper') {
+                console.log('[List] Injecting checkboxes after creating new checkbox list');
+                newList.querySelectorAll('li').forEach(li => injectCheckbox(li as HTMLElement));
+            }
         }
         console.groupEnd();
     }

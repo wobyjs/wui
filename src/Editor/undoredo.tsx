@@ -93,18 +93,70 @@ export const UndoRedo = ({ children, editor }: { children: JSX.Children, editor?
     /**
      * Effect: Runs automatically when the component mounts or dependencies change.
      * It captures the very first state of the editor (e.g., the "Lorem Ipsum" text).
+     *
+     * D-14: Delay initialization until shadow DOM has content (after light DOM sync).
+     * The EditorSurface syncs light DOM children into shadow DOM via a separate useEffect.
+     * That effect may run after this one, leaving the shadow DOM empty at initialization time.
+     * We use a polling mechanism with retries to wait for meaningful content before capturing.
+     *
+     * D-15: Prevent race condition where effect re-runs between retries.
+     * Use a local flag to track if we've started initialization, and only set isInitialized
+     * when we have meaningful content.
      */
     useEffect(() => {
         const currentEditor = $$(activeEditor) // unwrap
         // Initialize only if editor is available and not already initialized
         if (currentEditor && !$$(isInitialized)) { // unwrap
-            // Capture shadow DOM innerHTML — that is where contentEditable lives and where
-            // formatting (bold/italic/etc.) is applied. host.innerHTML (light DOM) never
-            // reflects formatting changes, so it cannot be used as the source of truth.
+            // D-14: Check if shadow DOM has content. If empty, delay initialization.
+            // The EditorSurface will sync light DOM content into shadow DOM shortly after mount.
             const initialContent = currentEditor.innerHTML
-            undos([{ content: initialContent }]) // initial state has no selection
-            isInitialized(true) // set observable
-            console.log('[UndoRedo] Initialized with:', initialContent.substring(0, 100))
+
+            // Check for meaningful content (not empty, not just whitespace, not just a br tag)
+            const hasMeaningfulContent = initialContent &&
+                initialContent.trim() !== '' &&
+                initialContent !== '<br>' &&
+                initialContent.length > 10 // Require at least 10 chars to have actual content
+
+            if (!hasMeaningfulContent) {
+                // Shadow DOM is empty or has minimal content - poll for real content
+                console.log('[UndoRedo] Shadow DOM has minimal content, polling for real content...', initialContent.substring(0, 50))
+
+                // Poll every 50ms up to 10 retries (500ms total)
+                let retries = 0
+                const maxRetries = 10
+                const pollInterval = 50
+
+                const pollForContent = () => {
+                    retries++
+                    const polledContent = currentEditor.innerHTML
+                    const polledHasContent = polledContent &&
+                        polledContent.trim() !== '' &&
+                        polledContent !== '<br>' &&
+                        polledContent.length > 10
+
+                    if (polledHasContent) {
+                        undos([{ content: polledContent }])
+                        isInitialized(true)
+                        console.log('[UndoRedo] Poll succeeded at retry', retries, 'with:', polledContent.substring(0, 100))
+                    } else if (retries < maxRetries) {
+                        // Continue polling
+                        setTimeout(pollForContent, pollInterval)
+                    } else {
+                        // Final fallback - capture whatever we have even if minimal
+                        // This ensures undo stack is not empty, just may have limited initial state
+                        undos([{ content: polledContent || '<br>' }])
+                        isInitialized(true)
+                        console.log('[UndoRedo] Poll exhausted after', retries, 'retries, captured:', polledContent?.substring(0, 100) || 'empty')
+                    }
+                }
+
+                setTimeout(pollForContent, pollInterval)
+            } else {
+                // Content already present (e.g., manually set or sync already ran)
+                undos([{ content: initialContent }]) // initial state has no selection
+                isInitialized(true) // set observable
+                console.log('[UndoRedo] ✓ Initialized with meaningful content:', initialContent.substring(0, 100))
+            }
         }
     }) // No dependency array, Woby will auto-track $$(editor) and $$(isInitialized)
     // #endregion

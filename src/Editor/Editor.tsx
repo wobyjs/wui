@@ -11,7 +11,7 @@ import { EditorContext, UndoRedo, useEditor, useUndoRedo, FocusManagerContext } 
 import { FontSize } from './FontSize' // import { FontSizeInput } from './FontSizeCopy' // Changed from Increase/Decrease
 import { List } from './List'
 import { Indent } from './Indent' // Will be part of TextAlignDropDown
-import { applyIndent as applyIndentStyle } from './StyleEngine' // Import applyIndent from StyleEngine instead
+import { applyIndent as applyIndentStyle, applyListIndent } from './StyleEngine' // Import applyIndent from StyleEngine instead
 import { Blockquote } from './Blockquote'
 import { FocusManager } from './FocusManager'
 
@@ -292,12 +292,28 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, children }) =
     */
     const handleKeyDown = (e: KeyboardEvent) => {
         if (e.key === 'Tab') {
-            console.log('[Editor] Tab key pressed, shiftKey:', e.shiftKey)
             e.preventDefault(); e.stopPropagation();
             if (isCaretInTableCell()) {
                 focusNextTableCell(e.shiftKey) // In table: Tab next cell, Shift+Tab previous
             } else {
-                console.log('[Editor] Applying indent, isDecrease:', e.shiftKey)
+                // Check if inside a list - use applyListIndent for LI elements
+                const shadow = editorRef()?.shadowRoot
+                const sel = shadow?.getSelection()
+                const range = sel?.getRangeAt(0)
+                if (range) {
+                    let node: Node | null = range.commonAncestorContainer
+                    while (node && node !== shadow) {
+                        if (node instanceof HTMLElement) {
+                            const tag = node.tagName.toUpperCase()
+                            if (tag === 'LI' || tag === 'UL' || tag === 'OL') {
+                                applyListIndent(e.shiftKey, 20)
+                                saveDo()
+                                return
+                            }
+                        }
+                        node = node.parentNode
+                    }
+                }
                 applyIndentStyle(e.shiftKey, 20) // Normal text: Tab=indent, Shift+Tab=outdent
                 saveDo()
             }
@@ -417,7 +433,27 @@ const EditorToolbar = ({ toolbarRef }) => {
         else
             switch (e.key) {
                 case 'Tab':
-                    document.execCommand(e.shiftKey ? 'outdent' : 'indent'); return true
+                    // Tab in toolbar - delegate to editor's indent logic
+                    {
+                        const shadow = document.querySelector('wui-editor')?.shadowRoot
+                        const sel = shadow?.getSelection()
+                        const range = sel?.getRangeAt(0)
+                        if (range) {
+                            let node: Node | null = range.commonAncestorContainer
+                            while (node && node !== shadow) {
+                                if (node instanceof HTMLElement) {
+                                    const tag = node.tagName.toUpperCase()
+                                    if (tag === 'LI' || tag === 'UL' || tag === 'OL') {
+                                        applyListIndent(e.shiftKey, 20)
+                                        return true
+                                    }
+                                }
+                                node = node.parentNode
+                            }
+                        }
+                        applyIndentStyle(e.shiftKey, 20)
+                    }
+                    return true
             }
     }
 

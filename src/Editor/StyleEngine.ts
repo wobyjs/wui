@@ -226,11 +226,13 @@ function normalizeStyleValue(prop: string, value: string): string {
  */
 function getBlockParent(node: Node): HTMLElement | null {
     let current: Node | null = node
-    const blockTags = ['P', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'LI', 'BLOCKQUOTE', 'PRE', 'DIV']
+    const blockTags = ['P', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'LI', 'BLOCKQUOTE', 'PRE']
 
     while (current) {
-        if (current instanceof HTMLElement && blockTags.includes(current.tagName)) {
-            return current
+        if (current instanceof HTMLElement) {
+            // Stop at the editor root — never indent the contenteditable container itself
+            if ('editorRoot' in (current as HTMLElement).dataset) return null
+            if (blockTags.includes(current.tagName)) return current
         }
         current = current.parentNode
     }
@@ -367,23 +369,45 @@ export function restoreSelectionFromOffsets(
     let startNodeOffset = 0
     let endNode: Text | null = null
     let endNodeOffset = 0
+    let lastNode: Text | null = null
+    let lastNodeLen = 0
     let node: Node | null
 
     while ((node = walker.nextNode())) {
         const textNode = node as Text
         const len = textNode.textContent?.length ?? 0
 
-        if (startNode === null && startOffset >= currentOffset && startOffset <= currentOffset + len) {
+        if (startNode === null && startOffset >= currentOffset && startOffset < currentOffset + len) {
             startNode = textNode
             startNodeOffset = startOffset - currentOffset
         }
         if (endNode === null && endOffset >= currentOffset && endOffset <= currentOffset + len) {
-            endNode = textNode
-            endNodeOffset = endOffset - currentOffset
+            // When endOffset falls exactly at the boundary after this node,
+            // prefer this node's end over the next node's start.
+            // This prevents the restored range from extending into the next sibling.
+            if (endOffset === currentOffset + len && len > 0) {
+                endNode = textNode
+                endNodeOffset = len
+            } else if (endOffset < currentOffset + len) {
+                endNode = textNode
+                endNodeOffset = endOffset - currentOffset
+            }
         }
 
         currentOffset += len
+        lastNode = textNode
+        lastNodeLen = len
         if (startNode !== null && endNode !== null) break
+    }
+
+    // Handle boundary offsets that landed exactly at the end of the last node
+    if (!startNode && startOffset === currentOffset && lastNode) {
+        startNode = lastNode
+        startNodeOffset = lastNodeLen
+    }
+    if (!endNode && endOffset === currentOffset && lastNode) {
+        endNode = lastNode
+        endNodeOffset = lastNodeLen
     }
 
     if (startNode && endNode) {
@@ -834,13 +858,6 @@ export function removeStyle(prop: string, savedSelection?: { editorRoot: HTMLEle
         savedSelection = saveSelectionAsOffsets(range)
     }
 
-    // CRITICAL: Save selection character offsets BEFORE any semantic element conversion
-    // After DOM manipulation, the browser may corrupt the range object
-    const selectionStartOffset = range.startOffset
-    const selectionEndOffset = range.endOffset
-    const selectionStartContainer = range.startContainer
-    const selectionTextContent = sel.toString()
-
     if (range.collapsed) {
         // For collapsed selection: find current style at cursor and unwrap
         const container = range.startContainer
@@ -1050,11 +1067,13 @@ export function removeStyle(prop: string, savedSelection?: { editorRoot: HTMLEle
             // previous style operations. The browser maintains the live range correctly.
             const liveRangeForNested = range.cloneRange()
             const selectionAnchor = liveRangeForNested.startContainer
+            console.log('[removeStyle] selectionAnchor:', selectionAnchor.nodeName, selectionAnchor.nodeType, selectionAnchor.textContent?.substring(0, 20), 'span childNodes count:', span.childNodes.length)
             let selectedChild: Node | null = null
 
             for (const child of Array.from(span.childNodes)) {
                 // Check if this child or any of its descendants contains the selection anchor
                 // We need to handle deeply nested structures like: span > italic-span > underline-span > text
+                console.log('[removeStyle] Checking child:', child.nodeName, child.textContent?.substring(0, 20), 'contains anchor:', child.contains(selectionAnchor))
                 if (child.contains(selectionAnchor)) {
                     selectedChild = child
                     break
@@ -1114,20 +1133,133 @@ export function removeStyle(prop: string, savedSelection?: { editorRoot: HTMLEle
                 // Normalize to merge adjacent text nodes
                 normalizeDOM(parent as HTMLElement)
             } else {
-                // Fallback: just remove the style property
-                console.log('[removeStyle] Could not find selected child, removing style from entire span')
-                span.style.removeProperty(cssProp)
-                if (!span.getAttribute('style')) {
-                    span.removeAttribute('style')
-                }
-                // Unwrap if no attributes remain
-                if (!span.hasAttribute('style') && !span.className && !span.id) {
-                    const parent = span.parentNode
-                    if (parent) {
-                        while (span.firstChild) {
-                            parent.insertBefore(span.firstChild, span)
+                // selectedChild is null — the browser re-anchored the range to an ancestor
+                // after DOM mutation (e.g., convertSemanticElementToSpan replaced <strong>).
+                // Use savedSelection (global offsets relative to editor root, captured BEFORE
+                // DOM mutation) to find which text nodes in the span intersect with the selection.
+                console.log('[removeStyle] selectedChild null, using savedSelection global offsets to find selection')
+
+                if (!savedSelection || !savedSelection.editorRoot) {
+                    // Fallback: no saved selection, remove style from entire span
+                    console.log('[removeStyle] No savedSelection available, removing style from entire span')
+                    span.style.removeProperty(cssProp)
+                    if (!span.getAttribute('style')) span.removeAttribute('style')
+                    if (!span.hasAttribute('style') && !span.className && !span.id) {
+                        const parent = span.parentNode
+                        if (parent) {
+                            while (span.firstChild) parent.insertBefore(span.firstChild, span)
+                            parent.removeChild(span)
                         }
-                        parent.removeChild(span)
+                    }
+                    return
+                }
+
+                const { editorRoot, startOffset: globalSelStart, endOffset: globalSelEnd } = savedSelection
+                console.log('[removeStyle] savedSelection global offsets:', { globalSelStart, globalSelEnd })
+
+                // Walk all text nodes from editor root, accumulating global offsets.
+                // Collect only those text nodes that are descendants of the span.
+                const editorWalker = document.createTreeWalker(editorRoot, NodeFilter.SHOW_TEXT)
+                const textNodes: { node: Text; globalStart: number; globalEnd: number }[] = []
+                let globalOffset = 0
+                let etn: Text | null
+                while ((etn = editorWalker.nextNode() as Text | null)) {
+                    const len = etn.textContent?.length || 0
+                    // Check if this text node is inside the span
+                    if (span.contains(etn)) {
+                        textNodes.push({ node: etn, globalStart: globalOffset, globalEnd: globalOffset + len })
+                        console.log('[removeStyle] span text node:', { text: etn.textContent?.substring(0, 30), globalStart: globalOffset, globalEnd: globalOffset + len })
+                    }
+                    globalOffset += len
+                }
+
+                // Find which text nodes intersect with [globalSelStart, globalSelEnd]
+                const intersecting = textNodes.filter(
+                    tn => tn.globalStart < globalSelEnd && tn.globalEnd > globalSelStart
+                )
+                console.log('[removeStyle] intersecting:', intersecting.map(tn => ({ text: tn.node.textContent?.substring(0, 20), gs: tn.globalStart, ge: tn.globalEnd })))
+
+                if (intersecting.length > 0) {
+                    console.log('[removeStyle] Found', intersecting.length, 'intersecting text nodes via saved offsets')
+
+                    // Map intersecting text nodes to their topmost child of span
+                    const selectedChildren = new Set<Node>()
+                    for (const { node: n } of intersecting) {
+                        let child: Node | null = n
+                        while (child && child.parentNode !== span) {
+                            child = child.parentNode
+                        }
+                        if (child) selectedChildren.add(child)
+                    }
+
+                    const selectedChildrenArr = Array.from(selectedChildren)
+                    const children = Array.from(span.childNodes)
+                    const selectedIndices = selectedChildrenArr.map(c => children.indexOf(c)).filter(i => i >= 0).sort((a, b) => a - b)
+
+                    if (selectedIndices.length > 0) {
+                        const firstIdx = selectedIndices[0]
+                        const lastIdx = selectedIndices[selectedIndices.length - 1]
+
+                        const parent = span.parentNode
+                        if (!parent) return
+
+                        const fragment = document.createDocumentFragment()
+
+                        // Add "before" children (wrapped in styled span)
+                        if (firstIdx > 0) {
+                            const beforeSpan = span.cloneNode(false) as HTMLSpanElement
+                            beforeSpan.removeAttribute('id')
+                            for (let i = 0; i < firstIdx; i++) {
+                                beforeSpan.appendChild(children[i].cloneNode(true))
+                            }
+                            if (beforeSpan.childNodes.length > 0) {
+                                fragment.appendChild(beforeSpan)
+                            }
+                        }
+
+                        // Add "selected" children - UNWRAPPED (no bold style)
+                        for (let i = firstIdx; i <= lastIdx; i++) {
+                            fragment.appendChild(children[i].cloneNode(true))
+                        }
+
+                        // Add "after" children (wrapped in styled span)
+                        if (lastIdx < children.length - 1) {
+                            const afterSpan = span.cloneNode(false) as HTMLSpanElement
+                            afterSpan.removeAttribute('id')
+                            for (let i = lastIdx + 1; i < children.length; i++) {
+                                afterSpan.appendChild(children[i].cloneNode(true))
+                            }
+                            if (afterSpan.childNodes.length > 0) {
+                                fragment.appendChild(afterSpan)
+                            }
+                        }
+
+                        parent.replaceChild(fragment, span)
+                        console.log('[removeStyle] Replaced span using saved offset intersection')
+                        normalizeDOM(parent as HTMLElement)
+                    } else {
+                        console.log('[removeStyle] Could not determine selected children, removing style from entire span')
+                        span.style.removeProperty(cssProp)
+                        if (!span.getAttribute('style')) span.removeAttribute('style')
+                        if (!span.hasAttribute('style') && !span.className && !span.id) {
+                            const parent = span.parentNode
+                            if (parent) {
+                                while (span.firstChild) parent.insertBefore(span.firstChild, span)
+                                parent.removeChild(span)
+                            }
+                        }
+                    }
+                } else {
+                    // Fallback: no intersecting text nodes found via saved offsets
+                    console.log('[removeStyle] No intersecting text nodes via saved offsets, removing style from entire span')
+                    span.style.removeProperty(cssProp)
+                    if (!span.getAttribute('style')) span.removeAttribute('style')
+                    if (!span.hasAttribute('style') && !span.className && !span.id) {
+                        const parent = span.parentNode
+                        if (parent) {
+                            while (span.firstChild) parent.insertBefore(span.firstChild, span)
+                            parent.removeChild(span)
+                        }
                     }
                 }
             }
@@ -1734,11 +1866,62 @@ export function removeFormat(): void {
 }
 
 /**
- * Apply indent to selected blocks
- * Increases or decreases text-indent property
+ * Tailwind margin-left class management
+ * Maps ml-0 through ml-96 (Tailwind scale: 0, 1=4px, 2=8px, 3=12px, 4=16px, 5=20px, 6=24px, 8=32px, 10=40px, 12=48px, ...)
+ */
+const ML_CLASS_PATTERN = /^ml-\d+$/
+
+function getMlClass(px: number): string {
+    // Map px to nearest Tailwind ml-* class
+    const twScale: Record<number, string> = {
+        0: 'ml-0', 4: 'ml-1', 8: 'ml-2', 12: 'ml-3', 16: 'ml-4',
+        20: 'ml-5', 24: 'ml-6', 28: 'ml-7', 32: 'ml-8', 36: 'ml-9',
+        40: 'ml-10', 48: 'ml-12', 56: 'ml-14', 64: 'ml-16', 80: 'ml-20', 96: 'ml-24'
+    }
+    if (twScale[px]) return twScale[px]
+    // Fallback: use closest
+    const keys = Object.keys(twScale).map(Number).sort((a, b) => a - b)
+    const closest = keys.reduce((prev, curr) => Math.abs(curr - px) < Math.abs(prev - px) ? curr : prev)
+    return twScale[closest]
+}
+
+function getMlPx(el: HTMLElement): number {
+    // Extract current ml-* class px value
+    for (const cls of el.classList) {
+        const m = cls.match(/^ml-(\d+)$/)
+        if (m) {
+            const n = parseInt(m[1])
+            // Tailwind ml-* to px: 1=4px, 2=8px, etc.
+            const twToPx: Record<number, number> = {
+                0: 0, 1: 4, 2: 8, 3: 12, 4: 16, 5: 20, 6: 24, 7: 28,
+                8: 32, 9: 36, 10: 40, 12: 48, 14: 56, 16: 64, 20: 80, 24: 96
+            }
+            return twToPx[n] ?? n * 4
+        }
+    }
+    return 0
+}
+
+function setMlClass(el: HTMLElement, px: number): void {
+    // Remove existing ml-* classes
+    const toRemove: string[] = []
+    for (const cls of el.classList) {
+        if (ML_CLASS_PATTERN.test(cls)) toRemove.push(cls)
+    }
+    toRemove.forEach(c => el.classList.remove(c))
+    // Also clear inline marginLeft if any
+    el.style.marginLeft = ''
+
+    if (px > 0) {
+        el.classList.add(getMlClass(px))
+    }
+}
+
+/**
+ * Apply indent to selected blocks using Tailwind ml-* classes
+ * For non-list blocks (P, H1-H6, DIV, etc.)
  */
 export function applyIndent(isDecrease: boolean, amount: number = 20): void {
-    // D-01: Find editor shadow root directly (more reliable than focusNode derivation)
     const focusSr = findEditorShadowRoot()
     const range = safeGetRange(focusSr)
     if (!range) return
@@ -1746,21 +1929,20 @@ export function applyIndent(isDecrease: boolean, amount: number = 20): void {
     const sel = safeGetSelection()
     if (!sel) return
 
-    // Save selection before any DOM operations
     const savedSelection = saveSelectionAsOffsets(range)
 
-    // Get selected block elements
     const block = getBlockParent(range.commonAncestorContainer)
-    if (!block) return
+    const editorRoot = findEditorRoot(range.commonAncestorContainer)
+    const walkerRoot = block || editorRoot
+    if (!walkerRoot) return
 
     const walker = document.createTreeWalker(
-        block,
+        walkerRoot,
         NodeFilter.SHOW_ELEMENT,
         {
             acceptNode: (node) => {
                 if (node instanceof HTMLElement) {
                     const tag = node.tagName.toUpperCase()
-                    // Apply to block elements but not lists
                     if (BLOCK_TAGS.includes(tag) && !['UL', 'OL', 'LI'].includes(tag)) {
                         return NodeFilter.FILTER_ACCEPT
                     }
@@ -1773,14 +1955,17 @@ export function applyIndent(isDecrease: boolean, amount: number = 20): void {
     const blocksToIndent: HTMLElement[] = []
     let node: Node | null
 
-    // For collapsed selection, just indent the current block
     if (range.collapsed) {
         const currentBlock = getBlockParent(range.startContainer)
         if (currentBlock && !['UL', 'OL', 'LI'].includes(currentBlock.tagName.toUpperCase())) {
             blocksToIndent.push(currentBlock)
         }
     } else {
-        // For non-collapsed selection, find all blocks in range
+        // If we have a single block parent, add it if it intersects
+        if (block && range.intersectsNode(block) && !['UL', 'OL', 'LI'].includes(block.tagName.toUpperCase())) {
+            blocksToIndent.push(block)
+        }
+        // Walk children for all intersecting blocks
         while ((node = walker.nextNode())) {
             if (range.intersectsNode(node)) {
                 blocksToIndent.push(node as HTMLElement)
@@ -1788,18 +1973,80 @@ export function applyIndent(isDecrease: boolean, amount: number = 20): void {
         }
     }
 
-    // Apply indent to each block
+    const processedLIs = new Set<HTMLElement>()
+
     blocksToIndent.forEach((blockElement, index) => {
-        const currentValue = blockElement.style.textIndent ? parseInt(blockElement.style.textIndent) : 0
-        const newValue = currentValue + (isDecrease ? -amount : amount)
-        blockElement.style.textIndent = newValue < 0 ? '0px' : `${newValue}px`
-        console.log(`[Indent] Block ${index + 1}: ${currentValue}px -> ${newValue}px`)
+        let targetElement = blockElement
+        const checkboxWrapper = blockElement.closest('.checklist-item-wrapper')
+        if (checkboxWrapper) {
+            const li = blockElement.closest('li')
+            if (li) {
+                targetElement = li as HTMLElement
+                if (processedLIs.has(li as HTMLElement)) return
+                processedLIs.add(li as HTMLElement)
+            }
+        }
+
+        const currentPx = getMlPx(targetElement)
+        const newPx = currentPx + (isDecrease ? -amount : amount)
+        setMlClass(targetElement, newPx < 0 ? 0 : newPx)
     })
 
-    // Normalize after operation
-    normalizeDOM(block)
+    if (savedSelection.editorRoot && savedSelection.startOffset >= 0 && savedSelection.endOffset >= 0) {
+        restoreSelectionFromOffsets(
+            savedSelection.editorRoot,
+            savedSelection.startOffset,
+            savedSelection.endOffset
+        )
+    }
+}
 
-    // Restore selection from saved offsets
+/**
+ * Apply indent/outdent to list items using Tailwind ml-* classes
+ * Replaces document.execCommand('indent'/'outdent') for lists.
+ * Increases/decreases margin-left on selected LI elements.
+ */
+export function applyListIndent(isDecrease: boolean, amount: number = 20): void {
+    const focusSr = findEditorShadowRoot()
+    const range = safeGetRange(focusSr)
+    if (!range) return
+
+    const savedSelection = saveSelectionAsOffsets(range)
+
+    // Find all LIs that intersect with the selection
+    const editorRoot = findEditorRoot(range.commonAncestorContainer)
+    if (!editorRoot) return
+
+    const lis = editorRoot.querySelectorAll('li')
+    const selectedLIs: HTMLLIElement[] = []
+
+    for (const li of lis) {
+        // Use intersectsNode instead of compareBoundaryPoints with document.createRange()
+        // because document.createRange().selectNode() doesn't work correctly with
+        // shadow DOM nodes — the range boundaries end up outside the shadow tree.
+        if (range.intersectsNode(li)) {
+            selectedLIs.push(li as HTMLLIElement)
+        }
+    }
+
+    // If no LIs found via intersection, try ancestor-based detection
+    if (selectedLIs.length === 0) {
+        let node: Node | null = range.commonAncestorContainer
+        while (node && node !== editorRoot) {
+            if (node instanceof HTMLElement && node.tagName === 'LI') {
+                selectedLIs.push(node as HTMLLIElement)
+                break
+            }
+            node = node.parentNode
+        }
+    }
+
+    selectedLIs.forEach((li) => {
+        const currentPx = getMlPx(li)
+        const newPx = currentPx + (isDecrease ? -amount : amount)
+        setMlClass(li, newPx < 0 ? 0 : newPx)
+    })
+
     if (savedSelection.editorRoot && savedSelection.startOffset >= 0 && savedSelection.endOffset >= 0) {
         restoreSelectionFromOffsets(
             savedSelection.editorRoot,

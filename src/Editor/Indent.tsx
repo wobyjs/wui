@@ -4,7 +4,7 @@ import { useEditor, useUndoRedo } from './undoredo'
 import IndentIcon from '../icons/indent'
 import OutdentIcon from '../icons/outdent'
 import { getCurrentEditor } from "./utils"
-import { applyIndent as applyIndentStyle } from './StyleEngine'
+import { applyIndent as applyIndentStyle, applyListIndent } from './StyleEngine'
 
 type IndentMode = "increase" | "decrease"
 
@@ -42,9 +42,34 @@ const Indent = defaults(def, (props) => {
         const stepVal = $$(step)
         const pxVal = $$(identPx)
         const amount = pxVal * stepVal
+        const decrease = $$(mode) === 'decrease'
 
-        // Use StyleEngine's applyIndent instead of manual DOM manipulation
-        applyIndentStyle($$(isDecrease), amount)
+        // Check if selection is inside a list (UL/OL)
+        const editorEl = document.querySelector('wui-editor')
+        const shadow = editorEl?.shadowRoot
+        const sel = shadow?.getSelection()
+        const range = sel?.getRangeAt(0)
+
+        if (range) {
+            const commonAncestor = range.commonAncestorContainer
+            // Check if we're inside a list
+            let node: Node | null = commonAncestor
+            while (node && node !== shadow) {
+                if (node instanceof HTMLElement) {
+                    const tag = node.tagName.toUpperCase()
+                    if (tag === 'LI' || tag === 'UL' || tag === 'OL') {
+                        // Use StyleEngine's applyListIndent for list items (ml-* classes)
+                        applyListIndent(decrease, amount)
+                        saveDo()
+                        return
+                    }
+                }
+                node = node.parentNode
+            }
+        }
+
+        // Use StyleEngine's applyIndent for non-list blocks (paragraphs, headings)
+        applyIndentStyle(decrease, amount)
         saveDo()
     }
 

@@ -7,6 +7,18 @@ import path from 'node:path';
 import { snapshotPlugin } from 'vite-plugin-snapshot'
 import { testPlugin } from '../vite-plugin-test/src/index.ts'
 
+// Plugin to rewrite @woby/use imports to @woby/use/ssr for SSR builds
+// NOTE: This plugin is disabled because @woby/use/ssr does not export browser-only hooks
+// like useClickAway, useEventListener, useViewportSize, etc.
+// Keep @woby/use/browser imports as-is for browser environments
+const ssrImportPlugin = (): PluginOption => ({
+    name: 'ssr-import-rewrite',
+    renderChunk(code) {
+        // Only rewrite bare @woby/use imports (not /browser or /ssr)
+        return code.replace(/@woby\/use(["'])(?!\/)/g, '@woby/use/browser$1')
+    }
+})
+
 const chkJsonUrl = new URL('./chk.json', import.meta.url);
 
 // let chkConfig: any = {};
@@ -47,6 +59,7 @@ const config = defineConfig({
         jsx: 'automatic',
     },
     plugins: [
+        ssrImportPlugin(),
         tailwindcss() as any as PluginOption,
         snapshotPlugin() as any as PluginOption,
         testPlugin() as any as PluginOption,
