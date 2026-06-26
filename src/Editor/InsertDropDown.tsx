@@ -1,7 +1,7 @@
 import { $, $$, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlString, JSX, Observable, ObservableMaybe } from 'woby'
 import { Button } from '../Button'
 import { EditorContext, useUndoRedo } from './undoredo'
-import { useOnClickOutside } from '@woby/use/browser'
+import { useOnClickOutside } from '@woby/use'
 import { range, getCurrentRange } from './utils' // Import getCurrentRange
 import KeyboardDownArrow from '../icons/keyboard_down_arrow'
 import Plus from '../icons/plus'
@@ -13,87 +13,50 @@ const TableIcon = () => <span>Tbl</span>
 const GifIcon = () => <span>GIF</span>
 // ... other icons
 
-// Re-implement or import insertImage and insertTable if they are not globally accessible
-// For now, assuming they might be passed via context or props if needed, or re-implemented simply.
+// Helper to get shadow root selection for wui-editor
+function getEditorSelection(): { selection: Selection | null, shadowRoot: ShadowRoot | null } {
+    const editorHost = document.querySelector('wui-editor')
+    const shadowRoot = editorHost?.shadowRoot || null
+    const selection = shadowRoot ? shadowRoot.getSelection() : window.getSelection()
+    return { selection, shadowRoot }
+}
 
 // #region Insert Actions
 const execInsertHorizontalRule = () => {
-    // document.execCommand('insertHorizontalRule', false)
+    const { selection, shadowRoot } = getEditorSelection()
+    if (!selection || selection.rangeCount === 0) return
+    const range = selection.getRangeAt(0)
+
+    // Restore selection after potential focus loss
+    selection.removeAllRanges()
+    selection.addRange(range)
+
     const hrWithClasses = '<hr class="my-4 mx-auto border-gray-400" />'
     document.execCommand('insertHTML', false, hrWithClasses)
 }
 
-const execInsertImage_ = () => {
-    const r = getCurrentRange()
-    if (!r) return
-    const imageUrl = prompt('Enter image URL:')
-    if (!imageUrl) return
-
-    const imgElement = document.createElement('img')
-    imgElement.src = imageUrl
-    imgElement.style.maxWidth = '100%' // Basic styling
-    r.deleteContents()
-    r.insertNode(imgElement)
-}
-
 const execInsertImage = () => {
-    const selection = window.getSelection()
+    const { selection, shadowRoot } = getEditorSelection()
     if (!selection || selection.rangeCount === 0) return
     const range = selection.getRangeAt(0)
 
     const imageUrl = prompt('Enter image URL:')
     if (!imageUrl) return
 
+    // Restore selection after prompt
     selection.removeAllRanges()
     selection.addRange(range)
 
     const imgHtml = `<img src="${imageUrl}" class="max-w-full h-auto my-2" />`
-
     document.execCommand('insertHTML', false, imgHtml)
 }
 
-const execInsertTable_ = () => {
-    const r = getCurrentRange()
-    if (!r) return
-    const rowsStr = prompt('Enter number of rows:', '2')
-    const colsStr = prompt('Enter number of columns:', '3')
-
-    if (!rowsStr || !colsStr) return
-    const rows = parseInt(rowsStr, 10)
-    const cols = parseInt(colsStr, 10)
-
-    if (isNaN(rows) || isNaN(cols) || rows <= 0 || cols <= 0) {
-        alert('Invalid number of rows or columns.')
-        return
-    }
-
-    let tableHTML = '<table class="border border-collapse border-gray-400"><tbody>'
-    for (let i = 0; i < rows; i++) {
-        tableHTML += '<tr>'
-        for (let j = 0; j < cols; j++) {
-            tableHTML += '<td class="border border-gray-300 p-2">Cell</td>'
-        }
-        tableHTML += '</tr>'
-    }
-    tableHTML += '</tbody></table>'
-
-    const tempDiv = document.createElement('div')
-    tempDiv.innerHTML = tableHTML
-    const tableNode = tempDiv.firstChild
-    if (tableNode) {
-        r.deleteContents()
-        r.insertNode(tableNode)
-    }
-}
-
 const execInsertTable = () => {
-    // 1. Capture selection before Prompt steals focus
-    const selection = window.getSelection()
+    const { selection, shadowRoot } = getEditorSelection()
     if (!selection || selection.rangeCount === 0) return
     const range = selection.getRangeAt(0)
 
     const rowsStr = prompt('Enter number of rows:', '2')
-    // If user cancels, stop immediately
     if (rowsStr === null) return
 
     const colsStr = prompt('Enter number of columns:', '3')
@@ -107,27 +70,22 @@ const execInsertTable = () => {
         return
     }
 
-    // 2. Restore Selection
-    // The prompts caused the editor to lose focus. We must restore it
-    // so execCommand knows where to put the table.
+    // Restore selection after prompts
     selection.removeAllRanges()
     selection.addRange(range)
 
-    // 3. Build HTML String
-    // Added 'w-full' to make the table expand to fit the editor
+    // Build HTML String
     let tableHTML = '<table class="w-full border-collapse border border-gray-400 my-2"><tbody>'
 
     for (let i = 0; i < rows; i++) {
         tableHTML += '<tr>'
         for (let j = 0; j < cols; j++) {
-            // Added min-w-[50px] so empty cells are clickable/visible
             tableHTML += '<td class="border border-gray-300 p-2 min-w-[50px]">&nbsp;</td>'
         }
         tableHTML += '</tr>'
     }
-    tableHTML += '</tbody></table><br>' // Add <br> so user can click/type after table
+    tableHTML += '</tbody></table><br>'
 
-    // 4. Insert Safe HTML
     document.execCommand('insertHTML', false, tableHTML)
 }
 // #endregion
