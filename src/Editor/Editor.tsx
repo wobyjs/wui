@@ -1,4 +1,4 @@
-import { useOnClickOutside } from '@woby/use/browser'
+import { useOnClickOutside } from '@woby/use'
 import { $, $$, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlClass, JSX, Observable, ObservableMaybe, useEffect, useMemo } from 'woby' // Added useEffect
 import { Button } from '../Button'
 import UndoIcon from '../icons/undo'
@@ -24,6 +24,8 @@ import { TextFormatOptionsDropDown } from './TextFormatOptionsDropDown'
 import { InsertDropDown } from './InsertDropDown'
 import { TextAlignDropDown } from './TextAlignDropDown'
 import { UndoRedoButton } from './UndoRedoButton'
+import { ImageResizer } from './ImageResizer' // Image resize handles + align/indent mini-toolbar
+import { TablePopupMenu } from './TablePopupMenu' // Table cell popup menu
 
 // StyleEngine imports for keyboard shortcuts
 import { applyBold, applyItalic, applyUnderline } from './StyleEngine'
@@ -293,12 +295,14 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, children }) =
     const handleKeyDown = (e: KeyboardEvent) => {
         if (e.key === 'Tab') {
             e.preventDefault(); e.stopPropagation();
-            if (isCaretInTableCell()) {
-                focusNextTableCell(e.shiftKey) // In table: Tab next cell, Shift+Tab previous
+            const editorEl = $$(activeEditor)
+            const shadow = editorEl?.getRootNode() as ShadowRoot | null
+            const isInTable = isCaretInTableCell(shadow)
+            if (isInTable) {
+                focusNextTableCell(e.shiftKey, shadow) // In table: Tab next cell, Shift+Tab previous
             } else {
                 // Check if inside a list - use applyListIndent for LI elements
-                const shadow = editorRef()?.shadowRoot
-                const sel = shadow?.getSelection()
+                const sel = (shadow as any)?.getSelection?.() ?? document.getSelection()
                 const range = sel?.getRangeAt(0)
                 if (range) {
                     let node: Node | null = range.commonAncestorContainer
@@ -371,8 +375,8 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, children }) =
     * isCaretInTableCell: A contextual helper that checks if the user's cursor
     * is currently located inside a <td> or <th> element.
     */
-    const isCaretInTableCell = () => {
-        const sel = document.getSelection()
+    const isCaretInTableCell = (shadow?: ShadowRoot | null) => {
+        const sel = shadow ? shadow.getSelection() : document.getSelection()
         if (!sel?.focusNode) return false
 
         let el: HTMLElement | null = sel.focusNode.nodeType === Node.ELEMENT_NODE ? (sel.focusNode as HTMLElement) : (sel.focusNode.parentElement)
@@ -385,23 +389,27 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, children }) =
     }
 
     return (
-        <div
-            ref={activeEditor}
-            data-editor-root
-            contentEditable={true}
-            onClick={handleEditorClick}
-            onBlur={handleBlur}
-            onKeyDown={handleKeyDown}
-            class={() => [
-                'border-blue-500 ring-2',
-                "p-6 my-4 rounded-xl border min-h-[250px] shadow-sm"
-            ]}
-            style={() => ({
-                outline: 'none',
-                caretColor: 'auto'
-            })}
-        >
-            {/* Children are cloned from light DOM into shadow DOM via the sync effect */}
+        <div class="relative">
+            <div
+                ref={activeEditor}
+                data-editor-root
+                contentEditable={true}
+                onClick={handleEditorClick}
+                onBlur={handleBlur}
+                onKeyDown={handleKeyDown}
+                class={() => [
+                    'border-blue-500 ring-2',
+                    "p-6 my-4 rounded-xl border min-h-[250px] shadow-sm"
+                ]}
+                style={() => ({
+                    outline: 'none',
+                    caretColor: 'auto'
+                })}
+            >
+                {/* Children are cloned from light DOM into shadow DOM via the sync effect */}
+            </div>
+            <ImageResizer />
+            <TablePopupMenu />
         </div>
     )
 }
@@ -435,8 +443,11 @@ const EditorToolbar = ({ toolbarRef }) => {
                 case 'Tab':
                     // Tab in toolbar - delegate to editor's indent logic
                     {
-                        const shadow = document.querySelector('wui-editor')?.shadowRoot
-                        const sel = shadow?.getSelection()
+                        // Editor surface lives inside wui-editor's shadow DOM
+                        const editor = document.querySelector('wui-editor') as HTMLElement | null
+                        const editorEl = editor?.shadowRoot?.querySelector('[data-editor-root]') as HTMLElement | null
+                        const shadow = editorEl?.getRootNode() as ShadowRoot | null
+                        const sel = (shadow as any)?.getSelection?.() ?? document.getSelection()
                         const range = sel?.getRangeAt(0)
                         if (range) {
                             let node: Node | null = range.commonAncestorContainer
