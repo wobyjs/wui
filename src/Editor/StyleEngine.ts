@@ -226,7 +226,7 @@ function normalizeStyleValue(prop: string, value: string): string {
  */
 function getBlockParent(node: Node): HTMLElement | null {
     let current: Node | null = node
-    const blockTags = ['P', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'LI', 'BLOCKQUOTE', 'PRE']
+    const blockTags = ['P', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'LI', 'BLOCKQUOTE', 'PRE', 'TD', 'TH']
 
     while (current) {
         if (current instanceof HTMLElement) {
@@ -309,6 +309,82 @@ export function getStyleStateInRange(range: Range, prop: string, value: string):
 export function hasStyleInRange(range: Range, prop: string, value: string): boolean {
     const state = getStyleStateInRange(range, prop, value)
     return state === 'all'
+}
+
+/**
+ * Check if the text immediately before or after a non-collapsed selection
+ * has the target style. Used to determine if a toggle-off was intended
+ * even when the selected text itself doesn't have the style (e.g., after
+ * a previous removeStyle operation created an unstyled middle span).
+ */
+function hasStyleInSurroundingContext(range: Range, prop: string, value: string): boolean {
+    // Check text node just before selection start
+    const startNode = range.startContainer
+    if (startNode.nodeType === Node.TEXT_NODE && range.startOffset > 0) {
+        // There's text before the selection in the same text node
+        // Check the character just before the selection
+        const beforeText = startNode.textContent?.charAt(range.startOffset - 1) || ''
+        if (beforeText.trim()) {
+            // Text exists before — check if the parent span has the style
+            let el: HTMLElement | null = startNode.parentElement
+            while (el) {
+                if (el instanceof HTMLSpanElement && el.style.getPropertyValue(prop.replace(/([A-Z])/g, '-$1').toLowerCase())) {
+                    return true
+                }
+                el = el.parentElement
+            }
+        }
+    } else {
+        // Check sibling text nodes before selection for styled spans
+        let node: Node | null = range.startContainer
+        // Walk to previous sibling
+        while (node && node !== range.commonAncestorContainer) {
+            const prev = node.previousSibling
+            if (prev && prev.textContent && prev.textContent.trim()) {
+                // Found text before — check its parent for the style
+                const parent = prev.parentElement
+                if (parent instanceof HTMLSpanElement) {
+                    const cssProp = prop.replace(/([A-Z])/g, '-$1').toLowerCase()
+                    if (parent.style.getPropertyValue(cssProp)) return true
+                }
+                break
+            }
+            node = node.parentNode
+        }
+    }
+
+    // Check text node just after selection end
+    const endNode = range.endContainer
+    if (endNode.nodeType === Node.TEXT_NODE && range.endOffset < (endNode.textContent?.length || 0)) {
+        // There's text after the selection in the same text node
+        const afterText = endNode.textContent?.charAt(range.endOffset) || ''
+        if (afterText.trim()) {
+            let el: HTMLElement | null = endNode.parentElement
+            while (el) {
+                if (el instanceof HTMLSpanElement && el.style.getPropertyValue(prop.replace(/([A-Z])/g, '-$1').toLowerCase())) {
+                    return true
+                }
+                el = el.parentElement
+            }
+        }
+    } else {
+        // Check sibling text nodes after selection for styled spans
+        let node: Node | null = range.endContainer
+        while (node && node !== range.commonAncestorContainer) {
+            const next = node.nextSibling
+            if (next && next.textContent && next.textContent.trim()) {
+                const parent = next.parentElement
+                if (parent instanceof HTMLSpanElement) {
+                    const cssProp = prop.replace(/([A-Z])/g, '-$1').toLowerCase()
+                    if (parent.style.getPropertyValue(cssProp)) return true
+                }
+                break
+            }
+            node = node.parentNode
+        }
+    }
+
+    return false
 }
 
 /**
@@ -456,9 +532,17 @@ export function applyStyle(prop: string, value: string): void {
 
     // Check if style already exists on selection (toggle check)
     const styleAlreadyApplied = hasStyleInRange(range, prop, value)
+    // Also check surrounding context: if selection is between styled text,
+    // the user likely wants to remove the style (toggle off).
+    // This handles the case where removeStyle splits a multi-style span
+    // and the middle portion loses all inline styles — subsequent un-style
+    // clicks should still remove rather than re-apply the style.
+    const surroundingHasStyle = !styleAlreadyApplied && !range.collapsed &&
+        hasStyleInSurroundingContext(range, prop, value)
 
-    if (styleAlreadyApplied) {
+    if (styleAlreadyApplied || surroundingHasStyle) {
         // Toggle OFF: Remove the style
+        console.log('[applyStyle] Removing style (alreadyApplied:', styleAlreadyApplied, 'surrounding:', surroundingHasStyle, ')')
         removeStyle(prop, savedSelection)
         return
     }
@@ -1109,10 +1193,186 @@ export function removeStyle(prop: string, savedSelection?: { editorRoot: HTMLEle
                     }
                 }
 
-                // Add "selected" child - UNWRAPPED from the bold style
-                // This is the key: we're removing the font-weight from this portion
-                const selectedClone = selectedChild.cloneNode(true)
-                fragment.appendChild(selectedClone)
+                // Check if selection only partially covers the selected child's text.
+                // If so, we need to split the selected child at the text level so only
+                // the actually-selected portion loses the outer style.
+                // This handles: bold > italic > underline > "New York" where "ew Yo" is selected.
+                const selText = range.toString()
+                const childFullText = selectedChild.textContent || ''
+                const isPartialSelection = selText.length < childFullText.length &&
+                    selectedChild.nodeType === Node.ELEMENT_NODE &&
+                    (selectedChild as HTMLElement).childNodes.length > 0
+
+                if (isPartialSelection) {
+                    console.log('[removeStyle] Partial selection within child - splitting at text level')
+                    // We need to recursively split the selected child to extract
+                    // before/selected/after at the deepest text level.
+                    // Strategy: temporarily remove the target style from the span,
+                    // then call removeStyle recursively on the selected child to do
+                    // the actual text-level split (which preserves the inner styles),
+                    // then re-wrap before/after with the original style.
+
+                    // Save current span's style
+                    const savedStyleValue = span.style.getPropertyValue(cssProp)
+                    span.style.removeProperty(cssProp)
+                    if (!span.getAttribute('style')) span.removeAttribute('style')
+
+                    // Now the span has no target style. Call removeStyle on the
+                    // selected child (which still has the target style from its
+                    // parent's perspective — actually no, the parent lost it).
+                    // We need a different approach: directly split the selectedChild
+                    // at text level, then wrap before/after in the original style.
+
+                    // Clone the selected child and operate on the clone
+                    const childClone = selectedChild.cloneNode(true) as HTMLElement
+
+                    // Find the deepest text node and split it at selection boundaries
+                    const selLiveRange = range.cloneRange()
+                    const selStartContainer = selLiveRange.startContainer
+                    const selEndContainer = selLiveRange.endContainer
+
+                    // Walk down to find text nodes within childClone that correspond
+                    // to the selection boundaries
+                    const childWalker = document.createTreeWalker(childClone, NodeFilter.SHOW_TEXT)
+                    let textNodesInChild: Text[] = []
+                    let tn: Text | null
+                    while ((tn = childWalker.nextNode() as Text | null)) {
+                        textNodesInChild.push(tn)
+                    }
+
+                    // Find which text nodes contain the selection boundaries
+                    // by comparing with the original child's text nodes
+                    const origWalker = document.createTreeWalker(selectedChild, NodeFilter.SHOW_TEXT)
+                    let origTextNodes: Text[] = []
+                    let otn: Text | null
+                    while ((otn = origWalker.nextNode() as Text | null)) {
+                        origTextNodes.push(otn)
+                    }
+
+                    // Map selection to text nodes in childClone
+                    let selStartTextIdx = -1, selEndTextIdx = -1
+                    let selStartOff = 0, selEndOff = 0
+
+                    for (let i = 0; i < origTextNodes.length; i++) {
+                        if (origTextNodes[i] === selStartContainer || origTextNodes[i].contains(selStartContainer)) {
+                            selStartTextIdx = i
+                            selStartOff = selStartContainer === origTextNodes[i] ? selLiveRange.startOffset : 0
+                        }
+                        if (origTextNodes[i] === selEndContainer || origTextNodes[i].contains(selEndContainer)) {
+                            selEndTextIdx = i
+                            selEndOff = selEndContainer === origTextNodes[i] ? selLiveRange.endOffset : origTextNodes[i].textContent?.length || 0
+                        }
+                    }
+
+                    if (selStartTextIdx >= 0 && selEndTextIdx >= 0 && textNodesInChild.length === origTextNodes.length) {
+                        // Build before/selected/after fragments from the clone
+                        const childFragment = document.createDocumentFragment()
+
+                        // When start and end are in the same text node, the end offset
+                        // is relative to the original text. After trimming the start,
+                        // we need to adjust: substring(selStartOff) then substring(0, selEndOff - selStartOff)
+                        const sameTextNode = selStartTextIdx === selEndTextIdx
+
+                        // Before: text nodes 0 to selStartTextIdx-1 + partial text of selStartTextIdx
+                        if (selStartTextIdx > 0 || selStartOff > 0) {
+                            const beforeClone = childClone.cloneNode(true) as HTMLElement
+                            const bw = document.createTreeWalker(beforeClone, NodeFilter.SHOW_TEXT)
+                            let bTextNodes: Text[] = []
+                            let btn: Text | null
+                            while ((btn = bw.nextNode() as Text | null)) bTextNodes.push(btn)
+
+                            // Trim: keep only text up to selStartTextIdx-1 full, plus selStartTextIdx partial
+                            for (let i = bTextNodes.length - 1; i > selStartTextIdx; i--) {
+                                // Remove later text nodes' content
+                                bTextNodes[i].textContent = ''
+                            }
+                            if (selStartOff > 0 && selStartTextIdx < bTextNodes.length) {
+                                bTextNodes[selStartTextIdx].textContent = bTextNodes[selStartTextIdx].textContent?.substring(0, selStartOff) || ''
+                            }
+                            // Remove any empty ancestor elements
+                            // Wrap in original style span
+                            const styledBefore = span.cloneNode(false) as HTMLSpanElement
+                            styledBefore.removeAttribute('id')
+                            styledBefore.style.setProperty(cssProp, savedStyleValue)
+                            styledBefore.appendChild(beforeClone)
+                            childFragment.appendChild(styledBefore)
+                        }
+
+                        // Selected: partial text from selStartTextIdx to selEndTextIdx
+                        {
+                            const selectedClone = childClone.cloneNode(true) as HTMLElement
+                            const sw = document.createTreeWalker(selectedClone, NodeFilter.SHOW_TEXT)
+                            let sTextNodes: Text[] = []
+                            let stn: Text | null
+                            while ((stn = sw.nextNode() as Text | null)) sTextNodes.push(stn)
+
+                            // Trim before
+                            for (let i = 0; i < selStartTextIdx; i++) {
+                                sTextNodes[i].textContent = ''
+                            }
+                            if (selStartTextIdx < sTextNodes.length) {
+                                sTextNodes[selStartTextIdx].textContent = sTextNodes[selStartTextIdx].textContent?.substring(selStartOff) || ''
+                            }
+                            // Trim after
+                            for (let i = selEndTextIdx + 1; i < sTextNodes.length; i++) {
+                                sTextNodes[i].textContent = ''
+                            }
+                            if (selEndTextIdx < sTextNodes.length && selEndOff < (sTextNodes[selEndTextIdx].textContent?.length || 0)) {
+                                const adjustedEndOff = sameTextNode ? selEndOff - selStartOff : selEndOff
+                                sTextNodes[selEndTextIdx].textContent = sTextNodes[selEndTextIdx].textContent?.substring(0, adjustedEndOff) || ''
+                            }
+                            // No style wrapper - this is the selected portion losing the style
+                            childFragment.appendChild(selectedClone)
+                        }
+
+                        // After: partial text of selEndTextIdx + text nodes after selEndTextIdx
+                        if (selEndTextIdx < textNodesInChild.length - 1 || selEndOff < (textNodesInChild[selEndTextIdx]?.textContent?.length || 0)) {
+                            const afterClone = childClone.cloneNode(true) as HTMLElement
+                            const aw = document.createTreeWalker(afterClone, NodeFilter.SHOW_TEXT)
+                            let aTextNodes: Text[] = []
+                            let atn: Text | null
+                            while ((atn = aw.nextNode() as Text | null)) aTextNodes.push(atn)
+
+                            // Trim before
+                            for (let i = 0; i < selEndTextIdx; i++) {
+                                aTextNodes[i].textContent = ''
+                            }
+                            if (selEndTextIdx < aTextNodes.length) {
+                                aTextNodes[selEndTextIdx].textContent = aTextNodes[selEndTextIdx].textContent?.substring(selEndOff) || ''
+                            }
+                            const styledAfter = span.cloneNode(false) as HTMLSpanElement
+                            styledAfter.removeAttribute('id')
+                            styledAfter.style.setProperty(cssProp, savedStyleValue)
+                            styledAfter.appendChild(afterClone)
+                            childFragment.appendChild(styledAfter)
+                        }
+
+                        // Clean up empty elements in the fragment
+                        // Remove empty text nodes and empty elements
+                        const cleanupWalker = document.createTreeWalker(childFragment, NodeFilter.SHOW_ELEMENT)
+                        let el: HTMLElement | null
+                        const emptyEls: HTMLElement[] = []
+                        while ((el = cleanupWalker.nextNode() as HTMLElement | null)) {
+                            if (!el.textContent?.trim() && el.childNodes.length === 0) {
+                                emptyEls.push(el)
+                            }
+                        }
+                        for (const empty of emptyEls) {
+                            empty.parentNode?.removeChild(empty)
+                        }
+
+                        fragment.appendChild(childFragment)
+                    } else {
+                        // Fallback: couldn't map selection to text nodes, unwrap entire child
+                        const selectedClone = selectedChild.cloneNode(true)
+                        fragment.appendChild(selectedClone)
+                    }
+                } else {
+                    // Add "selected" child - UNWRAPPED from the bold style
+                    // This is the key: we're removing the font-weight from this portion
+                    const selectedClone = selectedChild.cloneNode(true)
+                    fragment.appendChild(selectedClone)
+                }
 
                 // Add "after" children
                 if (selectedIdx < children.length - 1) {
@@ -1818,8 +2078,7 @@ export function removeFormat(): void {
 
     if (range.collapsed) {
         // For collapsed selection: find all styled spans at cursor and unwrap them
-        const container = range.startContainer
-        let node: Node | null = container
+        let node: Node | null = range.startContainer
 
         // Find all parent spans with styles
         while (node && node.parentElement) {
@@ -1831,9 +2090,26 @@ export function removeFormat(): void {
                         parent.insertBefore(el.firstChild, el)
                     }
                     parent.removeChild(el)
+                    // node is now under parent (the grandparent), continue checking parent chain
+                    node = parent
+                    continue
                 }
             }
-            node = node.parentElement
+            // Also check for semantic elements (B, STRONG, EM, I, U, etc.)
+            if (el instanceof HTMLElement
+                && !el.hasAttribute('style')
+                && ['B', 'STRONG', 'I', 'EM', 'U', 'INS', 'S', 'DEL', 'STRIKE', 'SUB', 'SUP', 'SPAN'].includes(el.tagName)) {
+                const parent = el.parentNode
+                if (parent) {
+                    while (el.firstChild) {
+                        parent.insertBefore(el.firstChild, el)
+                    }
+                    parent.removeChild(el)
+                    node = parent
+                    continue
+                }
+            }
+            node = el
         }
     } else {
         // For non-collapsed selection: unwrap all styled spans within the range
@@ -2056,7 +2332,7 @@ export function applyListIndent(isDecrease: boolean, amount: number = 20): void 
     }
 }
 
-const BLOCK_TAGS = ['P', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'LI', 'BLOCKQUOTE', 'PRE', 'DIV']
+const BLOCK_TAGS = ['P', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'LI', 'BLOCKQUOTE', 'PRE', 'DIV', 'TD', 'TH']
 
 /**
  * Apply list formatting (bullet, number, or checkbox)

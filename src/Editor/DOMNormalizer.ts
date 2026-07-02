@@ -177,6 +177,16 @@ export function mergeAdjacentSpans(container: HTMLElement): void {
             if (next.tagName !== 'SPAN') return
             if (!next.hasAttribute('style')) return
 
+            // Don't merge if there's non-empty text between the spans
+            // (nextElementSibling skips text nodes, so we need to check manually)
+            let node: Node | null = span.nextSibling
+            while (node && node !== next) {
+                if (node.nodeType === Node.TEXT_NODE && (node.textContent?.trim() || '').length > 0) {
+                    return
+                }
+                node = node.nextSibling
+            }
+
             // Check if styles match
             if (hasIdenticalStyles(span as HTMLElement, next)) {
                 // Don't merge if there's a space at the boundary (preserves word separation)
