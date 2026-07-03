@@ -115,6 +115,12 @@ const ImageResizer = () => {
                     : img.style.float === 'right' ? 'right'
                         : null
             if (inlineAlign) return inlineAlign
+            // Check parent LI for text-align (image in a list)
+            const li = img.closest('li')
+            if (li) {
+                const ta = li.style.textAlign
+                if (ta === 'center' || ta === 'right' || ta === 'left') return ta
+            }
             let parent: HTMLElement | null = img.parentElement
             while (parent && parent !== editorSurface) {
                 const textAlign = parent.style.textAlign

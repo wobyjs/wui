@@ -58,16 +58,68 @@ const TablePopupMenu = () => {
     let popupEl: HTMLDivElement | null = null
     let mounted = false
 
+    // Multi-cell selection state
+    let anchorCell: HTMLTableCellElement | null = null
+    let selectedCells: Set<HTMLTableCellElement> = new Set()
+    let activeCell: HTMLTableCellElement | null = null
+
+    const clearCellSelection = () => {
+        selectedCells.forEach(c => {
+            c.style.outline = ''
+            c.style.outlineOffset = ''
+        })
+        selectedCells.clear()
+        anchorCell = null
+    }
+
+    const highlightCells = (cells: HTMLTableCellElement[]) => {
+        cells.forEach(c => {
+            c.style.outline = '2px solid #3b82f6'
+            c.style.outlineOffset = '-2px'
+        })
+    }
+
+    const getCellRange = (cell1: HTMLTableCellElement, cell2: HTMLTableCellElement): HTMLTableCellElement[] => {
+        const table = cell1.closest('table')
+        if (!table || cell2.closest('table') !== table) return [cell1]
+
+        const rows = Array.from(table.querySelectorAll('tr'))
+        const row1 = cell1.parentElement as HTMLTableRowElement
+        const row2 = cell2.parentElement as HTMLTableRowElement
+        const rowIdx1 = rows.indexOf(row1)
+        const rowIdx2 = rows.indexOf(row2)
+        const minRow = Math.min(rowIdx1, rowIdx2)
+        const maxRow = Math.max(rowIdx1, rowIdx2)
+
+        const colIdx1 = Array.from(row1.children).indexOf(cell1)
+        const colIdx2 = Array.from(row2.children).indexOf(cell2)
+        const minCol = Math.min(colIdx1, colIdx2)
+        const maxCol = Math.max(colIdx1, colIdx2)
+
+        const result: HTMLTableCellElement[] = []
+        for (let r = minRow; r <= maxRow; r++) {
+            const row = rows[r]
+            const cells = Array.from(row.querySelectorAll('td, th')) as HTMLTableCellElement[]
+            for (let c = minCol; c <= maxCol && c < cells.length; c++) {
+                result.push(cells[c])
+            }
+        }
+        return result
+    }
+
     // Table operations
     const getCurrentCell = (): HTMLTableCellElement | null => {
         const editor = document.querySelector('wui-editor')
         const shadow = editor?.shadowRoot
+        // Prefer the last clicked/active cell over selection (which may be stale after programmatic caret placement)
+        if (activeCell && shadow?.contains(activeCell)) return activeCell
         const sel = shadow?.getSelection()
-        if (!sel || !sel.focusNode) return null
-        let node: Node | null = sel.focusNode
-        while (node && node !== shadow) {
-            if (node instanceof HTMLTableCellElement) return node
-            node = node.parentNode
+        if (sel && sel.focusNode) {
+            let node: Node | null = sel.focusNode
+            while (node && node !== shadow) {
+                if (node instanceof HTMLTableCellElement) return node
+                node = node.parentNode
+            }
         }
         return null
     }
@@ -85,7 +137,7 @@ const TablePopupMenu = () => {
         if (!tbody) return
         const newRow = row.cloneNode(true) as HTMLTableRowElement
         const cells = newRow.querySelectorAll('td, th')
-        cells.forEach(c => { c.textContent = ''; c.removeAttribute('style') })
+        cells.forEach(c => { c.innerHTML = '&nbsp;'; c.removeAttribute('colspan'); c.removeAttribute('rowspan') })
         if (above) {
             tbody.insertBefore(newRow, row)
         } else {
@@ -123,7 +175,13 @@ const TablePopupMenu = () => {
             const cells = r.querySelectorAll('td, th')
             const refCell = cells[Math.min(cellIndex, cells.length - 1)]
             const newCell = document.createElement(refCell?.tagName === 'TH' ? 'th' : 'td')
-            newCell.textContent = ''
+            newCell.innerHTML = '&nbsp;'
+            // Copy border styles from reference cell
+            if (refCell) {
+                const refStyle = getComputedStyle(refCell as HTMLElement)
+                newCell.style.border = `${refStyle.borderWidth} ${refStyle.borderStyle} ${refStyle.borderColor}`
+                newCell.style.padding = refStyle.padding
+            }
             if (left) {
                 refCell?.parentElement?.insertBefore(newCell, refCell)
             } else {
@@ -209,7 +267,9 @@ const TablePopupMenu = () => {
     const toggleBorder = () => {
         const cell = getCurrentCell()
         if (!cell) return
-        if (cell.style.borderWidth && cell.style.borderWidth !== '0px') {
+        const cs = getComputedStyle(cell)
+        const hasBorder = cs.borderWidth !== '0px' && cs.borderStyle !== 'none'
+        if (hasBorder) {
             cell.style.border = 'none'
         } else {
             cell.style.border = '1px solid #cccccc'
@@ -223,7 +283,12 @@ const TablePopupMenu = () => {
         const table = getTable(cell)
         if (!table) return
         const cells = table.querySelectorAll('td, th')
-        const hasBorder = cells[0] && (cells[0] as HTMLElement).style.borderWidth && (cells[0] as HTMLElement).style.borderWidth !== '0px'
+        const firstCell = cells[0] as HTMLElement | undefined
+        let hasBorder = false
+        if (firstCell) {
+            const cs = getComputedStyle(firstCell)
+            hasBorder = cs.borderWidth !== '0px' && cs.borderStyle !== 'none'
+        }
         cells.forEach(c => {
             const el = c as HTMLElement
             if (hasBorder) {
@@ -236,40 +301,38 @@ const TablePopupMenu = () => {
     }
 
     const mergeCells = () => {
-        const editor = document.querySelector('wui-editor')
-        const shadow = editor?.shadowRoot
-        const sel = shadow?.getSelection()
-        if (!sel || sel.rangeCount === 0) return
-
-        // Find all selected cells
-        const range = sel.getRangeAt(0)
         const table = getCurrentCell()?.closest('table')
         if (!table) return
 
-        const selectedCells: HTMLTableCellElement[] = []
-        const walker = document.createTreeWalker(table, NodeFilter.SHOW_ELEMENT, {
-            acceptNode: (node) => {
-                if (!(node instanceof HTMLTableCellElement)) return NodeFilter.FILTER_SKIP
-                return range.intersectsNode(node) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP
-            }
-        })
-        let n: Node | null
-        while ((n = walker.nextNode())) selectedCells.push(n as HTMLTableCellElement)
+        // Use multi-selected cells if available, otherwise try text selection range
+        let cellsToMerge: HTMLTableCellElement[] = []
+        if (selectedCells.size >= 2) {
+            cellsToMerge = Array.from(selectedCells)
+        } else {
+            const editor = document.querySelector('wui-editor')
+            const shadow = editor?.shadowRoot
+            const sel = shadow?.getSelection()
+            if (!sel || sel.rangeCount === 0) return
+            const range = sel.getRangeAt(0)
+            const walker = document.createTreeWalker(table, NodeFilter.SHOW_ELEMENT, {
+                acceptNode: (node) => {
+                    if (!(node instanceof HTMLTableCellElement)) return NodeFilter.FILTER_SKIP
+                    return range.intersectsNode(node) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP
+                }
+            })
+            let n: Node | null
+            while ((n = walker.nextNode())) cellsToMerge.push(n as HTMLTableCellElement)
+        }
 
-        if (selectedCells.length < 2) return
+        if (cellsToMerge.length < 2) return
 
-        // Merge cells: combine content into first cell, set colspan/rowspan, remove others
-        const first = selectedCells[0]
-        const last = selectedCells[selectedCells.length - 1]
-
-        // Calculate colspan
+        const first = cellsToMerge[0]
+        const last = cellsToMerge[cellsToMerge.length - 1]
         const firstRow = first.parentElement!
         const lastRow = last.parentElement!
-        const firstColIdx = Array.from(firstRow.children).indexOf(first)
-        const lastColIdx = Array.from(lastRow.children).indexOf(last)
 
         // Simple case: all cells in same row
-        if (firstRow === lastRow && selectedCells.every(c => c.parentElement === firstRow)) {
+        if (firstRow === lastRow && cellsToMerge.every(c => c.parentElement === firstRow)) {
             let totalCols = 0
             const rowCells = Array.from(firstRow.children)
             const startIdx = rowCells.indexOf(first)
@@ -278,15 +341,15 @@ const TablePopupMenu = () => {
                 const c = rowCells[i] as HTMLTableCellElement
                 totalCols += parseInt(c.getAttribute('colspan') || '1')
             }
-            // Move content from other cells into first
-            for (let i = 1; i < selectedCells.length; i++) {
-                while (selectedCells[i].firstChild) {
-                    first.appendChild(selectedCells[i].firstChild)
+            for (let i = 1; i < cellsToMerge.length; i++) {
+                while (cellsToMerge[i].firstChild) {
+                    first.appendChild(cellsToMerge[i].firstChild)
                 }
                 first.appendChild(document.createTextNode(' '))
-                selectedCells[i].remove()
+                cellsToMerge[i].remove()
             }
             first.setAttribute('colspan', String(totalCols))
+            clearCellSelection()
             saveDo()
         }
     }
@@ -309,7 +372,7 @@ const TablePopupMenu = () => {
         // Add cells in the same row
         for (let i = 1; i < colspan; i++) {
             const newCell = document.createElement(cell.tagName === 'TH' ? 'th' : 'td')
-            newCell.textContent = ''
+            newCell.innerHTML = '&nbsp;'
             row.insertBefore(newCell, row.children[cellIdx + i] || null)
         }
 
@@ -322,7 +385,7 @@ const TablePopupMenu = () => {
                 for (let r = rowIdx + 1; r < rowIdx + rowspan && r < rows.length; r++) {
                     for (let i = 0; i < colspan; i++) {
                         const newCell = document.createElement(cell.tagName === 'TH' ? 'th' : 'td')
-                        newCell.textContent = ''
+                        newCell.innerHTML = '&nbsp;'
                         const targetRow = rows[r]
                         const refIdx = Math.min(cellIdx + i, targetRow.children.length)
                         targetRow.insertBefore(newCell, targetRow.children[refIdx] || null)
@@ -383,9 +446,31 @@ const TablePopupMenu = () => {
             const target = e.composedPath()[0] as HTMLElement
             const cell = target.closest?.('td, th') as HTMLTableCellElement | null
             if (cell) {
+                activeCell = cell
+                if (e.shiftKey && anchorCell) {
+                    // Shift+click: select range of cells
+                    e.preventDefault()
+                    const cells = getCellRange(anchorCell, cell)
+                    clearCellSelection()
+                    highlightCells(cells)
+                    cells.forEach(c => selectedCells.add(c))
+                } else if (!e.shiftKey) {
+                    // Normal click: show popup, clear previous multi-selection
+                    if (!target.closest('[data-table-popup]')) {
+                        clearCellSelection()
+                        anchorCell = cell
+                        selectedCells.add(cell)
+                        highlightCells([cell])
+                    }
+                }
                 setTimeout(() => showPopup(cell), 50)
             } else if (!target.closest('[data-table-popup]')) {
-                hidePopup()
+                // Don't hide popup if clicking inside a table cell (text inside)
+                if (!target.closest('td, th')) {
+                    clearCellSelection()
+                    hidePopup()
+                    activeCell = null
+                }
             }
         }, true)
 
@@ -410,7 +495,9 @@ const TablePopupMenu = () => {
         document.addEventListener('click', (e: MouseEvent) => {
             const target = e.composedPath()[0] as HTMLElement
             if (!target.closest('[data-table-popup]') && !target.closest('td, th')) {
+                clearCellSelection()
                 hidePopup()
+                activeCell = null
             }
         })
     })

@@ -3,6 +3,7 @@ import { Button, ButtonStyles } from '../Button'
 import { useEditor, useUndoRedo } from './undoredo'
 import { Checkbox } from '../Checkbox'
 import { getSelection, getCurrentEditor, getClosestElementFromSelection, BLOCK_TAGS, getSelectedBlocks, restoreRangePosition, LIST_TAGS, LI_TAG, P_TAG } from './utils'
+import { applyBlockCommandToSelectedImage } from './ImageActions'
 import ListBulleted from '../icons/list_bulleted'
 import ListNumbered from '../icons/list_numbered'
 import ListCheckbox from '../icons/list_checkbox'
@@ -165,6 +166,17 @@ const List = defaults(def, (props) => {
     // #endregion
 
     const handleClick = () => {
+        // Check for image selection first - route to image handler
+        const listType = $$(mode) as 'bullet' | 'number' | 'checkbox'
+        if (applyBlockCommandToSelectedImage('list', listType)) {
+            saveDo()
+            setTimeout(() => {
+                const evt = new Event('selectionchange')
+                document.dispatchEvent(evt)
+            }, 10)
+            return
+        }
+
         const el = editor ?? getCurrentEditor()
         // Ensure we don't force inline styles, we want classes
         document.execCommand('styleWithCSS', false, 'false')
@@ -203,6 +215,7 @@ const List = defaults(def, (props) => {
 })
 
 export { List }
+export default List
 
 customElement('wui-list', List)
 
@@ -214,9 +227,11 @@ declare module 'woby' {
     }
 }
 
-export default List
 
-// #region List Service 
+// Table cell tags
+const TABLE_CELL_TAGS = ['TD', 'TH']
+
+// #region List Service
 export const ListService = {
     // Converts a block to an LI
     convertBlockToLi: (block: HTMLElement): HTMLLIElement => {
@@ -225,6 +240,13 @@ export const ListService = {
         li.style.cssText = block.style.cssText;
         while (block.firstChild) li.appendChild(block.firstChild);
         block.remove();
+        return li;
+    },
+
+    // Converts content of a TD/TH into an LI, preserving the cell
+    convertCellContentToLi: (cell: HTMLElement): HTMLLIElement => {
+        const li = document.createElement('li');
+        while (cell.firstChild) li.appendChild(cell.firstChild);
         return li;
     },
 
@@ -657,13 +679,20 @@ const insertList = (editor: HTMLDivElement, targetList: { tag: 'ul' | 'ol', clas
                 return !(parentContainer && selectedBlocks.includes(parentContainer as HTMLElement));
             });
 
+            // Check if we're working with table cells - list must go inside, not wrap
+            const isTableCell = firstBlock && TABLE_CELL_TAGS.includes(firstBlock.tagName.toUpperCase());
+
             // 3. Create the new list container
             const newList = document.createElement(targetList.tag.toUpperCase());
             newList.id = targetList.id;
             newList.className = targetList.classes.add;
 
-            // 4. Insert before/after - use firstBlock if available, otherwise startElement
-            if (firstBlock) {
+            // 4. Insert: for table cells, append inside the cell AFTER processing; otherwise insert before/after
+            if (isTableCell && firstBlock) {
+                // For table cells: process blocks first (move cell content into LIs),
+                // then append newList into the cell. This avoids HierarchyRequestError
+                // where the processing loop would move newList itself out of the TD.
+            } else if (firstBlock) {
                 previousSibling ? previousSibling.after(newList) : firstBlock.before(newList);
             } else {
                 previousSibling ? previousSibling.after(newList) : startElement.before(newList);
@@ -673,31 +702,33 @@ const insertList = (editor: HTMLDivElement, targetList: { tag: 'ul' | 'ol', clas
             selectedBlocks.forEach((block, index) => {
                 console.log(`Processing #${index + 1} <${block.tagName.toLowerCase()}>`);
                 if (block.tagName.toUpperCase() === 'LI') {
-                    // If it's already an LI, move it directly
                     newList.appendChild(block);
                 } else if (block.tagName.toUpperCase() === 'UL' || block.tagName.toUpperCase() === 'OL') {
-                    // CRITICAL FIX: Only move LI children that intersect with the range
-                    // Moving ALL children would incorrectly move items that are NOT in the selection
                     const allLIs = Array.from(block.querySelectorAll('li')) as HTMLLIElement[];
                     const intersectingLIs = allLIs.filter(li => range.intersectsNode(li));
-
                     console.log(`\tList has ${allLIs.length} LIs, ${intersectingLIs.length} intersect with range`);
-
                     if (intersectingLIs.length === allLIs.length) {
-                        // All items selected - move entire list
                         intersectingLIs.forEach(li => newList.appendChild(li));
                         block.remove();
                     } else if (intersectingLIs.length > 0) {
-                        // Partial selection - only move intersecting LIs
                         intersectingLIs.forEach(li => newList.appendChild(li));
-                        // Don't remove the list wrapper - it still has unselected items
                     }
-                    // If no LIs intersect (shouldn't happen), do nothing
+                } else if (TABLE_CELL_TAGS.includes(block.tagName.toUpperCase())) {
+                    // Table cells: convert only the cell's content to LI, keep the cell intact
+                    const li = document.createElement('li');
+                    while (block.firstChild) li.appendChild(block.firstChild);
+                    newList.appendChild(li);
                 } else {
                     // Otherwise, convert P, H1, etc. to LI
                     newList.appendChild(ListService.convertBlockToLi(block));
                 }
             });
+
+            // 6. For table cells: now insert the populated newList into the cell
+            if (isTableCell && firstBlock) {
+                firstBlock.appendChild(newList);
+            }
+
             console.log("Created a new list successfully.");
 
             // CRITICAL FIX: Inject checkboxes when creating a new checkbox list
