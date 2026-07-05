@@ -1,8 +1,8 @@
-import { useOnClickOutside, useSelection } from '@woby/use/browser'
+import { useOnClickOutside, useSelection } from '@woby/use'
 import { $, $$, useEffect, JSX, useMemo, Observable, createContext, useContext, ObservableMaybe } from 'woby'
 import { useEditor } from './undoredo'
 
-export const BLOCK_TAGS = ['P', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'BLOCKQUOTE', 'PRE', 'DIV', 'LI', 'UL', 'OL']
+export const BLOCK_TAGS = ['P', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'BLOCKQUOTE', 'PRE', 'DIV', 'LI', 'UL', 'OL', 'TD', 'TH']
 export const LIST_TAGS = ["UL", "OL"]
 export const LI_TAG = "LI"
 export const P_TAG = "P"
@@ -1051,16 +1051,21 @@ export const getSelectedTableCells = (
 
 /**
  * Moves the selection focus to the adjacent table cell.
- * 
- * @param reverse - If true, moves to the previous cell (Shift+Tab behavior). 
+ *
+ * @param reverse - If true, moves to the previous cell (Shift+Tab behavior).
  *                  If false, moves to the next cell (Tab behavior).
+ * @param shadowRoot - Optional shadow root. When provided, uses shadow.getSelection()
+ *                     to operate on shadow-DOM editors. Falls back to document.
  */
-export function focusNextTableCell(reverse: boolean = false) {
-    const selection = document.getSelection()
+export function focusNextTableCell(reverse: boolean = false, shadowRoot?: ShadowRoot | null) {
+    const selection = shadowRoot ? shadowRoot.getSelection() : document.getSelection()
     if (!selection || !selection.focusNode) return
 
     // Find the current <td>
-    let currentTd = selection.focusNode as HTMLElement | null
+    let currentTd: HTMLElement | null = selection.focusNode as HTMLElement | null
+    if (currentTd && currentTd.nodeType === Node.TEXT_NODE) {
+        currentTd = currentTd.parentElement
+    }
     while (currentTd && currentTd.tagName !== 'TD' && currentTd.tagName !== 'TH') {
         currentTd = currentTd.parentElement
     }
@@ -1076,25 +1081,24 @@ export function focusNextTableCell(reverse: boolean = false) {
 
     if (nextIndex >= 0 && nextIndex < allCells.length) {
         const nextCell = allCells[nextIndex]
-        // placeCaretAtStart(nextCell)
-        selectAllInElement(nextCell)
+        selectAllInElement(nextCell, shadowRoot)
     }
 }
 
-function placeCaretAtStart(el: HTMLElement) {
+function placeCaretAtStart(el: HTMLElement, shadowRoot?: ShadowRoot | null) {
     const range = document.createRange()
-    const sel = window.getSelection()
+    const sel = shadowRoot ? shadowRoot.getSelection() : window.getSelection()
     range.selectNodeContents(el)
     range.collapse(true)
     sel?.removeAllRanges()
     sel?.addRange(range)
 }
 
-function selectAllInElement(el: HTMLElement) {
+function selectAllInElement(el: HTMLElement, shadowRoot?: ShadowRoot | null) {
     const range = document.createRange()
     range.selectNodeContents(el)
 
-    const sel = window.getSelection()
+    const sel = shadowRoot ? shadowRoot.getSelection() : window.getSelection()
     sel?.removeAllRanges()
     sel?.addRange(range)
 }

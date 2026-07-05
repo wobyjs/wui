@@ -5,6 +5,7 @@ import IndentIcon from '../icons/indent'
 import OutdentIcon from '../icons/outdent'
 import { getCurrentEditor } from "./utils"
 import { applyIndent as applyIndentStyle, applyListIndent } from './StyleEngine'
+import { applyBlockCommandToSelectedImage } from './ImageActions'
 
 type IndentMode = "increase" | "decrease"
 
@@ -30,7 +31,7 @@ const Indent = defaults(def, (props) => {
     }
 
     // Determine Icon and Title based on mode
-    const displayIcon = () => $$(isDecrease) ? <IndentIcon class="size-5" /> : <OutdentIcon class="size-5" />
+    const displayIcon = () => $$(isDecrease) ? <OutdentIcon class="size-5" /> : <IndentIcon class="size-5" />
 
     const displayTitle = () => {
         const t = $$(title)
@@ -39,10 +40,16 @@ const Indent = defaults(def, (props) => {
     }
 
     const handleClick = (e: any) => {
+        // Check for image selection first - route to image handler
+        const isDecreaseMode = $$(mode) === 'decrease'
+        if (applyBlockCommandToSelectedImage(isDecreaseMode ? 'outdent' : 'indent')) {
+            saveDo()
+            return
+        }
+
         const stepVal = $$(step)
         const pxVal = $$(identPx)
         const amount = pxVal * stepVal
-        const decrease = $$(mode) === 'decrease'
 
         // Check if selection is inside a list (UL/OL)
         const editorEl = document.querySelector('wui-editor')
@@ -59,7 +66,7 @@ const Indent = defaults(def, (props) => {
                     const tag = node.tagName.toUpperCase()
                     if (tag === 'LI' || tag === 'UL' || tag === 'OL') {
                         // Use StyleEngine's applyListIndent for list items (ml-* classes)
-                        applyListIndent(decrease, amount)
+                        applyListIndent(isDecreaseMode, amount)
                         saveDo()
                         return
                     }
@@ -69,7 +76,7 @@ const Indent = defaults(def, (props) => {
         }
 
         // Use StyleEngine's applyIndent for non-list blocks (paragraphs, headings)
-        applyIndentStyle(decrease, amount)
+        applyIndentStyle(isDecreaseMode, amount)
         saveDo()
     }
 

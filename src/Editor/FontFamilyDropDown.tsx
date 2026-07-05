@@ -1,7 +1,7 @@
 import { $, $$, customElement, defaults, ElementAttributes, HtmlClass, HtmlNumber, JSX, ObservableMaybe, useEffect } from 'woby'
 import { Button } from '../Button'
 import { EditorContext, useUndoRedo } from './undoredo'
-import { useOnClickOutside } from '@woby/use/browser'
+import { useOnClickOutside } from '@woby/use'
 import { getCurrentRange } from './utils'
 import { applyFontFamily as applyFontFamilyStyle } from './StyleEngine'
 import KeyboardDownArrow from '../icons/keyboard_down_arrow'

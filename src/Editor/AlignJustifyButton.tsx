@@ -3,6 +3,7 @@ import { Button, ButtonStyles } from '../Button'
 import { applyTextAlign as applyTextAlignStyle, updateActiveStatus, ALIGNMENT_MAP } from './AlignButton'
 import { getCurrentEditor, useBlockEnforcer } from './utils'
 import { useEditor } from './undoredo'
+import { applyBlockCommandToSelectedImage } from './ImageActions'
 
 const JUSTIFY_MAP = ALIGNMENT_MAP.justify
 
@@ -58,6 +59,12 @@ const AlignJustifyButton = defaults(def, (props) => {
     });
 
     const handleClick = () => {
+        // Check for image selection first - route to image handler
+        if (applyBlockCommandToSelectedImage('align-justify')) {
+            isActive(true)
+            return
+        }
+
         applyTextAlignStyle(alignment)
         isActive(true)
     }

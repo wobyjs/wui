@@ -1,4 +1,4 @@
-import { useOnClickOutside, useSelection } from '@woby/use/browser'
+import { useOnClickOutside, useSelection } from '@woby/use'
 import { $, $$, useEffect, JSX, useMemo, Observable, createContext, useContext, setRef, customElement, defaults } from 'woby'
 import type { FocusManager } from './FocusManager'
 import { saveSelectionAsOffsets, restoreSelectionFromOffsets, findEditorRoot } from './StyleEngine'

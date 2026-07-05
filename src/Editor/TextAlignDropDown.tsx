@@ -1,7 +1,7 @@
 import { $, $$, customElement, defaults, ElementAttributes, HtmlClass, HtmlString, JSX, Observable, ObservableMaybe, useEffect } from 'woby'
 import { Button, ButtonStyles } from '../Button'
 import { EditorContext, useEditor, useUndoRedo } from './undoredo'
-import { useOnClickOutside } from '@woby/use/browser'
+import { useOnClickOutside } from '@woby/use'
 
 import AlignCenter from '../icons/align_center'
 import AlignLeft from '../icons/align_left'
@@ -12,6 +12,7 @@ import Outdent from '../icons/outdent'
 import KeyboardDownArrow from '../icons/keyboard_down_arrow'
 import { applyTextAlign } from './StyleEngine'
 import { applyIndent as applyIndentStyle, applyListIndent } from './StyleEngine'
+import { applyBlockCommandToSelectedImage } from './ImageActions'
 
 // Icons - placeholders, replace with actual SVGs or components
 const AlignLeftIcon = () => <AlignLeft class="size-5" />
@@ -22,6 +23,21 @@ const OutdentIcon = () => <Outdent class="size-5" />
 const IndentIcon = () => <Indent class="size-5" />
 
 const applyAlignment = (command: string) => {
+    // Check for selected image first - route to image handler
+    if (command === 'justifyLeft') {
+        if (applyBlockCommandToSelectedImage('align-left')) return
+    } else if (command === 'justifyCenter') {
+        if (applyBlockCommandToSelectedImage('align-center')) return
+    } else if (command === 'justifyRight') {
+        if (applyBlockCommandToSelectedImage('align-right')) return
+    } else if (command === 'justifyFull') {
+        if (applyBlockCommandToSelectedImage('align-justify')) return
+    } else if (command === 'indent') {
+        if (applyBlockCommandToSelectedImage('indent')) return
+    } else if (command === 'outdent') {
+        if (applyBlockCommandToSelectedImage('outdent')) return
+    }
+
     // Map execCommand names to CSS values
     const alignMap: Record<string, string> = {
         'justifyLeft': 'left',

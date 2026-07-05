@@ -3,6 +3,7 @@ import { Button, ButtonStyles } from '../Button'
 import { getCurrentEditor, useBlockEnforcer, BLOCK_TAGS, getCurrentBlock, getSelectedBlocks } from './utils'
 import { useEditor } from './undoredo'
 import { applyTextAlign as applyTextAlignStyle } from './StyleEngine'
+import { applyBlockCommandToSelectedImage } from './ImageActions'
 import AlignCenter from '../icons/align_center'
 import AlignLeft from '../icons/align_left'
 import AlignRight from '../icons/align_right'
@@ -112,6 +113,13 @@ const AlignButton = defaults(def, (props) => {
         }
 
         const alignment = currentAlignment().align
+
+        // Check for image selection first - route to image handler
+        if (applyBlockCommandToSelectedImage(`align-${alignment}` as any)) {
+            isActive(true)
+            return
+        }
+
         applyTextAlignStyle(alignment)
         isActive(true)
     }

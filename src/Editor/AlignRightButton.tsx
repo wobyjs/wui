@@ -3,6 +3,7 @@ import { Button, ButtonStyles } from '../Button'
 import { applyTextAlign, updateActiveStatus, ALIGNMENT_MAP } from './AlignButton'
 import { getCurrentEditor, useBlockEnforcer } from './utils'
 import { useEditor } from './undoredo'
+import { applyBlockCommandToSelectedImage } from './ImageActions'
 
 const RIGHT_MAP = ALIGNMENT_MAP.right
 
@@ -58,6 +59,12 @@ const AlignRightButton = defaults(def, (props) => {
     });
 
     const handleClick = () => {
+        // Check for image selection first - route to image handler
+        if (applyBlockCommandToSelectedImage('align-right')) {
+            isActive(true)
+            return
+        }
+
         const editorDiv = editor || getCurrentEditor()
 
         applyTextAlign(alignment, { toAdd, toRemove }, editorDiv)

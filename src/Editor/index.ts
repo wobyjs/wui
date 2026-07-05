@@ -14,7 +14,7 @@ export { BrowserInfo, safeGetSelection, safeGetRange, normalizeRange, getDirecti
 export { normalizeDOM, mergeTextNodes, removeEmptySpans, unwrapRedundantSpans, mergeAdjacentSpans, normalizeBlockBoundaries } from './DOMNormalizer'
 
 // Style Engine
-export { applyStyle, removeStyle, toggleStyle, applyBold, applyItalic, applyUnderline, applyStrikethrough, applyTextColor, applyBackgroundColor, applyFontFamily, applyFontSize, applyIndent, getStyleStateInRange } from './StyleEngine'
+export { applyStyle, removeStyle, toggleStyle, applyBold, applyItalic, applyUnderline, applyStrikethrough, applyTextColor, applyBackgroundColor, applyFontFamily, applyFontSize, applyIndent, applyTextAlign, getStyleStateInRange } from './StyleEngine'
 
 // Utility functions
 export { getSelection, restoreSelection, getCurrentRange, expandRange, getSelectedBlocks, getCurrentBlock } from './utils'

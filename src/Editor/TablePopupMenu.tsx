@@ -416,11 +416,16 @@ const TablePopupMenu = () => {
         const surfaceRect = surface.getBoundingClientRect()
         const cellRect = cell.getBoundingClientRect()
 
-        // Position popup above the cell
-        const left = cellRect.left - surfaceRect.left
-        const top = Math.max(0, cellRect.top - surfaceRect.top - 42)
-
+        // Show popup first so we can measure its actual height
         popupEl.style.display = ''
+        popupEl.style.visibility = 'hidden'
+        const popupHeight = popupEl.offsetHeight
+        popupEl.style.visibility = ''
+
+        // Position popup above the cell, accounting for actual popup height
+        const left = cellRect.left - surfaceRect.left
+        const top = Math.max(0, cellRect.top - surfaceRect.top - popupHeight - 4)
+
         popupEl.style.left = `${left}px`
         popupEl.style.top = `${top}px`
     }

@@ -1,7 +1,7 @@
 import { $, $$, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlString, JSX, ObservableMaybe, useEffect, Observable, HtmlClass } from 'woby'
 import { Button, ButtonStyles } from '../Button'
 import { useEditor, useUndoRedo } from './undoredo'
-import { useOnClickOutside } from '@woby/use/browser'
+import { useOnClickOutside } from '@woby/use'
 import KeyboardDownArrow from '../icons/keyboard_down_arrow'
 import { getCurrentEditor, getSelection } from './utils'
 import { QUOTE_TAG, QUOTE_CLASSES } from './Blockquote'
