@@ -1,6 +1,6 @@
 /* @jsxImportSource woby */
 import { $, $$, Observable, ObservableMaybe, useEffect, useMemo, untrack, Portal, type JSX, isObservable, defaults, customElement, ElementAttributes } from 'woby'
-import { use, useClickAway, useViewportSize } from '@woby/use/browser'
+import { use, useClickAway, useViewportSize } from '@woby/use'
 import { Wheeler, def as wheelerDef } from './Wheeler' // Adjust path
 import { Button } from '../Button'
 import { pick } from '../helper/helper'

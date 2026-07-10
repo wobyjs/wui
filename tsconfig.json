@@ -73,6 +73,7 @@
     "index.test.ts"
   ],
   "include": [
-    "src/**/*"
+    "src/**/*",
+    "index.test.ts"
   ]
 }

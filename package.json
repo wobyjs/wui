@@ -52,7 +52,7 @@
     "homepage": "https://github.com/axe-me/wui#readme",
     "dependencies": {
         "@woby/use": "workspace:^",
-        "woby": "^1.58.40"
+        "woby": "workspace:^"
     },
     "devDependencies": {
         "@types/node": "^25.9.1",

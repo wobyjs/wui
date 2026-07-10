@@ -1,5 +1,5 @@
 import { $, $$, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlClass, HtmlNumber, HtmlString, isObservable, Observable, ObservableMaybe, Portal, useEffect, useMemo } from 'woby'
-import { use, useClickAway } from '@woby/use/browser'
+import { use, useClickAway } from '@woby/use'
 import { WheelerProps, WheelerItem } from './WheelerType'
 
 export const ActiveWheelers = $([])

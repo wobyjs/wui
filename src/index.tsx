@@ -25,6 +25,7 @@ export * from './Wheeler/WheelerType'
 export * from './Wheeler/DateTimeWheeler'
 export * from './Wheeler/Wheeler'
 export * from './Wheeler/MultiWheeler'
+export * from './Wheeler/useRecordWheeler'
 
 export * from "./PropertyForm/BooleanEditor"
 export * from "./PropertyForm/ColorEditor"
