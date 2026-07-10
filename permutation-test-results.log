@@ -1,0 +1,2113 @@
+========================================
+COMPREHENSIVE PERMUTATION TEST
+========================================
+
+Selection Types: partial-word full-word cross-paragraph caret
+Actions: bold italic underline
+Click Counts: 1 2 3 4 5 6 7
+
+Total Test Cases: 84
+
+========================================
+
+Test 1: partial-word + bold x1 ... ❌ FAIL
+  Result: {
+  "result": {
+    "type": "object",
+    "subtype": "error",
+    "className": "TypeError",
+    "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+    "objectId": "1957285337141289009.6.1"
+  },
+  "exceptionDetails": {
+    "exceptionId": 2,
+    "text": "Uncaught",
+    "lineNumber": 2,
+    "columnNumber": 77,
+    "scriptId": "263",
+    "stackTrace": {
+      "callFrames": [
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 2,
+          "columnNumber": 77
+        },
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 9,
+          "columnNumber": 18
+        }
+      ]
+    },
+    "exception": {
+      "type": "object",
+      "subtype": "error",
+      "className": "TypeError",
+      "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+      "objectId": "1957285337141289009.6.2"
+    }
+  }
+}
+Test 2: partial-word + bold x2 ... ✅ PASS
+Test 3: partial-word + bold x3 ... ❌ FAIL
+  Result: {
+  "result": {
+    "type": "object",
+    "subtype": "error",
+    "className": "TypeError",
+    "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+    "objectId": "1957285337141289009.19.1"
+  },
+  "exceptionDetails": {
+    "exceptionId": 8,
+    "text": "Uncaught",
+    "lineNumber": 2,
+    "columnNumber": 77,
+    "scriptId": "263",
+    "stackTrace": {
+      "callFrames": [
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 2,
+          "columnNumber": 77
+        },
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 9,
+          "columnNumber": 18
+        }
+      ]
+    },
+    "exception": {
+      "type": "object",
+      "subtype": "error",
+      "className": "TypeError",
+      "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+      "objectId": "1957285337141289009.19.2"
+    }
+  }
+}
+Test 4: partial-word + bold x4 ... ✅ PASS
+Test 5: partial-word + bold x5 ... ❌ FAIL
+  Result: {
+  "result": {
+    "type": "object",
+    "subtype": "error",
+    "className": "TypeError",
+    "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+    "objectId": "1957285337141289009.36.1"
+  },
+  "exceptionDetails": {
+    "exceptionId": 18,
+    "text": "Uncaught",
+    "lineNumber": 2,
+    "columnNumber": 77,
+    "scriptId": "263",
+    "stackTrace": {
+      "callFrames": [
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 2,
+          "columnNumber": 77
+        },
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 9,
+          "columnNumber": 18
+        }
+      ]
+    },
+    "exception": {
+      "type": "object",
+      "subtype": "error",
+      "className": "TypeError",
+      "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+      "objectId": "1957285337141289009.36.2"
+    }
+  }
+}
+Test 6: partial-word + bold x6 ... ❌ FAIL
+  Result: {
+  "result": {
+    "type": "object",
+    "subtype": "error",
+    "className": "TypeError",
+    "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+    "objectId": "1957285337141289009.47.1"
+  },
+  "exceptionDetails": {
+    "exceptionId": 25,
+    "text": "Uncaught",
+    "lineNumber": 2,
+    "columnNumber": 77,
+    "scriptId": "263",
+    "stackTrace": {
+      "callFrames": [
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 2,
+          "columnNumber": 77
+        },
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 9,
+          "columnNumber": 18
+        }
+      ]
+    },
+    "exception": {
+      "type": "object",
+      "subtype": "error",
+      "className": "TypeError",
+      "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+      "objectId": "1957285337141289009.47.2"
+    }
+  }
+}
+Test 7: partial-word + bold x7 ... ❌ FAIL
+  Result: {
+  "result": {
+    "type": "object",
+    "subtype": "error",
+    "className": "TypeError",
+    "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+    "objectId": "1957285337141289009.59.1"
+  },
+  "exceptionDetails": {
+    "exceptionId": 35,
+    "text": "Uncaught",
+    "lineNumber": 2,
+    "columnNumber": 77,
+    "scriptId": "263",
+    "stackTrace": {
+      "callFrames": [
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 2,
+          "columnNumber": 77
+        },
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 9,
+          "columnNumber": 18
+        }
+      ]
+    },
+    "exception": {
+      "type": "object",
+      "subtype": "error",
+      "className": "TypeError",
+      "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+      "objectId": "1957285337141289009.59.2"
+    }
+  }
+}
+Test 8: partial-word + italic x1 ... ❌ FAIL
+  Result: {
+  "result": {
+    "type": "object",
+    "subtype": "error",
+    "className": "TypeError",
+    "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+    "objectId": "1957285337141289009.65.1"
+  },
+  "exceptionDetails": {
+    "exceptionId": 39,
+    "text": "Uncaught",
+    "lineNumber": 2,
+    "columnNumber": 77,
+    "scriptId": "263",
+    "stackTrace": {
+      "callFrames": [
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 2,
+          "columnNumber": 77
+        },
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 9,
+          "columnNumber": 18
+        }
+      ]
+    },
+    "exception": {
+      "type": "object",
+      "subtype": "error",
+      "className": "TypeError",
+      "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+      "objectId": "1957285337141289009.65.2"
+    }
+  }
+}
+Test 9: partial-word + italic x2 ... ✅ PASS
+Test 10: partial-word + italic x3 ... ✅ PASS
+Test 11: partial-word + italic x4 ... ✅ PASS
+Test 12: partial-word + italic x5 ... ✅ PASS
+Test 13: partial-word + italic x6 ... ❌ FAIL
+  Result: {
+  "result": {
+    "type": "object",
+    "subtype": "error",
+    "className": "TypeError",
+    "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+    "objectId": "1957285337141289009.108.1"
+  },
+  "exceptionDetails": {
+    "exceptionId": 63,
+    "text": "Uncaught",
+    "lineNumber": 2,
+    "columnNumber": 77,
+    "scriptId": "263",
+    "stackTrace": {
+      "callFrames": [
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 2,
+          "columnNumber": 77
+        },
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 9,
+          "columnNumber": 18
+        }
+      ]
+    },
+    "exception": {
+      "type": "object",
+      "subtype": "error",
+      "className": "TypeError",
+      "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+      "objectId": "1957285337141289009.108.2"
+    }
+  }
+}
+Test 14: partial-word + italic x7 ... ❌ FAIL
+  Result: {
+  "result": {
+    "type": "object",
+    "subtype": "error",
+    "className": "TypeError",
+    "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+    "objectId": "1957285337141289009.120.1"
+  },
+  "exceptionDetails": {
+    "exceptionId": 71,
+    "text": "Uncaught",
+    "lineNumber": 2,
+    "columnNumber": 77,
+    "scriptId": "263",
+    "stackTrace": {
+      "callFrames": [
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 2,
+          "columnNumber": 77
+        },
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 9,
+          "columnNumber": 18
+        }
+      ]
+    },
+    "exception": {
+      "type": "object",
+      "subtype": "error",
+      "className": "TypeError",
+      "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+      "objectId": "1957285337141289009.120.2"
+    }
+  }
+}
+Test 15: partial-word + underline x1 ... ❌ FAIL
+  Result: {
+  "result": {
+    "type": "object",
+    "subtype": "error",
+    "className": "TypeError",
+    "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+    "objectId": "1957285337141289009.125.1"
+  },
+  "exceptionDetails": {
+    "exceptionId": 74,
+    "text": "Uncaught",
+    "lineNumber": 2,
+    "columnNumber": 77,
+    "scriptId": "263",
+    "stackTrace": {
+      "callFrames": [
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 2,
+          "columnNumber": 77
+        },
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 9,
+          "columnNumber": 18
+        }
+      ]
+    },
+    "exception": {
+      "type": "object",
+      "subtype": "error",
+      "className": "TypeError",
+      "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+      "objectId": "1957285337141289009.125.2"
+    }
+  }
+}
+Test 16: partial-word + underline x2 ... ✅ PASS
+Test 17: partial-word + underline x3 ... ❌ FAIL
+  Result: {
+  "result": {
+    "type": "object",
+    "subtype": "error",
+    "className": "TypeError",
+    "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+    "objectId": "1957285337141289009.139.1"
+  },
+  "exceptionDetails": {
+    "exceptionId": 82,
+    "text": "Uncaught",
+    "lineNumber": 2,
+    "columnNumber": 77,
+    "scriptId": "263",
+    "stackTrace": {
+      "callFrames": [
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 2,
+          "columnNumber": 77
+        },
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 9,
+          "columnNumber": 18
+        }
+      ]
+    },
+    "exception": {
+      "type": "object",
+      "subtype": "error",
+      "className": "TypeError",
+      "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+      "objectId": "1957285337141289009.139.2"
+    }
+  }
+}
+Test 18: partial-word + underline x4 ... ✅ PASS
+Test 19: partial-word + underline x5 ... ✅ PASS
+Test 20: partial-word + underline x6 ... ✅ PASS
+Test 21: partial-word + underline x7 ... ✅ PASS
+Test 22: full-word + bold x1 ... ❌ FAIL
+  Result: {
+  "result": {
+    "type": "object",
+    "subtype": "error",
+    "className": "TypeError",
+    "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+    "objectId": "1957285337141289009.184.1"
+  },
+  "exceptionDetails": {
+    "exceptionId": 109,
+    "text": "Uncaught",
+    "lineNumber": 2,
+    "columnNumber": 77,
+    "scriptId": "263",
+    "stackTrace": {
+      "callFrames": [
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 2,
+          "columnNumber": 77
+        },
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 9,
+          "columnNumber": 18
+        }
+      ]
+    },
+    "exception": {
+      "type": "object",
+      "subtype": "error",
+      "className": "TypeError",
+      "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+      "objectId": "1957285337141289009.184.2"
+    }
+  }
+}
+Test 23: full-word + bold x2 ... ✅ PASS
+Test 24: full-word + bold x3 ... ✅ PASS
+Test 25: full-word + bold x4 ... ❌ FAIL
+  Result: {
+  "result": {
+    "type": "object",
+    "subtype": "error",
+    "className": "TypeError",
+    "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+    "objectId": "1957285337141289009.206.1"
+  },
+  "exceptionDetails": {
+    "exceptionId": 120,
+    "text": "Uncaught",
+    "lineNumber": 2,
+    "columnNumber": 77,
+    "scriptId": "263",
+    "stackTrace": {
+      "callFrames": [
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 2,
+          "columnNumber": 77
+        },
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 9,
+          "columnNumber": 18
+        }
+      ]
+    },
+    "exception": {
+      "type": "object",
+      "subtype": "error",
+      "className": "TypeError",
+      "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+      "objectId": "1957285337141289009.206.2"
+    }
+  }
+}
+Test 26: full-word + bold x5 ... ❌ FAIL
+  Result: {
+  "result": {
+    "type": "object",
+    "subtype": "error",
+    "className": "TypeError",
+    "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+    "objectId": "1957285337141289009.215.1"
+  },
+  "exceptionDetails": {
+    "exceptionId": 126,
+    "text": "Uncaught",
+    "lineNumber": 2,
+    "columnNumber": 77,
+    "scriptId": "263",
+    "stackTrace": {
+      "callFrames": [
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 2,
+          "columnNumber": 77
+        },
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 9,
+          "columnNumber": 18
+        }
+      ]
+    },
+    "exception": {
+      "type": "object",
+      "subtype": "error",
+      "className": "TypeError",
+      "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+      "objectId": "1957285337141289009.215.2"
+    }
+  }
+}
+Test 27: full-word + bold x6 ... ✅ PASS
+Test 28: full-word + bold x7 ... ❌ FAIL
+  Result: {
+  "result": {
+    "type": "object",
+    "subtype": "error",
+    "className": "TypeError",
+    "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+    "objectId": "1957285337141289009.236.1"
+  },
+  "exceptionDetails": {
+    "exceptionId": 141,
+    "text": "Uncaught",
+    "lineNumber": 2,
+    "columnNumber": 77,
+    "scriptId": "263",
+    "stackTrace": {
+      "callFrames": [
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 2,
+          "columnNumber": 77
+        },
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 9,
+          "columnNumber": 18
+        }
+      ]
+    },
+    "exception": {
+      "type": "object",
+      "subtype": "error",
+      "className": "TypeError",
+      "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+      "objectId": "1957285337141289009.236.2"
+    }
+  }
+}
+Test 29: full-word + italic x1 ... ❌ FAIL
+  Result: {
+  "result": {
+    "type": "object",
+    "subtype": "error",
+    "className": "TypeError",
+    "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+    "objectId": "1957285337141289009.242.1"
+  },
+  "exceptionDetails": {
+    "exceptionId": 143,
+    "text": "Uncaught",
+    "lineNumber": 2,
+    "columnNumber": 77,
+    "scriptId": "263",
+    "stackTrace": {
+      "callFrames": [
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 2,
+          "columnNumber": 77
+        },
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 9,
+          "columnNumber": 18
+        }
+      ]
+    },
+    "exception": {
+      "type": "object",
+      "subtype": "error",
+      "className": "TypeError",
+      "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+      "objectId": "1957285337141289009.242.2"
+    }
+  }
+}
+Test 30: full-word + italic x2 ... ✅ PASS
+Test 31: full-word + italic x3 ... ❌ FAIL
+  Result: {
+  "result": {
+    "type": "object",
+    "subtype": "error",
+    "className": "TypeError",
+    "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+    "objectId": "1957285337141289009.255.1"
+  },
+  "exceptionDetails": {
+    "exceptionId": 149,
+    "text": "Uncaught",
+    "lineNumber": 2,
+    "columnNumber": 77,
+    "scriptId": "263",
+    "stackTrace": {
+      "callFrames": [
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 2,
+          "columnNumber": 77
+        },
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 9,
+          "columnNumber": 18
+        }
+      ]
+    },
+    "exception": {
+      "type": "object",
+      "subtype": "error",
+      "className": "TypeError",
+      "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+      "objectId": "1957285337141289009.255.2"
+    }
+  }
+}
+Test 32: full-word + italic x4 ... ✅ PASS
+Test 33: full-word + italic x5 ... ✅ PASS
+Test 34: full-word + italic x6 ... ✅ PASS
+Test 35: full-word + italic x7 ... ❌ FAIL
+  Result: {
+  "result": {
+    "type": "object",
+    "subtype": "error",
+    "className": "TypeError",
+    "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+    "objectId": "1957285337141289009.296.1"
+  },
+  "exceptionDetails": {
+    "exceptionId": 175,
+    "text": "Uncaught",
+    "lineNumber": 2,
+    "columnNumber": 77,
+    "scriptId": "263",
+    "stackTrace": {
+      "callFrames": [
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 2,
+          "columnNumber": 77
+        },
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 9,
+          "columnNumber": 18
+        }
+      ]
+    },
+    "exception": {
+      "type": "object",
+      "subtype": "error",
+      "className": "TypeError",
+      "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+      "objectId": "1957285337141289009.296.2"
+    }
+  }
+}
+Test 36: full-word + underline x1 ... ❌ FAIL
+  Result: {
+  "result": {
+    "type": "object",
+    "subtype": "error",
+    "className": "TypeError",
+    "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+    "objectId": "1957285337141289009.301.1"
+  },
+  "exceptionDetails": {
+    "exceptionId": 178,
+    "text": "Uncaught",
+    "lineNumber": 2,
+    "columnNumber": 77,
+    "scriptId": "263",
+    "stackTrace": {
+      "callFrames": [
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 2,
+          "columnNumber": 77
+        },
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 9,
+          "columnNumber": 18
+        }
+      ]
+    },
+    "exception": {
+      "type": "object",
+      "subtype": "error",
+      "className": "TypeError",
+      "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+      "objectId": "1957285337141289009.301.2"
+    }
+  }
+}
+Test 37: full-word + underline x2 ... ❌ FAIL
+  Result: {
+  "result": {
+    "type": "object",
+    "subtype": "error",
+    "className": "TypeError",
+    "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+    "objectId": "1957285337141289009.308.1"
+  },
+  "exceptionDetails": {
+    "exceptionId": 182,
+    "text": "Uncaught",
+    "lineNumber": 2,
+    "columnNumber": 77,
+    "scriptId": "263",
+    "stackTrace": {
+      "callFrames": [
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 2,
+          "columnNumber": 77
+        },
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 9,
+          "columnNumber": 18
+        }
+      ]
+    },
+    "exception": {
+      "type": "object",
+      "subtype": "error",
+      "className": "TypeError",
+      "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+      "objectId": "1957285337141289009.308.2"
+    }
+  }
+}
+Test 38: full-word + underline x3 ... ❌ FAIL
+  Result: {
+  "result": {
+    "type": "object",
+    "subtype": "error",
+    "className": "TypeError",
+    "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+    "objectId": "1957285337141289009.315.1"
+  },
+  "exceptionDetails": {
+    "exceptionId": 186,
+    "text": "Uncaught",
+    "lineNumber": 2,
+    "columnNumber": 77,
+    "scriptId": "263",
+    "stackTrace": {
+      "callFrames": [
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 2,
+          "columnNumber": 77
+        },
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 9,
+          "columnNumber": 18
+        }
+      ]
+    },
+    "exception": {
+      "type": "object",
+      "subtype": "error",
+      "className": "TypeError",
+      "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+      "objectId": "1957285337141289009.315.2"
+    }
+  }
+}
+Test 39: full-word + underline x4 ... ❌ FAIL
+  Result: {
+  "result": {
+    "type": "object",
+    "subtype": "error",
+    "className": "TypeError",
+    "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+    "objectId": "1957285337141289009.323.1"
+  },
+  "exceptionDetails": {
+    "exceptionId": 192,
+    "text": "Uncaught",
+    "lineNumber": 2,
+    "columnNumber": 77,
+    "scriptId": "263",
+    "stackTrace": {
+      "callFrames": [
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 2,
+          "columnNumber": 77
+        },
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 9,
+          "columnNumber": 18
+        }
+      ]
+    },
+    "exception": {
+      "type": "object",
+      "subtype": "error",
+      "className": "TypeError",
+      "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+      "objectId": "1957285337141289009.323.2"
+    }
+  }
+}
+Test 40: full-word + underline x5 ... ✅ PASS
+Test 41: full-word + underline x6 ... ❌ FAIL
+  Result: {
+  "result": {
+    "type": "object",
+    "subtype": "error",
+    "className": "TypeError",
+    "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+    "objectId": "1957285337141289009.345.1"
+  },
+  "exceptionDetails": {
+    "exceptionId": 206,
+    "text": "Uncaught",
+    "lineNumber": 2,
+    "columnNumber": 77,
+    "scriptId": "263",
+    "stackTrace": {
+      "callFrames": [
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 2,
+          "columnNumber": 77
+        },
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 9,
+          "columnNumber": 18
+        }
+      ]
+    },
+    "exception": {
+      "type": "object",
+      "subtype": "error",
+      "className": "TypeError",
+      "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+      "objectId": "1957285337141289009.345.2"
+    }
+  }
+}
+Test 42: full-word + underline x7 ... ✅ PASS
+Test 43: cross-paragraph + bold x1 ... ✅ PASS
+Test 44: cross-paragraph + bold x2 ... ❌ FAIL
+  Result: {
+  "result": {
+    "type": "object",
+    "subtype": "error",
+    "className": "TypeError",
+    "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+    "objectId": "1957285337141289009.367.1"
+  },
+  "exceptionDetails": {
+    "exceptionId": 220,
+    "text": "Uncaught",
+    "lineNumber": 2,
+    "columnNumber": 77,
+    "scriptId": "263",
+    "stackTrace": {
+      "callFrames": [
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 2,
+          "columnNumber": 77
+        },
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 9,
+          "columnNumber": 18
+        }
+      ]
+    },
+    "exception": {
+      "type": "object",
+      "subtype": "error",
+      "className": "TypeError",
+      "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+      "objectId": "1957285337141289009.367.2"
+    }
+  }
+}
+Test 45: cross-paragraph + bold x3 ... ❌ FAIL
+  Result: {
+  "result": {
+    "type": "object",
+    "subtype": "error",
+    "className": "TypeError",
+    "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+    "objectId": "1957285337141289009.374.1"
+  },
+  "exceptionDetails": {
+    "exceptionId": 224,
+    "text": "Uncaught",
+    "lineNumber": 2,
+    "columnNumber": 77,
+    "scriptId": "263",
+    "stackTrace": {
+      "callFrames": [
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 2,
+          "columnNumber": 77
+        },
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 9,
+          "columnNumber": 18
+        }
+      ]
+    },
+    "exception": {
+      "type": "object",
+      "subtype": "error",
+      "className": "TypeError",
+      "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+      "objectId": "1957285337141289009.374.2"
+    }
+  }
+}
+Test 46: cross-paragraph + bold x4 ... ✅ PASS
+Test 47: cross-paragraph + bold x5 ... ❌ FAIL
+  Result: {
+  "result": {
+    "type": "object",
+    "subtype": "error",
+    "className": "TypeError",
+    "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+    "objectId": "1957285337141289009.393.1"
+  },
+  "exceptionDetails": {
+    "exceptionId": 235,
+    "text": "Uncaught",
+    "lineNumber": 2,
+    "columnNumber": 77,
+    "scriptId": "263",
+    "stackTrace": {
+      "callFrames": [
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 2,
+          "columnNumber": 77
+        },
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 9,
+          "columnNumber": 18
+        }
+      ]
+    },
+    "exception": {
+      "type": "object",
+      "subtype": "error",
+      "className": "TypeError",
+      "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+      "objectId": "1957285337141289009.393.2"
+    }
+  }
+}
+Test 48: cross-paragraph + bold x6 ... ❌ FAIL
+  Result: {
+  "result": {
+    "type": "object",
+    "subtype": "error",
+    "className": "TypeError",
+    "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+    "objectId": "1957285337141289009.403.1"
+  },
+  "exceptionDetails": {
+    "exceptionId": 242,
+    "text": "Uncaught",
+    "lineNumber": 2,
+    "columnNumber": 77,
+    "scriptId": "263",
+    "stackTrace": {
+      "callFrames": [
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 2,
+          "columnNumber": 77
+        },
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 9,
+          "columnNumber": 18
+        }
+      ]
+    },
+    "exception": {
+      "type": "object",
+      "subtype": "error",
+      "className": "TypeError",
+      "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+      "objectId": "1957285337141289009.403.2"
+    }
+  }
+}
+Test 49: cross-paragraph + bold x7 ... ❌ FAIL
+  Result: {
+  "result": {
+    "type": "object",
+    "subtype": "error",
+    "className": "TypeError",
+    "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+    "objectId": "1957285337141289009.414.1"
+  },
+  "exceptionDetails": {
+    "exceptionId": 252,
+    "text": "Uncaught",
+    "lineNumber": 2,
+    "columnNumber": 77,
+    "scriptId": "263",
+    "stackTrace": {
+      "callFrames": [
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 2,
+          "columnNumber": 77
+        },
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 9,
+          "columnNumber": 18
+        }
+      ]
+    },
+    "exception": {
+      "type": "object",
+      "subtype": "error",
+      "className": "TypeError",
+      "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+      "objectId": "1957285337141289009.414.2"
+    }
+  }
+}
+Test 50: cross-paragraph + italic x1 ... ✅ PASS
+Test 51: cross-paragraph + italic x2 ... ❌ FAIL
+  Result: {
+  "result": {
+    "type": "object",
+    "subtype": "error",
+    "className": "TypeError",
+    "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+    "objectId": "1957285337141289009.425.1"
+  },
+  "exceptionDetails": {
+    "exceptionId": 257,
+    "text": "Uncaught",
+    "lineNumber": 2,
+    "columnNumber": 77,
+    "scriptId": "263",
+    "stackTrace": {
+      "callFrames": [
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 2,
+          "columnNumber": 77
+        },
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 9,
+          "columnNumber": 18
+        }
+      ]
+    },
+    "exception": {
+      "type": "object",
+      "subtype": "error",
+      "className": "TypeError",
+      "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+      "objectId": "1957285337141289009.425.2"
+    }
+  }
+}
+Test 52: cross-paragraph + italic x3 ... ✅ PASS
+Test 53: cross-paragraph + italic x4 ... ✅ PASS
+Test 54: cross-paragraph + italic x5 ... ✅ PASS
+Test 55: cross-paragraph + italic x6 ... ✅ PASS
+Test 56: cross-paragraph + italic x7 ... ✅ PASS
+Test 57: cross-paragraph + underline x1 ... ❌ FAIL
+  Result: {
+  "result": {
+    "type": "object",
+    "subtype": "error",
+    "className": "TypeError",
+    "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+    "objectId": "1957285337141289009.478.1"
+  },
+  "exceptionDetails": {
+    "exceptionId": 284,
+    "text": "Uncaught",
+    "lineNumber": 2,
+    "columnNumber": 77,
+    "scriptId": "263",
+    "stackTrace": {
+      "callFrames": [
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 2,
+          "columnNumber": 77
+        },
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 9,
+          "columnNumber": 18
+        }
+      ]
+    },
+    "exception": {
+      "type": "object",
+      "subtype": "error",
+      "className": "TypeError",
+      "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+      "objectId": "1957285337141289009.478.2"
+    }
+  }
+}
+Test 58: cross-paragraph + underline x2 ... ✅ PASS
+Test 59: cross-paragraph + underline x3 ... ✅ PASS
+Test 60: cross-paragraph + underline x4 ... ❌ FAIL
+  Result: {
+  "result": {
+    "type": "object",
+    "subtype": "error",
+    "className": "TypeError",
+    "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+    "objectId": "1957285337141289009.499.1"
+  },
+  "exceptionDetails": {
+    "exceptionId": 296,
+    "text": "Uncaught",
+    "lineNumber": 2,
+    "columnNumber": 77,
+    "scriptId": "263",
+    "stackTrace": {
+      "callFrames": [
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 2,
+          "columnNumber": 77
+        },
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 9,
+          "columnNumber": 18
+        }
+      ]
+    },
+    "exception": {
+      "type": "object",
+      "subtype": "error",
+      "className": "TypeError",
+      "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+      "objectId": "1957285337141289009.499.2"
+    }
+  }
+}
+Test 61: cross-paragraph + underline x5 ... ✅ PASS
+Test 62: cross-paragraph + underline x6 ... ❌ FAIL
+  Result: {
+  "result": {
+    "type": "object",
+    "subtype": "error",
+    "className": "TypeError",
+    "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+    "objectId": "1957285337141289009.518.1"
+  },
+  "exceptionDetails": {
+    "exceptionId": 310,
+    "text": "Uncaught",
+    "lineNumber": 2,
+    "columnNumber": 77,
+    "scriptId": "263",
+    "stackTrace": {
+      "callFrames": [
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 2,
+          "columnNumber": 77
+        },
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 9,
+          "columnNumber": 18
+        }
+      ]
+    },
+    "exception": {
+      "type": "object",
+      "subtype": "error",
+      "className": "TypeError",
+      "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+      "objectId": "1957285337141289009.518.2"
+    }
+  }
+}
+Test 63: cross-paragraph + underline x7 ... ❌ FAIL
+  Result: {
+  "result": {
+    "type": "object",
+    "subtype": "error",
+    "className": "TypeError",
+    "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+    "objectId": "1957285337141289009.530.1"
+  },
+  "exceptionDetails": {
+    "exceptionId": 318,
+    "text": "Uncaught",
+    "lineNumber": 2,
+    "columnNumber": 77,
+    "scriptId": "263",
+    "stackTrace": {
+      "callFrames": [
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 2,
+          "columnNumber": 77
+        },
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 9,
+          "columnNumber": 18
+        }
+      ]
+    },
+    "exception": {
+      "type": "object",
+      "subtype": "error",
+      "className": "TypeError",
+      "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+      "objectId": "1957285337141289009.530.2"
+    }
+  }
+}
+Test 64: caret + bold x1 ... ❌ FAIL
+  Result: {
+  "result": {
+    "type": "object",
+    "subtype": "error",
+    "className": "TypeError",
+    "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+    "objectId": "1957285337141289009.535.1"
+  },
+  "exceptionDetails": {
+    "exceptionId": 321,
+    "text": "Uncaught",
+    "lineNumber": 2,
+    "columnNumber": 77,
+    "scriptId": "263",
+    "stackTrace": {
+      "callFrames": [
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 2,
+          "columnNumber": 77
+        },
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 9,
+          "columnNumber": 18
+        }
+      ]
+    },
+    "exception": {
+      "type": "object",
+      "subtype": "error",
+      "className": "TypeError",
+      "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+      "objectId": "1957285337141289009.535.2"
+    }
+  }
+}
+Test 65: caret + bold x2 ... ❌ FAIL
+  Result: {
+  "result": {
+    "type": "object",
+    "subtype": "error",
+    "className": "TypeError",
+    "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+    "objectId": "1957285337141289009.541.1"
+  },
+  "exceptionDetails": {
+    "exceptionId": 325,
+    "text": "Uncaught",
+    "lineNumber": 2,
+    "columnNumber": 77,
+    "scriptId": "263",
+    "stackTrace": {
+      "callFrames": [
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 2,
+          "columnNumber": 77
+        },
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 9,
+          "columnNumber": 18
+        }
+      ]
+    },
+    "exception": {
+      "type": "object",
+      "subtype": "error",
+      "className": "TypeError",
+      "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+      "objectId": "1957285337141289009.541.2"
+    }
+  }
+}
+Test 66: caret + bold x3 ... ❌ FAIL
+  Result: {
+  "result": {
+    "type": "object",
+    "subtype": "error",
+    "className": "TypeError",
+    "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+    "objectId": "1957285337141289009.548.1"
+  },
+  "exceptionDetails": {
+    "exceptionId": 330,
+    "text": "Uncaught",
+    "lineNumber": 2,
+    "columnNumber": 77,
+    "scriptId": "263",
+    "stackTrace": {
+      "callFrames": [
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 2,
+          "columnNumber": 77
+        },
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 9,
+          "columnNumber": 18
+        }
+      ]
+    },
+    "exception": {
+      "type": "object",
+      "subtype": "error",
+      "className": "TypeError",
+      "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+      "objectId": "1957285337141289009.548.2"
+    }
+  }
+}
+Test 67: caret + bold x4 ... ❌ FAIL
+  Result: {
+  "result": {
+    "type": "object",
+    "subtype": "error",
+    "className": "TypeError",
+    "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+    "objectId": "1957285337141289009.557.1"
+  },
+  "exceptionDetails": {
+    "exceptionId": 336,
+    "text": "Uncaught",
+    "lineNumber": 2,
+    "columnNumber": 77,
+    "scriptId": "263",
+    "stackTrace": {
+      "callFrames": [
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 2,
+          "columnNumber": 77
+        },
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 9,
+          "columnNumber": 18
+        }
+      ]
+    },
+    "exception": {
+      "type": "object",
+      "subtype": "error",
+      "className": "TypeError",
+      "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+      "objectId": "1957285337141289009.557.2"
+    }
+  }
+}
+Test 68: caret + bold x5 ... ❌ FAIL
+  Result: {
+  "result": {
+    "type": "object",
+    "subtype": "error",
+    "className": "TypeError",
+    "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+    "objectId": "1957285337141289009.567.1"
+  },
+  "exceptionDetails": {
+    "exceptionId": 343,
+    "text": "Uncaught",
+    "lineNumber": 2,
+    "columnNumber": 77,
+    "scriptId": "263",
+    "stackTrace": {
+      "callFrames": [
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 2,
+          "columnNumber": 77
+        },
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 9,
+          "columnNumber": 18
+        }
+      ]
+    },
+    "exception": {
+      "type": "object",
+      "subtype": "error",
+      "className": "TypeError",
+      "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+      "objectId": "1957285337141289009.567.2"
+    }
+  }
+}
+Test 69: caret + bold x6 ... ❌ FAIL
+  Result: {
+  "result": {
+    "type": "object",
+    "subtype": "error",
+    "className": "TypeError",
+    "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+    "objectId": "1957285337141289009.577.1"
+  },
+  "exceptionDetails": {
+    "exceptionId": 352,
+    "text": "Uncaught",
+    "lineNumber": 2,
+    "columnNumber": 77,
+    "scriptId": "263",
+    "stackTrace": {
+      "callFrames": [
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 2,
+          "columnNumber": 77
+        },
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 9,
+          "columnNumber": 18
+        }
+      ]
+    },
+    "exception": {
+      "type": "object",
+      "subtype": "error",
+      "className": "TypeError",
+      "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+      "objectId": "1957285337141289009.577.2"
+    }
+  }
+}
+Test 70: caret + bold x7 ... ❌ FAIL
+  Result: {
+  "result": {
+    "type": "object",
+    "subtype": "error",
+    "className": "TypeError",
+    "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+    "objectId": "1957285337141289009.588.1"
+  },
+  "exceptionDetails": {
+    "exceptionId": 360,
+    "text": "Uncaught",
+    "lineNumber": 2,
+    "columnNumber": 77,
+    "scriptId": "263",
+    "stackTrace": {
+      "callFrames": [
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 2,
+          "columnNumber": 77
+        },
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 9,
+          "columnNumber": 18
+        }
+      ]
+    },
+    "exception": {
+      "type": "object",
+      "subtype": "error",
+      "className": "TypeError",
+      "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+      "objectId": "1957285337141289009.588.2"
+    }
+  }
+}
+Test 71: caret + italic x1 ... ✅ PASS
+Test 72: caret + italic x2 ... ❌ FAIL
+  Result: {
+  "result": {
+    "type": "object",
+    "subtype": "error",
+    "className": "TypeError",
+    "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+    "objectId": "1957285337141289009.600.1"
+  },
+  "exceptionDetails": {
+    "exceptionId": 366,
+    "text": "Uncaught",
+    "lineNumber": 2,
+    "columnNumber": 77,
+    "scriptId": "263",
+    "stackTrace": {
+      "callFrames": [
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 2,
+          "columnNumber": 77
+        },
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 9,
+          "columnNumber": 18
+        }
+      ]
+    },
+    "exception": {
+      "type": "object",
+      "subtype": "error",
+      "className": "TypeError",
+      "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+      "objectId": "1957285337141289009.600.2"
+    }
+  }
+}
+Test 73: caret + italic x3 ... ✅ PASS
+Test 74: caret + italic x4 ... ❌ FAIL
+  Result: {
+  "result": {
+    "type": "object",
+    "subtype": "error",
+    "className": "TypeError",
+    "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+    "objectId": "1957285337141289009.617.1"
+  },
+  "exceptionDetails": {
+    "exceptionId": 376,
+    "text": "Uncaught",
+    "lineNumber": 2,
+    "columnNumber": 77,
+    "scriptId": "263",
+    "stackTrace": {
+      "callFrames": [
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 2,
+          "columnNumber": 77
+        },
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 9,
+          "columnNumber": 18
+        }
+      ]
+    },
+    "exception": {
+      "type": "object",
+      "subtype": "error",
+      "className": "TypeError",
+      "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+      "objectId": "1957285337141289009.617.2"
+    }
+  }
+}
+Test 75: caret + italic x5 ... ❌ FAIL
+  Result: {
+  "result": {
+    "type": "object",
+    "subtype": "error",
+    "className": "TypeError",
+    "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+    "objectId": "1957285337141289009.626.1"
+  },
+  "exceptionDetails": {
+    "exceptionId": 383,
+    "text": "Uncaught",
+    "lineNumber": 2,
+    "columnNumber": 77,
+    "scriptId": "263",
+    "stackTrace": {
+      "callFrames": [
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 2,
+          "columnNumber": 77
+        },
+        {
+          "functionName": "",
+          "scriptId": "263",
+          "url": "",
+          "lineNumber": 9,
+          "columnNumber": 18
+        }
+      ]
+    },
+    "exception": {
+      "type": "object",
+      "subtype": "error",
+      "className": "TypeError",
+      "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+      "objectId": "1957285337141289009.626.2"
+    }
+  }
+}
+Test 76: caret + italic x6 ... ❌ FAIL
+  Result: {
+  "result": {
+    "type": "object",
+    "subtype": "error",
+    "className": "TypeError",
+    "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+    "objectId": "1957285337141289009.637.1"
+  },
+  "exceptionDetails": {
+    "exceptionId": 391,
+    "text": "Uncaught",
+    "lineNumber": 2,
+    "columnNumber": 77,
+    "scriptId": "29635",
+    "stackTrace": {
+      "callFrames": [
+        {
+          "functionName": "",
+          "scriptId": "29635",
+          "url": "",
+          "lineNumber": 2,
+          "columnNumber": 77
+        },
+        {
+          "functionName": "",
+          "scriptId": "29635",
+          "url": "",
+          "lineNumber": 9,
+          "columnNumber": 18
+        }
+      ]
+    },
+    "exception": {
+      "type": "object",
+      "subtype": "error",
+      "className": "TypeError",
+      "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+      "objectId": "1957285337141289009.637.2"
+    }
+  }
+}
+Test 77: caret + italic x7 ... ✅ PASS
+Test 78: caret + underline x1 ... ❌ FAIL
+  Result: {
+  "result": {
+    "type": "object",
+    "subtype": "error",
+    "className": "TypeError",
+    "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+    "objectId": "1957285337141289009.655.1"
+  },
+  "exceptionDetails": {
+    "exceptionId": 402,
+    "text": "Uncaught",
+    "lineNumber": 2,
+    "columnNumber": 77,
+    "scriptId": "30520",
+    "stackTrace": {
+      "callFrames": [
+        {
+          "functionName": "",
+          "scriptId": "30520",
+          "url": "",
+          "lineNumber": 2,
+          "columnNumber": 77
+        },
+        {
+          "functionName": "",
+          "scriptId": "30520",
+          "url": "",
+          "lineNumber": 9,
+          "columnNumber": 18
+        }
+      ]
+    },
+    "exception": {
+      "type": "object",
+      "subtype": "error",
+      "className": "TypeError",
+      "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+      "objectId": "1957285337141289009.655.2"
+    }
+  }
+}
+Test 79: caret + underline x2 ... ❌ FAIL
+  Result: {
+  "result": {
+    "type": "object",
+    "subtype": "error",
+    "className": "TypeError",
+    "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+    "objectId": "1957285337141289009.661.1"
+  },
+  "exceptionDetails": {
+    "exceptionId": 406,
+    "text": "Uncaught",
+    "lineNumber": 2,
+    "columnNumber": 77,
+    "scriptId": "30520",
+    "stackTrace": {
+      "callFrames": [
+        {
+          "functionName": "",
+          "scriptId": "30520",
+          "url": "",
+          "lineNumber": 2,
+          "columnNumber": 77
+        },
+        {
+          "functionName": "",
+          "scriptId": "30520",
+          "url": "",
+          "lineNumber": 9,
+          "columnNumber": 18
+        }
+      ]
+    },
+    "exception": {
+      "type": "object",
+      "subtype": "error",
+      "className": "TypeError",
+      "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+      "objectId": "1957285337141289009.661.2"
+    }
+  }
+}
+Test 80: caret + underline x3 ... ❌ FAIL
+  Result: {
+  "result": {
+    "type": "object",
+    "subtype": "error",
+    "className": "TypeError",
+    "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+    "objectId": "1957285337141289009.668.1"
+  },
+  "exceptionDetails": {
+    "exceptionId": 410,
+    "text": "Uncaught",
+    "lineNumber": 2,
+    "columnNumber": 77,
+    "scriptId": "31886",
+    "stackTrace": {
+      "callFrames": [
+        {
+          "functionName": "",
+          "scriptId": "31886",
+          "url": "",
+          "lineNumber": 2,
+          "columnNumber": 77
+        },
+        {
+          "functionName": "",
+          "scriptId": "31886",
+          "url": "",
+          "lineNumber": 9,
+          "columnNumber": 18
+        }
+      ]
+    },
+    "exception": {
+      "type": "object",
+      "subtype": "error",
+      "className": "TypeError",
+      "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+      "objectId": "1957285337141289009.668.2"
+    }
+  }
+}
+Test 81: caret + underline x4 ... ❌ FAIL
+  Result: {
+  "result": {
+    "type": "object",
+    "subtype": "error",
+    "className": "TypeError",
+    "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+    "objectId": "1957285337141289009.677.1"
+  },
+  "exceptionDetails": {
+    "exceptionId": 417,
+    "text": "Uncaught",
+    "lineNumber": 2,
+    "columnNumber": 77,
+    "scriptId": "32500",
+    "stackTrace": {
+      "callFrames": [
+        {
+          "functionName": "",
+          "scriptId": "32500",
+          "url": "",
+          "lineNumber": 2,
+          "columnNumber": 77
+        },
+        {
+          "functionName": "",
+          "scriptId": "32500",
+          "url": "",
+          "lineNumber": 9,
+          "columnNumber": 18
+        }
+      ]
+    },
+    "exception": {
+      "type": "object",
+      "subtype": "error",
+      "className": "TypeError",
+      "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+      "objectId": "1957285337141289009.677.2"
+    }
+  }
+}
+Test 82: caret + underline x5 ... ❌ FAIL
+  Result: {
+  "result": {
+    "type": "object",
+    "subtype": "error",
+    "className": "TypeError",
+    "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+    "objectId": "1957285337141289009.687.1"
+  },
+  "exceptionDetails": {
+    "exceptionId": 424,
+    "text": "Uncaught",
+    "lineNumber": 2,
+    "columnNumber": 77,
+    "scriptId": "33301",
+    "stackTrace": {
+      "callFrames": [
+        {
+          "functionName": "",
+          "scriptId": "33301",
+          "url": "",
+          "lineNumber": 2,
+          "columnNumber": 77
+        },
+        {
+          "functionName": "",
+          "scriptId": "33301",
+          "url": "",
+          "lineNumber": 9,
+          "columnNumber": 18
+        }
+      ]
+    },
+    "exception": {
+      "type": "object",
+      "subtype": "error",
+      "className": "TypeError",
+      "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+      "objectId": "1957285337141289009.687.2"
+    }
+  }
+}
+Test 83: caret + underline x6 ... ❌ FAIL
+  Result: {
+  "result": {
+    "type": "object",
+    "subtype": "error",
+    "className": "TypeError",
+    "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+    "objectId": "1957285337141289009.698.1"
+  },
+  "exceptionDetails": {
+    "exceptionId": 432,
+    "text": "Uncaught",
+    "lineNumber": 2,
+    "columnNumber": 77,
+    "scriptId": "34097",
+    "stackTrace": {
+      "callFrames": [
+        {
+          "functionName": "",
+          "scriptId": "34097",
+          "url": "",
+          "lineNumber": 2,
+          "columnNumber": 77
+        },
+        {
+          "functionName": "",
+          "scriptId": "34097",
+          "url": "",
+          "lineNumber": 9,
+          "columnNumber": 18
+        }
+      ]
+    },
+    "exception": {
+      "type": "object",
+      "subtype": "error",
+      "className": "TypeError",
+      "description": "TypeError: Cannot read properties of null (reading 'querySelectorAll')\n    at <anonymous>:3:78\n    at <anonymous>:10:19",
+      "objectId": "1957285337141289009.698.2"
+    }
+  }
+}
+Test 84: caret + underline x7 ... ✅ PASS
+
+========================================
+TEST SUMMARY
+========================================
+Total: 84
+Passed: 35
+Failed: 49
+

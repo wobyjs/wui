@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Non-Module Test</title>
+</head>
+<body>
+    <h1>Non-Module Test</h1>
+    <div id="status">Initial status</div>
+
+    <script>
+        // Non-module script - should always execute
+        window.__nonModuleTest = 'NON_MODULE_EXECUTED';
+        document.getElementById('status').textContent = 'Non-module script ran!';
+        console.log('NON MODULE TEST LOG');
+    </script>
+</body>
+</html>

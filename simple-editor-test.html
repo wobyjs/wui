@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Simple Editor Test</title>
+</head>
+<body>
+    <h1>Simple Editor Test</h1>
+    <wui-editor id="editor">
+        <p>Test content</p>
+    </wui-editor>
+    <div id="status">Loading...</div>
+
+    <script type="module">
+        import './src/Editor/Editor.tsx';
+
+        // Check after import
+        setTimeout(() => {
+            const status = document.getElementById('status');
+            const ce = customElements.get('wui-editor');
+            const el = document.querySelector('wui-editor');
+            status.textContent = ce ? 'Editor loaded!' : 'Editor NOT loaded';
+            status.style.color = ce ? 'green' : 'red';
+
+            if (ce && el) {
+                const shadow = el.shadowRoot;
+                const root = shadow?.querySelector('[data-editor-root]');
+                console.log('Shadow:', shadow);
+                console.log('Root:', root);
+                console.log('Content:', root?.innerHTML);
+            }
+        }, 2000);
+    </script>
+</body>
+</html>

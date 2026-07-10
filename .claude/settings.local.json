@@ -262,7 +262,8 @@
       "Bash(node dist/cli.js profiles)",
       "Bash(node dist/cli.js stop --help)",
       "Bash(grep \"Local\" \"C:\\\\\\\\Users\\\\\\\\wongc\\\\\\\\AppData\\\\\\\\Local\\\\\\\\Temp\\\\\\\\claude\\\\\\\\D--Developments-tslib--woby-wui\\\\\\\\eea1bced-dd69-4cdb-a719-8a6c23df2677\\\\\\\\tasks\\\\\\\\bfybt1o5y.output\")",
-      "Bash(node dist/cli.js navigate --profile profile-3 --url http://localhost:5176/editor-demo.html)"
+      "Bash(node dist/cli.js navigate --profile profile-3 --url http://localhost:5176/editor-demo.html)",
+      "Bash(git commit -m 'feat: Editor image alignment/indent/list support + table popup fixes *)"
     ]
   },
   "enabledMcpjsonServers": [

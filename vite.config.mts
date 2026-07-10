@@ -5,7 +5,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import { snapshotPlugin } from 'vite-plugin-snapshot'
-import { testPlugin } from '../vite-plugin-test/src/index.ts'
+import { testPlugin } from '@woby/vite-plugin-test'
 
 // Plugin to rewrite @woby/use imports to @woby/use/ssr for SSR builds
 // NOTE: This plugin is disabled because @woby/use/ssr does not export browser-only hooks
@@ -75,7 +75,7 @@ const config = defineConfig({
             '@woby/chk': process.argv.includes('dev') || process.argv.includes('--dev') || (process.argv.includes('--mode') && process.argv.includes('dev')) ? path.resolve(__dirname, '../chk/src') : '@woby/chk',
             'vite-plugin-snapshot': isDevMode ? path.resolve(__dirname, '../../vite-plugin-snapshot/index.js') : 'vite-plugin-snapshot',
             '@woby/chk/index.css': path.resolve(__dirname, '../chk/src/index.css'),
-            '@woby/vite-plugin-test': path.resolve('../../vite-plugin-test/src/index.ts'),
+            // '@woby/vite-plugin-test': path.resolve('../../vite-plugin-test/src/index.ts'),
         }
     }
 })

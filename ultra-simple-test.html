@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Ultra Simple Test</title>
+</head>
+<body>
+    <h1>Ultra Simple Test</h1>
+    <div id="status">Initial status</div>
+
+    <script type="module">
+        // Super simple test - just set a global
+        window.__ultraSimpleTest = 'SCRIPT_EXECUTED';
+        document.getElementById('status').textContent = 'Script ran!';
+        console.log('ULTRA SIMPLE TEST LOG');
+    </script>
+</body>
+</html>
