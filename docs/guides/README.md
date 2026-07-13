@@ -15,6 +15,7 @@ This section contains guides and tutorials for using @woby/wui effectively.
 
 ## Advanced Topics
 
+- [Editor Plugin System](./editor-plugins.md) - How to register custom element insertion plugins for the wui-editor
 - [Creating Custom Components](./custom-components.md) - Building your own components that work with @woby/wui
 - [Performance Optimization](./performance.md) - Tips for optimizing performance
 - [Theming](./theming.md) - How to implement custom themes
