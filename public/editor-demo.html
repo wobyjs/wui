@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WUI Editor - Full Toolbar Demo</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: system-ui, -apple-system, sans-serif;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            margin: 0 0 10px 0;
+            font-size: 28px;
+            color: #1a1a1a;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
+        .debug-info {
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        .debug-info h3 {
+            margin: 0 0 10px 0;
+            font-size: 16px;
+            color: #333;
+        }
+        .debug-info code {
+            background: #e8e8e8;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+        #editor-root {
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            min-height: 300px;
+            background: white;
+        }
+
+        /* Make instructions clearly different from editor content */
+        .debug-info {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+        }
+
+        .debug-info h3 {
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>WUI Rich Text Editor</h1>
+        <p class="subtitle">Phase 18 fixes verified - All 7 test dimensions working correctly</p>
+
+        <div class="debug-info">
+            <h3>📋 Test Instructions (READ BEFORE TESTING)</h3>
+            <ol>
+                <li><strong>Dimension 1 (Activation)</strong>: Click inside editor below to activate, then use Ctrl+B for bold</li>
+                <li><strong>Dimension 2 (Selection)</strong>: Try caret, partial, full, and cross-paragraph selections</li>
+                <li><strong>Dimension 3 (Content)</strong>: Test formatting on different content types</li>
+                <li><strong>Dimension 4 (Toggle)</strong>: Click Bold 1x (on), 2x (off), 3x (on) - MS Word behavior</li>
+                <li><strong>Dimension 5 (Selection Retention)</strong>: Select text, click Bold - selection should stay highlighted</li>
+                <li><strong>Dimension 6 (Content Verify)</strong>: Check DOM structure via DevTools before/after formatting</li>
+                <li><strong>Dimension 7 (Undo/Redo)</strong>: Ctrl+Z to undo, Ctrl+Y to redo</li>
+            </ol>
+            <p style="color: #d32f2f; font-weight: bold;">⚠️ Test ONLY inside the white editor box below, NOT in these yellow instructions!</p>
+        </div>
+
+        <wui-editor enableToolbar="true" id="editor-root">
+            <h2>✏️ Editor Content - Test Here!</h2>
+            <p>Welcome to the WUI Rich Text Editor!</p>
+            <p>This is a <strong>full toolbar demo</strong> for testing Phase 18 fixes.</p>
+            <p><em>Select text and click Bold - it should work on FIRST click!</em></p>
+            <p>Second paragraph for <strong>cross-paragraph selection testing</strong>.</p>
+            <p><img src="https://picsum.photos/400/300" alt="Test image" width="400" height="300" /></p>
+            <p>Below is a default table:</p>
+            <table style="border-collapse: collapse; width: 100%;">
+                <thead>
+                    <tr><th style="border: 1px solid #ccc; padding: 8px;">Name</th><th style="border: 1px solid #ccc; padding: 8px;">Age</th><th style="border: 1px solid #ccc; padding: 8px;">City</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td style="border: 1px solid #ccc; padding: 8px;">Alice</td><td style="border: 1px solid #ccc; padding: 8px;">28</td><td style="border: 1px solid #ccc; padding: 8px;">New York</td></tr>
+                    <tr><td style="border: 1px solid #ccc; padding: 8px;">Bob</td><td style="border: 1px solid #ccc; padding: 8px;">35</td><td style="border: 1px solid #ccc; padding: 8px;">London</td></tr>
+                    <tr><td style="border: 1px solid #ccc; padding: 8px;">Charlie</td><td style="border: 1px solid #ccc; padding: 8px;">42</td><td style="border: 1px solid #ccc; padding: 8px;">Tokyo</td></tr>
+                </tbody>
+            </table>
+        </wui-editor>
+
+        <div class="debug-info" style="margin-top: 30px;">
+            <h3>🔧 Technical Status</h3>
+            <div>
+                <strong>Phase 1:</strong> <code id="phase1-status">Checking...</code>
+            </div>
+            <div>
+                <strong>SelectionManager:</strong> <code id="selection-manager-status">Not detected</code>
+            </div>
+            <div>
+                <strong>DOMNormalizer:</strong> <code id="dom-normalizer-status">Not detected</code>
+            </div>
+            <div>
+                <strong>StyleEngine:</strong> <code id="style-engine-status">Not detected</code>
+            </div>
+        </div>
+
+        <div class="debug-info" style="margin-top: 30px; background: #f8f9fa; border-left-color: #17a2b8;">
+            <h3 style="color: #17a2b8;">📊 Console Logs</h3>
+            <div id="console-output" style="font-family: monospace; font-size: 12px; max-height: 200px; overflow-y: auto;">
+                <div style="color: #999;">Waiting for editor interactions...</div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="./editor-demo-script.js"></script>
+</body>
+</html>

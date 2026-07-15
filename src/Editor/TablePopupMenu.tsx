@@ -434,7 +434,7 @@ const TablePopupMenu = () => {
         if (popupEl) popupEl.style.display = 'none'
     }
 
-    // One-time setup
+    // Set up event listeners with cleanup to prevent memory leaks
     useEffect(() => {
         if (mounted) return
         mounted = true
@@ -447,7 +447,7 @@ const TablePopupMenu = () => {
         if (!editorSurface) return
 
         // Track clicks on table cells
-        editorSurface.addEventListener('click', (e: MouseEvent) => {
+        const onClickSurface = (e: MouseEvent) => {
             const target = e.composedPath()[0] as HTMLElement
             const cell = target.closest?.('td, th') as HTMLTableCellElement | null
             if (cell) {
@@ -477,10 +477,10 @@ const TablePopupMenu = () => {
                     activeCell = null
                 }
             }
-        }, true)
+        }
 
         // Track keyboard navigation into cells
-        editorSurface.addEventListener('keyup', (e: KeyboardEvent) => {
+        const onKeyupSurface = (e: KeyboardEvent) => {
             if (e.key === 'Tab' || e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
                 const sel = root.getSelection()
                 if (!sel || !sel.focusNode) return
@@ -494,17 +494,28 @@ const TablePopupMenu = () => {
                 }
                 hidePopup()
             }
-        }, true)
+        }
 
         // Hide when clicking outside
-        document.addEventListener('click', (e: MouseEvent) => {
+        const onClickDocument = (e: MouseEvent) => {
             const target = e.composedPath()[0] as HTMLElement
             if (!target.closest('[data-table-popup]') && !target.closest('td, th')) {
                 clearCellSelection()
                 hidePopup()
                 activeCell = null
             }
-        })
+        }
+
+        editorSurface.addEventListener('click', onClickSurface, true)
+        editorSurface.addEventListener('keyup', onKeyupSurface, true)
+        document.addEventListener('click', onClickDocument)
+
+        // Cleanup: remove all event listeners on unmount
+        return () => {
+            editorSurface.removeEventListener('click', onClickSurface, true)
+            editorSurface.removeEventListener('keyup', onKeyupSurface, true)
+            document.removeEventListener('click', onClickDocument)
+        }
     })
 
     return (

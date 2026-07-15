@@ -270,7 +270,6 @@ const Zoomable = defaults(def, (props) => {
 
             // const w = +window.getComputedStyle($$(ref)).width.replace('px', '')
             // if ($$($$(translateX) * scaleRatioX) > w)
-            // console.log($$(translateX) * scaleRatioX, scaleRatioX, currentRect.width, w)
 
             // Save the current size, so it acts as the "Previous Size" for the NEXT resize event.
             previousRect = currentRect

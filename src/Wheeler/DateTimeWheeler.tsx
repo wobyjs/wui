@@ -1,5 +1,5 @@
 /* @jsxImportSource woby */
-import { $, $$, Observable, ObservableMaybe, useEffect, useMemo, untrack, Portal, type JSX, isObservable, defaults, customElement, ElementAttributes } from 'woby'
+import { $, $$, Observable, ObservableMaybe, useEffect, useMemo, untrack, Portal, type JSX, isObservable, defaults, customElement, ElementAttributes, useRenderEffect } from 'woby'
 import { use, useClickAway, useViewportSize } from '@woby/use'
 import { Wheeler, def as wheelerDef } from './Wheeler' // Adjust path
 import { Button } from '../Button'
@@ -75,7 +75,7 @@ const DateTimeWheeler = defaults(def, (props) => {
     const selectedSecond = $($$(modDate).getSeconds())
     // #endregion
 
-    const isVisible = $($$(visibleProp) ?? true)
+    const isVisible = $(true) // will be synced from visibleProp below
 
     // This handles the "top-down" data flow.
     useEffect(() => {
@@ -168,7 +168,6 @@ const DateTimeWheeler = defaults(def, (props) => {
         // --- >>> DAY CLAMPING LOGIC <<< ---
         const daysInCurrentMonth = getDaysInMonth(year, month)
         if (day > daysInCurrentMonth) {
-            // console.log(`Clamping day from ${day} to ${daysInCurrentMonth} for ${year}-${month + 1}`)
 
             selectedDay(daysInCurrentMonth) // Update the day observable
             return // <<< EXIT EARLY: Effect will re-run with the correct day
@@ -208,7 +207,6 @@ const DateTimeWheeler = defaults(def, (props) => {
         const currentPropValue = parseDate($$(modDate))
         // Check if controlledValue is an observable function before calling it
         if (typeof modDate === 'function' && (!currentPropValue || constrainedDate.getTime() !== currentPropValue.getTime())) {
-            // console.log("DateTimeWheeler updating main value:", constrainedDate.toISOString())
 
             modDate(constrainedDate) // Update the external observable
 
@@ -332,7 +330,12 @@ const DateTimeWheeler = defaults(def, (props) => {
     const renderHeaderBar = () => (
         <div class="flex items-center justify-between px-4 py-2 h-auto relative">
             <div class="w-[80px] flex justify-start">
-                <Button buttonType='contained' cls={['px-2']} onClick={hide} > Cancel </Button>
+                <button
+                    type="button"
+                    id="dtw-cancel-btn"
+                    class="px-2 inline-flex items-center justify-center relative box-border cursor-pointer select-none align-middle no-underline font-medium text-sm leading-[1.75] tracking-[0.02857em] uppercase rounded text-white bg-[#1976d2] rounded-[4px] border-0 outline-0 font-sans px-4 py-2 shadow-[0px_3px_1px_-2px_rgba(0,0,0,0.2),0px_2px_2px_0px_rgba(0,0,0,0.14),0px_1px_5px_0px_rgba(0,0,0,0.12)] hover:bg-[#1565c0]"
+                    ref={el => { if (el) el.onclick = (e) => { hide() } }}
+                > Cancel </button>
             </div>
             <div class="flex-1 text-center px-2">
                 <span class="inline-block break-words">
@@ -340,7 +343,12 @@ const DateTimeWheeler = defaults(def, (props) => {
                 </span>
             </div>
             <div class="w-[80px] flex justify-end">
-                <Button buttonType='contained' cls={['px-2']} onClick={handleOkClick}> OK </Button>
+                <button
+                    type="button"
+                    id="dtw-ok-btn"
+                    class="px-2 inline-flex items-center justify-center relative box-border cursor-pointer select-none align-middle no-underline font-medium text-sm leading-[1.75] tracking-[0.02857em] uppercase rounded text-white bg-[#1976d2] rounded-[4px] border-0 outline-0 font-sans px-4 py-2 shadow-[0px_3px_1px_-2px_rgba(0,0,0,0.2),0px_2px_2px_0px_rgba(0,0,0,0.14),0px_1px_5px_0px_rgba(0,0,0,0.12)] hover:bg-[#1565c0]"
+                    ref={el => { if (el) el.onclick = (e) => { handleOkClick() } }}
+                > OK </button>
             </div>
         </div>
     )
@@ -417,7 +425,7 @@ const DateTimeWheeler = defaults(def, (props) => {
                 'flex-col w-full bg-white shadow-lg z-10 h-fit'
             ]}
         >
-            {renderHeaderBar()}
+            {() => $$(bottomProp) ? renderHeaderBar() : null}
 
             <div class={[DATETIME_WHEELER_CLS]}>
                 {renderWheelers()}
@@ -441,50 +449,39 @@ const DateTimeWheeler = defaults(def, (props) => {
         }
     })
 
+    return () => {
+        const vis = $$(isVisible)
+        const bot = $$(bottomProp)
 
-    const renderAsPopup = () => {
-        return (
-            <Portal mount={document.body}>
-                {
-                    $$(mask) && (
+        if (!vis) {
+            return null
+        }
+
+        if (bot) {
+            return (
+                <Portal mount={document.body} when={isVisible}>
+                    {$$(mask) && (
                         <div
                             class={['fixed inset-0 bg-black/50 h-full w-full z-[10] opacity-50']}
                         />
                     )}
+                    <div
+                        ref={cont}
+                        class={[DATETIME_WHEELER_CLS, 'fixed inset-x-0 bottom-0 bg-white shadow-lg z-200 w-full']}
+                    >
+                        {component}
+                    </div>
+                </Portal>
+            )
+        }
 
-                <div
-                    ref={cont}
-                    class={[DATETIME_WHEELER_CLS, 'fixed inset-x-0 bottom-0 bg-white shadow-lg z-200 w-full']}
-                >
-                    {component}
-                </div>
-            </Portal>
-        )
-    }
-
-    const renderAsInline = () => {
-        return (
-            <div class={[$$(cls)].join(" ")} {...otherProps}>
+        const result = (
+            <div class={[DATETIME_WHEELER_CLS, $$(cls)].join(" ")} {...otherProps}>
                 {component}
             </div>
         )
+        return result
     }
-
-    return () => !$$(isVisible) ? null : $$(bottomProp) ? renderAsPopup() : renderAsInline()
-
-    // return () => !$$(isVisible) ? null :
-
-    //     $$(mask) ? <Portal mount={document.body}>
-    //         <div
-    //             class={['fixed inset-0 bg-black/50 h-full w-full z-[10] opacity-50']}
-    //         />
-    //         <div ref={cont} class={[DATETIME_WHEELER_CLS, 'fixed inset-x-0 bottom-0 bg-blue-600 shadow-lg z-200']}>
-    //             {component}
-    //         </div>
-    //     </Portal>
-    //         : <div class={[DATETIME_WHEELER_CLS]}>
-    //             {component}
-    //         </div>
 })
 
 export { DateTimeWheeler }

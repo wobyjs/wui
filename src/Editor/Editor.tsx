@@ -26,6 +26,9 @@ import { TextAlignDropDown } from './TextAlignDropDown'
 import { UndoRedoButton } from './UndoRedoButton'
 import { ImageResizer } from './ImageResizer' // Image resize handles + align/indent mini-toolbar
 import { TablePopupMenu } from './TablePopupMenu' // Table cell popup menu
+import { InfoButton } from './InfoButton' // Info button for property panel
+import { PropertyPanel, PropertyPanelContext } from './PropertyPanel' // Property panel for selected element
+import { SelectionType } from './PropertyExtractor' // Selection type enum
 
 // StyleEngine imports for keyboard shortcuts
 import { applyBold, applyItalic, applyUnderline } from './StyleEngine'
@@ -366,7 +369,7 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, children }) =
                     applyUnderline();
                     saveDo();
                     break;
-                // case 'a': console.log("Select All"); break;
+                // case 'a': break;
             }
         }
     }
@@ -410,6 +413,7 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, children }) =
             </div>
             <ImageResizer />
             <TablePopupMenu />
+            <PropertyPanel />
         </div>
     )
 }
@@ -521,6 +525,7 @@ const EditorToolbar = ({ toolbarRef }) => {
             <div class="flex items-center gap-1">
                 <InsertDropDown />
                 <Blockquote />
+                <InfoButton />
             </div>
         </>
     }
@@ -555,6 +560,11 @@ const Editor = defaults(def, (props) => {
     const container = $<HTMLDivElement>(null)
     const toolbarRef = $<HTMLDivElement>(null)
     const focusManager = new FocusManager()
+
+    // PropertyPanel shared state
+    const propertyPanelOpen = $(false)
+    const propertyTarget = $<HTMLElement | null>(null)
+    const propertySelectionType = $<SelectionType>('none')
 
     const _editor = $<HTMLDivElement>(null)
     const editor = ((...args: [HTMLDivElement?]) => {
@@ -636,20 +646,22 @@ const Editor = defaults(def, (props) => {
 
     return (
         <div ref={container}>
-            <FocusManagerContext.Provider value={focusManager}>
-                <EditorContext.Provider value={editor}>
-                    <UndoRedo>
-                        {() => $$(enableToolbar) && <EditorToolbar toolbarRef={toolbarRef} />}
-                        <EditorSurface
-                            isEditing={isEditing}
-                            handleEditorClick={handleEditorClick}
-                            handleBlur={handleBlur}
-                            children={children}
-                        >
-                        </EditorSurface>
-                    </UndoRedo>
-                </EditorContext.Provider>
-            </FocusManagerContext.Provider>
+            <PropertyPanelContext.Provider value={{ panelOpen: propertyPanelOpen, propertyTarget, selectionType: propertySelectionType }}>
+                <FocusManagerContext.Provider value={focusManager}>
+                    <EditorContext.Provider value={editor}>
+                        <UndoRedo>
+                            {() => $$(enableToolbar) && <EditorToolbar toolbarRef={toolbarRef} />}
+                            <EditorSurface
+                                isEditing={isEditing}
+                                handleEditorClick={handleEditorClick}
+                                handleBlur={handleBlur}
+                                children={children}
+                            >
+                            </EditorSurface>
+                        </UndoRedo>
+                    </EditorContext.Provider>
+                </FocusManagerContext.Provider>
+            </PropertyPanelContext.Provider>
         </div >
     )
 })
@@ -698,7 +710,6 @@ export default Editor
 //         const BASE_CLASS = "sticky top-0 z-10 bg-white border border-gray-200 rounded-t-lg p-1.5 flex items-center flex-wrap gap-1 shadow-sm mb-0"
 
 //         const handleToolbarKeyDown = (e: KeyboardEvent) => {
-//             console.log("[Editor Toolbar] keydown: ", { "ctrl": e.ctrlKey, "shift": e.shiftKey, "alt": e.altKey, "key": e.key })
 
 //             if (e.ctrlKey)
 //                 switch (e.key) {
@@ -882,7 +893,6 @@ export default Editor
 //         * - Ctrl+Z / Ctrl+Y: Triggers custom Undo/Redo logic.
 //         */
 //         const handleKeyDown = (e: KeyboardEvent) => {
-//             console.log("[Editor Surface] keydown: ", { "ctrl": e.ctrlKey, "shift": e.shiftKey, "alt": e.altKey, "key": e.key });
 
 //             if (e.key === 'Tab') {
 //                 e.preventDefault()
@@ -899,12 +909,10 @@ export default Editor
 //             if (e.ctrlKey) {
 //                 switch (e.key.toLowerCase()) {
 //                     case 'z':
-//                         console.log("[Editor Surface] undo action")
 //                         undo()
 //                         e.preventDefault();
 //                         break
 //                     case 'y':
-//                         console.log("[Editor Surface] red action")
 //                         redo()
 //                         e.preventDefault()
 //                         break

@@ -79,8 +79,6 @@ function convertSemanticElementToSpan(element: HTMLElement): HTMLSpanElement {
     // Replace the semantic element with the span
     element.parentNode?.replaceChild(span, element)
 
-    console.log('[convertSemanticElementToSpan] Converted', tagName, 'to span with style:', span.style.cssText)
-
     return span
 }
 
@@ -507,12 +505,9 @@ export function restoreSelectionFromOffsets(
  * Replaces execCommand('bold') etc.
  */
 export function applyStyle(prop: string, value: string): void {
-    console.log('[applyStyle] Called for:', prop, value)
     // D-01: Find editor shadow root directly (more reliable than focusNode derivation)
     const focusSr = findEditorShadowRoot()
-    console.log('[applyStyle] Shadow root:', focusSr ? 'found' : 'none')
     const range = safeGetRange(focusSr)
-    console.log('[applyStyle] Range:', range ? 'found' : 'null')
     if (!range) {
         console.warn('[applyStyle] No range found - returning early')
         return
@@ -542,7 +537,6 @@ export function applyStyle(prop: string, value: string): void {
 
     if (styleAlreadyApplied || surroundingHasStyle) {
         // Toggle OFF: Remove the style
-        console.log('[applyStyle] Removing style (alreadyApplied:', styleAlreadyApplied, 'surrounding:', surroundingHasStyle, ')')
         removeStyle(prop, savedSelection)
         return
     }
@@ -908,7 +902,6 @@ function insertStyledEmptySpan(prop: string, value: string, shadowRoot?: ShadowR
     }
     span.appendChild(document.createTextNode('﻿')) // ZWNBSP
 
-    console.log('[insertStyledEmptySpan] Created span:', span.outerHTML)
 
     range.insertNode(span)
 
@@ -984,8 +977,6 @@ export function removeStyle(prop: string, savedSelection?: { editorRoot: HTMLEle
         return
     }
 
-    console.log('[removeStyle] Processing non-collapsed selection')
-    console.log('[removeStyle] prop:', prop, 'range:', range.toString())
 
     // For non-collapsed selection: split spans at selection boundaries
     // then remove style only from the selected portion
@@ -994,27 +985,20 @@ export function removeStyle(prop: string, savedSelection?: { editorRoot: HTMLEle
     const spansToProcess: { span: HTMLSpanElement, cssProp: string }[] = []
 
     let searchContainer = range.commonAncestorContainer
-    console.log('[removeStyle] commonAncestorContainer:', searchContainer.nodeName, searchContainer.nodeType)
 
     if (searchContainer.nodeType === Node.TEXT_NODE && searchContainer.parentElement) {
         searchContainer = searchContainer.parentElement
-        console.log('[removeStyle] Using parent element:', searchContainer.nodeName)
     }
 
     // Collect all spans with the target style
     const cssProp = prop.replace(/([A-Z])/g, '-$1').toLowerCase()
-    console.log('[removeStyle] Looking for cssProp:', cssProp)
 
     if (searchContainer instanceof HTMLElement) {
-        console.log('[removeStyle] Walking element tree...')
 
         // Check if the searchContainer itself is a span with the target style
         if (searchContainer instanceof HTMLSpanElement) {
             const styleValue = searchContainer.style.getPropertyValue(cssProp)
-            console.log('[removeStyle] searchContainer is span:', searchContainer.textContent?.substring(0, 20),
-                       'styleValue:', styleValue)
             if (styleValue && range.intersectsNode(searchContainer)) {
-                console.log('[removeStyle] Adding searchContainer itself to process list')
                 spansToProcess.push({ span: searchContainer, cssProp })
             }
         }
@@ -1026,8 +1010,6 @@ export function removeStyle(prop: string, savedSelection?: { editorRoot: HTMLEle
                 acceptNode: (node) => {
                     if (node instanceof HTMLSpanElement) {
                         const styleValue = node.style.getPropertyValue(cssProp)
-                        console.log('[removeStyle] Checking span:', node.textContent?.substring(0, 20),
-                                   'styleValue:', styleValue, 'intersects:', range.intersectsNode(node))
                         if (styleValue && range.intersectsNode(node)) {
                             return NodeFilter.FILTER_ACCEPT
                         }
@@ -1040,7 +1022,6 @@ export function removeStyle(prop: string, savedSelection?: { editorRoot: HTMLEle
         let node: Node | null
         while ((node = walker.nextNode())) {
             if (node instanceof HTMLSpanElement) {
-                console.log('[removeStyle] Found span to process:', node.textContent?.substring(0, 20))
                 spansToProcess.push({ span: node, cssProp })
             }
         }
@@ -1063,7 +1044,6 @@ export function removeStyle(prop: string, savedSelection?: { editorRoot: HTMLEle
                 const semanticStyle = getSemanticElementStyle(tagName)
 
                 if (semanticStyle) {
-                    console.log('[removeStyle] Found semantic element:', tagName, 'with style:', semanticStyle)
 
                     // Check if this semantic element has the style we're removing
                     const computedStyle = window.getComputedStyle(ancestor)
@@ -1073,7 +1053,6 @@ export function removeStyle(prop: string, savedSelection?: { editorRoot: HTMLEle
                     // For font-style: em/i have fontStyle='italic'
                     // For text-decoration: u has textDecoration='underline'
                     if (computedValue && computedValue !== 'normal' && computedValue !== 'none') {
-                        console.log('[removeStyle] Semantic element has target style:', computedValue)
                         // Convert semantic element to span with inline style
                         const span = convertSemanticElementToSpan(ancestor as HTMLElement)
                         spansToProcess.push({ span, cssProp })
@@ -1108,7 +1087,6 @@ export function removeStyle(prop: string, savedSelection?: { editorRoot: HTMLEle
                 // Check if it's already in our list (was converted from ancestor walk)
                 const alreadyProcessed = spansToProcess.some(s => s.span === el)
                 if (!alreadyProcessed) {
-                    console.log('[removeStyle] Found intersecting semantic element:', tagName)
                     // Convert to span and add to process list
                     const span = convertSemanticElementToSpan(el as HTMLElement)
                     spansToProcess.push({ span, cssProp })
@@ -1117,11 +1095,9 @@ export function removeStyle(prop: string, savedSelection?: { editorRoot: HTMLEle
         }
     }
 
-    console.log('[removeStyle] Total spans to process:', spansToProcess.length)
 
     // Process each span: split at selection boundaries and remove style from middle
     spansToProcess.forEach(({ span, cssProp }) => {
-        console.log('[removeStyle] Processing span:', span.textContent?.substring(0, 20))
 
         // CRITICAL: After semantic element conversion, the span may have nested elements
         // We need to check if the span has ONLY a single text child
@@ -1135,7 +1111,6 @@ export function removeStyle(prop: string, savedSelection?: { editorRoot: HTMLEle
             span.childNodes.length === 1
 
         if (!hasOnlySingleTextChild) {
-            console.log('[removeStyle] Span has nested elements or multiple children - using nested element handling')
             // The span contains nested elements or multiple children
             // This happens when a semantic element like <strong> contains mixed content
             // e.g., <strong>text <em>selected</em> more text</strong>
@@ -1151,13 +1126,11 @@ export function removeStyle(prop: string, savedSelection?: { editorRoot: HTMLEle
             // previous style operations. The browser maintains the live range correctly.
             const liveRangeForNested = range.cloneRange()
             const selectionAnchor = liveRangeForNested.startContainer
-            console.log('[removeStyle] selectionAnchor:', selectionAnchor.nodeName, selectionAnchor.nodeType, selectionAnchor.textContent?.substring(0, 20), 'span childNodes count:', span.childNodes.length)
             let selectedChild: Node | null = null
 
             for (const child of Array.from(span.childNodes)) {
                 // Check if this child or any of its descendants contains the selection anchor
                 // We need to handle deeply nested structures like: span > italic-span > underline-span > text
-                console.log('[removeStyle] Checking child:', child.nodeName, child.textContent?.substring(0, 20), 'contains anchor:', child.contains(selectionAnchor))
                 if (child.contains(selectionAnchor)) {
                     selectedChild = child
                     break
@@ -1165,7 +1138,6 @@ export function removeStyle(prop: string, savedSelection?: { editorRoot: HTMLEle
             }
 
             if (selectedChild) {
-                console.log('[removeStyle] Found selected child:', selectedChild.nodeName || selectedChild.textContent?.substring(0, 20))
 
                 // Determine which children are before, selected, and after
                 const children = Array.from(span.childNodes)
@@ -1204,7 +1176,6 @@ export function removeStyle(prop: string, savedSelection?: { editorRoot: HTMLEle
                     (selectedChild as HTMLElement).childNodes.length > 0
 
                 if (isPartialSelection) {
-                    console.log('[removeStyle] Partial selection within child - splitting at text level')
                     // We need to recursively split the selected child to extract
                     // before/selected/after at the deepest text level.
                     // Strategy: temporarily remove the target style from the span,
@@ -1388,7 +1359,6 @@ export function removeStyle(prop: string, savedSelection?: { editorRoot: HTMLEle
 
                 // Replace original span with fragment
                 parent.replaceChild(fragment, span)
-                console.log('[removeStyle] Replaced span with nested structure handling')
 
                 // Normalize to merge adjacent text nodes
                 normalizeDOM(parent as HTMLElement)
@@ -1397,11 +1367,9 @@ export function removeStyle(prop: string, savedSelection?: { editorRoot: HTMLEle
                 // after DOM mutation (e.g., convertSemanticElementToSpan replaced <strong>).
                 // Use savedSelection (global offsets relative to editor root, captured BEFORE
                 // DOM mutation) to find which text nodes in the span intersect with the selection.
-                console.log('[removeStyle] selectedChild null, using savedSelection global offsets to find selection')
 
                 if (!savedSelection || !savedSelection.editorRoot) {
                     // Fallback: no saved selection, remove style from entire span
-                    console.log('[removeStyle] No savedSelection available, removing style from entire span')
                     span.style.removeProperty(cssProp)
                     if (!span.getAttribute('style')) span.removeAttribute('style')
                     if (!span.hasAttribute('style') && !span.className && !span.id) {
@@ -1415,7 +1383,6 @@ export function removeStyle(prop: string, savedSelection?: { editorRoot: HTMLEle
                 }
 
                 const { editorRoot, startOffset: globalSelStart, endOffset: globalSelEnd } = savedSelection
-                console.log('[removeStyle] savedSelection global offsets:', { globalSelStart, globalSelEnd })
 
                 // Walk all text nodes from editor root, accumulating global offsets.
                 // Collect only those text nodes that are descendants of the span.
@@ -1428,7 +1395,6 @@ export function removeStyle(prop: string, savedSelection?: { editorRoot: HTMLEle
                     // Check if this text node is inside the span
                     if (span.contains(etn)) {
                         textNodes.push({ node: etn, globalStart: globalOffset, globalEnd: globalOffset + len })
-                        console.log('[removeStyle] span text node:', { text: etn.textContent?.substring(0, 30), globalStart: globalOffset, globalEnd: globalOffset + len })
                     }
                     globalOffset += len
                 }
@@ -1437,10 +1403,8 @@ export function removeStyle(prop: string, savedSelection?: { editorRoot: HTMLEle
                 const intersecting = textNodes.filter(
                     tn => tn.globalStart < globalSelEnd && tn.globalEnd > globalSelStart
                 )
-                console.log('[removeStyle] intersecting:', intersecting.map(tn => ({ text: tn.node.textContent?.substring(0, 20), gs: tn.globalStart, ge: tn.globalEnd })))
 
                 if (intersecting.length > 0) {
-                    console.log('[removeStyle] Found', intersecting.length, 'intersecting text nodes via saved offsets')
 
                     // Map intersecting text nodes to their topmost child of span
                     const selectedChildren = new Set<Node>()
@@ -1495,10 +1459,8 @@ export function removeStyle(prop: string, savedSelection?: { editorRoot: HTMLEle
                         }
 
                         parent.replaceChild(fragment, span)
-                        console.log('[removeStyle] Replaced span using saved offset intersection')
                         normalizeDOM(parent as HTMLElement)
                     } else {
-                        console.log('[removeStyle] Could not determine selected children, removing style from entire span')
                         span.style.removeProperty(cssProp)
                         if (!span.getAttribute('style')) span.removeAttribute('style')
                         if (!span.hasAttribute('style') && !span.className && !span.id) {
@@ -1511,7 +1473,6 @@ export function removeStyle(prop: string, savedSelection?: { editorRoot: HTMLEle
                     }
                 } else {
                     // Fallback: no intersecting text nodes found via saved offsets
-                    console.log('[removeStyle] No intersecting text nodes via saved offsets, removing style from entire span')
                     span.style.removeProperty(cssProp)
                     if (!span.getAttribute('style')) span.removeAttribute('style')
                     if (!span.hasAttribute('style') && !span.className && !span.id) {
@@ -1539,24 +1500,9 @@ export function removeStyle(prop: string, savedSelection?: { editorRoot: HTMLEle
         const spanRange = document.createRange()
         spanRange.selectNodeContents(textNode)
 
-        console.log('[removeStyle] spanRange (text node):', {
-            startContainer: spanRange.startContainer.textContent?.substring(0, 10),
-            startOffset: spanRange.startOffset,
-            endContainer: spanRange.endContainer.textContent?.substring(0, 10),
-            endOffset: spanRange.endOffset
-        })
-
-        console.log('[removeStyle] liveRange:', {
-            startContainer: liveRange.startContainer.textContent?.substring(0, 10),
-            startOffset: liveRange.startOffset,
-            endContainer: liveRange.endContainer.textContent?.substring(0, 10),
-            endOffset: liveRange.endOffset
-        })
-
         // Check intersection using the live range
         // intersectsNode checks if the range intersects with the node at all
         if (!liveRange.intersectsNode(span)) {
-            console.log('[removeStyle] Live range does not intersect span - skipping')
             return
         }
 
@@ -1567,13 +1513,6 @@ export function removeStyle(prop: string, savedSelection?: { editorRoot: HTMLEle
         const startToEnd = liveRange.compareBoundaryPoints(Range.START_TO_END, spanRange)
         const endToStart = liveRange.compareBoundaryPoints(Range.END_TO_START, spanRange)
         const endToEnd = liveRange.compareBoundaryPoints(Range.END_TO_END, spanRange)
-
-        console.log('[removeStyle] Boundary comparisons:', {
-            startToStart,
-            startToEnd,
-            endToStart,
-            endToEnd
-        })
 
         // Determine the selected portion within THIS span:
         // - If liveRange starts before span: selection starts at 0
@@ -1613,14 +1552,10 @@ export function removeStyle(prop: string, savedSelection?: { editorRoot: HTMLEle
             }
         }
 
-        console.log('[removeStyle] Calculated selection within span:', { selStart, selEnd, textLength: text.length })
-
         // Check if selection fully contains the span
         const selectionFullyContainsSpan = selStart === 0 && selEnd === text.length
 
         if (selectionFullyContainsSpan) {
-            console.log('[removeStyle] Selection fully contains span - removing entire style')
-
             // Entire span is selected - remove style
             span.style.removeProperty(cssProp)
             if (!span.getAttribute('style')) {
@@ -1637,13 +1572,9 @@ export function removeStyle(prop: string, savedSelection?: { editorRoot: HTMLEle
                 }
             }
         } else if (selStart < selEnd) {
-            console.log('[removeStyle] Partial selection - splitting span')
-
             // Partial selection - need to split the span
             const firstChild = span.firstChild
             if (!firstChild || firstChild.nodeType !== Node.TEXT_NODE) {
-                console.log('[removeStyle] Span has nested elements - using special handling')
-
                 // When span contains nested elements, we need to find the selected child element(s)
                 // and remove the style only from those, preserving it on the rest
 
@@ -1737,7 +1668,6 @@ export function removeStyle(prop: string, savedSelection?: { editorRoot: HTMLEle
 
                 // Replace original span with fragment
                 parent.replaceChild(fragment, span)
-                console.log('[removeStyle] Replaced span with nested elements handling')
                 return
             }
 
@@ -1747,15 +1677,8 @@ export function removeStyle(prop: string, savedSelection?: { editorRoot: HTMLEle
             const selectedText = text.substring(selStart, selEnd)
             const afterText = text.substring(selEnd)
 
-            console.log('[removeStyle] Splitting:', {
-                before: beforeText,
-                selected: selectedText,
-                after: afterText
-            })
-
             const parent = span.parentNode
             if (!parent) {
-                console.log('[removeStyle] ERROR: No parent')
                 return
             }
 
@@ -1767,7 +1690,6 @@ export function removeStyle(prop: string, savedSelection?: { editorRoot: HTMLEle
                 beforeSpan.removeAttribute('id')
                 beforeSpan.textContent = beforeText
                 fragment.appendChild(beforeSpan)
-                console.log('[removeStyle] Added before span:', beforeText)
             }
 
             if (selectedText) {
@@ -1775,7 +1697,6 @@ export function removeStyle(prop: string, savedSelection?: { editorRoot: HTMLEle
                 const selectedSpan = document.createElement('span')
                 selectedSpan.textContent = selectedText
                 fragment.appendChild(selectedSpan)
-                console.log('[removeStyle] Added selected span:', selectedText)
             }
 
             if (afterText) {
@@ -1783,24 +1704,18 @@ export function removeStyle(prop: string, savedSelection?: { editorRoot: HTMLEle
                 afterSpan.removeAttribute('id')
                 afterSpan.textContent = afterText
                 fragment.appendChild(afterSpan)
-                console.log('[removeStyle] Added after span:', afterText)
             }
-
-            console.log('[removeStyle] Fragment children:', fragment.childNodes.length)
 
             // Replace original span with fragment
             parent.replaceChild(fragment, span)
-            console.log('[removeStyle] Replaced original span')
         } else {
-            console.log('[removeStyle] WARNING: Invalid selection range in span')
+            // WARNING: Invalid selection range in span
         }
     })
 
     const normalizeTarget = getBlockParent(range.commonAncestorContainer) ?? findEditorRoot(range.commonAncestorContainer)
     if (normalizeTarget) {
-        console.log('[removeStyle] Before normalizeDOM:', normalizeTarget.innerHTML)
         normalizeDOM(normalizeTarget)
-        console.log('[removeStyle] After normalizeDOM:', normalizeTarget.innerHTML)
     }
 
     // D-08: Restore selection after DOM normalization
@@ -1901,7 +1816,6 @@ export function toggleStyle(prop: string, value: string): void {
  * Apply font-weight bold
  */
 export function applyBold(): void {
-    console.log('[applyBold] Called')
     applyStyle('fontWeight', 'bold')
 }
 
@@ -2357,8 +2271,6 @@ export function applyList(mode: 'bullet' | 'number' | 'checkbox'): void {
 
     // Note: Full implementation would be quite complex
     // For now, this is a placeholder that can be expanded
-
-    console.log(`[applyList] Mode: ${mode}, Range: ${range.toString()}`)
 
     // Restore selection from saved offsets
     if (savedSelection.editorRoot && savedSelection.startOffset >= 0 && savedSelection.endOffset >= 0) {

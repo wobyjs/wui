@@ -87,11 +87,9 @@ const NumberField = defaults(def, (props) => {
         if ($$(reactive) && isObservable(value)) {
             const newValue = +$$((value)) - +$$(step)
                 ; (value as Observable)?.(newValue)
-            // console.log("Decreased to:", newValue)
         } else if (!$$(reactive) && isObservable(value)) {
             const newValue = (+$$(inputRef).valueAsNumber as any) - +$$(step)
                 ; (value as Observable)?.(newValue)
-            // console.log("Decreased to:", newValue)
         }
         updated()
     }
@@ -105,11 +103,9 @@ const NumberField = defaults(def, (props) => {
         if ($$(reactive) && isObservable(value)) {
             const newValue = +$$((value)) + +$$(step)
                 ; (value as Observable)?.(newValue)
-            // console.log("Increased to:", newValue)
         } else if (!$$(reactive) && isObservable(value)) {
             const newValue = (+$$(inputRef).valueAsNumber as any) + +$$(step)
                 ; (value as Observable)?.(newValue)
-            // console.log("Increased to:", newValue)
         }
         updated()
     }
@@ -120,8 +116,6 @@ const NumberField = defaults(def, (props) => {
     let timeoutId: number | null = null
 
     function startContinuousUpdate(isIncrement: boolean) {
-        // console.log("Start: Continuous Update");
-
         // Don't allow continuous update if disabled
         if ($$(disabled)) return
 
@@ -134,39 +128,27 @@ const NumberField = defaults(def, (props) => {
         // Start interval to continue updating while pressed
         // Use native setTimeout/setInterval to avoid reactive hook issues
         timeoutId = setTimeout(() => {
-            // console.log("Timeout fired - starting interval");
             intervalId = setInterval(() => {
-                // console.log("Interval tick - before update");
                 isIncrement ? inc() : dec()
-                // console.log("Interval tick - after update");
             }, 100)
-            // console.log("Interval created with ID:", intervalId);
         }, 200)
-        // console.log("Timeout created with ID:", timeoutId);
     }
 
     function stopUpdate() {
-        // console.log("Stop: Continuous Update");
-        // console.log("Stopping - timeout ID:", timeoutId, "interval ID:", intervalId);
-
         if (timeoutId !== null) {
-            // console.log("Clearing timeout:", timeoutId);
             clearTimeout(timeoutId)
             timeoutId = null
         }
         if (intervalId !== null) {
-            // console.log("Clearing interval:", intervalId);
             clearInterval(intervalId)
             intervalId = null
         }
-        // console.log("Stop complete");
     }
 
     // Add global pointerup listener as a safety net
     useEffect(() => {
         const handleGlobalPointerUp = () => {
             if (intervalId !== null || timeoutId !== null) {
-                // console.log("Global PointerUp: Stopping update");
                 stopUpdate()
             }
         }

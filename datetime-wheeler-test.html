@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DateTimeWheeler Cancel Debug v5</title>
+    <style>
+        body { font-family: system-ui, -apple-system, sans-serif; padding: 40px; background: #f5f5f5; max-width: 800px; margin: 0 auto; }
+        .container { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        h1 { font-size: 20px; margin: 0 0 4px 0; }
+        .test-row { margin: 16px 0; }
+        .test-row label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #333; }
+        pre { background: #f0f0f0; padding: 8px; border-radius: 4px; font-size: 12px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>DateTimeWheeler Cancel Debug v5</h1>
+
+        <div class="test-row">
+            <label>DateTimeWheeler</label>
+            <wui-datetime-wheeler mode="datetime" visible="true" bottom="true" id="wheeler1"></wui-datetime-wheeler>
+        </div>
+        <div class="test-row" style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button id="clickCancelBtn" class="bg-red-500 text-white px-4 py-2 rounded">Click Cancel button</button>
+            <button id="checkBtn" class="bg-blue-500 text-white px-4 py-2 rounded">Check state</button>
+            <button id="setAttrBtn" class="bg-green-500 text-white px-4 py-2 rounded">Set visible="false" attr</button>
+            <button id="clearBtn" class="bg-gray-500 text-white px-4 py-2 rounded">Clear log</button>
+        </div>
+        <div class="test-row">
+            <pre id="dump"></pre>
+        </div>
+        <div class="test-row">
+            <div id="log" style="background:#111;color:#0f0;padding:8px;border-radius:4px;font-family:monospace;font-size:12px;white-space:pre-wrap;min-height:200px;max-height:400px;overflow:auto;"></div>
+        </div>
+    </div>
+
+    <script type="module" src="./src/Wheeler/DateTimeWheeler.tsx"></script>
+    <script type="module" src="./src/index.tsx"></script>
+    <script type="module">
+        import { isObservable, $, $$ } from 'woby'
+
+        function log(msg) {
+            const el = document.getElementById('log')
+            const t = new Date().toISOString().substring(11, 23)
+            el.textContent = `[${t}] ${msg}\n` + el.textContent
+        }
+
+        async function setup() {
+            await customElements.whenDefined('wui-datetime-wheeler')
+            const w1 = document.getElementById('wheeler1')
+
+            log(`Setup. visible attr: "${w1.getAttribute('visible')}"`)
+            log(`w1.props keys: ${Object.keys(w1.props).join(', ')}`)
+
+            // DO NOT replace w1.props.visible — that breaks the reference.
+            // Instead, just read from it directly.
+
+            const visibleObs = w1.props.visible
+
+            // Polling: check if the value changes
+            let lastVal = visibleObs()
+            let pollCount = 0
+            setInterval(() => {
+                const current = visibleObs()
+                if (current !== lastVal) {
+                    pollCount++
+                    log(`POLL #${pollCount}: visible changed ${lastVal} -> ${current}`)
+                    lastVal = current
+                    updateDump()
+                }
+            }, 50)
+
+            // MutationObserver for attribute changes
+            const attrObs = new MutationObserver(mutations => {
+                for (const m of mutations) {
+                    if (m.type === 'attributes') {
+                        log(`ATTR: ${m.attributeName}: "${m.oldValue}" -> "${w1.getAttribute(m.attributeName)}"`)
+                    }
+                }
+            })
+            attrObs.observe(w1, { attributes: true, attributeOldValue: true })
+
+            function updateDump() {
+                const el = document.getElementById('dump')
+                el.textContent = JSON.stringify({
+                    visibleObs: visibleObs(),
+                    visibleAttr: w1.getAttribute('visible'),
+                    shadowRoot: !!w1.shadowRoot,
+                    shadowContent: w1.shadowRoot ? w1.shadowRoot.children.length : 0,
+                }, null, 2)
+            }
+
+            log(`Ready. visible = ${visibleObs()}`)
+            updateDump()
+
+            // Check button
+            document.getElementById('checkBtn').onclick = () => {
+                log(`CHECK: visible = ${visibleObs()}, attr = "${w1.getAttribute('visible')}"`)
+                log(`Poll detected ${pollCount} changes`)
+                updateDump()
+            }
+
+            // Set attribute button — test if setting attribute triggers reactive update
+            document.getElementById('setAttrBtn').onclick = () => {
+                log('=== Setting visible="false" on host ===')
+                log(`Before: visible = ${visibleObs()}, attr = "${w1.getAttribute('visible')}"`)
+                w1.setAttribute('visible', 'false')
+                log(`After setAttribute: visible = ${visibleObs()}, attr = "${w1.getAttribute('visible')}"`)
+                setTimeout(() => {
+                    log(`After 100ms: visible = ${visibleObs()}`)
+                }, 100)
+            }
+
+            // Cancel button click
+            document.getElementById('clickCancelBtn').onclick = () => {
+                log('=== Clicking Cancel button in UI ===')
+                // DateTimeWheeler uses Portal — buttons are at document.body, not in shadowRoot
+                const allButtons = document.querySelectorAll('button')
+                log(`Found ${allButtons.length} buttons in total`)
+                const cancelBtn = Array.from(allButtons).find(b => b.id === 'dtw-cancel-btn')
+                if (cancelBtn) {
+                    log('Found Cancel button (via Portal), clicking with PointerEvent...')
+                    log(`Before click: visible = ${visibleObs()}, attr = "${w1.getAttribute('visible')}"`)
+                    cancelBtn.dispatchEvent(new PointerEvent('click', { composed: true, bubbles: true }))
+                    log(`After click: visible = ${visibleObs()}, attr = "${w1.getAttribute('visible')}"`)
+                    setTimeout(() => {
+                        log(`After 100ms: visible = ${visibleObs()}, attr = "${w1.getAttribute('visible')}"`)
+                    }, 100)
+                    setTimeout(() => {
+                        log(`After 500ms: visible = ${visibleObs()}, attr = "${w1.getAttribute('visible')}"`)
+                    }, 500)
+                    setTimeout(() => {
+                        log(`After 1s: visible = ${visibleObs()}, attr = "${w1.getAttribute('visible')}"`)
+                    }, 1000)
+                } else {
+                    log('ERROR: Cancel button not found!')
+                    log(`All buttons: ${Array.from(allButtons).map(b => '#' + b.id + ':' + b.textContent?.trim()).join(', ')}`)
+                }
+            }
+
+            // Clear button
+            document.getElementById('clearBtn').onclick = () => {
+                document.getElementById('log').textContent = ''
+            }
+        }
+        setup()
+    </script>
+</body>
+</html>

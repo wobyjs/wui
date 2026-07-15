@@ -5,6 +5,7 @@ import { useOnClickOutside } from '@woby/use'
 import { range, getCurrentRange } from './utils' // Import getCurrentRange
 import KeyboardDownArrow from '../icons/keyboard_down_arrow'
 import Plus from '../icons/plus'
+import { getEditorPlugins, pluginsToInsertItems, InsertMenuItem } from './EditorPlugin'
 
 // Icons - placeholders, replace with actual SVGs or components
 const HorizontalRuleIcon = () => <span>HR</span>
@@ -12,6 +13,37 @@ const ImageIcon = () => <span>Img</span>
 const TableIcon = () => <span>Tbl</span>
 const GifIcon = () => <span>GIF</span>
 // ... other icons
+
+/**
+ * Sanitize a string for safe insertion as an HTML attribute value.
+ * Strips characters that could break out of the attribute context.
+ * This prevents XSS when user input is interpolated into HTML strings
+ * passed to document.execCommand('insertHTML').
+ */
+const sanitizeAttr = (str: string): string => {
+    return str
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+}
+
+/**
+ * Sanitize HTML content for safe insertion via document.execCommand('insertHTML').
+ * Removes dangerous elements (script, iframe, object, embed, form, etc.)
+ * and event handler attributes (on*).
+ */
+const sanitizeHTML = (html: string): string => {
+    // Remove dangerous tags and their content
+    html = html.replace(/<\s*script[^>]*>[\s\S]*?<\s*\/\s*script\s*>/gi, '')
+    html = html.replace(/<\s*\/?\s*(script|iframe|object|embed|applet|form|input|textarea|select|button|link|style|meta|base)[^>]*>/gi, '')
+    // Remove event handler attributes (onclick, onload, onerror, etc.)
+    html = html.replace(/\s+on\w+\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]+)/gi, '')
+    // Remove javascript: URLs
+    html = html.replace(/(href|src|action)\s*=\s*(?:"javascript:[^"]*"|'javascript:[^']*')/gi, '$1=""')
+    return html
+}
 
 // Helper to get shadow root selection for wui-editor
 function getEditorSelection(): { selection: Selection | null, shadowRoot: ShadowRoot | null } {
@@ -47,8 +79,10 @@ const execInsertImage = () => {
     selection.removeAllRanges()
     selection.addRange(range)
 
-    const imgHtml = `<img src="${imageUrl}" class="max-w-full h-auto my-2" />`
-    document.execCommand('insertHTML', false, imgHtml)
+    // Sanitize URL to prevent XSS via attribute injection
+    const safeUrl = sanitizeAttr(imageUrl)
+    const imgHtml = `<img src="${safeUrl}" class="max-w-full h-auto my-2" />`
+    document.execCommand('insertHTML', false, sanitizeHTML(imgHtml))
 }
 
 const execInsertTable = () => {
@@ -86,27 +120,26 @@ const execInsertTable = () => {
     }
     tableHTML += '</tbody></table><br>'
 
-    document.execCommand('insertHTML', false, tableHTML)
+    document.execCommand('insertHTML', false, sanitizeHTML(tableHTML))
 }
 // #endregion
 
-const INSERT_OPTIONS = [
-    { label: 'Horizontal Rule', action: execInsertHorizontalRule, icon: HorizontalRuleIcon },
-    // { label: 'Page Break', action: () => console.log('Insert Page Break (TODO)'), icon: () => <span>PB</span> },
-    { label: 'Image', action: execInsertImage, icon: ImageIcon },
-    // { label: 'Inline Image', action: () => console.log('Insert Inline Image (TODO)'), icon: ImageIcon },
-    { label: 'Table', action: execInsertTable, icon: TableIcon },
-    // { label: 'GIF', action: () => console.log('Insert GIF (TODO)'), icon: GifIcon },
-    // { label: 'Excalidraw', action: () => console.log('Insert Excalidraw (TODO)'), icon: () => <span>Ex</span> },
-    // { label: 'Poll', action: () => console.log('Insert Poll (TODO)'), icon: () => <span>Poll</span> },
-    // { label: 'Columns Layout', action: () => console.log('Insert Columns (TODO)'), icon: () => <span>Cols</span> },
-    // { label: 'Equation', action: () => console.log('Insert Equation (TODO)'), icon: () => <span>Eq</span> },
-    // { label: 'Sticky Note', action: () => console.log('Insert Sticky (TODO)'), icon: () => <span>Note</span> },
-    // { label: 'Collapsible container', action: () => console.log('Insert Collapsible (TODO)'), icon: () => <span>Col</span> },
-    // { label: 'X(Tweet)', action: () => console.log('Insert Tweet (TODO)'), icon: () => <span>X</span> },
-    // { label: 'Youtube Video', action: () => console.log('Insert YouTube (TODO)'), icon: () => <span>YT</span> },
-    // { label: 'Figma Document', action: () => console.log('Insert Figma (TODO)'), icon: () => <span>Fig</span> },
-]
+const getInsertOptions = (): InsertMenuItem[] => {
+    const builtIn = [
+        { label: 'Horizontal Rule', action: execInsertHorizontalRule, icon: HorizontalRuleIcon },
+        { label: 'Image', action: execInsertImage, icon: ImageIcon },
+        { label: 'Table', action: execInsertTable, icon: TableIcon },
+    ]
+
+    // Merge registered plugin items
+    const plugins = $$(getEditorPlugins())
+    if (plugins.length > 0) {
+        const pluginItems = pluginsToInsertItems(document.querySelector('wui-editor')?.shadowRoot?.querySelector('[data-editor-root]') as HTMLElement) as InsertMenuItem[]
+        return [...builtIn, ...pluginItems]
+    }
+
+    return builtIn
+}
 
 const def = () => ({
     cls: $(""),
@@ -149,7 +182,7 @@ const InsertDropDown = defaults(def, (props) => {
                 }}
             >
                 <div class="py-1" role="none">
-                    {INSERT_OPTIONS.map(opt => (
+                    {getInsertOptions().map(opt => (
                         <Button
                             type='outlined'
                             cls="w-full flex items-center text-gray-700 px-4 py-2 text-sm hover:bg-gray-100 hover:text-gray-900"

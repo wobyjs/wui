@@ -1,10 +1,10 @@
 /** @jsxImportSource woby */
 
 import { $$, isObservable, ObservableMaybe } from "woby"
-import { Editors, TableRow, UIProps, skippedProperties } from "./PropertyForm"
+import { Editors, UIProps, skippedProperties } from "./Editors"
+import { TableRow } from "./PropertyForm"
 import { TextField } from "../TextField"
 import { EditorProps } from "./EditorProps"
-import * as test from '../TextField.effect'
 
 export const StringEditor = () => {
 

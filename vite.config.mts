@@ -34,14 +34,14 @@ const isDevMode = process.argv.includes('dev') || process.argv.includes('--dev')
 
 const config = defineConfig({
     build: {
-        minify: false,
+        minify: 'esbuild',
         lib: {
             entry: ["./src/index.tsx"],
             name: "@woby/wui",
             formats: ['es'],
             fileName: (format: string, entryName: string) => `${entryName}.${format}.js`
         },
-        emptyOutDir: false,
+        emptyOutDir: true,
         sourcemap: true,
         rollupOptions: {
             external: ['woby', 'woby/jsx-runtime', 'oby', 'woby/jsx-runtime', 'nanoid', /^@woby\/(.*)/],
@@ -66,9 +66,9 @@ const config = defineConfig({
     ],
     resolve: {
         alias: {
-            'woby/jsx-dev-runtime': process.argv.includes('dev') || process.argv.includes('--dev') || (process.argv.includes('--mode') && process.argv.includes('dev')) ? path.resolve('../../woby/src/jsx/runtime') : 'woby/jsx-dev-runtime',
-            'woby/jsx-runtime': process.argv.includes('dev') || process.argv.includes('--dev') || (process.argv.includes('--mode') && process.argv.includes('dev')) ? path.resolve('../../woby/src/jsx/runtime') : 'woby/jsx-runtime',
-            'woby': process.argv.includes('dev') || process.argv.includes('--dev') || (process.argv.includes('--mode') && process.argv.includes('dev')) ? path.resolve('../../woby/src') : 'woby',
+            'woby/jsx-dev-runtime': process.argv.includes('dev') || process.argv.includes('--dev') || (process.argv.includes('--mode') && process.argv.includes('dev')) ? path.resolve('../../@woby/woby/src/jsx/runtime') : 'woby/jsx-dev-runtime',
+            'woby/jsx-runtime': process.argv.includes('dev') || process.argv.includes('--dev') || (process.argv.includes('--mode') && process.argv.includes('dev')) ? path.resolve('../../@woby/woby/src/jsx/runtime') : 'woby/jsx-runtime',
+            'woby': process.argv.includes('dev') || process.argv.includes('--dev') || (process.argv.includes('--mode') && process.argv.includes('dev')) ? path.resolve('../../@woby/woby/src') : 'woby',
             '@woby/styled': process.argv.includes('dev') || process.argv.includes('--dev') || (process.argv.includes('--mode') && process.argv.includes('dev')) ? path.resolve('../styled/src') : '@woby/styled',
             '@woby/use': process.argv.includes('dev') || process.argv.includes('--dev') || (process.argv.includes('--mode') && process.argv.includes('dev')) ? path.resolve('../use/src') : '@woby/use',
             // '@woby/chk': process.argv.includes('dev') || process.argv.includes('--dev') || (process.argv.includes('--mode') && process.argv.includes('dev')) ? path.resolve('./src') : 'chk',

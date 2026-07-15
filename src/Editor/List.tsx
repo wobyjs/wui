@@ -8,7 +8,6 @@ import ListBulleted from '../icons/list_bulleted'
 import ListNumbered from '../icons/list_numbered'
 import ListCheckbox from '../icons/list_checkbox'
 
-
 // #region Types & Configuration
 type ListMode = "bullet" | "number" | "checkbox"
 
@@ -152,7 +151,6 @@ const List = defaults(def, (props) => {
                             li.forEach((el, index) => {
                                 const isContainCheckbox = el.querySelector(`#${CHECKBOX_WRAPPER_ID}`) != null ? true : false
                                 if (!isContainCheckbox) {
-                                    console.log(`[List] #${index + 1} Injecting checkbox for li`)
                                     injectCheckbox(el)
                                 }
                             })
@@ -226,7 +224,6 @@ declare module 'woby' {
         }
     }
 }
-
 
 // Table cell tags
 const TABLE_CELL_TAGS = ['TD', 'TH']
@@ -343,12 +340,9 @@ export const ListService = {
  * 3. list-none (checkbox)
  */
 const insertList = (editor: HTMLDivElement, targetList: { tag: 'ul' | 'ol', classes: { add: string, remove: string }, id }, mode: ListMode) => {
-    console.group("[List] Inserting List (mode: " + mode + ")");
     const { selection, state } = getSelection(editor);
 
     if (!selection?.rangeCount) {
-        console.log("[List] No selection range available.");
-        console.groupEnd();
         return;
     }
 
@@ -364,7 +358,6 @@ const insertList = (editor: HTMLDivElement, targetList: { tag: 'ul' | 'ol', clas
     const isAllLI = selectedBlocks.every(block => block.tagName === LI_TAG);
 
     if (selectedLists.length > 1 && isAllLI) {
-        console.log("[List] Multiple lists detected. Merging...");
 
         // 2. Save markers for the exact text nodes so we can restore the exact selection later
         const start = { node: state.startContainer, offset: state.startOffset }
@@ -388,35 +381,17 @@ const insertList = (editor: HTMLDivElement, targetList: { tag: 'ul' | 'ol', clas
     const startRange = { node: state.startContainer, offset: state.startOffset }
     const endRange = (!state.isCollapsed && state.endContainer && state.endOffset) ? { node: state.endContainer, offset: state.endOffset } : undefined
 
-    console.log(`✨ start element [${startElement.tagName}]: ${startElement.textContent}`)
-    console.log(`✨   end element [${endElement.tagName}]: ${endElement.textContent}`)
-
-    console.groupCollapsed(`🟢 Selected Block (${selectedBlocks.length})`);
-    selectedBlocks.forEach((block, index) => { console.log(`\t#${index + 1}. [${block.tagName.padStart(2, ' ')}] - ${block.textContent}`); })
-    console.groupEnd();
-
-    console.groupCollapsed(`🟢 Selected List (${selectedLists.length})`);
-    selectedLists.forEach((list, index) => { console.log(`\t#${index + 1}. [${list.tagName.padStart(2, ' ')}] - ${list.textContent}`); })
-    console.groupEnd();
-
     let action: string | null = null
 
     // selected items is all <li> tag
     let currentList: HTMLElement | null = null
     if (isAllLI) {
-        console.log("📌 Selected Items is all <li> tags.")
         currentList = startElement.closest('ul, ol') as HTMLElement;
         const items = Array.from(currentList.children) as HTMLLIElement[];
-        console.log("Current List: ", currentList)
-
-        console.group("📦 List Items");
-        items.forEach((li, index) => { console.log(`#${index + 1}. ${li.textContent}`) })
-        console.groupEnd();
 
         // Case 1: Toggle Off
         if (currentList.id === targetList.id && !isPerformMergeList) {
             action = "Toggle Off"
-            console.log(`Case 1: ${action}`)
         }
         // Case 2: Switch List
         else if (currentList.id !== targetList.id) {
@@ -426,19 +401,13 @@ const insertList = (editor: HTMLDivElement, targetList: { tag: 'ul' | 'ol', clas
             } else {
                 action = "Switch Tag (selected items)"
             }
-            console.log(`Case 2: ${action}`)
 
         }
     }
     // selected items is not all <li> tag
     else {
-        console.log("📌 Selected Items is NOT all <li> tags.")
+        // Not all selected items are <li> tags
     }
-
-
-    console.log("Action: ", action)
-
-    console.groupEnd()
 
     // Continue with list manipulation
     if (!currentList) {
@@ -448,7 +417,7 @@ const insertList = (editor: HTMLDivElement, targetList: { tag: 'ul' | 'ol', clas
     // CRITICAL FIX: Only process list operations if we have an existing list
     // For creating new lists, jump to Case 3
     if (!currentList) {
-        console.log("No existing list found. Will create new list.");
+        // No existing list found. Will create new list.
     }
 
     if (currentList) {
@@ -466,24 +435,10 @@ const insertList = (editor: HTMLDivElement, targetList: { tag: 'ul' | 'ol', clas
         const targetItems = allItems.slice(firstSelectedIndex, lastSelectedIndex + 1) as HTMLElement[];
         const afterItems = allItems.slice(lastSelectedIndex + 1) as HTMLElement[];
 
-        console.groupCollapsed(`Before Items (${beforeItems.length})`)
-        beforeItems.forEach((item, index) => console.log(`\tℹ️#${index + 1}. ${item.textContent}`))
-        console.groupEnd()
-
-        console.groupCollapsed(`Target Items (${targetItems.length})`)
-        targetItems.forEach((item, index) => console.log(`\t❗#${index + 1}. ${item.textContent}`))
-        console.groupEnd()
-
-        console.groupCollapsed(`After Items (${afterItems.length})`)
-        afterItems.forEach((item, index) => console.log(`\tℹ️#${index + 1}. ${item.textContent}`))
-        console.groupEnd()
-
         // #region Toggle Off List
         if (currentList!.id === targetList.id && !isPerformMergeList) {
-            console.groupCollapsed("Case 1: Toggle Off")
             ListService.splitList(currentList!, targetItems, afterItems, (items) => {
                 return items.map((li, index) => {
-                    console.log(`\t#${index + 1}. ${li.textContent} `)
 
                     const p = document.createElement('p');
                     if (li.className) p.className = li.className;
@@ -499,19 +454,15 @@ const insertList = (editor: HTMLDivElement, targetList: { tag: 'ul' | 'ol', clas
                     return p;
                 });
             });
-            console.groupEnd()
         }
         // #endregion
 
         // #region Switch Tag List
         else if (currentList!.id !== targetList.id) {
-            console.groupCollapsed("Case 1: Partial Switch Tag / Mixed Tag")
             let newList: HTMLElement | null = null;
             if (state.isCollapsed) {
-                console.log("Case 1: Switch Tag (entire list)")
                 newList = ListService.switchTag(currentList!, targetList.tag, targetList);
             } else {
-                console.log("Case 1: Switch Tag (selected items)")
 
                 newList = ListService.splitList(currentList!, targetItems, afterItems, (items) => {
                     const middle = document.createElement(targetList.tag.toUpperCase());
@@ -519,7 +470,6 @@ const insertList = (editor: HTMLDivElement, targetList: { tag: 'ul' | 'ol', clas
                     middle.className = targetList.classes.add;
 
                     items.forEach((item, index) => {
-                        console.log(`\t#${index + 1}. [${item.tagName}]`)
 
                         if (item.tagName == "P") {
                             const li = ListService.convertBlockToLi(item);
@@ -535,22 +485,17 @@ const insertList = (editor: HTMLDivElement, targetList: { tag: 'ul' | 'ol', clas
             // CRITICAL FIX: Inject checkboxes when switching to checkbox mode
             // LIs are moved (reparented), not added, so MutationObserver doesn't detect them
             if (newList && targetList.id === 'checkbox-wrapper') {
-                console.log('[List] Injecting checkboxes after switch to checkbox mode');
                 newList.querySelectorAll('li').forEach(li => injectCheckbox(li as HTMLElement));
             }
-            console.groupEnd()
         }
         // #endregion
 
         // #region Case 2: Append/Split List (The Surgery)
         else if (startElement.tagName == "LI" || endElement.tagName == "LI") {
-            console.groupCollapsed("CASE 2: Append/Split List (The Surgery)");
-            console.log("Range Selection either start or end is a list tag.");
 
             const currentList = startElement.tagName == "LI" ? startElement.closest('ul, ol') : endElement.closest('ul, ol');
 
             if (currentList.id && currentList.id == targetList.id) {
-            console.groupCollapsed("Add into same list");
             const selectedBlocks = getSelectedBlocks(editor, range, BLOCK_TAGS.filter((tag) => ['P', 'LI'].includes(tag)))
 
             // Check the position of the first selected P tag relative to the list
@@ -569,29 +514,14 @@ const insertList = (editor: HTMLDivElement, targetList: { tag: 'ul' | 'ol', clas
                     currentList.appendChild(li);
                 });
             }
-            console.log(`Successfully converted [${selectedBlocks.length}] blocks to <li> items.`);
-            console.groupEnd();
         } else {
-            console.groupCollapsed("Mismatch detected or new list requested. Splitting and converting...");
             const selectedBlocks = getSelectedBlocks(editor, range, ['P', 'LI']);
-
-            console.groupCollapsed("Selected Blocks (" + selectedBlocks.length + ")")
-            selectedBlocks.forEach((block, index) => {
-                console.log(`\t#${index + 1}[${block.tagName}]. ${block.textContent}`)
-            })
-            console.groupEnd();
 
             // 1. Determine relative position
             const firstBlock = selectedBlocks[0];
             const lastBlock = selectedBlocks[selectedBlocks.length - 1];
             const isInsertingBefore = firstBlock.tagName === 'P' && lastBlock.tagName === 'LI';
             const isInsertingAfter = firstBlock.tagName === 'LI' && lastBlock.tagName === 'P';
-
-            console.log(`First Block: [${firstBlock.tagName}] ${firstBlock.textContent}`)
-            console.log(`Last Block: [${lastBlock.tagName}] ${lastBlock.textContent}`)
-            console.log("Is Inserting Before: ", isInsertingBefore)
-            console.log("Is Inserting After: ", isInsertingAfter)
-
 
             // 2. Create the new list
             const newList = document.createElement(targetList.tag.toUpperCase()) as HTMLUListElement | HTMLOListElement;
@@ -603,7 +533,6 @@ const insertList = (editor: HTMLDivElement, targetList: { tag: 'ul' | 'ol', clas
                 // INSERT BEFORE: 
                 currentList.before(newList);
                 selectedBlocks.forEach((block, index) => {
-                    console.log(`Processing #${index + 1} <${block.tagName.toLowerCase()}> -- insert Before`)
                     if (block.tagName === 'P') {
                         newList.appendChild(ListService.convertBlockToLi(block));
                     } else if (block.tagName === 'LI') {
@@ -614,7 +543,6 @@ const insertList = (editor: HTMLDivElement, targetList: { tag: 'ul' | 'ol', clas
                 // INSERT AFTER:
                 currentList.after(newList);
                 const startLi = firstBlock.closest('li');
-                console.log(`Start LI: [${startLi.tagName}] ${startLi.textContent}`)
                 if (startLi) {
                     let nodeToMove: ChildNode | null = startLi;
                     while (nodeToMove) {
@@ -625,7 +553,6 @@ const insertList = (editor: HTMLDivElement, targetList: { tag: 'ul' | 'ol', clas
                 }
                 // Now append the remaining P tags
                 selectedBlocks.forEach((block, index) => {
-                    console.log(`Processing #${index + 1} <${block.tagName.toLowerCase()}> -- append to new list`)
                     if (block.tagName === 'P') {
                         newList.appendChild(ListService.convertBlockToLi(block));
                     } else if (block.tagName === 'LI') {
@@ -635,17 +562,13 @@ const insertList = (editor: HTMLDivElement, targetList: { tag: 'ul' | 'ol', clas
             }
             // 4. Cleanup
             if (currentList.children.length === 0) currentList.remove();
-            console.groupEnd();
         }
-        console.groupEnd();
     }
     // #endregion
     } // End of if (currentList)
 
     // #region  Case 3: Create New List
     else {
-        console.groupCollapsed("CASE 3: Create New List");
-        console.log("Range Selection neither start nor end is a list tag.");
 
         // Get the actual selected blocks first
         let selectedBlocks = getSelectedBlocks(editor, range);
@@ -657,17 +580,14 @@ const insertList = (editor: HTMLDivElement, targetList: { tag: 'ul' | 'ol', clas
 
         // Path A: Join existing list
         if (isList && previousSibling!.id === targetList.id) {
-            console.log("Previous List and Target List are the same. Join.");
             const selectedBlocks = getSelectedBlocks(editor, range, ['P']);
 
             selectedBlocks.forEach((block, index) => {
-                console.log(`Processing #${index + 1} <${block.tagName.toLowerCase()}>`);
                 previousSibling!.appendChild(ListService.convertBlockToLi(block));
             });
         }
         // Path B: Create new list (Handles both "Different ID" and "No Preceding List")
         else {
-            console.log(isList ? "Previous List and Target List are different. Create new list." : "No preceding list. Create new list.");
 
             // 1. Get ALL selected blocks
             let selectedBlocks = getSelectedBlocks(editor, range);
@@ -700,13 +620,11 @@ const insertList = (editor: HTMLDivElement, targetList: { tag: 'ul' | 'ol', clas
 
             // 5. Process blocks
             selectedBlocks.forEach((block, index) => {
-                console.log(`Processing #${index + 1} <${block.tagName.toLowerCase()}>`);
                 if (block.tagName.toUpperCase() === 'LI') {
                     newList.appendChild(block);
                 } else if (block.tagName.toUpperCase() === 'UL' || block.tagName.toUpperCase() === 'OL') {
                     const allLIs = Array.from(block.querySelectorAll('li')) as HTMLLIElement[];
                     const intersectingLIs = allLIs.filter(li => range.intersectsNode(li));
-                    console.log(`\tList has ${allLIs.length} LIs, ${intersectingLIs.length} intersect with range`);
                     if (intersectingLIs.length === allLIs.length) {
                         intersectingLIs.forEach(li => newList.appendChild(li));
                         block.remove();
@@ -729,34 +647,26 @@ const insertList = (editor: HTMLDivElement, targetList: { tag: 'ul' | 'ol', clas
                 firstBlock.appendChild(newList);
             }
 
-            console.log("Created a new list successfully.");
-
             // CRITICAL FIX: Inject checkboxes when creating a new checkbox list
             // LIs are added via appendChild, MutationObserver should detect but doesn't in some cases
             if (targetList.id === 'checkbox-wrapper') {
-                console.log('[List] Injecting checkboxes after creating new checkbox list');
                 newList.querySelectorAll('li').forEach(li => injectCheckbox(li as HTMLElement));
             }
         }
-        console.groupEnd();
     }
     // #endregion
 
     // #region Restore Selection
-    console.log("Restore selection.")
     if (startRange.node && startRange.node.isConnected) {
         restoreRangePosition(selection, startRange, endRange);
     } else {
         console.warn("[List] Cannot restore selection: Nodes were destroyed during flatten.");
     }
     // #endregion
-    console.groupEnd();
 
 }
 
 const insertList_ = (editor: HTMLDivElement, listTag: 'ul' | 'ol', classToAdd: string, classToRemove: string, mode: ListMode) => {
-
-    console.groupCollapsed("[List] Inserting List (mode: " + mode + ")")
 
     const { selection } = getSelection(editor);
     if (!selection) return
@@ -772,18 +682,16 @@ const insertList_ = (editor: HTMLDivElement, listTag: 'ul' | 'ol', classToAdd: s
     // 3. Execute Logic based on Context
     if (existingList) {
         if (currentMode === mode) {
-            console.log('[List] 🔄 Toggling OFF'); // CASE A: Toggle Off (User clicked active mode)
+            // CASE A: Toggle Off (User clicked active mode)
             toggleListOff(existingList, mode, editor);
             return;
         } else {
-            console.groupCollapsed('[List] 🔄 Switching Mode'); // CASE B: Switch Mode (User clicked different mode)
+            // CASE B: Switch Mode (User clicked different mode)
             switchListMode(existingList, listTag, editor);
-            console.groupEnd();
         }
     } else {
-        console.log('[List] ➕ Creating New List'); // CASE C: Create New List
+        // CASE C: Create New List
 
-        console.log("[List] Before create new list. To check block class.")
         const selectedBlocks: HTMLElement[] = [];
         if (selection && selection.rangeCount > 0) {
             if (selection.isCollapsed) {
@@ -800,14 +708,11 @@ const insertList_ = (editor: HTMLDivElement, listTag: 'ul' | 'ol', classToAdd: s
             }
         }
 
-
         const command = listTag === 'ul' ? 'insertUnorderedList' : 'insertOrderedList';
         document.execCommand(command, false);
 
-        console.log("[List] Unwrapping paragraphs")
         unwrapParagraph(editor, listTag);
 
-        console.log("[List] Restore class to blocks");
         const currentBlock = getClosestElementFromSelection(selection, listTag);
         const liItems = currentBlock.querySelectorAll('li');
         if (liItems.length == selectedBlocks.length) {
@@ -822,10 +727,8 @@ const insertList_ = (editor: HTMLDivElement, listTag: 'ul' | 'ol', classToAdd: s
         }
     }
 
-    console.log("Apply Styles.")
     // 4. Apply Styles & Components (Runs for Case B and C)
     styleActiveList(editor, listTag, mode, { add: classToAdd, remove: classToRemove });
-    console.groupEnd();
 };
 // #endregion
 
@@ -850,15 +753,11 @@ const injectCheckbox = (li: HTMLElement) => {
     render(<Checkbox />, wrapper);
 };
 const injectCheckbox_ = (li: HTMLElement) => {
-    console.groupCollapsed(`[injectCheckbox] Processing list item: ${li.textContent?.substring(0, 30)}`)
 
     const existingWrapper = li.querySelector('#woby-checkbox-wrapper')
     if (existingWrapper) {
-        console.log('[injectCheckbox] 🗑️ Removing existing checkbox wrapper')
         existingWrapper.remove()
     }
-
-    console.log('[injectCheckbox] ✅ Applied list item styles (relative positioning, padding)')
 
     // 3. Create the container
     const wrapper = document.createElement('span')
@@ -869,12 +768,9 @@ const injectCheckbox_ = (li: HTMLElement) => {
 
     // 4. Insert at start
     li.prepend(wrapper)
-    console.log('[injectCheckbox] 📦 Checkbox wrapper created and inserted at start of list item')
 
     // 5. Render the Woby Component
     render(<Checkbox />, wrapper)
-    console.log('[injectCheckbox] ✅ Checkbox component rendered successfully')
-    console.groupEnd()
 }
 
 const removeCheckboxWrapper = (listEl: HTMLElement) => {
@@ -883,7 +779,6 @@ const removeCheckboxWrapper = (listEl: HTMLElement) => {
     });
 };
 const removeCheckboxWrapper_ = (listEl: HTMLElement) => {
-    console.groupCollapsed(`[removeCheckboxWrapper] Removing checkboxes from ${listEl.tagName}`)
 
     const items: HTMLElement[] = [];
 
@@ -895,15 +790,12 @@ const removeCheckboxWrapper_ = (listEl: HTMLElement) => {
         listEl.tagName == 'LI' ? items.push(listEl) : null;
     }
 
-    console.log(`[removeCheckboxWrapper] Processing ${items.length} list items`)
-
     let removedCount = 0
 
     items.forEach((li, index) => {
         const wrapper = li.querySelector('#woby-checkbox-wrapper')
 
         if (wrapper) {
-            console.log(`[removeCheckboxWrapper] Removing wrapper from item ${index + 1}`)
             wrapper.remove()
             removedCount++
         }
@@ -914,8 +806,6 @@ const removeCheckboxWrapper_ = (listEl: HTMLElement) => {
         }
     })
 
-    console.log(`[removeCheckboxWrapper] ✅ Complete - Removed ${removedCount} checkbox wrappers`)
-    console.groupEnd()
 }
 // #endregion
 
@@ -963,22 +853,19 @@ const toggleListOff = (listEl: HTMLElement, mode: ListMode, editor: HTMLElement)
 
     listEl.replaceWith(fragment);
 
-    console.log("[List] Restoring selection:")
     if (state && state.startContainer && state.startContainer.isConnected) {
-        console.log("[List] use restoreRangePosition")
         // restoreRangePosition(selection, state.startContainer, state.startOffset, state.endContainer, state.endOffset, state.isCollapsed)
         const start = { node: state.startContainer, offset: state.startOffset };
         const end = state.isCollapsed || !state.endContainer ? undefined : { node: state.endContainer, offset: state.endOffset };
         restoreRangePosition(selection, start, end);
     } else if (lastNode && selection) {
-        console.log("[List] use range selection")
         const range = document.createRange();
         range.selectNodeContents(lastNode);
         range.collapse(false);
         selection.removeAllRanges();
         selection.addRange(range);
     } else {
-        console.log("[List] no selection to restore")
+        // No selection to restore
     }
 };
 
@@ -999,15 +886,10 @@ const switchListMode = (listEl: HTMLElement, targetTag: 'ul' | 'ol', editor: HTM
     // 4. Restore Cursor
     restoreCursorPosition(newList, cursorSnapshot);
 
-    console.log(`[List] Switched to ${targetTag} mode.`);
 };
 
 /** 1.Captures the active list item index and relative character offset */
 const captureCursorPosition = (listEl: HTMLElement, editor: HTMLElement) => {
-
-    console.log("[List] Capture Cursor Position: ", {
-        listEl, editor
-    })
 
     const { selection } = getSelection(editor);
     if (!selection?.rangeCount) return null;
@@ -1015,8 +897,6 @@ const captureCursorPosition = (listEl: HTMLElement, editor: HTMLElement) => {
     const range = selection.getRangeAt(0);
     const activeLi = range.startContainer.parentElement?.closest('li');
     if (!activeLi) return null;
-
-    console.log("Active LI: ", activeLi)
 
     const liIndex = Array.from(listEl.querySelectorAll('li')).indexOf(activeLi);
 
@@ -1186,12 +1066,10 @@ const switchListMode_ = (listEl: HTMLElement, targetTag: 'ul' | 'ol', editor: HT
         }
     }
 
-    console.log(`[List] Switched to ${targetTag} and selection restored.`);
 };
 
 /** Logic to apply classes, IDs, and components to the active list */
 const styleActiveList = (editor: HTMLElement, listTag: string, mode: ListMode, classes: { add: string, remove: string }) => {
-    console.log("[List] 🎨 Styling List", { listTag, mode, add: classes.add, remove: classes.remove, })
     const { selection } = getSelection(editor);
     if (!selection?.rangeCount) return;
 
@@ -1210,9 +1088,7 @@ const styleActiveList = (editor: HTMLElement, listTag: string, mode: ListMode, c
     const toRemove = classes.remove.split(' ').filter(c => c);
     const toAdd = classes.add.split(' ').filter(c => c);
 
-    console.log("[List] 🎨 Removing Classes:", toRemove);
     listEl.classList.remove(...toRemove);
-    console.log("[List] 🎨 Adding Classes:", toAdd);
     listEl.classList.add(...toAdd);
 
     // 3. Inject checkboxes if mode is checkbox
@@ -1224,7 +1100,6 @@ const styleActiveList = (editor: HTMLElement, listTag: string, mode: ListMode, c
 };
 
 const styleActiveList_ = (editor: HTMLElement, listTag: string, mode: ListMode, classes: { add: string, remove: string }) => {
-    console.log('[List] 🎨 Styling List');
 
     let { selection, state } = getSelection(editor);
     if (!selection?.rangeCount) return;
@@ -1263,7 +1138,6 @@ const unwrapParagraph = (editor: HTMLDivElement, listTag: 'ul' | 'ol') => {
 
             if (parentTag === 'P') {
                 // 2. Unwrap <p> tag
-                console.log('[List] 🛠️ Unwrapping invalid parent <P>');
                 const parentElement = newList.parentElement;
                 const fragment = document.createDocumentFragment();
 
@@ -1281,8 +1155,7 @@ const unwrapParagraph = (editor: HTMLDivElement, listTag: 'ul' | 'ol') => {
                 const endRange = postSelection.state.isCollapsed || !postSelection.state.endContainer ? undefined : { node: postSelection.state.endContainer, offset: postSelection.state.endOffset }
                 restoreRangePosition(postSelection.selection, startRange, endRange)
             } else {
-                // It's not a P tag, so just log it as requested
-                console.log(`[List] ℹ️ Parent is <${parentTag}>, no unwrap needed.`);
+                // Parent is not a P tag, no unwrap needed
             }
         }
     }

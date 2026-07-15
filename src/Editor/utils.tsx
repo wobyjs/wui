@@ -45,7 +45,6 @@ export const getSelectedBlocks = (container: HTMLElement, range: Range, blockTag
             // Query the assigned (light DOM) elements
             const host = root.host as HTMLElement;
             allBlocks = Array.from(host.querySelectorAll(blockTags.join(',')));
-            console.log('[getSelectedBlocks] Shadow DOM detected, querying light DOM via host. Found:', allBlocks.length, 'blocks');
         } else {
             // No slot, query shadow DOM
             allBlocks = Array.from(container.querySelectorAll(blockTags.join(',')));
@@ -60,8 +59,6 @@ export const getSelectedBlocks = (container: HTMLElement, range: Range, blockTag
         // range.intersectsNode returns true if the block is even partially selected
         return range.intersectsNode(block);
     }) as HTMLElement[];
-
-    console.log('[getSelectedBlocks] Filtered to', result.length, 'blocks in range. Tags:', result.map(b => b.tagName).join(', '));
 
     return result;
 };
@@ -287,24 +284,6 @@ export function restoreRangePosition(selection: Selection, start: { node: Node, 
 
 }
 
-// export const restoreRangePosition = (selection: Selection, startNode: Node, startOffset: number, endNode?: Node, endOffset?: number, collapsed: boolean = true) => {
-//     const newRange = document.createRange();
-
-//     try {
-//         newRange.setStart(startNode, startOffset);
-
-//         if (collapsed) {
-//             newRange.collapse(true);
-//         } else if (endNode && endOffset !== undefined) {
-//             newRange.setEnd(endNode, endOffset);
-//         }
-
-//         selection.removeAllRanges();
-//         selection.addRange(newRange);
-//     } catch (e) {
-//         console.warn("[Utils] Failed to restore range position", e);
-//     }
-// };
 
 /**
  * Get selection state relative to a root node (default: document.body).
@@ -373,14 +352,8 @@ export function restoreSelection(state: SelectionState, root?: Node): void {
     root = root ?? $$(useEditor())
     const range = document.createRange()
 
-    // console.log('[restoreSelection] Attempting to restore state:', state)
-    // console.log('[restoreSelection] Root node:', root)
-
     const startNode = getNodeFromPath(state.startContainerPath, root)
     const endNode = getNodeFromPath(state.endContainerPath, root)
-
-    // console.log('[restoreSelection] Resolved startNode:', startNode, 'from path:', state.startContainerPath)
-    // console.log('[restoreSelection] Resolved endNode:', endNode, 'from path:', state.endContainerPath)
 
     if (!startNode || !endNode) {
         console.error('[restoreSelection] Failed to resolve startNode or endNode. Aborting restoration.')
@@ -403,9 +376,7 @@ export function restoreSelection(state: SelectionState, root?: Node): void {
     }
 
     try {
-        // console.log(`[restoreSelection] Setting start: Node=`, startNode, `Offset=`, clampedStartOffset, `(Original: ${state.startOffset}, Type: ${startNode.nodeType}, Node text/childNodes: "${startNode.nodeType === Node.TEXT_NODE ? startNode.textContent?.substring(0, 20) : startNode.childNodes.length}")`)
         range.setStart(startNode, clampedStartOffset)
-        // console.log(`[restoreSelection] Setting end: Node=`, endNode, `Offset=`, clampedEndOffset, `(Original: ${state.endOffset}, Type: ${endNode.nodeType}, Node text/childNodes: "${endNode.nodeType === Node.TEXT_NODE ? endNode.textContent?.substring(0, 20) : endNode.childNodes.length}")`)
         range.setEnd(endNode, clampedEndOffset)
     } catch (e) {
         console.error('[restoreSelection] Error setting range start/end:', e, {
@@ -422,9 +393,7 @@ export function restoreSelection(state: SelectionState, root?: Node): void {
     if (selection) {
         selection.removeAllRanges()
         selection.addRange(range)
-        // console.log('[restoreSelection] Selection restored successfully.')
     } else {
-        // console.error('[restoreSelection] window.getSelection() returned null. Cannot restore selection.')
     }
 }
 
@@ -552,7 +521,6 @@ export const selectText = (element: HTMLElement, range: Range, t: string) => {
 
 // Complex applyStyle function to be restored
 export const applyStyle = (styleSetter: (element: HTMLElement) => void) => {
-    console.groupCollapsed('[applyStyle] Applying styles...')
     const editor = $$(useEditor()) ?? $$(getCurrentEditor())
     const currentWindowSelection = window.getSelection()
 
@@ -569,11 +537,7 @@ export const applyStyle = (styleSetter: (element: HTMLElement) => void) => {
         return
     }
 
-    console.log('[applyStyle] Initial SelectionState:', initialSelectionState)
-    console.log('[applyStyle] Initial GlobalRange:', initialGlobalRange)
-
     if (initialSelectionState.state.isCollapsed) {
-        console.log('[applyStyle] Case: Initial selection is collapsed.')
         // Try to determine if the cursor is within a word
         const container = initialGlobalRange.startContainer
         const offset = initialGlobalRange.startOffset
@@ -598,14 +562,12 @@ export const applyStyle = (styleSetter: (element: HTMLElement) => void) => {
                 wordRange.setStart(container, start)
                 wordRange.setEnd(container, end)
                 originalCursorOffsetInWord = offset - start
-                console.log(`[applyStyle] Collapsed cursor in word: "${text.substring(start, end)}", original offset in word: ${originalCursorOffsetInWord}`)
             }
         }
         // TODO: Add similar logic for ELEMENT_NODE if cursor is at boundary of elements that form a word
 
         if (wordRange) {
             // Scenario A: Cursor within a word (e.g., wo|rd)
-            console.log('[applyStyle] Scenario A: Styling word based on cursor.', wordRange.toString())
             const spanElement = document.createElement('span')
             try {
                 wordRange.surroundContents(spanElement) // Modifies DOM, may invalidate initialGlobalRange's container/offset for the original node
@@ -619,7 +581,6 @@ export const applyStyle = (styleSetter: (element: HTMLElement) => void) => {
                         }
                         parent.removeChild(spanElement)
                     }
-                    console.log('[applyStyle] Word styled span was empty, unwrapped. Restoring original selection.')
                     if (initialSelectionState.state) restoreSelection(initialSelectionState.state, editor)
                 } else {
                     // Restore cursor to its original relative position within the styled word
@@ -631,7 +592,6 @@ export const applyStyle = (styleSetter: (element: HTMLElement) => void) => {
                         newRangeToRestore.collapse(true)
                         currentWindowSelection.removeAllRanges()
                         currentWindowSelection.addRange(newRangeToRestore)
-                        console.log('[applyStyle] Restored cursor inside styled word at offset:', newCursorOffset)
                     } else {
                         console.warn('[applyStyle] Could not restore cursor precisely in word, falling back to initial state restoration.')
                         if (initialSelectionState.state) restoreSelection(initialSelectionState.state, editor)
@@ -667,13 +627,11 @@ export const applyStyle = (styleSetter: (element: HTMLElement) => void) => {
             }
         } else {
             // Scenario B: Cursor in whitespace, or between words
-            console.log('[applyStyle] Scenario B: Inserting new styled span for typing.')
             const spanElement = document.createElement('span')
             styleSetter(spanElement)
 
             // Only insert if a style was actually applied or it's a non-attribute style like underline
             if (spanElement.getAttribute('style') === '' && !styleSetter.toString().includes('text-decoration')) {
-                console.log('[applyStyle] No style effectively applied, not inserting empty span. Restoring original cursor.')
                 if (initialSelectionState.state) restoreSelection(initialSelectionState.state, editor)
             } else {
                 spanElement.appendChild(document.createTextNode('\uFEFF')) // ZWNBSP
@@ -688,7 +646,6 @@ export const applyStyle = (styleSetter: (element: HTMLElement) => void) => {
                     // After replacement, the cursor is usually placed after the typed content by the browser.
                     currentWindowSelection.removeAllRanges()
                     currentWindowSelection.addRange(newCursorRange)
-                    console.log('[applyStyle] Inserted new styled span, ZWNBSP selected.')
                 } else {
                     console.error('[applyStyle] Failed to find ZWNBSP node in new span. Restoring original selection.')
                     if (initialSelectionState.state) restoreSelection(initialSelectionState.state, editor)
@@ -697,7 +654,6 @@ export const applyStyle = (styleSetter: (element: HTMLElement) => void) => {
         }
     } else {
         // Case: Initial selection is not collapsed (user selected a range)
-        console.log('[applyStyle] Case: Non-collapsed selection.')
         const spanElement = document.createElement('span')
         try {
             initialGlobalRange.surroundContents(spanElement) // Use the original range
@@ -732,17 +688,14 @@ export const applyStyle = (styleSetter: (element: HTMLElement) => void) => {
         // Restore the original selection boundaries
         if (initialSelectionState.state) {
             restoreSelection(initialSelectionState.state, editor)
-            console.log('[applyStyle] Restored original non-collapsed selection state.')
         }
     }
     // Ensure editor focus if needed, though selection changes should handle it.
     // $$(useEditor())?.focus()
-    console.groupEnd()
 }
 
 // #region apply style original
 export const applyStyleOriginal = (styleSetter: (element: HTMLElement) => void) => {
-    console.groupCollapsed('[applyStyle] Applying styles...')
     const editor = $$(useEditor()) ?? $$(getCurrentEditor())
     const currentWindowSelection = window.getSelection()
 
@@ -759,11 +712,7 @@ export const applyStyleOriginal = (styleSetter: (element: HTMLElement) => void) 
         return
     }
 
-    console.log('[applyStyle] Initial SelectionState:', initialSelectionState)
-    console.log('[applyStyle] Initial GlobalRange:', initialGlobalRange)
-
     if (initialSelectionState.state.isCollapsed) {
-        console.log('[applyStyle] Case: Initial selection is collapsed.')
         // Try to determine if the cursor is within a word
         const container = initialGlobalRange.startContainer
         const offset = initialGlobalRange.startOffset
@@ -788,14 +737,12 @@ export const applyStyleOriginal = (styleSetter: (element: HTMLElement) => void) 
                 wordRange.setStart(container, start)
                 wordRange.setEnd(container, end)
                 originalCursorOffsetInWord = offset - start
-                console.log(`[applyStyle] Collapsed cursor in word: "${text.substring(start, end)}", original offset in word: ${originalCursorOffsetInWord}`)
             }
         }
         // TODO: Add similar logic for ELEMENT_NODE if cursor is at boundary of elements that form a word
 
         if (wordRange) {
             // Scenario A: Cursor within a word (e.g., wo|rd)
-            console.log('[applyStyle] Scenario A: Styling word based on cursor.', wordRange.toString())
             const spanElement = document.createElement('span')
             try {
                 wordRange.surroundContents(spanElement) // Modifies DOM, may invalidate initialGlobalRange's container/offset for the original node
@@ -809,7 +756,6 @@ export const applyStyleOriginal = (styleSetter: (element: HTMLElement) => void) 
                         }
                         parent.removeChild(spanElement)
                     }
-                    console.log('[applyStyle] Word styled span was empty, unwrapped. Restoring original selection.')
                     if (initialSelectionState.state) restoreSelection(initialSelectionState.state, editor)
                 } else {
                     // Restore cursor to its original relative position within the styled word
@@ -821,7 +767,6 @@ export const applyStyleOriginal = (styleSetter: (element: HTMLElement) => void) 
                         newRangeToRestore.collapse(true)
                         currentWindowSelection.removeAllRanges()
                         currentWindowSelection.addRange(newRangeToRestore)
-                        console.log('[applyStyle] Restored cursor inside styled word at offset:', newCursorOffset)
                     } else {
                         console.warn('[applyStyle] Could not restore cursor precisely in word, falling back to initial state restoration.')
                         if (initialSelectionState.state) restoreSelection(initialSelectionState.state, editor)
@@ -857,13 +802,11 @@ export const applyStyleOriginal = (styleSetter: (element: HTMLElement) => void) 
             }
         } else {
             // Scenario B: Cursor in whitespace, or between words
-            console.log('[applyStyle] Scenario B: Inserting new styled span for typing.')
             const spanElement = document.createElement('span')
             styleSetter(spanElement)
 
             // Only insert if a style was actually applied or it's a non-attribute style like underline
             if (spanElement.getAttribute('style') === '' && !styleSetter.toString().includes('text-decoration')) {
-                console.log('[applyStyle] No style effectively applied, not inserting empty span. Restoring original cursor.')
                 if (initialSelectionState.state) restoreSelection(initialSelectionState.state, editor)
             } else {
                 spanElement.appendChild(document.createTextNode('\uFEFF')) // ZWNBSP
@@ -878,7 +821,6 @@ export const applyStyleOriginal = (styleSetter: (element: HTMLElement) => void) 
                     // After replacement, the cursor is usually placed after the typed content by the browser.
                     currentWindowSelection.removeAllRanges()
                     currentWindowSelection.addRange(newCursorRange)
-                    console.log('[applyStyle] Inserted new styled span, ZWNBSP selected.')
                 } else {
                     console.error('[applyStyle] Failed to find ZWNBSP node in new span. Restoring original selection.')
                     if (initialSelectionState.state) restoreSelection(initialSelectionState.state, editor)
@@ -887,7 +829,6 @@ export const applyStyleOriginal = (styleSetter: (element: HTMLElement) => void) 
         }
     } else {
         // Case: Initial selection is not collapsed (user selected a range)
-        console.log('[applyStyle] Case: Non-collapsed selection.')
         const spanElement = document.createElement('span')
         try {
             initialGlobalRange.surroundContents(spanElement) // Use the original range
@@ -922,12 +863,10 @@ export const applyStyleOriginal = (styleSetter: (element: HTMLElement) => void) 
         // Restore the original selection boundaries
         if (initialSelectionState.state) {
             restoreSelection(initialSelectionState.state, editor)
-            console.log('[applyStyle] Restored original non-collapsed selection state.')
         }
     }
     // Ensure editor focus if needed, though selection changes should handle it.
     // $$(useEditor())?.focus()
-    console.groupEnd()
 }
 // #endregion
 

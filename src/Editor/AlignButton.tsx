@@ -184,7 +184,6 @@ export const applyTextAlign = (alignment: ContentAlign, classes: { toAdd: string
     }
 
     selectedItems.forEach((target, index) => {
-        console.log(`[Alignment] #${index + 1} Setting ${target.tagName.toLowerCase()} to ${alignment}`);
 
         const toAdd = classes.toAdd.split(' ').filter(c => c);
         const toRemove = classes.toRemove.split(' ').filter(c => c);

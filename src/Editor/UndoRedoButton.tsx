@@ -18,9 +18,7 @@ const UndoRedoButton = defaults(def, (props) => {
     // We don't destructure 'title' or 'disabled' here so we can control them dynamically
     const { mode, cls, class: cn, ...otherProps } = props
 
-    console.log('[UndoRedoButton] Attempting to use context...');
     const undoRedoContext = useUndoRedo();
-    console.log('[UndoRedoButton] Context value:', undoRedoContext);
 
     // Create default empty observables as fallback
     const fallbackUndos = $([] as string[]);
@@ -96,13 +94,8 @@ const editorProviderDef = () => ({
 const EditorProvider = defaults(editorProviderDef, (props) => {
     const { children } = props;
 
-    console.log('[EditorProvider] Initializing...');
-
     // Create an observable to hold the editor reference
     const editorRef = $<HTMLDivElement | null>(null);
-
-    console.log('[EditorProvider] Providing EditorContext...');
-    console.log('[EditorProvider] Initial editor value:', $$(editorRef));
 
     return (
         <EditorContext.Provider value={editorRef}>

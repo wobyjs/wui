@@ -1,4 +1,4 @@
-//@ts-ignore
+// @ts-expect-error -- complex import with mixed type/value specifiers
 import { nanoid } from 'nanoid'
 import { ObservableMaybe, useEffect, $, $$, isObservable, Observable, type JSX, FunctionMaybe, defaults, customElement, type ElementAttributes, HtmlBoolean, HtmlString, useMemo, HtmlClass } from 'woby'
 import {

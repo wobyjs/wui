@@ -44,10 +44,6 @@ const Wheeler = defaults(def, (props) => {
     //     }
     // })
 
-    // useEffect(() =>
-    //     console.log('Wheeler', 'visible', $$(isVisible))
-    // )
-
     const hide = () => {
         isVisible(false)
         if (isObservable(visibleProp)) {
@@ -607,7 +603,7 @@ const Wheeler = defaults(def, (props) => {
     // #endregion
 
 
-    // #region Original Toggle All
+    // #region Toggle All
     /**
      * `toggleAll` is the event handler for a "Select All / Deselect All" action.
      *
@@ -653,7 +649,7 @@ const Wheeler = defaults(def, (props) => {
     // #endregion
 
 
-    // #region Original Layout Effect
+    // #region Layout Effect
     /**
      * This is the main Layout & Geometry Synchronization Hook for the Wheeler.
      *
@@ -710,9 +706,6 @@ const Wheeler = defaults(def, (props) => {
         // This ensures that if the list of options changes, the visual position of the
         // selected item remains correctly centered in the viewport.
         snapToIndex($$(selectedIndex))
-
-        // Example debug log to see the results of the layout calculation.
-        // console.log(`Layout Updated: count=${itemCount}, h=${viewportHeight}, pad=${paddingItemCount}, minY=${minTranslateY}, maxY=${maxTranslateY}`);
     })
     // #endregion
 
@@ -1851,7 +1844,7 @@ const Wheeler = defaults(def, (props) => {
 
         // Priority 2: If no custom placeholder, try to derive one from the header.
         if (header) {
-            // @ts-ignore - header is FunctionMaybe<Child> which can be callable
+            // @ts-expect-error - header is FunctionMaybe<Child> which can be callable
             const headerContent = $$(header)(value)
             if (typeof headerContent === 'string' && headerContent.length > 0) {
                 return `Enter ${headerContent.toLowerCase()}`

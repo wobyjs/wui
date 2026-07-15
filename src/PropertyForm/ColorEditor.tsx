@@ -1,7 +1,8 @@
 /** @jsxImportSource woby */
 
 import { $$, ObservableMaybe, isObservable } from "woby"
-import { Editors, TableRow, UIProps, skippedProperties } from "./PropertyForm"
+import { Editors, UIProps, skippedProperties } from "./Editors"
+import { TableRow } from "./PropertyForm"
 import { EditorProps } from "./EditorProps"
 
 export const ColorEditor = () => {
@@ -56,7 +57,6 @@ export const ColorEditor = () => {
 					id="alpha"
 					onChange={(e) => {
 						const value = e.target.value
-						console.log("alpha", value)
 					}}
 					min={"0"}
 					max={"1"}

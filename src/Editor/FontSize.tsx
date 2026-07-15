@@ -28,7 +28,6 @@ const FontSize = defaults(def, (props) => {
         const syncWithSelection = () => {
             const el = editor ?? getCurrentEditor();
             if (!$$(el)) {
-                console.log('[FontSize] No editor found, skipping selection sync');
                 return;
             }
 
@@ -89,7 +88,6 @@ const FontSize = defaults(def, (props) => {
 
             // 3. Update the UI if we found a valid size
             if (smallestSize !== Infinity && $$(fontSize) !== smallestSize) {
-                console.log(`[FontSize] 🆕 Updating observed font size from ${$$(fontSize)} to ${smallestSize}`);
                 if (isObservable(fontSize)) {
                     fontSize(smallestSize);
                 }
@@ -105,7 +103,6 @@ const FontSize = defaults(def, (props) => {
 
     // #region Actions (Internal Logic)
     const applyNewSize = (size: number) => {
-        console.log('[FontSize] applyNewSize called, size:', size)
         if (isNaN(size) || size <= 0) return;
         fontSize(size);
         applyFontSizeStyle(size + "px");
@@ -114,7 +111,6 @@ const FontSize = defaults(def, (props) => {
 
     // #region Event Handlers
     const onStepClick = (delta: number) => (e: MouseEvent) => {
-        console.log('[FontSize] onStepClick called, delta:', delta)
         e.preventDefault(); // Prevent losing focus
         applyNewSize(Math.max(1, $$(fontSize) + delta));
     };

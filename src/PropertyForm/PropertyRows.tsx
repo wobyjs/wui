@@ -1,8 +1,9 @@
 /** @jsxImportSource woby */
 
-import { $$, type JSX } from "woby"
+import { $, $$, type JSX, defaults, customElement, type ElementAttributes } from "woby"
 import { Button } from "../Button"
-import { changeEnumerable, Editors } from "./PropertyForm"
+import { changeEnumerable } from "./PropertyForm"
+import { Editors } from "./Editors"
 
 type PropertyRowProps = {
 	obj: any
@@ -12,13 +13,19 @@ type PropertyRowProps = {
 	onCommit?: () => void
 }
 
-export const PropertyRows = (props: PropertyRowProps) => {
-	changeEnumerable(props.obj)
+export const PropertyRows = defaults(() => ({
+	obj: $(null as any),
+	order: $([]),
+	className: $(''),
+	indentLvl: $(0),
+	onCommit: null as (() => void) | null,
+}), (props: PropertyRowProps) => {
 	const { obj, order, indentLvl } = props
-	const formUI = $$(Editors).map((e) => e())
+	const getFormUI = () => $$(Editors).map((e) => e())
 	const dashMatchReg = /^-([a-zA-Z].*)-$/
 
 	const renderForm = (propertyData: object, title?: string, order?: string[]) => {
+		changeEnumerable(propertyData)
 		const sortedKeys = Object.keys(propertyData).sort((a, b) => order?.indexOf(a) - order?.indexOf(b))
 		if (sortedKeys.indexOf("colLabel") != -1) {
 			sortedKeys.splice(sortedKeys.indexOf("colLabel"), 1)
@@ -46,7 +53,7 @@ export const PropertyRows = (props: PropertyRowProps) => {
 					{() =>
 						($$(value) && !(value instanceof HTMLElement)) || $$(value) === 0 || $$(value) === false ? (
 							<>
-								{formUI.map((formFields) => {
+								{getFormUI().map((formFields) => {
 									const { UI, renderCondition } = formFields
 									const renderCon = renderCondition(value, key)
 
@@ -73,7 +80,7 @@ export const PropertyRows = (props: PropertyRowProps) => {
 
 	return (
 		<>
-			{renderForm(obj, undefined, order)}
+			{() => { $$(Editors); const data = $$(obj); return data ? renderForm(data, undefined, $$(order)) : null }}
 			<div>
 				{() =>
 					props.onCommit ? (
@@ -90,4 +97,18 @@ export const PropertyRows = (props: PropertyRowProps) => {
 			</div>
 		</>
 	)
+})
+
+// NOTE: Register the custom element
+customElement('wui-property-rows', PropertyRows)
+
+// NOTE: Add the custom element to the JSX namespace
+declare module 'woby' {
+	namespace JSX {
+		interface IntrinsicElements {
+			'wui-property-rows': ElementAttributes<typeof PropertyRows>
+		}
+	}
 }
+
+export default PropertyRows

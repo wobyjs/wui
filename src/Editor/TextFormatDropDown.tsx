@@ -69,11 +69,9 @@ const TextFormatDropDown = defaults(def, (props) => {
         const handleKeyDown = (event: KeyboardEvent) => {
             const el = editor ?? getCurrentEditor()
             if (!$$(el)) {
-                // console.log('[TextFormatDropDown] No editor found, skipping hotkey')
                 return
             }
 
-            // console.groupCollapsed('[TextFormatDropDown] Hotkey pressed:', event.key, `Ctrl:${event.ctrlKey} Alt:${event.altKey} Shift:${event.shiftKey}`)
             for (const opt of FORMAT_OPTIONS) {
                 if (!opt.hotkey) continue
                 const parts = opt.hotkey.split('+')
@@ -82,28 +80,15 @@ const TextFormatDropDown = defaults(def, (props) => {
                 const alt = parts.includes('Alt')
                 const shift = parts.includes('Shift')
 
-                // console.log(`[TextFormatDropDown] Checking hotkey: ${opt.hotkey} for format: ${opt.label}`)
-
                 if (key && event.key.toUpperCase() === key && event.ctrlKey === ctrl && event.altKey === alt && event.shiftKey === shift) {
                     let target = event.target as HTMLElement
                     const currentDropdownEl = $$(dropdownRef)
-
-                    // console.log('[TextFormatDropDown] Hotkey matched!', {
-                    //     format: opt.label,
-                    //     hotkey: opt.hotkey,
-                    //     tag: opt.tag,
-                    //     targetTag: target.tagName,
-                    //     isInEditor: $$(el).contains(target),
-                    //     isEditor: target === $$(el),
-                    //     isInDropdown: currentDropdownEl?.contains(target)
-                    // })
 
                     if (target.tagName.toLowerCase() === 'wui-editor') {
                         const shadowRoot = (target as HTMLElement).shadowRoot
                         if (shadowRoot) {
                             const shadowEditor = shadowRoot.querySelector('[data-editor-root]') as HTMLElement
                             if (shadowEditor) {
-                                // console.log("Redirecting target from wui-editor to shadow DOM contenteditable:", shadowEditor)
                                 target = shadowEditor as HTMLElement
                             }
                         }
@@ -111,21 +96,16 @@ const TextFormatDropDown = defaults(def, (props) => {
 
                     // Check if event is relevant to this editor
                     if ($$(el).contains(target) || target === $$(el) || currentDropdownEl?.contains(target)) {
-                        // console.log('[TextFormatDropDown] Applying format:', opt.tag)
                         event.preventDefault()
                         applyFormatBlockStyle(opt.tag, opt.class)
                         saveDo()
                         selectedFormat(opt.label as TextFormatOptions)
                         isOpen(false)
                         $$(el).focus()
-                        // console.groupEnd()
                         break
-                    } else {
-                        // console.log('[TextFormatDropDown] Target not in editor scope, ignoring')
                     }
                 }
             }
-            console.groupEnd()
         }
         document.addEventListener('keydown', handleKeyDown)
         return () => document.removeEventListener('keydown', handleKeyDown)

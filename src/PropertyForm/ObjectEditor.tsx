@@ -1,7 +1,6 @@
 /** @jsxImportSource woby */
 import { $, $$, ObservableMaybe, isObservable, useEffect } from "woby"
-import { Editors, UIProps, indent, skippedProperties } from "./PropertyForm"
-import { Collapse } from "../Collapse"
+import { Editors, UIProps, indent, skippedProperties } from "./Editors"
 import { PropertyRows } from "./PropertyRows"
 
 export const ObjectEditor = () => {
@@ -35,9 +34,7 @@ export const ObjectEditor = () => {
 					<th className={`flex items-center whitespace-nowrap`}>{
 						<button
 							class={"w-5 h-5 cursor-pointer"}
-							onClick={() =>
-								open(!$$(open))
-							}
+							ref={el => { if (el) el.onclick = () => { open(v => !v) } }}
 						>
 							{() => $$(open) ? <svg xmlns="http://www.w3.org/2000/svg" class="h-full w-full text-gray-500" viewBox="0 0 20 20" fill="currentColor">
 								<path fill-rule="evenodd" d="M4 10a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1z" clip-rule="evenodd" />
@@ -48,22 +45,23 @@ export const ObjectEditor = () => {
 						</button>}
 					</th>
 					<th className={["w-full flex items-center justify-between outline-1 whitespace-nowrap text-left"]}>
-						<span className={() => ["whitespace-nowrap px-2 py-1", `${indent[indentLvl]}`]}>
+						<span className={() => ["whitespace-nowrap px-2 py-1", indent[indentLvl] ?? '']}>
 							{() => $$(optionName)}
 						</span>
 						{button}
 					</th>
 				</tr>
-				<Collapse
-					open={open}
-					background={false}
-				>
-					<PropertyRows
-						obj={$$(value)}
-						className={["h-fit bg-white"]}
-						indentLvl={indentLvl + 1}
-					/>
-				</Collapse >
+				{() => $$(open) ? (
+					<tr class="flex w-full items-stretch border-x border-b border-gray-200 bg-white">
+						<td class="w-full" colSpan={2}>
+							<PropertyRows
+								obj={$$(value)}
+								className={["h-fit bg-white"]}
+								indentLvl={indentLvl + 1}
+							/>
+						</td>
+					</tr>
+				) : null}
 			</>
 		)
 	}

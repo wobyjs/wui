@@ -9,7 +9,7 @@
     "declarationMap": false,
     "declarationDir": "./dist/types",
     "disableSizeLimit": true,
-    "esModuleInterop": false,
+    "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     // "importsNotUsedAsValues": "error",
     "inlineSourceMap": false,
@@ -39,16 +39,11 @@
     "strict": true,
     "strictBindCallApply": true,
     "strictFunctionTypes": true,
-    "strictNullChecks": false,
+    "strictNullChecks": true,
     "target": "es2020",
     "useDefineForClassFields": false,
     "useUnknownInCatchVariables": true,
-    "noImplicitAny": false,
-    "noUncheckedIndexedAccess": false,
-    "baseUrl": ".",
-    "typeRoots": [
-      "types"
-    ],
+    "noImplicitAny": true,
     "resolveJsonModule": true
     // "tsBuildInfoFile": "./dist/tsconfig.tsbuildinfo",
     // "composite": true,

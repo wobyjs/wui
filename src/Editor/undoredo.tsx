@@ -119,8 +119,6 @@ export const UndoRedo = ({ children, editor }: { children: JSX.Children, editor?
 
             if (!hasMeaningfulContent) {
                 // Shadow DOM is empty or has minimal content - poll for real content
-                console.log('[UndoRedo] Shadow DOM has minimal content, polling for real content...', initialContent.substring(0, 50))
-
                 // Poll every 50ms up to 10 retries (500ms total)
                 let retries = 0
                 const maxRetries = 10
@@ -137,7 +135,6 @@ export const UndoRedo = ({ children, editor }: { children: JSX.Children, editor?
                     if (polledHasContent) {
                         undos([{ content: polledContent }])
                         isInitialized(true)
-                        console.log('[UndoRedo] Poll succeeded at retry', retries, 'with:', polledContent.substring(0, 100))
                     } else if (retries < maxRetries) {
                         // Continue polling
                         setTimeout(pollForContent, pollInterval)
@@ -146,7 +143,6 @@ export const UndoRedo = ({ children, editor }: { children: JSX.Children, editor?
                         // This ensures undo stack is not empty, just may have limited initial state
                         undos([{ content: polledContent || '<br>' }])
                         isInitialized(true)
-                        console.log('[UndoRedo] Poll exhausted after', retries, 'retries, captured:', polledContent?.substring(0, 100) || 'empty')
                     }
                 }
 
@@ -155,7 +151,6 @@ export const UndoRedo = ({ children, editor }: { children: JSX.Children, editor?
                 // Content already present (e.g., manually set or sync already ran)
                 undos([{ content: initialContent }]) // initial state has no selection
                 isInitialized(true) // set observable
-                console.log('[UndoRedo] ✓ Initialized with meaningful content:', initialContent.substring(0, 100))
             }
         }
     }) // No dependency array, Woby will auto-track $$(editor) and $$(isInitialized)
@@ -205,7 +200,6 @@ export const UndoRedo = ({ children, editor }: { children: JSX.Children, editor?
             if (!$$(isInitialized)) {
                 undos([{ content: currentContent, selection: selectionData }])
                 isInitialized(true)
-                console.log('[UndoRedo] SaveDo initialized:', currentContent.substring(0, 100))
                 return
             }
 
@@ -222,7 +216,6 @@ export const UndoRedo = ({ children, editor }: { children: JSX.Children, editor?
 
                 undos(newUndos)
                 redos([]) // Clear redo stack on new action
-                console.log('[UndoRedo] Saved state:', newUndos.length, 'entries')
             }
         }, DEBOUNCE_MS)
     }
@@ -356,6 +349,13 @@ export const UndoRedo = ({ children, editor }: { children: JSX.Children, editor?
 
     // Bundle the state and functions together
     const rf = { undos, undo, redos, redo, saveDo }
+
+    // Cleanup: clear pending debounce timer on unmount
+    useEffect(() => {
+        return () => {
+            if (debounceTimer) clearTimeout(debounceTimer)
+        }
+    })
 
     // Provide this bundle to all child components (Buttons, Toolbars, etc.)
     return <UndoRedoContext.Provider value={rf}>{children}</UndoRedoContext.Provider>

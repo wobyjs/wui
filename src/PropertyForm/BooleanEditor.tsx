@@ -1,7 +1,8 @@
 /** @jsxImportSource woby */
 
 import { $, $$, ObservableMaybe, isObservable, useEffect } from "woby"
-import { Editors, TableRow, UIProps, skippedProperties } from "./PropertyForm"
+import { Editors, UIProps, skippedProperties } from "./Editors"
+import { TableRow } from "./PropertyForm"
 import { Checkbox } from "../Checkbox"
 import { EditorProps } from "./EditorProps"
 

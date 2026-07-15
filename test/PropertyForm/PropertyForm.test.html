@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>PropertyForm Custom Element Test</title>
+    <link href="/node_modules/@woby/chk/dist/index.css" rel="stylesheet">
+</head>
+
+<body>
+    <link href="../dist/wui.css" rel="stylesheet">
+    <h2 class="text-[1.2em] pl-4">PropertyForm Custom Element Test</h2>
+
+    <woby-chk name="PropertyForm TSX Component">
+        <div id="tsx-test-root"></div>
+    </woby-chk>
+
+    <woby-chk name="PropertyForm Custom Element">
+        <wui-property-form id="ce-property-form"></wui-property-form>
+    </woby-chk>
+
+    <woby-chk name="PropertyForm Dynamic Update">
+        <wui-property-form id="ce-dynamic"></wui-property-form>
+        <button id="ce-change-btn" class="mt-2 px-3 py-1 bg-blue-500 text-white rounded text-sm cursor-pointer">Change Username</button>
+    </woby-chk>
+
+    <woby-chk name="PropertyRows Custom Element">
+        <wui-property-rows id="ce-property-rows"></wui-property-rows>
+    </woby-chk>
+
+    <script type="module">
+        import { $ } from 'woby'
+        import { render } from 'woby'
+
+        // Import components and editors (side effects register them)
+        import '/src/PropertyForm/PropertyForm'
+        import '/src/PropertyForm/PropertyRows'
+        import '/src/PropertyForm/BooleanEditor'
+        import '/src/PropertyForm/StringEditor'
+        import '/src/PropertyForm/NumberEditor'
+        import '/src/PropertyForm/DropdownEditor'
+        import '/src/PropertyForm/ColorEditor'
+        import '/src/PropertyForm/ObjectEditor'
+
+        // Expose Editors to window for debugging
+        import { Editors } from '/src/PropertyForm/Editors'
+        window.Editors = Editors
+
+        // ── Sample data factory ──
+        const SampleProps = () => ({
+            username: $("JohnDoe_99"),
+            accountBalance: $(125),
+            isVerified: $(true),
+            brandColor: $("#1976d2"),
+            userRoles: $(["Admin", "Editor", "Viewer", "Guest"]),
+            settings: $({
+                notifications: $(true),
+                darkMode: $(false),
+                fontSize: $(14),
+            }),
+        })
+
+        // ── Test 1: TSX Component ──
+        const tsxProps = SampleProps()
+        const tsxRoot = document.getElementById('tsx-test-root')
+        if (tsxRoot) {
+            const { PropertyForm } = await import('/src/PropertyForm/PropertyForm')
+            render(PropertyForm({ obj: tsxProps }), tsxRoot)
+        }
+
+        // ── Test 2: Custom Element (obj assigned via props observable) ──
+        const ceProps = SampleProps()
+        const ceForm = document.getElementById('ce-property-form')
+        if (ceForm) {
+            ceForm.props.obj(ceProps)
+        }
+
+        // ── Test 3: Dynamic Update ──
+        const dynProps = SampleProps()
+        const dynForm = document.getElementById('ce-dynamic')
+        if (dynForm) {
+            dynForm.props.obj(dynProps)
+        }
+
+        const changeBtn = document.getElementById('ce-change-btn')
+        if (changeBtn) {
+            changeBtn.addEventListener('click', () => {
+                dynProps.username('JaneDoe_' + Math.floor(Math.random() * 100))
+            })
+        }
+
+        // ── Test 4: PropertyRows Custom Element ──
+        const rowsProps = {
+            title: $("Task Manager"),
+            count: $(7),
+            enabled: $(true),
+            color: $("#ff5722"),
+        }
+        const rowsEl = document.getElementById('ce-property-rows')
+        if (rowsEl) {
+            rowsEl.props.obj(rowsProps)
+        }
+
+        console.log('✅ PropertyForm tests initialized')
+        console.log('✅ TSX component rendered at #tsx-test-root')
+        console.log('✅ Custom element at #ce-property-form')
+        console.log('✅ Dynamic element at #ce-dynamic with Change Username button')
+        console.log('✅ PropertyRows at #ce-property-rows')
+    </script>
+</body>
+
+</html>

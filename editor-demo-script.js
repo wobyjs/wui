@@ -1,4 +1,5 @@
 import './src/index.tsx'
+import './src/Editor/CounterPlugin.ts'
 
 // Wait for custom element to be defined
 await customElements.whenDefined('wui-editor')

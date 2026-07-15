@@ -22,3 +22,13 @@ export { applyStyle as applyStyleLegacy } from './utils'
 
 // Focus management
 export { FocusManager } from './FocusManager'
+
+// Editor Plugin System
+export { registerEditorPlugin, unregisterEditorPlugin, getEditorPlugins, pluginsToInsertItems, serializeEditorContent } from './EditorPlugin'
+export type { EditorPlugin, InsertMenuItem } from './EditorPlugin'
+
+// Property Panel
+export { InfoButton } from './InfoButton'
+export { PropertyPanel, PropertyPanelContext, usePropertyPanel } from './PropertyPanel'
+export { detectSelectionType, extractImageProperties, extractTextProperties, extractCustomElementProperties } from './PropertyExtractor'
+export type { SelectionType, SelectionInfo } from './PropertyExtractor'

@@ -108,7 +108,6 @@ export default Blockquote
 
 // #region Helper Functions
 const applyFormatBlock = (editor: HTMLDivElement, tag: string, className: string) => {
-    console.log("Apply Format Block")
     const { selection } = getSelection(editor);
     if (!selection || selection.rangeCount === 0) return;
 
@@ -142,14 +141,12 @@ const applyFormatBlock = (editor: HTMLDivElement, tag: string, className: string
     // 2. Insert the container into the DOM before the first selected block
     const firstBlock = blocksArray[0];
     firstBlock.parentNode?.insertBefore(container, firstBlock);
-    console.log("First Block: ", firstBlock);
 
     // 3. Move all selected blocks inside the new container
     selectedBlocks.forEach(block => {
         container.appendChild(block);
     });
 
-    console.log("Successfully wrapped", blocksArray.length, "blocks in", tag);
 }
 
 const unwrapBlockquote = (editor: HTMLDivElement) => {
@@ -161,7 +158,6 @@ const unwrapBlockquote = (editor: HTMLDivElement) => {
     const blockquote = (cursorNode instanceof HTMLElement ? cursorNode : cursorNode?.parentElement)?.closest('blockquote');
 
     if (!blockquote) {
-        console.log("No blockquote found to unwrap!");
         return;
     }
 
@@ -178,6 +174,5 @@ const unwrapBlockquote = (editor: HTMLDivElement) => {
     // 3. Remove the empty blockquote
     blockquote.remove();
 
-    console.log("Blockquote unwrapped successfully.");
 };
 // #endregion

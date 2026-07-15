@@ -41,49 +41,37 @@ const def = () => ({
 })
 
 const Badge = defaults(def, (props) => {
-    // console.log('Badge: props received:', props)
     const { class: cn, cls, children, badgeContent, badgeClass, vertical, horizontal, ...otherProps } = props
-    // console.log('Badge: destructured props - badgeContent:', badgeContent, 'otherProps:', otherProps)
 
     // Handle attribute and prop values
     useEffect(() => {
-        // console.log('Badge: useEffect running')
         // First check if badgeContent is provided as a prop
         const contentValue = $$(badgeContent)
         if (contentValue) {
-            // console.log('Badge: Using prop content value:', contentValue)
             return
         }
 
         // If no prop value, check for the badge-content attribute from otherProps
         // For custom elements, attributes are passed in otherProps
         // HTML attributes with hyphens are converted to camelCase
-        // console.log('Badge: Checking otherProps for badge content...')
-        // console.log('Badge: otherProps keys:', Object.keys(otherProps))
 
         if (otherProps['badgeContent']) {
             badgeContent(otherProps['badgeContent'])
-            // console.log('Badge: Using badgeContent attribute:', otherProps['badgeContent'])
         } else if (otherProps['badge-content']) {
             badgeContent(otherProps['badge-content'])
-            // console.log('Badge: Using badge-content attribute:', otherProps['badge-content'])
         } else if (otherProps['children']) {
             // For HTML custom elements, content might be passed as children
             badgeContent(otherProps['children'])
-            // console.log('Badge: Using children attribute:', otherProps['children'])
         } else {
             // For custom elements, we might need to access the attribute directly from the element
             // This is a fallback for when the attribute isn't properly passed through otherProps
-            // console.log('Badge: No content found in props, otherProps:', otherProps)
             // Try to access the attribute directly from the element
             // This is a workaround for cases where the attribute conversion is not working
-            // console.log('Badge: Trying to access attribute directly from element')
         }
     })
 
     const isEmpty = () => {
         const empty = !($$(badgeContent))
-        // console.log('Badge: isEmpty check, badgeContent:', $$(badgeContent), 'result:', empty)
         return empty
     }
 
@@ -91,7 +79,6 @@ const Badge = defaults(def, (props) => {
     const visibilityClass = () => {
         const empty = isEmpty()
         const visClass = empty ? 'hidden' : 'min-w-[20px] h-5 rounded-[10px] px-1'
-        // console.log('Badge: visibilityClass, isEmpty:', empty, 'class:', visClass)
         return visClass
     }
 
@@ -112,7 +99,6 @@ const Badge = defaults(def, (props) => {
     // Absolute positioning classes
     const positionClasses = () => {
         const posClass = `${vertical === 'top' ? 'top-0' : 'bottom-0'} ${horizontal === 'right' ? 'right-0' : 'left-0'}`
-        // console.log('Badge: positionClasses:', posClass)
         return posClass
     }
 
@@ -129,13 +115,11 @@ const Badge = defaults(def, (props) => {
                             positionClasses(),
                             (badgeClass),
                         ].join(' ')
-                        // console.log('Badge: span classes:', classes)
                         return classes
                     }}
                 >
                     {() => {
                         const content = $$(badgeContent)
-                        // console.log('Badge: rendering content:', content)
                         return content
                     }}
                 </span>

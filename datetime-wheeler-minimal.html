@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Minimal DateTimeWheeler Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="p-8">
+    <h1 class="text-xl font-bold mb-4">Minimal Test</h1>
+
+    <!-- Simple inline test without the custom element -->
+    <div id="test-output" class="bg-gray-100 p-4 rounded mb-4"></div>
+
+    <wui-datetime-wheeler mode="datetime" visible="true" bottom="true" id="wheeler1"></wui-datetime-wheeler>
+
+    <div class="mt-4 flex gap-2">
+        <button id="checkBtn" class="px-4 py-2 bg-blue-500 text-white rounded">Check State</button>
+        <button id="clickCancelBtn" class="px-4 py-2 bg-red-500 text-white rounded">Click Cancel</button>
+    </div>
+    <div id="log" class="mt-4 bg-black text-green-400 p-4 rounded font-mono text-sm whitespace-pre-wrap min-h-[200px]"></div>
+
+    <script type="module">
+        // Load the component
+        import './src/Wheeler/DateTimeWheeler.tsx'
+        import './src/index.tsx'
+
+        function log(msg) {
+            const el = document.getElementById('log')
+            el.textContent += msg + '\n'
+        }
+
+        async function setup() {
+            await customElements.whenDefined('wui-datetime-wheeler')
+            const w1 = document.getElementById('wheeler1')
+
+            log(`Setup complete. visible=${w1.props.visible()} attr="${w1.getAttribute('visible')}"`)
+            log(`shadowRoot: ${!!w1.shadowRoot}`)
+            log(`shadowHTML: "${w1.shadowRoot.innerHTML.substring(0, 200)}"`)
+
+            // Check state
+            document.getElementById('checkBtn').onclick = () => {
+                log(`--- Check ---`)
+                log(`visible prop: ${w1.props.visible()}`)
+                log(`visible attr: "${w1.getAttribute('visible')}"`)
+                log(`shadowHTML: "${w1.shadowRoot.innerHTML.substring(0, 200)}"`)
+            }
+
+            // Click cancel — search in the ENTIRE DOM, not just shadowRoot
+            document.getElementById('clickCancelBtn').onclick = () => {
+                log(`--- Click Cancel ---`)
+                // The DateTimeWheeler uses Portal, so buttons are mounted at document.body, not shadow DOM
+                const allButtons = document.querySelectorAll('button')
+                log(`Found ${allButtons.length} buttons in total`)
+                const cancelBtn = Array.from(allButtons).find(b => b.id === 'dtw-cancel-btn')
+                if (cancelBtn) {
+                    log(`Before: visible=${w1.props.visible()}`)
+                    // Use PointerEvent with composed:true so Woby's delegation can catch it via composedPath()
+                    cancelBtn.dispatchEvent(new PointerEvent('click', { composed: true, bubbles: true }))
+                    log(`After click: visible=${w1.props.visible()}`)
+                    setTimeout(() => log(`After 200ms: visible=${w1.props.visible()}`), 200)
+                } else {
+                    log('Cancel button NOT FOUND in the document')
+                    log(`All buttons: ${Array.from(allButtons).map(b => '#' + b.id + ':' + b.textContent?.trim()).join(', ')}`)
+                }
+            }
+        }
+
+        setup()
+    </script>
+</body>
+</html>

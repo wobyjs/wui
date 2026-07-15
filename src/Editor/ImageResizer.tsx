@@ -12,8 +12,8 @@ import { applyImageAlignment, applyImageIndent } from './ImageActions'
  * because Woby's reactive expressions don't respond to observable
  * changes made from DOM event listeners (addEventListener callbacks).
  *
- * CRITICAL: Event listeners are attached ONCE using a mounted ref,
- * not in useEffect (which runs on every render and removes listeners).
+ * CRITICAL: Event listeners are attached in useEffect with cleanup
+ * to prevent memory leaks on unmount.
  */
 
 type ResizeDirection = 'nw' | 'n' | 'ne' | 'e' | 'se' | 's' | 'sw' | 'w'
@@ -87,15 +87,14 @@ const ImageResizer = () => {
     let indentBtn: HTMLButtonElement | null = null
     let deleteBtn: HTMLButtonElement | null = null
 
-    // One-time setup: attach event listeners in a microtask after DOM refs are populated
-    Promise.resolve().then(() => {
+    // Set up event listeners in useEffect with cleanup to prevent memory leaks
+    useEffect(() => {
             const editor = document.querySelector('wui-editor') as HTMLElement | null
             const root = editor?.shadowRoot
-            if (!editor || !root) { console.log('[ImageResizer] no editor/root'); return }
+            if (!editor || !root) return
 
             const editorSurface = root.querySelector('[data-editor-root]') as HTMLElement | null
-            if (!editorSurface) { console.log('[ImageResizer] no editorSurface'); return }
-            console.log('[ImageResizer] one-time setup on', editorSurface.tagName)
+            if (!editorSurface) return
 
         const computeRect = (img: HTMLImageElement) => {
             const surfaceRect = editorSurface.getBoundingClientRect()
@@ -133,7 +132,6 @@ const ImageResizer = () => {
         const showOverlay = (img: HTMLImageElement) => {
             const rect = computeRect(img)
             const align = detectAlign(img)
-            console.log('[ImageResizer] showOverlay', JSON.stringify({ rect, align }))
 
             overlayRect({ left: rect.left, top: rect.top, width: rect.width, height: rect.height })
 
@@ -195,20 +193,16 @@ const ImageResizer = () => {
 
         const onMouseDown = (e: MouseEvent) => {
             // Use composedPath()[0] to get the actual target before shadow DOM retargeting
-            // event.target is retargeted to the host element when crossing shadow boundary
             const actualTarget = e.composedPath()[0] as HTMLElement
-            console.log('[ImageResizer] mousedown handler called', actualTarget.tagName)
             // Skip if clicking on overlay, mini-toolbar, or main editor toolbar
             if (actualTarget.closest('[data-image-overlay],[data-image-mini-toolbar],.editor-toolbar')) return
             if (actualTarget instanceof HTMLImageElement && editorSurface.contains(actualTarget)) {
-                console.log('[ImageResizer] image clicked!')
                 e.preventDefault()
                 e.stopPropagation()
                 activeImage(actualTarget)
                 // Directly set __activeImage on shadow root since Woby reactivity
                 // doesn't trigger from addEventListener callbacks
                 if (root) (root as any).__activeImage = actualTarget
-                console.log('[ImageResizer] activeImage set:', $$(activeImage) ? 'has-img' : 'null')
                 showOverlay(actualTarget)
             } else if ($$(activeImage)) {
                 activeImage(null)
@@ -277,43 +271,46 @@ const ImageResizer = () => {
                 toolbarEl.onmousedown = (e: MouseEvent) => { e.stopPropagation() }
             }
 
-            if (allAttached) {
-                console.log('[ImageResizer] click handlers attached successfully')
-            } else {
+            if (!allAttached) {
                 // Retry after a short delay if refs aren't populated yet
-                console.log('[ImageResizer] refs not ready, retrying...')
                 setTimeout(attachClickHandlers, 50)
             }
         }
         // Attach direct mousedown handlers for drag and resize handles
-            // (Woby's onMouseDown delegation doesn't work in shadow DOM)
-            const attachDragHandlers = () => {
-                if (dragHandleEl) {
-                    dragHandleEl.onmousedown = (e: MouseEvent) => {
-                        console.log('[ImageResizer] dragHandle onmousedown fired!')
-                        startDrag(e)
-                    }
-                }
-                let allResizeAttached = true
-                handleInnerEls.forEach((el, i) => {
-                    if (el) {
-                        const dir = handles[i]
-                        el.onmousedown = (e: MouseEvent) => {
-                            console.log('[ImageResizer] resize handle onmousedown fired!', dir)
-                            startResize(e, dir)
-                        }
-                    } else {
-                        allResizeAttached = false
-                    }
-                })
-                if (!dragHandleEl || !allResizeAttached || handleInnerEls.length !== 8) {
-                    setTimeout(attachDragHandlers, 50)
-                } else {
-                    console.log('[ImageResizer] drag handlers attached successfully')
+        // (Woby's onMouseDown delegation doesn't work in shadow DOM)
+        const attachDragHandlers = () => {
+            if (dragHandleEl) {
+                dragHandleEl.onmousedown = (e: MouseEvent) => {
+                    startDrag(e)
                 }
             }
-            setTimeout(attachDragHandlers, 50)
-            setTimeout(attachClickHandlers, 100)
+            let allResizeAttached = true
+            handleInnerEls.forEach((el, i) => {
+                if (el) {
+                    const dir = handles[i]
+                    el.onmousedown = (e: MouseEvent) => {
+                        startResize(e, dir)
+                    }
+                } else {
+                    allResizeAttached = false
+                }
+            })
+            if (!dragHandleEl || !allResizeAttached || handleInnerEls.length !== 8) {
+                setTimeout(attachDragHandlers, 50)
+            }
+        }
+        setTimeout(attachDragHandlers, 50)
+        setTimeout(attachClickHandlers, 100)
+
+        // Cleanup: remove all event listeners and observer on unmount
+        return () => {
+            editor.removeEventListener('mousedown', onMouseDown, true)
+            root.removeEventListener('mousedown', onMouseDown, true)
+            document.removeEventListener('keydown', onKey)
+            window.removeEventListener('scroll', onScrollOrResize, true)
+            window.removeEventListener('resize', onScrollOrResize)
+            observer.disconnect()
+        }
     })
 
     const startResize = (e: MouseEvent, direction: ResizeDirection) => {
@@ -387,9 +384,8 @@ const ImageResizer = () => {
     }
 
     const startDrag = (e: MouseEvent) => {
-        console.log('[ImageResizer] startDrag called', e.type, e.clientX, e.clientY)
         const img = $$(activeImage)
-        if (!img) { console.log('[ImageResizer] startDrag: no activeImage'); return }
+        if (!img) return
         e.preventDefault()
         e.stopPropagation()
 
@@ -515,10 +511,8 @@ const ImageResizer = () => {
 
     const align = (a: 'left' | 'center' | 'right') => {
         const img = $$(activeImage)
-        console.log('[ImageResizer] align called, direction:', a, 'activeImage:', img ? 'has-img' : 'null')
         if (!img) return
         applyImageAlignment(img, a)
-        console.log('[ImageResizer] after applyImageAlignment:', img.style.display, img.style.marginLeft, img.style.marginRight)
         currentAlign(a)
         // Update button visuals
         [alignLBtn, alignCBtn, alignRBtn].forEach(b => {

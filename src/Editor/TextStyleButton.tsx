@@ -146,10 +146,8 @@ export const updateStylesState = (
     command: string,
     isMixed?: Observable<boolean>
 ) => {
-    console.log('[updateStylesState] Called for command:', command)
     const el = $$(editor)
     if (!el || typeof el.contains !== 'function') {
-        console.log('[updateStylesState] No editor or invalid')
         isActive(false)
         if (isMixed) isMixed(false)
         return
@@ -168,13 +166,11 @@ export const updateStylesState = (
                                      (shadowRoot.host && document.activeElement === shadowRoot.host)
 
             if (!shadowHostActive && !shadowRoot.contains(document.activeElement)) {
-                console.log('[updateStylesState] Editor not focused, activeElement:', document.activeElement.tagName || document.activeElement)
                 isActive(false)
                 if (isMixed) isMixed(false)
                 return
             }
         } else {
-            console.log('[updateStylesState] Editor not focused (no shadow), activeElement:', document.activeElement.tagName || document.activeElement)
             isActive(false)
             if (isMixed) isMixed(false)
             return
@@ -184,7 +180,6 @@ export const updateStylesState = (
     const sr = shadowRoot || (rootNode instanceof ShadowRoot ? rootNode : undefined)
     const range = safeGetRange(sr)
     if (!range) {
-        console.log('[updateStylesState] No range found')
         isActive(false)
         if (isMixed) isMixed(false)
         return
@@ -192,16 +187,13 @@ export const updateStylesState = (
 
     const entry = COMMAND_STYLE_MAP[command]
     if (!entry) {
-        console.log('[updateStylesState] No entry for command:', command)
         isActive(false)
         if (isMixed) isMixed(false)
         return
     }
 
-    console.log('[updateStylesState] Checking range, calling getStyleStateInRange...')
     try {
         const state = getStyleStateInRange(range, entry.prop, entry.value)
-        console.log('[updateStylesState] Style state:', state, 'for prop:', entry.prop)
         isActive(state === 'all')
         if (isMixed) isMixed(state === 'mixed')
     } catch (e) {

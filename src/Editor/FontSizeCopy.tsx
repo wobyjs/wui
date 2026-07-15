@@ -68,7 +68,6 @@ const FontSizeInputComponent = () => {
     // Create reactive variable for the number part, derived from fontSizeValue
     const currentSizeNum = useMemo(() => parseFloat($$(fontSizeValue)))
 
-    // useEffect(() => console.log('fontSize', $$(currentSizeNum)))
     // --- useEffect is removed ---
 
     const handleApplyFontSize = (newSize: number) => {

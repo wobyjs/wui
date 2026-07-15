@@ -5,21 +5,20 @@
         "access": "public"
     },
     "description": "A powerful tooltip and menu component library for voby.",
-    "main": "./dist/index.es.js",
     "module": "./dist/index.es.js",
     "browser": "./dist/index.es.js",
     "types": "./dist/types/index.d.ts",
     "style": "./dist/wui.css",
+    "css": "./dist/wui.css",
     "exports": {
         ".": {
             "import": "./dist/index.es.js",
-            "require": "./dist/index.es.js",
             "types": "./dist/types/index.d.ts"
         },
-        "./dist/wui.css": "./dist/wui.css"
+        "./style.css": "./dist/wui.css"
     },
     "scripts": {
-        "dev": "vite",
+        "dev": "vite dev",
         "git": "git add . && git commit -m \"Bump version\" && git push",
         "bump": "pnpm version patch --no-git-tag-version",
         "npmjs": "pnpm publish",
@@ -50,7 +49,13 @@
         "url": "https://github.com/axe-me/wui/issues"
     },
     "homepage": "https://github.com/axe-me/wui#readme",
+    "files": [
+        "dist",
+        "README.md",
+        "LICENSE"
+    ],
     "dependencies": {
+        "@woby/chk": "workspace:^",
         "@woby/use": "workspace:^",
         "woby": "workspace:^"
     },

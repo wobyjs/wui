@@ -1,5 +1,5 @@
 import { tw } from '@woby/styled'
-//@ts-ignore
+// @ts-expect-error -- complex import with mixed type/value specifiers
 import { $, $$, isObservable, type JSX, defaults, customElement, ElementAttributes, HtmlBoolean, type ObservableMaybe, HtmlClass } from 'woby'
 
 /** color: [&_svg]:fill-current */

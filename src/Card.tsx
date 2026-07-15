@@ -221,12 +221,6 @@ const CardMedia = defaults(defCardMedia, (props) => {
     // const fit = () => _fit ?? "cover"
     // const extra = () => className ?? ""
 
-    // console.log("CardMedia src: ", src());
-    // console.log("CardMedia alt: ", alt());
-    // console.log("CardMedia height: ", height());
-    // console.log("CardMedia position: ", position());
-    // console.log("CardMedia fit: ", fit());
-
     return (
         <div
             role="img"
@@ -251,10 +245,6 @@ const CardContent = defaults(defCardContent, (props) => {
     // const extra = () => (className) ?? ""
     // const kids = () => (children)
 
-    // console.log("CardContent Padding: ", padding());
-    // console.log("CardContent Class: ", className());
-    // console.log("CardContent children: ", children());
-
     return (
         <div class={[() => $$(cls) ? $$(cls) : [$$(padding)].join(" "), cn]} {...otherProps}>
             {children}
@@ -272,11 +262,6 @@ const CardActions = defaults(defCardAction, (props) => {
     // const kids = () => (children)
 
     const justify = () => align() == "end" ? "justify-end" : align() == "between" ? "justify-between" : align() == "center" ? "justify-center" : "justify-start"
-
-    // console.log("CardActions Align: ", align());
-    // console.log("CardActions Padding: ", padding());
-    // console.log("CardActions ClassName: ", className());
-    // console.log("CardActions Justify: ", justify());
 
     return (
         <div
@@ -307,18 +292,3 @@ declare module "woby" {
 }
 
 export default Card
-
-// #region Original Card, CardMedia, CardContent, CardAction
-// import { tw } from '@woby/styled'
-// //@ts-ignore
-// import { Observable, ObservableMaybe, type JSX } from 'woby'
-
-// export const Card = tw('div')`bg-white text-[rgba(0,0,0,0.87)] transition-shadow duration-300 ease-in-out delay-[0ms] rounded shadow-[rgba(0,0,0,0.2)_0px_2px_1px_-1px,rgba(0,0,0,0.14)_0px_1px_1px_0px,rgba(0,0,0,0.12)_0px_1px_3px_0px] overflow-hidden`
-
-// export const CardMedia = (props: JSX.DOMAttributes<HTMLDivElement>) => <div class="block bg-cover bg-no-repeat bg-[center_center] h-[140px]" role="img" title="green iguana" style="background-image: url(/static/images/cards/contemplative-reptile.jpg)" {...props}>
-// </div>
-
-// export const CardContent = tw('div')`p-[16px]`
-
-// export const CardActions = tw('div')`flex items-center p-2`
-// #endregion

@@ -58,7 +58,6 @@ const SideBar = defaults(sideBarDef, (props) => {
         // 2. Guard Clause: If no content element is provided, we can't do anything.
         // This prevents errors if `contentRef` is null or hasn't been attached yet.
         if (!contentEl) {
-            console.log('[SideBar] contentRef is null')
             return
         }
 
