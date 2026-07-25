@@ -18,6 +18,10 @@ export const useEditor = () => useContext(EditorContext)
 export const FocusManagerContext = createContext<FocusManager>()
 export const useFocusManager = () => useContext(FocusManagerContext)
 
+// Readonly context — controls whether editor is in edit or readonly mode
+export const ReadonlyContext = createContext<Observable<boolean>>()
+export const useReadonly = () => useContext(ReadonlyContext)
+
 // 3. CREATE THE UNDO/REDO DATA STORE
 // This creates another storage box that holds an object with specific properties:
 // - undos/redos: Observable arrays (the history stacks).

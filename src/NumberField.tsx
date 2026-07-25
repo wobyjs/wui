@@ -200,7 +200,7 @@ const NumberField = defaults(def, (props) => {
                     // Don't allow change if disabled
                     if ($$(disabled)) return
 
-                    !$$(reactive) && isObservable(value) ? ((value as Observable)?.(e.target.valueAsNumber), onChange?.(e))
+                    isObservable(value) ? ((value as Observable)?.(e.target.valueAsNumber), onChange?.(e))
                         : undefined
                     updated()
                 }}

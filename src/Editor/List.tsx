@@ -117,21 +117,38 @@ const List = defaults(def, (props) => {
 
     // #region Auto-Render on "Enter"
     useEffect(() => {
-        const el = editor ?? getCurrentEditor()
-        if (!$$(el)) {
-            console.error("[List] Cannot find editor element to observe")
-            return
+        let editorObserver: MutationObserver | null = null
+        let bodyObserver: MutationObserver | null = null
+
+        const setupEditorObserver = () => {
+            const el = editor ?? getCurrentEditor()
+            const unwrapped = el instanceof HTMLElement ? el : $$(el)
+            if (!unwrapped) return false
+
+            editorObserver = new MutationObserver(handleListMutations)
+            editorObserver.observe(unwrapped, {
+                childList: true,
+                subtree: true
+            })
+            return true
         }
 
-        const observer = new MutationObserver(handleListMutations)
+        // Try immediately — editor may already be in the DOM
+        if (!setupEditorObserver()) {
+            // Editor not found yet — watch document body for it to appear
+            bodyObserver = new MutationObserver(() => {
+                if (setupEditorObserver()) {
+                    bodyObserver?.disconnect()
+                    bodyObserver = null
+                }
+            })
+            bodyObserver.observe(document.body, { childList: true, subtree: true })
+        }
 
-        // Start observing the editor
-        observer.observe($$(el), {
-            childList: true, // Watch for added/removed children
-            subtree: true    // Watch deep inside the editor
-        })
-
-        return () => observer.disconnect()
+        return () => {
+            editorObserver?.disconnect()
+            bodyObserver?.disconnect()
+        }
     })
 
     const handleListMutations = (mutations: MutationRecord[]) => {

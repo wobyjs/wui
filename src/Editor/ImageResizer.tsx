@@ -192,6 +192,10 @@ const ImageResizer = () => {
         }
 
         const onMouseDown = (e: MouseEvent) => {
+            // Don't select images in readonly mode
+            const editorSurface = root.querySelector('[data-editor-root]')
+            if (editorSurface?.getAttribute('contenteditable') === 'false') return
+
             // Use composedPath()[0] to get the actual target before shadow DOM retargeting
             const actualTarget = e.composedPath()[0] as HTMLElement
             // Skip if clicking on overlay, mini-toolbar, or main editor toolbar
@@ -199,6 +203,11 @@ const ImageResizer = () => {
             if (actualTarget instanceof HTMLImageElement && editorSurface.contains(actualTarget)) {
                 e.preventDefault()
                 e.stopPropagation()
+                // CRITICAL: Explicitly clear text selection when clicking an image.
+                // preventDefault() on mousedown prevents the browser from clearing the
+                // text selection, leaving the old text highlight visible even though
+                // the image is now selected.
+                window.getSelection()?.removeAllRanges()
                 activeImage(actualTarget)
                 // Directly set __activeImage on shadow root since Woby reactivity
                 // doesn't trigger from addEventListener callbacks
@@ -236,6 +245,10 @@ const ImageResizer = () => {
                 activeImage(null)
                 if (root) (root as any).__activeImage = null
                 hideOverlay()
+            } else if (img) {
+                // Image still in DOM but may have been repositioned by indent/align
+                // Re-position the overlay to follow the image
+                showOverlay(img)
             }
         })
         observer.observe(editorSurface, { childList: true, subtree: true, attributes: true })

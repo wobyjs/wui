@@ -6,7 +6,7 @@ import { Button } from './Button'
 import { Badge } from './Badge'
 import { Avatar } from './Avatar'
 import { AlignButton } from './Editor/AlignButton'
-import { EditorContext, UndoRedo, useUndoRedo } from './Editor/undoredo'
+import { EditorContext, UndoRedo, useUndoRedo, FocusManagerContext } from './Editor/undoredo'
 import { Card, CardMedia, CardContent, CardActions } from './Card'
 import { Checkbox } from './Checkbox'
 import { Chip } from './Chip'
@@ -43,6 +43,10 @@ import { List } from './Editor/List'
 import { InsertDropDown } from './Editor/InsertDropDown'
 import { Editor } from './Editor/Editor'
 import { Blockquote } from './Editor/Blockquote'
+import { InfoButton } from './Editor/InfoButton'
+import { PropertyPanelContext } from './Editor/PropertyPanel'
+import { SelectionType } from './Editor/PropertyExtractor'
+import { FocusManager } from './Editor/FocusManager'
 import { AlignLeftButton } from './Editor/AlignLeftButton'
 import { AlignCenterButton } from './Editor/AlignCenterButton'
 import { AlignRightButton } from './Editor/AlignRightButton'
@@ -3870,11 +3874,12 @@ function Debug() {
                 <TextColorPicker />
 
                 <TextFormatDropDown />
+                <InfoButton />
             </div>
         )
     }
 
-    const DebugDemoEditor = () => {
+    const DebugDemoEditor = ({ propertyPanelOpen, propertyTarget, propertySelectionType }: { propertyPanelOpen: Observable<boolean>; propertyTarget: Observable<HTMLElement | null>; propertySelectionType: Observable<SelectionType> }) => {
         const useEditorSurface = () => {
             return (
                 <Editor enableToolbar={false}>
@@ -3902,7 +3907,7 @@ function Debug() {
 
         const debugEditorSurface = () => {
             return (
-                <Editor enableToolbar={false}>
+                <Editor enableToolbar={false} externalPropertyPanel={{ panelOpen: propertyPanelOpen, propertyTarget, selectionType: propertySelectionType }}>
 
                     {/* <ul id="bullet-wrapper" class="list-inside list-disc border border-red-500">
                         <li class="text-left">This is a list 1
@@ -3948,14 +3953,28 @@ function Debug() {
     }
 
     const DebugDemo = () => {
+        const editorRef = $<HTMLDivElement>(null)
+        const focusManager = new FocusManager()
+        // Property panel state shared between InfoButton (toolbar) and DebugDemoEditor
+        const propertyPanelOpen = $(false)
+        const propertyTarget = $<HTMLElement | null>(null)
+        const propertySelectionType = $<SelectionType>('none')
         return (
-            <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
-                <h1 class="text-2xl font-bold py-2">Debug Demo</h1>
-                <div class="mb-4">
-                    <DebugDemoToolbar />
-                    <DebugDemoEditor />
-                </div>
-            </div>
+            <FocusManagerContext.Provider value={focusManager}>
+                <EditorContext.Provider value={editorRef}>
+                    <UndoRedo>
+                        <PropertyPanelContext.Provider value={{ panelOpen: propertyPanelOpen, propertyTarget, selectionType: propertySelectionType }}>
+                            <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                                <h1 class="text-2xl font-bold py-2">Debug Demo</h1>
+                                <div class="mb-4">
+                                    <DebugDemoToolbar />
+                                    <DebugDemoEditor propertyPanelOpen={propertyPanelOpen} propertyTarget={propertyTarget} propertySelectionType={propertySelectionType} />
+                                </div>
+                            </div>
+                        </PropertyPanelContext.Provider>
+                    </UndoRedo>
+                </EditorContext.Provider>
+            </FocusManagerContext.Provider>
         )
     }
 

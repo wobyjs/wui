@@ -7,7 +7,7 @@ import { getCurrentRange, expandRange, getElementsInRange, getSelectedTableCells
 import { BoldButton } from './BoldButton'
 import { ItalicButton } from './ItalicButton'
 import { UnderlineButton } from './UnderlineButton' // Added UnderlineButton
-import { EditorContext, UndoRedo, useEditor, useUndoRedo, FocusManagerContext } from './undoredo'
+import { EditorContext, UndoRedo, useEditor, useUndoRedo, FocusManagerContext, ReadonlyContext, useReadonly } from './undoredo'
 import { FontSize } from './FontSize' // import { FontSizeInput } from './FontSizeCopy' // Changed from Increase/Decrease
 import { List } from './List'
 import { Indent } from './Indent' // Will be part of TextAlignDropDown
@@ -88,6 +88,8 @@ const def = () => ({
     cls: $(null, HtmlClass) as ObservableMaybe<JSX.Class>,
     class: $(null, HtmlClass) as ObservableMaybe<JSX.Class>,
     enableToolbar: $(true, HtmlBoolean) as ObservableMaybe<boolean>,
+    externalPropertyPanel: $(null) as ObservableMaybe<{ panelOpen: Observable<boolean>; propertyTarget: Observable<HTMLElement | null>; selectionType: Observable<SelectionType> } | null>,
+    readonly: $(false, HtmlBoolean) as ObservableMaybe<boolean>,
 })
 
 
@@ -100,6 +102,7 @@ const def = () => ({
 const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, children }) => {
     const { saveDo, undo, redo } = useUndoRedo()
     const activeEditor = useEditor()
+    const isReadonly = useReadonly()
 
     useEffect(() => {
         useBlockEnforcer($$(activeEditor) ?? $$(getCurrentEditor))
@@ -309,7 +312,7 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, children }) =
                 const range = sel?.getRangeAt(0)
                 if (range) {
                     let node: Node | null = range.commonAncestorContainer
-                    while (node && node !== shadow) {
+                    while (node && (!shadow || node.getRootNode() === shadow)) {
                         if (node instanceof HTMLElement) {
                             const tag = node.tagName.toUpperCase()
                             if (tag === 'LI' || tag === 'UL' || tag === 'OL') {
@@ -396,7 +399,7 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, children }) =
             <div
                 ref={activeEditor}
                 data-editor-root
-                contentEditable={true}
+                contentEditable={() => $$(isReadonly) ? 'false' : 'true'}
                 onClick={handleEditorClick}
                 onBlur={handleBlur}
                 onKeyDown={handleKeyDown}
@@ -455,7 +458,7 @@ const EditorToolbar = ({ toolbarRef }) => {
                         const range = sel?.getRangeAt(0)
                         if (range) {
                             let node: Node | null = range.commonAncestorContainer
-                            while (node && node !== shadow) {
+                            while (node && (!shadow || node.getRootNode() === shadow)) {
                                 if (node instanceof HTMLElement) {
                                     const tag = node.tagName.toUpperCase()
                                     if (tag === 'LI' || tag === 'UL' || tag === 'OL') {
@@ -554,17 +557,20 @@ const EditorToolbar = ({ toolbarRef }) => {
 // #region Editor
 const Editor = defaults(def, (props) => {
 
-    const { children, cls, class: cn, enableToolbar, ...otherProps } = props
+    const { children, cls, class: cn, enableToolbar, readonly: _readonly, ...otherProps } = props
 
     const isEditing = $(false)
+    const isReadonly = $(false)
+    useEffect(() => { isReadonly($$(_readonly) ?? false) })
     const container = $<HTMLDivElement>(null)
     const toolbarRef = $<HTMLDivElement>(null)
     const focusManager = new FocusManager()
 
-    // PropertyPanel shared state
-    const propertyPanelOpen = $(false)
-    const propertyTarget = $<HTMLElement | null>(null)
-    const propertySelectionType = $<SelectionType>('none')
+    // PropertyPanel shared state — use external props if provided, otherwise create internal state
+    const externalCtx = $$(props.externalPropertyPanel)
+    const propertyPanelOpen = externalCtx?.panelOpen ?? $(false)
+    const propertyTarget = externalCtx?.propertyTarget ?? $<HTMLElement | null>(null)
+    const propertySelectionType = externalCtx?.selectionType ?? $<SelectionType>('none')
 
     const _editor = $<HTMLDivElement>(null)
     const editor = ((...args: [HTMLDivElement?]) => {
@@ -609,38 +615,45 @@ const Editor = defaults(def, (props) => {
 
     // useOnClickOutside(container, () => handleBlur(null),)
 
-    const handleEditorClick = () => { isEditing(true) }
+    const handleEditorClick = () => {
+        if ($$(isReadonly)) return
+        isEditing(true)
+    }
 
     const withoutToolbar = () => {
         return (
-            <EditorContext.Provider value={editor}>
-                <UndoRedo>
-                    <EditorSurface
-                        isEditing={isEditing}
-                        handleEditorClick={handleEditorClick}
-                        handleBlur={handleBlur}
-                        children={children}
-                    >
-                    </EditorSurface>
-                </UndoRedo>
-            </EditorContext.Provider>
+            <ReadonlyContext.Provider value={isReadonly}>
+                <EditorContext.Provider value={editor}>
+                    <UndoRedo>
+                        <EditorSurface
+                            isEditing={isEditing}
+                            handleEditorClick={handleEditorClick}
+                            handleBlur={handleBlur}
+                            children={children}
+                        >
+                        </EditorSurface>
+                    </UndoRedo>
+                </EditorContext.Provider>
+            </ReadonlyContext.Provider>
         )
     }
 
     const withToolbar = () => {
         return (
-            <EditorContext.Provider value={editor}>
-                <UndoRedo>
-                    {() => $$(isEditing) && $$(enableToolbar) && <EditorToolbar toolbarRef={toolbarRef} />}
-                    <EditorSurface
-                        isEditing={isEditing}
-                        handleEditorClick={handleEditorClick}
-                        handleBlur={handleBlur}
-                        children={children}
-                    >
-                    </EditorSurface>
-                </UndoRedo>
-            </EditorContext.Provider>
+            <ReadonlyContext.Provider value={isReadonly}>
+                <EditorContext.Provider value={editor}>
+                    <UndoRedo>
+                        {() => !$$(isReadonly) && $$(isEditing) && $$(enableToolbar) && <EditorToolbar toolbarRef={toolbarRef} />}
+                        <EditorSurface
+                            isEditing={isEditing}
+                            handleEditorClick={handleEditorClick}
+                            handleBlur={handleBlur}
+                            children={children}
+                        >
+                        </EditorSurface>
+                    </UndoRedo>
+                </EditorContext.Provider>
+            </ReadonlyContext.Provider>
         )
     }
 
@@ -648,18 +661,50 @@ const Editor = defaults(def, (props) => {
         <div ref={container}>
             <PropertyPanelContext.Provider value={{ panelOpen: propertyPanelOpen, propertyTarget, selectionType: propertySelectionType }}>
                 <FocusManagerContext.Provider value={focusManager}>
-                    <EditorContext.Provider value={editor}>
-                        <UndoRedo>
-                            {() => $$(enableToolbar) && <EditorToolbar toolbarRef={toolbarRef} />}
-                            <EditorSurface
-                                isEditing={isEditing}
-                                handleEditorClick={handleEditorClick}
-                                handleBlur={handleBlur}
-                                children={children}
-                            >
-                            </EditorSurface>
-                        </UndoRedo>
-                    </EditorContext.Provider>
+                    <ReadonlyContext.Provider value={isReadonly}>
+                        <EditorContext.Provider value={editor}>
+                            <UndoRedo>
+                                {() => !$$(isReadonly) && $$(enableToolbar) && <EditorToolbar toolbarRef={toolbarRef} />}
+                                <EditorSurface
+                                    isEditing={isEditing}
+                                    handleEditorClick={handleEditorClick}
+                                    handleBlur={handleBlur}
+                                    children={children}
+                                >
+                                </EditorSurface>
+                            </UndoRedo>
+                        </EditorContext.Provider>
+                        {/* FAB toggle button for readonly mode */}
+                        <button
+                            class={() => [
+                                'fixed bottom-6 right-6 z-50 w-12 h-12 rounded-full shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95',
+                                $$(isReadonly) ? 'bg-blue-500 hover:bg-blue-600' : 'bg-green-500 hover:bg-green-600'
+                            ]}
+                            onClick={() => {
+                                const newVal = !$$(isReadonly)
+                                isReadonly(newVal)
+                                // If switching to readonly, blur the editor
+                                if (newVal) {
+                                    isEditing(false)
+                                    const el = $$(editor)
+                                    if (el) el.blur()
+                                }
+                            }}
+                            title={() => $$(isReadonly) ? 'Switch to Edit mode' : 'Switch to Read-only mode'}
+                        >
+                            {/* Edit icon (pencil) when readonly, eye icon when editing */}
+                            {() => $$(isReadonly) ? (
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                </svg>
+                            ) : (
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                            )}
+                        </button>
+                    </ReadonlyContext.Provider>
                 </FocusManagerContext.Provider>
             </PropertyPanelContext.Provider>
         </div >

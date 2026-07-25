@@ -138,6 +138,24 @@ export function getSelectedImage(editorEl?: HTMLElement | null): HTMLImageElemen
     const shadow = host?.shadowRoot
     if (!shadow) return null
 
+    // 0. Guard: if there's a text selection range that's NOT on an image, return null
+    // This prevents stale overlay/__activeImage from a previous image click from
+    // intercepting indent/align commands meant for text blocks.
+    const sel = shadow.getSelection()
+    if (sel && sel.rangeCount > 0) {
+        const range = sel.getRangeAt(0)
+        const sc = range.startContainer
+        const isOnImage =
+            (sc.nodeType === Node.ELEMENT_NODE && (sc as Element).tagName === 'IMG') ||
+            (sc.nodeType === Node.TEXT_NODE && !!(sc.parentElement?.closest?.('img'))) ||
+            (sc.nodeType === Node.ELEMENT_NODE && !!(sc as Element).closest?.('img'))
+        if (!isOnImage) {
+            return null
+        }
+    }
+    // If rangeCount === 0, the image is selected via ImageResizer (which clears the selection),
+    // so proceed to check overlay/__activeImage below.
+
     // 1. Check for visible ImageResizer overlay - if it's visible, find the corresponding image
     // The overlay is positioned directly over the selected image
     const overlay = shadow.querySelector('[data-image-overlay]') as HTMLElement | null
@@ -165,7 +183,8 @@ export function getSelectedImage(editorEl?: HTMLElement | null): HTMLImageElemen
     }
 
     // 3. Fallback: check if selection anchor is an <img> or inside one
-    const sel = shadow.getSelection()
+    // (reuse the `sel` captured in the guard above — re-declaring `const sel` here
+    //  is a duplicate-declaration parse error; the value is unchanged since then)
     if (sel && sel.rangeCount > 0) {
         const range = sel.getRangeAt(0)
         const sc = range.startContainer

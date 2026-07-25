@@ -1,5 +1,5 @@
 import { render } from 'woby'
-import { App } from './app'
+import { App2 as App } from './app'
 // import { Checks } from '@woby/chk'
 // import '@woby/chk/index.css'
 import './input.css'

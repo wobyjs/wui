@@ -89,16 +89,30 @@ export const PropertyForm = defaults(() => ({
 		if (!data) return null
 		if (editorsLen === 0) return null
 
+		// DEBUG: Log raw object keys before any mutation
+		console.log('[PropertyForm] raw keys before changeEnumerable:', JSON.stringify(Object.keys(data)))
+
 		changeEnumerable(data)
-		const sortedKeys = Object.keys(data).sort((a, b) => $$(order)?.indexOf(a) - $$(order)?.indexOf(b))
+
+		// DEBUG: Log keys after changeEnumerable mutation
+		const keysAfter = Object.keys(data)
+		console.log('[PropertyForm] keys after changeEnumerable:', JSON.stringify(keysAfter), 'width?', keysAfter.includes('width'))
+
+		const sortedKeys = keysAfter.sort((a, b) => $$(order)?.indexOf(a) - $$(order)?.indexOf(b))
 		if (sortedKeys.indexOf("colLabel") != -1) {
 			sortedKeys.splice(sortedKeys.indexOf("colLabel"), 1)
 		}
 
+		console.log('[PropertyForm] keys after sort:', JSON.stringify(sortedKeys), 'width?', sortedKeys.includes('width'))
+
 		const formUI = $$(Editors).map((e) => e())
 
-		return sortedKeys
+		const filtered = sortedKeys
 			.filter((key) => !dashMatchReg.test(key) && !key.includes("Obj") && !key.startsWith("$"))
+
+		console.log('[PropertyForm] keys after filter:', JSON.stringify(filtered), 'width?', filtered.includes('width'))
+
+		return filtered
 			.map((key) => {
 				const value = data[key]
 				const actualValue = $$(value)

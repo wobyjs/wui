@@ -118,7 +118,8 @@ const TextAlignDropDown = defaults(def, (props) => {
     const { cls, class: cn, selectedFormat, buttonType: btnType, ...otherProps } = props
 
     const editor = useEditor()
-    const { saveDo } = useUndoRedo()
+    const undoRedoContext = useUndoRedo()
+    const saveDo = undoRedoContext?.saveDo || (() => {})
     const isOpen = $(false)
     const dropdownRef = $<HTMLElement>(null)
 

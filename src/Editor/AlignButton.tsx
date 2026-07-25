@@ -60,7 +60,9 @@ const AlignButton = defaults(def, (props) => {
 
     useEffect(() => {
         const el = editor ?? getCurrentEditor()
-        useBlockEnforcer($$(el))
+        const unwrapped = $$(el)
+        if (!unwrapped) return
+        useBlockEnforcer(unwrapped)
     })
 
     /**
@@ -69,7 +71,8 @@ const AlignButton = defaults(def, (props) => {
     useEffect(() => {
         // 1. Get the actual HTML Element
         const el = editor ?? getCurrentEditor();
-        if (!el) return;
+        const unwrapped = $$(el);
+        if (!unwrapped) return;
 
         // 2. Create a stable reference for the handler
         // This ensures addEventListener and removeEventListener refer to the SAME function
@@ -79,18 +82,18 @@ const AlignButton = defaults(def, (props) => {
 
         // 3. Attach listeners to the UNWRAPPED element 'el'
         document.addEventListener('selectionchange', handler);
-        $$(el).addEventListener('click', handler);
-        $$(el).addEventListener('keyup', handler);
-        $$(el).addEventListener('mouseup', handler);
+        unwrapped.addEventListener('click', handler);
+        unwrapped.addEventListener('keyup', handler);
+        unwrapped.addEventListener('mouseup', handler);
 
         // Run initial check
         handler();
 
         return () => {
             document.removeEventListener('selectionchange', handler);
-            $$(el).removeEventListener('click', handler);
-            $$(el).removeEventListener('keyup', handler);
-            $$(el).removeEventListener('mouseup', handler);
+            unwrapped.removeEventListener('click', handler);
+            unwrapped.removeEventListener('keyup', handler);
+            unwrapped.removeEventListener('mouseup', handler);
         };
     });
 

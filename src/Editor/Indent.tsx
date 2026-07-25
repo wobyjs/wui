@@ -25,7 +25,8 @@ const Indent = defaults(def, (props) => {
     const { buttonType, title, cls, class: cn, mode, step, disabled, identPx, ...otherProps } = props
 
     const editor = useEditor()
-    const { saveDo } = useUndoRedo()
+    const undoRedoContext = useUndoRedo()
+    const saveDo = undoRedoContext?.saveDo || (() => {})
     const isDecrease = () => {
         return $$(mode) == 'decrease'
     }
@@ -61,7 +62,7 @@ const Indent = defaults(def, (props) => {
             const commonAncestor = range.commonAncestorContainer
             // Check if we're inside a list
             let node: Node | null = commonAncestor
-            while (node && node !== shadow) {
+            while (node && (!shadow || node.getRootNode() === shadow)) {
                 if (node instanceof HTMLElement) {
                     const tag = node.tagName.toUpperCase()
                     if (tag === 'LI' || tag === 'UL' || tag === 'OL') {

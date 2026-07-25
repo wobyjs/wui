@@ -119,6 +119,45 @@ const TextField = defaults(def, (props) => {
 		}
 	})
 
+	// Native event handlers for shadow DOM compatibility.
+	// Woby's JSX event delegation doesn't handle composed events
+	// from shadow DOM correctly (keyup reaches the document but Woby's
+	// handler throws), so we attach native handlers directly on the
+	// input element as a fallback.
+	useEffect(() => {
+		const input = $$(inputRef)
+		if (!input) return
+
+		const handleKeyUp = (e: KeyboardEvent) => {
+			if (!isObservable(value)) return
+			const targetVal = (e.target as HTMLInputElement).value
+
+			if ($$(assignOnEnter)) {
+				if (e.key === "Enter") {
+					value(targetVal)
+					onKeyUp?.(e as any)
+				}
+			} else {
+				value(targetVal)
+				onKeyUp?.(e as any)
+			}
+		}
+
+		const handleInput = (e: Event) => {
+			if (!$$(assignOnEnter) && isObservable(value)) {
+				value((e.target as HTMLInputElement).value)
+				onChange?.(e as any)
+			}
+		}
+
+		input.addEventListener('keyup', handleKeyUp)
+		input.addEventListener('input', handleInput)
+		return () => {
+			input.removeEventListener('keyup', handleKeyUp)
+			input.removeEventListener('input', handleInput)
+		}
+	})
+
 	const effectStyle = useMemo(() => {
 		const effectName = $$(effect)
 		return effectMap[effectName] || defaultStyle
@@ -205,10 +244,16 @@ const TextField = defaults(def, (props) => {
 							{...otherProps}
 
 							onChange={(e) => {
-								!$$(assignOnEnter) && isObservable(value) ? (value?.(e.target.value), onChange?.(e)) : undefined
+								// NOTE: Native handler (attached via addEventListener in useEffect) handles all value-setting.
+								// JSX handler's value() call would use retargeted e.target (shadow host), causing value(undefined).
+								onChange?.(e)
 							}}
 							onKeyUp={(e) => {
-								!$$(assignOnEnter) && isObservable(value) ? (value?.(e.target.value), onKeyUp?.(e)) : (e.key === "Enter" && isObservable(value) && value(e.target.value), onKeyUp?.(e))
+								console.log('[TextField onKeyUp]', { key: e.key, targetTag: e.target?.tagName, targetVal: e.target?.value, assignOnEnter: $$(assignOnEnter), isObs: isObservable(value), val: value })
+								// NOTE: Native handler (attached via addEventListener in useEffect) handles all value-setting.
+								// JSX handler's value() call would use retargeted e.target (shadow host), causing value(undefined).
+								// Only invoke the callback here — native handler already set the observable.
+								onKeyUp?.(e)
 							}}
 						/>
 						<span class="focus-border focus-bg pointer-events-none"><i></i></span>

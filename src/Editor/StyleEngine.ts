@@ -460,8 +460,13 @@ export function restoreSelectionFromOffsets(
             // prefer this node's end over the next node's start.
             // This prevents the restored range from extending into the next sibling.
             if (endOffset === currentOffset + len && len > 0) {
-                endNode = textNode
-                endNodeOffset = len
+                // For collapsed ranges at text node boundaries, skip setting endNode
+                // to the previous node — startNode will be set to the next node,
+                // and assigning endNode here creates a backwards range (end before start).
+                if (startOffset !== endOffset) {
+                    endNode = textNode
+                    endNodeOffset = len
+                }
             } else if (endOffset < currentOffset + len) {
                 endNode = textNode
                 endNodeOffset = endOffset - currentOffset
