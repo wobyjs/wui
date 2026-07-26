@@ -53,12 +53,13 @@ const def = () => {
         // title: (d: Date) => <div>{d.toISOString()}</div> as ObservableMaybe<(d: Date) => JSX.Element>,
         title: undefined as ((v: ObservableMaybe<any | any[]>) => JSX.Element) | undefined,
         visible: $(true) as ObservableMaybe<boolean>,
+        header: undefined as ((props: { ok: (v: boolean) => void, visible: (v: boolean) => void }) => JSX.Element) | undefined,
         ...inheritedDefaults
     }
 }
 
 const DateTimeWheeler = defaults(def, (props) => {
-    const { value: oriDate, mode, minDate: minDateProp, maxDate: maxDateProp, yearRange: yearRangeProp, divider, title, cls, bottom: bottomProp, commitOnBlur, cancelOnBlur, ok, mask, itemHeight, itemCount, changeValueOnClickOnly, visible: visibleProp, ...otherProps } = props
+    const { value: oriDate, mode, minDate: minDateProp, maxDate: maxDateProp, yearRange: yearRangeProp, divider, title, cls, class: className, header, bottom: bottomProp, commitOnBlur, cancelOnBlur, ok, mask, itemHeight, itemCount, changeValueOnClickOnly, visible: visibleProp, ...otherProps } = props
 
     // #region Internal Selection State
     const type = use(mode)
@@ -75,21 +76,22 @@ const DateTimeWheeler = defaults(def, (props) => {
     const selectedSecond = $($$(modDate).getSeconds())
     // #endregion
 
-    const isVisible = $(true) // will be synced from visibleProp below
+    const isVisible = use(visibleProp, true)
 
-    // This handles the "top-down" data flow.
+    console.log('[DateTimeWheeler] component fn, visibleProp:', typeof visibleProp, 'isObservable:', isObservable(visibleProp), 'isVisible===visibleProp:', isVisible === visibleProp, 'value:', $$(isVisible))
+
+    // Track isVisible changes reactively
     useEffect(() => {
-        const propValue = $$(visibleProp)
-        if (propValue !== undefined && propValue !== $$(isVisible)) {
-            isVisible(propValue)
-        }
+        console.log('[DateTimeWheeler] isVisible CHANGED to:', $$(isVisible))
     })
 
     const hide = () => {
+        console.log('[DateTimeWheeler] hide() called, isVisible value before:', $$(isVisible), 'visibleProp isObservable:', isObservable(visibleProp))
         isVisible(false)
         if (isObservable(visibleProp)) {
             visibleProp(false)
         }
+        console.log('[DateTimeWheeler] hide() done, isVisible value after:', $$(isVisible))
     }
 
 
@@ -327,31 +329,37 @@ const DateTimeWheeler = defaults(def, (props) => {
     // }
 
     // Helper: Render header bar with Cancel/Title/OK
-    const renderHeaderBar = () => (
-        <div class="flex items-center justify-between px-4 py-2 h-auto relative">
-            <div class="w-[80px] flex justify-start">
-                <button
-                    type="button"
-                    id="dtw-cancel-btn"
-                    class="px-2 inline-flex items-center justify-center relative box-border cursor-pointer select-none align-middle no-underline font-medium text-sm leading-[1.75] tracking-[0.02857em] uppercase rounded text-white bg-[#1976d2] rounded-[4px] border-0 outline-0 font-sans px-4 py-2 shadow-[0px_3px_1px_-2px_rgba(0,0,0,0.2),0px_2px_2px_0px_rgba(0,0,0,0.14),0px_1px_5px_0px_rgba(0,0,0,0.12)] hover:bg-[#1565c0]"
-                    ref={el => { if (el) el.onclick = (e) => { hide() } }}
-                > Cancel </button>
+    // If a custom `header` prop is provided, use it instead of the built-in buttons.
+    const renderHeaderBar = () => {
+        if (header) {
+            return header({ ok: handleOkClick, visible: hide })
+        }
+        return (
+            <div class="flex items-center justify-between px-4 py-2 h-auto relative">
+                <div class="w-[80px] flex justify-start">
+                    <button
+                        type="button"
+                        id="dtw-cancel-btn"
+                        class="px-2 inline-flex items-center justify-center relative box-border cursor-pointer select-none align-middle no-underline font-medium text-sm leading-[1.75] tracking-[0.02857em] uppercase rounded text-white bg-[#1976d2] rounded-[4px] border-0 outline-0 font-sans px-4 py-2 shadow-[0px_3px_1px_-2px_rgba(0,0,0,0.2),0px_2px_2px_0px_rgba(0,0,0,0.14),0px_1px_5px_0px_rgba(0,0,0,0.12)] hover:bg-[#1565c0]"
+                        ref={el => { if (el) el.onclick = (e) => { hide() } }}
+                    > Cancel </button>
+                </div>
+                <div class="flex-1 text-center px-2">
+                    <span class="inline-block break-words">
+                        {() => title($$(modDate))}
+                    </span>
+                </div>
+                <div class="w-[80px] flex justify-end">
+                    <button
+                        type="button"
+                        id="dtw-ok-btn"
+                        class="px-2 inline-flex items-center justify-center relative box-border cursor-pointer select-none align-middle no-underline font-medium text-sm leading-[1.75] tracking-[0.02857em] uppercase rounded text-white bg-[#1976d2] rounded-[4px] border-0 outline-0 font-sans px-4 py-2 shadow-[0px_3px_1px_-2px_rgba(0,0,0,0.2),0px_2px_2px_0px_rgba(0,0,0,0.14),0px_1px_5px_0px_rgba(0,0,0,0.12)] hover:bg-[#1565c0]"
+                        ref={el => { if (el) el.onclick = (e) => { handleOkClick() } }}
+                    > OK </button>
+                </div>
             </div>
-            <div class="flex-1 text-center px-2">
-                <span class="inline-block break-words">
-                    {() => title($$(modDate))}
-                </span>
-            </div>
-            <div class="w-[80px] flex justify-end">
-                <button
-                    type="button"
-                    id="dtw-ok-btn"
-                    class="px-2 inline-flex items-center justify-center relative box-border cursor-pointer select-none align-middle no-underline font-medium text-sm leading-[1.75] tracking-[0.02857em] uppercase rounded text-white bg-[#1976d2] rounded-[4px] border-0 outline-0 font-sans px-4 py-2 shadow-[0px_3px_1px_-2px_rgba(0,0,0,0.2),0px_2px_2px_0px_rgba(0,0,0,0.14),0px_1px_5px_0px_rgba(0,0,0,0.12)] hover:bg-[#1565c0]"
-                    ref={el => { if (el) el.onclick = (e) => { handleOkClick() } }}
-                > OK </button>
-            </div>
-        </div>
-    )
+        )
+    }
 
     // Configuration: Wheeler items with their properties
     const wheelerConfigs = useMemo(() => [
@@ -425,7 +433,7 @@ const DateTimeWheeler = defaults(def, (props) => {
                 'flex-col w-full bg-white shadow-lg z-10 h-fit'
             ]}
         >
-            {() => $$(bottomProp) ? renderHeaderBar() : null}
+            {renderHeaderBar()}
 
             <div class={[DATETIME_WHEELER_CLS]}>
                 {renderWheelers()}
@@ -449,39 +457,66 @@ const DateTimeWheeler = defaults(def, (props) => {
         }
     })
 
-    return () => {
-        const vis = $$(isVisible)
-        const bot = $$(bottomProp)
+    // Read static values at component scope (bottom is set once, not dynamic)
+    const bot = $$(bottomProp)
 
-        if (!vis) {
-            return null
-        }
-
-        if (bot) {
-            return (
-                <Portal mount={document.body} when={isVisible}>
-                    {$$(mask) && (
-                        <div
-                            class={['fixed inset-0 bg-black/50 h-full w-full z-[10] opacity-50']}
-                        />
-                    )}
+    // NOTE: Portal's `when` prop only controls portal behavior (attach to body vs inline),
+    // NOT visibility. Portal line 100 returns `() => $(condition) || children` — when
+    // `condition` is false, children render inline. So we use a reactive `useMemo` to
+    // conditionally return null (when hidden) or the actual UI (when visible), gated on
+    // `isVisible`. This is needed because the component's thunk is wrapped in `untrack()`
+    // by `createElement`, so a plain `$(isVisible) ? <UI/> : null` in the return JSX
+    // would only evaluate once at construction time and never re-run.
+    if (bot) {
+        const portalChildren = useMemo(() => {
+            if (!$$(isVisible)) return null
+            return [
+                $$(mask) && (
                     <div
-                        ref={cont}
-                        class={[DATETIME_WHEELER_CLS, 'fixed inset-x-0 bottom-0 bg-white shadow-lg z-200 w-full']}
-                    >
-                        {component}
-                    </div>
-                </Portal>
-            )
-        }
+                        class={['fixed inset-0 bg-black/50 h-full w-full z-[10] opacity-50']}
+                    />
+                ),
+                <div
+                    ref={cont}
+                    class={[DATETIME_WHEELER_CLS, 'fixed inset-x-0 bottom-0 bg-white shadow-lg z-200 w-full']}
+                >
+                    {component}
+                </div>
+            ]
+        })
 
-        const result = (
-            <div class={[DATETIME_WHEELER_CLS, $$(cls)].join(" ")} {...otherProps}>
+        return (
+            <Portal mount={document.body} when={isVisible}>
+                {portalChildren}
+            </Portal>
+        )
+    }
+
+    // ── Inline path (no Portal, bot=false) ──────────────────────────────────────
+    // NOTE: No Portal wrapper here. The useMemo's reactive tracking would be
+    // disposed by Portal's disposeRender() when `when` becomes false, breaking
+    // the memo→null→DOM propagation chain (the close bug). By returning the
+    // memo directly, the subscription lives in the parent's context and survives
+    // visibility transitions.
+    const inlineChildren = useMemo(() => {
+        if (!$$(isVisible)) return null
+        // Contract for caller-supplied styling:
+        //   `cls`  → OVERRIDE base DATETIME_WHEELER_CLS (replace entirely)
+        //   `class`→ APPEND to the resolved class (extend, never replace)
+        // Most callers should pass `cls` for layout/positioning and reserve
+        // `class` for one-off tweaks (test overrides, theme accents).
+        const clsVal = $$(cls)
+        const baseCls = clsVal !== undefined && clsVal !== '' ? clsVal : DATETIME_WHEELER_CLS
+        const classVal = $$(className)
+        const finalCls = classVal ? [baseCls, classVal].filter(Boolean).join(" ") : baseCls
+        return (
+            <div ref={cont} class={finalCls} {...otherProps}>
                 {component}
             </div>
         )
-        return result
-    }
+    })
+
+    return inlineChildren
 })
 
 export { DateTimeWheeler }

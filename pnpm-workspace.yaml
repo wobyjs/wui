@@ -1,0 +1,4 @@
+packages:
+  - '@woby/*'
+  - '!@woby/temp-*'
+  - '!@woby/temp-ink-reference'

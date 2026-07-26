@@ -57,30 +57,30 @@ const def = () => {
 
 
 const MultiWheeler = defaults(def, (props) => {
-    const { options, value, itemHeight = $(36), itemCount = $(5), headers, divider, bottom, title, mask, visible: visibleProp, changeValueOnClickOnly, ok, cancelOnBlur, cls, searchable = [], searchPlaceholder = [], ...otherProps } = props
+    const { options, value, itemHeight = $(36), itemCount = $(5), headers, divider, bottom, title, mask, visible: visibleProp, changeValueOnClickOnly, ok, cancelOnBlur, commitOnBlur, cls, searchable = [], searchPlaceholder = [], ...otherProps } = props
 
     // --- Internal Selection State ---
     const modDate = options
     const stateArr = value
-    const isVisible = $($$(visibleProp));
 
     const { height: vh, width: vw, offsetLeft: ol, offsetTop: ot, pageTop: pt, pageLeft: pl } = useViewportSize()
 
+    // Internal visibility management — same pattern as DateTimeWheeler.
+    // use() creates a proper reactive binding that automatically updates.
+    const isVisible = use(visibleProp, true)
 
-    useEffect(() => {
-        const propValue = $$(visibleProp);
-        if (propValue !== $$(isVisible)) {
-            isVisible(propValue);
-        }
-    });
+    // Sync from parent's visibleProp to internal isVisible
+    // useEffect(() => {
+    //     const propValue = $$(visibleProp)
+    //     if (propValue !== undefined && propValue !== $$(isVisible)) {
+    //         isVisible(propValue)
+    //     }
+    // })
 
     const hide = () => {
-        // Update our internal state to immediately hide the component.
-        isVisible(false);
-
-        // If the parent passed a writable observable for `visible`, update it too.
+        isVisible(false)
         if (isObservable(visibleProp)) {
-            visibleProp(false);
+            visibleProp(false)
         }
     };
 
@@ -155,7 +155,7 @@ const MultiWheeler = defaults(def, (props) => {
     // #endregion
 
     const renderAsPopup = () => (
-        <Portal mount={document.body}>
+        <Portal mount={document.body} when={isVisible}>
             {$$(mask) && (
                 <div
                     class="fixed inset-0 bg-black/50 z-50"
@@ -180,7 +180,8 @@ const MultiWheeler = defaults(def, (props) => {
     );
 
     return () => {
-        // If not visible, render nothing.
+        // Track isVisible internally so re-renders happen when we toggle it
+        console.log('[MultiWheeler] render check:', 'visible=' + $$(isVisible), 'bottom=' + $$(bottom));
         if (!$$(isVisible)) {
             return null;
         }
