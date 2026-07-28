@@ -1,4 +1,4 @@
-import { $, $$, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlNumber, HtmlString, ObservableMaybe, Portal, useEffect, useMemo, isObservable, HtmlClass } from "woby"
+import { $, $$, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlNumber, HtmlString, ObservableMaybe, useEffect, useMemo, isObservable, HtmlClass } from "woby"
 
 
 // #region Sidebar Component
@@ -26,12 +26,14 @@ const sideBarDef = () => ({
     width: $('250px', HtmlString) as ObservableMaybe<string | number>,
     /** When true, a dark overlay will appear over the main content, which closes the sidebar on click. */
     mask: $(false, HtmlBoolean) as ObservableMaybe<boolean>,
+    /** The top position of the sidebar (e.g., 0 or '56px'). Defaults to 0. */
+    top: $(0, HtmlString) as ObservableMaybe<number | string>,
 })
 
 const SideBar = defaults(sideBarDef, (props) => {
-    const { class: cn, cls, children, open, contentRef, width, mask, ...otherProps } = props
+    const { class: cn, cls, children, open, contentRef, width, mask, top, ...otherProps } = props
 
-    const BASE_CLASS = `fixed h-full top-0 left-0 overflow-x-hidden transition-all duration-500 ease-in-out flex items-start z-[10]`
+    const BASE_CLASS = `fixed h-full left-0 overflow-x-hidden transition-all duration-500 ease-in-out flex items-start z-[10]`
 
     const sidebarWidth = useMemo(() => {
         if (!$$(open)) return '0px'
@@ -97,7 +99,7 @@ const SideBar = defaults(sideBarDef, (props) => {
         return (
             <div
                 class={[() => $$(cls) ? $$(cls) : BASE_CLASS, cn]}
-                style={{ width: sidebarWidth }}
+                style={{ width: sidebarWidth, top: $$(top) }}
                 {...otherProps}
             >
                 <slot>
@@ -110,43 +112,21 @@ const SideBar = defaults(sideBarDef, (props) => {
     }
 
     const BackgroundOverlay = () => {
-        {/*
-            * WHY A SEPARATE PORTAL?
-            * This `<div>` is the dark, semi-transparent overlay that covers the main content.
-            * It also needs to be at the top level of the DOM for the same reasons as the sidebar.
-            *
-            * WHY NOT IN THE SAME PORTAL AS THE SIDEBAR?
-            * Because they have different `z-index` values.
-            *   - The Overlay has `z-[5]`.
-            *   - The Sidebar has `z-[10]`.
-            * This ensures the sidebar menu (`z-10`) always appears *on top of* the overlay (`z-999`).
-            * If they were siblings inside the same parent `div`, managing their stacking order
-            * would be more complex and less reliable. Using two separate Portals keeps their
-            * stacking contexts clean and independent.
-        */}
         return <>
-            {/* <Portal mount={document.body}> */}
             {
                 () => $$(mask) && $$(open) ? (
                     <div
                         class="fixed inset-0 bg-black/50 z-[5] transition-opacity duration-500"
+                        style={{ top: $$(top) }}
                         onClick={() => isObservable(open) && open(false)}
                     />) : null
             }
-            {/* </Portal> */}
         </>
     }
-    // #endregion
 
     return <>
-        {/* ===== PORTAL 1: The Sidebar Itself ===== */}
-        <Portal mount={document.body}>
-            <SidebarComponent />
-        </Portal>
-        {/* ===== PORTAL 2: The Background Overlay ===== */}
-        <Portal mount={document.body}>
-            <BackgroundOverlay />
-        </Portal>
+        <SidebarComponent />
+        <BackgroundOverlay />
     </>
 }) as typeof SideBar
 // #endregion

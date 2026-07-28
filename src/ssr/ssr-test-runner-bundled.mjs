@@ -440,7 +440,7 @@ function getCreators() {
     };
   }
 }
-var DEBUGGER, Stack, callStack, BATCH, OBSERVER, setBatch, setObserver, castArray$1, castError$1, is, isArray$1, isEqual, isFunction$1, isObject$1, isSymbol, noop$1, nope, counter, resolve$1, batch, SYMBOL_CACHED, SYMBOL_OBSERVABLE, SYMBOL_OBSERVABLE_BOOLEAN, SYMBOL_OBSERVABLE_FROZEN, SYMBOL_OBSERVABLE_READABLE, SYMBOL_OBSERVABLE_WRITABLE, SYMBOL_STORE, SYMBOL_STORE_KEYS, SYMBOL_STORE_OBSERVABLE, SYMBOL_STORE_TARGET, SYMBOL_STORE_VALUES, SYMBOL_STORE_UNTRACKED, SYMBOL_SUSPENSE$1, SYMBOL_UNCACHED, SYMBOL_UNTRACKED, SYMBOL_UNTRACKED_UNWRAPPED, isObservableBoolean, isObservableFrozen, isUntracked$1, isObservable, frozen, readable, writable, OBSERVABLE_FALSE, OBSERVABLE_TRUE, UNAVAILABLE, UNINITIALIZED, Scheduler$1, scheduler_sync_default, Observable, lazyArrayEach, lazyArrayEachRight, lazyArrayPush, lazySetAdd, lazySetDelete, lazySetEach, onCleanup, onDispose, Owner, SuperRoot, SUPER_OWNER, OWNER, setOwner, ObservablesArray, ObservablesSet, Observer, Memo, memo, boolean, cleanup, Context, disposed, Scheduler, scheduler_async_default, Effect, effect, Root, DUMMY_INDEX$1, MappedRoot$1, CacheKeyed, Suspense, suspense, DUMMY_INDEX, MappedRoot, CacheUnkeyed, isStore, warmup, match, ternary, isBatching, owner, isObservableWritable, target, readonly, root, isEqualForSelector, DisposableMap, SelectedObservable, selector, StoreMap, StoreCleanable, StoreKeys, StoreValues, StoreHas, StoreProperty, StoreListenersRegular, StoreListenersRoots, StoreScheduler, NODES, SPECIAL_SYMBOLS, UNREACTIVE_KEYS, STORE_TRAPS, STORE_UNTRACK_TRAPS, getNode, getNodeExisting, getNodeFromStore, getNodeKeys, getNodeValues, getNodeHas, getNodeObservable, getNodeProperty, getGettersAndSetters, getStore, getTarget, getUntracked, isEqualDescriptor, isFrozenLike, isListenable, isProxiable, isUntracked, throwNoSetterError, store, suspended, tick, tryCatch, _with, dist_default, CONTEXTS_DATA, DIRECTIVES, SYMBOL_TEMPLATE_ACCESSOR, SYMBOLS_DIRECTIVES, SYMBOL_CLONE, SYMBOL_CONTEXT, SYMBOL_ISSLOT, SYMBOL_JSX, SYMBOL_DEFAULT, SYMBOL_CONTEXT_WRAP, SimpleNodeList, BaseNode, Comment2, Style, Element3, createComment$1, createElement, createHTMLNode$1, SVGNode, createSVGNode$1, createText$1, createDocumentFragment$1, createDocument, document$1, isNodeEnvironment, createComment, createHTMLNode, createSVGNode, createText, createDocumentFragment, NOOP_CHILDREN, Node$1, FragmentUtils, useCheapDisposed, useMicrotask, options, useRenderEffect, assign, castArray, flatten, indexOf, isArray, isBoolean, isFunction, isClass, isFunctionReactive, isNil, isNode, isObject, isPrimitive, isPromise, isString, isSVG, isSVGElement, isTemplateAccessor, isVoidChild, isPureFunction, classesToggle, dummyNode, beforeDummyWrapper, afterDummyWrapper, diff, EnvironmentToken, DocumentToken, EnvironmentContext, useEnvironment, DocumentContext, useDocument, resolveChild, resolveClass, resolveStyle, resolveArraysAndStatics, kebabToCamelCase, camelToKebabCase, normalizePropertyPath, setNestedAttribute, setAttributeStatic, setAttribute, setChildStatic, setChild, setClassStatic, setClass, setClassBooleanStatic, setClassBoolean, setClassesStatic, setClasses, setDirective, setEventStatic, setEvent, setHTMLStatic, setHTML, setPropertyStatic, setProperty, setRef, propertyNonDimensionalRe, setStyleStatic, setStyle, setStylesStatic, setStyles, setTemplateAccessor, setProp, setProps;
+var DEBUGGER, Stack, callStack, BATCH, OBSERVER, setBatch, setObserver, castArray$1, castError$1, is, isArray$1, isEqual, isFunction$1, isObject$1, isSymbol, noop$1, nope, counter, resolve$1, batch, SYMBOL_CACHED, SYMBOL_OBSERVABLE, SYMBOL_OBSERVABLE_BOOLEAN, SYMBOL_OBSERVABLE_FROZEN, SYMBOL_OBSERVABLE_READABLE, SYMBOL_OBSERVABLE_WRITABLE, SYMBOL_STORE, SYMBOL_STORE_KEYS, SYMBOL_STORE_OBSERVABLE, SYMBOL_STORE_TARGET, SYMBOL_STORE_VALUES, SYMBOL_STORE_UNTRACKED, SYMBOL_SUSPENSE$1, SYMBOL_UNCACHED, SYMBOL_UNTRACKED, SYMBOL_UNTRACKED_UNWRAPPED, isObservableBoolean, isObservableFrozen, isUntracked$1, isObservable, frozen, readable, writable, OBSERVABLE_FALSE, OBSERVABLE_TRUE, UNAVAILABLE, UNINITIALIZED, Scheduler$1, scheduler_sync_default, Observable, lazyArrayEach, lazyArrayEachRight, lazyArrayPush, lazySetAdd, lazySetDelete, lazySetEach, onCleanup, onDispose, Owner, SuperRoot, SUPER_OWNER, OWNER, setOwner, ObservablesArray, ObservablesSet, Observer, Memo, memo, boolean, cleanup, Context, disposed, Scheduler, scheduler_async_default, Effect, effect, Root, DUMMY_INDEX$1, MappedRoot$1, CacheKeyed, Suspense, suspense, DUMMY_INDEX, MappedRoot, CacheUnkeyed, isStore, warmup, match, ternary, isBatching, owner, isObservableWritable, target, readonly, root, isEqualForSelector, DisposableMap, SelectedObservable, selector, StoreMap, StoreCleanable, StoreKeys, StoreValues, StoreHas, StoreProperty, StoreListenersRegular, StoreListenersRoots, StoreScheduler, NODES, SPECIAL_SYMBOLS, UNREACTIVE_KEYS, STORE_TRAPS, STORE_UNTRACK_TRAPS, getNode, getNodeExisting, getNodeFromStore, getNodeKeys, getNodeValues, getNodeHas, getNodeObservable, getNodeProperty, getGettersAndSetters, getStore, getTarget, getUntracked, isEqualDescriptor, isFrozenLike, isListenable, isProxiable, isUntracked, throwNoSetterError, store, suspended, tick, tryCatch, _with, dist_default, CONTEXTS_DATA, DIRECTIVES, SYMBOL_TEMPLATE_ACCESSOR, SYMBOLS_DIRECTIVES, SYMBOL_CLONE, SYMBOL_CONTEXT, SYMBOL_ISSLOT, SYMBOL_JSX, SYMBOL_DEFAULT, SYMBOL_CONTEXT_WRAP, SimpleNodeList, BaseNode, Comment2, Style, Element3, createComment$1, createElement, createHTMLNode$1, SVGNode, createSVGNode$1, createText$1, createDocumentFragment$1, createDocument, document$1, isNodeEnvironment, createComment, createHTMLNode, createSVGNode, createText, createDocumentFragment, NOOP_CHILDREN, Node$1, FragmentUtils, useCheapDisposed, useMicrotask, options, useRenderEffect, assign, castArray, flatten, indexOf, isArray, isBoolean, isFunction, isClass, isFunctionReactive, isNil, isNode, isObject, isPrimitive, isPromise, isString, isSVG, isSVGElement, isTemplateAccessor, isVoidChild, isPureFunction, classesToggle, dummyNode, beforeDummyWrapper, afterDummyWrapper, diff, EnvironmentToken, DocumentToken, EnvironmentContext, useEnvironment, DocumentContext, resolveChild, resolveClass, resolveStyle, resolveArraysAndStatics, kebabToCamelCase, camelToKebabCase, normalizePropertyPath, setNestedAttribute, setAttributeStatic, setAttribute, setChildStatic, setChild, setClassStatic, setClass, setClassBooleanStatic, setClassBoolean, setClassesStatic, setClasses, setDirective, setEventStatic, setEvent, setHTMLStatic, setHTML, setPropertyStatic, setProperty, setRef, propertyNonDimensionalRe, setStyleStatic, setStyle, setStylesStatic, setStyles, setTemplateAccessor, setProp, setProps;
 var init_setters_Cy5CROMu = __esm({
   "../woby/dist/setters-Cy5CROMu.js"() {
     "use strict";
@@ -2962,13 +2962,6 @@ var init_setters_Cy5CROMu = __esm({
     EnvironmentContext = { Provider: (env, callback) => context({ [EnvironmentToken]: env }, callback) };
     useEnvironment = () => context(EnvironmentToken);
     DocumentContext = { Provider: (doc, callback) => context({ [DocumentToken]: doc }, callback) };
-    useDocument = () => {
-      try {
-        return context(DocumentToken);
-      } catch {
-        return null;
-      }
-    };
     resolveChild = (value, setter, _dynamic = false, stack) => {
       const isSSR = useEnvironment() === "ssr";
       if (isArray(value)) {
@@ -4769,7 +4762,7 @@ var init_htm_module_BFutDv50 = __esm({
 });
 
 // ../woby/dist/index.es.js
-var IS_BROWSER, runWithSuperRoot, render, Portal, registry, h$1, register, html, is2, HtmlBoolean, toNumber, HtmlNumber, toString, HtmlString, toClassString, HtmlClass;
+var IS_BROWSER, runWithSuperRoot, render, registry, h$1, register, html, is2, HtmlBoolean, toNumber, HtmlNumber, toString, HtmlString, toClassString, HtmlClass;
 var init_index_es = __esm({
   "../woby/dist/index.es.js"() {
     "use strict";
@@ -4799,73 +4792,6 @@ var init_index_es = __esm({
           }
         };
       });
-    };
-    Portal = ({ when = true, mount, wrapper, children }) => {
-      const isSSR = useEnvironment() === "ssr";
-      const createHTMLNode$2 = isSSR ? createHTMLNode$1 : createHTMLNode;
-      const portal = get(wrapper) || createHTMLNode$2("div");
-      if (isSSR) {
-        if (!("appendChild" in portal)) throw new Error("Invalid wrapper node");
-      } else if (!(portal instanceof HTMLElement)) throw new Error("Invalid wrapper node");
-      const condition = boolean(when);
-      const stack = /* @__PURE__ */ new Error();
-      if (!isSSR) {
-        useRenderEffect(() => {
-          if (!get(condition)) return;
-          const parent = get(mount) || document.body;
-          if (isSSR) {
-            if (!("appendChild" in parent)) throw new Error("Invalid mount node");
-          } else if (!(parent instanceof Element)) throw new Error("Invalid mount node");
-          parent.insertBefore(portal, null);
-          return () => {
-            parent.removeChild(portal);
-          };
-        }, stack);
-        useRenderEffect(() => {
-          if (!get(condition)) return;
-          const disposeRender = render(children, portal);
-          return () => {
-            if (disposeRender) disposeRender();
-          };
-        }, stack);
-      } else {
-        const ssrDoc = useDocument();
-        let mountNode = get(mount);
-        console.log("[Portal SSR]", {
-          hasSsrDoc: !!ssrDoc,
-          mountType: typeof mountNode,
-          mountIsBody: mountNode === globalThis.document?.body,
-          mountIsGlobalBody: mountNode === globalThis.document?.body,
-          globalBodyType: typeof globalThis.document?.body,
-          hasChildren: !!children
-        });
-        if (ssrDoc && mountNode === globalThis.document?.body) {
-          mountNode = ssrDoc.body;
-          console.log("[Portal SSR] Redirected to ssrDoc.body");
-        }
-        const parent = mountNode || createHTMLNode$2("div");
-        console.log("[Portal SSR] parent:", {
-          isBody: parent === ssrDoc?.body,
-          parentNodeType: typeof parent.parentNode,
-          hasParentNode: !!parent.parentNode
-        });
-        if (wrapper) {
-          let portal2 = get(wrapper);
-          while (typeof portal2 === "function") portal2 = portal2();
-          setChild(portal2, children, FragmentUtils.make(), stack);
-          parent.appendChild(portal2);
-        } else setChild(parent, children, FragmentUtils.make(), stack);
-        console.log("[Portal SSR] after setChild, parent innerHTML:", parent.innerHTML);
-        if (mount && parent.parentNode) console.log("[Portal SSR] parent already has parentNode, skipping append");
-        else if (mount) {
-          const doc = ssrDoc || createDocument();
-          if (parent !== doc.body) {
-            doc.body.appendChild(parent);
-            console.log("[Portal SSR] appended parent to doc.body");
-          }
-        }
-      }
-      return assign(() => get(condition) || children, { metadata: { portal } });
     };
     registry = {};
     h$1 = (type2, props, ...children) => createElement2(registry[type2] || type2, props, ...children);
@@ -51438,11 +51364,13 @@ var sideBarDef = () => ({
   /** The width of the sidebar when it is open (e.g., '250px' or 250). */
   width: observable("250px", HtmlString),
   /** When true, a dark overlay will appear over the main content, which closes the sidebar on click. */
-  mask: observable(false, HtmlBoolean)
+  mask: observable(false, HtmlBoolean),
+  /** The top position of the sidebar (e.g., 0 or '56px'). Defaults to 0. */
+  top: observable(0, HtmlString)
 });
 var SideBar = defaults(sideBarDef, (props) => {
-  const { class: cn2, cls, children, open, contentRef, width: width2, mask, ...otherProps } = props;
-  const BASE_CLASS4 = `fixed h-full top-0 left-0 overflow-x-hidden transition-all duration-500 ease-in-out flex items-start z-[10]`;
+  const { class: cn2, cls, children, open, contentRef, width: width2, mask, top, ...otherProps } = props;
+  const BASE_CLASS4 = `fixed h-full left-0 overflow-x-hidden transition-all duration-500 ease-in-out flex items-start z-[10]`;
   const sidebarWidth = memo(() => {
     if (!get(open)) return "0px";
     const w2 = get(width2);
@@ -51462,26 +51390,25 @@ var SideBar = defaults(sideBarDef, (props) => {
       "div",
       {
         class: [() => get(cls) ? get(cls) : BASE_CLASS4, cn2],
-        style: { width: sidebarWidth },
+        style: { width: sidebarWidth, top: get(top) },
         ...otherProps,
         children: /* @__PURE__ */ jsx("slot", { children: /* @__PURE__ */ jsx("div", { class: "flex flex-col justify-end", children }) })
       }
     );
   };
   const BackgroundOverlay = () => {
-    {
-    }
     return /* @__PURE__ */ jsx(Fragment, { children: () => get(mask) && get(open) ? /* @__PURE__ */ jsx(
       "div",
       {
         class: "fixed inset-0 bg-black/50 z-[5] transition-opacity duration-500",
+        style: { top: get(top) },
         onClick: () => isObservable(open) && open(false)
       }
     ) : null });
   };
   return /* @__PURE__ */ jsxs(Fragment, { children: [
-    /* @__PURE__ */ jsx(Portal, { mount: document.body, children: /* @__PURE__ */ jsx(SidebarComponent, {}) }),
-    /* @__PURE__ */ jsx(Portal, { mount: document.body, children: /* @__PURE__ */ jsx(BackgroundOverlay, {}) })
+    /* @__PURE__ */ jsx(SidebarComponent, {}),
+    /* @__PURE__ */ jsx(BackgroundOverlay, {})
   ] });
 });
 var menuItemDef = () => ({
@@ -51553,12 +51480,12 @@ var TestSideBar = () => {
   registerTestObservable(`${name13}_ssr`, ret);
   return ret;
 };
-var BASE_CLASS2 = "fixed h-full top-0 left-0 overflow-x-hidden transition-all duration-500 ease-in-out flex items-start z-[10]";
+var BASE_CLASS2 = "fixed h-full left-0 overflow-x-hidden transition-all duration-500 ease-in-out flex items-start z-[10]";
 if (typeof globalThis.__isSSRTest__ !== "undefined") {
   TestSideBar();
   const fullElements = [
-    `<h3>SideBar</h3><div class="${BASE_CLASS2}" style="width: 0px;"><slot><div class="flex flex-col justify-end">Sidebar</div></slot></div>`,
-    `<h3>SideBar</h3><div class="${BASE_CLASS2}" style="width: 250px;"><slot><div class="flex flex-col justify-end">Sidebar</div></slot></div>`
+    `<h3>SideBar</h3><div class="${BASE_CLASS2}" style="width: 0px; top: 0px;"><slot><div class="flex flex-col justify-end">Sidebar</div></slot></div>`,
+    `<h3>SideBar</h3><div class="${BASE_CLASS2}" style="width: 250px; top: 0px;"><slot><div class="flex flex-col justify-end">Sidebar</div></slot></div>`
   ];
   console.log(`
 \u{1F4DD} Test: ${name13}`);
@@ -51588,7 +51515,7 @@ TestSideBar.test = {
     const ssrComponent = testObservables[`${name13}_ssr`];
     const ssrResult = renderToString(ssrComponent);
     const fullWidth = idx === 1 ? "250px" : "0px";
-    const expectedFull = `<h3>SideBar</h3><div class="${BASE_CLASS2}" style="width: ${fullWidth};"><slot><div class="flex flex-col justify-end">Sidebar</div></slot></div>`;
+    const expectedFull = `<h3>SideBar</h3><div class="${BASE_CLASS2}" style="width: ${fullWidth}; top: 0px;"><slot><div class="flex flex-col justify-end">Sidebar</div></slot></div>`;
     if (ssrResult !== expectedFull) {
       assert(false, `[${name13}] SSR mismatch: got 
 ${ssrResult}, expected 

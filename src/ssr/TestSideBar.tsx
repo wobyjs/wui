@@ -30,15 +30,15 @@ const TestSideBar = (): JSX.Element => {
     return ret
 }
 
-const BASE_CLASS = "fixed h-full top-0 left-0 overflow-x-hidden transition-all duration-500 ease-in-out flex items-start z-[10]"
+const BASE_CLASS = "fixed h-full left-0 overflow-x-hidden transition-all duration-500 ease-in-out flex items-start z-[10]"
 
 // SSR test (Node.js)
 if (typeof globalThis.__isSSRTest__ !== 'undefined') {
     TestSideBar()
 
     const fullElements = [
-        `<h3>SideBar</h3><div class="${BASE_CLASS}" style="width: 0px;"><slot><div class="flex flex-col justify-end">Sidebar</div></slot></div>`,
-        `<h3>SideBar</h3><div class="${BASE_CLASS}" style="width: 250px;"><slot><div class="flex flex-col justify-end">Sidebar</div></slot></div>`,
+        `<h3>SideBar</h3><div class="${BASE_CLASS}" style="width: 0px; top: 0px;"><slot><div class="flex flex-col justify-end">Sidebar</div></slot></div>`,
+        `<h3>SideBar</h3><div class="${BASE_CLASS}" style="width: 250px; top: 0px;"><slot><div class="flex flex-col justify-end">Sidebar</div></slot></div>`,
     ]
 
     console.log(`\n📝 Test: ${name}`)
@@ -71,15 +71,15 @@ TestSideBar.test = {
         const ssrResult = renderToString(ssrComponent)
 
         const fullWidth = idx === 1 ? '250px' : '0px'
-        const expectedFull = `<h3>SideBar</h3><div class="${BASE_CLASS}" style="width: ${fullWidth};"><slot><div class="flex flex-col justify-end">Sidebar</div></slot></div>`
+        const expectedFull = `<h3>SideBar</h3><div class="${BASE_CLASS}" style="width: ${fullWidth}; top: 0px;"><slot><div class="flex flex-col justify-end">Sidebar</div></slot></div>`
         if (ssrResult !== expectedFull) {
             assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ [${name}] SSR test passed: ${ssrResult}`)
         }
 
-        // Return empty string for browser comparison — SideBar renders via <Portal mount={document.body}>,
-        // so Portal content is teleported to document.body and won't appear in the test container's getInnerHTML()
+        // Return empty string for browser comparison — SideBar no longer uses Portal,
+        // but the SSR test already validates the output above
         return ''
     }
 }
