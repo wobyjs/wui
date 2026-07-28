@@ -170,7 +170,7 @@ const NumberField = defaults(def, (props) => {
             "number-input inline-flex items-center bg-white border border-gray-300 rounded-lg transition-all duration-200",
             "focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500", // Nice focus state
             "divide-x divide-gray-200", // Subtle dividers between elements
-            { "bg-gray-100 opacity-70": disabled }, // Style for disabled state
+            () => $$(disabled) ? "bg-gray-100 opacity-70" : "", // Style for disabled state
             () => $$(cls) ? $$(cls) : "",
             cn
         ]}>
@@ -189,7 +189,7 @@ const NumberField = defaults(def, (props) => {
                 class={[
                     "w-16 text-center border-none bg-transparent focus:outline-none focus:ring-0 text-lg font-semibold text-gray-700",
                     "[-moz-appearance:textfield] [&::-webkit-inner-spin-button]:hidden [&::-webkit-outer-spin-button]:hidden",
-                    { "text-red-500": error }
+                    () => $$(error) ? "text-red-500" : ""
                 ]}
                 type="number"
                 value={value}

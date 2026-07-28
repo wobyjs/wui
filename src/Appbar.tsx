@@ -313,52 +313,54 @@ const Appbar = defaults(def, (props) => {
         return `${positionClass}`
     }
 
-    // let el: HTMLElement | null = null;
-    // useEffect(() => {
-    //     if (!el) return;
+    let el: HTMLElement | null = null;
+    useEffect(() => {
+        if (typeof globalThis.__isSSRTest__ !== 'undefined') return
+        if (!el) return;
+        if (!(el instanceof HTMLElement)) return;
 
-    //     /* In TSX (no Shadow DOM): header -> parentElement (the scroll container) */
-    //     /* In custom element: header -> ShadowRoot (no parentElement). We need the host's parent. */
-    //     const root = el.getRootNode() as any;           // Document | ShadowRoot
-    //     const host: HTMLElement | null = root?.host ?? null; // present only in Shadow DOM
-    //     const container: HTMLElement | null =
-    //         host?.parentElement ?? el.parentElement;      // prefer host's parent, else normal parent
+        /* In TSX (no Shadow DOM): header -> parentElement (the scroll container) */
+        /* In custom element: header -> ShadowRoot (no parentElement). We need the host's parent. */
+        const root = el.getRootNode() as any;           // Document | ShadowRoot
+        const host: HTMLElement | null = root?.host ?? null; // present only in Shadow DOM
+        const container: HTMLElement | null =
+            host?.parentElement ?? el.parentElement;      // prefer host's parent, else normal parent
 
-    //     if (!container) return;
+        if (!container) return;
 
-    //     const isFixed = () => position() === "fixed";
-    //     const doOffset = () => isFixed();
+        const isFixed = () => position() === "fixed";
+        const doOffset = () => isFixed();
 
-    //     const apply = () => {
-    //         if (!doOffset()) {
-    //             container.style.paddingTop = "";
-    //             container.style.paddingBottom = "";
-    //             return;
-    //         }
-    //         const h = el!.offsetHeight || 0;
-    //         if (edge() === "top") {
-    //             container.style.paddingTop = `${h}px`;
-    //             container.style.paddingBottom = "";
-    //         } else {
-    //             container.style.paddingBottom = `${h}px`;
-    //             container.style.paddingTop = "";
-    //         }
-    //     };
+        const apply = () => {
+            if (!doOffset()) {
+                container.style.paddingTop = "";
+                container.style.paddingBottom = "";
+                return;
+            }
+            const h = el!.offsetHeight || 0;
+            if (edge() === "top") {
+                container.style.paddingTop = `${h}px`;
+                container.style.paddingBottom = "";
+            } else {
+                container.style.paddingBottom = `${h}px`;
+                container.style.paddingTop = "";
+            }
+        };
 
-    //     const ro = new ResizeObserver(apply);
-    //     ro.observe(el);
-    //     apply();
+        const ro = new ResizeObserver(apply);
+        ro.observe(el);
+        apply();
 
-    //     return () => {
-    //         ro.disconnect();
-    //         container.style.paddingTop = "";
-    //         container.style.paddingBottom = "";
-    //     };
-    // });
+        return () => {
+            ro.disconnect();
+            container.style.paddingTop = "";
+            container.style.paddingBottom = "";
+        };
+    });
 
     return (
         <header
-            // ref={(e: any) => (el = e)}
+            ref={(e: any) => (el = e)}
             class={[() => $$(cls) ? $$(cls) : variantStyle[$$(variant)], () => getPositionClass(), cn]}
             {...otherProps}
         >

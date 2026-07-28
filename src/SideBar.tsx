@@ -127,11 +127,11 @@ const SideBar = defaults(sideBarDef, (props) => {
         return <>
             {/* <Portal mount={document.body}> */}
             {
-                () => $$(mask) && $$(open) && (
+                () => $$(mask) && $$(open) ? (
                     <div
                         class="fixed inset-0 bg-black/50 z-[5] transition-opacity duration-500"
                         onClick={() => isObservable(open) && open(false)}
-                    />)
+                    />) : null
             }
             {/* </Portal> */}
         </>
@@ -140,9 +140,13 @@ const SideBar = defaults(sideBarDef, (props) => {
 
     return <>
         {/* ===== PORTAL 1: The Sidebar Itself ===== */}
-        <SidebarComponent />
+        <Portal mount={document.body}>
+            <SidebarComponent />
+        </Portal>
         {/* ===== PORTAL 2: The Background Overlay ===== */}
-        <BackgroundOverlay />
+        <Portal mount={document.body}>
+            <BackgroundOverlay />
+        </Portal>
     </>
 }) as typeof SideBar
 // #endregion

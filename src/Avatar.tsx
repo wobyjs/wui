@@ -67,7 +67,7 @@ const Avatar = defaults(def, (props) => {
         const s = $$(srcObs)
         const a = $$(altObs)
         if (s) {
-            return <img src={s} alt={a} class="w-full h-full object-cover" />
+            return <img src={s} alt={a} class="w-full h-full object-cover" onerror={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
         }
         // initials / custom children
         return children ?? (a ? a[0] : "")

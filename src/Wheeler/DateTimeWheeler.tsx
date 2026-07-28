@@ -1,5 +1,5 @@
 /* @jsxImportSource woby */
-import { $, $$, Observable, ObservableMaybe, useEffect, useMemo, untrack, Portal, type JSX, isObservable, defaults, customElement, ElementAttributes, useRenderEffect } from 'woby'
+import { $, $$, Observable, ObservableMaybe, useEffect, useMemo, untrack, Portal, type JSX, isObservable, defaults, customElement, ElementAttributes, useRenderEffect, HtmlBoolean } from 'woby'
 import { use, useClickAway, useViewportSize } from '@woby/use'
 import { Wheeler, def as wheelerDef } from './Wheeler' // Adjust path
 import { Button } from '../Button'
@@ -54,7 +54,8 @@ const def = () => {
         title: undefined as ((v: ObservableMaybe<any | any[]>) => JSX.Element) | undefined,
         visible: $(true) as ObservableMaybe<boolean>,
         header: undefined as ((props: { ok: (v: boolean) => void, visible: (v: boolean) => void }) => JSX.Element) | undefined,
-        ...inheritedDefaults
+        ...inheritedDefaults,
+        cancelOnBlur: $(false, HtmlBoolean) as ObservableMaybe<boolean>,
     }
 }
 
@@ -210,6 +211,8 @@ const DateTimeWheeler = defaults(def, (props) => {
         // Check if controlledValue is an observable function before calling it
         if (typeof modDate === 'function' && (!currentPropValue || constrainedDate.getTime() !== currentPropValue.getTime())) {
 
+            console.log('DBG_DOB [DTW sync-effect] wheel commit -> y=' + year + ' m=' + month + ' d=' + day + ' h=' + hour + ' mi=' + minute + ' s=' + second + ' | constrained=' + constrainedDate.toISOString() + ' | prevMod=' + (currentPropValue ? currentPropValue.toISOString() : 'null') + ' | ok=' + $$(ok) + ' | oriIsObs=' + isObservable(oriDate))
+
             modDate(constrainedDate) // Update the external observable
 
             if (!$$(ok)) { if (isObservable(oriDate)) { oriDate($$(modDate)) } }
@@ -317,6 +320,7 @@ const DateTimeWheeler = defaults(def, (props) => {
 
     // Helper: Handle OK button click
     const handleOkClick = () => {
+        console.log('DBG_DOB [DTW handleOkClick] OK pressed | modDate=' + ($$(modDate) ? $$(modDate).toISOString() : 'null') + ' | oriDate=' + (isObservable(oriDate) ? ($$(oriDate) ? $$(oriDate).toISOString() : 'null') : 'NOT_OBS') + ' | ok=' + $$(ok))
         if (isObservable(oriDate)) { oriDate($$(modDate)) }
         hide()
     }
@@ -407,10 +411,9 @@ const DateTimeWheeler = defaults(def, (props) => {
         }
     ])
 
-    // Helper: Render individual wheeler columns
     const renderWheelers = () => (
         $$(wheelerConfigs).map(({ show, label, options, value, hasBorder }) =>
-            () => $$(show) && (
+            () => $$(show) ? (
                 <Wheeler
                     header={v => label}
                     options={options}
@@ -421,7 +424,7 @@ const DateTimeWheeler = defaults(def, (props) => {
                     bottom={false}
                     cancelOnBlur={false}  // Disable inner Wheeler click-away, let DateTimeWheeler handle it
                 />
-            )
+            ) : null
         )
     )
 
@@ -471,11 +474,11 @@ const DateTimeWheeler = defaults(def, (props) => {
         const portalChildren = useMemo(() => {
             if (!$$(isVisible)) return null
             return [
-                $$(mask) && (
+                $$(mask) ? (
                     <div
                         class={['fixed inset-0 bg-black/50 h-full w-full z-[10] opacity-50']}
                     />
-                ),
+                ) : null,
                 <div
                     ref={cont}
                     class={[DATETIME_WHEELER_CLS, 'fixed inset-x-0 bottom-0 bg-white shadow-lg z-200 w-full']}

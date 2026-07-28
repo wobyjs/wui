@@ -5,7 +5,7 @@ const DefaultAvatar = () => {
 }
 
 const SampleAvatar = () => {
-    return (<Avatar src="sample-avatar.png" alt="sample avatar" />)
+    return (<Avatar src="sample-avatar.svg" alt="sample avatar" />)
 }
 
 const HAvatar = () => {

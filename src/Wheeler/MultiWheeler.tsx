@@ -156,12 +156,12 @@ const MultiWheeler = defaults(def, (props) => {
 
     const renderAsPopup = () => (
         <Portal mount={document.body} when={isVisible}>
-            {$$(mask) && (
+            {$$(mask) ? (
                 <div
                     class="fixed inset-0 bg-black/50 z-50"
                     onClick={() => $$(cancelOnBlur) && hide()}
                 />
-            )}
+            ) : null}
             <div
                 class="fixed inset-x-0 bottom-0 z-[100] flex justify-center items-end p-4 pointer-events-none"
                 {...otherProps}

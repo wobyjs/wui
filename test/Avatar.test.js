@@ -4,7 +4,7 @@ const DefaultAvatar = () => {
     return (_jsx(Avatar, {}));
 };
 const SampleAvatar = () => {
-    return (_jsx(Avatar, { src: "sample-avatar.png", alt: "sample avatar" }));
+    return (_jsx(Avatar, { src: "sample-avatar.svg", alt: "sample avatar" }));
 };
 const HAvatar = () => {
     return (_jsx(Avatar, { children: "H" }));

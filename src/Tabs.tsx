@@ -28,6 +28,12 @@ const Tabs = defaults(defTabs, (props) => {
 
 	// 2. Logic: DOM Controller
 	useEffect(() => {
+		// SSR guard: this effect body runs in a deferred Scheduler microtask flush
+		// during renderToString, where refs resolve to non-null woby SSR internal
+		// objects lacking DOM properties (e.g. .children), which would crash
+		// Array.from below. Skip DOM manipulation entirely under SSR.
+		if (typeof globalThis.__isSSRTest__ !== 'undefined') return
+
 		const mainDiv = $$(mainRef)
 		const contentDiv = $$(contentRef)
 		if (!mainDiv || !contentDiv) return
@@ -41,6 +47,7 @@ const Tabs = defaults(defTabs, (props) => {
 		if (isShadow) {
 			const host = (rootNode as ShadowRoot).host as HTMLElement
 			// Get immediate children of the host (the <wui-tab> elements)
+			if (!host?.children) return
 			const lightChildren = Array.from(host.children)
 
 			lightChildren.forEach(node => {
@@ -54,7 +61,7 @@ const Tabs = defaults(defTabs, (props) => {
 
 		// --- B. Scan Content Container ---
 		// Now 'contentDiv' contains the tabs (either from JSX render or moved HTML nodes)
-		const nodes = Array.from(contentDiv.children) as HTMLElement[]
+		const nodes = contentDiv?.children ? Array.from(contentDiv.children) as HTMLElement[] : []
 
 		const foundTitles: string[] = []
 		const tabNodes: HTMLElement[] = []

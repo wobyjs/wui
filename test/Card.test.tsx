@@ -89,7 +89,7 @@ const FilledCardExample4 = () => (
 const MediaCenteredCardExample = () => (
     <Card cls="max-w-sm m-2">
         <CardMedia
-            src="/sample-avatar.png"
+            src="/sample-avatar.svg"
             alt="Avatar"
             cls="w-24 h-24 rounded-full mx-auto bg-center bg-cover mt-4"
             position="center center"
@@ -148,7 +148,7 @@ const ContentPaddingCardExample = () => (
 const NameCardExample = () => (
     <Card cls="max-w-sm m-2">
         <CardMedia
-            src="/sample-avatar.png"
+            src="/sample-avatar.svg"
             alt="Sample avatar"
             cls="w-24 h-24 rounded-full mx-auto bg-center bg-cover mt-4"
             position="center center"
@@ -190,7 +190,7 @@ const NameCard = () => {
         <Card cls="max-w-sm m-2 border border-red-500">
             {/* Avatar / photo centered */}
             <CardMedia
-                src="sample-avatar.png"
+                src="sample-avatar.svg"
                 alt="Sample avatar"
                 // center the media block and make it round
                 cls="w-24 h-24 rounded-full mx-auto bg-center bg-cover mt-4 border border-yellow-500"

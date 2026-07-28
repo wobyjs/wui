@@ -175,7 +175,7 @@ Supports horizontal alignment:
 ```tsx
 <Card cls="max-w-sm m-2">
     <CardMedia
-        src="/sample-avatar.png"
+        src="/sample-avatar.svg"
         alt="Avatar"
         cls="w-24 h-24 rounded-full mx-auto mt-4 bg-cover"
     />
@@ -194,7 +194,7 @@ Supports horizontal alignment:
 ### HTML equivalent
 ```html
 <wui-card cls="max-w-sm m-2">
-    <wui-card-media src="/sample-avatar.png"></wui-card-media>
+    <wui-card-media src="/sample-avatar.svg"></wui-card-media>
     <wui-card-content cls="px-5 pb-4">...</wui-card-content>
     <wui-card-actions align="center" padding="p-3">
         <wui-button cls="px-4 py-2 rounded">Say Hi</wui-button>

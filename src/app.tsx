@@ -1,7 +1,7 @@
 /// <reference types="vite/client" />
 
 
-import { DEBUGGER, $, $$, useMemo, Observable, ObservableMaybe, useEffect } from 'woby'
+import { DEBUGGER, $, $$, useMemo, Observable, ObservableMaybe, useEffect, renderToString } from 'woby'
 import { Button } from './Button'
 import { Badge } from './Badge'
 import { Avatar } from './Avatar'
@@ -53,6 +53,27 @@ import { AlignRightButton } from './Editor/AlignRightButton'
 import { AlignJustifyButton } from './Editor/AlignJustifyButton'
 import { EditorProvider, UndoRedoButton } from './Editor/UndoRedoButton'
 import { useEditor } from './Editor/undoredo'
+import { TestSnapshots, registerTestObservable, testObservables, TEST_INTERVAL, useInterval, assert } from './test-util'
+import TestAppbar from './ssr/TestAppbar'
+import TestAvatar from './ssr/TestAvatar'
+import TestBadge from './ssr/TestBadge'
+import TestButton from './ssr/TestButton'
+import TestCard from './ssr/TestCard'
+import TestCheckbox from './ssr/TestCheckbox'
+import TestChip from './ssr/TestChip'
+import TestCollapse from './ssr/TestCollapse'
+import TestFab from './ssr/TestFab'
+import TestIconButton from './ssr/TestIconButton'
+import TestNumberField from './ssr/TestNumberField'
+import TestPaper from './ssr/TestPaper'
+import TestSideBar from './ssr/TestSideBar'
+import TestSwitch from './ssr/TestSwitch'
+import TestTabs from './ssr/TestTabs'
+import TestTextArea from './ssr/TestTextArea'
+import TestTextField from './ssr/TestTextField'
+import TestToggleButton from './ssr/TestToggleButton'
+import TestToolbar from './ssr/TestToolbar'
+import TestZoomable from './ssr/TestZoomable'
 
 
 const isDev = typeof import.meta.env !== 'undefined' && import.meta.env.DEV
@@ -282,10 +303,10 @@ function App() {
                         <Avatar />
                     </div>
                     <div class="border border-gray-300 rounded-lg p-4 flex items-center justify-center min-h-[120px]">
-                        <Avatar src="/sample-avatar.png" alt="Sample avatar" />
+                        <Avatar src="/sample-avatar.svg" alt="Sample avatar" />
                     </div>
                     <div class="border border-gray-300 rounded-lg p-4 flex items-center justify-center min-h-[120px]">
-                        <Avatar class="w-16 h-16 ring-2 ring-blue-500" src="/sample-avatar.png" />
+                        <Avatar class="w-16 h-16 ring-2 ring-blue-500" src="/sample-avatar.svg" />
                     </div>
                     <div class="border border-gray-300 rounded-lg p-4 flex items-center justify-center min-h-[120px]">
                         <Avatar class="w-12 h-12 bg-purple-500">JL</Avatar>
@@ -371,6 +392,7 @@ function App() {
 
     // #region AlignButton Demo
     const alignButtonDemo = () => {
+        const editorRef = $<HTMLDivElement>(null)
         return <>
             <h2 id="alignbutton" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">AlignButton Demo</h2>
             <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
@@ -378,9 +400,9 @@ function App() {
                     <UndoRedo>
                         <div class="mb-4">
                             <div class="flex gap-4 items-center my-2">
-                                <AlignButton contentAlign="start" />
-                                <AlignButton contentAlign="center" />
-                                <AlignButton contentAlign="end" />
+                                <AlignButton mode="left" />
+                                <AlignButton mode="center" />
+                                <AlignButton mode="right" />
                             </div>
                             <div ref={editorRef} contentEditable class="border border-gray-300 rounded p-4 min-h-[200px] mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 <p>Select this text and try the alignment buttons below!</p>
@@ -398,6 +420,7 @@ function App() {
 
     // #region Bold Button Demo
     const boldButtonDemo = () => {
+        const editorRef = $<HTMLDivElement>(null)
         return <>
             <h2 id="boldbutton" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Bold Button Demo</h2>
             <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
@@ -421,6 +444,7 @@ function App() {
 
     // #region Indent Demo
     const indentDemo = () => {
+        const editorRef = $<HTMLDivElement>(null)
         return <>
             <h2 id="indent" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Indent Demo</h2>
             <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
@@ -445,6 +469,7 @@ function App() {
 
     // #region Italic Button Demo
     const italicButtonDemo = () => {
+        const editorRef = $<HTMLDivElement>(null)
         return <>
             <h2 id="italicbutton" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Italic Button Demo</h2>
             <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
@@ -469,6 +494,7 @@ function App() {
 
     // #region Underline Button Demo
     const underlineButtonDemo = () => {
+        const editorRef = $<HTMLDivElement>(null)
         return <>
             <h2 id="underlinebutton" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Underline Button Demo</h2>
             <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
@@ -493,6 +519,7 @@ function App() {
 
     // #region Text Style Button Demo
     const textStyleButtonDemo = () => {
+        const editorRef = $<HTMLDivElement>(null)
         return <>
             <h2 id="boldbutton" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Text Style Button Demo</h2>
             <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
@@ -519,6 +546,7 @@ function App() {
 
     // #region Font Size Demo
     const fontSizeDemo = () => {
+        const editorRef = $<HTMLDivElement>(null)
         return <>
             <h2 id="fontsize" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Font Size Demo</h2>
             <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
@@ -543,6 +571,7 @@ function App() {
 
     // #region Font Family Drop Down Demo
     const fontFamilyDropDownDemo = () => {
+        const editorRef = $<HTMLDivElement>(null)
         return <>
             <h2 id="fontfamilydropdown" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Font Family Drop Down Demo</h2>
             <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
@@ -567,6 +596,7 @@ function App() {
 
     // #region Text Format Options Drop Down Demo
     const textFormatOptionsDropDownDemo = () => {
+        const editorRef = $<HTMLDivElement>(null)
         return <>
             <h2 id="textformatoptionsdropdown" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Text Format Options Drop Down Demo</h2>
             <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
@@ -591,6 +621,7 @@ function App() {
 
     // #region Text Color Picker Demo
     const textColorPickerDemo = () => {
+        const editorRef = $<HTMLDivElement>(null)
         return <>
             <h2 id="textcolorpicker" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Text Color Picker Demo</h2>
             <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
@@ -614,6 +645,7 @@ function App() {
 
     // #region Text Background Color Picker Demo
     const textBackgroundColorPickerDemo = () => {
+        const editorRef = $<HTMLDivElement>(null)
         return <>
             <h2 id="textbackgroundcolorpicker" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Text Background Color Picker Demo</h2>
             <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
@@ -637,6 +669,7 @@ function App() {
 
     // #region List Button Demo
     const listButtonDemo = () => {
+        const editorRef = $<HTMLDivElement>(null)
         return <>
             <h2 id="listbutton" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">List Demo</h2>
             <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
@@ -665,6 +698,7 @@ function App() {
 
     // #region Insert DropDown (Horizontal Rule, Image, Table)
     const insertDropDownDemo = () => {
+        const editorRef = $<HTMLDivElement>(null)
         return <>
             <h2 id="insertdropdown" class="text-2xl font-semibold mt-8 mb-4 scroll-mt-4">Insert Drop Down Demo</h2>
             <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
@@ -791,7 +825,7 @@ function App() {
                     <div class="border border-gray-300 rounded-lg p-4">
                         <h3 class="text-lg font-semibold mb-2">Media Centered Card Example</h3>
                         <Card cls="max-w-sm m-2">
-                            <CardMedia src="/sample-avatar.png" alt="Avatar" cls="w-24 h-24 rounded-full mx-auto bg-center bg-cover mt-4" position="center center" fit="cover" />
+                            <CardMedia src="/sample-avatar.svg" alt="Avatar" cls="w-24 h-24 rounded-full mx-auto bg-center bg-cover mt-4" position="center center" fit="cover" />
                             <CardContent cls="px-5 pb-4">
                                 <h3 class="text-lg font-semibold text-center">Taylor</h3>
                                 <p class="text-sm text-gray-600 mt-1 text-justify">Front-end engineer focused on fast, accessible components and delightful UX.</p>
@@ -806,7 +840,7 @@ function App() {
                     <div class="border border-gray-300 rounded-lg p-4">
                         <h3 class="text-lg font-semibold mb-2">Name Card Example</h3>
                         <Card cls="max-w-sm m-2">
-                            <CardMedia src="/sample-avatar.png" alt="Sample avatar" cls="w-24 h-24 rounded-full mx-auto bg-center bg-cover mt-4" position="center center" fit="cover" />
+                            <CardMedia src="/sample-avatar.svg" alt="Sample avatar" cls="w-24 h-24 rounded-full mx-auto bg-center bg-cover mt-4" position="center center" fit="cover" />
                             <CardContent cls="px-5 pb-4">
                                 <h3 class="text-lg font-semibold text-center">Alex</h3>
                                 <p class="text-sm text-gray-600 mt-1 text-justify">Product-minded developer who enjoys building cohesive UI systems and great DX.</p>
@@ -949,7 +983,7 @@ function App() {
                         <h3 class="text-lg font-semibold mb-2">Avatar Chip</h3>
                         <div class="flex gap-2 items-center">
                             <Chip cls="h-auto w-auto mx-2 bg-purple-500 text-white font-bold">
-                                <Avatar src="/sample-avatar.png" alt="Sample avatar" /> <span class="ml-2">Sample Avatar</span>
+                                <Avatar src="/sample-avatar.svg" alt="Sample avatar" /> <span class="ml-2">Sample Avatar</span>
                             </Chip>
                         </div>
                     </div>
@@ -2230,7 +2264,7 @@ function App() {
                         <h3 class="font-bold mb-2">Paper as a Profile Card</h3>
                         <p class="text-sm text-gray-600 mb-2">A practical example using Paper as a container.</p>
                         <Paper cls="p-6 flex items-center gap-4" elevation={8}>
-                            <Avatar src="/sample-avatar.png" size="lg" />
+                            <Avatar src="/sample-avatar.svg" size="lg" />
                             <div class="flex-1">
                                 <p class="font-bold text-lg">Alex Doe</p>
                                 <p class="text-sm text-gray-600">Frontend Developer</p>
@@ -2733,7 +2767,7 @@ function App() {
                                 <div class="p-6 bg-white rounded-lg shadow-sm">
                                     <h3 class="text-xl font-bold mb-2">User Profile</h3>
                                     <div class="flex items-center gap-4 mt-4">
-                                        <Avatar src="/sample-avatar.png" />
+                                        <Avatar src="/sample-avatar.svg" />
                                         <div>
                                             <p class="font-bold">John Doe</p>
                                             <p class="text-sm text-gray-500">Software Engineer</p>
@@ -3483,7 +3517,7 @@ underline:  ${$$(isUnderline)}`}
                                     </svg>
                                 </IconButton>
                                 <div class="w-[1px] h-6 bg-gray-700"></div>
-                                <Avatar src="/sample-avatar.png" cls="w-9 h-9 ring-2 ring-gray-700 cursor-pointer" />
+                                <Avatar src="/sample-avatar.svg" cls="w-9 h-9 ring-2 ring-gray-700 cursor-pointer" />
                             </div>
                         </Toolbar>
                     </div>
@@ -3705,6 +3739,34 @@ underline:  ${$$(isUnderline)}`}
 
             <div class="mt-8 p-4 bg-gray-100 rounded">
                 <p class="text-sm text-gray-600">💡 This is the main application view. The test runner at <code class="bg-gray-200 px-1 rounded">/test</code> will show snapshot tests for all components.</p>
+            </div>
+
+            {/* Three-way SSR + browser snapshot tests */}
+            <div class="mt-8 p-4 border border-gray-300 rounded">
+                <h2 class="text-2xl font-bold mb-2">SSR Snapshot Tests</h2>
+                <p class="text-sm text-gray-600 mb-4">Each component runs a 3-way check: browser DOM snapshot, browser woby renderToString, and Node.js SSR. Open the console to see results (✅).</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <TestAppbar />
+                    <TestAvatar />
+                    <TestBadge />
+                    <TestButton />
+                    <TestCard />
+                    <TestCheckbox />
+                    <TestChip />
+                    <TestCollapse />
+                    <TestFab />
+                    <TestIconButton />
+                    <TestNumberField />
+                    <TestPaper />
+                    <TestSideBar />
+                    <TestSwitch />
+                    <TestTabs />
+                    <TestTextArea />
+                    <TestTextField />
+                    <TestToggleButton />
+                    <TestToolbar />
+                    <TestZoomable />
+                </div>
             </div>
 
             <div class="mt-8">
@@ -3997,6 +4059,34 @@ const DebugTemplate = () => {
 
             <div class="space-y-4">
                 <Debug />
+            </div>
+
+            {/* Three-way SSR + browser snapshot tests */}
+            <div class="mt-8 p-4 border border-gray-300 rounded">
+                <h2 class="text-2xl font-bold mb-2">SSR Snapshot Tests</h2>
+                <p class="text-sm text-gray-600 mb-4">Each component runs a 3-way check: browser DOM snapshot, browser woby renderToString, and Node.js SSR. Open the console to see results (✅).</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <TestAppbar />
+                    <TestAvatar />
+                    <TestBadge />
+                    <TestButton />
+                    <TestCard />
+                    <TestCheckbox />
+                    <TestChip />
+                    <TestCollapse />
+                    <TestFab />
+                    <TestIconButton />
+                    <TestNumberField />
+                    <TestPaper />
+                    <TestSideBar />
+                    <TestSwitch />
+                    <TestTabs />
+                    <TestTextArea />
+                    <TestTextField />
+                    <TestToggleButton />
+                    <TestToolbar />
+                    <TestZoomable />
+                </div>
             </div>
 
             <div class="mt-8 p-4 bg-gray-100 rounded">

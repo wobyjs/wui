@@ -1867,7 +1867,7 @@ const Wheeler = defaults(def, (props) => {
                 <div class='font-bold text-center'>{header(value)}</div>
 
                 {/* This conditional rendering is now correct with your `searchable` prop */}
-                {() => $$(searchable) && (
+                {() => $$(searchable) ? (
                     <div class="relative flex flex-col flex-wrap items-center my-2">
                         <input
                             type="text"
@@ -1879,7 +1879,7 @@ const Wheeler = defaults(def, (props) => {
                             }}
                         />
                     </div>
-                )}
+                ) : null}
 
                 <div class="my-1 h-px w-full bg-gray-300 dark:bg-gray-600"></div>
             </div>
