@@ -3758,7 +3758,6 @@ underline:  ${$$(isUnderline)}`}
                     <TestIconButton />
                     <TestNumberField />
                     <TestPaper />
-                    <TestSideBar />
                     <TestSwitch />
                     <TestTabs />
                     <TestTextArea />
@@ -4078,7 +4077,6 @@ const DebugTemplate = () => {
                     <TestIconButton />
                     <TestNumberField />
                     <TestPaper />
-                    <TestSideBar />
                     <TestSwitch />
                     <TestTabs />
                     <TestTextArea />

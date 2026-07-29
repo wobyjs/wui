@@ -18,7 +18,7 @@ const TestSideBar = (): JSX.Element => {
         return (
             <>
                 <h3>SideBar</h3>
-                <SideBar open={s.open}>{s.children}</SideBar>
+                <SideBar open={s.open} top={56}>{s.children}</SideBar>
             </>
         )
     }
@@ -37,8 +37,8 @@ if (typeof globalThis.__isSSRTest__ !== 'undefined') {
     TestSideBar()
 
     const fullElements = [
-        `<h3>SideBar</h3><div class="${BASE_CLASS}" style="width: 0px; top: 0px;"><slot><div class="flex flex-col justify-end">Sidebar</div></slot></div>`,
-        `<h3>SideBar</h3><div class="${BASE_CLASS}" style="width: 250px; top: 0px;"><slot><div class="flex flex-col justify-end">Sidebar</div></slot></div>`,
+        `<h3>SideBar</h3><div class="${BASE_CLASS}" style="width: 0px; top: 56px;"><slot><div class="flex flex-col justify-end">Sidebar</div></slot></div>`,
+        `<h3>SideBar</h3><div class="${BASE_CLASS}" style="width: 250px; top: 56px;"><slot><div class="flex flex-col justify-end">Sidebar</div></slot></div>`,
     ]
 
     console.log(`\n📝 Test: ${name}`)
@@ -65,22 +65,25 @@ TestSideBar.test = {
     compareActualValues: true,
     expect: () => {
         const idx = $$(testObservables[name])
+        const fullWidth = idx === 1 ? '250px' : '0px'
+        const expected = `<div class="${BASE_CLASS}" style="width: ${fullWidth}; top: 56px;"></div>`
 
-        // Run SSR assertion internally — this verifies the SSR output is correct
+        // Run SSR assertion internally
         const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
 
-        const fullWidth = idx === 1 ? '250px' : '0px'
-        const expectedFull = `<h3>SideBar</h3><div class="${BASE_CLASS}" style="width: ${fullWidth}; top: 0px;"><slot><div class="flex flex-col justify-end">Sidebar</div></slot></div>`
+        const fullElements = [
+            `<h3>SideBar</h3><div class="${BASE_CLASS}" style="width: 0px; top: 56px;"><slot><div class="flex flex-col justify-end">Sidebar</div></slot></div>`,
+            `<h3>SideBar</h3><div class="${BASE_CLASS}" style="width: 250px; top: 56px;"><slot><div class="flex flex-col justify-end">Sidebar</div></slot></div>`,
+        ]
+        const expectedFull = fullElements[idx]
         if (ssrResult !== expectedFull) {
             assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
             console.log(`✅ [${name}] SSR test passed: ${ssrResult}`)
         }
 
-        // Return empty string for browser comparison — SideBar no longer uses Portal,
-        // but the SSR test already validates the output above
-        return ''
+        return expected
     }
 }
 

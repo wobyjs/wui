@@ -17,7 +17,7 @@ import CodeBlock from '../helper/CodeBlock'
 
 const App = () => (
     <div>
-        <Appbar cls="px-4 mt-2">
+        <Appbar cls="bg-orange-500 z-[1100] w-full px-4">
             <div class="flex items-center h-12 pl-4">Default Appbar</div>
         </Appbar>
 
@@ -25,7 +25,7 @@ const App = () => (
             <p>This demo shows the <span class="font-bold">Default Appbar</span> rendered with the TSX component <code class="font-bold">&lt;Appbar&gt;</code>.</p>
             <p>Scroll down…</p>
             <div class="bg-gray-100 rounded border p-4">
-                <CodeBlock code={`<Appbar cls="px-4 mt-2">\n\t<div class="flex items-center h-12 pl-4">Default Appbar</div>\n</Appbar>`} language="tsx" />
+                <CodeBlock code={`<Appbar cls="bg-orange-500 px-4 mt-2">\n\t<div class="flex items-center h-12 pl-4">Default Appbar</div>\n</Appbar>`} language="tsx" />
             </div>
         </div>
     </div>

@@ -49537,9 +49537,9 @@ TestAvatar.test = {
     const BASE_CLASS4 = "relative flex items-center justify-center align-middle select-none leading-none overflow-hidden shrink-0 m-0 bg-[rgb(189,189,189)] text-white";
     const elements = [
       `<div class="rounded-full w-6 h-6 text-xs ${BASE_CLASS4}"></div>`,
-      `<div class="rounded-xl w-8 h-8 text-sm ${BASE_CLASS4}"><img src="x.png" alt="Avatar" class="w-full h-full object-cover"></div>`,
+      `<div class="rounded-xl w-8 h-8 text-sm ${BASE_CLASS4}"><img src="x.png" alt="Avatar" class="w-full h-full object-cover" style="display: none;"></div>`,
       `<div class="rounded-md w-10 h-10 text-base ${BASE_CLASS4}"></div>`,
-      `<div class="rounded-full w-12 h-12 text-lg ${BASE_CLASS4}"><img src="y.png" alt="User" class="w-full h-full object-cover"></div>`
+      `<div class="rounded-full w-12 h-12 text-lg ${BASE_CLASS4}"><img src="y.png" alt="User" class="w-full h-full object-cover" style="display: none;"></div>`
     ];
     const expected = elements[idx];
     const ssrComponent = testObservables[`${name2}_ssr`];
@@ -51473,7 +51473,7 @@ var TestSideBar = () => {
     const s = states[index()];
     return /* @__PURE__ */ jsxs(Fragment, { children: [
       /* @__PURE__ */ jsx("h3", { children: "SideBar" }),
-      /* @__PURE__ */ jsx(SideBar, { open: s.open, children: s.children })
+      /* @__PURE__ */ jsx(SideBar, { open: s.open, top: 56, children: s.children })
     ] });
   };
   const ret = () => getCurrentElement();
@@ -51484,8 +51484,8 @@ var BASE_CLASS2 = "fixed h-full left-0 overflow-x-hidden transition-all duration
 if (typeof globalThis.__isSSRTest__ !== "undefined") {
   TestSideBar();
   const fullElements = [
-    `<h3>SideBar</h3><div class="${BASE_CLASS2}" style="width: 0px; top: 0px;"><slot><div class="flex flex-col justify-end">Sidebar</div></slot></div>`,
-    `<h3>SideBar</h3><div class="${BASE_CLASS2}" style="width: 250px; top: 0px;"><slot><div class="flex flex-col justify-end">Sidebar</div></slot></div>`
+    `<h3>SideBar</h3><div class="${BASE_CLASS2}" style="width: 0px; top: 56px;"><slot><div class="flex flex-col justify-end">Sidebar</div></slot></div>`,
+    `<h3>SideBar</h3><div class="${BASE_CLASS2}" style="width: 250px; top: 56px;"><slot><div class="flex flex-col justify-end">Sidebar</div></slot></div>`
   ];
   console.log(`
 \u{1F4DD} Test: ${name13}`);
@@ -51512,10 +51512,15 @@ TestSideBar.test = {
   compareActualValues: true,
   expect: () => {
     const idx = get(testObservables[name13]);
+    const fullWidth = idx === 1 ? "250px" : "0px";
+    const expected = `<div class="${BASE_CLASS2}" style="width: ${fullWidth}; top: 56px;"><slot><div class="flex flex-col justify-end">Sidebar</div></slot></div>`;
     const ssrComponent = testObservables[`${name13}_ssr`];
     const ssrResult = renderToString(ssrComponent);
-    const fullWidth = idx === 1 ? "250px" : "0px";
-    const expectedFull = `<h3>SideBar</h3><div class="${BASE_CLASS2}" style="width: ${fullWidth}; top: 0px;"><slot><div class="flex flex-col justify-end">Sidebar</div></slot></div>`;
+    const fullElements = [
+      `<h3>SideBar</h3><div class="${BASE_CLASS2}" style="width: 0px; top: 56px;"><slot><div class="flex flex-col justify-end">Sidebar</div></slot></div>`,
+      `<h3>SideBar</h3><div class="${BASE_CLASS2}" style="width: 250px; top: 56px;"><slot><div class="flex flex-col justify-end">Sidebar</div></slot></div>`
+    ];
+    const expectedFull = fullElements[idx];
     if (ssrResult !== expectedFull) {
       assert(false, `[${name13}] SSR mismatch: got 
 ${ssrResult}, expected 
@@ -51523,7 +51528,7 @@ ${expectedFull}`);
     } else {
       console.log(`\u2705 [${name13}] SSR test passed: ${ssrResult}`);
     }
-    return "";
+    return expected;
   }
 };
 

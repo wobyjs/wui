@@ -16,15 +16,15 @@ import CodeBlock from '../helper/CodeBlock'
 
 const App = () => (
     <div>
-        <Appbar position="fixed" cls="px-4 mt-2">
+        <Appbar position="fixed" cls="bg-orange-500 z-[1100] w-full px-4">
             <div class="flex items-center h-12 pl-4">Fixed Appbar</div>
         </Appbar>
 
-        <div class="p-4 text-sm text-gray-500 space-y-4 pt-14 mt-2 h-[600px] ">
+        <div class="p-4 text-sm text-gray-500 space-y-4 pt-14 h-[600px] ">
             <p>This demo shows an <span class="font-bold">Fixed Appbar</span> with <code class="font-bold">position="fixed"</code> rendered via the TSX <code class="font-bold">&lt;Appbar&gt;</code> component.</p>
             <p>Scroll down…</p>
             <div class="bg-gray-100 rounded border p-4">
-                <CodeBlock code={`<Appbar position="fixed" cls="px-4 mt-2">\n\t<div class="flex items-center h-12 pl-4">Fixed Appbar</div>\n</Appbar>`} language="tsx" />
+                <CodeBlock code={`<Appbar position="fixed" cls="bg-orange-500 z-[1100] w-full px-4">\n\t<div class="flex items-center h-12 pl-4">Fixed Appbar</div>\n</Appbar>`} language="tsx" />
             </div>
         </div>
     </div>
