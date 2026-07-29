@@ -53,8 +53,12 @@ const def = () => {
         // title: (d: Date) => <div>{d.toISOString()}</div> as ObservableMaybe<(d: Date) => JSX.Element>,
         title: undefined as ((v: ObservableMaybe<any | any[]>) => JSX.Element) | undefined,
         visible: $(true) as ObservableMaybe<boolean>,
-        header: undefined as ((props: { ok: (v: boolean) => void, visible: (v: boolean) => void }) => JSX.Element) | undefined,
+        header: undefined as ((props: { ok: () => void, cancel: () => void, visible: (v: boolean) => void }) => JSX.Element) | undefined,
         ...inheritedDefaults,
+        // `ok` truthy (default): the main `value` only updates via the OK button.
+        // `ok="false"` = "reactive" mode: every scroll/tap commits to `value`
+        // immediately; Cancel reverts to the value captured when the wheeler opened.
+        ok: $(true, HtmlBoolean) as ObservableMaybe<boolean>,
         cancelOnBlur: $(false, HtmlBoolean) as ObservableMaybe<boolean>,
     }
 }
@@ -68,7 +72,8 @@ const DateTimeWheeler = defaults(def, (props) => {
     const minDate = useMemo(() => parseDate($$(use(minDateProp))))
     const maxDate = useMemo(() => parseDate($$(use(maxDateProp))))
 
-    const modDate = $($$(oriDate) ?? new Date()) //use(oriDate, new Date())
+    // `value` may arrive as an ISO string when set via HTML attribute on the custom element
+    const modDate = $(parseDate($$(oriDate) as any) ?? new Date()) //use(oriDate, new Date())
     const selectedYear = $($$(modDate).getFullYear())
     const selectedMonth = $($$(modDate).getMonth())
     const selectedDay = $($$(modDate).getDate())
@@ -79,21 +84,25 @@ const DateTimeWheeler = defaults(def, (props) => {
 
     const isVisible = use(visibleProp, true)
 
-    console.log('[DateTimeWheeler] component fn, visibleProp:', typeof visibleProp, 'isObservable:', isObservable(visibleProp), 'isVisible===visibleProp:', isVisible === visibleProp, 'value:', $$(isVisible))
-
-    // Track isVisible changes reactively
-    useEffect(() => {
-        console.log('[DateTimeWheeler] isVisible CHANGED to:', $$(isVisible))
-    })
-
     const hide = () => {
-        console.log('[DateTimeWheeler] hide() called, isVisible value before:', $$(isVisible), 'visibleProp isObservable:', isObservable(visibleProp))
         isVisible(false)
         if (isObservable(visibleProp)) {
             visibleProp(false)
         }
-        console.log('[DateTimeWheeler] hide() done, isVisible value after:', $$(isVisible))
     }
+
+    // Snapshot of the main `value` taken each time the wheeler opens.
+    // Used to restore the wheels from the main value on reopen, and to revert
+    // live commits when Cancel is pressed in reactive mode (`ok` falsy).
+    const openSnapshot = $($$(modDate))
+    useEffect(() => {
+        if (!$$(isVisible)) return
+        // Only track `isVisible` — in reactive mode `oriDate` changes on every
+        // scroll and must not overwrite the snapshot while open.
+        const d = untrack(() => parseDate($$(oriDate) as any)) ?? new Date()
+        openSnapshot(d)
+        modDate(d)
+    })
 
 
     // #region Sync `modDate` to Individual Wheel States
@@ -210,18 +219,12 @@ const DateTimeWheeler = defaults(def, (props) => {
         const currentPropValue = parseDate($$(modDate))
         // Check if controlledValue is an observable function before calling it
         if (typeof modDate === 'function' && (!currentPropValue || constrainedDate.getTime() !== currentPropValue.getTime())) {
-
-            console.log('DBG_DOB [DTW sync-effect] wheel commit -> y=' + year + ' m=' + month + ' d=' + day + ' h=' + hour + ' mi=' + minute + ' s=' + second + ' | constrained=' + constrainedDate.toISOString() + ' | prevMod=' + (currentPropValue ? currentPropValue.toISOString() : 'null') + ' | ok=' + $$(ok) + ' | oriIsObs=' + isObservable(oriDate))
-
             modDate(constrainedDate) // Update the external observable
 
-            if (!$$(ok)) { if (isObservable(oriDate)) { oriDate($$(modDate)) } }
-
-            if (!$$(ok)) { return }
-
-            if (isObservable(oriDate)) { oriDate($$(modDate)) }
-
-            if (isObservable(ok)) { ok(false) }
+            // Reactive mode (`ok` falsy): commit every change to the main value
+            // immediately. With `ok` truthy (default) the main value updates
+            // only via the OK button (or commitOnBlur).
+            if (!untrack(() => $$(ok)) && isObservable(oriDate)) { oriDate(constrainedDate) }
         }
     })
     // #endregion
@@ -320,8 +323,16 @@ const DateTimeWheeler = defaults(def, (props) => {
 
     // Helper: Handle OK button click
     const handleOkClick = () => {
-        console.log('DBG_DOB [DTW handleOkClick] OK pressed | modDate=' + ($$(modDate) ? $$(modDate).toISOString() : 'null') + ' | oriDate=' + (isObservable(oriDate) ? ($$(oriDate) ? $$(oriDate).toISOString() : 'null') : 'NOT_OBS') + ' | ok=' + $$(ok))
         if (isObservable(oriDate)) { oriDate($$(modDate)) }
+        hide()
+    }
+
+    // Helper: Handle Cancel button click — never commits; in reactive mode
+    // (`ok` falsy) also reverts the live commits made while scrolling.
+    const handleCancelClick = () => {
+        const d = $$(openSnapshot)
+        modDate(d)
+        if (!$$(ok) && isObservable(oriDate)) { oriDate(d) }
         hide()
     }
 
@@ -335,8 +346,10 @@ const DateTimeWheeler = defaults(def, (props) => {
     // Helper: Render header bar with Cancel/Title/OK
     // If a custom `header` prop is provided, use it instead of the built-in buttons.
     const renderHeaderBar = () => {
-        if (header) {
-            return header({ ok: handleOkClick, visible: hide })
+        // `header` may be an observable wrapper (custom element) holding undefined — unwrap before testing
+        const headerFn = isObservable(header) ? $$(header) : header
+        if (typeof headerFn === 'function') {
+            return headerFn({ ok: handleOkClick, cancel: handleCancelClick, visible: hide })
         }
         return (
             <div class="flex items-center justify-between px-4 py-2 h-auto relative">
@@ -345,12 +358,18 @@ const DateTimeWheeler = defaults(def, (props) => {
                         type="button"
                         id="dtw-cancel-btn"
                         class="px-2 inline-flex items-center justify-center relative box-border cursor-pointer select-none align-middle no-underline font-medium text-sm leading-[1.75] tracking-[0.02857em] uppercase rounded text-white bg-[#1976d2] rounded-[4px] border-0 outline-0 font-sans px-4 py-2 shadow-[0px_3px_1px_-2px_rgba(0,0,0,0.2),0px_2px_2px_0px_rgba(0,0,0,0.14),0px_1px_5px_0px_rgba(0,0,0,0.12)] hover:bg-[#1565c0]"
-                        ref={el => { if (el) el.onclick = (e) => { hide() } }}
+                        ref={el => { if (el) el.onclick = (e) => { handleCancelClick() } }}
                     > Cancel </button>
                 </div>
                 <div class="flex-1 text-center px-2">
                     <span class="inline-block break-words">
-                        {() => title($$(modDate))}
+                        {/* `title` may be a render function (TSX) or a plain/observable string (HTML attribute).
+                            With no title, show the live-selected date (updates while scrolling). */}
+                        {() => {
+                            const t = isObservable(title) ? $$(title) : title
+                            if (typeof t === 'function') return (t as any)($$(modDate))
+                            return t ?? $$(modDate).toString().slice(0, 24)
+                        }}
                     </span>
                 </div>
                 <div class="w-[80px] flex justify-end">
@@ -449,7 +468,7 @@ const DateTimeWheeler = defaults(def, (props) => {
 
     useClickAway(cont as any, () => {
         if ($$(cancelOnBlur))
-            hide() //just hide, no save
+            handleCancelClick() // treat click-away as Cancel: revert live commits, hide
 
         if ($$(commitOnBlur)) //hide & save
         {
@@ -463,34 +482,27 @@ const DateTimeWheeler = defaults(def, (props) => {
     // Read static values at component scope (bottom is set once, not dynamic)
     const bot = $$(bottomProp)
 
-    // NOTE: Portal's `when` prop only controls portal behavior (attach to body vs inline),
-    // NOT visibility. Portal line 100 returns `() => $(condition) || children` — when
-    // `condition` is false, children render inline. So we use a reactive `useMemo` to
-    // conditionally return null (when hidden) or the actual UI (when visible), gated on
-    // `isVisible`. This is needed because the component's thunk is wrapped in `untrack()`
-    // by `createElement`, so a plain `$(isVisible) ? <UI/> : null` in the return JSX
-    // would only evaluate once at construction time and never re-run.
+    // Portal path — renders children directly inside Portal, matching Wheeler.tsx's
+    // working pattern. No `useMemo` wrapper: Portal's own `useRenderEffect` manages
+    // the lifecycle. The `when={isVisible}` prop controls Portal attachment/removal.
+    // The children thunk `() => !$$(isVisible) ? null : [...]` provides reactive
+    // visibility gating: when hidden, the thunk returns null so no popup DOM is rendered.
     if (bot) {
-        const portalChildren = useMemo(() => {
-            if (!$$(isVisible)) return null
-            return [
-                $$(mask) ? (
-                    <div
-                        class={['fixed inset-0 bg-black/50 h-full w-full z-[10] opacity-50']}
-                    />
-                ) : null,
-                <div
-                    ref={cont}
-                    class={[DATETIME_WHEELER_CLS, 'fixed inset-x-0 bottom-0 bg-white shadow-lg z-200 w-full']}
-                >
-                    {component}
-                </div>
-            ]
-        })
-
         return (
             <Portal mount={document.body} when={isVisible}>
-                {portalChildren}
+                {() => !$$(isVisible) ? null : [
+                    () => $$(mask) ? (
+                        <div
+                            class={['fixed inset-0 bg-black/50 h-full w-full z-[10] opacity-50']}
+                        />
+                    ) : null,
+                    <div
+                        ref={cont}
+                        class={[DATETIME_WHEELER_CLS, 'fixed inset-x-0 bottom-0 bg-white shadow-lg z-200 w-full']}
+                    >
+                        {component}
+                    </div>
+                ]}
             </Portal>
         )
     }
@@ -501,25 +513,32 @@ const DateTimeWheeler = defaults(def, (props) => {
     // the memo→null→DOM propagation chain (the close bug). By returning the
     // memo directly, the subscription lives in the parent's context and survives
     // visibility transitions.
-    const inlineChildren = useMemo(() => {
-        if (!$$(isVisible)) return null
-        // Contract for caller-supplied styling:
-        //   `cls`  → OVERRIDE base DATETIME_WHEELER_CLS (replace entirely)
-        //   `class`→ APPEND to the resolved class (extend, never replace)
-        // Most callers should pass `cls` for layout/positioning and reserve
-        // `class` for one-off tweaks (test overrides, theme accents).
-        const clsVal = $$(cls)
-        const baseCls = clsVal !== undefined && clsVal !== '' ? clsVal : DATETIME_WHEELER_CLS
-        const classVal = $$(className)
-        const finalCls = classVal ? [baseCls, classVal].filter(Boolean).join(" ") : baseCls
-        return (
-            <div ref={cont} class={finalCls} {...otherProps}>
-                {component}
-            </div>
-        )
-    })
-
-    return inlineChildren
+    // Contract for caller-supplied styling:
+    //   `cls`  → OVERRIDE base DATETIME_WHEELER_CLS (replace entirely)
+    //   `class`→ APPEND to the resolved class (extend, never replace)
+    // Most callers should pass `cls` for layout/positioning and reserve
+    // `class` for one-off tweaks (test overrides, theme accents).
+    //
+    // NOTE: The wrapper div is ALWAYS returned; visibility is gated by the
+    // reactive `class` binding and the reactive child thunk. Returning a
+    // memo that flips to null does NOT work in the custom-element path —
+    // woby's setChild unwraps the component's top-level return untracked,
+    // so only bindings INSIDE elements stay reactive there.
+    return (
+        <div
+            ref={cont}
+            class={() => {
+                const clsVal = $$(cls)
+                const baseCls = clsVal !== undefined && clsVal !== '' ? clsVal : DATETIME_WHEELER_CLS
+                const classVal = $$(className)
+                return classVal ? [baseCls, classVal].filter(Boolean).join(" ") : baseCls
+            }}
+            style={{ display: () => $$(isVisible) ? null : 'none' }}
+            {...otherProps}
+        >
+            {component}
+        </div>
+    )
 })
 
 export { DateTimeWheeler }

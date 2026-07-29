@@ -1313,7 +1313,10 @@ const Wheeler = defaults(def, (props) => {
         if (!hasMoved) {
             // --- Path A: The gesture was a TAP/CLICK ---
 
-            const targetElement = e.target as HTMLElement
+            // The pointerup listener is on `document`; for events originating inside a
+            // shadow root, `e.target` is retargeted to the host element. composedPath()[0]
+            // gives the actual element that was tapped.
+            const targetElement = (e.composedPath ? e.composedPath()[0] : e.target) as HTMLElement
             // Find the closest parent `<li>` that is a wheeler item.
             const targetItem = targetElement.closest('.wheeler-item') as HTMLElement
 
