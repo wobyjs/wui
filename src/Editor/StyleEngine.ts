@@ -264,9 +264,12 @@ export function getStyleStateInRange(range: Range, prop: string, value: string):
 
     // For non-collapsed range, check all text nodes
     let container = range.commonAncestorContainer
+    if (!container) return 'none'
     if (container.nodeType === Node.TEXT_NODE) {
         container = container.parentNode || container
     }
+
+    if (!container) return 'none'
 
     const walker = document.createTreeWalker(
         container,
@@ -565,7 +568,9 @@ export function applyStyle(prop: string, value: string): void {
     }
 
     // Normalize after operation
-    const normalizeTarget = getBlockParent(range.commonAncestorContainer) ?? findEditorRoot(range.commonAncestorContainer)
+    const normalizeTarget = range.commonAncestorContainer
+        ? getBlockParent(range.commonAncestorContainer) ?? findEditorRoot(range.commonAncestorContainer)
+        : null
     if (normalizeTarget) {
         normalizeDOM(normalizeTarget)
     }
@@ -737,6 +742,7 @@ function expandToWord(range: Range): Range | null {
 function applyStyleToRange(range: Range, prop: string, value: string): HTMLElement | null {
     // Get the common ancestor
     let commonAncestor = range.commonAncestorContainer
+    if (!commonAncestor) return null
 
     // If common ancestor is a text node, we need to handle it specially
     // TreeWalker doesn't walk into the starting node itself

@@ -190,11 +190,21 @@ const TextFormatOptionsDropDown = defaults(def, (props) => {
     const editor = useEditor()
     const isOpen = $(false)
     const dropdownRef = $<HTMLElement>(null)
-    const { saveDo } = useUndoRedo()
+    const menuRef = $<HTMLElement>(null)
+    const undoRedoContext = useUndoRedo()
+    const saveDo = undoRedoContext?.saveDo || (() => {})
 
     // Cache selection when dropdown opens - clicking menu items changes selection
     // The saved selection includes the editorRoot from saveSelectionAsOffsets()
     const savedSelection = $<{ editorRoot: HTMLElement | null; startOffset: number; endOffset: number } | null>(null)
+
+    // Direct DOM manipulation to show/hide menu (bypasses Woby reconciler)
+    useEffect(() => {
+        const menu = $$(menuRef)
+        if (menu) {
+            menu.style.display = $$(isOpen) ? '' : 'none'
+        }
+    })
 
     useOnClickOutside(dropdownRef as any, () => isOpen(false))
 
@@ -215,14 +225,19 @@ const TextFormatOptionsDropDown = defaults(def, (props) => {
     }
 
     const handleSelectOption = (action: (editor?: HTMLElement) => void) => {
+        console.log('handleSelectOption called, closing dropdown')
         const el = editor ?? getCurrentEditor()
 
         if ($$(el)) {
             // Use cached selection from when dropdown opened
             const cachedSel = savedSelection()
 
-            action($$(el))
-            saveDo()
+            try {
+                action($$(el))
+                saveDo()
+            } catch (e) {
+                console.warn('Text format action failed, but closing dropdown:', e)
+            }
 
             // Restore selection after action (for range selections only)
             if (cachedSel && cachedSel.editorRoot && cachedSel.startOffset !== cachedSel.endOffset) {
@@ -235,6 +250,7 @@ const TextFormatOptionsDropDown = defaults(def, (props) => {
     const DropdownMenu = () => {
         return (
             <div
+                ref={menuRef}
                 class="origin-top-left absolute left-0 mt-2 w-64 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10"
                 role="menu"
                 aria-orientation="vertical"
@@ -304,7 +320,8 @@ const StrikethroughButton = defaults(def_Strikethrough, (props) => {
 
     const editor = useEditor()
     const isActive = $(false)
-    const { saveDo } = useUndoRedo()
+    const undoRedoContext = useUndoRedo()
+    const saveDo = undoRedoContext?.saveDo || (() => {})
     const format = FORMAT_OPTIONS.find(f => f.label === 'Strikethrough')
     const action = () => { format.action(); saveDo(); }
     const displayIcon = () => format.icon
@@ -333,7 +350,8 @@ const SubscriptButton = defaults(def_Subscript, (props) => {
 
     const editor = useEditor()
     const isActive = $(false)
-    const { saveDo } = useUndoRedo()
+    const undoRedoContext = useUndoRedo()
+    const saveDo = undoRedoContext?.saveDo || (() => {})
     const format = FORMAT_OPTIONS.find(f => f.label === 'Subscript')
     const action = () => { format.action(); saveDo(); }
     const displayIcon = () => format.icon
@@ -362,7 +380,8 @@ const SuperscriptButton = defaults(def_Superscript, (props) => {
 
     const editor = useEditor()
     const isActive = $(false)
-    const { saveDo } = useUndoRedo()
+    const undoRedoContext = useUndoRedo()
+    const saveDo = undoRedoContext?.saveDo || (() => {})
     const format = FORMAT_OPTIONS.find(f => f.label === 'Superscript')
     const action = () => { format.action(); saveDo(); }
     const displayIcon = () => format.icon
@@ -392,7 +411,8 @@ const HighlightButton = defaults(def_Highlight, (props) => {
 
     const editor = useEditor()
     const isActive = $(false)
-    const { saveDo } = useUndoRedo()
+    const undoRedoContext = useUndoRedo()
+    const saveDo = undoRedoContext?.saveDo || (() => {})
     const format = FORMAT_OPTIONS.find(f => f.label === 'Highlight')
     const action = () => { applyHighlight($$(highlightColor)); saveDo(); }
     const displayIcon = () => format.icon
@@ -419,7 +439,8 @@ const def_ClearFormat = () => ({
 const ClearFormatButton = defaults(def_ClearFormat, (props) => {
     const { buttonType: btnType, title, cls, class: cn, disabled, ...otherProps } = props
     const isActive = false
-    const { saveDo } = useUndoRedo()
+    const undoRedoContext = useUndoRedo()
+    const saveDo = undoRedoContext?.saveDo || (() => {})
     const format = FORMAT_OPTIONS.find(f => f.label === 'Clear Formatting')
     const action = () => { format.action(); saveDo(); }
     const displayIcon = () => format.icon
@@ -444,7 +465,8 @@ const LowercaseButton = defaults(def_Lowercase, (props) => {
     const editor = useEditor()
 
     const isActive = false
-    const { saveDo } = useUndoRedo()
+    const undoRedoContext = useUndoRedo()
+    const saveDo = undoRedoContext?.saveDo || (() => {})
     const format = FORMAT_OPTIONS.find(f => f.label === 'Lowercase')
     const action = () => {
         const el = editor || getCurrentEditor()
@@ -472,7 +494,8 @@ const UppercaseButton = defaults(def_Uppercase, (props) => {
     const editor = useEditor()
 
     const isActive = false
-    const { saveDo } = useUndoRedo()
+    const undoRedoContext = useUndoRedo()
+    const saveDo = undoRedoContext?.saveDo || (() => {})
     const format = FORMAT_OPTIONS.find(f => f.label === 'Uppercase')
     const action = () => {
         const el = editor || getCurrentEditor()
@@ -500,7 +523,8 @@ const CapitalizeButton = defaults(def_Capitalize, (props) => {
     const editor = useEditor()
 
     const isActive = false
-    const { saveDo } = useUndoRedo()
+    const undoRedoContext = useUndoRedo()
+    const saveDo = undoRedoContext?.saveDo || (() => {})
     const format = FORMAT_OPTIONS.find(f => f.label === 'Capitalize')
     const action = () => {
         const el = editor || getCurrentEditor()

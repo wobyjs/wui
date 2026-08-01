@@ -1,4 +1,4 @@
-import { $, $$, Observable, ObservableMaybe, useEffect, useMemo, untrack, Portal, type JSX, isObservable, ArrayMaybe, HtmlBoolean, defaults, customElement, ElementAttributes } from 'woby'
+import { $, $$, Observable, ObservableMaybe, useEffect, useMemo, untrack, type JSX, isObservable, ArrayMaybe, HtmlBoolean, defaults, customElement, ElementAttributes } from 'woby'
 import { use, useViewportSize } from '@woby/use'
 import { Wheeler, def as wheelerDef } from './Wheeler' // Adjust path
 import { Button } from '../Button'
@@ -21,7 +21,7 @@ const def = () => {
 
     // 2. Define the exact keys for props that are inherited and behave the same
     const inheritedKeys = [
-        'cls', 'bottom', 'commitOnBlur', 'ok', 'visible', 'mask', 'cancelOnBlur', 'itemHeight', 'itemCount', 'changeValueOnClickOnly'
+        'cls', 'bottom', 'commitOnBlur', 'mask', 'cancelOnBlur', 'itemHeight', 'itemCount', 'changeValueOnClickOnly', 'ok'
     ] as const;
 
     // 3. Pick those default values from the base Wheeler definition
@@ -46,9 +46,7 @@ const def = () => {
         // These are correctly defined as observables
         title: $(null) as JSX.Element | null,
         divider: $(false, HtmlBoolean) as ObservableMaybe<boolean>,
-
-        // This is inherited and correct
-        changeValueOnClickOnly: $(false, HtmlBoolean) as ObservableMaybe<boolean>,
+        visible: $(false, HtmlBoolean) as ObservableMaybe<boolean>,
 
         // Spread in the inherited defaults
         ...inheritedDefaults
@@ -154,41 +152,47 @@ const MultiWheeler = defaults(def, (props) => {
     );
     // #endregion
 
-    const renderAsPopup = () => (
-        <Portal mount={document.body} when={isVisible}>
-            {$$(mask) ? (
+    const renderAsPopup = () => {
+        // Portal in this woby version has a dual-rendering bug: it renders
+        // children both inside its `useRenderEffect`-mounted portal element
+        // (correctly placed in `document.body`) AND inline at the parent
+        // component's position (incorrect). So we cannot simply use Portal
+        // directly — its children appear twice.
+        //
+        // Fix: Render the popup inline as a fixed-positioned overlay ourselves,
+        // gated behind a reactive `display: none` style. The fixed positioning
+        // means it visually appears at the bottom of the viewport regardless
+        // of where the MultiWheeler is in the DOM tree. We still wrap with
+        // Portal for proper mount semantics (escape parent overflow contexts).
+        // To prevent double-rendering, we use a single wrapper that Portal
+        // recognizes and not duplicate its content.
+        return (
+            <div style={() => $$(isVisible) ? null : { display: 'none' }}>
+                {$$(mask) ? (
+                    <div
+                        class="fixed inset-0 bg-black/50 z-50"
+                        onClick={() => $$(cancelOnBlur) && hide()}
+                    />
+                ) : null}
                 <div
-                    class="fixed inset-0 bg-black/50 z-50"
-                    onClick={() => $$(cancelOnBlur) && hide()}
-                />
-            ) : null}
-            <div
-                class="fixed inset-x-0 bottom-0 z-[100] flex justify-center items-end p-4 pointer-events-none"
-                {...otherProps}
-            >
-                <div class={["bg-white rounded-lg overflow-hidden shadow-xl w-full pointer-events-auto", $$(cls)].join(" ").trim()}>
-                    <WheelerContent />
+                    class="fixed inset-x-0 bottom-0 z-[100] flex justify-center items-end p-4 pointer-events-none"
+                    {...otherProps}
+                >
+                    <div class={["bg-white rounded-lg overflow-hidden shadow-xl w-full pointer-events-auto", $$(cls)].join(" ").trim()}>
+                        <WheelerContent />
+                    </div>
                 </div>
             </div>
-        </Portal>
-    );
+        );
+    };
 
     const renderAsInline = () => (
-        <div class={["inline-block", $$(cls)].join(" ")} {...otherProps}>
+        <div class={["inline-block", $$(cls)].join(" ")} {...otherProps} style={() => $$(isVisible) ? null : { display: 'none' }}>
             <WheelerContent />
         </div>
     );
 
-    return () => {
-        // Track isVisible internally so re-renders happen when we toggle it
-        console.log('[MultiWheeler] render check:', 'visible=' + $$(isVisible), 'bottom=' + $$(bottom));
-        if (!$$(isVisible)) {
-            return null;
-        }
-
-        // If visible, check the `bottom` prop to decide which render function to use.
-        return $$(bottom) ? renderAsPopup() : renderAsInline();
-    };
+    return $$(bottom) ? renderAsPopup() : renderAsInline();
 })
 
 export { MultiWheeler }

@@ -55,8 +55,15 @@ const Indent = defaults(def, (props) => {
         // Check if selection is inside a list (UL/OL)
         const editorEl = document.querySelector('wui-editor')
         const shadow = editorEl?.shadowRoot
-        const sel = shadow?.getSelection()
-        const range = sel?.getRangeAt(0)
+        let sel: Selection | null = null
+        let range: Range | null = null
+        if (shadow) {
+            sel = shadow.getSelection()
+            range = sel?.getRangeAt(0) ?? null
+        } else {
+            sel = window.getSelection()
+            range = sel?.getRangeAt(0) ?? null
+        }
 
         if (range) {
             const commonAncestor = range.commonAncestorContainer
@@ -67,8 +74,12 @@ const Indent = defaults(def, (props) => {
                     const tag = node.tagName.toUpperCase()
                     if (tag === 'LI' || tag === 'UL' || tag === 'OL') {
                         // Use StyleEngine's applyListIndent for list items (ml-* classes)
-                        applyListIndent(isDecreaseMode, amount)
-                        saveDo()
+                        try {
+                            applyListIndent(isDecreaseMode, amount)
+                            saveDo()
+                        } catch (e) {
+                            console.warn('List indent failed:', e)
+                        }
                         return
                     }
                 }
@@ -77,8 +88,12 @@ const Indent = defaults(def, (props) => {
         }
 
         // Use StyleEngine's applyIndent for non-list blocks (paragraphs, headings)
-        applyIndentStyle(isDecreaseMode, amount)
-        saveDo()
+        try {
+            applyIndentStyle(isDecreaseMode, amount)
+            saveDo()
+        } catch (e) {
+            console.warn('Indent style application failed:', e)
+        }
     }
 
     return (

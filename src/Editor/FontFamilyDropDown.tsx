@@ -1,6 +1,6 @@
-import { $, $$, customElement, defaults, ElementAttributes, HtmlClass, HtmlNumber, JSX, ObservableMaybe, useEffect } from 'woby'
+import { $, $$, customElement, defaults, ElementAttributes, HtmlClass, HtmlNumber, JSX, ObservableMaybe, useEffect, type Observable } from 'woby'
 import { Button } from '../Button'
-import { EditorContext, useUndoRedo } from './undoredo'
+import { EditorContext, useEditor, useUndoRedo } from './undoredo'
 import { useOnClickOutside } from '@woby/use'
 import { getCurrentRange } from './utils'
 import { applyFontFamily as applyFontFamilyStyle } from './StyleEngine'
@@ -29,14 +29,24 @@ const FontFamilyDropDown = defaults(def, (props) => {
 
     const BASE_BTN = "size-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-black hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500 cursor-pointer"
 
-    const editor = $(EditorContext)
-    const isOpen = $(false)
+    const editor = useEditor()
+    const isOpen = $(false) as Observable<boolean>
     const selectedFont = $(FONT_FAMILY[$$(defaultIndex)].label)
     const dropdownRef = $<HTMLElement>(null)
-    const { saveDo } = useUndoRedo()
+    const menuRef = $<HTMLElement>(null)
+    const undoRedoContext = useUndoRedo()
+    const saveDo = undoRedoContext?.saveDo || (() => {})
 
 
     useOnClickOutside(dropdownRef as any, () => isOpen(false))
+
+    // Use direct DOM manipulation to show/hide menu (bypasses Woby reconciler)
+    useEffect(() => {
+        const menu = $$(menuRef)
+        if (menu) {
+            menu.style.display = $$(isOpen) ? '' : 'none'
+        }
+    })
 
     // Update selected font based on the shared range observable
     // Woby's useEffect runs this function automatically when dependent observables change
@@ -102,15 +112,23 @@ const FontFamilyDropDown = defaults(def, (props) => {
     const toggleDropdown = () => isOpen(!isOpen())
 
     const handleSelectFont = (fontValue: string, fontLabel: string) => {
-        applyFontFamilyStyle(fontValue)
-        selectedFont(fontLabel)
-        saveDo()
+        console.log('handleSelectFont called, setting isOpen to false')
+        try {
+            applyFontFamilyStyle(fontValue)
+            selectedFont(fontLabel)
+            saveDo()
+        } catch (e) {
+            console.warn('Font application failed, but closing dropdown:', e)
+        }
+        // Always close dropdown regardless of style application success
         isOpen(false)
+        console.log('isOpen set to false, current value:', $$(isOpen))
     }
 
     const DropDownMenu = () => {
         return (
             <div
+                ref={menuRef}
                 class="origin-top-left absolute left-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10"
                 role="menu"
                 aria-orientation="vertical"
@@ -180,7 +198,10 @@ const FontFamilyDropDown = defaults(def, (props) => {
                 </Button>
             </div>
 
-            {() => $$(isOpen) && (<DropDownMenu />)}
+            {() => {
+                const open = $$(isOpen)
+                return open ? (<DropDownMenu />) : null
+            }}
         </div>
     )
 })

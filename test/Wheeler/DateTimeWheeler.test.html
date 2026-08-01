@@ -12,7 +12,7 @@
 </head>
 
 <body>
-    <link href="../dist/wui.css" rel="stylesheet">
+    <link href="../../dist/wui.css" rel="stylesheet">
     <h2 class="text-[1.2em] pl-4 font-bold">DateTime Wheeler Component Test Suite</h2>
 
     <!-- Test Case 1: Basic DateTimeWheeler -->
@@ -21,6 +21,56 @@
             visible="true" title="Select Date & Time" cls="w-full border border-gray-300 rounded-md overflow-auto">
         </wui-datetime-wheeler>
     </woby-chk>
+
+    <!-- Pen popup demo A: default mode — main date updates ONLY on OK -->
+    <woby-chk name="Pen popup - default (commit on OK)">
+        <div class="p-4">
+            <div class="flex items-center gap-2 mb-2">
+                <span class="font-bold">Date:</span>
+                <span id="main-date-a" class="font-mono border border-gray-300 rounded px-2 py-1"></span>
+                <button id="pen-a" class="cursor-pointer text-lg px-2 py-1 border border-gray-300 rounded hover:bg-gray-100" title="Edit date">&#9998;</button>
+            </div>
+            <wui-datetime-wheeler id="dtw-pen-a" value="2026-03-15T14:30:45" bottom="false" visible="false"
+                cls="w-full border border-gray-300 rounded-md overflow-auto">
+            </wui-datetime-wheeler>
+        </div>
+    </woby-chk>
+
+    <!-- Pen popup demo B: reactive mode (ok="false") — main date updates live while scrolling; Cancel reverts -->
+    <woby-chk name="Pen popup - reactive (ok=false, live commit)">
+        <div class="p-4">
+            <div class="flex items-center gap-2 mb-2">
+                <span class="font-bold">Date:</span>
+                <span id="main-date-b" class="font-mono border border-gray-300 rounded px-2 py-1"></span>
+                <button id="pen-b" class="cursor-pointer text-lg px-2 py-1 border border-gray-300 rounded hover:bg-gray-100" title="Edit date">&#9998;</button>
+            </div>
+            <wui-datetime-wheeler id="dtw-pen-b" value="2026-03-15T14:30:45" bottom="false" visible="false" ok="false"
+                cls="w-full border border-gray-300 rounded-md overflow-auto">
+            </wui-datetime-wheeler>
+        </div>
+    </woby-chk>
+
+    <script type="module">
+        const fmt = (v) => {
+            const d = v instanceof Date ? v : new Date(v)
+            return isNaN(d.getTime()) ? String(v) : d.toString().slice(0, 24)
+        }
+        const wire = (elId, penId, dispId) => {
+            const el = document.getElementById(elId)
+            const pen = document.getElementById(penId)
+            const disp = document.getElementById(dispId)
+            pen.onclick = () => el.props.visible(true)
+            // No title attribute: the built-in header shows the live-scrolled date
+            // Main component date display (poll — plain page script, no woby import)
+            const render = () => { disp.textContent = fmt(el.props.value()) }
+            render()
+            setInterval(render, 200)
+        }
+        customElements.whenDefined('wui-datetime-wheeler').then(() => {
+            wire('dtw-pen-a', 'pen-a', 'main-date-a')
+            wire('dtw-pen-b', 'pen-b', 'main-date-b')
+        })
+    </script>
 
     <!-- Test Case 2: DateOnlyWheeler -->
     <!-- <woby-chk name="DateTimeWheeler - Date Mode">

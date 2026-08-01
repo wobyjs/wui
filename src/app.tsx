@@ -455,7 +455,7 @@ function App() {
                                 <Indent mode="increase" cls="text-black" />
                                 <Indent mode="decrease" cls="text-black" />
                             </div>
-                            <div ref={editorRef} contentEditable class="border border-gray-300 rounded p-4 min-h-[200px] mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <div ref={editorRef} data-editor-root contentEditable class="border border-gray-300 rounded p-4 min-h-[200px] mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 <p>Select this text and try the Indent Buttons below!</p>
                                 <p>You can make text indent.</p>
                             </div>
