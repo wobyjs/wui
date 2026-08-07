@@ -62,6 +62,7 @@ if (typeof globalThis.__isSSRTest__ !== 'undefined') {
 
 TestTextArea.test = {
     static: false,
+    stateCount: 2,
     compareActualValues: true,
     expect: () => {
         const idx = $$(testObservables[name])
@@ -83,4 +84,5 @@ TestTextArea.test = {
     }
 }
 
+export { TestTextArea }
 export default () => <TestSnapshots Component={TestTextArea} />

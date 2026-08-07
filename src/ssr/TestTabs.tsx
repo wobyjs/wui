@@ -63,6 +63,7 @@ if (typeof globalThis.__isSSRTest__ !== 'undefined') {
 
 TestTabs.test = {
     static: false,
+    stateCount: 1,
     compareActualValues: true,
     expect: () => {
         const idx = $$(testObservables[name])
@@ -84,4 +85,5 @@ TestTabs.test = {
     }
 }
 
+export { TestTabs }
 export default () => <TestSnapshots Component={TestTabs} />

@@ -28,7 +28,7 @@
         "watch": "run-p build:watch",
         "build:watch": "tsc --watch",
         "build": "vite build",
-        "test": "vitest run",
+        "test": "pnpm ssr-test",
         "test:watch": "vitest watch",
         "ssr-test": "pnpm exec esbuild src/ssr/ssr-test-runner.tsx --bundle --platform=node --format=esm --loader:.css=empty --inject:src/ssr/ssr-shim.js --outfile=src/ssr/ssr-test-runner-bundled.mjs && node src/ssr/ssr-test-runner-bundled.mjs",
         "probe": "pnpm exec esbuild src/ssr/probe.tsx --bundle --platform=node --format=esm --loader:.css=empty --inject:src/ssr/ssr-shim.js --outfile=src/ssr/probe-bundled.mjs && node src/ssr/probe-bundled.mjs"

@@ -63,6 +63,7 @@ if (typeof globalThis.__isSSRTest__ !== 'undefined') {
 
 TestTextField.test = {
     static: false,
+    stateCount: 2,
     compareActualValues: true,
     expect: () => {
         const idx = $$(testObservables[name])
@@ -84,4 +85,5 @@ TestTextField.test = {
     }
 }
 
+export { TestTextField }
 export default () => <TestSnapshots Component={TestTextField} />

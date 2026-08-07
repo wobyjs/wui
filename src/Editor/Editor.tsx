@@ -1,5 +1,5 @@
 import { useOnClickOutside } from '@woby/use'
-import { $, $$, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlClass, JSX, Observable, ObservableMaybe, useEffect, useMemo } from 'woby' // Added useEffect
+import { $, $$, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlClass, JSX, Observable, ObservableMaybe, useEffect, useMemo, render } from 'woby' // Added useEffect
 import { Button } from '../Button'
 import UndoIcon from '../icons/undo'
 import RedoIcon from '../icons/redo'
@@ -138,7 +138,24 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, children }) =
         // Get the host element (light DOM parent)
         const host = el.getRootNode().host as HTMLElement | null
         if (!host) {
-            console.warn("[EditorSurface] Light DOM sync skipped: no host element")
+            // Non-shadow-DOM mode: render children directly into the editor root element.
+            // This is used when <wui-editor> is created via JSX (no shadow DOM attached).
+            //
+            // Use a data attribute flag instead of el.hasChildNodes() because the browser
+            // may have already inserted filler content (e.g. <p><br></p>) into the empty
+            // contentEditable div before this effect runs.
+            if (children && !el.hasAttribute('data-editor-content-initialized')) {
+                try {
+                    el.setAttribute('data-editor-content-initialized', 'true')
+                    // Clear any browser-added empty content before rendering
+                    while (el.firstChild) {
+                        el.removeChild(el.firstChild)
+                    }
+                    render(children, el)
+                } catch (e) {
+                    console.warn('[EditorSurface] Non-shadow-DOM render failed:', e)
+                }
+            }
             return
         }
 
@@ -560,7 +577,7 @@ const Editor = defaults(def, (props) => {
     const { children, cls, class: cn, enableToolbar, readonly: _readonly, ...otherProps } = props
 
     const isEditing = $(false)
-    const isReadonly = $(false)
+    const isReadonly = $($$(_readonly) ?? false)
     useEffect(() => { isReadonly($$(_readonly) ?? false) })
     const container = $<HTMLDivElement>(null)
     const toolbarRef = $<HTMLDivElement>(null)

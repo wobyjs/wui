@@ -66,6 +66,7 @@ if (typeof globalThis.__isSSRTest__ !== 'undefined') {
 
 TestNumberField.test = {
     static: false,
+    stateCount: 2,
     compareActualValues: true,
     expect: () => {
         const idx = $$(testObservables[name])
@@ -87,4 +88,5 @@ TestNumberField.test = {
     }
 }
 
+export { TestNumberField }
 export default () => <TestSnapshots Component={TestNumberField} />

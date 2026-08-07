@@ -56,6 +56,9 @@ const FontSize = defaults(def, (props) => {
             }
             // 2. Multi-Paragraph / Multi-Element Selection
             else {
+                // Guard: container must be a valid Node for createTreeWalker
+                if (!container || !(container instanceof Node)) return;
+
                 // Create a fast scanner that only looks at Raw Text nodes inside the highlighted area
                 const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, null);
                 let currentNode = walker.nextNode();

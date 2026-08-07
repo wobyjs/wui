@@ -66,6 +66,7 @@ if (typeof globalThis.__isSSRTest__ !== 'undefined') {
 
 TestCheckbox.test = {
     static: false,
+    stateCount: 3,
     compareActualValues: true,
     expect: () => {
         const idx = $$(testObservables[name])
@@ -95,4 +96,5 @@ TestCheckbox.test = {
     }
 }
 
+export { TestCheckbox }
 export default () => <TestSnapshots Component={TestCheckbox} />

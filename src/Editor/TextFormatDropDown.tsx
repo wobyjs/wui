@@ -35,7 +35,8 @@ const TextFormatDropDown = defaults(def, (props) => {
 
     const isOpen = $(false)
     const dropdownRef = $<HTMLElement>(null)
-    const { saveDo } = useUndoRedo()
+    const undoRedoContext = useUndoRedo()
+    const saveDo = undoRedoContext?.saveDo || (() => {})
 
     useOnClickOutside(dropdownRef as any, () => isOpen(false))
 

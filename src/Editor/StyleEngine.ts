@@ -997,6 +997,8 @@ export function removeStyle(prop: string, savedSelection?: { editorRoot: HTMLEle
 
     let searchContainer = range.commonAncestorContainer
 
+    if (!searchContainer || !(searchContainer instanceof Node)) return
+
     if (searchContainer.nodeType === Node.TEXT_NODE && searchContainer.parentElement) {
         searchContainer = searchContainer.parentElement
     }
@@ -1800,8 +1802,11 @@ export function toggleStyle(prop: string, value: string): void {
 
     // For non-collapsed selection, check if ALL selected content has the style
     let allStyled = true
+    const walkerContainer = range.commonAncestorContainer
+    if (!walkerContainer || !(walkerContainer instanceof Node)) return
+
     const walker = document.createTreeWalker(
-        range.commonAncestorContainer,
+        walkerContainer,
         NodeFilter.SHOW_TEXT,
         null
     )

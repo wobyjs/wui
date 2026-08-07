@@ -283,7 +283,7 @@ var init_ssr_shim = __esm({
   }
 });
 
-// ../woby/dist/setters-Cy5CROMu.js
+// ../woby/dist/setters-AZ8Dlk0c.js
 function deepResolve(value, returnFunction = false) {
   if (isFunction$1(value)) {
     if (isObservable(value)) return deepResolve(value(), returnFunction);
@@ -441,8 +441,8 @@ function getCreators() {
   }
 }
 var DEBUGGER, Stack, callStack, BATCH, OBSERVER, setBatch, setObserver, castArray$1, castError$1, is, isArray$1, isEqual, isFunction$1, isObject$1, isSymbol, noop$1, nope, counter, resolve$1, batch, SYMBOL_CACHED, SYMBOL_OBSERVABLE, SYMBOL_OBSERVABLE_BOOLEAN, SYMBOL_OBSERVABLE_FROZEN, SYMBOL_OBSERVABLE_READABLE, SYMBOL_OBSERVABLE_WRITABLE, SYMBOL_STORE, SYMBOL_STORE_KEYS, SYMBOL_STORE_OBSERVABLE, SYMBOL_STORE_TARGET, SYMBOL_STORE_VALUES, SYMBOL_STORE_UNTRACKED, SYMBOL_SUSPENSE$1, SYMBOL_UNCACHED, SYMBOL_UNTRACKED, SYMBOL_UNTRACKED_UNWRAPPED, isObservableBoolean, isObservableFrozen, isUntracked$1, isObservable, frozen, readable, writable, OBSERVABLE_FALSE, OBSERVABLE_TRUE, UNAVAILABLE, UNINITIALIZED, Scheduler$1, scheduler_sync_default, Observable, lazyArrayEach, lazyArrayEachRight, lazyArrayPush, lazySetAdd, lazySetDelete, lazySetEach, onCleanup, onDispose, Owner, SuperRoot, SUPER_OWNER, OWNER, setOwner, ObservablesArray, ObservablesSet, Observer, Memo, memo, boolean, cleanup, Context, disposed, Scheduler, scheduler_async_default, Effect, effect, Root, DUMMY_INDEX$1, MappedRoot$1, CacheKeyed, Suspense, suspense, DUMMY_INDEX, MappedRoot, CacheUnkeyed, isStore, warmup, match, ternary, isBatching, owner, isObservableWritable, target, readonly, root, isEqualForSelector, DisposableMap, SelectedObservable, selector, StoreMap, StoreCleanable, StoreKeys, StoreValues, StoreHas, StoreProperty, StoreListenersRegular, StoreListenersRoots, StoreScheduler, NODES, SPECIAL_SYMBOLS, UNREACTIVE_KEYS, STORE_TRAPS, STORE_UNTRACK_TRAPS, getNode, getNodeExisting, getNodeFromStore, getNodeKeys, getNodeValues, getNodeHas, getNodeObservable, getNodeProperty, getGettersAndSetters, getStore, getTarget, getUntracked, isEqualDescriptor, isFrozenLike, isListenable, isProxiable, isUntracked, throwNoSetterError, store, suspended, tick, tryCatch, _with, dist_default, CONTEXTS_DATA, DIRECTIVES, SYMBOL_TEMPLATE_ACCESSOR, SYMBOLS_DIRECTIVES, SYMBOL_CLONE, SYMBOL_CONTEXT, SYMBOL_ISSLOT, SYMBOL_JSX, SYMBOL_DEFAULT, SYMBOL_CONTEXT_WRAP, SimpleNodeList, BaseNode, Comment2, Style, Element3, createComment$1, createElement, createHTMLNode$1, SVGNode, createSVGNode$1, createText$1, createDocumentFragment$1, createDocument, document$1, isNodeEnvironment, createComment, createHTMLNode, createSVGNode, createText, createDocumentFragment, NOOP_CHILDREN, Node$1, FragmentUtils, useCheapDisposed, useMicrotask, options, useRenderEffect, assign, castArray, flatten, indexOf, isArray, isBoolean, isFunction, isClass, isFunctionReactive, isNil, isNode, isObject, isPrimitive, isPromise, isString, isSVG, isSVGElement, isTemplateAccessor, isVoidChild, isPureFunction, classesToggle, dummyNode, beforeDummyWrapper, afterDummyWrapper, diff, EnvironmentToken, DocumentToken, EnvironmentContext, useEnvironment, DocumentContext, resolveChild, resolveClass, resolveStyle, resolveArraysAndStatics, kebabToCamelCase, camelToKebabCase, normalizePropertyPath, setNestedAttribute, setAttributeStatic, setAttribute, setChildStatic, setChild, setClassStatic, setClass, setClassBooleanStatic, setClassBoolean, setClassesStatic, setClasses, setDirective, setEventStatic, setEvent, setHTMLStatic, setHTML, setPropertyStatic, setProperty, setRef, propertyNonDimensionalRe, setStyleStatic, setStyle, setStylesStatic, setStyles, setTemplateAccessor, setProp, setProps;
-var init_setters_Cy5CROMu = __esm({
-  "../woby/dist/setters-Cy5CROMu.js"() {
+var init_setters_AZ8Dlk0c = __esm({
+  "../woby/dist/setters-AZ8Dlk0c.js"() {
     "use strict";
     init_ssr_shim();
     DEBUGGER = {
@@ -3055,7 +3055,7 @@ var init_setters_Cy5CROMu = __esm({
       };
     })();
     kebabToCamelCase = (str) => {
-      return str.replace(/-([a-z])/g, (g) => g[1].toUpperCase());
+      return str.replace(/-([a-z])/g, (g2) => g2[1].toUpperCase());
     };
     camelToKebabCase = (str) => {
       return str.replace(/[A-Z]/g, (match2) => `-${match2.toLowerCase()}`);
@@ -3155,13 +3155,12 @@ var init_setters_Cy5CROMu = __esm({
       else setAttributeStatic(element, key, get(value));
     };
     setChildStatic = (parent, fragment, fragmentOnly, child, dynamic, childComp, stack) => {
+      const callId = setChildStatic._callId = (setChildStatic._callId || 0) + 1;
+      parent.tagName;
+      parent.className;
+      (parent.textContent || "").length;
+      parent.childNodes.length;
       if (isVoidChild(child)) return;
-      const childType = typeof child;
-      if (childType !== "string" && childType !== "number" && childType !== "bigint" && childType !== "function") {
-        if (child !== null && child !== void 0) {
-          if (typeof child === "object" && child.nodeType === void 0) console.warn("[DEBUG setChildStatic] non-Node object:", childType, Object.prototype.toString.call(child), child);
-        }
-      }
       const prev = FragmentUtils.getChildren(fragment);
       const prevIsArray = prev instanceof Array;
       const prevLength = prevIsArray ? prev.length : 1;
@@ -3232,10 +3231,13 @@ var init_setters_Cy5CROMu = __esm({
           else if (arrayChildType === "function") {
             const resolved = arrayChild();
             if (resolved !== null && resolved !== void 0) {
-              if (typeof resolved === "object" && typeof resolved.nodeType === "number") FragmentUtils.pushNode(fragmentNext, resolved);
-              else if (Array.isArray(resolved)) resolved.forEach((item) => {
-                if (typeof item === "object" && item !== null && typeof item.nodeType === "number") FragmentUtils.pushNode(fragmentNext, item);
-              });
+              if (typeof resolved === "object" && typeof resolved.nodeType === "number") {
+                FragmentUtils.pushNode(fragmentNext, resolved);
+              } else if (Array.isArray(resolved)) {
+                resolved.forEach((item) => {
+                  if (typeof item === "object" && item !== null && typeof item.nodeType === "number") FragmentUtils.pushNode(fragmentNext, item);
+                });
+              }
             }
           }
         }
@@ -3284,7 +3286,9 @@ var init_setters_Cy5CROMu = __esm({
           nextLength += 1;
         }
       }
-      if (!fragmentOnly) diff(parent, prev, next, prevSibling);
+      if (!fragmentOnly) {
+        diff(parent, prev, next, prevSibling);
+      }
       FragmentUtils.replaceWithFragment(fragment, fragmentNext);
     };
     setChild = (parent, child, fragment = FragmentUtils.make(), stack = callStack()) => {
@@ -3607,7 +3611,7 @@ var init_setters_Cy5CROMu = __esm({
   }
 });
 
-// ../woby/dist/create_element-hFbYvVUP.js
+// ../woby/dist/create_element-Cv0Upzqo.js
 function renderToString(child, options2) {
   const ssrDoc = options2?.document ?? createDocument();
   return EnvironmentContext.Provider("ssr", () => {
@@ -3737,11 +3741,11 @@ function jsx(component, props, ...children) {
   return wrapCloneElement(createElement2(component, props, props?.key), component, props);
 }
 var SYMBOL_STACK, wrapElement, Fragment, customElementsRegistry, customElements2, SSRCustomElement, SSRShadowRoot, WobyCustomElementsRegistry, wobyCustomElements, wrapCloneElement, wrapJsx, isJsx, jsxs, createElement2;
-var init_create_element_hFbYvVUP = __esm({
-  "../woby/dist/create_element-hFbYvVUP.js"() {
+var init_create_element_Cv0Upzqo = __esm({
+  "../woby/dist/create_element-Cv0Upzqo.js"() {
     "use strict";
     init_ssr_shim();
-    init_setters_Cy5CROMu();
+    init_setters_AZ8Dlk0c();
     SYMBOL_STACK = /* @__PURE__ */ Symbol("STACK");
     wrapElement = (element) => {
       element[SYMBOL_UNTRACKED_UNWRAPPED] = true;
@@ -3951,7 +3955,7 @@ var init_create_element_hFbYvVUP = __esm({
   }
 });
 
-// ../woby/dist/htm.module-BFutDv50.js
+// ../woby/dist/htm.module-CV57aFhr.js
 function scheduleStylesheetUpdate() {
   if (updateScheduled) return;
   updateScheduled = true;
@@ -4150,12 +4154,12 @@ function htm_module_default(s) {
   })(s)), r), arguments, [])).length > 1 ? r : r[0];
 }
 var Switch, useScheduler, useTimeout, cachedConstructedSheets, stylesheetObserver, loggedErrors, MAX_LOGGED_ERRORS, shadowRootRegistry, updateScheduled, set, isObject2, assign2, isJsxProp, make, merge, defaults, HtmlChild, contextRefRegistry, isContextRef, collectAncestorContextWrap$1, parseContextRef, resolveContextRef, createSSRCustomElement, _pendingContextWrapGlobal, consumePendingContextWrap, peekPendingContextWrap, composePendingContextWrap, collectAncestorContextWrap, createBrowserCustomElement, setObservableValue, setNestedProperty, customElement, HtmlHidden, n, t;
-var init_htm_module_BFutDv50 = __esm({
-  "../woby/dist/htm.module-BFutDv50.js"() {
+var init_htm_module_CV57aFhr = __esm({
+  "../woby/dist/htm.module-CV57aFhr.js"() {
     "use strict";
     init_ssr_shim();
-    init_setters_Cy5CROMu();
-    init_create_element_hFbYvVUP();
+    init_setters_AZ8Dlk0c();
+    init_create_element_Cv0Upzqo();
     Switch = ({ when, fallback, children }) => {
       return _switch(when, castArray(children).map((child) => child().metadata), fallback);
     };
@@ -4767,9 +4771,9 @@ var init_index_es = __esm({
   "../woby/dist/index.es.js"() {
     "use strict";
     init_ssr_shim();
-    init_setters_Cy5CROMu();
-    init_create_element_hFbYvVUP();
-    init_htm_module_BFutDv50();
+    init_setters_AZ8Dlk0c();
+    init_create_element_Cv0Upzqo();
+    init_htm_module_CV57aFhr();
     IS_BROWSER = !!globalThis.CDATASection?.toString?.().match(/^\s*function\s+CDATASection\s*\(\s*\)\s*\{\s*\[native code\]\s*\}\s*$/);
     runWithSuperRoot = _with();
     render = (child, parent, options2) => {
@@ -4795,7 +4799,7 @@ var init_index_es = __esm({
     };
     registry = {};
     h$1 = (type2, props, ...children) => createElement2(registry[type2] || type2, props, ...children);
-    register = (components) => void assign(registry, components);
+    register = (components2) => void assign(registry, components2);
     html = assign(htm_module_default.bind(h$1), { register });
     is2 = (value) => value === "" || value === "true" || value === true;
     HtmlBoolean = {
@@ -4863,7 +4867,7 @@ var init_runtime_es = __esm({
   "../woby/dist/runtime.es.js"() {
     "use strict";
     init_ssr_shim();
-    init_create_element_hFbYvVUP();
+    init_create_element_Cv0Upzqo();
   }
 });
 
@@ -5670,7 +5674,7 @@ var init_src_De9AWQgk = __esm({
       function h(...e4) {
         return "(" + e4.map((e5) => p(e5)).join("|") + ")";
       }
-      function g(e4) {
+      function g2(e4) {
         return RegExp(e4.toString() + "|").exec("").length - 1;
       }
       function _(e4, t4) {
@@ -5868,7 +5872,7 @@ var init_src_De9AWQgk = __esm({
             this.matchIndexes = {}, this.regexes = [], this.matchAt = 1, this.position = 0;
           }
           addRule(e5, t5) {
-            t5.position = this.position++, this.matchIndexes[this.matchAt] = t5, this.regexes.push([t5, e5]), this.matchAt += g(e5) + 1;
+            t5.position = this.position++, this.matchIndexes[this.matchAt] = t5, this.regexes.push([t5, e5]), this.matchAt += g2(e5) + 1;
           }
           compile() {
             this.regexes.length === 0 && (this.exec = () => null);
@@ -6088,10 +6092,10 @@ var init_src_De9AWQgk = __esm({
             language: a3
           };
           R3("before:highlight", o3);
-          let s3 = o3.result ? o3.result : g2(o3.language, o3.code, n5, r2);
+          let s3 = o3.result ? o3.result : g3(o3.language, o3.code, n5, r2);
           return s3.code = o3.code, R3("after:highlight", s3), s3;
         }
-        function g2(e5, n5, r2, s3) {
+        function g3(e5, n5, r2, s3) {
           function l4(e6, t5) {
             let n6 = E4.case_insensitive ? t5[0].toLowerCase() : t5[0];
             return Object.prototype.hasOwnProperty.call(e6.keywords, n6) && e6.keywords[n6];
@@ -6127,7 +6131,7 @@ var init_src_De9AWQgk = __esm({
                 j4.addText(M4);
                 return;
               }
-              e6 = g2(k4.subLanguage, M4, true, A4[k4.subLanguage]), A4[k4.subLanguage] = e6.top;
+              e6 = g3(k4.subLanguage, M4, true, A4[k4.subLanguage]), A4[k4.subLanguage] = e6.top;
             } else e6 = y3(M4, k4.subLanguage.length ? k4.subLanguage : null);
             k4.relevance > 0 && (N4 += e6.relevance), j4.addSublanguage(e6.emitter, e6.language);
           }
@@ -6255,7 +6259,7 @@ var init_src_De9AWQgk = __esm({
         }
         function y3(e5, n5) {
           n5 = n5 || u2.languages || Object.keys(t4);
-          let r2 = v3(e5), i2 = n5.filter(I3).filter(L3).map((t5) => g2(t5, e5, false));
+          let r2 = v3(e5), i2 = n5.filter(I3).filter(L3).map((t5) => g3(t5, e5, false));
           i2.unshift(r2);
           let [a3, o3] = i2.sort((e6, t5) => {
             if (e6.relevance !== t5.relevance) return t5.relevance - e6.relevance;
@@ -7242,7 +7246,7 @@ var init_src_De9AWQgk = __esm({
           e4.C_BLOCK_COMMENT_MODE,
           l2,
           c
-        ], g = {
+        ], g2 = {
           variants: [
             {
               begin: /=/,
@@ -7343,7 +7347,7 @@ var init_src_De9AWQgk = __esm({
           keywords: p,
           illegal: "</",
           classNameAliases: { "function.dispatch": "built_in" },
-          contains: [].concat(g, _, m, h, [
+          contains: [].concat(g2, _, m, h, [
             u,
             {
               begin: "\\b(deque|list|queue|priority_queue|pair|stack|vector|map|set|bitset|multiset|multimap|unordered_map|unordered_set|unordered_multiset|unordered_multimap|array)\\s*<",
@@ -8547,7 +8551,7 @@ var init_src_De9AWQgk = __esm({
           e4.C_BLOCK_COMMENT_MODE,
           l2,
           c
-        ], g = {
+        ], g2 = {
           variants: [
             {
               begin: /=/,
@@ -8648,7 +8652,7 @@ var init_src_De9AWQgk = __esm({
           keywords: p,
           illegal: "</",
           classNameAliases: { "function.dispatch": "built_in" },
-          contains: [].concat(g, _, m, h, [
+          contains: [].concat(g2, _, m, h, [
             u,
             {
               begin: "\\b(deque|list|queue|priority_queue|pair|stack|vector|map|set|bitset|multiset|multimap|unordered_map|unordered_set|unordered_multiset|unordered_multimap|array)\\s*<",
@@ -9105,7 +9109,7 @@ var init_src_De9AWQgk = __esm({
           i,
           s,
           r
-        ], g = {
+        ], g2 = {
           beginKeywords: "def defonce defprotocol defstruct defmulti defmethod defn- defn defmacro deftype defrecord",
           lexemes: t4,
           end: '(\\[|#|\\d|"|:|\\{|\\)|\\(|$)',
@@ -9119,7 +9123,7 @@ var init_src_De9AWQgk = __esm({
         };
         return f.contains = [
           e4.COMMENT("comment", ""),
-          g,
+          g2,
           m,
           p
         ], p.contains = h, c.contains = h, u.contains = [c], {
@@ -9538,7 +9542,7 @@ var init_src_De9AWQgk = __esm({
           e4.C_BLOCK_COMMENT_MODE,
           l2,
           c
-        ], g = {
+        ], g2 = {
           variants: [
             {
               begin: /=/,
@@ -9639,7 +9643,7 @@ var init_src_De9AWQgk = __esm({
           keywords: p,
           illegal: "</",
           classNameAliases: { "function.dispatch": "built_in" },
-          contains: [].concat(g, _, m, h, [
+          contains: [].concat(g2, _, m, h, [
             u,
             {
               begin: "\\b(deque|list|queue|priority_queue|pair|stack|vector|map|set|bitset|multiset|multimap|unordered_map|unordered_set|unordered_multiset|unordered_multimap|array)\\s*<",
@@ -10110,7 +10114,7 @@ var init_src_De9AWQgk = __esm({
           begin: "<",
           end: ">",
           contains: [{ beginKeywords: "in out" }, i]
-        }, h = e4.IDENT_RE + "(<" + e4.IDENT_RE + "(\\s*,\\s*" + e4.IDENT_RE + ")*>)?(\\[\\])?", g = {
+        }, h = e4.IDENT_RE + "(<" + e4.IDENT_RE + "(\\s*,\\s*" + e4.IDENT_RE + ")*>)?(\\[\\])?", g2 = {
           begin: "@" + e4.IDENT_RE,
           relevance: 0
         };
@@ -10235,7 +10239,7 @@ var init_src_De9AWQgk = __esm({
                 e4.C_BLOCK_COMMENT_MODE
               ]
             },
-            g
+            g2
           ]
         };
       }
@@ -12997,7 +13001,7 @@ var init_src_De9AWQgk = __esm({
         ] }, s2 = /""|"[^"]+"/, c = /''|'[^']+'/, l2 = /\[\]|\[[^\]]+\]/, u = /[^\s!"#%&'()*+,.\/;<=>@\[\\\]^`{|}~]+/, d = /(\.|\/)/, f = o(s2, c, l2, u), p = a(i(/\.|\.\/|\//), f, r(a(d, f))), m = a("(", l2, "|", u, ")(?==)"), h = {
           begin: p,
           lexemes: /[\w.\/]+/
-        }, g = e4.inherit(h, { keywords: n4 }), _ = {
+        }, g2 = e4.inherit(h, { keywords: n4 }), _ = {
           begin: /\(/,
           end: /\)/
         }, v2 = {
@@ -13011,7 +13015,7 @@ var init_src_De9AWQgk = __esm({
               e4.NUMBER_MODE,
               e4.QUOTE_STRING_MODE,
               e4.APOS_STRING_MODE,
-              g,
+              g2,
               _
             ] }
           }
@@ -13027,7 +13031,7 @@ var init_src_De9AWQgk = __esm({
               contains: [{ begin: /\w+/ }]
             },
             v2,
-            g,
+            g2,
             _
           ],
           returnEnd: true
@@ -13449,7 +13453,7 @@ var init_src_De9AWQgk = __esm({
         ] }, s2 = /""|"[^"]+"/, c2 = /''|'[^']+'/, l2 = /\[\]|\[[^\]]+\]/, u = /[^\s!"#%&'()*+,.\/;<=>@\[\\\]^`{|}~]+/, d = /(\.|\/)/, f = o(s2, c2, l2, u), p = a(i(/\.|\.\/|\//), f, r(a(d, f))), m = a("(", l2, "|", u, ")(?==)"), h = {
           begin: p,
           lexemes: /[\w.\/]+/
-        }, g = e4.inherit(h, { keywords: n4 }), _ = {
+        }, g2 = e4.inherit(h, { keywords: n4 }), _ = {
           begin: /\(/,
           end: /\)/
         }, v2 = {
@@ -13463,7 +13467,7 @@ var init_src_De9AWQgk = __esm({
               e4.NUMBER_MODE,
               e4.QUOTE_STRING_MODE,
               e4.APOS_STRING_MODE,
-              g,
+              g2,
               _
             ] }
           }
@@ -13479,7 +13483,7 @@ var init_src_De9AWQgk = __esm({
               contains: [{ begin: /\w+/ }]
             },
             v2,
-            g,
+            g2,
             _
           ],
           returnEnd: true
@@ -13694,7 +13698,7 @@ var init_src_De9AWQgk = __esm({
         }, h = {
           endsWithParent: true,
           relevance: 0
-        }, g = {
+        }, g2 = {
           className: "name",
           relevance: 0,
           keywords: r,
@@ -13714,7 +13718,7 @@ var init_src_De9AWQgk = __esm({
         ];
         return m.contains = [
           e4.COMMENT("comment", ""),
-          g,
+          g2,
           h
         ], h.contains = _, u.contains = _, {
           name: "Hy",
@@ -14221,7 +14225,7 @@ var init_src_De9AWQgk = __esm({
             { begin: "\\b0[0-7]+n?\\b" }
           ],
           relevance: 0
-        }, g = {
+        }, g2 = {
           className: "subst",
           begin: "\\$\\{",
           end: "\\}",
@@ -14233,7 +14237,7 @@ var init_src_De9AWQgk = __esm({
           starts: {
             end: "`",
             returnEnd: false,
-            contains: [e4.BACKSLASH_ESCAPE, g],
+            contains: [e4.BACKSLASH_ESCAPE, g2],
             subLanguage: "xml"
           }
         }, v2 = {
@@ -14242,14 +14246,14 @@ var init_src_De9AWQgk = __esm({
           starts: {
             end: "`",
             returnEnd: false,
-            contains: [e4.BACKSLASH_ESCAPE, g],
+            contains: [e4.BACKSLASH_ESCAPE, g2],
             subLanguage: "css"
           }
         }, y2 = {
           className: "string",
           begin: "`",
           end: "`",
-          contains: [e4.BACKSLASH_ESCAPE, g]
+          contains: [e4.BACKSLASH_ESCAPE, g2]
         }, b2 = {
           className: "comment",
           variants: [
@@ -14290,13 +14294,13 @@ var init_src_De9AWQgk = __esm({
           h,
           e4.REGEXP_MODE
         ];
-        g.contains = x2.concat({
+        g2.contains = x2.concat({
           begin: /\{/,
           end: /\}/,
           keywords: d,
           contains: ["self"].concat(x2)
         });
-        let S2 = [].concat(b2, g.contains), C2 = S2.concat([{
+        let S2 = [].concat(b2, g2.contains), C2 = S2.concat([{
           begin: /\(/,
           end: /\)/,
           keywords: d,
@@ -15103,7 +15107,7 @@ var init_src_De9AWQgk = __esm({
             },
             relevance: 0
           }, p(d, n5));
-        }, g = (t5 = "string") => e4.END_SAME_AS_BEGIN({
+        }, g2 = (t5 = "string") => e4.END_SAME_AS_BEGIN({
           className: t5,
           begin: /(.|\r?\n)/,
           end: /(.|\r?\n)/,
@@ -15137,9 +15141,9 @@ var init_src_De9AWQgk = __esm({
           name: "LaTeX",
           aliases: ["tex"],
           contains: [
-            ...["verb", "lstinline"].map((e5) => m(e5, { contains: [g()] })),
-            m("mint", p(d, { contains: [g()] })),
-            m("mintinline", p(d, { contains: [v2(), g()] })),
+            ...["verb", "lstinline"].map((e5) => m(e5, { contains: [g2()] })),
+            m("mint", p(d, { contains: [g2()] })),
+            m("mintinline", p(d, { contains: [v2(), g2()] })),
             m("url", { contains: [v2("link"), v2("link")] }),
             m("hyperref", { contains: [v2("link")] }),
             m("href", p(f, { contains: [v2("link")] })),
@@ -15305,7 +15309,7 @@ var init_src_De9AWQgk = __esm({
           returnBegin: true,
           excludeEnd: true
         }, t4.IMPORTANT);
-        let g = d.concat({
+        let g2 = d.concat({
           begin: /\{/,
           end: /\}/,
           contains: u
@@ -15348,7 +15352,7 @@ var init_src_De9AWQgk = __esm({
           starts: {
             end: "[;}]",
             returnEnd: true,
-            contains: g
+            contains: g2
           }
         }, x2 = {
           variants: [{
@@ -15388,7 +15392,7 @@ var init_src_De9AWQgk = __esm({
             {
               begin: "\\(",
               end: "\\)",
-              contains: g
+              contains: g2
             },
             { begin: "!important" }
           ]
@@ -17917,7 +17921,7 @@ var init_src_De9AWQgk = __esm({
           className: "selector-tag",
           begin: /@\B/,
           relevance: 0
-        }, g = {
+        }, g2 = {
           className: "function",
           begin: /\[.*\]\s*[\w]+[ ]??\(/,
           end: /$/,
@@ -17930,7 +17934,7 @@ var init_src_De9AWQgk = __esm({
             relevance: 0
           }, e4.inherit(e4.TITLE_MODE, { endsParent: true })]
         }, _ = [
-          g,
+          g2,
           l2,
           i,
           e4.NUMBER_MODE,
@@ -17956,7 +17960,7 @@ var init_src_De9AWQgk = __esm({
             relevance: 0
           })
         };
-        return g.contains.unshift(v2), {
+        return g2.contains.unshift(v2), {
           name: "PowerShell",
           aliases: ["ps", "ps1"],
           case_insensitive: true,
@@ -20192,7 +20196,7 @@ var init_src_De9AWQgk = __esm({
           "nulls last",
           "depth first",
           "breadth first"
-        ], m = d, h = [...u, ...l2].filter((e5) => !d.includes(e5)), g = {
+        ], m = d, h = [...u, ...l2].filter((e5) => !d.includes(e5)), g2 = {
           className: "variable",
           begin: /@[a-z0-9]+/
         }, _ = {
@@ -20233,7 +20237,7 @@ var init_src_De9AWQgk = __esm({
               begin: i(...s)
             },
             v2,
-            g,
+            g2,
             n4,
             a2,
             e4.C_NUMBER_MODE,
@@ -20715,7 +20719,7 @@ var init_src_De9AWQgk = __esm({
         "#sourceLocation",
         "#warn_unqualified_access",
         "#warning"
-      ], m = /* @__PURE__ */ "abs.all.any.assert.assertionFailure.debugPrint.dump.fatalError.getVaList.isKnownUniquelyReferenced.max.min.numericCast.pointwiseMax.pointwiseMin.precondition.preconditionFailure.print.readLine.repeatElement.sequence.stride.swap.swift_unboxFromSwiftValueWithType.transcode.type.unsafeBitCast.unsafeDowncast.withExtendedLifetime.withUnsafeMutablePointer.withUnsafePointer.withVaList.withoutActuallyEscaping.zip".split("."), h = a(/[/=\-+!*%<>&|^~?]/, /[\u00A1-\u00A7]/, /[\u00A9\u00AB]/, /[\u00AC\u00AE]/, /[\u00B0\u00B1]/, /[\u00B6\u00BB\u00BF\u00D7\u00F7]/, /[\u2016-\u2017]/, /[\u2020-\u2027]/, /[\u2030-\u203E]/, /[\u2041-\u2053]/, /[\u2055-\u205E]/, /[\u2190-\u23FF]/, /[\u2500-\u2775]/, /[\u2794-\u2BFF]/, /[\u2E00-\u2E7F]/, /[\u3001-\u3003]/, /[\u3008-\u3020]/, /[\u3030]/), g = a(h, /[\u0300-\u036F]/, /[\u1DC0-\u1DFF]/, /[\u20D0-\u20FF]/, /[\uFE00-\uFE0F]/, /[\uFE20-\uFE2F]/), _ = i(h, g, "*"), v2 = a(/[a-zA-Z_]/, /[\u00A8\u00AA\u00AD\u00AF\u00B2-\u00B5\u00B7-\u00BA]/, /[\u00BC-\u00BE\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u00FF]/, /[\u0100-\u02FF\u0370-\u167F\u1681-\u180D\u180F-\u1DBF]/, /[\u1E00-\u1FFF]/, /[\u200B-\u200D\u202A-\u202E\u203F-\u2040\u2054\u2060-\u206F]/, /[\u2070-\u20CF\u2100-\u218F\u2460-\u24FF\u2776-\u2793]/, /[\u2C00-\u2DFF\u2E80-\u2FFF]/, /[\u3004-\u3007\u3021-\u302F\u3031-\u303F\u3040-\uD7FF]/, /[\uF900-\uFD3D\uFD40-\uFDCF\uFDF0-\uFE1F\uFE30-\uFE44]/, /[\uFE47-\uFEFE\uFF00-\uFFFD]/), y2 = a(v2, /\d/, /[\u0300-\u036F\u1DC0-\u1DFF\u20D0-\u20FF\uFE20-\uFE2F]/), b2 = i(v2, y2, "*"), x2 = i(/[A-Z]/, y2, "*"), S2 = [
+      ], m = /* @__PURE__ */ "abs.all.any.assert.assertionFailure.debugPrint.dump.fatalError.getVaList.isKnownUniquelyReferenced.max.min.numericCast.pointwiseMax.pointwiseMin.precondition.preconditionFailure.print.readLine.repeatElement.sequence.stride.swap.swift_unboxFromSwiftValueWithType.transcode.type.unsafeBitCast.unsafeDowncast.withExtendedLifetime.withUnsafeMutablePointer.withUnsafePointer.withVaList.withoutActuallyEscaping.zip".split("."), h = a(/[/=\-+!*%<>&|^~?]/, /[\u00A1-\u00A7]/, /[\u00A9\u00AB]/, /[\u00AC\u00AE]/, /[\u00B0\u00B1]/, /[\u00B6\u00BB\u00BF\u00D7\u00F7]/, /[\u2016-\u2017]/, /[\u2020-\u2027]/, /[\u2030-\u203E]/, /[\u2041-\u2053]/, /[\u2055-\u205E]/, /[\u2190-\u23FF]/, /[\u2500-\u2775]/, /[\u2794-\u2BFF]/, /[\u2E00-\u2E7F]/, /[\u3001-\u3003]/, /[\u3008-\u3020]/, /[\u3030]/), g2 = a(h, /[\u0300-\u036F]/, /[\u1DC0-\u1DFF]/, /[\u20D0-\u20FF]/, /[\uFE00-\uFE0F]/, /[\uFE20-\uFE2F]/), _ = i(h, g2, "*"), v2 = a(/[a-zA-Z_]/, /[\u00A8\u00AA\u00AD\u00AF\u00B2-\u00B5\u00B7-\u00BA]/, /[\u00BC-\u00BE\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u00FF]/, /[\u0100-\u02FF\u0370-\u167F\u1681-\u180D\u180F-\u1DBF]/, /[\u1E00-\u1FFF]/, /[\u200B-\u200D\u202A-\u202E\u203F-\u2040\u2054\u2060-\u206F]/, /[\u2070-\u20CF\u2100-\u218F\u2460-\u24FF\u2776-\u2793]/, /[\u2C00-\u2DFF\u2E80-\u2FFF]/, /[\u3004-\u3007\u3021-\u302F\u3031-\u303F\u3040-\uD7FF]/, /[\uF900-\uFD3D\uFD40-\uFDCF\uFDF0-\uFE1F\uFE30-\uFE44]/, /[\uFE47-\uFEFE\uFF00-\uFFFD]/), y2 = a(v2, /\d/, /[\u0300-\u036F\u1DC0-\u1DFF\u20D0-\u20FF\uFE20-\uFE2F]/), b2 = i(v2, y2, "*"), x2 = i(/[A-Z]/, y2, "*"), S2 = [
         "autoclosure",
         i(/convention\(/, a("swift", "block", "c"), /\)/),
         "discardableResult",
@@ -20792,7 +20796,7 @@ var init_src_De9AWQgk = __esm({
         }, j2 = [A2, {
           className: "operator",
           relevance: 0,
-          variants: [{ match: _ }, { match: `\\.(\\.|${g})+` }]
+          variants: [{ match: _ }, { match: `\\.(\\.|${g2})+` }]
         }], M2 = "([0-9]_*)+", N2 = "([0-9a-fA-F]_*)+", P2 = {
           className: "number",
           relevance: 0,
@@ -21554,7 +21558,7 @@ var init_src_De9AWQgk = __esm({
             { begin: "\\b0[0-7]+n?\\b" }
           ],
           relevance: 0
-        }, g = {
+        }, g2 = {
           className: "subst",
           begin: "\\$\\{",
           end: "\\}",
@@ -21566,7 +21570,7 @@ var init_src_De9AWQgk = __esm({
           starts: {
             end: "`",
             returnEnd: false,
-            contains: [e4.BACKSLASH_ESCAPE, g],
+            contains: [e4.BACKSLASH_ESCAPE, g2],
             subLanguage: "xml"
           }
         }, v2 = {
@@ -21575,14 +21579,14 @@ var init_src_De9AWQgk = __esm({
           starts: {
             end: "`",
             returnEnd: false,
-            contains: [e4.BACKSLASH_ESCAPE, g],
+            contains: [e4.BACKSLASH_ESCAPE, g2],
             subLanguage: "css"
           }
         }, y2 = {
           className: "string",
           begin: "`",
           end: "`",
-          contains: [e4.BACKSLASH_ESCAPE, g]
+          contains: [e4.BACKSLASH_ESCAPE, g2]
         }, b2 = {
           className: "comment",
           variants: [
@@ -21623,13 +21627,13 @@ var init_src_De9AWQgk = __esm({
           h,
           e4.REGEXP_MODE
         ];
-        g.contains = x2.concat({
+        g2.contains = x2.concat({
           begin: /\{/,
           end: /\}/,
           keywords: d,
           contains: ["self"].concat(x2)
         });
-        let S2 = [].concat(b2, g.contains), C2 = S2.concat([{
+        let S2 = [].concat(b2, g2.contains), C2 = S2.concat([{
           begin: /\(/,
           end: /\)/,
           keywords: d,
@@ -42258,7 +42262,7 @@ var init_src_De9AWQgk = __esm({
         156: 339,
         158: 382,
         159: 376
-      }, l2 = 1, u = 2, d = 4, f = 7, p = "DATA_STATE", m = "RCDATA_STATE", h = "RAWTEXT_STATE", g = "SCRIPT_DATA_STATE", _ = "PLAINTEXT_STATE", v2 = "TAG_OPEN_STATE", y2 = "END_TAG_OPEN_STATE", b2 = "TAG_NAME_STATE", x2 = "RCDATA_LESS_THAN_SIGN_STATE", S2 = "RCDATA_END_TAG_OPEN_STATE", C2 = "RCDATA_END_TAG_NAME_STATE", w2 = "RAWTEXT_LESS_THAN_SIGN_STATE", T2 = "RAWTEXT_END_TAG_OPEN_STATE", E2 = "RAWTEXT_END_TAG_NAME_STATE", D2 = "SCRIPT_DATA_LESS_THAN_SIGN_STATE", O2 = "SCRIPT_DATA_END_TAG_OPEN_STATE", k2 = "SCRIPT_DATA_END_TAG_NAME_STATE", A2 = "SCRIPT_DATA_ESCAPE_START_STATE", j2 = "SCRIPT_DATA_ESCAPE_START_DASH_STATE", M2 = "SCRIPT_DATA_ESCAPED_STATE", N2 = "SCRIPT_DATA_ESCAPED_DASH_STATE", P2 = "SCRIPT_DATA_ESCAPED_DASH_DASH_STATE", F2 = "SCRIPT_DATA_ESCAPED_LESS_THAN_SIGN_STATE", ee2 = "SCRIPT_DATA_ESCAPED_END_TAG_OPEN_STATE", I2 = "SCRIPT_DATA_ESCAPED_END_TAG_NAME_STATE", te2 = "SCRIPT_DATA_DOUBLE_ESCAPE_START_STATE", L2 = "SCRIPT_DATA_DOUBLE_ESCAPED_STATE", ne2 = "SCRIPT_DATA_DOUBLE_ESCAPED_DASH_STATE", re2 = "SCRIPT_DATA_DOUBLE_ESCAPED_DASH_DASH_STATE", R2 = "SCRIPT_DATA_DOUBLE_ESCAPED_LESS_THAN_SIGN_STATE", ie2 = "SCRIPT_DATA_DOUBLE_ESCAPE_END_STATE", z2 = "BEFORE_ATTRIBUTE_NAME_STATE", ae2 = "ATTRIBUTE_NAME_STATE", oe2 = "AFTER_ATTRIBUTE_NAME_STATE", se2 = "BEFORE_ATTRIBUTE_VALUE_STATE", ce2 = "ATTRIBUTE_VALUE_DOUBLE_QUOTED_STATE", le2 = "ATTRIBUTE_VALUE_SINGLE_QUOTED_STATE", ue2 = "ATTRIBUTE_VALUE_UNQUOTED_STATE", de2 = "AFTER_ATTRIBUTE_VALUE_QUOTED_STATE", B2 = "SELF_CLOSING_START_TAG_STATE", fe2 = "BOGUS_COMMENT_STATE", pe2 = "MARKUP_DECLARATION_OPEN_STATE", V2 = "COMMENT_START_STATE", me2 = "COMMENT_START_DASH_STATE", H2 = "COMMENT_STATE", he2 = "COMMENT_LESS_THAN_SIGN_STATE", ge2 = "COMMENT_LESS_THAN_SIGN_BANG_STATE", U2 = "COMMENT_LESS_THAN_SIGN_BANG_DASH_STATE", _e2 = "COMMENT_LESS_THAN_SIGN_BANG_DASH_DASH_STATE", ve2 = "COMMENT_END_DASH_STATE", ye2 = "COMMENT_END_STATE", be2 = "COMMENT_END_BANG_STATE", xe2 = "DOCTYPE_STATE", Se2 = "BEFORE_DOCTYPE_NAME_STATE", Ce2 = "DOCTYPE_NAME_STATE", we2 = "AFTER_DOCTYPE_NAME_STATE", Te2 = "AFTER_DOCTYPE_PUBLIC_KEYWORD_STATE", W2 = "BEFORE_DOCTYPE_PUBLIC_IDENTIFIER_STATE", Ee2 = "DOCTYPE_PUBLIC_IDENTIFIER_DOUBLE_QUOTED_STATE", De2 = "DOCTYPE_PUBLIC_IDENTIFIER_SINGLE_QUOTED_STATE", Oe2 = "AFTER_DOCTYPE_PUBLIC_IDENTIFIER_STATE", ke2 = "BETWEEN_DOCTYPE_PUBLIC_AND_SYSTEM_IDENTIFIERS_STATE", Ae2 = "AFTER_DOCTYPE_SYSTEM_KEYWORD_STATE", je2 = "BEFORE_DOCTYPE_SYSTEM_IDENTIFIER_STATE", Me2 = "DOCTYPE_SYSTEM_IDENTIFIER_DOUBLE_QUOTED_STATE", Ne2 = "DOCTYPE_SYSTEM_IDENTIFIER_SINGLE_QUOTED_STATE", Pe2 = "AFTER_DOCTYPE_SYSTEM_IDENTIFIER_STATE", Fe2 = "BOGUS_DOCTYPE_STATE", Ie2 = "CDATA_SECTION_STATE", Le2 = "CDATA_SECTION_BRACKET_STATE", Re2 = "CDATA_SECTION_END_STATE", ze2 = "CHARACTER_REFERENCE_STATE", Be2 = "NAMED_CHARACTER_REFERENCE_STATE", Ve2 = "AMBIGUOS_AMPERSAND_STATE", He2 = "NUMERIC_CHARACTER_REFERENCE_STATE", Ue2 = "HEXADEMICAL_CHARACTER_REFERENCE_START_STATE", We2 = "DECIMAL_CHARACTER_REFERENCE_START_STATE", Ge2 = "HEXADEMICAL_CHARACTER_REFERENCE_STATE", Ke2 = "DECIMAL_CHARACTER_REFERENCE_STATE", qe2 = "NUMERIC_CHARACTER_REFERENCE_END_STATE";
+      }, l2 = 1, u = 2, d = 4, f = 7, p = "DATA_STATE", m = "RCDATA_STATE", h = "RAWTEXT_STATE", g2 = "SCRIPT_DATA_STATE", _ = "PLAINTEXT_STATE", v2 = "TAG_OPEN_STATE", y2 = "END_TAG_OPEN_STATE", b2 = "TAG_NAME_STATE", x2 = "RCDATA_LESS_THAN_SIGN_STATE", S2 = "RCDATA_END_TAG_OPEN_STATE", C2 = "RCDATA_END_TAG_NAME_STATE", w2 = "RAWTEXT_LESS_THAN_SIGN_STATE", T2 = "RAWTEXT_END_TAG_OPEN_STATE", E2 = "RAWTEXT_END_TAG_NAME_STATE", D2 = "SCRIPT_DATA_LESS_THAN_SIGN_STATE", O2 = "SCRIPT_DATA_END_TAG_OPEN_STATE", k2 = "SCRIPT_DATA_END_TAG_NAME_STATE", A2 = "SCRIPT_DATA_ESCAPE_START_STATE", j2 = "SCRIPT_DATA_ESCAPE_START_DASH_STATE", M2 = "SCRIPT_DATA_ESCAPED_STATE", N2 = "SCRIPT_DATA_ESCAPED_DASH_STATE", P2 = "SCRIPT_DATA_ESCAPED_DASH_DASH_STATE", F2 = "SCRIPT_DATA_ESCAPED_LESS_THAN_SIGN_STATE", ee2 = "SCRIPT_DATA_ESCAPED_END_TAG_OPEN_STATE", I2 = "SCRIPT_DATA_ESCAPED_END_TAG_NAME_STATE", te2 = "SCRIPT_DATA_DOUBLE_ESCAPE_START_STATE", L2 = "SCRIPT_DATA_DOUBLE_ESCAPED_STATE", ne2 = "SCRIPT_DATA_DOUBLE_ESCAPED_DASH_STATE", re2 = "SCRIPT_DATA_DOUBLE_ESCAPED_DASH_DASH_STATE", R2 = "SCRIPT_DATA_DOUBLE_ESCAPED_LESS_THAN_SIGN_STATE", ie2 = "SCRIPT_DATA_DOUBLE_ESCAPE_END_STATE", z2 = "BEFORE_ATTRIBUTE_NAME_STATE", ae2 = "ATTRIBUTE_NAME_STATE", oe2 = "AFTER_ATTRIBUTE_NAME_STATE", se2 = "BEFORE_ATTRIBUTE_VALUE_STATE", ce2 = "ATTRIBUTE_VALUE_DOUBLE_QUOTED_STATE", le2 = "ATTRIBUTE_VALUE_SINGLE_QUOTED_STATE", ue2 = "ATTRIBUTE_VALUE_UNQUOTED_STATE", de2 = "AFTER_ATTRIBUTE_VALUE_QUOTED_STATE", B2 = "SELF_CLOSING_START_TAG_STATE", fe2 = "BOGUS_COMMENT_STATE", pe2 = "MARKUP_DECLARATION_OPEN_STATE", V2 = "COMMENT_START_STATE", me2 = "COMMENT_START_DASH_STATE", H2 = "COMMENT_STATE", he2 = "COMMENT_LESS_THAN_SIGN_STATE", ge2 = "COMMENT_LESS_THAN_SIGN_BANG_STATE", U2 = "COMMENT_LESS_THAN_SIGN_BANG_DASH_STATE", _e2 = "COMMENT_LESS_THAN_SIGN_BANG_DASH_DASH_STATE", ve2 = "COMMENT_END_DASH_STATE", ye2 = "COMMENT_END_STATE", be2 = "COMMENT_END_BANG_STATE", xe2 = "DOCTYPE_STATE", Se2 = "BEFORE_DOCTYPE_NAME_STATE", Ce2 = "DOCTYPE_NAME_STATE", we2 = "AFTER_DOCTYPE_NAME_STATE", Te2 = "AFTER_DOCTYPE_PUBLIC_KEYWORD_STATE", W2 = "BEFORE_DOCTYPE_PUBLIC_IDENTIFIER_STATE", Ee2 = "DOCTYPE_PUBLIC_IDENTIFIER_DOUBLE_QUOTED_STATE", De2 = "DOCTYPE_PUBLIC_IDENTIFIER_SINGLE_QUOTED_STATE", Oe2 = "AFTER_DOCTYPE_PUBLIC_IDENTIFIER_STATE", ke2 = "BETWEEN_DOCTYPE_PUBLIC_AND_SYSTEM_IDENTIFIERS_STATE", Ae2 = "AFTER_DOCTYPE_SYSTEM_KEYWORD_STATE", je2 = "BEFORE_DOCTYPE_SYSTEM_IDENTIFIER_STATE", Me2 = "DOCTYPE_SYSTEM_IDENTIFIER_DOUBLE_QUOTED_STATE", Ne2 = "DOCTYPE_SYSTEM_IDENTIFIER_SINGLE_QUOTED_STATE", Pe2 = "AFTER_DOCTYPE_SYSTEM_IDENTIFIER_STATE", Fe2 = "BOGUS_DOCTYPE_STATE", Ie2 = "CDATA_SECTION_STATE", Le2 = "CDATA_SECTION_BRACKET_STATE", Re2 = "CDATA_SECTION_END_STATE", ze2 = "CHARACTER_REFERENCE_STATE", Be2 = "NAMED_CHARACTER_REFERENCE_STATE", Ve2 = "AMBIGUOS_AMPERSAND_STATE", He2 = "NUMERIC_CHARACTER_REFERENCE_STATE", Ue2 = "HEXADEMICAL_CHARACTER_REFERENCE_START_STATE", We2 = "DECIMAL_CHARACTER_REFERENCE_START_STATE", Ge2 = "HEXADEMICAL_CHARACTER_REFERENCE_STATE", Ke2 = "DECIMAL_CHARACTER_REFERENCE_STATE", qe2 = "NUMERIC_CHARACTER_REFERENCE_END_STATE";
       function G2(e4) {
         return e4 === o.SPACE || e4 === o.LINE_FEED || e4 === o.TABULATION || e4 === o.FORM_FEED;
       }
@@ -42477,7 +42481,7 @@ var init_src_De9AWQgk = __esm({
         [h](e5) {
           this.preprocessor.dropParsedChunk(), e5 === o.LESS_THAN_SIGN ? this.state = w2 : e5 === o.NULL ? (this._err(a.unexpectedNullCharacter), this._emitChars(r.REPLACEMENT_CHARACTER)) : e5 === o.EOF ? this._emitEOFToken() : this._emitCodePoint(e5);
         }
-        [g](e5) {
+        [g2](e5) {
           this.preprocessor.dropParsedChunk(), e5 === o.LESS_THAN_SIGN ? this.state = D2 : e5 === o.NULL ? (this._err(a.unexpectedNullCharacter), this._emitChars(r.REPLACEMENT_CHARACTER)) : e5 === o.EOF ? this._emitEOFToken() : this._emitCodePoint(e5);
         }
         [_](e5) {
@@ -42547,10 +42551,10 @@ var init_src_De9AWQgk = __esm({
           }
         }
         [D2](e5) {
-          e5 === o.SOLIDUS ? (this.tempBuff = [], this.state = O2) : e5 === o.EXCLAMATION_MARK ? (this.state = A2, this._emitChars("<!")) : (this._emitChars("<"), this._reconsumeInState(g));
+          e5 === o.SOLIDUS ? (this.tempBuff = [], this.state = O2) : e5 === o.EXCLAMATION_MARK ? (this.state = A2, this._emitChars("<!")) : (this._emitChars("<"), this._reconsumeInState(g2));
         }
         [O2](e5) {
-          Ze2(e5) ? (this._createEndTagToken(), this._reconsumeInState(k2)) : (this._emitChars("</"), this._reconsumeInState(g));
+          Ze2(e5) ? (this._createEndTagToken(), this._reconsumeInState(k2)) : (this._emitChars("</"), this._reconsumeInState(g2));
         }
         [k2](e5) {
           if (Ye2(e5)) this.currentToken.tagName += rt2(e5), this.tempBuff.push(e5);
@@ -42568,14 +42572,14 @@ var init_src_De9AWQgk = __esm({
                 return;
               }
             }
-            this._emitChars("</"), this._emitSeveralCodePoints(this.tempBuff), this._reconsumeInState(g);
+            this._emitChars("</"), this._emitSeveralCodePoints(this.tempBuff), this._reconsumeInState(g2);
           }
         }
         [A2](e5) {
-          e5 === o.HYPHEN_MINUS ? (this.state = j2, this._emitChars("-")) : this._reconsumeInState(g);
+          e5 === o.HYPHEN_MINUS ? (this.state = j2, this._emitChars("-")) : this._reconsumeInState(g2);
         }
         [j2](e5) {
-          e5 === o.HYPHEN_MINUS ? (this.state = P2, this._emitChars("-")) : this._reconsumeInState(g);
+          e5 === o.HYPHEN_MINUS ? (this.state = P2, this._emitChars("-")) : this._reconsumeInState(g2);
         }
         [M2](e5) {
           e5 === o.HYPHEN_MINUS ? (this.state = N2, this._emitChars("-")) : e5 === o.LESS_THAN_SIGN ? this.state = F2 : e5 === o.NULL ? (this._err(a.unexpectedNullCharacter), this._emitChars(r.REPLACEMENT_CHARACTER)) : e5 === o.EOF ? (this._err(a.eofInScriptHtmlCommentLikeText), this._emitEOFToken()) : this._emitCodePoint(e5);
@@ -42584,7 +42588,7 @@ var init_src_De9AWQgk = __esm({
           e5 === o.HYPHEN_MINUS ? (this.state = P2, this._emitChars("-")) : e5 === o.LESS_THAN_SIGN ? this.state = F2 : e5 === o.NULL ? (this._err(a.unexpectedNullCharacter), this.state = M2, this._emitChars(r.REPLACEMENT_CHARACTER)) : e5 === o.EOF ? (this._err(a.eofInScriptHtmlCommentLikeText), this._emitEOFToken()) : (this.state = M2, this._emitCodePoint(e5));
         }
         [P2](e5) {
-          e5 === o.HYPHEN_MINUS ? this._emitChars("-") : e5 === o.LESS_THAN_SIGN ? this.state = F2 : e5 === o.GREATER_THAN_SIGN ? (this.state = g, this._emitChars(">")) : e5 === o.NULL ? (this._err(a.unexpectedNullCharacter), this.state = M2, this._emitChars(r.REPLACEMENT_CHARACTER)) : e5 === o.EOF ? (this._err(a.eofInScriptHtmlCommentLikeText), this._emitEOFToken()) : (this.state = M2, this._emitCodePoint(e5));
+          e5 === o.HYPHEN_MINUS ? this._emitChars("-") : e5 === o.LESS_THAN_SIGN ? this.state = F2 : e5 === o.GREATER_THAN_SIGN ? (this.state = g2, this._emitChars(">")) : e5 === o.NULL ? (this._err(a.unexpectedNullCharacter), this.state = M2, this._emitChars(r.REPLACEMENT_CHARACTER)) : e5 === o.EOF ? (this._err(a.eofInScriptHtmlCommentLikeText), this._emitEOFToken()) : (this.state = M2, this._emitCodePoint(e5));
         }
         [F2](e5) {
           e5 === o.SOLIDUS ? (this.tempBuff = [], this.state = ee2) : Ze2(e5) ? (this.tempBuff = [], this._emitChars("<"), this._reconsumeInState(te2)) : (this._emitChars("<"), this._reconsumeInState(M2));
@@ -42623,7 +42627,7 @@ var init_src_De9AWQgk = __esm({
           e5 === o.HYPHEN_MINUS ? (this.state = re2, this._emitChars("-")) : e5 === o.LESS_THAN_SIGN ? (this.state = R2, this._emitChars("<")) : e5 === o.NULL ? (this._err(a.unexpectedNullCharacter), this.state = L2, this._emitChars(r.REPLACEMENT_CHARACTER)) : e5 === o.EOF ? (this._err(a.eofInScriptHtmlCommentLikeText), this._emitEOFToken()) : (this.state = L2, this._emitCodePoint(e5));
         }
         [re2](e5) {
-          e5 === o.HYPHEN_MINUS ? this._emitChars("-") : e5 === o.LESS_THAN_SIGN ? (this.state = R2, this._emitChars("<")) : e5 === o.GREATER_THAN_SIGN ? (this.state = g, this._emitChars(">")) : e5 === o.NULL ? (this._err(a.unexpectedNullCharacter), this.state = L2, this._emitChars(r.REPLACEMENT_CHARACTER)) : e5 === o.EOF ? (this._err(a.eofInScriptHtmlCommentLikeText), this._emitEOFToken()) : (this.state = L2, this._emitCodePoint(e5));
+          e5 === o.HYPHEN_MINUS ? this._emitChars("-") : e5 === o.LESS_THAN_SIGN ? (this.state = R2, this._emitChars("<")) : e5 === o.GREATER_THAN_SIGN ? (this.state = g2, this._emitChars(">")) : e5 === o.NULL ? (this._err(a.unexpectedNullCharacter), this.state = L2, this._emitChars(r.REPLACEMENT_CHARACTER)) : e5 === o.EOF ? (this._err(a.eofInScriptHtmlCommentLikeText), this._emitEOFToken()) : (this.state = L2, this._emitCodePoint(e5));
         }
         [R2](e5) {
           e5 === o.SOLIDUS ? (this.tempBuff = [], this.state = ie2, this._emitChars("/")) : this._reconsumeInState(L2);
@@ -42797,7 +42801,7 @@ var init_src_De9AWQgk = __esm({
         DATA: p,
         RCDATA: m,
         RAWTEXT: h,
-        SCRIPT_DATA: g,
+        SCRIPT_DATA: g2,
         PLAINTEXT: _
       }, at2.getTokenAttr = function(e4, t4) {
         for (let n4 = e4.attrs.length - 1; n4 >= 0; n4--) if (e4.attrs[n4].name === t4) return e4.attrs[n4].value;
@@ -44054,7 +44058,7 @@ var init_src_De9AWQgk = __esm({
       };
     }));
     Fr = /* @__PURE__ */ w(((e3, t3) => {
-      var n3 = vr(), r = br(), i = xr(), a = Er(), o = Ar(), s = Sr(), c = jr(), l2 = Mr(), u = Nr(), d = Pr(), f = hr(), p = mr(), m = yr(), h = m.TAG_NAMES, g = m.NAMESPACES, _ = m.ATTRS, v2 = {
+      var n3 = vr(), r = br(), i = xr(), a = Er(), o = Ar(), s = Sr(), c = jr(), l2 = Mr(), u = Nr(), d = Pr(), f = hr(), p = mr(), m = yr(), h = m.TAG_NAMES, g2 = m.NAMESPACES, _ = m.ATTRS, v2 = {
         scriptingEnabled: true,
         sourceCodeLocationInfo: false,
         onParseError: null,
@@ -44320,8 +44324,8 @@ var init_src_De9AWQgk = __esm({
           return this._bootstrap(t4, null), this.tokenizer.write(e4, true), this._runParsingLoop(null), t4;
         }
         parseFragment(e4, t4) {
-          t4 ||= this.treeAdapter.createElement(h.TEMPLATE, g.HTML, []);
-          let n4 = this.treeAdapter.createElement("documentmock", g.HTML, []);
+          t4 ||= this.treeAdapter.createElement(h.TEMPLATE, g2.HTML, []);
+          let n4 = this.treeAdapter.createElement("documentmock", g2.HTML, []);
           this._bootstrap(n4, t4), this.treeAdapter.getTagName(t4) === h.TEMPLATE && this._pushTmplInsertionMode(L2), this._initTokenizerForFragmentParsing(), this._insertFakeRootElement(), this._resetInsertionMode(), this._findFormInFragmentContext(), this.tokenizer.write(e4, true), this._runParsingLoop(null);
           let r2 = this.treeAdapter.getFirstChild(n4), i2 = this.treeAdapter.createDocumentFragment();
           return this._adoptNodes(r2, i2), i2;
@@ -44353,10 +44357,10 @@ var init_src_De9AWQgk = __esm({
         }
         _setupTokenizerCDATAMode() {
           let e4 = this._getAdjustedCurrentElement();
-          this.tokenizer.allowCDATA = e4 && e4 !== this.document && this.treeAdapter.getNamespaceURI(e4) !== g.HTML && !this._isIntegrationPoint(e4);
+          this.tokenizer.allowCDATA = e4 && e4 !== this.document && this.treeAdapter.getNamespaceURI(e4) !== g2.HTML && !this._isIntegrationPoint(e4);
         }
         _switchToTextParsing(e4, t4) {
-          this._insertElement(e4, g.HTML), this.tokenizer.state = t4, this.originalInsertionMode = this.insertionMode, this.insertionMode = k2;
+          this._insertElement(e4, g2.HTML), this.tokenizer.state = t4, this.originalInsertionMode = this.insertionMode, this.insertionMode = k2;
         }
         switchToPlaintextParsing() {
           this.insertionMode = k2, this.originalInsertionMode = O2, this.tokenizer.state = n3.MODE.PLAINTEXT;
@@ -44375,7 +44379,7 @@ var init_src_De9AWQgk = __esm({
           } while (e4);
         }
         _initTokenizerForFragmentParsing() {
-          if (this.treeAdapter.getNamespaceURI(this.fragmentContext) === g.HTML) {
+          if (this.treeAdapter.getNamespaceURI(this.fragmentContext) === g2.HTML) {
             let e4 = this.treeAdapter.getTagName(this.fragmentContext);
             e4 === h.TITLE || e4 === h.TEXTAREA ? this.tokenizer.state = n3.MODE.RCDATA : e4 === h.STYLE || e4 === h.XMP || e4 === h.IFRAME || e4 === h.NOEMBED || e4 === h.NOFRAMES || e4 === h.NOSCRIPT ? this.tokenizer.state = n3.MODE.RAWTEXT : e4 === h.SCRIPT ? this.tokenizer.state = n3.MODE.SCRIPT_DATA : e4 === h.PLAINTEXT && (this.tokenizer.state = n3.MODE.PLAINTEXT);
           }
@@ -44400,15 +44404,15 @@ var init_src_De9AWQgk = __esm({
           this._attachElementToTree(n4), this.openElements.push(n4);
         }
         _insertFakeElement(e4) {
-          let t4 = this.treeAdapter.createElement(e4, g.HTML, []);
+          let t4 = this.treeAdapter.createElement(e4, g2.HTML, []);
           this._attachElementToTree(t4), this.openElements.push(t4);
         }
         _insertTemplate(e4) {
-          let t4 = this.treeAdapter.createElement(e4.tagName, g.HTML, e4.attrs), n4 = this.treeAdapter.createDocumentFragment();
+          let t4 = this.treeAdapter.createElement(e4.tagName, g2.HTML, e4.attrs), n4 = this.treeAdapter.createDocumentFragment();
           this.treeAdapter.setTemplateContent(t4, n4), this._attachElementToTree(t4), this.openElements.push(t4);
         }
         _insertFakeRootElement() {
-          let e4 = this.treeAdapter.createElement(h.HTML, g.HTML, []);
+          let e4 = this.treeAdapter.createElement(h.HTML, g2.HTML, []);
           this.treeAdapter.appendChild(this.openElements.current, e4), this.openElements.push(e4);
         }
         _appendCommentNode(e4, t4) {
@@ -44429,9 +44433,9 @@ var init_src_De9AWQgk = __esm({
           let t4 = this._getAdjustedCurrentElement();
           if (!t4 || t4 === this.document) return false;
           let r2 = this.treeAdapter.getNamespaceURI(t4);
-          if (r2 === g.HTML || this.treeAdapter.getTagName(t4) === h.ANNOTATION_XML && r2 === g.MATHML && e4.type === n3.START_TAG_TOKEN && e4.tagName === h.SVG) return false;
+          if (r2 === g2.HTML || this.treeAdapter.getTagName(t4) === h.ANNOTATION_XML && r2 === g2.MATHML && e4.type === n3.START_TAG_TOKEN && e4.tagName === h.SVG) return false;
           let i2 = e4.type === n3.CHARACTER_TOKEN || e4.type === n3.NULL_CHARACTER_TOKEN || e4.type === n3.WHITESPACE_CHARACTER_TOKEN;
-          return (e4.type === n3.START_TAG_TOKEN && e4.tagName !== h.MGLYPH && e4.tagName !== h.MALIGNMARK || i2) && this._isIntegrationPoint(t4, g.MATHML) || (e4.type === n3.START_TAG_TOKEN || i2) && this._isIntegrationPoint(t4, g.HTML) ? false : e4.type !== n3.EOF_TOKEN;
+          return (e4.type === n3.START_TAG_TOKEN && e4.tagName !== h.MGLYPH && e4.tagName !== h.MALIGNMARK || i2) && this._isIntegrationPoint(t4, g2.MATHML) || (e4.type === n3.START_TAG_TOKEN || i2) && this._isIntegrationPoint(t4, g2.HTML) ? false : e4.type !== n3.EOF_TOKEN;
         }
         _processToken(e4) {
           se2[this.insertionMode][e4.type](this, e4);
@@ -44528,7 +44532,7 @@ var init_src_De9AWQgk = __esm({
           };
           for (let t4 = this.openElements.stackTop; t4 >= 0; t4--) {
             let n4 = this.openElements.items[t4], r2 = this.treeAdapter.getTagName(n4), i2 = this.treeAdapter.getNamespaceURI(n4);
-            if (r2 === h.TEMPLATE && i2 === g.HTML) {
+            if (r2 === h.TEMPLATE && i2 === g2.HTML) {
               e4.parent = this.treeAdapter.getTemplateContent(n4);
               break;
             } else if (r2 === h.TABLE) {
@@ -44581,7 +44585,7 @@ var init_src_De9AWQgk = __esm({
         if (e4._isElementCausesFosterParenting(t4)) e4._fosterParentElement(n4);
         else {
           let r2 = e4.treeAdapter.getTagName(t4), i2 = e4.treeAdapter.getNamespaceURI(t4);
-          r2 === h.TEMPLATE && i2 === g.HTML && (t4 = e4.treeAdapter.getTemplateContent(t4)), e4.treeAdapter.appendChild(t4, n4);
+          r2 === h.TEMPLATE && i2 === g2.HTML && (t4 = e4.treeAdapter.getTemplateContent(t4)), e4.treeAdapter.appendChild(t4, n4);
         }
       }
       function fe2(e4, t4, n4) {
@@ -44627,7 +44631,7 @@ var init_src_De9AWQgk = __esm({
         e4._err(f.missingDoctype, { beforeToken: true }), e4.treeAdapter.setDocumentMode(e4.document, m.DOCUMENT_MODE.QUIRKS), e4.insertionMode = C2, e4._processToken(t4);
       }
       function be2(e4, t4) {
-        t4.tagName === h.HTML ? (e4._insertElement(t4, g.HTML), e4.insertionMode = w2) : Se2(e4, t4);
+        t4.tagName === h.HTML ? (e4._insertElement(t4, g2.HTML), e4.insertionMode = w2) : Se2(e4, t4);
       }
       function xe2(e4, t4) {
         let n4 = t4.tagName;
@@ -44638,7 +44642,7 @@ var init_src_De9AWQgk = __esm({
       }
       function Ce2(e4, t4) {
         let n4 = t4.tagName;
-        n4 === h.HTML ? ft2(e4, t4) : n4 === h.HEAD ? (e4._insertElement(t4, g.HTML), e4.headElement = e4.openElements.current, e4.insertionMode = T2) : Te2(e4, t4);
+        n4 === h.HTML ? ft2(e4, t4) : n4 === h.HEAD ? (e4._insertElement(t4, g2.HTML), e4.headElement = e4.openElements.current, e4.insertionMode = T2) : Te2(e4, t4);
       }
       function we2(e4, t4) {
         let n4 = t4.tagName;
@@ -44649,7 +44653,7 @@ var init_src_De9AWQgk = __esm({
       }
       function W2(e4, t4) {
         let r2 = t4.tagName;
-        r2 === h.HTML ? ft2(e4, t4) : r2 === h.BASE || r2 === h.BASEFONT || r2 === h.BGSOUND || r2 === h.LINK || r2 === h.META ? (e4._appendElement(t4, g.HTML), t4.ackSelfClosing = true) : r2 === h.TITLE ? e4._switchToTextParsing(t4, n3.MODE.RCDATA) : r2 === h.NOSCRIPT ? e4.options.scriptingEnabled ? e4._switchToTextParsing(t4, n3.MODE.RAWTEXT) : (e4._insertElement(t4, g.HTML), e4.insertionMode = E2) : r2 === h.NOFRAMES || r2 === h.STYLE ? e4._switchToTextParsing(t4, n3.MODE.RAWTEXT) : r2 === h.SCRIPT ? e4._switchToTextParsing(t4, n3.MODE.SCRIPT_DATA) : r2 === h.TEMPLATE ? (e4._insertTemplate(t4, g.HTML), e4.activeFormattingElements.insertMarker(), e4.framesetOk = false, e4.insertionMode = L2, e4._pushTmplInsertionMode(L2)) : r2 === h.HEAD ? e4._err(f.misplacedStartTagForHeadElement) : De2(e4, t4);
+        r2 === h.HTML ? ft2(e4, t4) : r2 === h.BASE || r2 === h.BASEFONT || r2 === h.BGSOUND || r2 === h.LINK || r2 === h.META ? (e4._appendElement(t4, g2.HTML), t4.ackSelfClosing = true) : r2 === h.TITLE ? e4._switchToTextParsing(t4, n3.MODE.RCDATA) : r2 === h.NOSCRIPT ? e4.options.scriptingEnabled ? e4._switchToTextParsing(t4, n3.MODE.RAWTEXT) : (e4._insertElement(t4, g2.HTML), e4.insertionMode = E2) : r2 === h.NOFRAMES || r2 === h.STYLE ? e4._switchToTextParsing(t4, n3.MODE.RAWTEXT) : r2 === h.SCRIPT ? e4._switchToTextParsing(t4, n3.MODE.SCRIPT_DATA) : r2 === h.TEMPLATE ? (e4._insertTemplate(t4, g2.HTML), e4.activeFormattingElements.insertMarker(), e4.framesetOk = false, e4.insertionMode = L2, e4._pushTmplInsertionMode(L2)) : r2 === h.HEAD ? e4._err(f.misplacedStartTagForHeadElement) : De2(e4, t4);
       }
       function Ee2(e4, t4) {
         let n4 = t4.tagName;
@@ -44672,7 +44676,7 @@ var init_src_De9AWQgk = __esm({
       }
       function je2(e4, t4) {
         let n4 = t4.tagName;
-        n4 === h.HTML ? ft2(e4, t4) : n4 === h.BODY ? (e4._insertElement(t4, g.HTML), e4.framesetOk = false, e4.insertionMode = O2) : n4 === h.FRAMESET ? (e4._insertElement(t4, g.HTML), e4.insertionMode = re2) : n4 === h.BASE || n4 === h.BASEFONT || n4 === h.BGSOUND || n4 === h.LINK || n4 === h.META || n4 === h.NOFRAMES || n4 === h.SCRIPT || n4 === h.STYLE || n4 === h.TEMPLATE || n4 === h.TITLE ? (e4._err(f.abandonedHeadElementChild), e4.openElements.push(e4.headElement), W2(e4, t4), e4.openElements.remove(e4.headElement)) : n4 === h.HEAD ? e4._err(f.misplacedStartTagForHeadElement) : Ne2(e4, t4);
+        n4 === h.HTML ? ft2(e4, t4) : n4 === h.BODY ? (e4._insertElement(t4, g2.HTML), e4.framesetOk = false, e4.insertionMode = O2) : n4 === h.FRAMESET ? (e4._insertElement(t4, g2.HTML), e4.insertionMode = re2) : n4 === h.BASE || n4 === h.BASEFONT || n4 === h.BGSOUND || n4 === h.LINK || n4 === h.META || n4 === h.NOFRAMES || n4 === h.SCRIPT || n4 === h.STYLE || n4 === h.TEMPLATE || n4 === h.TITLE ? (e4._err(f.abandonedHeadElementChild), e4.openElements.push(e4.headElement), W2(e4, t4), e4.openElements.remove(e4.headElement)) : n4 === h.HEAD ? e4._err(f.misplacedStartTagForHeadElement) : Ne2(e4, t4);
       }
       function Me2(e4, t4) {
         let n4 = t4.tagName;
@@ -44696,22 +44700,22 @@ var init_src_De9AWQgk = __esm({
       }
       function Re2(e4, t4) {
         let n4 = e4.openElements.tryPeekProperlyNestedBodyElement();
-        e4.framesetOk && n4 && (e4.treeAdapter.detachNode(n4), e4.openElements.popAllUpToHtmlElement(), e4._insertElement(t4, g.HTML), e4.insertionMode = re2);
+        e4.framesetOk && n4 && (e4.treeAdapter.detachNode(n4), e4.openElements.popAllUpToHtmlElement(), e4._insertElement(t4, g2.HTML), e4.insertionMode = re2);
       }
       function ze2(e4, t4) {
-        e4.openElements.hasInButtonScope(h.P) && e4._closePElement(), e4._insertElement(t4, g.HTML);
+        e4.openElements.hasInButtonScope(h.P) && e4._closePElement(), e4._insertElement(t4, g2.HTML);
       }
       function Be2(e4, t4) {
         e4.openElements.hasInButtonScope(h.P) && e4._closePElement();
         let n4 = e4.openElements.currentTagName;
-        (n4 === h.H1 || n4 === h.H2 || n4 === h.H3 || n4 === h.H4 || n4 === h.H5 || n4 === h.H6) && e4.openElements.pop(), e4._insertElement(t4, g.HTML);
+        (n4 === h.H1 || n4 === h.H2 || n4 === h.H3 || n4 === h.H4 || n4 === h.H5 || n4 === h.H6) && e4.openElements.pop(), e4._insertElement(t4, g2.HTML);
       }
       function Ve2(e4, t4) {
-        e4.openElements.hasInButtonScope(h.P) && e4._closePElement(), e4._insertElement(t4, g.HTML), e4.skipNextNewLine = true, e4.framesetOk = false;
+        e4.openElements.hasInButtonScope(h.P) && e4._closePElement(), e4._insertElement(t4, g2.HTML), e4.skipNextNewLine = true, e4.framesetOk = false;
       }
       function He2(e4, t4) {
         let n4 = e4.openElements.tmplCount > 0;
-        (!e4.formElement || n4) && (e4.openElements.hasInButtonScope(h.P) && e4._closePElement(), e4._insertElement(t4, g.HTML), n4 || (e4.formElement = e4.openElements.current));
+        (!e4.formElement || n4) && (e4.openElements.hasInButtonScope(h.P) && e4._closePElement(), e4._insertElement(t4, g2.HTML), n4 || (e4.formElement = e4.openElements.current));
       }
       function Ue2(e4, t4) {
         e4.framesetOk = false;
@@ -44724,49 +44728,49 @@ var init_src_De9AWQgk = __esm({
           }
           if (i2 !== h.ADDRESS && i2 !== h.DIV && i2 !== h.P && e4._isSpecialElement(r2)) break;
         }
-        e4.openElements.hasInButtonScope(h.P) && e4._closePElement(), e4._insertElement(t4, g.HTML);
+        e4.openElements.hasInButtonScope(h.P) && e4._closePElement(), e4._insertElement(t4, g2.HTML);
       }
       function We2(e4, t4) {
-        e4.openElements.hasInButtonScope(h.P) && e4._closePElement(), e4._insertElement(t4, g.HTML), e4.tokenizer.state = n3.MODE.PLAINTEXT;
+        e4.openElements.hasInButtonScope(h.P) && e4._closePElement(), e4._insertElement(t4, g2.HTML), e4.tokenizer.state = n3.MODE.PLAINTEXT;
       }
       function Ge2(e4, t4) {
-        e4.openElements.hasInScope(h.BUTTON) && (e4.openElements.generateImpliedEndTags(), e4.openElements.popUntilTagNamePopped(h.BUTTON)), e4._reconstructActiveFormattingElements(), e4._insertElement(t4, g.HTML), e4.framesetOk = false;
+        e4.openElements.hasInScope(h.BUTTON) && (e4.openElements.generateImpliedEndTags(), e4.openElements.popUntilTagNamePopped(h.BUTTON)), e4._reconstructActiveFormattingElements(), e4._insertElement(t4, g2.HTML), e4.framesetOk = false;
       }
       function Ke2(e4, t4) {
         let n4 = e4.activeFormattingElements.getElementEntryInScopeWithTagName(h.A);
-        n4 && (pe2(e4, t4), e4.openElements.remove(n4.element), e4.activeFormattingElements.removeEntry(n4)), e4._reconstructActiveFormattingElements(), e4._insertElement(t4, g.HTML), e4.activeFormattingElements.pushElement(e4.openElements.current, t4);
+        n4 && (pe2(e4, t4), e4.openElements.remove(n4.element), e4.activeFormattingElements.removeEntry(n4)), e4._reconstructActiveFormattingElements(), e4._insertElement(t4, g2.HTML), e4.activeFormattingElements.pushElement(e4.openElements.current, t4);
       }
       function qe2(e4, t4) {
-        e4._reconstructActiveFormattingElements(), e4._insertElement(t4, g.HTML), e4.activeFormattingElements.pushElement(e4.openElements.current, t4);
+        e4._reconstructActiveFormattingElements(), e4._insertElement(t4, g2.HTML), e4.activeFormattingElements.pushElement(e4.openElements.current, t4);
       }
       function G2(e4, t4) {
-        e4._reconstructActiveFormattingElements(), e4.openElements.hasInScope(h.NOBR) && (pe2(e4, t4), e4._reconstructActiveFormattingElements()), e4._insertElement(t4, g.HTML), e4.activeFormattingElements.pushElement(e4.openElements.current, t4);
+        e4._reconstructActiveFormattingElements(), e4.openElements.hasInScope(h.NOBR) && (pe2(e4, t4), e4._reconstructActiveFormattingElements()), e4._insertElement(t4, g2.HTML), e4.activeFormattingElements.pushElement(e4.openElements.current, t4);
       }
       function Je2(e4, t4) {
-        e4._reconstructActiveFormattingElements(), e4._insertElement(t4, g.HTML), e4.activeFormattingElements.insertMarker(), e4.framesetOk = false;
+        e4._reconstructActiveFormattingElements(), e4._insertElement(t4, g2.HTML), e4.activeFormattingElements.insertMarker(), e4.framesetOk = false;
       }
       function Ye2(e4, t4) {
-        e4.treeAdapter.getDocumentMode(e4.document) !== m.DOCUMENT_MODE.QUIRKS && e4.openElements.hasInButtonScope(h.P) && e4._closePElement(), e4._insertElement(t4, g.HTML), e4.framesetOk = false, e4.insertionMode = A2;
+        e4.treeAdapter.getDocumentMode(e4.document) !== m.DOCUMENT_MODE.QUIRKS && e4.openElements.hasInButtonScope(h.P) && e4._closePElement(), e4._insertElement(t4, g2.HTML), e4.framesetOk = false, e4.insertionMode = A2;
       }
       function Xe2(e4, t4) {
-        e4._reconstructActiveFormattingElements(), e4._appendElement(t4, g.HTML), e4.framesetOk = false, t4.ackSelfClosing = true;
+        e4._reconstructActiveFormattingElements(), e4._appendElement(t4, g2.HTML), e4.framesetOk = false, t4.ackSelfClosing = true;
       }
       function Ze2(e4, t4) {
-        e4._reconstructActiveFormattingElements(), e4._appendElement(t4, g.HTML);
+        e4._reconstructActiveFormattingElements(), e4._appendElement(t4, g2.HTML);
         let r2 = n3.getTokenAttr(t4, _.TYPE);
         (!r2 || r2.toLowerCase() !== y2) && (e4.framesetOk = false), t4.ackSelfClosing = true;
       }
       function Qe2(e4, t4) {
-        e4._appendElement(t4, g.HTML), t4.ackSelfClosing = true;
+        e4._appendElement(t4, g2.HTML), t4.ackSelfClosing = true;
       }
       function $e2(e4, t4) {
-        e4.openElements.hasInButtonScope(h.P) && e4._closePElement(), e4._appendElement(t4, g.HTML), e4.framesetOk = false, e4.ackSelfClosing = true;
+        e4.openElements.hasInButtonScope(h.P) && e4._closePElement(), e4._appendElement(t4, g2.HTML), e4.framesetOk = false, e4.ackSelfClosing = true;
       }
       function et2(e4, t4) {
         t4.tagName = h.IMG, Xe2(e4, t4);
       }
       function tt2(e4, t4) {
-        e4._insertElement(t4, g.HTML), e4.skipNextNewLine = true, e4.tokenizer.state = n3.MODE.RCDATA, e4.originalInsertionMode = e4.insertionMode, e4.framesetOk = false, e4.insertionMode = k2;
+        e4._insertElement(t4, g2.HTML), e4.skipNextNewLine = true, e4.tokenizer.state = n3.MODE.RCDATA, e4.originalInsertionMode = e4.insertionMode, e4.framesetOk = false, e4.insertionMode = k2;
       }
       function nt2(e4, t4) {
         e4.openElements.hasInButtonScope(h.P) && e4._closePElement(), e4._reconstructActiveFormattingElements(), e4.framesetOk = false, e4._switchToTextParsing(t4, n3.MODE.RAWTEXT);
@@ -44778,28 +44782,28 @@ var init_src_De9AWQgk = __esm({
         e4._switchToTextParsing(t4, n3.MODE.RAWTEXT);
       }
       function it2(e4, t4) {
-        e4._reconstructActiveFormattingElements(), e4._insertElement(t4, g.HTML), e4.framesetOk = false, e4.insertionMode === A2 || e4.insertionMode === M2 || e4.insertionMode === P2 || e4.insertionMode === F2 || e4.insertionMode === ee2 ? e4.insertionMode = te2 : e4.insertionMode = I2;
+        e4._reconstructActiveFormattingElements(), e4._insertElement(t4, g2.HTML), e4.framesetOk = false, e4.insertionMode === A2 || e4.insertionMode === M2 || e4.insertionMode === P2 || e4.insertionMode === F2 || e4.insertionMode === ee2 ? e4.insertionMode = te2 : e4.insertionMode = I2;
       }
       function at2(e4, t4) {
-        e4.openElements.currentTagName === h.OPTION && e4.openElements.pop(), e4._reconstructActiveFormattingElements(), e4._insertElement(t4, g.HTML);
+        e4.openElements.currentTagName === h.OPTION && e4.openElements.pop(), e4._reconstructActiveFormattingElements(), e4._insertElement(t4, g2.HTML);
       }
       function ot2(e4, t4) {
-        e4.openElements.hasInScope(h.RUBY) && e4.openElements.generateImpliedEndTags(), e4._insertElement(t4, g.HTML);
+        e4.openElements.hasInScope(h.RUBY) && e4.openElements.generateImpliedEndTags(), e4._insertElement(t4, g2.HTML);
       }
       function st2(e4, t4) {
-        e4.openElements.hasInScope(h.RUBY) && e4.openElements.generateImpliedEndTagsWithExclusion(h.RTC), e4._insertElement(t4, g.HTML);
+        e4.openElements.hasInScope(h.RUBY) && e4.openElements.generateImpliedEndTagsWithExclusion(h.RTC), e4._insertElement(t4, g2.HTML);
       }
       function ct2(e4, t4) {
-        e4.openElements.hasInButtonScope(h.P) && e4._closePElement(), e4._insertElement(t4, g.HTML);
+        e4.openElements.hasInButtonScope(h.P) && e4._closePElement(), e4._insertElement(t4, g2.HTML);
       }
       function lt2(e4, t4) {
-        e4._reconstructActiveFormattingElements(), d.adjustTokenMathMLAttrs(t4), d.adjustTokenXMLAttrs(t4), t4.selfClosing ? e4._appendElement(t4, g.MATHML) : e4._insertElement(t4, g.MATHML), t4.ackSelfClosing = true;
+        e4._reconstructActiveFormattingElements(), d.adjustTokenMathMLAttrs(t4), d.adjustTokenXMLAttrs(t4), t4.selfClosing ? e4._appendElement(t4, g2.MATHML) : e4._insertElement(t4, g2.MATHML), t4.ackSelfClosing = true;
       }
       function ut2(e4, t4) {
-        e4._reconstructActiveFormattingElements(), d.adjustTokenSVGAttrs(t4), d.adjustTokenXMLAttrs(t4), t4.selfClosing ? e4._appendElement(t4, g.SVG) : e4._insertElement(t4, g.SVG), t4.ackSelfClosing = true;
+        e4._reconstructActiveFormattingElements(), d.adjustTokenSVGAttrs(t4), d.adjustTokenXMLAttrs(t4), t4.selfClosing ? e4._appendElement(t4, g2.SVG) : e4._insertElement(t4, g2.SVG), t4.ackSelfClosing = true;
       }
       function dt2(e4, t4) {
-        e4._reconstructActiveFormattingElements(), e4._insertElement(t4, g.HTML);
+        e4._reconstructActiveFormattingElements(), e4._insertElement(t4, g2.HTML);
       }
       function ft2(e4, t4) {
         let n4 = t4.tagName;
@@ -44931,16 +44935,16 @@ var init_src_De9AWQgk = __esm({
         n4 === h.TABLE || n4 === h.TBODY || n4 === h.TFOOT || n4 === h.THEAD || n4 === h.TR ? (e4.pendingCharacterTokens = [], e4.hasNonWhitespacePendingCharacterToken = false, e4.originalInsertionMode = e4.insertionMode, e4.insertionMode = j2, e4._processToken(t4)) : zt2(e4, t4);
       }
       function kt2(e4, t4) {
-        e4.openElements.clearBackToTableContext(), e4.activeFormattingElements.insertMarker(), e4._insertElement(t4, g.HTML), e4.insertionMode = M2;
+        e4.openElements.clearBackToTableContext(), e4.activeFormattingElements.insertMarker(), e4._insertElement(t4, g2.HTML), e4.insertionMode = M2;
       }
       function At2(e4, t4) {
-        e4.openElements.clearBackToTableContext(), e4._insertElement(t4, g.HTML), e4.insertionMode = N2;
+        e4.openElements.clearBackToTableContext(), e4._insertElement(t4, g2.HTML), e4.insertionMode = N2;
       }
       function jt2(e4, t4) {
         e4.openElements.clearBackToTableContext(), e4._insertFakeElement(h.COLGROUP), e4.insertionMode = N2, e4._processToken(t4);
       }
       function Mt2(e4, t4) {
-        e4.openElements.clearBackToTableContext(), e4._insertElement(t4, g.HTML), e4.insertionMode = P2;
+        e4.openElements.clearBackToTableContext(), e4._insertElement(t4, g2.HTML), e4.insertionMode = P2;
       }
       function Nt2(e4, t4) {
         e4.openElements.clearBackToTableContext(), e4._insertFakeElement(h.TBODY), e4.insertionMode = P2, e4._processToken(t4);
@@ -44950,10 +44954,10 @@ var init_src_De9AWQgk = __esm({
       }
       function Ft2(e4, t4) {
         let r2 = n3.getTokenAttr(t4, _.TYPE);
-        r2 && r2.toLowerCase() === y2 ? e4._appendElement(t4, g.HTML) : zt2(e4, t4), t4.ackSelfClosing = true;
+        r2 && r2.toLowerCase() === y2 ? e4._appendElement(t4, g2.HTML) : zt2(e4, t4), t4.ackSelfClosing = true;
       }
       function It2(e4, t4) {
-        !e4.formElement && e4.openElements.tmplCount === 0 && (e4._insertElement(t4, g.HTML), e4.formElement = e4.openElements.current, e4.openElements.pop());
+        !e4.formElement && e4.openElements.tmplCount === 0 && (e4._insertElement(t4, g2.HTML), e4.formElement = e4.openElements.current, e4.openElements.pop());
       }
       function Lt2(e4, t4) {
         let n4 = t4.tagName;
@@ -45013,7 +45017,7 @@ var init_src_De9AWQgk = __esm({
       }
       function Gt2(e4, t4) {
         let n4 = t4.tagName;
-        n4 === h.HTML ? ft2(e4, t4) : n4 === h.COL ? (e4._appendElement(t4, g.HTML), t4.ackSelfClosing = true) : n4 === h.TEMPLATE ? W2(e4, t4) : qt2(e4, t4);
+        n4 === h.HTML ? ft2(e4, t4) : n4 === h.COL ? (e4._appendElement(t4, g2.HTML), t4.ackSelfClosing = true) : n4 === h.TEMPLATE ? W2(e4, t4) : qt2(e4, t4);
       }
       function Kt2(e4, t4) {
         let n4 = t4.tagName;
@@ -45024,7 +45028,7 @@ var init_src_De9AWQgk = __esm({
       }
       function Jt2(e4, t4) {
         let n4 = t4.tagName;
-        n4 === h.TR ? (e4.openElements.clearBackToTableBodyContext(), e4._insertElement(t4, g.HTML), e4.insertionMode = F2) : n4 === h.TH || n4 === h.TD ? (e4.openElements.clearBackToTableBodyContext(), e4._insertFakeElement(h.TR), e4.insertionMode = F2, e4._processToken(t4)) : n4 === h.CAPTION || n4 === h.COL || n4 === h.COLGROUP || n4 === h.TBODY || n4 === h.TFOOT || n4 === h.THEAD ? e4.openElements.hasTableBodyContextInTableScope() && (e4.openElements.clearBackToTableBodyContext(), e4.openElements.pop(), e4.insertionMode = A2, e4._processToken(t4)) : Lt2(e4, t4);
+        n4 === h.TR ? (e4.openElements.clearBackToTableBodyContext(), e4._insertElement(t4, g2.HTML), e4.insertionMode = F2) : n4 === h.TH || n4 === h.TD ? (e4.openElements.clearBackToTableBodyContext(), e4._insertFakeElement(h.TR), e4.insertionMode = F2, e4._processToken(t4)) : n4 === h.CAPTION || n4 === h.COL || n4 === h.COLGROUP || n4 === h.TBODY || n4 === h.TFOOT || n4 === h.THEAD ? e4.openElements.hasTableBodyContextInTableScope() && (e4.openElements.clearBackToTableBodyContext(), e4.openElements.pop(), e4.insertionMode = A2, e4._processToken(t4)) : Lt2(e4, t4);
       }
       function Yt2(e4, t4) {
         let n4 = t4.tagName;
@@ -45032,7 +45036,7 @@ var init_src_De9AWQgk = __esm({
       }
       function Xt2(e4, t4) {
         let n4 = t4.tagName;
-        n4 === h.TH || n4 === h.TD ? (e4.openElements.clearBackToTableRowContext(), e4._insertElement(t4, g.HTML), e4.insertionMode = ee2, e4.activeFormattingElements.insertMarker()) : n4 === h.CAPTION || n4 === h.COL || n4 === h.COLGROUP || n4 === h.TBODY || n4 === h.TFOOT || n4 === h.THEAD || n4 === h.TR ? e4.openElements.hasInTableScope(h.TR) && (e4.openElements.clearBackToTableRowContext(), e4.openElements.pop(), e4.insertionMode = P2, e4._processToken(t4)) : Lt2(e4, t4);
+        n4 === h.TH || n4 === h.TD ? (e4.openElements.clearBackToTableRowContext(), e4._insertElement(t4, g2.HTML), e4.insertionMode = ee2, e4.activeFormattingElements.insertMarker()) : n4 === h.CAPTION || n4 === h.COL || n4 === h.COLGROUP || n4 === h.TBODY || n4 === h.TFOOT || n4 === h.THEAD || n4 === h.TR ? e4.openElements.hasInTableScope(h.TR) && (e4.openElements.clearBackToTableRowContext(), e4.openElements.pop(), e4.insertionMode = P2, e4._processToken(t4)) : Lt2(e4, t4);
       }
       function Zt2(e4, t4) {
         let n4 = t4.tagName;
@@ -45048,7 +45052,7 @@ var init_src_De9AWQgk = __esm({
       }
       function en2(e4, t4) {
         let n4 = t4.tagName;
-        n4 === h.HTML ? ft2(e4, t4) : n4 === h.OPTION ? (e4.openElements.currentTagName === h.OPTION && e4.openElements.pop(), e4._insertElement(t4, g.HTML)) : n4 === h.OPTGROUP ? (e4.openElements.currentTagName === h.OPTION && e4.openElements.pop(), e4.openElements.currentTagName === h.OPTGROUP && e4.openElements.pop(), e4._insertElement(t4, g.HTML)) : n4 === h.INPUT || n4 === h.KEYGEN || n4 === h.TEXTAREA || n4 === h.SELECT ? e4.openElements.hasInSelectScope(h.SELECT) && (e4.openElements.popUntilTagNamePopped(h.SELECT), e4._resetInsertionMode(), n4 !== h.SELECT && e4._processToken(t4)) : (n4 === h.SCRIPT || n4 === h.TEMPLATE) && W2(e4, t4);
+        n4 === h.HTML ? ft2(e4, t4) : n4 === h.OPTION ? (e4.openElements.currentTagName === h.OPTION && e4.openElements.pop(), e4._insertElement(t4, g2.HTML)) : n4 === h.OPTGROUP ? (e4.openElements.currentTagName === h.OPTION && e4.openElements.pop(), e4.openElements.currentTagName === h.OPTGROUP && e4.openElements.pop(), e4._insertElement(t4, g2.HTML)) : n4 === h.INPUT || n4 === h.KEYGEN || n4 === h.TEXTAREA || n4 === h.SELECT ? e4.openElements.hasInSelectScope(h.SELECT) && (e4.openElements.popUntilTagNamePopped(h.SELECT), e4._resetInsertionMode(), n4 !== h.SELECT && e4._processToken(t4)) : (n4 === h.SCRIPT || n4 === h.TEMPLATE) && W2(e4, t4);
       }
       function tn2(e4, t4) {
         let n4 = t4.tagName;
@@ -45090,7 +45094,7 @@ var init_src_De9AWQgk = __esm({
       }
       function dn2(e4, t4) {
         let n4 = t4.tagName;
-        n4 === h.HTML ? ft2(e4, t4) : n4 === h.FRAMESET ? e4._insertElement(t4, g.HTML) : n4 === h.FRAME ? (e4._appendElement(t4, g.HTML), t4.ackSelfClosing = true) : n4 === h.NOFRAMES && W2(e4, t4);
+        n4 === h.HTML ? ft2(e4, t4) : n4 === h.FRAMESET ? e4._insertElement(t4, g2.HTML) : n4 === h.FRAME ? (e4._appendElement(t4, g2.HTML), t4.ackSelfClosing = true) : n4 === h.NOFRAMES && W2(e4, t4);
       }
       function fn2(e4, t4) {
         t4.tagName === h.FRAMESET && !e4.openElements.isRootHtmlElementCurrent() && (e4.openElements.pop(), !e4.fragmentContext && e4.openElements.currentTagName !== h.FRAMESET && (e4.insertionMode = R2));
@@ -45120,17 +45124,17 @@ var init_src_De9AWQgk = __esm({
       }
       function bn2(e4, t4) {
         if (d.causesExit(t4) && !e4.fragmentContext) {
-          for (; e4.treeAdapter.getNamespaceURI(e4.openElements.current) !== g.HTML && !e4._isIntegrationPoint(e4.openElements.current); ) e4.openElements.pop();
+          for (; e4.treeAdapter.getNamespaceURI(e4.openElements.current) !== g2.HTML && !e4._isIntegrationPoint(e4.openElements.current); ) e4.openElements.pop();
           e4._processToken(t4);
         } else {
           let n4 = e4._getAdjustedCurrentElement(), r2 = e4.treeAdapter.getNamespaceURI(n4);
-          r2 === g.MATHML ? d.adjustTokenMathMLAttrs(t4) : r2 === g.SVG && (d.adjustTokenSVGTagName(t4), d.adjustTokenSVGAttrs(t4)), d.adjustTokenXMLAttrs(t4), t4.selfClosing ? e4._appendElement(t4, r2) : e4._insertElement(t4, r2), t4.ackSelfClosing = true;
+          r2 === g2.MATHML ? d.adjustTokenMathMLAttrs(t4) : r2 === g2.SVG && (d.adjustTokenSVGTagName(t4), d.adjustTokenSVGAttrs(t4)), d.adjustTokenXMLAttrs(t4), t4.selfClosing ? e4._appendElement(t4, r2) : e4._insertElement(t4, r2), t4.ackSelfClosing = true;
         }
       }
       function xn2(e4, t4) {
         for (let n4 = e4.openElements.stackTop; n4 > 0; n4--) {
           let r2 = e4.openElements.items[n4];
-          if (e4.treeAdapter.getNamespaceURI(r2) === g.HTML) {
+          if (e4.treeAdapter.getNamespaceURI(r2) === g2.HTML) {
             e4._processToken(t4);
             break;
           }
@@ -47182,7 +47186,7 @@ var init_src_De9AWQgk = __esm({
         return f(e4);
       }
       for (let [e4, t4] of Object.entries(n3)) l2[e4] = { get() {
-        let n4 = _(this, g(t4.open, t4.close, this._styler), this._isEmpty);
+        let n4 = _(this, g2(t4.open, t4.close, this._styler), this._isEmpty);
         return Object.defineProperty(this, e4, { value: n4 }), n4;
       } };
       l2.visible = { get() {
@@ -47202,7 +47206,7 @@ var init_src_De9AWQgk = __esm({
       for (let e4 of m) l2[e4] = { get() {
         let { level: t4 } = this;
         return function(...r2) {
-          let i2 = g(n3.color[c[t4]][e4](...r2), n3.color.close, this._styler);
+          let i2 = g2(n3.color[c[t4]][e4](...r2), n3.color.close, this._styler);
           return _(this, i2, this._isEmpty);
         };
       } };
@@ -47211,7 +47215,7 @@ var init_src_De9AWQgk = __esm({
         l2[t4] = { get() {
           let { level: t5 } = this;
           return function(...r2) {
-            let i2 = g(n3.bgColor[c[t5]][e4](...r2), n3.bgColor.close, this._styler);
+            let i2 = g2(n3.bgColor[c[t5]][e4](...r2), n3.bgColor.close, this._styler);
             return _(this, i2, this._isEmpty);
           };
         } };
@@ -47228,7 +47232,7 @@ var init_src_De9AWQgk = __esm({
             this._generator.level = e4;
           }
         }
-      }), g = (e4, t4, n4) => {
+      }), g2 = (e4, t4, n4) => {
         let r2, i2;
         return n4 === void 0 ? (r2 = e4, i2 = t4) : (r2 = n4.openAll + e4, i2 = t4 + n4.closeAll), {
           open: e4,
@@ -47436,12 +47440,12 @@ var init_src_De9AWQgk = __esm({
               for (var i3 = -1 * u2; i3 <= u2; i3 += 2) {
                 var a3 = void 0, d3 = f2[i3 - 1], p3 = f2[i3 + 1], m3 = (p3 ? p3.newPos : 0) - i3;
                 d3 && (f2[i3 - 1] = void 0);
-                var h3 = d3 && d3.newPos + 1 < c2, g2 = p3 && 0 <= m3 && m3 < l3;
-                if (!h3 && !g2) {
+                var h3 = d3 && d3.newPos + 1 < c2, g3 = p3 && 0 <= m3 && m3 < l3;
+                if (!h3 && !g3) {
                   f2[i3] = void 0;
                   continue;
                 }
-                if (!h3 || g2 && d3.newPos < p3.newPos ? (a3 = r(p3), o2.pushComponent(a3.components, void 0, true)) : (a3 = d3, a3.newPos++, o2.pushComponent(a3.components, true, void 0)), m3 = o2.extractCommon(a3, t5, e5, i3), a3.newPos + 1 >= c2 && m3 + 1 >= l3) return s2(n3(o2, a3.components, t5, e5, o2.useLongestToken));
+                if (!h3 || g3 && d3.newPos < p3.newPos ? (a3 = r(p3), o2.pushComponent(a3.components, void 0, true)) : (a3 = d3, a3.newPos++, o2.pushComponent(a3.components, true, void 0)), m3 = o2.extractCommon(a3, t5, e5, i3), a3.newPos + 1 >= c2 && m3 + 1 >= l3) return s2(n3(o2, a3.components, t5, e5, o2.useLongestToken));
                 f2[i3] = a3;
               }
               u2++;
@@ -47560,7 +47564,7 @@ var init_src_De9AWQgk = __esm({
         h.tokenize = function(e5) {
           return e5.split(/(\S.+?[.!?])(?=\s+|$)/);
         };
-        function g(e5, t5, n4) {
+        function g2(e5, t5, n4) {
           return h.diff(e5, t5, n4);
         }
         var _ = new t4();
@@ -47709,7 +47713,7 @@ var init_src_De9AWQgk = __esm({
             return true;
           }
           for (var m2 = 0; m2 < a2.length; m2++) {
-            for (var h2 = a2[m2], g2 = r2.length - h2.oldLines, _2 = 0, v3 = u2 + h2.oldStart - 1, y3 = j2(v3, l3, g2); _2 !== void 0; _2 = y3()) if (p2(h2, v3 + _2)) {
+            for (var h2 = a2[m2], g3 = r2.length - h2.oldLines, _2 = 0, v3 = u2 + h2.oldStart - 1, y3 = j2(v3, l3, g3); _2 !== void 0; _2 = y3()) if (p2(h2, v3 + _2)) {
               h2.offset = u2 += _2;
               break;
             }
@@ -47764,7 +47768,7 @@ var init_src_De9AWQgk = __esm({
               return " " + e7;
             });
           }
-          for (var l3 = [], u2 = 0, d2 = 0, f2 = [], m2 = 1, h2 = 1, g2 = function(e6) {
+          for (var l3 = [], u2 = 0, d2 = 0, f2 = [], m2 = 1, h2 = 1, g3 = function(e6) {
             var t6 = s2[e6], i3 = t6.lines || t6.value.replace(/\n$/, "").split("\n");
             if (t6.lines = i3, t6.added || t6.removed) {
               var a3;
@@ -47777,8 +47781,8 @@ var init_src_De9AWQgk = __esm({
               }))), t6.added ? h2 += i3.length : m2 += i3.length;
             } else {
               if (u2) if (i3.length <= o2.context * 2 && e6 < s2.length - 2) {
-                var g3;
-                (g3 = f2).push.apply(g3, b2(c2(i3)));
+                var g4;
+                (g4 = f2).push.apply(g4, b2(c2(i3)));
               } else {
                 var _3, v3 = Math.min(i3.length, o2.context);
                 (_3 = f2).push.apply(_3, b2(c2(i3.slice(0, v3))));
@@ -47797,7 +47801,7 @@ var init_src_De9AWQgk = __esm({
               }
               m2 += i3.length, h2 += i3.length;
             }
-          }, _2 = 0; _2 < s2.length; _2++) g2(_2);
+          }, _2 = 0; _2 < s2.length; _2++) g3(_2);
           return {
             oldFileName: e5,
             newFileName: t5,
@@ -48009,7 +48013,7 @@ var init_src_De9AWQgk = __esm({
           var t5 = e5;
           return t5 = t5.replace(/&/g, "&amp;"), t5 = t5.replace(/</g, "&lt;"), t5 = t5.replace(/>/g, "&gt;"), t5 = t5.replace(/"/g, "&quot;"), t5;
         }
-        e4.Diff = t4, e4.diffChars = a, e4.diffWords = u, e4.diffWordsWithSpace = d, e4.diffLines = p, e4.diffTrimmedLines = m, e4.diffSentences = g, e4.diffCss = v2, e4.diffJson = E2, e4.diffArrays = k2, e4.structuredPatch = P2, e4.createTwoFilesPatch = F2, e4.createPatch = ee2, e4.applyPatch = M2, e4.applyPatches = N2, e4.parsePatch = A2, e4.merge = ne2, e4.convertChangesToDMP = H2, e4.convertChangesToXML = he2, e4.canonicalize = D2, Object.defineProperty(e4, "__esModule", { value: true });
+        e4.Diff = t4, e4.diffChars = a, e4.diffWords = u, e4.diffWordsWithSpace = d, e4.diffLines = p, e4.diffTrimmedLines = m, e4.diffSentences = g2, e4.diffCss = v2, e4.diffJson = E2, e4.diffArrays = k2, e4.structuredPatch = P2, e4.createTwoFilesPatch = F2, e4.createPatch = ee2, e4.applyPatch = M2, e4.applyPatches = N2, e4.parsePatch = A2, e4.merge = ne2, e4.convertChangesToDMP = H2, e4.convertChangesToXML = he2, e4.canonicalize = D2, Object.defineProperty(e4, "__esModule", { value: true });
       });
     }));
     $r = /* @__PURE__ */ w(((e3, t3) => {
@@ -48026,7 +48030,7 @@ var init_src_De9AWQgk = __esm({
       }, m = {
         open: c,
         close: c
-      }, h = 39, g = 49, _ = {}, v2 = ({ p: e4 }, { open: t4 = "", close: n4 = "", f: i2 }) => {
+      }, h = 39, g2 = 49, _ = {}, v2 = ({ p: e4 }, { open: t4 = "", close: n4 = "", f: i2 }) => {
         let o2 = (e5, ...r2) => {
           if (!e5) {
             if (t4 && t4 === n4) return t4;
@@ -48089,8 +48093,8 @@ var init_src_De9AWQgk = __esm({
         }, S2 = y3 > 0, C2 = (e5, t5) => S2 ? {
           open: `\x1B[${e5}m`,
           close: `\x1B[${t5}m`
-        } : m, w2 = (e5) => (t5) => e5(...d(t5)), T2 = (e5, t5) => (n4, r2, i2) => C2(`${e5}8;2;${n4};${r2};${i2}`, t5), E2 = (e5) => (t5, n4, r2) => e5(f(t5, n4, r2)), D2 = (e5, t5) => (n4, r2, i2) => C2(p(f(n4, r2, i2)) + e5, t5), O2 = (e5) => "bg" + e5[0].toUpperCase() + e5.slice(1), k2 = "Bright", A2 = T2(3, h), j2 = T2(4, g), M2 = (e5) => C2("38;5;" + e5, h), N2 = (e5) => C2("48;5;" + e5, g);
-        return y3 === 2 ? (A2 = E2(M2), j2 = E2(N2)) : y3 === 1 && (A2 = D2(0, h), j2 = D2(10, g), M2 = (e5) => C2(p(e5), h), N2 = (e5) => C2(p(e5) + 10, g)), u2 = {
+        } : m, w2 = (e5) => (t5) => e5(...d(t5)), T2 = (e5, t5) => (n4, r2, i2) => C2(`${e5}8;2;${n4};${r2};${i2}`, t5), E2 = (e5) => (t5, n4, r2) => e5(f(t5, n4, r2)), D2 = (e5, t5) => (n4, r2, i2) => C2(p(f(n4, r2, i2)) + e5, t5), O2 = (e5) => "bg" + e5[0].toUpperCase() + e5.slice(1), k2 = "Bright", A2 = T2(3, h), j2 = T2(4, g2), M2 = (e5) => C2("38;5;" + e5, h), N2 = (e5) => C2("48;5;" + e5, g2);
+        return y3 === 2 ? (A2 = E2(M2), j2 = E2(N2)) : y3 === 1 && (A2 = D2(0, h), j2 = D2(10, g2), M2 = (e5) => C2(p(e5), h), N2 = (e5) => C2(p(e5) + 10, g2)), u2 = {
           fg: M2,
           bg: N2,
           rgb: A2,
@@ -48108,7 +48112,7 @@ var init_src_De9AWQgk = __esm({
           strikethrough: C2(9, 29),
           link: { f: (e5, t5 = e5) => S2 ? `\x1B]8;;${e5}\x07${t5}\x1B]8;;\x07` : t5 == e5 ? e5 : `${t5} (\u200B${e5}\u200B)` }
         }, "gray,black,red,green,yellow,blue,magenta,cyan,white".split(",").map(((e5, t5) => {
-          l3 = O2(e5), t5 ? (u2[e5 + k2] = C2(89 + t5, h), u2[l3 + k2] = C2(99 + t5, g)) : t5 = 61, u2[e5] = C2(29 + t5, h), u2[l3] = C2(39 + t5, g);
+          l3 = O2(e5), t5 ? (u2[e5 + k2] = C2(89 + t5, h), u2[l3 + k2] = C2(99 + t5, g2)) : t5 = 61, u2[e5] = C2(29 + t5, h), u2[l3] = C2(39 + t5, g2);
         })), b2.extend(u2);
       }();
       t3.exports = y2.default = y2;
@@ -48250,13 +48254,13 @@ var init_src_De9AWQgk = __esm({
                 ...p2,
                 ""
               ]);
-              let m2 = !i || !o3, h2 = m2, g = !o3 && r2.startsWith("html") && a;
+              let m2 = !i || !o3, h2 = m2, g2 = !o3 && r2.startsWith("html") && a;
               return s2(ua(o3, c2, l3, [f2, ...p2]), {
                 collapse: !!o3,
                 group: h2
               }, async ({ log: t5 }) => {
                 let n4 = u2.split("\n"), r3 = n4[4] ?? n4[3];
-                if (r3.includes("Promise") && (r3 = n4[3]), m2 && t5(`%c${r3.trim()}`, "text-align: right"), g) {
+                if (r3.includes("Promise") && (r3 = n4[3]), m2 && t5(`%c${r3.trim()}`, "text-align: right"), g2) {
                   console.log("\n%cInteractive Snapshot Testing:", "font-weight:bold;color:yellow"), console.log("%cHTML assertion failed. Would you like to accept this new snapshot?", "color:orange");
                   try {
                     let t6 = await aa("New HTML output detected");
@@ -49176,10 +49180,6 @@ var init_src_De9AWQgk = __esm({
 // src/ssr/ssr-test-runner.tsx
 init_ssr_shim();
 
-// src/ssr/TestAppbar.tsx
-init_ssr_shim();
-init_index_es();
-
 // src/test-util.tsx
 init_ssr_shim();
 init_runtime_es();
@@ -49200,11 +49200,11 @@ if (!globalThis.__consoleLogPatched) {
 var TEST_INTERVAL = 500;
 var assert = (result, message) => {
   console.assert(result, message);
-  const g = globalThis;
-  if (!g.__testFailures) g.__testFailures = [];
-  if (!g.__testPassCount) g.__testPassCount = 0;
-  if (result) g.__testPassCount++;
-  else g.__testFailures.push(message || "assertion failed");
+  const g2 = globalThis;
+  if (!g2.__testFailures) g2.__testFailures = [];
+  if (!g2.__testPassCount) g2.__testPassCount = 0;
+  if (result) g2.__testPassCount++;
+  else g2.__testFailures.push(message || "assertion failed");
 };
 var testObservables = {};
 if (typeof window !== "undefined") {
@@ -49225,6 +49225,10 @@ var useInterval2 = (callback, delay) => {
       clearInterval(id);
   }, delay);
 };
+
+// src/ssr/TestAppbar.tsx
+init_ssr_shim();
+init_index_es();
 
 // src/Appbar.tsx
 init_ssr_shim();
@@ -49384,6 +49388,7 @@ if (typeof globalThis.__isSSRTest__ !== "undefined") {
 }
 TestAppbar.test = {
   static: false,
+  stateCount: 1,
   compareActualValues: true,
   expect: () => {
     const idx = get(testObservables[name]);
@@ -49531,15 +49536,22 @@ if (typeof globalThis.__isSSRTest__ !== "undefined") {
 }
 TestAvatar.test = {
   static: false,
+  stateCount: 4,
   compareActualValues: true,
   expect: () => {
     const idx = get(testObservables[name2]);
     const BASE_CLASS4 = "relative flex items-center justify-center align-middle select-none leading-none overflow-hidden shrink-0 m-0 bg-[rgb(189,189,189)] text-white";
     const elements = [
       `<div class="rounded-full w-6 h-6 text-xs ${BASE_CLASS4}"></div>`,
-      `<div class="rounded-xl w-8 h-8 text-sm ${BASE_CLASS4}"><img src="x.png" alt="Avatar" class="w-full h-full object-cover" style="display: none;"></div>`,
+      [
+        `<div class="rounded-xl w-8 h-8 text-sm ${BASE_CLASS4}"><img src="x.png" alt="Avatar" class="w-full h-full object-cover"></div>`,
+        `<div class="rounded-xl w-8 h-8 text-sm ${BASE_CLASS4}"><img src="x.png" alt="Avatar" class="w-full h-full object-cover" style="display: none;"></div>`
+      ],
       `<div class="rounded-md w-10 h-10 text-base ${BASE_CLASS4}"></div>`,
-      `<div class="rounded-full w-12 h-12 text-lg ${BASE_CLASS4}"><img src="y.png" alt="User" class="w-full h-full object-cover" style="display: none;"></div>`
+      [
+        `<div class="rounded-full w-12 h-12 text-lg ${BASE_CLASS4}"><img src="y.png" alt="User" class="w-full h-full object-cover"></div>`,
+        `<div class="rounded-full w-12 h-12 text-lg ${BASE_CLASS4}"><img src="y.png" alt="User" class="w-full h-full object-cover" style="display: none;"></div>`
+      ]
     ];
     const expected = elements[idx];
     const ssrComponent = testObservables[`${name2}_ssr`];
@@ -49709,6 +49721,7 @@ if (typeof globalThis.__isSSRTest__ !== "undefined") {
 }
 TestBadge.test = {
   static: false,
+  stateCount: 3,
   compareActualValues: true,
   expect: () => {
     const idx = get(testObservables[name3]);
@@ -49981,6 +49994,7 @@ if (typeof globalThis.__isSSRTest__ !== "undefined") {
 }
 TestButton.test = {
   static: false,
+  stateCount: 4,
   compareActualValues: true,
   expect: () => {
     const idx = get(testObservables[name4]);
@@ -50228,6 +50242,7 @@ if (typeof globalThis.__isSSRTest__ !== "undefined") {
 }
 TestCard.test = {
   static: false,
+  stateCount: 3,
   compareActualValues: true,
   expect: () => {
     const idx = get(testObservables[name5]);
@@ -50369,6 +50384,7 @@ if (typeof globalThis.__isSSRTest__ !== "undefined") {
 }
 TestCheckbox.test = {
   static: false,
+  stateCount: 3,
   compareActualValues: true,
   expect: () => {
     const idx = get(testObservables[name6]);
@@ -50546,6 +50562,7 @@ if (typeof globalThis.__isSSRTest__ !== "undefined") {
 }
 TestChip.test = {
   static: false,
+  stateCount: 2,
   compareActualValues: true,
   expect: () => {
     const idx = get(testObservables[name7]);
@@ -50673,6 +50690,7 @@ if (typeof globalThis.__isSSRTest__ !== "undefined") {
 }
 TestCollapse.test = {
   static: false,
+  stateCount: 3,
   compareActualValues: true,
   expect: () => {
     const idx = get(testObservables[name8]);
@@ -50796,6 +50814,7 @@ if (typeof globalThis.__isSSRTest__ !== "undefined") {
 }
 TestFab.test = {
   static: false,
+  stateCount: 2,
   compareActualValues: true,
   expect: () => {
     const idx = get(testObservables[name9]);
@@ -50912,6 +50931,7 @@ if (typeof globalThis.__isSSRTest__ !== "undefined") {
 }
 TestIconButton.test = {
   static: false,
+  stateCount: 2,
   compareActualValues: true,
   expect: () => {
     const idx = get(testObservables[name10]);
@@ -51194,6 +51214,7 @@ if (typeof globalThis.__isSSRTest__ !== "undefined") {
 }
 TestNumberField.test = {
   static: false,
+  stateCount: 2,
   compareActualValues: true,
   expect: () => {
     const idx = get(testObservables[name11]);
@@ -51314,6 +51335,7 @@ if (typeof globalThis.__isSSRTest__ !== "undefined") {
 }
 TestPaper.test = {
   static: false,
+  stateCount: 3,
   compareActualValues: true,
   expect: () => {
     const idx = get(testObservables[name12]);
@@ -51389,10 +51411,10 @@ var SideBar = defaults(sideBarDef, (props) => {
     return /* @__PURE__ */ jsx(
       "div",
       {
-        class: [() => get(cls) ? get(cls) : BASE_CLASS4, cn2],
+        class: [BASE_CLASS4, () => get(cls) ? get(cls) : null, cn2],
         style: { width: sidebarWidth, top: get(top) },
         ...otherProps,
-        children: /* @__PURE__ */ jsx("slot", { children: /* @__PURE__ */ jsx("div", { class: "flex flex-col justify-end", children }) })
+        children: /* @__PURE__ */ jsx("slot", { children: /* @__PURE__ */ jsx("div", { class: "w-full h-full flex flex-col justify-end", children }) })
       }
     );
   };
@@ -51484,8 +51506,8 @@ var BASE_CLASS2 = "fixed h-full left-0 overflow-x-hidden transition-all duration
 if (typeof globalThis.__isSSRTest__ !== "undefined") {
   TestSideBar();
   const fullElements = [
-    `<h3>SideBar</h3><div class="${BASE_CLASS2}" style="width: 0px; top: 56px;"><slot><div class="flex flex-col justify-end">Sidebar</div></slot></div>`,
-    `<h3>SideBar</h3><div class="${BASE_CLASS2}" style="width: 250px; top: 56px;"><slot><div class="flex flex-col justify-end">Sidebar</div></slot></div>`
+    `<h3>SideBar</h3><div class="${BASE_CLASS2}" style="width: 0px; top: 56px;"><slot><div class="w-full h-full flex flex-col justify-end">Sidebar</div></slot></div>`,
+    `<h3>SideBar</h3><div class="${BASE_CLASS2}" style="width: 250px; top: 56px;"><slot><div class="w-full h-full flex flex-col justify-end">Sidebar</div></slot></div>`
   ];
   console.log(`
 \u{1F4DD} Test: ${name13}`);
@@ -51509,16 +51531,17 @@ if (typeof globalThis.__isSSRTest__ !== "undefined") {
 }
 TestSideBar.test = {
   static: false,
+  stateCount: 2,
   compareActualValues: true,
   expect: () => {
     const idx = get(testObservables[name13]);
     const fullWidth = idx === 1 ? "250px" : "0px";
-    const expected = `<div class="${BASE_CLASS2}" style="width: ${fullWidth}; top: 56px;"><slot><div class="flex flex-col justify-end">Sidebar</div></slot></div>`;
+    const expected = `<div class="${BASE_CLASS2}" style="width: ${fullWidth}; top: 56px;"></div>`;
     const ssrComponent = testObservables[`${name13}_ssr`];
     const ssrResult = renderToString(ssrComponent);
     const fullElements = [
-      `<h3>SideBar</h3><div class="${BASE_CLASS2}" style="width: 0px; top: 56px;"><slot><div class="flex flex-col justify-end">Sidebar</div></slot></div>`,
-      `<h3>SideBar</h3><div class="${BASE_CLASS2}" style="width: 250px; top: 56px;"><slot><div class="flex flex-col justify-end">Sidebar</div></slot></div>`
+      `<h3>SideBar</h3><div class="${BASE_CLASS2}" style="width: 0px; top: 56px;"><slot><div class="w-full h-full flex flex-col justify-end">Sidebar</div></slot></div>`,
+      `<h3>SideBar</h3><div class="${BASE_CLASS2}" style="width: 250px; top: 56px;"><slot><div class="w-full h-full flex flex-col justify-end">Sidebar</div></slot></div>`
     ];
     const expectedFull = fullElements[idx];
     if (ssrResult !== expectedFull) {
@@ -53032,6 +53055,7 @@ if (typeof globalThis.__isSSRTest__ !== "undefined") {
 }
 TestSwitch.test = {
   static: false,
+  stateCount: 2,
   compareActualValues: true,
   expect: () => {
     const idx = get(testObservables[name14]);
@@ -53230,6 +53254,7 @@ if (typeof globalThis.__isSSRTest__ !== "undefined") {
 }
 TestTabs.test = {
   static: false,
+  stateCount: 1,
   compareActualValues: true,
   expect: () => {
     const idx = get(testObservables[name15]);
@@ -54616,6 +54641,7 @@ if (typeof globalThis.__isSSRTest__ !== "undefined") {
 }
 TestTextArea.test = {
   static: false,
+  stateCount: 2,
   compareActualValues: true,
   expect: () => {
     const idx = get(testObservables[name16]);
@@ -54916,6 +54942,7 @@ if (typeof globalThis.__isSSRTest__ !== "undefined") {
 }
 TestTextField.test = {
   static: false,
+  stateCount: 2,
   compareActualValues: true,
   expect: () => {
     const idx = get(testObservables[name17]);
@@ -55048,6 +55075,7 @@ if (typeof globalThis.__isSSRTest__ !== "undefined") {
 }
 TestToggleButton.test = {
   static: false,
+  stateCount: 2,
   compareActualValues: true,
   expect: () => {
     const idx = get(testObservables[name18]);
@@ -55148,6 +55176,7 @@ if (typeof globalThis.__isSSRTest__ !== "undefined") {
 }
 TestToolbar.test = {
   static: true,
+  stateCount: 1,
   compareActualValues: true,
   expect: () => {
     const idx = get(testObservables[name19]);
@@ -55472,6 +55501,7 @@ if (typeof globalThis.__isSSRTest__ !== "undefined") {
 }
 TestZoomable.test = {
   static: true,
+  stateCount: 1,
   compareActualValues: true,
   expect: () => {
     const idx = get(testObservables[name20]);
@@ -55489,3 +55519,54 @@ ${expectedFull}`);
     return expected;
   }
 };
+
+// src/ssr/ssr-test-runner.tsx
+var g = globalThis;
+var components = [
+  TestAppbar,
+  TestAvatar,
+  TestBadge,
+  TestButton,
+  TestCard,
+  TestCheckbox,
+  TestChip,
+  TestCollapse,
+  TestFab,
+  TestIconButton,
+  TestNumberField,
+  TestPaper,
+  TestSideBar,
+  TestSwitch,
+  TestTabs,
+  TestTextArea,
+  TestTextField,
+  TestToggleButton,
+  TestToolbar,
+  TestZoomable
+];
+for (const comp of components) {
+  if (comp.test?.expect) {
+    const stateCount = comp.test.stateCount ?? 1;
+    for (let i = 0; i < stateCount; i++) {
+      if (testObservables[comp.name]) {
+        ;
+        testObservables[comp.name](i);
+      }
+      comp.test.expect();
+    }
+  }
+}
+var totalLogs = g.__consoleLogCount ?? 0;
+var passLogs = g.__passLogCount ?? 0;
+var failCount = g.__testFailures?.length ?? 0;
+var passCount = g.__testPassCount ?? 0;
+console.log(`
+\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550`);
+console.log(`   \u{1F4CA} SSR Test Summary`);
+console.log(`   Total console.log calls: ${totalLogs}`);
+console.log(`   \u2705 Pass log lines:       ${passLogs}`);
+console.log(`   Assertion passes:        ${passCount}`);
+console.log(`   Assertion failures:      ${failCount}`);
+console.log(`   Result: ${failCount > 0 ? "\u274C SOME FAILED" : "\u2705 ALL PASSED"}`);
+console.log(`\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550
+`);

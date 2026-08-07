@@ -80,6 +80,7 @@ if (typeof globalThis.__isSSRTest__ !== 'undefined') {
 
 TestCard.test = {
     static: false,
+    stateCount: 3,
     compareActualValues: true,
     expect: () => {
         const idx = $$(testObservables[name])
@@ -114,4 +115,5 @@ TestCard.test = {
     }
 }
 
+export { TestCard }
 export default () => <TestSnapshots Component={TestCard} />

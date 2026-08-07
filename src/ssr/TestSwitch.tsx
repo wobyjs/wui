@@ -60,6 +60,7 @@ if (typeof globalThis.__isSSRTest__ !== 'undefined') {
 
 TestSwitch.test = {
     static: false,
+    stateCount: 2,
     compareActualValues: true,
     expect: () => {
         const idx = $$(testObservables[name])
@@ -80,4 +81,5 @@ TestSwitch.test = {
     }
 }
 
+export { TestSwitch }
 export default () => <TestSnapshots Component={TestSwitch} />

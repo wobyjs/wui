@@ -71,6 +71,7 @@ if (typeof globalThis.__isSSRTest__ !== 'undefined') {
 
 TestBadge.test = {
     static: false,
+    stateCount: 3,
     compareActualValues: true,
     expect: () => {
         const idx = $$(testObservables[name])
@@ -101,4 +102,5 @@ TestBadge.test = {
     }
 }
 
+export { TestBadge }
 export default () => <TestSnapshots Component={TestBadge} />

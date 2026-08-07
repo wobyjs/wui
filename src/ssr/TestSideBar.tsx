@@ -37,8 +37,8 @@ if (typeof globalThis.__isSSRTest__ !== 'undefined') {
     TestSideBar()
 
     const fullElements = [
-        `<h3>SideBar</h3><div class="${BASE_CLASS}" style="width: 0px; top: 56px;"><slot><div class="flex flex-col justify-end">Sidebar</div></slot></div>`,
-        `<h3>SideBar</h3><div class="${BASE_CLASS}" style="width: 250px; top: 56px;"><slot><div class="flex flex-col justify-end">Sidebar</div></slot></div>`,
+        `<h3>SideBar</h3><div class="${BASE_CLASS}" style="width: 0px; top: 56px;"><slot><div class="w-full h-full flex flex-col justify-end">Sidebar</div></slot></div>`,
+        `<h3>SideBar</h3><div class="${BASE_CLASS}" style="width: 250px; top: 56px;"><slot><div class="w-full h-full flex flex-col justify-end">Sidebar</div></slot></div>`,
     ]
 
     console.log(`\n📝 Test: ${name}`)
@@ -62,6 +62,7 @@ if (typeof globalThis.__isSSRTest__ !== 'undefined') {
 
 TestSideBar.test = {
     static: false,
+    stateCount: 2,
     compareActualValues: true,
     expect: () => {
         const idx = $$(testObservables[name])
@@ -73,8 +74,8 @@ TestSideBar.test = {
         const ssrResult = renderToString(ssrComponent)
 
         const fullElements = [
-            `<h3>SideBar</h3><div class="${BASE_CLASS}" style="width: 0px; top: 56px;"><slot><div class="flex flex-col justify-end">Sidebar</div></slot></div>`,
-            `<h3>SideBar</h3><div class="${BASE_CLASS}" style="width: 250px; top: 56px;"><slot><div class="flex flex-col justify-end">Sidebar</div></slot></div>`,
+            `<h3>SideBar</h3><div class="${BASE_CLASS}" style="width: 0px; top: 56px;"><slot><div class="w-full h-full flex flex-col justify-end">Sidebar</div></slot></div>`,
+            `<h3>SideBar</h3><div class="${BASE_CLASS}" style="width: 250px; top: 56px;"><slot><div class="w-full h-full flex flex-col justify-end">Sidebar</div></slot></div>`,
         ]
         const expectedFull = fullElements[idx]
         if (ssrResult !== expectedFull) {
@@ -87,4 +88,5 @@ TestSideBar.test = {
     }
 }
 
+export { TestSideBar }
 export default () => <TestSnapshots Component={TestSideBar} />

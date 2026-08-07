@@ -60,6 +60,7 @@ if (typeof globalThis.__isSSRTest__ !== 'undefined') {
 
 TestToolbar.test = {
     static: true,
+    stateCount: 1,
     compareActualValues: true,
     expect: () => {
         const idx = $$(testObservables[name])
@@ -79,4 +80,5 @@ TestToolbar.test = {
     }
 }
 
+export { TestToolbar }
 export default () => <TestSnapshots Component={TestToolbar} />

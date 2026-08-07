@@ -38,7 +38,8 @@ const List = defaults(def, (props) => {
     const { class: cn, cls, mode, buttonType: btnType, ...otherProps } = props
 
     const editor = useEditor()
-    const { saveDo } = useUndoRedo()
+    const undoRedoContext = useUndoRedo()
+    const saveDo = undoRedoContext?.saveDo || (() => {})
     const isActive = $(false)
 
     // Reactive Icon

@@ -64,6 +64,7 @@ if (typeof globalThis.__isSSRTest__ !== 'undefined') {
 
 TestChip.test = {
     static: false,
+    stateCount: 2,
     compareActualValues: true,
     expect: () => {
         const idx = $$(testObservables[name])
@@ -88,4 +89,5 @@ TestChip.test = {
     }
 }
 
+export { TestChip }
 export default () => <TestSnapshots Component={TestChip} />

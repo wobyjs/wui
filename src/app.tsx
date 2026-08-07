@@ -2291,6 +2291,9 @@ function App() {
         const mask = $(true)
         const demoTitle = $("Default Configuration")
 
+        // Derived: sidebar is in wide mode when width > 100px
+        // const isWideSidebar = useMemo(() => $$(sidebarWidth) > 100)
+
         // 3. Helper functions to switch modes
         const setMode = (mode: 'default' | 'no-overlay' | 'wide' | 'narrow') => {
             // Reset to closed first for smooth transition effect, or keep open if preferred
@@ -2355,7 +2358,7 @@ function App() {
                 >
                     <div class="flex flex-col h-full">
                         {/* Sidebar Header */}
-                        <div class="h-16 flex items-center justify-center border-b border-gray-700 bg-gray-900">
+                        <div class="w-full h-16 flex items-center justify-center border-b border-gray-700 bg-gray-900">
                             {/* Logic to hide text if narrow */}
                             {() => $$(sidebarWidth) > 100
                                 ? <h2 class="text-xl font-bold text-white tracking-wider">WOBY UI</h2>
@@ -2367,32 +2370,32 @@ function App() {
                         <div class="flex-1 py-4 overflow-y-auto">
                             <MenuItem>
                                 <span class="text-xl min-w-[24px] text-center">🏠</span>
-                                {() => $$(sidebarWidth) > 100 && <MenuText>Dashboard</MenuText>}
+                                <span class="ml-3 text-sm font-medium" style={() => $$(sidebarWidth) > 100 ? null : { display: 'none' }}>Dashboard</span>
                             </MenuItem>
 
                             <MenuItem>
                                 <span class="text-xl min-w-[24px] text-center">👥</span>
-                                {() => $$(sidebarWidth) > 100 && <MenuText>Users</MenuText>}
+                                <span class="ml-3 text-sm font-medium" style={() => $$(sidebarWidth) > 100 ? null : { display: 'none' }}>Users</span>
                             </MenuItem>
 
                             <MenuItem>
                                 <span class="text-xl min-w-[24px] text-center">📈</span>
-                                {() => $$(sidebarWidth) > 100 && <MenuText>Analytics</MenuText>}
+                                <span class="ml-3 text-sm font-medium" style={() => $$(sidebarWidth) > 100 ? null : { display: 'none' }}>Analytics</span>
                             </MenuItem>
 
                             <div class="my-4 border-t border-gray-700"></div>
 
                             <MenuItem>
                                 <span class="text-xl min-w-[24px] text-center">⚙️</span>
-                                {() => $$(sidebarWidth) > 100 && <MenuText>Settings</MenuText>}
+                                <span class="ml-3 text-sm font-medium" style={() => $$(sidebarWidth) > 100 ? null : { display: 'none' }}>Settings</span>
                             </MenuItem>
                         </div>
 
                         {/* Sidebar Footer */}
-                        <div class="p-4 bg-gray-900">
+                        <div class="w-full p-4 bg-gray-900">
                             <MenuItem onClick={() => isOpen(false)}>
                                 <span class="text-xl min-w-[24px] text-center">🔙</span>
-                                {() => $$(sidebarWidth) > 100 && <MenuText>Close Menu</MenuText>}
+                                <span class="ml-3 text-sm font-medium" style={() => $$(sidebarWidth) > 100 ? null : { display: 'none' }}>Close Menu</span>
                             </MenuItem>
                         </div>
                     </div>

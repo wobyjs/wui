@@ -64,6 +64,7 @@ if (typeof globalThis.__isSSRTest__ !== 'undefined') {
 
 TestToggleButton.test = {
     static: false,
+    stateCount: 2,
     compareActualValues: true,
     expect: () => {
         const idx = $$(testObservables[name])
@@ -85,4 +86,5 @@ TestToggleButton.test = {
     }
 }
 
+export { TestToggleButton }
 export default () => <TestSnapshots Component={TestToggleButton} />

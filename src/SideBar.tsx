@@ -98,12 +98,12 @@ const SideBar = defaults(sideBarDef, (props) => {
     const SidebarComponent = () => {
         return (
             <div
-                class={[() => $$(cls) ? $$(cls) : BASE_CLASS, cn]}
+                class={[BASE_CLASS, () => $$(cls) ? $$(cls) : null, cn]}
                 style={{ width: sidebarWidth, top: $$(top) }}
                 {...otherProps}
             >
                 <slot>
-                    <div class='flex flex-col justify-end'>
+                    <div class='w-full h-full flex flex-col justify-end'>
                         {children}
                     </div>
                 </slot>

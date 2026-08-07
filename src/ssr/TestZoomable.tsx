@@ -61,6 +61,7 @@ if (typeof globalThis.__isSSRTest__ !== 'undefined') {
 
 TestZoomable.test = {
     static: true,
+    stateCount: 1,
     compareActualValues: true,
     expect: () => {
         const idx = $$(testObservables[name])
@@ -80,4 +81,5 @@ TestZoomable.test = {
     }
 }
 
+export { TestZoomable }
 export default () => <TestSnapshots Component={TestZoomable} />

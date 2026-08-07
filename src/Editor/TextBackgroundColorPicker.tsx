@@ -18,7 +18,8 @@ const TextBackgroundColorPicker = defaults(def, (props) => {
     const BASE_BTN = "size-full inline-flex items-center justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-black hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500 cursor-pointer"
 
     const editor = useEditor() // Editor context, likely the contentEditable div
-    const { saveDo } = useUndoRedo() // Undo/redo context
+    const undoRedoContext = useUndoRedo() // Undo/redo context
+    const saveDo = undoRedoContext?.saveDo || (() => {})
     const colorInputRef = $<HTMLInputElement>(null)
 
     // Updates selectedBgColor when the color input changes

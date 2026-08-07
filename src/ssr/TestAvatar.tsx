@@ -66,15 +66,22 @@ if (typeof globalThis.__isSSRTest__ !== 'undefined') {
 
 TestAvatar.test = {
     static: false,
+    stateCount: 4,
     compareActualValues: true,
     expect: () => {
         const idx = $$(testObservables[name])
         const BASE_CLASS = "relative flex items-center justify-center align-middle select-none leading-none overflow-hidden shrink-0 m-0 bg-[rgb(189,189,189)] text-white"
-        const elements = [
+        const elements: (string | string[])[] = [
             `<div class="rounded-full w-6 h-6 text-xs ${BASE_CLASS}"></div>`,
-            `<div class="rounded-xl w-8 h-8 text-sm ${BASE_CLASS}"><img src="x.png" alt="Avatar" class="w-full h-full object-cover" style="display: none;"></div>`,
+            [
+                `<div class="rounded-xl w-8 h-8 text-sm ${BASE_CLASS}"><img src="x.png" alt="Avatar" class="w-full h-full object-cover"></div>`,
+                `<div class="rounded-xl w-8 h-8 text-sm ${BASE_CLASS}"><img src="x.png" alt="Avatar" class="w-full h-full object-cover" style="display: none;"></div>`,
+            ],
             `<div class="rounded-md w-10 h-10 text-base ${BASE_CLASS}"></div>`,
-            `<div class="rounded-full w-12 h-12 text-lg ${BASE_CLASS}"><img src="y.png" alt="User" class="w-full h-full object-cover" style="display: none;"></div>`,
+            [
+                `<div class="rounded-full w-12 h-12 text-lg ${BASE_CLASS}"><img src="y.png" alt="User" class="w-full h-full object-cover"></div>`,
+                `<div class="rounded-full w-12 h-12 text-lg ${BASE_CLASS}"><img src="y.png" alt="User" class="w-full h-full object-cover" style="display: none;"></div>`,
+            ],
         ]
         const expected = elements[idx]
 
@@ -98,4 +105,5 @@ TestAvatar.test = {
     }
 }
 
+export { TestAvatar }
 export default () => <TestSnapshots Component={TestAvatar} />

@@ -112,6 +112,7 @@ if (typeof globalThis.__isSSRTest__ !== 'undefined') {
 
 TestButton.test = {
     static: false,
+    stateCount: 4,
     compareActualValues: true,
     expect: () => {
         const idx = $$(testObservables[name])
@@ -135,4 +136,5 @@ TestButton.test = {
     }
 }
 
+export { TestButton }
 export default () => <TestSnapshots Component={TestButton} />

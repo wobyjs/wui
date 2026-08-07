@@ -1,31 +1,60 @@
-/* SSR Test Runner — imports all TestXxx modules, triggering their SSR assertion blocks.
-   Each TestXxx.tsx has an `if (typeof globalThis.__isSSRTest__ !== 'undefined')` block that:
-   1. Calls the component function to register observables
-   2. Iterates through all states
-   3. Compares renderToString output against expected strings
-   4. console.logs ✅/❌ per state
-   5. process.exit(1) on any failure
+/* SSR Test Runner — imports all TestXxx modules, triggering their SSR assertion blocks,
+   then also runs Component.test.expect() for each state to match browser test behavior. */
 
-   Run: pnpm ssr-test
-   (Bundles this file with esbuild + ssr-shim.js, executes in Node.js) */
+import { testObservables } from '../test-util'
+import { TestAppbar } from './TestAppbar'
+import { TestAvatar } from './TestAvatar'
+import { TestBadge } from './TestBadge'
+import { TestButton } from './TestButton'
+import { TestCard } from './TestCard'
+import { TestCheckbox } from './TestCheckbox'
+import { TestChip } from './TestChip'
+import { TestCollapse } from './TestCollapse'
+import { TestFab } from './TestFab'
+import { TestIconButton } from './TestIconButton'
+import { TestNumberField } from './TestNumberField'
+import { TestPaper } from './TestPaper'
+import { TestSideBar } from './TestSideBar'
+import { TestSwitch } from './TestSwitch'
+import { TestTabs } from './TestTabs'
+import { TestTextArea } from './TestTextArea'
+import { TestTextField } from './TestTextField'
+import { TestToggleButton } from './TestToggleButton'
+import { TestToolbar } from './TestToolbar'
+import { TestZoomable } from './TestZoomable'
 
-import './TestAppbar'
-import './TestAvatar'
-import './TestBadge'
-import './TestButton'
-import './TestCard'
-import './TestCheckbox'
-import './TestChip'
-import './TestCollapse'
-import './TestFab'
-import './TestIconButton'
-import './TestNumberField'
-import './TestPaper'
-import './TestSideBar'
-import './TestSwitch'
-import './TestTabs'
-import './TestTextArea'
-import './TestTextField'
-import './TestToggleButton'
-import './TestToolbar'
-import './TestZoomable'
+// Accumulated summary report
+const g = globalThis as any
+
+// Run expect() for each component state (matching browser TestSnapshots behavior)
+const components = [
+    TestAppbar, TestAvatar, TestBadge, TestButton, TestCard, TestCheckbox,
+    TestChip, TestCollapse, TestFab, TestIconButton, TestNumberField, TestPaper,
+    TestSideBar, TestSwitch, TestTabs, TestTextArea, TestTextField, TestToggleButton,
+    TestToolbar, TestZoomable,
+]
+
+for (const comp of components) {
+    if (comp.test?.expect) {
+        const stateCount = comp.test.stateCount ?? 1
+        for (let i = 0; i < stateCount; i++) {
+            if (testObservables[comp.name]) {
+                ; (testObservables[comp.name] as any)(i)
+            }
+            comp.test.expect()
+        }
+    }
+}
+
+const totalLogs = g.__consoleLogCount ?? 0
+const passLogs = g.__passLogCount ?? 0
+const failCount = g.__testFailures?.length ?? 0
+const passCount = g.__testPassCount ?? 0
+console.log(`\n═══════════════════════════════════════`)
+console.log(`   📊 SSR Test Summary`)
+console.log(`   Total console.log calls: ${totalLogs}`)
+console.log(`   ✅ Pass log lines:       ${passLogs}`)
+console.log(`   Assertion passes:        ${passCount}`)
+console.log(`   Assertion failures:      ${failCount}`)
+console.log(`   Result: ${failCount > 0 ? '❌ SOME FAILED' : '✅ ALL PASSED'}`)
+console.log(`═══════════════════════════════════════\n`)

@@ -64,6 +64,7 @@ if (typeof globalThis.__isSSRTest__ !== 'undefined') {
 
 TestCollapse.test = {
     static: false,
+    stateCount: 3,
     compareActualValues: true,
     expect: () => {
         const idx = $$(testObservables[name])
@@ -89,4 +90,5 @@ TestCollapse.test = {
     }
 }
 
+export { TestCollapse }
 export default () => <TestSnapshots Component={TestCollapse} />

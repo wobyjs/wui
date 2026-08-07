@@ -61,6 +61,7 @@ if (typeof globalThis.__isSSRTest__ !== 'undefined') {
 
 TestPaper.test = {
     static: false,
+    stateCount: 3,
     compareActualValues: true,
     expect: () => {
         const idx = $$(testObservables[name])
@@ -80,4 +81,5 @@ TestPaper.test = {
     }
 }
 
+export { TestPaper }
 export default () => <TestSnapshots Component={TestPaper} />

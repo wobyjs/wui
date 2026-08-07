@@ -27,7 +27,8 @@ const InfoButton = defaults(def, (props) => {
     const { buttonType: btnType, title, cls, class: cn, disabled } = props
 
     const focusManager = useFocusManager()
-    const { saveDo } = useUndoRedo()
+    const undoRedoContext = useUndoRedo()
+    const saveDo = undoRedoContext?.saveDo || (() => {})
     const panelCtx = usePropertyPanel()
 
     const handleMouseDown = (e: MouseEvent) => {

@@ -19,7 +19,8 @@ const ItalicButton = defaults(def, (props) => {
     const { buttonType: btnType, title, cls, class: cn, disabled, ...otherProps } = props
 
     const editorNode = useEditor()
-    const { saveDo } = useUndoRedo()
+    const undoRedoContext = useUndoRedo()
+    const saveDo = undoRedoContext?.saveDo || (() => {})
     const focusManager = useFocusManager()
     const isActive = $(false)
     const command = "italic"
@@ -48,13 +49,13 @@ const ItalicButton = defaults(def, (props) => {
         e.preventDefault()
         // D-09: Cache selection BEFORE browser can move focus and clear it
         // onMouseDown fires before focus shift, onClick fires after
-        focusManager.beginCommand()
+        if (focusManager) focusManager.beginCommand()
     }
 
     const handleClick = () => {
         // D-09: Apply formatting, selection already cached by onMouseDown
         applyItalic()
-        focusManager.endCommand()
+        if (focusManager) focusManager.endCommand()
         saveDo()
         // D-05: updateStylesState via selectionchange handles active state.
         // queryCommandState removed — it is shadow-DOM-blind.
