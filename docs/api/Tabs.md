@@ -12,8 +12,6 @@ The **Tabs API** defines the behavior, props, rendering logic, tab registration,
 import { Tabs, Tab } from "./Tabs";
 ```
 
-````
-
 ### Web Component
 
 ```ts
@@ -24,22 +22,24 @@ import "./Tabs"; // registers <wui-tabs> and <wui-tab>
 
 # 🧭 Tabs Props
 
-| Prop              | Type                 | Default         | Description                     |
-| ----------------- | -------------------- | --------------- | ------------------------------- |
-| **activeTag**     | string or observable | first tab title | Determines which tab is visible |
-| **cls**           | string               | `""`            | Styles the outer wrapper        |
-| **...otherProps** | HTMLAttributes\<div> | —               | Extra props                     |
+| Prop              | Type                 | Default | Description                                     |
+| ----------------- | -------------------- | ------- | ----------------------------------------------- |
+| **activeTag**     | string or observable | `""`    | Determines which tab is visible; resolves to first tab title when unset/invalid (HtmlString) |
+| **cls**           | string               | `""`    | Primary class; styles the outer wrapper (HtmlClass) |
+| **class**         | string               | `""`    | Additional classes appended to the outer wrapper |
+| **children**      | JSX.Child            | `null`  | Tab content (slots)                             |
+| **...otherProps** | HTMLAttributes\<div> | —       | Extra props applied to the outer wrapper        |
 
 ---
 
 # 🧭 Tab Props
 
-| Prop                 | Type      | Default | Description                          |
-| -------------------- | --------- | ------- | ------------------------------------ |
-| **title**            | string    | `""`    | Tab display title                    |
-| **inactive-content** | string    | `""`    | Preview shown when tab is not active |
-| **cls**              | string    | `""`    | Additional styling                   |
-| **children**         | JSX.Child | `null`  | Tab content                          |
+| Prop | Type | Default | Description |
+| ---- | ---- | ------- | ----------- |
+| **title** | string or Observable<string> | `""` | Tab display title (HtmlString) |
+| **cls** | string | `""` | Primary class for the tab container (HtmlClass) |
+| **class** | string | `""` | Additional classes appended to the tab container |
+| **children** | JSX.Child | `null` | Tab content |
 
 ---
 
@@ -47,26 +47,23 @@ import "./Tabs"; // registers <wui-tabs> and <wui-tab>
 
 Tabs internally:
 
-1. Collects each `<Tab>` element or `<wui-tab>` child
-2. Extracts:
-   - `title`
-   - `inactive-content`
-   - `children` (tab content)
-3. Builds a **navigation button row** from the titles
-4. Shows only the tab whose `title === activeTag`
+1. Holds an internal `currentTab` observable (derived from `activeTag` if not already observable)
+2. Collects each `<Tab>` element or `<wui-tab>` child
+3. Extracts each tab's title from its `data-tab-title` / `title` attributes
+4. Builds a **navigation button row** from the titles
+5. Shows only the tab whose title matches `currentTab`
 
 ---
 
 # 🧭 Title Resolution Logic
 
-A tab title may come from multiple sources:
+A tab title is read from the rendered `<Tab>` element, which exposes both attributes:
 
 ```ts
-title = props.title
-      || element.getAttribute('title')
-      || element.getAttribute('data-tab-title')
-      || extracted slotted text
+const t = node.getAttribute('data-tab-title') || node.getAttribute('title')
 ```
+
+When found, the title is pushed into the internal `titles` list and the nav button is generated from it.
 
 ---
 
@@ -75,12 +72,26 @@ title = props.title
 Tabs render:
 
 ```tsx
-<div class="tabs-wrapper">
-  <div class="nav-buttons">
-    <Button onClick={() => activeTag(tab.title)}>{tab.title}</Button>
+<div class={[() => $$(cls) ? $$(cls) : "", cn]} {...otherProps} ref={mainRef}>
+  <div class="flex justify-center flex-wrap gap-2 my-4 border-2 border-gray-200 py-2 rounded-lg">
+    {titles.map(t => (
+      <Button type="custom" buttonFunction="button" cls={[...]} onClick={e => currentTab(t)}>
+        {t}
+      </Button>
+    ))}
   </div>
 
-  <div class="tab-content">{activeTabContent}</div>
+  <div ref={contentRef} class="p-4 border border-gray-200 rounded-b-lg shadow-sm bg-white min-h-[50px]">
+    {children}
+  </div>
+</div>
+```
+
+Each `Tab` renders a container that exposes its title:
+
+```tsx
+<div class={[() => $$(cls) ? $$(cls) : "", cn]} {...otherProps} data-tab-title={$$(title)} title={$$(title)}>
+  {children}
 </div>
 ```
 
@@ -91,28 +102,21 @@ Tabs render:
 If `activeTag` is observable:
 
 ```ts
-activeTag("Settings");
+currentTab("Settings");
 ```
 
-Tab view updates automatically.
+Tab view updates automatically. When no title matches (or `activeTag` is empty), Tabs falls back to the first tab title.
 
 ---
 
-# 📤 Child Collection Logic
+# 📤 DOM Visibility Logic
 
-Tabs uses:
+An effect scans the content container and toggles visibility:
 
-```ts
-let children = menu.querySelectorAll("wui-tab");
-```
+- The active tab gets `display: block` and its `hidden` attribute removed
+- All other tabs get `display: none` and a `hidden` attribute
 
-Then moves their content into the display container, preserving order.
-
-This enables support for:
-
-- Web Component HTML
-- TSX children
-- Function children (dynamic mapping)
+In Shadow DOM (custom element) mode, `<wui-tab>` children are moved from the host's light DOM into the content container before scanning.
 
 ---
 
@@ -154,6 +158,5 @@ Tabs + Tab provide:
 - Automatic navigation button generation
 - Reactive tab control
 - Full TSX + Web Component compatibility
-- Customizable styling
+- Customizable styling via `cls` + `class`
 - Clean child-slot extraction and rendering
-````

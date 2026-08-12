@@ -1,6 +1,6 @@
 # 🧩 Zoomable API
 
-This API explains internal logic, gesture handling, transform math, props, and lifecycle behavior of the Zoomable component.
+This API explains internal logic, gesture handling, transform math, props, and lifecycle behavior of the Zoomable component and its companion Img component.
 
 ---
 
@@ -9,10 +9,8 @@ This API explains internal logic, gesture handling, transform math, props, and l
 ### TSX
 
 ```tsx
-import { Zoomable } from "./Zoomable";
+import { Zoomable, Img, useZoomable } from "./Zoomable";
 ```
-
-````
 
 ### Web Component
 
@@ -24,14 +22,34 @@ import "./Zoomable"; // registers <wui-zoomable> and <wui-zoomable-img>
 
 # 🧭 Props Overview
 
-| Prop              | Type                 | Default                  | Description                |
-| ----------------- | -------------------- | ------------------------ | -------------------------- |
-| **scale**         | number or Observable | `1`                      | Current zoom scale         |
-| **minScale**      | number               | `0.1`                    | Minimum allowed zoom       |
-| **maxScale**      | number               | `10`                     | Maximum allowed zoom       |
-| **children**      | JSX.Child            | Content to render & zoom |
-| **cls**           | string               | `""`                     | Additional wrapper classes |
-| **...otherProps** | HTMLAttributes\<div> | —                        | Passed to root element     |
+## Zoomable
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| **scale** | number or Observable | `1` | Current zoom scale |
+| **x** | number or Observable | `0` | Horizontal translation offset |
+| **y** | number or Observable | `0` | Vertical translation offset |
+| **minScale** | number | `1` | Minimum allowed zoom |
+| **maxScale** | number | `5` | Maximum allowed zoom |
+| **type** | string | `"default"` | Visual variant |
+| **height** | number | `400` | Container height in px |
+| **width** | number | `400` | Container width in px |
+| **children** | JSX.Child | `null` | Content to render inside the zoomable area |
+| **cls** | string | `""` | Override/extra classes |
+| **class** | string | `""` | Append classes |
+| **...otherProps** | HTMLAttributes\<div> | — | Passed to root element |
+
+## Img
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| **src** | string | `""` | Image source URL |
+| **alt** | string | `"Image"` | Alt text for the image |
+| **type** | string | `"default"` | Visual variant |
+| **children** | JSX.Child | `null` | Additional children |
+| **cls** | string | `""` | Override/extra classes |
+| **class** | string | `""` | Append classes |
+| **...otherProps** | HTMLAttributes | — | Passed to `<img>` |
 
 ---
 
@@ -40,15 +58,27 @@ import "./Zoomable"; // registers <wui-zoomable> and <wui-zoomable-img>
 Zoomable produces:
 
 ```tsx
-<div class="zoomable-wrapper [cls]">
-  <div class="zoomable-content">{children}</div>
+<div ref={containerRef}
+    class={[zoomableStyles[type], "is-dragging"|"cursor-grab", pointer-{type}, cls, class]}
+    style={{ width, height }}
+    onPointerDown={handlePointerDown}
+    onPointerMove={handlePointerMove}
+    onPointerUp={handlePointerUp}
+    onWheel={handleWheel}>
+
+    <div ref={wrapperRef} class="wrapperStyles"
+        style={{ transform: `translate(x, y) scale(scale)` }}>
+        {children}
+    </div>
 </div>
 ```
 
 Where:
 
-- `zoomable-wrapper` receives pointer-type classes
-- `zoomable-content` receives transform updates
+- `zoomableStyles` provides the default container styling (`overflow-hidden`, `touch-none`, border, rounded)
+- `wrapperStyles` provides `absolute top-0 left-0 w-full h-full origin-top-left will-change-transform`
+- The container tracks pointer, touch, and pen events
+- `pointer-{type}` class is added dynamically based on pointer type
 
 ---
 
@@ -57,10 +87,16 @@ Where:
 Zoomable maintains:
 
 ```ts
-scaleInternal; // number or observable-backed value
-position = { x, y }; // panning offset
-pointers = Map(); // active pointer positions
-containerSize; // width/height of wrapper
+scale;       // observable, current zoom level
+translateX;  // observable, horizontal pan offset
+translateY;  // observable, vertical pan offset
+isDown;      // observable, whether user is pressing
+startX/Y;    // anchor coordinates for gesture start
+lastX/Y;     // last known pointer position for delta calculation
+pointers;    // observable array of active PointerEvent objects
+pointerType; // observable string: 'mouse', 'touch', or 'pen'
+containerRef; // ref to the root div
+wrapperRef;   // ref to the inner transform wrapper
 ```
 
 ---
@@ -68,89 +104,79 @@ containerSize; // width/height of wrapper
 # ✋ Pointer Tracking Behavior
 
 ### On pointer down:
-
-- Add pointer to tracking map
-- Record initial positions
+- `e.preventDefault()` to prevent text selection and native zoom
+- Capture pointer type (`mouse`, `touch`, or `pen`)
+- Add pointer to tracking array
+- Record initial and last positions
 
 ### On pointer move:
-
-- If 1 pointer → **panning**
-- If 2 pointers → **pinch zoom**
+- If 2+ pointers active → **pinch zoom**
+- If 1 pointer and `isDown` → **panning**
 
 ### On pointer up:
-
-- Remove pointer from map
-- Reset gesture state when last pointer removed
+- Remove pointer from tracking array (by pointerId)
+- If no pointers remain, reset `isDown` to false
+- Transfer tracking to remaining pointer if any
 
 ---
 
 # 🤏 Pinch Zoom Logic
 
 ```ts
-distance = sqrt((x2-x1)² + (y2-y1)²)
-scaleDelta = distance / previousDistance
-scaleInternal *= scaleDelta
+distance = Math.hypot(x2-x1, y2-y1)
+scaleDelta = currentDistance / initialDistance
+newScale = clamp(scale * scaleDelta)
 ```
 
-Zoom pivot = midpoint of two fingers:
+Zoom pivot is midpoint of two fingers, adjusted relative to container:
 
 ```ts
-pivotX = (x1 + x2) / 2;
-pivotY = (y1 + y2) / 2;
+centerX = (p1.clientX + p2.clientX) / 2 - rect.left
+centerY = (p1.clientY + p2.clientY) / 2 - rect.top
+translateX = centerX - (centerX - translateX) * (newScale / scale)
+translateY = centerY - (centerY - translateY) * (newScale / scale)
 ```
-
-Transform origin is simulated manually (not CSS `transform-origin`):
-
-1. Convert pivot to content coordinates
-2. Apply scale delta
-3. Recalculate translate offsets
-4. Apply clamping
 
 ---
 
 # 🎚 Wheel Zoom Logic
 
 ```ts
-newScale = oldScale * (1 - deltaY * 0.001);
+delta = e.deltaY < 0 ? 1.1 : 0.9
+newScale = clamp(scale * delta)
 ```
 
 Where:
 
-- `deltaY > 0` → zoom out
-- `deltaY < 0` → zoom in
+- `deltaY < 0` (scroll up) → zoom in (multiply by 1.1)
+- `deltaY > 0` (scroll down) → zoom out (multiply by 0.9)
 
-Pivot is cursor location (relative to wrapper):
+Pivot is cursor location relative to container:
 
 ```
-cursorX = e.clientX - wrapper.left
-cursorY = e.clientY - wrapper.top
+mouseX = e.clientX - rect.left
+mouseY = e.clientY - rect.top
+scaleRatio = newScale / scale
+translateX = mouseX - (mouseX - translateX) * scaleRatio
+translateY = mouseY - (mouseY - translateY) * scaleRatio
 ```
 
-Position is corrected to keep content centered:
-
-```ts
-offset.x = offset.x - (cursorX - offset.x) * ratio;
-offset.y = offset.y - (cursorY - offset.y) * ratio;
-```
+The pointer type is set to `'mouse'` on wheel events.
 
 ---
 
 # ✋ Pan (Drag) Logic
 
-If only 1 pointer:
+If exactly 1 pointer and `isDown`:
 
 ```ts
-offset.x += dx;
-offset.y += dy;
+deltaX = e.clientX - lastX
+deltaY = e.clientY - lastY
+translateX += deltaX
+translateY += deltaY
+lastX = e.clientX
+lastY = e.clientY
 ```
-
-Uses pointer movement delta.
-
-All panning uses:
-
-- `pointermove`
-- `setPointerCapture`
-- `ReleasePointerCapture` logic upon cancellation
 
 ---
 
@@ -159,74 +185,109 @@ All panning uses:
 Each zoom update includes:
 
 ```ts
-scaleInternal = Math.min(maxScale, Math.max(minScale, scaleInternal));
+clamp = Math.max(minScale, Math.min(maxScale, value))
 ```
-
-If clamped, pivot translation is still corrected to avoid "jump" effect.
 
 ---
 
 # 📐 Resize Behavior
 
-Zoomable uses ResizeObserver:
+Zoomable uses `useEventListener(window, 'resize', adjustTransformOnResize)`:
 
-1. On resize, reads old size + new size
-2. Maintains scale
-3. Adjusts position so content remains visually centered
-4. Updates bounding calculations
+1. On resize, reads previous container rect vs current rect
+2. Calculates scale ratios for width and height
+3. Multiplies translations by the respective ratios to keep content centered
+4. Saves the current rect as "previous" for the next resize event
 
-This ensures a responsive zoom experience.
+```ts
+scaleRatioX = currentRect.width / previousRect.width
+scaleRatioY = currentRect.height / previousRect.height
+translateX *= scaleRatioX
+translateY *= scaleRatioY
+```
 
 ---
 
 # 🔧 Transform Application
 
-Zoomable calculates:
+The inner wrapper div receives:
 
 ```ts
-transform = translate(x, y) scale(scaleInternal)
+transform: `translate(${translateX}px, ${translateY}px) scale(${scale})`
 ```
 
-Applied to zoomable-content via style binding.
+Applied via reactive style binding with `origin-top-left` for correct scaling origin.
 
-GPU acceleration ensures smooth animation.
+---
+
+# 🖼 Img Component
+
+The `Img` component is a companion that renders a styled `<img>` inside a Zoomable:
+
+```tsx
+<img class={[imgStyles[type], cls, class]}
+    alt={alt}
+    src={src} />
+```
+
+`imgStyles.default` provides `absolute w-full h-full object-contain origin-top-left cursor-grab select-none pointer-events-none rounded-lg`.
 
 ---
 
 # 🧪 Usage Examples
 
 ### TSX
-
 ```tsx
 <Zoomable scale={1}>
-  <img src="/photo.png" />
+    <img src="/photo.png" />
+</Zoomable>
+```
+
+### With Img component
+```tsx
+<Zoomable>
+    <Img src="/photo.png" alt="Photo" />
 </Zoomable>
 ```
 
 ### HTML
-
 ```html
 <wui-zoomable>
-  <img src="/photo.png" />
+    <img src="/photo.png" />
+</wui-zoomable>
+
+<wui-zoomable>
+    <wui-zoomable-img src="/photo.png" alt="Photo"></wui-zoomable-img>
 </wui-zoomable>
 ```
 
 ### Controlled zoom
-
 ```tsx
 const s = $(1)
-<Zoomable scale={s}></Zoomable>
+<Zoomable scale={s}>
+    <img src="/photo.png" />
+</Zoomable>
 <Button onClick={() => s(s() * 1.1)}>+</Button>
+```
+
+### Custom size
+```tsx
+<Zoomable width={800} height={600} minScale={0.5} maxScale={3}>
+    <Img src="/diagram.png" />
+</Zoomable>
 ```
 
 ---
 
 # ♿ Accessibility
 
-- Supports pointer, touch, pen
+- Supports pointer, touch, pen — all captured via unified Pointer Events
 - Prevents default scroll-on-wheel to avoid interference
-- Use additional ARIA attributes depending on content (map, image, document)
-- Child semantics remain untouched
+- `pointer-{type}` class allows CSS targeting by device type
+- `touch-none` prevents default touch behavior
+- Add appropriate ARIA attributes depending on content (map, image, document)
+- `cursor-grab` / `cursor-grabbing` classes provide visual affordance
+- `select-none` prevents text selection during drag
 
 ---
 
@@ -235,9 +296,9 @@ const s = $(1)
 Zoomable provides:
 
 - High-performance pinch + wheel + drag zoom system
-- Observable-friendly scale control
-- Resize-safe transform math
-- Pointer-type adaptive styling
+- Observable-friendly scale, x, and y control
+- Resize-safe transform math with automatic recentering
+- Pointer-type adaptive styling (`pointer-mouse`, `pointer-touch`, `pointer-pen`)
+- Companion `Img` component for image-specific use cases
 - Full TSX & Web Component compatibility
 - A powerful wrapper for maps, diagrams, documents, images, charts, and more
-````

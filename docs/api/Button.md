@@ -25,14 +25,17 @@ Below is the complete list of supported props for both TSX and HTML usage.
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| **type** | `"text" \| "contained" \| "outlined" \| "icon"` | `"contained"` | Controls the visual variant |
+| **type** | `"text" \| "contained" \| "outlined" \| "icon" \| "custom"` | `"contained"` | Controls the visual variant |
 | **buttonFunction** | `"button" \| "submit" \| "reset"` | `"button"` | Maps to the native HTML button `type` attribute |
 | **checked** | `Observable<boolean> \| boolean` | `false` | Toggles automatically on click if observable |
 | **disabled** | `Observable<boolean> \| boolean` | `false` | Disables the button and updates styling |
-| **cls** | `string \| Observable<string>` | `""` | Additional classes applied to the button |
+| **cls** | `JSX.Class` | `""` | **Overrides** the default `variant` class when non-empty |
+| **class** | `JSX.Class` | `""` | **Appends** additional classes on top of the resolved class |
 | **children** | `JSX.Child` | `"Button"` | Inner label or icon |
 | **onClick** | `(e: MouseEvent) => void` | `undefined` | Runs before internal toggle behavior |
 | **...otherProps** | `JSX.ButtonHTMLAttributes<HTMLButtonElement>` | — | Any native HTML `<button>` attributes |
+
+> **Class override contract:** `cls` is the **primary class** — when non-empty it fully replaces the built-in variant class. `class` (aliased `cn` internally) **appends/pads** extra classes on top of whatever was resolved.
 
 ---
 
@@ -76,8 +79,6 @@ Web Component slot extraction:
 slot.assignedNodes().map(n => n.textContent).join('')
 ```
 
-Ensures `_TSX output matches Web Component output_`.
-
 ---
 
 # 🎨 Visual Variants
@@ -105,28 +106,41 @@ The button uses Tailwind-style utility classes for styling.
 - Icon-only  
 - Hover background  
 
+### **custom**
+- No built-in styling  
+- Developer controls all visuals using `cls`
+
 ---
 
 # 🔤 TypeScript Definition
 
 ```ts
-type ButtonProps = JSX.ButtonHTMLAttributes<HTMLButtonElement> & {
-    type?: "text" | "contained" | "outlined" | "icon",
-    buttonFunction?: "button" | "submit" | "reset",
-    checked?: Observable<boolean> | boolean,
-    disabled?: Observable<boolean> | boolean,
-    cls?: string | Observable<string>,
-    children?: JSX.Child,
-    onClick?: (e: MouseEvent) => void
-}
-
-export const Button: (props: ButtonProps) => JSX.Element
+type ButtonStyles = "text" | "contained" | "outlined" | "icon" | "custom";
+type ButtonFunction = "button" | "submit" | "reset";
 ```
 
 Web Component registration:
 
 ```ts
 customElement('wui-button', Button)
+```
+
+---
+
+# 🧩 Render Structure
+
+```tsx
+<button
+    ref={btnRef}
+    type={() => $$(buttonFunction) as ButtonFunction}
+    disabled={disabled}
+    class={() => [
+        () => $$(cls) ? $$(cls) : variant[$$(buttonType)], cn
+    ]}
+    {...otherProps}
+>
+    {children}
+</button>
 ```
 
 ---
@@ -171,6 +185,6 @@ The Button component is:
 
 - **Consistent** — same API across TSX & HTML  
 - **Reactive** — supports Woby observable props  
-- **Customizable** — extend styles using `cls`  
+- **Customizable** — extend styles using `cls` / `class`  
 - **Accessible** — fully keyboard-friendly  
-- **Flexible** — supports text, outlined, contained, and icon modes  
+- **Flexible** — supports text, outlined, contained, icon, and custom modes

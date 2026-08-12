@@ -24,9 +24,10 @@ import './Collapse'   // registers <wui-collapse>
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | **children** | JSX.Child | `null` | Content shown inside collapse |
-| **open** | boolean \| Observable<boolean> | `true` | Controls visibility; closed = not rendered |
-| **background** | boolean \| Observable<boolean> | `true` | Enables grey background shading |
-| **cls** | string | `""` | Additional classes merged with base styles |
+| **open** | boolean \| Observable<boolean> | `true` | Controls visibility; closed = not rendered (HtmlBoolean) |
+| **background** | boolean \| Observable<boolean> | `true` | Enables grey background shading (HtmlBoolean) |
+| **cls** | string | `""` | Primary class; overrides default base classes when set (HtmlClass) |
+| **class** | string | `""` | Additional classes appended to the component |
 | **...otherProps** | HTMLAttributes\<div> | — | All other HTML `<div>` attributes |
 
 ---
@@ -48,7 +49,9 @@ If `open` is not observable, Collapse wraps it with an observable.
 Collapse only renders when `open === true`:
 
 ```tsx
-return internalOpen() === false ? null : renderCollapse()
+return () => {
+  return $$(internalOpen) === false ? null : renderCollapse()
+}
 ```
 
 This means:
@@ -62,7 +65,9 @@ This means:
 ## 3. Background Logic
 
 ```ts
-isBackground = () => background === true ? "bg-[#ccc]" : ""
+const isBackground = () => {
+  return $$(background) === true ? "bg-[#ccc]" : ""
+}
 ```
 
 - `background={true}` → grey shaded container  
@@ -73,18 +78,23 @@ isBackground = () => background === true ? "bg-[#ccc]" : ""
 ## 4. Wrapper Structure
 
 ```tsx
-<div class={[baseClass, isBackground(), cls].join(" ")}>
-    <div class="h-fit">
-        {children}
-    </div>
+<div
+  class={[() => $$(cls) ? $$(cls) : baseClass, () => isBackground(), cn]}
+  {...otherProps}
+>
+  <div class="h-fit">
+    {children}
+  </div>
 </div>
 ```
 
 Where:
 
 ```
-baseClass = "overflow-hidden transition-height duration-200 ease-in-out"
+baseClass = "overflow-hidden transition-height duration-200 ease-in-out "
 ```
+
+Note that `cls` overrides `baseClass` entirely when set, while `class` (aliased as `cn`) appends on top.
 
 ---
 
@@ -133,8 +143,8 @@ The Collapse component offers:
 
 - Clean expand/collapse logic  
 - Background control  
-- Full styling override capability  
+- Full styling override capability via `cls` + `class`  
 - Reactive open/close state  
 - Unmounted content when closed  
 - Smooth, built-in height animation  
-- Identical behavior in TSX and Web Component usage  
+- Identical behavior in TSX and Web Component usage

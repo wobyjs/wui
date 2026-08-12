@@ -1,7 +1,7 @@
 # 🧩 IconButton API
 
 The **IconButton API** defines the props, behavior, and internal logic of the icon-only action button.  
-This component accepts SVGs, images, objects, or custom visual elements.
+This component accepts SVGs, images, or custom visual elements.
 
 ---
 
@@ -23,13 +23,13 @@ import "./IconButton"; // registers <wui-icon-button>
 
 # 🧭 Props Overview
 
-| Prop              | Type                  | Default     | Description                                   |
-| ----------------- | --------------------- | ----------- | --------------------------------------------- |
-| **children**      | JSX.Child             | `null`      | Icon element (SVG, IMG, OBJECT, etc.)         |
-| **cls**           | string                | `""`        | Additional CSS classes merged with base style |
-| **disabled**      | boolean or Observable | `false`     | Disables click interaction                    |
-| **onClick**       | function              | `undefined` | Click handler                                 |
-| **...otherProps** | ButtonHTMLAttributes  | —           | Full support for all native `<button>` props  |
+| Prop              | Type                          | Default | Description                                                  |
+| ----------------- | ----------------------------- | ------- | ------------------------------------------------------------ |
+| **children**      | JSX.Child                     | `null`  | Icon element (SVG, IMG, etc.)                                |
+| **disabled**      | boolean or Observable<boolean> | `false` | Disables click interaction (HtmlBoolean)                     |
+| **cls**           | string                        | `""`    | Primary class; overrides default base classes when set (HtmlClass) |
+| **class**         | string                        | `""`    | Additional classes appended to the component                 |
+| **...otherProps** | ButtonHTMLAttributes          | —       | Full support for all native `<button>` props, incl. `onClick` |
 
 ---
 
@@ -38,20 +38,19 @@ import "./IconButton"; // registers <wui-icon-button>
 The base class applied:
 
 ```
-inline-flex items-center justify-center
-cursor-pointer select-none
-bg-transparent rounded-[50%]
-p-2 text-[rgba(0,0,0,0.54)]
-transition-[background-color] ease-in-out
+inline-flex items-center justify-center relative box-border
+bg-transparent cursor-pointer select-none align-middle appearance-none
+no-underline text-center flex-[0_0_auto] text-2xl overflow-visible
+text-[rgba(0,0,0,0.54)] transition-[background-color] duration ease-in-out
+delay-[0ms] m-0 p-2 rounded-[50%] border-0 [outline:0px] duration-[0.3s]
 hover:bg-[#dde0dd]
 ```
 
 ### Icon Handling
 
 ```
-svg → 1em size, fill-current
-img → 1em size
-object → inherits size
+svg → 1em width/height, fill-current
+img → 1em width/height
 ```
 
 ---
@@ -63,8 +62,9 @@ When `disabled === true`:
 ```
 disabled:bg-transparent
 disabled:text-[rgba(0,0,0,0.26)]
-disabled:[&_svg]:fill-[rgba(0,0,0,0.26)]
 disabled:pointer-events-none
+disabled:cursor-default
+disabled:[&_svg]:fill-[rgba(0,0,0,0.26)]
 ```
 
 Effectively:
@@ -80,12 +80,16 @@ Effectively:
 Final output:
 
 ```tsx
-<button disabled={disabled} class={[baseClass, cls]} {...otherProps}>
+<button
+  disabled={disabled}
+  class={[() => $$(cls) ? $$(cls) : baseClass, cn]}
+  {...otherProps}
+>
   {children}
 </button>
 ```
 
-Children are inserted directly, allowing any icon node.
+Children are inserted directly, allowing any icon node. `cls` overrides the base class entirely when set; `class` (aliased as `cn`) appends on top.
 
 ---
 
@@ -131,8 +135,8 @@ Children are inserted directly, allowing any icon node.
 IconButton provides:
 
 - A compact, circular action control
-- Support for any icon type (SVG, IMG, OBJECT)
-- Full styling override via `cls`
+- Support for any icon type (SVG, IMG)
+- Full styling override via `cls` (override) and `class` (append)
 - Native button semantics and accessibility
 - Clean disabled state handling
 - TSX and Web Component compatibility

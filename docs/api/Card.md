@@ -30,10 +30,13 @@ import './Card'
 |------|------|---------|-------------|
 | **variant** | `"elevated" \| "outlined" \| "filled"` | `"elevated"` | Determines card style |
 | **elevation** | `0 \| 1 \| 2 \| 3 \| 4` | `1` | Shadow intensity |
-| **interactive** | `boolean` | `false` | Enables hover shadow/transform |
-| **cls** | string | `""` | Additional classes |
+| **interactive** | `boolean \| Observable<boolean>` | `false` | Enables hover shadow |
+| **cls** | `JSX.Class` | `""` | **Overrides** the default base classes when non-empty |
+| **class** | `JSX.Class` | `""` | **Appends** additional classes on top of the resolved class |
 | **children** | JSX.Child | `null` | Card body |
 | **...otherProps** | HTMLAttributes `<div>` | — | Additional `<div>` attributes |
+
+> **Class override contract:** `cls` is the **primary class** — when non-empty it fully replaces the built-in base + variant + interactive classes. `class` (aliased `cn`) **appends/pads** extra classes on top of whatever was resolved.
 
 ---
 
@@ -41,7 +44,7 @@ import './Card'
 
 ```ts
 variant === "outlined"
-    → "border shadow-none"
+    → "border border-[rgba(0,0,0,0.12)] shadow-none"
 
 variant === "filled"
     → "!bg-gray-50" + elevation shadow
@@ -67,8 +70,8 @@ variant === "elevated"
 # ⚙️ Interactive Logic
 
 ```ts
-interactive === true
-    → "cursor-pointer hover:shadow-[...]"
+interactive == true
+    → "cursor-pointer hover:shadow-[rgba(0,0,0,0.2)_0px_4px_5px_-2px,rgba(0,0,0,0.14)_0px_7px_10px_1px,rgba(0,0,0,0.12)_0px_2px_16px_1px]"
 ```
 
 Useful for clickable cards.
@@ -79,49 +82,61 @@ Useful for clickable cards.
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| **src** | string | `""` | Background image |
-| **alt** | string | `""` | Accessible label |
+| **src** | string | `""` | Background image URL (`background-image: url(...)`) |
+| **alt** | string | `""` | Accessible label (`aria-label` + `title`) |
 | **height** | string | `"140px"` | Height of media |
 | **position** | string | `"center center"` | CSS background-position |
-| **fit** | `"cover" \| "contain" \| ..." ` | `"cover"` | Background-size |
-| **cls** | string | `""` | Extra classes |
+| **fit** | `"cover" \| "contain" \| "fill" \| "none" \| "scale-down"` | `"cover"` | background-size |
+| **cls** | `JSX.Class` | `""` | **Overrides** the default `"block bg-no-repeat"` class when non-empty |
+| **class** | `JSX.Class` | `""` | **Appends** additional classes |
 
-Media container uses:
+Media renders as a `<div>` with `role="img"`, `title`, and `aria-label`:
 
 ```tsx
-style={{
-    height: height(),
-    backgroundImage: src() ? `url(${src()})` : "",
-    backgroundPosition: position(),
-    backgroundSize: fit(),
-}}
+<div
+    role="img"
+    title={alt()}
+    aria-label={alt()}
+    class={[() => $$(cls) ? $$(cls) : "block bg-no-repeat", cn]}
+    style={() => ({
+        height: height(),
+        backgroundImage: src() ? `url(${src()})` : "",
+        backgroundPosition: position(),
+        backgroundSize: fit(),
+    })}
+/>
 ```
 
 ---
 
 # 📄 CardContent Props
 
-| Prop | Type | Default |
-|------|------|---------|
-| **padding** | string | `"p-4"` |
-| **cls** | string | `""` |
-| **children** | JSX.Child | content |
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| **padding** | `JSX.Class` | `"p-4"` | Padding utility class |
+| **cls** | `JSX.Class` | `""` | **Overrides** the default padding class when non-empty |
+| **class** | `JSX.Class` | `""` | **Appends** additional classes |
+| **children** | JSX.Child | `null` | Content |
 
 Renders as:
 
 ```tsx
-<div class={[padding(), cls()].join(" ")}>
+<div class={[() => $$(cls) ? $$(cls) : [$$(padding)].join(" "), cn]}>
+    {children}
+</div>
 ```
 
 ---
 
 # 🔘 CardActions Props
 
-| Prop | Type | Default |
-|------|------|---------|
-| **align** | `"start" \| "center" \| "between" \| "end"` | `"start"` |
-| **padding** | string | `"p-2"` |
-| **cls** | string | `""` |
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| **align** | `"start" \| "center" \| "between" \| "end"` | `"start"` | Horizontal alignment |
+| **padding** | `JSX.Class` | `"p-2"` | Padding utility class |
+| **cls** | `JSX.Class` | `""` | **Overrides** the default flex alignment classes when non-empty |
+| **class** | `JSX.Class` | `""` | **Appends** additional classes |
+| **children** | JSX.Child | `null` | Action buttons |
 
 Alignment logic:
 
@@ -130,6 +145,14 @@ start   → justify-start
 center  → justify-center
 between → justify-between
 end     → justify-end
+```
+
+Renders as:
+
+```tsx
+<div class={[() => $$(cls) ? $$(cls) : ["flex items-center", justify(), $$(padding)].join(" "), cn]}>
+    {children}
+</div>
 ```
 
 ---
@@ -154,7 +177,7 @@ end     → justify-end
 
 # ♿ Accessibility
 
-- `CardMedia` uses `role="img"` + `aria-label` for screen readers  
+- `CardMedia` uses `role="img"` + `aria-label` + `title` for screen readers  
 - Cards are neutral `<div>` elements; wrap in `<article>` or `<section>` for richer semantics  
 - Interactive cards should include `tabindex` if they behave like buttons  
 - Ensure text contrast meets WCAG when using filled variant  
@@ -169,4 +192,4 @@ The Card system provides:
 - **Flexible visual variants & elevation**  
 - **Hover interactivity**  
 - **Powerful media + content + actions pattern**  
-- **Full TSX + Web Component compatibility**  
+- **Full TSX + Web Component compatibility**

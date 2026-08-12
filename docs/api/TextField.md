@@ -8,12 +8,12 @@ This API describes the internal logic, props, reactive behavior, DOM structure, 
 
 ### TSX
 ```tsx
-import { TextField } from './TextField'
+import { TextField, StartAdornment, EndAdornment } from './TextField'
 ```
 
 ### Web Component
 ```ts
-import './TextField'   // registers <wui-text-field>
+import './TextField'   // registers <wui-text-field>, <wui-start-adornment>, <wui-end-adornment>
 ```
 
 ---
@@ -22,21 +22,42 @@ import './TextField'   // registers <wui-text-field>
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| **label** | string | `""` | Floating label text |
-| **value** | string or Observable | `""` | Input value |
+| **value** | string or Observable | `""` | Input value (observable for two-way binding) |
+| **inputType** | `INPUT_TYPE` | `"text"` | Input type attribute (`text`, `password`, `email`, `number`, `tel`, `url`, `search`, `date`, `datetime-local`, `month`, `week`, `time`, `color`) |
 | **placeholder** | string | `""` | Placeholder text |
-| **helperText** | string | `""` | Helper text below the field |
-| **error** | boolean | `false` | Error state styling |
+| **label** | string | `""` | Floating label text |
 | **disabled** | boolean | `false` | Disables input interaction |
-| **required** | boolean | `false` | Shows required indicator |
-| **effect** | string | `"underline"` | One of 27 supported visual effects |
-| **startIcon** | JSX.Child | `null` | Leading icon |
-| **endIcon** | JSX.Child | `null` | Trailing icon |
-| **multiline** | boolean | `false` | Uses `<textarea>` instead of `<input>` |
-| **rows** | number | `3` | Textarea row count |
-| **type** | string | `"text"` | Input type attribute |
-| **cls** | string | `""` | Additional class overrides |
-| **...otherProps** | HTMLAttributes | — | Passed to `<input>` or `<textarea>` |
+| **effect** | string | `""` | Effect name from the 27 supported effects |
+| **assignOnEnter** | boolean | `false` | When `true`, value is committed only on Enter key |
+| **children** | JSX.Child | `null` | Rendered inside the field; used for `StartAdornment` / `EndAdornment` |
+| **ref** | `(el: HTMLInputElement) => void` | — | Callback ref for the input element |
+| **onChange** | `(e: Event) => void` | — | Input change callback |
+| **onKeyUp** | `(e: KeyboardEvent) => void` | — | Key-up callback |
+| **cls** | string | `""` | Override/extra classes |
+| **class** | string | `""` | Append classes |
+| **...otherProps** | HTMLAttributes | — | Passed to `<input>` |
+
+---
+
+# 🧩 Adornment Components
+
+TextField uses `StartAdornment` and `EndAdornment` children in place of the previous `startIcon`/`endIcon` props.
+
+### StartAdornment
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| **children** | JSX.Child | `null` | Content rendered as leading adornment |
+| **cls** | string | `""` | Additional classes |
+
+### EndAdornment
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| **children** | JSX.Child | `null` | Content rendered as trailing adornment |
+| **cls** | string | `""` | Additional classes |
+
+Adornments are identified by an internal `adornmentType` property set to `'start'` or `'end'`. The TextField's `children` are split by adornment type; unrecognized children are rendered in the middle slot alongside the input.
 
 ---
 
@@ -51,27 +72,21 @@ value(newValue) → update
 
 If a primitive is passed:
 
-- TextField becomes controlled internally  
-- Only parent re-render changes the value  
+- TextField becomes controlled internally
+- Only parent re-render changes the value
+
+### commit Strategy
+
+- **`assignOnEnter = false` (default)**: Value is committed on every `keyup` and `input` event.
+- **`assignOnEnter = true`**: Value is committed only when the Enter key is pressed.
+
+Native event handlers (`addEventListener`) are used instead of JSX event delegation for `keyup` and `input` to avoid shadow DOM retargeting issues where `e.target` would point to the shadow host instead of the input element.
 
 ---
 
-# 🎛 Focus & Floating Label Logic
+# 🎛 Focus & Label Logic
 
-TextField tracks:
-
-- `isFocused`
-- `hasValue`
-- `isErrored`
-- `isDisabled`
-
-Label floats when:
-
-```
-isFocused === true
-or
-value !== ""
-```
+TextField tracks focus via `inputRef` and renders a floating label when `label` is non-empty. Clicking the wrapper div calls `inputRef.focus()`.
 
 ---
 
@@ -80,23 +95,44 @@ value !== ""
 Effects are stored in a lookup object:
 
 ```ts
-effects = {
-    underline, underline2, underline3,
-    box, box2, box3,
-    outline, outline2, outline3,
-    filled, filled2, ..., filled6,
-    floatUnderline, floatUnderline2, floatUnderline3,
-    floatBox, floatBox2, floatBox3,
-    floatFill, floatFill2, floatFill3,
-    labeledBox, labeledBox2, labeledBox3
+effectMap = {
+    effect1,   // Center-out underline
+    effect2,   // Left-to-right underline
+    effect3,   // Split center-out underline
+    effect4,   // Bottom-up fill border
+    effect5,   // Left-to-right fill border
+    effect6,   // Right-to-left fill border
+    effect7,   // Center-out split outline
+    effect8,   // Corner-to-corner outline
+    effect9,   // Snake/Chasing outline
+    effect10,  // Fade in fill
+    effect11,  // Left-to-right fill
+    effect12,  // Center-out fill
+    effect13,  // Split center-out fill
+    effect14,  // Diagonal split fill
+    effect15,  // Center diamond fill
+    effect16,  // Center-out underline w/ floating label
+    effect17,  // Center-out (from left) w/ floating label
+    effect18,  // Split center-out w/ floating label
+    effect19,  // Split top/bottom border w/ floating label
+    effect20,  // Clockwise border w/ floating label
+    effect21,  // Snake border w/ floating label
+    effect22,  // Fade in fill w/ floating label
+    effect23,  // Split fill w/ floating label
+    effect24,  // Diagonal fill w/ floating label
+    effect19a, // Split border, label cuts line
+    effect20a, // Clockwise border, label cuts line
+    effect21a, // Snake border, label cuts line
 }
 ```
 
 Then selected via:
 
 ```ts
-activeEffect = effects[effect] || effects["underline"]
+activeEffect = effectMap[effectName] || defaultStyle
 ```
+
+When `effect` is empty or unrecognized, the default input style `defaultStyle` is used (no animation).
 
 ---
 
@@ -105,38 +141,54 @@ activeEffect = effects[effect] || effects["underline"]
 TextField outputs:
 
 ```tsx
-<div class="textfield-wrapper [cls] [effectClass]">
-    <div class="leading-icon">{startIcon}</div>
+<div class={[baseClass, cls, class]} tabIndex={-1} onFocus={handleFocus}>
+    <div class="relative flex-1">
+        <div class="relative flex items-center w-full gap-2">
 
-    <div class="input-container">
-        <input or textarea ... />
+            {startAdornments && (
+                <div class="shrink-0 whitespace-nowrap text-[rgba(0,0,0,0.54)]">
+                    {startAdornments}
+                </div>
+            )}
 
-        <label class="floating-label">{label}</label>
+            <div class="relative flex-1 min-w-0">
+                <input ref={inputRef} class={effectStyle}
+                    value={value} disabled={disabled}
+                    type={inputType} placeholder={placeholder} />
 
-        <!-- Animated effect elements -->
-        <div class="effect-layer"></div>
+                <span class="focus-border focus-bg pointer-events-none"><i></i></span>
+
+                {label && <label class="cursor-text">{label}</label>}
+            </div>
+
+            {endAdornments && (
+                <div class="shrink-0 whitespace-nowrap text-[rgba(0,0,0,0.54)]">
+                    {endAdornments}
+                </div>
+            )}
+
+        </div>
     </div>
-
-    <div class="trailing-icon">{endIcon}</div>
-
-    <div class="helper-text">{helperText}</div>
 </div>
 ```
+
+Key behaviors:
+
+- `cls` overrides, `class` appends
+- `tabIndex={-1}` on the wrapper div enables focus forwarding to the input
+- The `<span>` element with `focus-border` / `focus-bg` is the effect animation container
+- The label is conditionally rendered when `label` is non-empty
 
 ---
 
 # 🔄 Events
 
-TextField fires:
+TextField fires native events:
 
-- `onFocus`
-- `onBlur`
-- `onInput`
-- `onChange`
-- `onKeyDown`
-- `onKeyUp`
+- **onChange** — Called on input events (when `assignOnEnter` is false and value is observable)
+- **onKeyUp** — Called on keyup events (always, value committed based on `assignOnEnter`)
 
-All support observables seamlessly.
+Both are attached via native `addEventListener` for shadow DOM compatibility. The JSX `onChange`/`onKeyUp` handlers only invoke the callback -- value-setting is handled by the native listener.
 
 ---
 
@@ -147,29 +199,44 @@ All support observables seamlessly.
 <TextField label="Name" />
 ```
 
-### With error
+### With adornments
 ```tsx
-<TextField label="Email" error helperText="Invalid email." />
+<TextField label="Search">
+    <StartAdornment>🔍</StartAdornment>
+    <EndAdornment>
+        <button onClick={() => alert('clear')}>✕</button>
+    </EndAdornment>
+</TextField>
 ```
 
 ### With effect
 ```tsx
-<TextField effect="outline" label="Search" />
+<TextField effect="effect10" label="Search" />
 ```
 
-### Multiline
+### Commit on Enter
 ```tsx
-<TextField multiline rows={4} label="Message" />
+const name = $('')
+<TextField assignOnEnter value={name} label="Name (Enter to commit)" />
+```
+
+### HTML Usage
+```html
+<wui-text-field label="Name" placeholder="Enter name"></wui-text-field>
+
+<wui-text-field label="With icons">
+    <wui-start-adornment>🔍</wui-start-adornment>
+</wui-text-field>
 ```
 
 ---
 
 # ♿ Accessibility
 
-- Uses native `<input>` or `<textarea>` → full screen reader support  
-- Floating label doubles as accessible `<label>`  
-- Error & helper text are visibly connected  
-- Disabled state blocks interaction and reduces opacity  
+- Uses native `<input>` — full screen reader support
+- Floating label is visually connected (clickable via `cursor-text`)
+- Disabled state blocks interaction and reduces opacity
+- The wrapper is focusable (`tabIndex={-1}`) to forward focus to the input
 
 ---
 
@@ -177,10 +244,10 @@ All support observables seamlessly.
 
 TextField provides:
 
-- 27 animated effect variants  
-- Leading/trailing icons  
-- Floating label system  
-- Helper/error text  
-- Observable-friendly input value  
-- Full TSX + Web Component compatibility  
-- Highly customizable visual styling  
+- 27 animated effect variants
+- Adornment system via `StartAdornment` / `EndAdornment` children
+- Floating label system
+- Observable-friendly two-way value binding
+- Commit-on-enter mode via `assignOnEnter`
+- Full TSX + Web Component compatibility
+- Shadow DOM-safe event handling

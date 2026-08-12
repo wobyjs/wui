@@ -24,7 +24,8 @@ import './Toolbar'   // registers <wui-toolbar>
 |------|------|---------|-------------|
 | **children** | JSX.Child | `null` | Elements rendered inside the toolbar |
 | **type** | string | `"default"` | Visual variant (currently only `"default"`) |
-| **cls** | string | `""` | Additional styling classes |
+| **cls** | string | `""` | Override/extra classes |
+| **class** | string | `""` | Append classes |
 | **...otherProps** | HTMLAttributes\<div> | — | Passed directly to the root `<div>` |
 
 ---
@@ -40,10 +41,10 @@ relative flex items-center px-4 h-full
 
 This establishes baseline layout:
 
-- Horizontal flex container  
-- Vertical centering (`items-center`)  
-- Horizontal padding  
-- Full height relative to its parent  
+- Horizontal flex container
+- Vertical centering (`items-center`)
+- Horizontal padding
+- Full height relative to its parent
 
 ---
 
@@ -52,25 +53,26 @@ This establishes baseline layout:
 Toolbar renders:
 
 ```tsx
-<div class={[variantStyle[type], cls]} {...otherProps}>
+<div class={[variantStyle[type], cls, class]} {...otherProps}>
     {children}
 </div>
 ```
 
 This means:
 
-- Built-in styles apply first  
-- `cls` overrides later styles  
-- Children are rendered untouched — Toolbar does not modify or wrap them  
+- Built-in styles apply first
+- `cls` overrides later styles
+- `class` appends (plus `cls` and `class` are reactive)
+- Children are rendered untouched — Toolbar does not modify or wrap them
 
 ---
 
 # 🧩 Behavior Summary
 
-- Pure layout component — no internal logic besides class resolution  
-- Does not manage click events  
-- Does not enforce spacing  
-- Does not alter child structure  
+- Pure layout component — no internal logic besides class resolution
+- Does not manage click events
+- Does not enforce spacing
+- Does not alter child structure
 - Provides a consistent, responsive alignment container
 
 ---
@@ -112,8 +114,8 @@ This means:
 
 # ♿ Accessibility
 
-- Renders a native `<div>`; semantic meaning depends on context  
-- Add appropriate ARIA roles if used as navigation or application bar  
+- Renders a native `<div>`; semantic meaning depends on context
+- Add appropriate ARIA roles if used as navigation or application bar
 - Fully supports keyboard-accessible children
 
 ---
@@ -122,8 +124,8 @@ This means:
 
 Toolbar provides:
 
-- A clean horizontal layout container  
-- Responsive flex alignment  
-- Full styling customization via `cls`  
-- Compatible with TSX + Web Component use  
-- Ideal for headers, navbars, tool panels, and action bars  
+- A clean horizontal layout container
+- Responsive flex alignment
+- Full styling customization via `cls` and `class`
+- Compatible with TSX + Web Component use
+- Ideal for headers, navbars, tool panels, and action bars

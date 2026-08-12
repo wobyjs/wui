@@ -26,16 +26,17 @@ import "./NumberField"; // registers <wui-number-field>
 | Prop              | Type                           | Default     | Description                                       |
 | ----------------- | ------------------------------ | ----------- | ------------------------------------------------- |
 | **children**      | JSX.Child                      | `null`      | Optional extra content appended to the right side |
-| **reactive**      | boolean                        | `false`     | Updates observable immediately during typing      |
-| **noMinMax**      | boolean                        | `false`     | Disables min/max comparison logic                 |
-| **noFix**         | boolean                        | `false`     | Prevents auto-correction for out-of-range values  |
-| **noRotate**      | boolean                        | `false`     | Prevents wrapping (min→max / max→min)             |
-| **value**         | number or Observable<number>   | `0`         | Current numeric value                             |
-| **min**           | number or Observable<number>   | `0`         | Minimum allowed value                             |
-| **max**           | number or Observable<number>   | `100`       | Maximum allowed value                             |
-| **step**          | number or Observable<number>   | `1`         | Increment/decrement step                          |
-| **disabled**      | boolean or Observable<boolean> | `false`     | Fully disables all interactions                   |
-| **cls**           | string                         | `""`        | Additional classes for the wrapper                |
+| **reactive**      | boolean or Observable<boolean> | `false`     | Updates observable immediately during typing (HtmlBoolean) |
+| **noMinMax**      | boolean or Observable<boolean> | `false`     | Disables min/max comparison logic (HtmlBoolean)   |
+| **noFix**         | boolean or Observable<boolean> | `false`     | Prevents auto-correction for out-of-range values (HtmlBoolean) |
+| **noRotate**      | boolean or Observable<boolean> | `false`     | Prevents wrapping (min→max / max→min) (HtmlBoolean) |
+| **value**         | number or Observable<number>   | `0`         | Current numeric value (HtmlNumber)                |
+| **min**           | number or Observable<number>   | `0`         | Minimum allowed value (HtmlNumber)                |
+| **max**           | number or Observable<number>   | `100`       | Maximum allowed value (HtmlNumber)                |
+| **step**          | number or Observable<number>   | `1`         | Increment/decrement step (HtmlNumber)             |
+| **disabled**      | boolean or Observable<boolean> | `false`     | Fully disables all interactions (HtmlBoolean)     |
+| **cls**           | string                         | `""`        | Primary class; overrides default wrapper classes when set (HtmlClass) |
+| **class**         | string                         | `""`        | Additional classes appended to the wrapper        |
 | **onChange**      | function                       | `undefined` | Fired when value changes (non-reactive mode)      |
 | **onKeyUp**       | function                       | `undefined` | Keyboard keyup handler                            |
 | **...otherProps** | HTMLInputAttributes            | —           | Applied to `<input type="number">`                |
@@ -47,19 +48,27 @@ import "./NumberField"; // registers <wui-number-field>
 ## 1. Error Detection
 
 ```ts
-error = value < min || value > max;
+const error = useMemo(() => {
+  if ($$(noMinMax)) return false
+  return +$$(value) < +$$(min) || +$$(value) > +$$(max)
+})
 ```
 
-Turns input text red when out of range.
+Turns input text red when out of range (skipped when `noMinMax` is true).
 
----
+## 2. Disabled / Limit Guards
 
-## 2. Disabled Logic
-
-Every mutation function (inc, dec, wheel, input change) starts with:
+Decrement and increment are each gated by a computed guard:
 
 ```ts
-if (disabled) return;
+const cantMin = () => $$(disabled) || (!$$(noMinMax) && $$(value) <= $$(min) && $$(noRotate))
+const cantMax = () => $$(disabled) || (!$$(noMinMax) && $$(value) >= $$(max) && $$(noRotate))
+```
+
+Every mutation function (inc, dec, wheel, input change) also starts with:
+
+```ts
+if ($$(disabled)) return;
 ```
 
 ---
@@ -69,7 +78,7 @@ if (disabled) return;
 ### Reactive mode
 
 ```ts
-value(value + step);
+value($$((value)) ± $$(step))
 ```
 
 ### Non-reactive mode
@@ -82,9 +91,11 @@ value(inputRef.valueAsNumber ± step)
 
 ## 4. Auto-Fix Logic (`updated()`)
 
-When value changes:
+When value changes (`useEffect(updated)`):
 
-- If `noFix === true` → skip fixing
+- If `disabled` → return
+- If value unchanged since last run → return
+- If `noFix === true` **or** `noMinMax === true` → skip fixing
 - If below min:
   - `noRotate === true` → clamp to min
   - else → wrap to max
@@ -101,7 +112,7 @@ onPointerDown → inc/dec once → after 200ms → repeat every 100ms
 onPointerUp / onPointerLeave → stop repeating
 ```
 
-Makes holding +/– button rapidly update the value.
+A global `pointerup` / `pointercancel` document listener acts as a safety net to stop any active timers.
 
 ---
 
@@ -119,20 +130,24 @@ Wheel is prevented when disabled.
 # 🧩 Render Structure
 
 ```tsx
-<div class="number-input ...">
-  <Button type="icon">-</Button>
+<div class={[
+  "number-input inline-flex items-center bg-white border border-gray-300 rounded-lg ...",
+  () => $$(disabled) ? "bg-gray-100 opacity-70" : "",
+  () => $$(cls) ? $$(cls) : "",
+  cn
+]}>
+  <Button type="icon" onPointerDown={...} onPointerUp={stopUpdate} disabled={cantMin}>-</Button>
 
   <input
     ref={inputRef}
     type="number"
     value={value}
-    min={min}
-    max={max}
+    min={() => $$(noMinMax) ? undefined : $$(min)}
+    max={() => $$(noMinMax) ? undefined : $$(max)}
     step={step}
-    class="..."
   />
 
-  <Button type="icon">+</Button>
+  <Button type="icon" onPointerDown={...} onPointerUp={stopUpdate} disabled={cantMax}>+</Button>
 
   {children}
 </div>
@@ -175,4 +190,4 @@ The NumberField provides:
 - Continuous press handling
 - Wheel support
 - Full TSX + Web Component compatibility
-- Extensive styling control through `cls`
+- Extensive styling control through `cls` (override) and `class` (append)

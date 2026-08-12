@@ -23,85 +23,81 @@ import "./Badge"; // registers <wui-badge>
 
 # 🧭 Props Overview
 
-| Prop              | Type                                                          | Default                     | Description                                      |
-| ----------------- | ------------------------------------------------------------- | --------------------------- | ------------------------------------------------ |
-| **content**       | `number \| string \| null`                                    | `null`                      | The text/number displayed inside the badge.      |
-| **dot**           | `boolean`                                                     | `false`                     | If true, renders a small dot instead of content. |
-| **color**         | `"default" \| "primary" \| "success" \| "warning" \| "error"` | `"default"`                 | Badge theme color.                               |
-| **cls**           | `string \| ObservableMaybe<string>`                           | `""`                        | Additional classes.                              |
-| **children**      | `JSX.Child`                                                   | —                           | The element the badge attaches to.               |
-| **...otherProps** | —                                                             | Additional HTML attributes. |
+| Prop              | Type                                   | Default                     | Description                                      |
+| ----------------- | -------------------------------------- | --------------------------- | ------------------------------------------------ |
+| **badgeContent**  | `JSX.Child` (observable allowed)       | `null`                      | The text/number/content displayed inside the badge. |
+| **badgeClass**    | `JSX.Class`                            | `"bg-[rgb(156,39,176)]"`    | Extra classes for the badge span (default is a purple background). |
+| **vertical**      | `"top" \| "bottom"`                    | `"top"`                     | Vertical position of the badge.                  |
+| **horizontal**    | `"left" \| "right"`                    | `"right"`                   | Horizontal position of the badge.                |
+| **cls**           | `JSX.Class`                            | `""`                        | **Overrides** the default wrapper classes when non-empty. |
+| **class**         | `JSX.Class`                            | `""`                        | **Appends** additional classes onto the wrapper. |
+| **children**      | `JSX.Child`                            | `null`                      | The element the badge attaches to.               |
+| **...otherProps** | HTML attributes                        | —                           | Additional HTML attributes (incl. `badgeContent` / `badge-content` / `children` for custom elements). |
+
+> **Class override contract:** `cls` is the **primary class** for the wrapper — when non-empty it replaces the default `relative inline-flex align-middle shrink-0 m-4`. `class` (aliased `cn`) **appends** classes on top. `badgeClass` is separate and always applied to the badge span itself.
 
 ---
 
 # ⚙️ Internal Logic
 
-### Display Priority
+## 🧩 badgeContent Resolution
 
-Badge chooses what to render:
-
-1. **If `dot = true` → render a dot badge**
-2. **Else if `content != null` → render a badge with content**
-3. **Else → hide badge (unless forced visible)**
-
-### Positioning
-
-Badge wraps children:
-
-```tsx
-<div class="relative inline-block">
-  {children}
-  <span class="absolute top-0 right-0 transform ...">{content}</span>
-</div>
-```
-
----
-
-# 🎨 Styling Logic
-
-### Color Variants
+The component first normalizes `badgeContent` from various sources (important for custom-element usage where attributes arrive via `otherProps`):
 
 ```ts
-const colorMap = {
-  default: "bg-gray-500 text-white",
-  primary: "bg-blue-600 text-white",
-  success: "bg-green-600 text-white",
-  warning: "bg-yellow-500 text-white",
-  error: "bg-red-600 text-white",
-};
+useEffect(() => {
+    const contentValue = $$(badgeContent)
+    if (contentValue) return
+
+    if (otherProps['badgeContent']) {
+        badgeContent(otherProps['badgeContent'])
+    } else if (otherProps['badge-content']) {
+        badgeContent(otherProps['badge-content'])
+    } else if (otherProps['children']) {
+        badgeContent(otherProps['children'])
+    }
+})
 ```
 
-### Dot Badge
+The lookup order is: existing `badgeContent` prop → `badgeContent` attribute → `badge-content` attribute → `children`.
 
-```html
-<div class="w-2 h-2 rounded-full"></div>
+## 🎭 Visibility (isEmpty)
+
+The badge is hidden when there is no content:
+
+```ts
+const isEmpty = () => !$$(badgeContent)
 ```
 
-### Content Badge
+The visibility class toggles between `hidden` (empty) and the sized pill `min-w-[20px] h-5 rounded-[10px] px-1` (has content).
 
-```html
-<div class="px-2 py-[1px] text-xs rounded-full"></div>
-```
+## 📐 Positioning & Transform
+
+- **Placement:** `top-0`/`bottom-0` + `left-0`/`right-0` based on `vertical`/`horizontal`.
+- **Transform origin:** the badge is offset by a half-translate so it straddles the corner. The origin flips based on corner (`origin-[100%_0%]`, `origin-[0%_0%]`, `origin-[100%_100%]`, `origin-[0%_100%]`).
 
 ---
 
 # 🧩 Render Structure
 
 ```tsx
-<div class="relative inline-block" {.otherProps}>
+<div>
+  <span class={[() => ($$(cls) ? $$(cls) : "relative inline-flex align-middle shrink-0 m-4"), cn]} {...otherProps}>
+    <span class={[
+        "flex place-content-center items-center absolute box-border font-medium text-xs leading-none z-[1] text-white scale-100 [flex-flow:wrap] [transition:transform_225ms_cubic-bezier(0.4,0,0.2,1)0ms]",
+        visibilityClass(),
+        transformOriginClass(),
+        positionClasses(),
+        badgeClass,
+    ]}>
+        {() => $$(badgeContent)}
+    </span>
     {children}
-
-    {() =>
-        dot
-            ? <span class={["badge-dot", colorClass, cls]} />
-            : content != null && (
-                <span class={["badge-content", colorClass, cls]}>
-                    {content}
-                </span>
-            )
-    }
+  </span>
 </div>
 ```
+
+Note the outer `<div>` wrapper plus an inner `<span>` wrapper. The badge span is absolutely positioned relative to the wrapper span.
 
 ---
 
@@ -110,23 +106,23 @@ const colorMap = {
 ## TSX
 
 ```tsx
-<Badge content={5}>
-  <Button>Inbox</Button>
+<Badge badgeContent={5}>
+    <Avatar>J</Avatar>
 </Badge>
 ```
 
-### Dot Badge
+### Custom position & color
 
 ```tsx
-<Badge dot>
-  <Avatar>J</Avatar>
+<Badge badgeContent="9" vertical="bottom" horizontal="left">
+    <Avatar>M</Avatar>
 </Badge>
 ```
 
 ## HTML
 
 ```html
-<wui-badge content="9">
+<wui-badge badge-content="9">
   <button>Messages</button>
 </wui-badge>
 ```
@@ -136,7 +132,7 @@ const colorMap = {
 # ♿ Accessibility
 
 - Badge content is readable by screen readers
-- Dot badges should include an accessible label via `aria-label` when used for status
+- Badges should include an accessible label via `aria-label` when used for status
 
 ---
 
@@ -144,8 +140,8 @@ const colorMap = {
 
 Badge provides:
 
-- **Counts & indicators**
-- **Dot or content display**
-- **Color variants**
+- **Counts & indicators** via `badgeContent`
+- **Position control** via `vertical` / `horizontal`
+- **Custom badge styling** via `badgeClass`
 - **TSX and Web Component support**
 - **Flexible styling & layout**

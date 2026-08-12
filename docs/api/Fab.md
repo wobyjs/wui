@@ -23,13 +23,14 @@ import "./Fab"; // registers <wui-fab>
 
 # 🧭 Props Overview
 
-| Prop              | Type                               | Default  | Description                 |
-| ----------------- | ---------------------------------- | -------- | --------------------------- |
-| **children**      | JSX.Child                          | `""`     | Icon, text, or both         |
-| **type**          | `"pill" \| "circular" \| "custom"` | `"pill"` | Visual variant              |
-| **disabled**      | boolean or observable              | `false`  | Disables interaction        |
-| **cls**           | string                             | `""`     | Additional/override classes |
-| **...otherProps** | HTML button attributes             | —        | Any standard button props   |
+| Prop              | Type                              | Default  | Description                                                       |
+| ----------------- | --------------------------------- | -------- | ----------------------------------------------------------------- |
+| **children**      | JSX.Child                         | `""`     | Icon, text, or both                                               |
+| **type**          | `"pill" \| "circular" \| "custom"` | `"pill"` | Visual variant (HtmlString)                                       |
+| **disabled**      | boolean or Observable<boolean>    | `false`  | Disables interaction                                              |
+| **cls**           | string                            | `""`     | Primary class; overrides default variant classes when set (HtmlClass) |
+| **class**         | string                            | `""`     | Additional classes appended to the component                      |
+| **...otherProps** | HTML button attributes            | —        | Any standard button props                                         |
 
 ---
 
@@ -59,10 +60,10 @@ import "./Fab"; // registers <wui-fab>
 Variant styles are mapped by:
 
 ```ts
-variantStyle = {
-  circular: "...",
-  pill: "...",
-  custom: "",
+const variantStyle = {
+  circular: "inline-flex items-center justify-center ... w-14 h-14 bg-[rgb(25,118,210)] hover:bg-[rgb(21,101,192)]",
+  pill: "absolute bg-[rgb(25,118,210)] text-[white] text-4xl font-black ... rounded-[50px]",
+  custom: ""
 };
 ```
 
@@ -73,14 +74,19 @@ variantStyle = {
 The core element is a `<button>`:
 
 ```tsx
-<button class={[variantStyle[type], cls]} disabled={disabled} {...otherProps}>
+<button
+  class={[() => $$(cls) ? $$(cls) : variantStyle[$$(variant)], cn]}
+  disabled={disabled}
+  {...otherProps}
+>
   <div class="flex items-center">{children}</div>
 </button>
 ```
 
 Key behaviors:
 
-- `cls` merges last → strongest override
+- `cls` overrides the default variant classes; when it is unset, the variant style is applied
+- `class` (aliased as `cn`) appends additional classes on top
 - Disabled buttons prevent interaction
 - Children are wrapped for consistent icon/text alignment
 
@@ -131,6 +137,6 @@ The Fab component provides:
 - High-emphasis CTA actions
 - Circular and pill variants
 - Click handling & disabled states
-- Full styling control via `cls`
+- Full styling control via `cls` (override) and `class` (append)
 - Works in TSX and Web Component usage
 - Ideal for floating UI triggers and add-action patterns

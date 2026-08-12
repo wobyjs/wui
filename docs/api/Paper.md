@@ -24,8 +24,9 @@ import './Paper'   // registers <wui-paper>
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | **children** | JSX.Child | `null` | Content inside the Paper container |
-| **elevation** | number or Observable<number> | `1` | Shadow depth (0–24 supported, presets applied) |
-| **cls** | string | `""` | Additional styles merged with base classes |
+| **elevation** | number or Observable<number> | `1` | Shadow depth; presets applied via lookup (HtmlNumber) |
+| **cls** | string | `""` | Primary class; overrides default base classes when set (HtmlClass) |
+| **class** | string | `""` | Additional classes appended to the component |
 | **...otherProps** | HTMLAttributes\<div> | — | Passed directly to the wrapper `<div>` |
 
 ---
@@ -41,10 +42,13 @@ transition-shadow duration-300 ease-in-out
 
 ### Elevation preset mapping
 ```ts
-elevationClass = preset[elevation] ?? preset[0]
+const elevationClass = useMemo(() => {
+  const elev = $$(elevation)
+  return preset[elev] ?? preset[0]
+})
 ```
 
-### Examples of mapping:
+### Mapping:
 | Elevation | Class |
 |-----------|--------|
 | `0` | `shadow-none` |
@@ -53,7 +57,10 @@ elevationClass = preset[elevation] ?? preset[0]
 | `3` | `shadow-md` |
 | `4` | `shadow-lg` |
 | `6` | `shadow-xl` |
-| `8`+ | `shadow-2xl` |
+| `8` | `shadow-2xl` |
+| `12` | `shadow-2xl` |
+| `16` | `shadow-2xl` |
+| `24` | `shadow-2xl` |
 
 Invalid numbers (e.g., 5, 7, 15, etc.) automatically fallback to elevation 0.
 
@@ -62,7 +69,7 @@ Invalid numbers (e.g., 5, 7, 15, etc.) automatically fallback to elevation 0.
 # ⚙️ Rendering Structure
 
 ```tsx
-<div class={[baseClass, elevationClass, cls]} {...otherProps}>
+<div class={[() => $$(cls) ? $$(cls) : baseClass, elevationClass, cn]} {...otherProps}>
     {children}
 </div>
 ```
@@ -70,8 +77,10 @@ Invalid numbers (e.g., 5, 7, 15, etc.) automatically fallback to elevation 0.
 Where:
 
 ```
-baseClass = "bg-white transition-shadow duration-300 ease-in-out rounded-lg"
+baseClass = "bg-white transition-shadow duration-300 ease-in-out rounded-lg "
 ```
+
+`cls` overrides `baseClass` entirely when set, while `class` (aliased as `cn`) appends on top.
 
 ---
 
@@ -114,6 +123,6 @@ Paper provides:
 - Elevation-based visual depth  
 - Smooth shadow transitions  
 - Clean white container by default  
-- Fully customizable styling  
+- Fully customizable styling via `cls` + `class`  
 - TSX + Web Component support  
-- Graceful fallback for unsupported elevation values  
+- Graceful fallback for unsupported elevation values
