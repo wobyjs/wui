@@ -154,7 +154,7 @@ const InsertDropDown = defaults(def, (props) => {
     const editor = $(EditorContext)
     // const { undos, saveDo } = useUndoRedo() // Removed as saveDo is handled by MutationObserver
     const isOpen = $(false)
-    const dropdownRef = $<HTMLElement>(null)
+    const dropdownRef = $<HTMLElement>(null as any)
 
     useOnClickOutside(dropdownRef as any, () => isOpen(false))
 
@@ -176,7 +176,7 @@ const InsertDropDown = defaults(def, (props) => {
                 role="menu"
                 aria-orientation="vertical"
                 aria-labelledby="insert-menu-button"
-                onMouseDown={(e) => {
+                onMouseDown={(e: any) => {
                     e.stopPropagation() // Prevents the menu from closing immediately
                     e.preventDefault()  // Prevents the editor from losing focus
                 }}
@@ -213,7 +213,7 @@ const InsertDropDown = defaults(def, (props) => {
                     onClick={toggleDropdown}
                     title="Insert content"
                     disabled={disabled}
-                    onMouseDown={(e) => { e.preventDefault(); e.stopPropagation() }}
+                    onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation() }}
                 >
                     <span class="text-center truncate">
                         <Plus class="size-5" />
@@ -223,7 +223,7 @@ const InsertDropDown = defaults(def, (props) => {
                     type='outlined'
                     class="size-full inline-flex justify-center items-center rounded-md border border-gray-300 shadow-sm bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500 cursor-pointer px-2"
                     onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleDropdown(); }}
-                    onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                    onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation(); }}
                     title="Toggle dropdown"
                     disabled={disabled}
                 >

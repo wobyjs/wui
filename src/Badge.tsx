@@ -31,16 +31,16 @@ const def = () => ({
      * - User can override the default class by providing a `cls` prop
      * - `class` can be used to add additional classes to the component
      */
-    cls: $('', HtmlClass) as JSX.Class | undefined,
-    class: $('', HtmlClass) as JSX.Class | undefined,
-    children: $(null as JSX.Child),
+    cls: $('', HtmlClass) as JSX.Class,
+    class: $('', HtmlClass) as JSX.Class,
+    children: $(null as JSX.Child) as CustomElementChildren,
     badgeContent: $(null as JSX.Child),
-    badgeClass: $("bg-[rgb(156,39,176)]", HtmlClass) as JSX.Class | undefined, //$("bg-[rgb(156,39,176)]" as JSX.Class),
+    badgeClass: $("bg-[rgb(156,39,176)]", HtmlClass) as JSX.Class, //$("bg-[rgb(156,39,176)]" as JSX.Class),
     vertical: $('top', HtmlString) as ObservableMaybe<VerticalPosition>,
     horizontal: $('right', HtmlString) as ObservableMaybe<HorizontalPosition>,
 })
 
-const Badge = defaults(def, (props) => {
+const Badge: Defaulted<typeof def> = defaults(def, (props) => {
     const { class: cn, cls, children, badgeContent, badgeClass, vertical, horizontal, ...otherProps } = props
 
     // Handle attribute and prop values
@@ -55,13 +55,16 @@ const Badge = defaults(def, (props) => {
         // For custom elements, attributes are passed in otherProps
         // HTML attributes with hyphens are converted to camelCase
 
-        if (otherProps['badgeContent']) {
-            badgeContent(otherProps['badgeContent'])
-        } else if (otherProps['badge-content']) {
-            badgeContent(otherProps['badge-content'])
-        } else if (otherProps['children']) {
+        // `otherProps` is the untyped attribute bag the custom element hands through; the badge
+        // content can arrive under any of these spellings depending on how the tag was authored.
+        const attrs = otherProps as Record<string, any>
+        if (attrs['badgeContent']) {
+            badgeContent(attrs['badgeContent'])
+        } else if (attrs['badge-content']) {
+            badgeContent(attrs['badge-content'])
+        } else if (attrs['children']) {
             // For HTML custom elements, content might be passed as children
-            badgeContent(otherProps['children'])
+            badgeContent(attrs['children'])
         } else {
             // For custom elements, we might need to access the attribute directly from the element
             // This is a fallback for when the attribute isn't properly passed through otherProps

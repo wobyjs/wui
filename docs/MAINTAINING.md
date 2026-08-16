@@ -47,15 +47,28 @@ docs/components/
 
 Use an existing component file as a template.
 
-### **2. Run the Documentation Generation Script**
+### **2. Derive the Prop Table from the Emitted Types**
+
+There is no doc-generation script. The authoritative prop surface is the
+declaration output, so build it first and read the component's `.d.ts`:
 
 ```sh
-npm run docs:generate
+pnpm build          # vite build, then tsc --emitDeclarationOnly → dist/types/
+cat dist/types/MyComponent.d.ts
 ```
 
-This creates baseline documentation that must be further refined manually.
+Components written with woby's `defaults()` emit as a `def` factory plus a
+`Defaulted` alias — the object literal inside `def` **is** the prop list:
 
-### **3. Enhance the Generated Documentation**
+```ts
+declare const def: () => { children: CustomElementChildren; checked: ObservableMaybe<boolean>; /* … */ }
+declare const Checkbox: Defaulted<typeof def>;
+```
+
+Plain function components emit `declare const X: (props: Partial<{ … }>) => JSX.Element`
+instead. Either way, every key in that literal needs a row in the doc table.
+
+### **3. Enhance the Documentation**
 
 Update the component doc with:
 
@@ -107,6 +120,25 @@ Verify the following before committing documentation changes:
 - Prop descriptions match implementation
 - No outdated patterns remain
 
+Run both suites — they log actual **and** expected markup per state, so a drifted
+prop shows up as a concrete diff rather than a bare failure:
+
+```sh
+pnpm build              # must emit zero `error TS` lines
+pnpm test               # pure Node.js woby SSR (src/ssr/TestXxx.tsx)
+pnpm dev                # demo cum test page — scroll to "SSR Snapshot Tests"
+```
+
+Those two are the whole suite. `pnpm dev` shows each module's actual/expect pair
+on the page and mirrors the same log to the console; `pnpm test` is the headless
+`renderToString` equivalent. Playwright is parked (see `playwright/README.md`);
+the small vitest suite for editor internals (`pnpm exec vitest run`) is separate
+and not part of the release check.
+
+`pnpm build` runs `vite build` **before** `declaration` on purpose: `vite build`
+has `emptyOutDir: true`, so emitting declarations first would leave `dist/types`
+wiped and the package's `"types"` field dangling. Don't reorder them.
+
 Following these steps ensures the documentation stays accurate and reliable.
 
 ---
@@ -133,9 +165,21 @@ Adhering to these conventions ensures readability and reduces friction for users
 
 ---
 
-## ⚙️ Automated Documentation Generation
+## ⚙️ Keeping Docs in Sync with the Types
 
-The documentation generator creates starting templates, but **manual refinement** is always required.
+Docs are written by hand; `dist/types/**/*.d.ts` is the source of truth for what
+props exist. When auditing a batch of pages, compare the first column of each
+markdown prop table against the keys declared in the matching `.d.ts` — the
+mismatches fall into two buckets:
+
+- **Undocumented** (in the types, absent from the table) — a real gap; add the row.
+- **Not in code** (in the table, absent from the types) — usually a *false
+  positive*: value tables (`effect1`…`effect24` for TextArea's `effect` prop,
+  the `mode` values for DateTimeWheeler), event tables (Wheeler's
+  `pointerdown`/`pointermove`), section tables (Editor's History/Colors), or
+  props inherited from a shared type (the PropertyForm editors all take
+  `UIProps<T>` from `PropertyForm/Editors.d.ts`, which lives in a different file
+  than the component). Check before deleting anything.
 
 Automation helps with structure; humans supply clarity and correctness.
 

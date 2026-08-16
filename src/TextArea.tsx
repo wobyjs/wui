@@ -11,7 +11,7 @@ import {
 } from './TextField.effect'
 
 import {
-    ObservableMaybe, $$, $, type JSX, isObservable, Observable,
+    ObservableMaybe, $$, $, type JSX, isObservable, Observable, type CustomElementChildren,
     defaults, customElement, type ElementAttributes,
     HtmlBoolean, HtmlString, useMemo,
     HtmlClass,
@@ -73,26 +73,25 @@ type ResizeProps = "none" | "horizontal" | "vertical" | "both"
 /* ------------------------------------------------------------------ */
 
 const def = () => ({
-    cls: $('', HtmlClass) as JSX.Class | undefined,
-    class: $('', HtmlClass) as JSX.Class | undefined,
-    children: $(null) as ObservableMaybe<JSX.Child> | undefined,
-
+    cls: $('', HtmlClass) as JSX.Class,
+    class: $('', HtmlClass) as JSX.Class,
+    children: $(null) as CustomElementChildren,
     /** Effect name like "effect19a", "effect7", etc. */
-    effect: $("effect19a", HtmlString) as ObservableMaybe<string> | undefined,
+    effect: $("effect19a", HtmlString) as ObservableMaybe<string>,
 
     /** If true → commit only on Enter. If false (default) → commit on key up / change. */
-    assignOnEnter: $(false, HtmlBoolean) as ObservableMaybe<boolean> | undefined,
+    assignOnEnter: $(false, HtmlBoolean) as ObservableMaybe<boolean>,
 
     /** Text value (primitive or observable). */
-    value: $("", HtmlString) as ObservableMaybe<string> | undefined,
+    value: $("", HtmlString) as ObservableMaybe<string>,
 
     /** Placeholder text – keep empty when using floating label effects. */
-    placeholder: $("", HtmlString) as ObservableMaybe<string> | undefined,
+    placeholder: $("", HtmlString) as ObservableMaybe<string>,
 
     /** Optional floating label text (for label-based effects). */
-    label: $("", HtmlString) as ObservableMaybe<string> | undefined,
+    label: $("", HtmlString) as ObservableMaybe<string>,
 
-    resize: $("none", HtmlString) as ObservableMaybe<ResizeProps> | undefined,
+    resize: $("none", HtmlString) as ObservableMaybe<ResizeProps>,
 
 
     onChange: undefined as ((e: any) => void) | undefined,
@@ -103,7 +102,7 @@ const def = () => ({
 /*  TextArea component (effect-compatible with TextField)             */
 /* ------------------------------------------------------------------ */
 
-const TextArea = defaults(def, (props) => {
+const TextArea: Defaulted<typeof def> = defaults(def, (props) => {
     const { cls, class: cn, children, effect, assignOnEnter, value, placeholder, label, resize, onChange, onKeyUp, ...otherProps } = props
 
     // Wrapper: only positions span/label, allows overflow for floating label
@@ -126,6 +125,18 @@ const TextArea = defaults(def, (props) => {
         return effectMap[effectName] || ""
     })
 
+    // ── Floating-label / placeholder reconciliation ──
+    // See the matching comment in TextField: the labeled effects float the label
+    // on `:not(:placeholder-shown)`, which needs a non-empty placeholder to exist,
+    // and a visible placeholder overprints the resting label.
+    const placeholderValue = useMemo(() => {
+        const p = $$(placeholder)
+        if (!$$(label)) return p
+        return p ? p : ' '
+    })
+    const labelPlaceholderClass = useMemo(() =>
+        $$(label) ? "placeholder:text-transparent focus:placeholder:text-[#aaa]" : "")
+
     const commitValue = (e: any) => {
         if (isObservable(value)) {
             (value as Observable<string>)(e.target.value)
@@ -140,19 +151,20 @@ const TextArea = defaults(def, (props) => {
                 class={() => [
                     effectStyle,
                     resizeStyle,
+                    labelPlaceholderClass,
 
                     "block bg-transparent size-full",
                 ]}
-                placeholder={placeholder}
+                placeholder={placeholderValue}
                 value={value}
                 {...otherProps}
-                onChange={(e) => {
+                onChange={(e: any) => {
                     if (!$$(assignOnEnter) && isObservable(value)) {
                         commitValue(e)
                     }
                     onChange?.(e)
                 }}
-                onKeyUp={(e) => {
+                onKeyUp={(e: any) => {
                     if (!$$(assignOnEnter) && isObservable(value)) {
                         commitValue(e)
                         onKeyUp?.(e)
@@ -163,6 +175,11 @@ const TextArea = defaults(def, (props) => {
                         }
                         onKeyUp?.(e)
                     }
+                }}
+                onBlur={(e: any) => {
+                    // Same reason as TextField: with `assignOnEnter` the observable was
+                    // only ever written on Enter, so clicking away discarded the edit.
+                    if ($$(assignOnEnter) && isObservable(value)) commitValue(e as any)
                 }}
             />
 
@@ -246,12 +263,12 @@ export const TextAreaOriginal = ({
             <textarea
                 class={effect ?? effect19a}
                 {...{ ...ps, type, placeholder }}
-                onChange={e =>
+                onChange={(e: any) =>
                     !$$(reactive) && isObservable(ps.value)
                         ? ((ps.value as Observable)?.(e.target.value), onChange?.(e))
                         : undefined
                 }
-                onKeyUp={e =>
+                onKeyUp={(e: any) =>
                     !$$(reactive) && isObservable(ps.value)
                         ? ((ps.value as Observable)?.(e.target.value), onKeyUp?.(e))
                         : (e.key === 'Enter' && isObservable(ps.value) && ps.value(e.target.value),

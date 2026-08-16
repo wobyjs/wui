@@ -19,3 +19,4 @@ declare const NoOverlaySidebar: () => import("woby").Child;
  */
 declare const CustomStyledSidebar: () => import("woby").Child;
 export { BasicSidebar, CustomWidthSidebar, NoOverlaySidebar, CustomStyledSidebar, };
+//# sourceMappingURL=Sidebar.test.d.ts.map

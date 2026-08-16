@@ -2,20 +2,20 @@ import { $, $$, ElementAttributes, HtmlClass, HtmlString, Observable, Observable
 import { Button } from "./Button"
 
 const defTabs = () => ({
-	cls: $('', HtmlClass) as JSX.Class | undefined,
-	class: $('', HtmlClass) as JSX.Class | undefined,
+	cls: $('', HtmlClass) as JSX.Class,
+	class: $('', HtmlClass) as JSX.Class,
 	activeTag: $("", HtmlString) as ObservableMaybe<string>,
 	children: $(null) as JSX.Child
 })
 
 const defTab = () => ({
-	cls: $('', HtmlClass) as JSX.Class | undefined,
-	class: $('', HtmlClass) as JSX.Class | undefined,
+	cls: $('', HtmlClass) as JSX.Class,
+	class: $('', HtmlClass) as JSX.Class,
 	title: $("", HtmlString) as ObservableMaybe<string>,
 	children: $(null) as JSX.Child
 })
 
-const Tabs = defaults(defTabs, (props) => {
+const Tabs: Defaulted<typeof defTabs> = defaults(defTabs, (props) => {
 	const { cls, class: cn, activeTag, children, ...otherProps } = props
 
 	// 1. State
@@ -151,7 +151,7 @@ const Tabs = defaults(defTabs, (props) => {
 	)
 }) as typeof Tabs
 
-const Tab = defaults(defTab, (props) => {
+const Tab: Defaulted<typeof defTab> = defaults(defTab, (props) => {
 	const { title, children, cls, class: cn, ...otherProps } = props
 
 	return (

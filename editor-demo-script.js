@@ -1,5 +1,28 @@
-import './src/index.tsx'
+// Document-centric components only. We deliberately do NOT import the barrel
+// './src/index.tsx' here — it re-exports the Wheeler family (Wheeler,
+// WheelerType, DateTimeWheeler, MultiWheeler), which are Portal-based overlay
+// widgets, not document-centric content. Pulling them into the editor bundle
+// instantiates Portal at load and blows the stack via
+// Portal -> useRenderEffect -> Effect.update recursion.
+import './src/input.css'
+import './src/Editor/Editor'
+import './src/Editor/EditorPlugin'
+
+// Doc-based components embeddable in editor content
+import './src/Button'
+import './src/ToggleButton'
+import './src/Checkbox'
+import './src/Switch'
+import './src/TextField'
+import './src/TextArea'
+import './src/NumberField'
+import './src/IconButton'
+import './src/Badge'
+import './src/Fab'
+import './src/Avatar'
+
 import './src/Editor/CounterPlugin.ts'
+import './src/Editor/WuiPlugins.ts'
 
 // Wait for custom element to be defined
 await customElements.whenDefined('wui-editor')

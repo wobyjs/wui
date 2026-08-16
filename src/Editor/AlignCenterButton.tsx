@@ -10,12 +10,12 @@ const CENTER_MAP = ALIGNMENT_MAP.center
 const def = () => ({
     buttonType: $("outlined", HtmlString) as ObservableMaybe<ButtonStyles>,
     title: $(CENTER_MAP.defaultTitle, HtmlString) as ObservableMaybe<string>,
-    cls: $('', HtmlClass) as JSX.Class | undefined,
-    class: $('', HtmlClass) as JSX.Class | undefined,
+    cls: $('', HtmlClass) as JSX.Class,
+    class: $('', HtmlClass) as JSX.Class,
     disabled: $(false, HtmlBoolean) as Observable<boolean>,
 })
 
-const AlignCenterButton = defaults(def, (props) => {
+const AlignCenterButton: Defaulted<typeof def> = defaults(def, (props) => {
     const { buttonType, title, cls, class: cn, disabled, ...otherProps } = props
     const editor = useEditor()
 
@@ -85,7 +85,7 @@ const AlignCenterButton = defaults(def, (props) => {
             ]}
             disabled={disabled}
             onClick={handleClick}
-            onMouseDown={(e) => { e.preventDefault(); e.stopPropagation() }}
+            onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation() }}
             {...otherProps}
         >
             {CENTER_MAP.icon}

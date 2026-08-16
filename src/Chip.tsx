@@ -1,4 +1,4 @@
-import { $, $$, defaults, type JSX, customElement, type ElementAttributes, type ObservableMaybe, useEffect, StyleEncapsulationProps, isObservable, Observable, HtmlBoolean, HtmlClass } from "woby"
+import { type CustomElementChildren, $, $$, defaults, type JSX, customElement, type ElementAttributes, type ObservableMaybe, useEffect, StyleEncapsulationProps, isObservable, Observable, HtmlBoolean, HtmlClass } from "woby"
 import "@woby/chk"
 import "./input.css"
 import DeleteIcon from "./icons/delete_icon"
@@ -6,7 +6,7 @@ import DeleteIcon from "./icons/delete_icon"
 const def = () => ({
     avatar: $(null as JSX.Child),
     deleteIcon: $(<DeleteIcon /> as JSX.Element),
-    children: $(null as JSX.Child),
+    children: $(null as JSX.Child) as CustomElementChildren,
     /** 
      * Custom CSS classes to apply to the chip.
      * 
@@ -19,14 +19,14 @@ const def = () => ({
      * - User can override the default class by providing a `cls` prop
      * - `class` can be used to add additional classes to the component
      */
-    cls: $('', HtmlClass) as JSX.Class | undefined,
-    class: $('', HtmlClass) as JSX.Class | undefined,
-    deletable: $(false, HtmlBoolean) as ObservableMaybe<boolean> | undefined,
-    visible: $(true, HtmlBoolean) as ObservableMaybe<boolean> | undefined,
+    cls: $('', HtmlClass) as JSX.Class,
+    class: $('', HtmlClass) as JSX.Class,
+    deletable: $(false, HtmlBoolean) as ObservableMaybe<boolean>,
+    visible: $(true, HtmlBoolean) as ObservableMaybe<boolean>,
     onDelete: undefined as ((e: JSX.TargetedMouseEvent<HTMLDivElement>) => void) | undefined,
 })
 
-const Chip = defaults(def, (props) => {
+const Chip: Defaulted<typeof def> = defaults(def, (props) => {
     const { class: cn, cls, avatar, deleteIcon, children, deletable, visible, onDelete, ...otherProps } = props
 
     // Create internal visible state if not provided as observable
@@ -61,7 +61,7 @@ const Chip = defaults(def, (props) => {
                 return (
                     <div
                         class="chip-delete-icon cursor-pointer"
-                        onClick={(e) => {
+                        onClick={(e: any) => {
                             e.stopPropagation()
                             // If user provided onDelete, call it
                             if (onDelete) {

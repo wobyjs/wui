@@ -286,9 +286,19 @@ export function restoreRangePosition(selection: Selection, start: { node: Node, 
 
 
 /**
+ * A `getSelection()` result that is known to carry a live range.
+ *
+ * `state` is null exactly when `selection.rangeCount === 0`, so callers that guard on `rangeCount`
+ * have already proven `state` is present — but TypeScript cannot see that the two fields are
+ * correlated. Casting the destructure to this type states the invariant once instead of forcing a
+ * `!` onto every `state.startContainer` / `state.endOffset` read that follows the guard.
+ */
+export type LiveSelection = { selection: Selection, state: SelectionState }
+
+/**
  * Get selection state relative to a root node (default: document.body).
  */
-export function getSelection(container?: HTMLElement): { selection: Selection, state: SelectionState } | null {
+export function getSelection(container?: HTMLElement): { selection: Selection | null, state: SelectionState | null } {
     // D-16: When the editor is in shadow DOM (content cloned from light DOM via syncChildren),
     // we need to use shadowRoot.getSelection() to get the correct selection.
     // The content is in shadow DOM after syncChildren clones light DOM children.
@@ -305,7 +315,11 @@ export function getSelection(container?: HTMLElement): { selection: Selection, s
         selection = window.getSelection()
     }
 
-    if (!selection) return null;
+    // Always hand back the pair rather than `null`: every call site immediately destructures
+    // `{ selection, state }` and then null-checks `selection`, so a nullable envelope would only
+    // force ~20 redundant guards for a case (`window.getSelection()` returning null) that a real
+    // browser never produces.
+    if (!selection) return { selection: null, state: null };
 
     if (selection.rangeCount === 0) {
         // Return the selection, but state is null because there is no range to map
@@ -400,7 +414,7 @@ export function restoreSelection(state: SelectionState, root?: Node): void {
 /**
  * Generate a path of child indexes from a node up to the root.
  */
-function getNodePath(node: Node, root: Node): number[] {
+function getNodePath(node: Node, root?: Node): number[] {
     const path: number[] = []
     while (node && node !== root) {
         const parent = node.parentNode
@@ -429,7 +443,9 @@ function getNodeFromPath(path: number[], root: Node): Node | null {
 // Helper function to get the first Range object from the selection
 export const getCurrentRange = (): Range | null => {
     const selection = $$(range)
-    return selection?.ranges?.[0] ?? null
+    // `ranges` is itself an observable on the `useSelection` result, so it has to be unwrapped
+    // before indexing — reading `.ranges[0]` off the observable yields undefined at runtime.
+    return $$(selection?.ranges)?.[0] ?? null
 }
 
 export const range = useMemo(() => {
@@ -504,7 +520,7 @@ export const selectText = (element: HTMLElement, range: Range, t: string) => {
     const textNode = element.firstChild // Get the text node inside <p>
 
     if (textNode && textNode.nodeType === Node.TEXT_NODE) {
-        const text = textNode.textContent
+        const text = textNode.textContent ?? ''
         const startIndex = text.indexOf(t)
         const endIndex = startIndex + t.length
 
@@ -513,8 +529,8 @@ export const selectText = (element: HTMLElement, range: Range, t: string) => {
             range.setEnd(textNode, endIndex)
 
             const selection = window.getSelection()
-            selection.removeAllRanges()
-            selection.addRange(range)
+            selection?.removeAllRanges()
+            selection?.addRange(range)
         }
     }
 }
@@ -530,7 +546,8 @@ export const applyStyle = (styleSetter: (element: HTMLElement) => void) => {
     }
 
     const initialGlobalRange = currentWindowSelection.getRangeAt(0).cloneRange()
-    const initialSelectionState = getSelection(editor) // Snapshot before any changes
+    // Guarded by the `rangeCount === 0` early-return above, so the range state is present.
+    const initialSelectionState = getSelection(editor) as LiveSelection // Snapshot before any changes
 
     if (!initialSelectionState) {
         console.warn('[applyStyle] Could not get initial selection state.')
@@ -705,7 +722,8 @@ export const applyStyleOriginal = (styleSetter: (element: HTMLElement) => void) 
     }
 
     const initialGlobalRange = currentWindowSelection.getRangeAt(0).cloneRange()
-    const initialSelectionState = getSelection(editor) // Snapshot before any changes
+    // Guarded by the `rangeCount === 0` early-return above, so the range state is present.
+    const initialSelectionState = getSelection(editor) as LiveSelection // Snapshot before any changes
 
     if (!initialSelectionState) {
         console.warn('[applyStyle] Could not get initial selection state.')

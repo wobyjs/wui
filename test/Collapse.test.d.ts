@@ -13,3 +13,4 @@ declare const CollapseWithComplexContent: () => JSX.Child;
 declare const MultipleCollapses: () => JSX.Child;
 declare const ComprehensiveCollapseTest: () => JSX.Child;
 export { DefaultCollapse, OpenCollapse, ClosedCollapse, CollapseWithBackground, CollapseWithoutBackground, ToggleableCollapse, ToggleableCollapseWithoutBackground, OpenCollapseWithoutBackground, ClosedCollapseWithBackground, CustomStyledCollapse, CollapseWithComplexContent, MultipleCollapses, ComprehensiveCollapseTest, };
+//# sourceMappingURL=Collapse.test.d.ts.map

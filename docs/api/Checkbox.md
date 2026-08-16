@@ -27,7 +27,8 @@ import './Checkbox'  // registers <wui-checkbox>
 | **checked** | boolean or Observable<boolean> | `false` | Checkbox checked state |
 | **disabled** | boolean or Observable<boolean> | `false` | Disables the checkbox |
 | **id** | string | auto-generated | Unique identifier bound to label |
-| **cls** | string | `""` | Additional classes applied to wrapper `<div>` |
+| **cls** | `JSX.Class` | `""` | Primary class for the wrapper `<div>`; when set it **replaces** the default classes |
+| **class** | `JSX.Class` | `""` | Additional classes that patch/extend the resolved classes (never replaces them) |
 | **...otherProps** | InputHTMLAttributes | — | All other native checkbox attributes |
 
 ---

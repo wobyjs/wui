@@ -23,3 +23,4 @@ declare const CustomYearRangeWheeler: () => import("woby").Child;
  */
 declare const CustomItemCountWheeler: () => import("woby").Child;
 export { BasicDateTimeWheeler, DateOnlyWheeler, TimeOnlyWheeler, ConstrainedDateTimeWheeler, CustomYearRangeWheeler, CustomItemCountWheeler };
+//# sourceMappingURL=DateTimeWheeler.test.d.ts.map

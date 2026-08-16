@@ -30,8 +30,8 @@ const TestFab = (): JSX.Element => {
     return ret
 }
 
-const PILL = "absolute bg-[rgb(25,118,210)] text-[white] text-4xl font-black cursor-pointer shadow-[0px_4px_8px_rgba(0,0,0,0.3)] transition-[background-color] duration-[0.3s] px-5 py-[15px] rounded-[50px] border-[none] [transition:top_0.3s_ease,left_0.3s_ease] z-[1050]"
-const CIRCULAR = "inline-flex items-center justify-center relative box-border cursor-pointer select-none align-middle appearance-none no-underline font-medium text-lg z-[1050] shadow-[rgba(0,0,0,0.2)_0px_3px_5px_-1px,rgba(0,0,0,0.14)_0px_6px_10px_0px,rgba(0,0,0,0.12)_0px_1px_18px_0px] text-white m-2 p-0 rounded-[50%] border-0 [transition:background-color_250ms_cubic-bezier(0.4,0,0.2,1)0ms,box-shadow_250ms_cubic-bezier(0.4,0,0.2,1)0ms,border-color_250ms_cubic-bezier(0.4,0,0.2,1)0ms] outline-none w-14 h-14 bg-[rgb(25,118,210)] hover:bg-[rgb(21,101,192)]"
+const PILL = "inline-flex items-center justify-center align-middle bg-[rgb(25,118,210)] text-[white] text-4xl font-black cursor-pointer shadow-[0px_4px_8px_rgba(0,0,0,0.3)] transition-[background-color] duration-[0.3s] px-5 py-[15px] rounded-[50px] border-[none] [transition:top_0.3s_ease,left_0.3s_ease] z-[1050] disabled:!bg-[rgba(0,0,0,0.12)] disabled:!text-[rgba(0,0,0,0.26)] disabled:!shadow-none disabled:!cursor-default"
+const CIRCULAR = "inline-flex items-center justify-center relative box-border cursor-pointer select-none align-middle appearance-none no-underline font-medium text-lg z-[1050] shadow-[rgba(0,0,0,0.2)_0px_3px_5px_-1px,rgba(0,0,0,0.14)_0px_6px_10px_0px,rgba(0,0,0,0.12)_0px_1px_18px_0px] text-white m-2 p-0 rounded-[50%] border-0 [transition:background-color_250ms_cubic-bezier(0.4,0,0.2,1)0ms,box-shadow_250ms_cubic-bezier(0.4,0,0.2,1)0ms,border-color_250ms_cubic-bezier(0.4,0,0.2,1)0ms] outline-none w-14 h-14 bg-[rgb(25,118,210)] hover:bg-[rgb(21,101,192)] disabled:!bg-[rgba(0,0,0,0.12)] disabled:!text-[rgba(0,0,0,0.26)] disabled:!shadow-none disabled:!cursor-default"
 
 // SSR test (Node.js)
 if (typeof globalThis.__isSSRTest__ !== 'undefined') {
@@ -57,7 +57,11 @@ if (typeof globalThis.__isSSRTest__ !== 'undefined') {
 
     if (!allPassed) {
         console.error(`❌ [${name}] SSR test failed`)
-        process.exit(1)
+        // Recorded rather than `process.exit(1)`: the runner imports every TestXxx module, so an
+        // immediate exit here would hide the actual/expected output of every module after this one.
+        // `ssr-test-runner.tsx` reads this list and exits non-zero once the whole suite has run.
+        const g = globalThis as any
+        ;(g.__ssrFailures ??= []).push(name)
     }
 }
 
@@ -81,6 +85,9 @@ TestFab.test = {
         if (ssrResult !== expectedFull) {
             assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
+            // Counted, not just logged: the runner summary reports assertion passes, and a
+            // silently-passing branch made a fully green suite still report zero passes.
+            assert(true, `[${name}] SSR match`)
             console.log(`✅ [${name}] SSR test passed: ${ssrResult}`)
         }
 

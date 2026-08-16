@@ -343,7 +343,7 @@ const TablePopupMenu = () => {
             }
             for (let i = 1; i < cellsToMerge.length; i++) {
                 while (cellsToMerge[i].firstChild) {
-                    first.appendChild(cellsToMerge[i].firstChild)
+                    first.appendChild(cellsToMerge[i].firstChild!)
                 }
                 first.appendChild(document.createTextNode(' '))
                 cellsToMerge[i].remove()
@@ -487,7 +487,7 @@ const TablePopupMenu = () => {
                 let node: Node | null = sel.focusNode
                 while (node && node !== root) {
                     if (node instanceof HTMLTableCellElement) {
-                        setTimeout(() => showPopup(node), 50)
+                        setTimeout(() => showPopup(node as HTMLTableCellElement), 50)
                         return
                     }
                     node = node.parentNode
@@ -531,23 +531,23 @@ const TablePopupMenu = () => {
                 padding: '4px 6px',
                 boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
             }}
-            onMouseDown={(e) => { e.preventDefault(); e.stopPropagation() }}
+            onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation() }}
         >
             <div style={{ display: 'flex', alignItems: 'center', gap: '2px', flexWrap: 'wrap' }}>
                 {/* Row operations */}
                 <button data-table-popup title="Insert row above" style={btnStyle}
-                    onMouseDown={(e) => { e.preventDefault(); e.stopPropagation() }}
-                    onClick={(e) => { e.preventDefault(); insertRow(true) }}>
+                    onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation() }}
+                    onClick={(e: any) => { e.preventDefault(); insertRow(true) }}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d={icons.rowAbove} /></svg>
                 </button>
                 <button data-table-popup title="Insert row below" style={btnStyle}
-                    onMouseDown={(e) => { e.preventDefault(); e.stopPropagation() }}
-                    onClick={(e) => { e.preventDefault(); insertRow(false) }}>
+                    onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation() }}
+                    onClick={(e: any) => { e.preventDefault(); insertRow(false) }}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d={icons.rowBelow} /></svg>
                 </button>
                 <button data-table-popup title="Delete row" style={btnStyle}
-                    onMouseDown={(e) => { e.preventDefault(); e.stopPropagation() }}
-                    onClick={(e) => { e.preventDefault(); deleteRow() }}>
+                    onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation() }}
+                    onClick={(e: any) => { e.preventDefault(); deleteRow() }}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d={icons.deleteRow} /></svg>
                 </button>
 
@@ -555,18 +555,18 @@ const TablePopupMenu = () => {
 
                 {/* Column operations */}
                 <button data-table-popup title="Insert column left" style={btnStyle}
-                    onMouseDown={(e) => { e.preventDefault(); e.stopPropagation() }}
-                    onClick={(e) => { e.preventDefault(); insertColumn(true) }}>
+                    onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation() }}
+                    onClick={(e: any) => { e.preventDefault(); insertColumn(true) }}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d={icons.colLeft} /></svg>
                 </button>
                 <button data-table-popup title="Insert column right" style={btnStyle}
-                    onMouseDown={(e) => { e.preventDefault(); e.stopPropagation() }}
-                    onClick={(e) => { e.preventDefault(); insertColumn(false) }}>
+                    onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation() }}
+                    onClick={(e: any) => { e.preventDefault(); insertColumn(false) }}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d={icons.colRight} /></svg>
                 </button>
                 <button data-table-popup title="Delete column" style={btnStyle}
-                    onMouseDown={(e) => { e.preventDefault(); e.stopPropagation() }}
-                    onClick={(e) => { e.preventDefault(); deleteColumn() }}>
+                    onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation() }}
+                    onClick={(e: any) => { e.preventDefault(); deleteColumn() }}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d={icons.deleteCol} /></svg>
                 </button>
 
@@ -574,23 +574,23 @@ const TablePopupMenu = () => {
 
                 {/* Cell formatting */}
                 <button data-table-popup title="Cell background color" style={btnStyle}
-                    onMouseDown={(e) => { e.preventDefault(); e.stopPropagation() }}
-                    onClick={(e) => { e.preventDefault(); setCellBgColor() }}>
+                    onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation() }}
+                    onClick={(e: any) => { e.preventDefault(); setCellBgColor() }}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z" />
                         <rect x="7" y="7" width="10" height="10" fill="currentColor" opacity="0.5" />
                     </svg>
                 </button>
                 <button data-table-popup title="Cell border color" style={btnStyle}
-                    onMouseDown={(e) => { e.preventDefault(); e.stopPropagation() }}
-                    onClick={(e) => { e.preventDefault(); setCellBorderColor() }}>
+                    onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation() }}
+                    onClick={(e: any) => { e.preventDefault(); setCellBorderColor() }}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z" fill="none" stroke="currentColor" strokeWidth="2" />
                     </svg>
                 </button>
                 <button data-table-popup title="Cell text color" style={btnStyle}
-                    onMouseDown={(e) => { e.preventDefault(); e.stopPropagation() }}
-                    onClick={(e) => { e.preventDefault(); setCellTextColor() }}>
+                    onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation() }}
+                    onClick={(e: any) => { e.preventDefault(); setCellTextColor() }}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M9.64 7.64c.23-.5.36-1.05.36-1.64 0-2.21-1.79-4-4-4S2 3.79 2 6s1.79 4 4 4c.59 0 1.14-.13 1.64-.36L10 12l-2.36 2.36C7.14 14.13 6.59 14 6 14c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4c0-.59-.13-1.14-.36-1.64L12 14l7 7h3v-1L9.64 7.64zM6 8c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm0 12c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z" />
                     </svg>
@@ -600,13 +600,13 @@ const TablePopupMenu = () => {
 
                 {/* Border toggle */}
                 <button data-table-popup title="Toggle cell border" style={btnStyle}
-                    onMouseDown={(e) => { e.preventDefault(); e.stopPropagation() }}
-                    onClick={(e) => { e.preventDefault(); toggleBorder() }}>
+                    onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation() }}
+                    onClick={(e: any) => { e.preventDefault(); toggleBorder() }}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d={icons.borderAll} /></svg>
                 </button>
                 <button data-table-popup title="Toggle all borders" style={btnStyle}
-                    onMouseDown={(e) => { e.preventDefault(); e.stopPropagation() }}
-                    onClick={(e) => { e.preventDefault(); toggleTableBorders() }}>
+                    onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation() }}
+                    onClick={(e: any) => { e.preventDefault(); toggleTableBorders() }}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d={icons.table} /></svg>
                 </button>
 
@@ -614,13 +614,13 @@ const TablePopupMenu = () => {
 
                 {/* Merge/Split */}
                 <button data-table-popup title="Merge cells" style={btnStyle}
-                    onMouseDown={(e) => { e.preventDefault(); e.stopPropagation() }}
-                    onClick={(e) => { e.preventDefault(); mergeCells() }}>
+                    onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation() }}
+                    onClick={(e: any) => { e.preventDefault(); mergeCells() }}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d={icons.mergeCells} /></svg>
                 </button>
                 <button data-table-popup title="Split cell" style={btnStyle}
-                    onMouseDown={(e) => { e.preventDefault(); e.stopPropagation() }}
-                    onClick={(e) => { e.preventDefault(); splitCell() }}>
+                    onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation() }}
+                    onClick={(e: any) => { e.preventDefault(); splitCell() }}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d={icons.splitCells} /></svg>
                 </button>
 
@@ -628,8 +628,8 @@ const TablePopupMenu = () => {
 
                 {/* Delete table */}
                 <button data-table-popup title="Delete table" style={{ ...btnStyle, color: '#ff6b6b' }}
-                    onMouseDown={(e) => { e.preventDefault(); e.stopPropagation() }}
-                    onClick={(e) => { e.preventDefault(); deleteTable() }}>
+                    onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation() }}
+                    onClick={(e: any) => { e.preventDefault(); deleteTable() }}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" /></svg>
                 </button>
             </div>

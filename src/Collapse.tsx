@@ -1,4 +1,4 @@
-import { $, $$, defaults, type JSX, customElement, type ElementAttributes, type ObservableMaybe, StyleEncapsulationProps, isObservable, HtmlBoolean, HtmlClass } from "woby"
+import { type CustomElementChildren, $, $$, defaults, type JSX, customElement, type ElementAttributes, type ObservableMaybe, StyleEncapsulationProps, isObservable, HtmlBoolean, HtmlClass } from "woby"
 import "@woby/chk"
 import "./input.css"
 
@@ -10,9 +10,9 @@ type CollapseProps = JSX.VoidHTMLAttributes<HTMLDivElement> & {
 }
 
 const def = () => ({
-	children: $(null as JSX.Child),
-	open: $(true, HtmlBoolean) as ObservableMaybe<boolean> | undefined,
-	background: $(true, HtmlBoolean) as ObservableMaybe<boolean> | undefined,
+	children: $(null as JSX.Child) as CustomElementChildren,
+	open: $(true, HtmlBoolean) as ObservableMaybe<boolean>,
+	background: $(true, HtmlBoolean) as ObservableMaybe<boolean>,
 	/** 
 	 * Custom CSS classes to apply to the collapse.
 	 * 
@@ -25,11 +25,11 @@ const def = () => ({
 	 * - User can override the default class by providing a `cls` prop
 	 * - `class` can be used to add additional classes to the component
 	 */
-	cls: $('', HtmlClass) as JSX.Class | undefined,
-	class: $('', HtmlClass) as JSX.Class | undefined,
+	cls: $('', HtmlClass) as JSX.Class,
+	class: $('', HtmlClass) as JSX.Class,
 })
 
-const Collapse = defaults(def, (props) => {
+const Collapse: Defaulted<typeof def> = defaults(def, (props) => {
 	const { class: cn, cls, children, open, background, ...otherProps } = props
 	// Create internal open state if not provided as observable
 	const internalOpen = isObservable(open) ? open : $(open ?? true)

@@ -100,12 +100,35 @@ One or more examples showing how to use the API in TSX and HTML.
 
 ## 🧪 About the Tests
 
-Many API behaviors are validated inside:
+Most documented API behaviour is pinned by the snapshot suite in `src/ssr/TestXxx.tsx`
+— twenty modules, each asserting the same component in two environments:
 
-- `*.testx.tsx`
-- `*.testx.html`
+| Runner | Command / entry | What it compares |
+| ------ | --------------- | ---------------- |
+| Node SSR | `pnpm test` (`pnpm ssr-test`) | `renderToString` output vs. a literal expected string, per state |
+| Browser | `pnpm dev` → "SSR Snapshot Tests" | live serialized DOM vs. `TestXxx.test.expect()`, re-checked on every MutationObserver tick |
 
-These test files can also be used as _usage references_ when designing or modifying component logic.
+Both runners surface the **actual and expected** markup for every state, so a
+mismatch names the exact attribute that drifted. The browser runner prints it on
+the page — a summary banner plus one `actual / expect` panel per module, opened
+automatically when that module fails — as well as to the console.
+
+The two forms differ where the serializers legitimately differ: `renderToString`
+emits self-closing void elements (`<input … />`) and reflects `checked` as
+`checked=""`, while the browser emits `<input …>` and keeps `checked` as a
+property, never an attribute. Expectations account for that — don't "fix" one to
+match the other.
+
+These two are the whole story. The Playwright specs under `playwright/` are
+**parked** — `@playwright/test` isn't a dependency and the config is renamed
+`playwright.config.parked.ts` so nothing runs it. A small vitest suite for editor
+internals (`pnpm exec vitest run`) exists separately; its include pattern is `.ts`
+only, so `test/*.test.tsx` files are not collected.
+
+`test/Template.testx.tsx` / `test/Template.testx.html` are scaffolding templates
+for new component tests, not a live suite.
+
+These files double as _usage references_ when designing or modifying component logic.
 
 ---
 

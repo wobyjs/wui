@@ -30,7 +30,7 @@ const TestTextField = (): JSX.Element => {
     return ret
 }
 
-const DEFAULT_STYLE = "block w-full py-1.5 px-2 text-base text-gray-900 placeholder:text-gray-400 focus:border-blue-500 sm:text-sm/6 truncate"
+const DEFAULT_STYLE = "block w-full py-1.5 px-2 text-base text-gray-900 placeholder:text-gray-400 focus:border-blue-500 sm:text-sm/6 truncate disabled:cursor-not-allowed disabled:text-[#00000061] disabled:border-[#0000001f] disabled:bg-[#0000000a] [&:disabled~label]:text-[#00000061]"
 const BASE_CLASS = "relative z-0 flex items-center"
 
 // SSR test (Node.js)
@@ -57,7 +57,11 @@ if (typeof globalThis.__isSSRTest__ !== 'undefined') {
 
     if (!allPassed) {
         console.error(`❌ [${name}] SSR test failed`)
-        process.exit(1)
+        // Recorded rather than `process.exit(1)`: the runner imports every TestXxx module, so an
+        // immediate exit here would hide the actual/expected output of every module after this one.
+        // `ssr-test-runner.tsx` reads this list and exits non-zero once the whole suite has run.
+        const g = globalThis as any
+        ;(g.__ssrFailures ??= []).push(name)
     }
 }
 
@@ -78,6 +82,9 @@ TestTextField.test = {
         if (ssrResult !== expectedFull) {
             assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
+            // Counted, not just logged: the runner summary reports assertion passes, and a
+            // silently-passing branch made a fully green suite still report zero passes.
+            assert(true, `[${name}] SSR match`)
             console.log(`✅ [${name}] SSR test passed: ${ssrResult}`)
         }
 

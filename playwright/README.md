@@ -1,3 +1,23 @@
+> ## ⛔ PARKED
+>
+> This suite is **not maintained and does not run**. `@playwright/test` is not a
+> dependency of this package, and the config has been renamed to
+> `playwright.config.parked.ts` so nothing picks it up by accident.
+>
+> The two supported suites are:
+>
+> | Command | Suite |
+> | ------- | ----- |
+> | `pnpm dev` | Demo-cum-test page. Every component renders live; the **SSR Snapshot Tests** section shows each module's actual vs. expected markup and mirrors woby's SSR log to the console. |
+> | `pnpm test` | Pure Node.js woby SSR. Bundles `src/ssr/ssr-test-runner.tsx` and compares `renderToString` output per state. |
+>
+> Both are driven by the same `src/ssr/TestXxx.tsx` modules, so a component is
+> covered in a real browser and in Node from one set of expectations.
+>
+> To revive this directory: add `@playwright/test` to `devDependencies`, rename the
+> config back to `playwright.config.ts`, and re-check the specs against the current
+> markup — they were written before the snapshot suite existed.
+
 # Playwright Tests for WUI Components
 
 This directory contains Playwright tests for all WUI components. Each component has its own subdirectory with specific test files.

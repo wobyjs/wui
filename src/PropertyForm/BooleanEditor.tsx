@@ -37,7 +37,7 @@ export const BooleanEditor = () => {
 			<Checkbox
 				checked={$$(value)}
 				disabled={!isObservable(value)}
-				onChange={(e) => {
+				onChange={(e: any) => {
 					value((e.target as HTMLInputElement).checked)
 					onChange?.(e)
 				}}

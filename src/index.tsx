@@ -31,6 +31,7 @@ export * from './Wheeler/useRecordWheeler'
 export * from "./PropertyForm/BooleanEditor"
 export * from "./PropertyForm/ColorEditor"
 export * from "./PropertyForm/DropdownEditor"
+export * from "./PropertyForm/EnumEditor"
 export * from "./PropertyForm/NumberEditor"
 export * from "./PropertyForm/ObjectEditor"
 export * from "./PropertyForm/PropertyForm"

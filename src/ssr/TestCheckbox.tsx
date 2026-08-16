@@ -35,15 +35,23 @@ const TestCheckbox = (): JSX.Element => {
     return ret
 }
 
+// Markup order is fixed — input first, then label — with placement expressed as flex direction on
+// the wrapper (see the comment in `src/Checkbox.tsx`). The old expectations assumed two
+// conditionally-rendered labels and `<br>` separators, which the component no longer emits.
+const WRAP = ['inline-flex flex-row-reverse items-center', 'inline-flex flex-row items-center', 'inline-flex flex-col-reverse items-start']
+const PAD = ['select-none pr-1.5', 'select-none pl-1.5', 'select-none pb-1.5']
+const TEXT = ['Remember', 'Agree', 'On']
+// State 2 is the only checked state; `renderToString` reflects it as an empty attribute.
+const CHECKED = ['', '', ' checked=""']
+
+const ssrElement = (i: number) =>
+    `<h3>Checkbox</h3><div class="${WRAP[i]}"><input id="${IDS[i]}" type="checkbox"${CHECKED[i]} /><label class="${PAD[i]}" for="${IDS[i]}">${TEXT[i]}</label></div>`
+
 // SSR test (Node.js)
 if (typeof globalThis.__isSSRTest__ !== 'undefined') {
     TestCheckbox()
 
-    const fullElements = [
-        `<h3>Checkbox</h3><div><label class="pr-1.5 select-none" for="${IDS[0]}"> Remember </label><input id="${IDS[0]}" type="checkbox" /></div>`,
-        `<h3>Checkbox</h3><div><input id="${IDS[1]}" type="checkbox" /><label class="pl-1.5 select-none" for="${IDS[1]}"> Agree </label></div>`,
-        `<h3>Checkbox</h3><div><label class="pr-1.5 select-none" for="${IDS[2]}"> On </label><br /><input id="${IDS[2]}" type="checkbox" checked="" /><br /></div>`,
-    ]
+    const fullElements = [ssrElement(0), ssrElement(1), ssrElement(2)]
 
     console.log(`\n📝 Test: ${name}`)
     let allPassed = true
@@ -60,7 +68,11 @@ if (typeof globalThis.__isSSRTest__ !== 'undefined') {
 
     if (!allPassed) {
         console.error(`❌ [${name}] SSR test failed`)
-        process.exit(1)
+        // Recorded rather than `process.exit(1)`: the runner imports every TestXxx module, so an
+        // immediate exit here would hide the actual/expected output of every module after this one.
+        // `ssr-test-runner.tsx` reads this list and exits non-zero once the whole suite has run.
+        const g = globalThis as any
+        ;(g.__ssrFailures ??= []).push(name)
     }
 }
 
@@ -70,25 +82,20 @@ TestCheckbox.test = {
     compareActualValues: true,
     expect: () => {
         const idx = $$(testObservables[name])
-        const elements = [
-            `<div><label class="pr-1.5 select-none" for="${IDS[0]}"> Remember </label><input id="${IDS[0]}" type="checkbox"></div>`,
-            `<div><input id="${IDS[1]}" type="checkbox"><label class="pl-1.5 select-none" for="${IDS[1]}"> Agree </label></div>`,
-            `<div><label class="pr-1.5 select-none" for="${IDS[2]}"> On </label><br><input id="${IDS[2]}" type="checkbox"><br></div>`,
-        ]
-        const expected = elements[idx]
+        // Browser (live-DOM) form: void elements are serialized without the trailing slash, and
+        // `checked` is set as a property so it never appears as an attribute.
+        const expected = `<div class="${WRAP[idx]}"><input id="${IDS[idx]}" type="checkbox"><label class="${PAD[idx]}" for="${IDS[idx]}">${TEXT[idx]}</label></div>`
 
         const ssrComponent = testObservables[`${name}_ssr`]
         const ssrResult = renderToString(ssrComponent)
 
-        const fullElements = [
-            `<h3>Checkbox</h3><div><label class="pr-1.5 select-none" for="${IDS[0]}"> Remember </label><input id="${IDS[0]}" type="checkbox" /></div>`,
-            `<h3>Checkbox</h3><div><input id="${IDS[1]}" type="checkbox" /><label class="pl-1.5 select-none" for="${IDS[1]}"> Agree </label></div>`,
-            `<h3>Checkbox</h3><div><label class="pr-1.5 select-none" for="${IDS[2]}"> On </label><br /><input id="${IDS[2]}" type="checkbox" checked="" /><br /></div>`,
-        ]
-        const expectedFull = fullElements[idx]
+        const expectedFull = ssrElement(idx)
         if (ssrResult !== expectedFull) {
             assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
+            // Counted, not just logged: the runner summary reports assertion passes, and a
+            // silently-passing branch made a fully green suite still report zero passes.
+            assert(true, `[${name}] SSR match`)
             console.log(`✅ [${name}] SSR test passed: ${ssrResult}`)
         }
 

@@ -449,7 +449,7 @@ const App = () => (
 
 
 				<div class="[@media(min-width:768px)]:w-[750px] mx-auto px-[15px]">
-					<Fab class="w-18 h-18" style={{ top: () => $$(pt) + $$(vh) - (80), left: () => $$(pl) }}>
+					<Fab class="absolute w-18 h-18" style={{ top: () => $$(pt) + $$(vh) - (80), left: () => $$(pl) }}>
 						<svg
 							class="select-none w-[1em] h-[1em] inline-block fill-[black] shrink-0 text-2xl [transition:fill_200ms_cubic-bezier(0.4,0,0.2,1)0ms]"
 							focusable="false"
@@ -460,7 +460,7 @@ const App = () => (
 							<path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path>
 						</svg>
 					</Fab>
-					<Fab class="w-18 h-18" style={{ top: () => $$(pt) + (80), right: pl }}>
+					<Fab class="absolute w-18 h-18" style={{ top: () => $$(pt) + (80), right: pl }}>
 						☰
 						{/* <svg
 							class="select-none w-[1em] h-[1em] inline-block fill-[black] shrink-0 text-2xl [transition:fill_200ms_cubic-bezier(0.4,0,0.2,1)0ms]"

@@ -32,7 +32,10 @@ export function rgbToHsv({ r, g, b }: RGB): HSV {
     r /= 255, g /= 255, b /= 255
 
     let max = Math.max(r, g, b), min = Math.min(r, g, b)
-    let h, s, v = max
+    // `h` is seeded rather than left bare: the `switch (max)` below has no `default` branch, so
+    // TypeScript cannot see that one of the three cases always matches `max`. 0 is the achromatic
+    // hue the `max === min` branch would assign anyway, so the seed is never observable.
+    let h = 0, s, v = max
 
     let d = max - min
     s = max === 0 ? 0 : d / max
@@ -56,7 +59,9 @@ export function hsvToRgb({ h, s, v }: HSV): RGB {
     v /= 100
     h /= 360
 
-    let r, g, b
+    // Seeded for the same reason as `h` in `rgbToHsv`: `switch (i % 6)` enumerates every possible
+    // value but has no `default`, so TypeScript still treats these as possibly-unassigned.
+    let r = 0, g = 0, b = 0
     let i = Math.floor(h * 6)
     let f = h * 6 - i
     let p = v * (1 - s)

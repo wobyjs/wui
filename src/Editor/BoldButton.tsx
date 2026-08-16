@@ -9,13 +9,13 @@ import { applyBold } from './StyleEngine'
 const def = () => ({
     buttonType: $("outlined", HtmlString) as ObservableMaybe<ButtonStyles>,
     title: $("Bold", HtmlString) as ObservableMaybe<string>,
-    cls: $('', HtmlClass) as JSX.Class | undefined,
-    class: $('', HtmlClass) as JSX.Class | undefined,
+    cls: $('', HtmlClass) as ObservableMaybe<string>,
+    class: $('', HtmlClass) as ObservableMaybe<string>,
     disabled: $(false, HtmlBoolean) as Observable<boolean>,
 })
 
 
-const BoldButton = defaults(def, (props) => {
+const BoldButton: Defaulted<typeof def> = defaults(def, (props) => {
     const { buttonType: btnType, title, cls, class: cn, disabled, ...otherProps } = props
 
     const editorNode = useEditor()
@@ -67,7 +67,7 @@ const BoldButton = defaults(def, (props) => {
             type={btnType}
             title={title}
             class={() => [
-                () => $$(cls) ? $$(cls) : cn,
+                () => $$(cls) ? $$(cls) : $$(cn),
                 () => $$(isActive) ? '!bg-slate-200' : '',
                 () => $$(isMixed) ? '!bg-slate-100 opacity-60' : ''
             ]}

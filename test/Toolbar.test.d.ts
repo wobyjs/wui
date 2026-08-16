@@ -4,3 +4,4 @@ declare const IconToolbar: () => import("woby").Child;
 declare const NavigationToolbar: () => import("woby").Child;
 declare const CompactToolbar: () => import("woby").Child;
 export { DefaultToolbar, StyledToolbar, IconToolbar, NavigationToolbar, CompactToolbar, };
+//# sourceMappingURL=Toolbar.test.d.ts.map

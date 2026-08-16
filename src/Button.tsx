@@ -1,4 +1,3 @@
-// @ts-expect-error -- complex import with mixed type/value specifiers
 import { $, $$, defaults, type JSX, isObservable, customElement, type ElementAttributes, type Observable, type CustomElementChildren, type StyleEncapsulationProps, useEffect, HtmlBoolean, ObservableMaybe, HtmlClass, HtmlString } from "woby"
 import '@woby/chk'
 import './input.css'
@@ -72,11 +71,11 @@ const variant = {
 }
 
 const def = () => ({
-    type: $("contained", HtmlString) as ObservableMaybe<string>,
+    type: $("contained", HtmlString) as ObservableMaybe<ButtonStyles>,
     buttonFunction: $("button", HtmlString) as ObservableMaybe<ButtonFunction>,
-    children: $("Button"),
-    checked: $(false, HtmlBoolean) as ObservableMaybe<boolean> | undefined,
-    disabled: $(false, HtmlBoolean) as ObservableMaybe<boolean> | undefined,
+    children: $("Button") as CustomElementChildren,
+    checked: $(false, HtmlBoolean) as ObservableMaybe<boolean>,
+    disabled: $(false, HtmlBoolean) as ObservableMaybe<boolean>,
     /** 
      * Custom CSS classes to apply to the button.
      * 
@@ -89,12 +88,12 @@ const def = () => ({
      * - User can override the default class by providing a `cls` prop
      * - `class` can be used to add additional classes to the component
      */
-    cls: $('', HtmlClass) as JSX.Class | undefined,
-    class: $('', HtmlClass) as JSX.Class | undefined,
-    onClick: undefined,
+    cls: $('', HtmlClass) as JSX.Class,
+    class: $('', HtmlClass) as JSX.Class,
+    onClick: undefined as ((e: any) => void) | undefined,
 })
 
-const Button = defaults(def, (props) => {
+const Button: Defaulted<typeof def> = defaults(def, (props) => {
     const { children, cls, class: cn, type: buttonType, buttonFunction, checked, disabled, onClick, ...otherProps } = props    // Create reactive displayText observable with proper type
     const displayText = $<string>('')
     const btnRef = $<HTMLButtonElement>()
@@ -154,7 +153,11 @@ const Button = defaults(def, (props) => {
             type={() => $$(buttonFunction) as ButtonFunction}
             disabled={disabled}
             class={() => [
-                () => $$(cls) ? $$(cls) : variant[$$(buttonType)], cn
+                // Fall back to the `contained` variant for an unknown/empty type.
+                // Removing the `type` attribute at runtime (the property panel does
+                // exactly that when the value equals the default) left buttonType ''
+                // and variant[''] undefined, rendering class="" — an invisible button.
+                () => $$(cls) ? $$(cls) : (variant[$$(buttonType) as keyof typeof variant] ?? variant.contained), cn
             ]}
             {...otherProps}
         >

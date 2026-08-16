@@ -1,6 +1,38 @@
 import { $, $$, JSX, Observable, ObservableMaybe } from 'woby'
 
 /**
+ * Typed property schema for editor plugin custom elements.
+ */
+export type PluginPropType = 'string' | 'number' | 'boolean' | 'color' | 'enum'
+
+export interface PluginProp {
+    /** Attribute name on the element, e.g. 'label', 'count', 'variant'. */
+    name: string
+    type: PluginPropType
+    /** Row label; defaults to `name`. */
+    label?: string
+    /** Value used when the attribute is absent. Also the "unset" comparison value. */
+    default?: string | number | boolean
+    /** Required for type 'enum'. */
+    options?: { value: string; label?: string }[]
+    /** Rendered, but not editable (e.g. values resolved at construction time). */
+    readonly?: boolean
+    /** Never surfaced in the panel at all. */
+    hidden?: boolean
+    /** Tooltip / helper text for the row. */
+    hint?: string
+    /**
+     * This prop is the element's light-DOM text, not an attribute.
+     *
+     * Needed for the `children` prop of every wui-* component: woby's
+     * customElement() always passes a <slot> as `children`, so a
+     * children="Label" *attribute* is silently ignored and the component
+     * renders blank. The label has to live in the light DOM to reach the slot.
+     */
+    textContent?: boolean
+}
+
+/**
  * EditorPlugin: Interface for 3rd-party plugins that register custom elements
  * and toolbar insert items with the wui editor.
  */
@@ -50,6 +82,20 @@ export interface EditorPlugin {
      * @returns The parsed custom element
      */
     fromHTML?: (html: string) => HTMLElement
+
+    /**
+     * Declarative, typed props for the property panel.
+     * When present, the property panel renders typed editors instead of
+     * blind string fields.
+     */
+    props?: PluginProp[]
+
+    /**
+     * Called after the panel has written an attribute.
+     * Lets a plugin re-render, re-insert, or otherwise react to an edit that its
+     * element cannot pick up from an attribute change on its own.
+     */
+    onPropChange?: (element: HTMLElement, key: string, value: any) => void
 }
 
 // Internal type for insert menu items (matches what InsertDropDown renders)
@@ -66,8 +112,11 @@ const registeredPlugins = $<EditorPlugin[]>([])
  * Register a plugin with the editor. Plugins appear in the insert menu
  * under the "Advanced Inserts" section.
  *
+ * Re-registering an existing name is a no-op: it warns and keeps the first
+ * registration rather than throwing, so a module imported twice for its
+ * side-effects cannot take the page down.
+ *
  * @param plugin - The plugin descriptor
- * @throws If a plugin with the same name is already registered
  */
 export const registerEditorPlugin = (plugin: EditorPlugin): void => {
     const current = $$(registeredPlugins)
@@ -93,6 +142,13 @@ export const unregisterEditorPlugin = (name: string): void => {
  * Components can use $$(getEditorPlugins()) to reactively read the list.
  */
 export const getEditorPlugins = (): Observable<EditorPlugin[]> => registeredPlugins
+
+/**
+ * Look up a plugin by its element's tag name.
+ * Returns undefined if no plugin matches.
+ */
+export const getPluginForElement = (el: HTMLElement): EditorPlugin | undefined =>
+    $$(registeredPlugins).find(p => p.tagName.toUpperCase() === el.tagName.toUpperCase())
 
 /**
  * Convert registered plugins into insert menu items consumable by InsertDropDown.

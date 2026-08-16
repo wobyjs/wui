@@ -29,12 +29,12 @@ const def = () => ({
      * - User can override the default class by providing a `cls` prop
      * - `class` can be used to add additional classes to the component
      */
-    cls: $('', HtmlClass) as JSX.Class | undefined,
-    class: $('', HtmlClass) as JSX.Class | undefined,
+    cls: $('', HtmlClass) as JSX.Class,
+    class: $('', HtmlClass) as JSX.Class,
     src: $('', HtmlString) as ObservableMaybe<string>,
     alt: $("Avatar", HtmlString) as ObservableMaybe<string>,
     // children: $(null, HtmlString) as JSX.Child,
-    children: $(null) as ObservableMaybe<JSX.Child>,
+    children: $(null) as CustomElementChildren,
     size: $("md" as Size) as ObservableMaybe<Size>,                 // xs | sm | md | lg
     type: $("circular" as Variant) as ObservableMaybe<Variant>,
 })
@@ -42,20 +42,24 @@ const def = () => ({
 const BASE_CLASS =
     "relative flex items-center justify-center align-middle select-none leading-none overflow-hidden shrink-0 m-0 bg-[rgb(189,189,189)] text-white"
 
-const variantStyle = {
+// Indexed by the `type`/`variant`/`size` prop, which is a free-form string on the custom
+// element (attributes carry no enum), so the table needs a string index signature.
+const variantStyle: Record<string, string> = {
     circular: "rounded-full",
     rounded: "rounded-xl",
     square: "rounded-md",
 }
 
-const sizeStyle = {
+// Indexed by the `type`/`variant`/`size` prop, which is a free-form string on the custom
+// element (attributes carry no enum), so the table needs a string index signature.
+const sizeStyle: Record<string, string> = {
     xs: "w-6 h-6 text-xs",
     sm: "w-8 h-8 text-sm",
     md: "w-10 h-10 text-base",
     lg: "w-12 h-12 text-lg",
 }
 
-const Avatar = defaults(def, (props) => {
+const Avatar: Defaulted<typeof def> = defaults(def, (props) => {
     const { class: cn, cls, src, alt, children, size, type: variant, ...otherProps } = props
 
     // normalise src / alt into observables
@@ -67,7 +71,7 @@ const Avatar = defaults(def, (props) => {
         const s = $$(srcObs)
         const a = $$(altObs)
         if (s) {
-            return <img src={s} alt={a} class="w-full h-full object-cover" onerror={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
+            return <img src={s} alt={a} class="w-full h-full object-cover" onError={(e: any) => { (e.target as HTMLImageElement).style.display = 'none' }} />
         }
         // initials / custom children
         return children ?? (a ? a[0] : "")

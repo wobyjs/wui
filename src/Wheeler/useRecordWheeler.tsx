@@ -19,7 +19,7 @@ export const useRecordWheeler = <T, V extends boolean>(
     const initialValues = keys.filter(key => $$(d[key]) as boolean)
 
     // Create a central value observable for Wheeler
-    const value = $<keyof T[]>(initialValues)
+    const value = $<(keyof T)[]>(initialValues)
 
     // Create options array with label/value format for Wheeler
     const optionsArray = useMemo(() =>

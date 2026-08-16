@@ -85,6 +85,15 @@ The first matching editor's `UI` is rendered for each property key. Editors are 
 
 ## TableRow Component
 
+`TableRow` is exported, so custom forms can render rows that line up with
+`PropertyForm`'s own.
+
+| Prop | Type | Default | Description |
+| ---- | ---- | ------- | ----------- |
+| **optionName** | `JSX.Child` | `undefined` | Row label rendered in the fixed-width left column |
+| **children** | `JSX.Child` | `undefined` | The editor control rendered in the right column |
+| **indentLvl** | `number` | `0` | Nesting depth; selects a left padding from `pl-4` / `pl-8` / `pl-12` / `pl-16` |
+
 Each property row is rendered by the `TableRow` helper:
 
 ```tsx

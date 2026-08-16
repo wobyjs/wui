@@ -57,6 +57,7 @@ const config = defineConfig({
     },
     esbuild: {
         jsx: 'automatic',
+        jsxImportSource: 'woby',
     },
     plugins: [
         ssrImportPlugin(),

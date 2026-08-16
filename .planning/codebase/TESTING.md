@@ -1,5 +1,17 @@
 # Testing Patterns
 
+> **Superseded 2026-08-16.** This file is a stale snapshot. The project now has
+> exactly two suites, both driven by the `src/ssr/TestXxx.tsx` modules:
+>
+> - `pnpm dev` — demo cum test page; the "SSR Snapshot Tests" section shows each
+>   module's actual vs. expected markup on the page and in the console.
+> - `pnpm test` — pure Node.js woby SSR (`pnpm ssr-test`).
+>
+> Playwright is **parked**: `@playwright/test` is not a dependency and the config
+> is renamed `playwright.config.parked.ts`. See `playwright/README.md` and
+> `docs/guides/contributing.md` for the current story.
+
+
 **Analysis Date:** 2026-05-24
 
 ## Test Framework

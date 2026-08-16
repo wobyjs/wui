@@ -8,3 +8,4 @@ declare const DisabledCheckBox: () => import("woby").Child;
 declare const DisabledCheckedCheckBox: () => import("woby").Child;
 declare const CustomClassCheckBox: () => import("woby").Child;
 export { DefaultCheckBox, LeftLabelCheckBox, RightLabelCheckBox, TopLabelCheckBox, BottomLabelCheckBox, CheckedCheckBox, DisabledCheckBox, DisabledCheckedCheckBox, CustomClassCheckBox };
+//# sourceMappingURL=Checkbox.test.d.ts.map

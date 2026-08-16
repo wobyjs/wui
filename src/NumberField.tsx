@@ -1,29 +1,29 @@
-import { $, $$, useEffect, isObservable, Observable, ObservableMaybe, type JSX, defaults, customElement, type ElementAttributes, HtmlBoolean, useMemo, HtmlNumber, HtmlClass } from 'woby'
+import { type CustomElementChildren, $, $$, useEffect, isObservable, Observable, ObservableMaybe, type JSX, defaults, customElement, type ElementAttributes, HtmlBoolean, useMemo, HtmlNumber, HtmlClass } from 'woby'
 import { Button } from './Button'
 
 const btnCls = `bg-transparent items-center justify-center cursor-pointer relative m-0 border-[none] [outline:none] [-webkit-appearance:none] disabled:bg-[#d9dbda]`
 
 const def = () => ({
     /** Child elements to be rendered inside the number field */
-    children: $(null as JSX.Child),
+    children: $(null as JSX.Child) as CustomElementChildren,
     /** When true, the value will be updated immediately on user input rather than on blur */
-    reactive: $(false, HtmlBoolean) as ObservableMaybe<boolean> | undefined,
+    reactive: $(false, HtmlBoolean) as ObservableMaybe<boolean>,
     /** When true, disables min/max constraints validation */
-    noMinMax: $(false, HtmlBoolean) as ObservableMaybe<boolean> | undefined,
+    noMinMax: $(false, HtmlBoolean) as ObservableMaybe<boolean>,
     /** When true, prevents automatic value correction when outside min/max range */
-    noFix: $(false, HtmlBoolean) as ObservableMaybe<boolean> | undefined,
+    noFix: $(false, HtmlBoolean) as ObservableMaybe<boolean>,
     /** When true, prevents value wrapping when reaching min/max limits */
-    noRotate: $(false, HtmlBoolean) as ObservableMaybe<boolean> | undefined,
+    noRotate: $(false, HtmlBoolean) as ObservableMaybe<boolean>,
     /** The current value of the number field */
-    value: $(0, HtmlNumber) as ObservableMaybe<number> | undefined,
+    value: $(0, HtmlNumber) as ObservableMaybe<number>,
     /** The minimum allowed value */
-    min: $(0, HtmlNumber) as ObservableMaybe<number> | undefined,
+    min: $(0, HtmlNumber) as ObservableMaybe<number>,
     /** The maximum allowed value */
-    max: $(100, HtmlNumber) as ObservableMaybe<number> | undefined,
+    max: $(100, HtmlNumber) as ObservableMaybe<number>,
     /** The step increment for the number field */
-    step: $(1, HtmlNumber) as ObservableMaybe<number> | undefined,
+    step: $(1, HtmlNumber) as ObservableMaybe<number>,
     /** When true, disables the number field */
-    disabled: $(false, HtmlBoolean) as ObservableMaybe<boolean> | undefined,
+    disabled: $(false, HtmlBoolean) as ObservableMaybe<boolean>,
     /** 
      * Custom CSS classes to apply to the number field.
      * 
@@ -36,15 +36,15 @@ const def = () => ({
      * - User can override the default class by providing a `cls` prop
      * - `class` can be used to add additional classes to the component
      */
-    cls: $('', HtmlClass) as JSX.Class | undefined,
-    class: $('', HtmlClass) as JSX.Class | undefined,
+    cls: $('', HtmlClass) as JSX.Class,
+    class: $('', HtmlClass) as JSX.Class,
     /** Callback function triggered when the value changes */
     onChange: undefined as ((e: any) => void) | undefined,
     /** Callback function triggered when a key is released */
     onKeyUp: undefined as ((e: any) => void) | undefined,
 })
 
-const NumberField = defaults(def, (props) => {
+const NumberField: Defaulted<typeof def> = defaults(def, (props) => {
     const { class: cn, cls, children, reactive, noMinMax, noFix, noRotate, value, min, max, step, disabled, onChange, onKeyUp, ...otherProps } = props
 
     const inputRef = $<HTMLInputElement>()
@@ -88,7 +88,7 @@ const NumberField = defaults(def, (props) => {
             const newValue = +$$((value)) - +$$(step)
                 ; (value as Observable)?.(newValue)
         } else if (!$$(reactive) && isObservable(value)) {
-            const newValue = (+$$(inputRef).valueAsNumber as any) - +$$(step)
+            const newValue = (+$$(inputRef)?.valueAsNumber! as any) - +$$(step)
                 ; (value as Observable)?.(newValue)
         }
         updated()
@@ -104,7 +104,7 @@ const NumberField = defaults(def, (props) => {
             const newValue = +$$((value)) + +$$(step)
                 ; (value as Observable)?.(newValue)
         } else if (!$$(reactive) && isObservable(value)) {
-            const newValue = (+$$(inputRef).valueAsNumber as any) + +$$(step)
+            const newValue = (+$$(inputRef)?.valueAsNumber! as any) + +$$(step)
                 ; (value as Observable)?.(newValue)
         }
         updated()
@@ -170,13 +170,19 @@ const NumberField = defaults(def, (props) => {
             "number-input inline-flex items-center bg-white border border-gray-300 rounded-lg transition-all duration-200",
             "focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500", // Nice focus state
             "divide-x divide-gray-200", // Subtle dividers between elements
-            () => $$(disabled) ? "bg-gray-100 opacity-70" : "", // Style for disabled state
+            // `bg-gray-100` alone never won: it sits at the same specificity as the
+            // `bg-white` above and Tailwind emits bg-white later, so a disabled field
+            // stayed pure white and only `opacity-70` showed. Force it.
+            () => $$(disabled) ? "!bg-gray-100 opacity-70 cursor-not-allowed" : "", // Style for disabled state
             () => $$(cls) ? $$(cls) : "",
             cn
         ]}>
             <Button
                 // class={btnCls}
-                type="icon" cls="!rounded-none !rounded-l-md !w-10 !h-10 !border-r !border-gray-200 !bg-transparent"
+                // `!bg-transparent` outranks Button's own `disabled:bg-...`, so a disabled
+                // step button was indistinguishable from a live one. The `disabled:` variant
+                // adds a pseudo-class, so at equal !important it wins over the flat rule.
+                type="icon" cls="!rounded-none !rounded-l-md !w-10 !h-10 !border-r !border-gray-200 !bg-transparent disabled:!bg-[#d9dbda] disabled:!text-[#00000061] disabled:!cursor-not-allowed"
                 buttonFunction="button"
                 onPointerDown={() => { startContinuousUpdate(false); }}
                 onPointerUp={stopUpdate}
@@ -188,6 +194,7 @@ const NumberField = defaults(def, (props) => {
                 ref={inputRef}
                 class={[
                     "w-16 text-center border-none bg-transparent focus:outline-none focus:ring-0 text-lg font-semibold text-gray-700",
+                    "disabled:text-[#00000061] disabled:cursor-not-allowed",
                     "[-moz-appearance:textfield] [&::-webkit-inner-spin-button]:hidden [&::-webkit-outer-spin-button]:hidden",
                     () => $$(error) ? "text-red-500" : ""
                 ]}
@@ -196,7 +203,7 @@ const NumberField = defaults(def, (props) => {
                 min={() => $$(noMinMax) ? undefined : $$(min)} // min={min}
                 max={() => $$(noMinMax) ? undefined : $$(max)}// max={max}
                 step={step}
-                onChange={e => {
+                onChange={(e: any) => {
                     // Don't allow change if disabled
                     if ($$(disabled)) return
 
@@ -204,7 +211,7 @@ const NumberField = defaults(def, (props) => {
                         : undefined
                     updated()
                 }}
-                onWheel={e => {
+                onWheel={(e: any) => {
                     // Don't allow wheel if disabled
                     if ($$(disabled)) {
                         e.preventDefault()
@@ -220,7 +227,7 @@ const NumberField = defaults(def, (props) => {
             <Button
                 // class={[btnCls, "plus"]}
                 // cls="plus"
-                type="icon" cls="!rounded-none !rounded-r-md !w-10 !h-10 !border-l !border-gray-200 !bg-transparent"
+                type="icon" cls="!rounded-none !rounded-r-md !w-10 !h-10 !border-l !border-gray-200 !bg-transparent disabled:!bg-[#d9dbda] disabled:!text-[#00000061] disabled:!cursor-not-allowed"
                 onPointerDown={() => { startContinuousUpdate(true); }}
                 onPointerUp={stopUpdate}
                 onPointerLeave={stopUpdate}

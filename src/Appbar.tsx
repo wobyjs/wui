@@ -248,7 +248,7 @@
 // #endregion
 
 // #region Using tw Appbar
-import { $, $$, defaults, type JSX, customElement, type ElementAttributes, type ObservableMaybe, useEffect, HtmlBoolean, HtmlClass } from "woby"
+import { type CustomElementChildren, $, $$, defaults, type JSX, customElement, type ElementAttributes, type ObservableMaybe, useEffect, HtmlBoolean, HtmlClass } from "woby"
 import "@woby/chk"
 import "./input.css"
 
@@ -268,24 +268,30 @@ const def = () => ({
      * - User can override the default class by providing a `cls` prop
      * - `class` can be used to add additional classes to the component
      */
-    cls: $('', HtmlClass) as JSX.Class | undefined,
-    class: $("", HtmlClass) as JSX.Class | undefined,
-    children: $(""),
+    cls: $('', HtmlClass) as JSX.Class,
+    class: $("", HtmlClass) as JSX.Class,
+    children: $("") as CustomElementChildren,
     type: $("default"),
-    position: $("fixed" as Position),
+    // Cast to the caller-facing type: `defaults()` exposes `Partial<ReturnType<def>>`, and
+    // `Observable<T>` is invariant, so an uncast def rejects the plain `position="fixed"` attribute.
+    position: $("fixed" as Position) as ObservableMaybe<Position>,
     edge: $("top" as Edge),
 })
 
-const variantStyle = {
+// Indexed by the `type`/`variant`/`size` prop, which is a free-form string on the custom
+// element (attributes carry no enum), so the table needs a string index signature.
+const variantStyle: Record<string, string> = {
     default: "shadow-[rgba(0,0,0,0.2)_0px_2px_4px_-1px,rgba(0,0,0,0.14)_0px_4px_5px_0px,rgba(0,0,0,0.12)_0px_1px_10px_0px] [@media_screen]:flex [@media_screen]:flex-col w-full box-border shrink-0 z-[1100] bg-[rgb(25,118,210)] text-white left-auto [transition:box-shadow_300ms_cubic-bezier(0.4,0,0.2,1)0ms] ",
 }
 
-const Appbar = defaults(def, (props) => {
+const Appbar: Defaulted<typeof def> = defaults(def, (props) => {
     const { class: cn, cls, type: variant, position, edge, children, ...otherProps } = props
 
 
     const getPositionClass = () => {
-        const pos = position()
+        // `$$` rather than a direct call: the prop is `ObservableMaybe`, so a JSX caller may pass
+        // the plain string "fixed" instead of an observable.
+        const pos = $$(position)
         const edgePos = edge()
 
         // Base position class
@@ -328,7 +334,7 @@ const Appbar = defaults(def, (props) => {
 
         if (!container) return;
 
-        const isFixed = () => position() === "fixed";
+        const isFixed = () => $$(position) === "fixed";
         const doOffset = () => isFixed();
 
         const apply = () => {

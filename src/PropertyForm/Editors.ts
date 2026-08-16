@@ -11,13 +11,13 @@ export type UIProps<T> = {
 	indentLvl?: number
 	open?: Observable<boolean>
 	button?: JSX.Element
-	onChange: (e) => void
+	onChange?: (e: any) => void
 	changeValueOnClickOnly?: ObservableMaybe<boolean>
 }
 
 export const Editors = $<
 	(() => {
-		UI: (props: { data, editorName: string, value: any, indentLvl?: number, textAlign?: string }) => JSX.Element,
+		UI: (props: { data: any, editorName: string, value: any, indentLvl?: number, textAlign?: string }) => JSX.Element,
 		renderCondition: (values: ObservableMaybe<any>, key?: string) => boolean
 	})[]
 >([])

@@ -9,7 +9,7 @@ import {
 	effect22, effect23, effect24,
 	effect19a, effect20a, effect21a,
 } from './TextField.effect'
-import { ObservableMaybe, $$, $, type JSX, isObservable, Observable, defaults, customElement, type ElementAttributes, HtmlBoolean, HtmlString, useMemo, HtmlClass, useEffect } from 'woby'
+import { type CustomElementChildren, ObservableMaybe, $$, $, type JSX, isObservable, Observable, defaults, customElement, type ElementAttributes, HtmlBoolean, HtmlString, useMemo, HtmlClass, useEffect } from 'woby'
 
 //https://codepen.io/maheshambure21/pen/EozKKy
 
@@ -61,19 +61,19 @@ const effectMap: Record<string, string> = {
 }
 
 const def = () => ({
-	class: $('', HtmlClass) as JSX.Class | undefined,
-	cls: $('', HtmlClass) as JSX.Class | undefined,
-	children: $(null as JSX.Child),
-	effect: $("", HtmlString) as ObservableMaybe<string> | undefined,
-	assignOnEnter: $(false, HtmlBoolean) as ObservableMaybe<boolean> | undefined,
-	value: $("", HtmlString) as ObservableMaybe<string> | undefined,
-	inputType: $("text", HtmlString) as ObservableMaybe<INPUT_TYPE> | undefined,
-	placeholder: $("", HtmlString) as ObservableMaybe<string> | undefined,
-	disabled: $(false, HtmlBoolean) as ObservableMaybe<boolean> | undefined,
+	class: $('', HtmlClass) as JSX.Class,
+	cls: $('', HtmlClass) as JSX.Class,
+	children: $(null as JSX.Child) as CustomElementChildren,
+	effect: $("", HtmlString) as ObservableMaybe<string>,
+	assignOnEnter: $(false, HtmlBoolean) as ObservableMaybe<boolean>,
+	value: $("", HtmlString) as ObservableMaybe<string>,
+	inputType: $("text", HtmlString) as ObservableMaybe<INPUT_TYPE>,
+	placeholder: $("", HtmlString) as ObservableMaybe<string>,
+	disabled: $(false, HtmlBoolean) as ObservableMaybe<boolean>,
 	onChange: undefined as ((e: any) => void) | undefined,
 	onKeyUp: undefined as ((e: any) => void) | undefined,
 
-	label: $("", HtmlString) as ObservableMaybe<string> | undefined,
+	label: $("", HtmlString) as ObservableMaybe<string>,
 	ref: undefined as ((el: HTMLInputElement) => void) | undefined,
 })
 
@@ -104,7 +104,7 @@ const def = () => ({
  *
  * label text: [&~label]:text-[red] [&:focus~label]:text-[red] [&:not(:placeholder-shown)~label]:text-[red]
  */
-const TextField = defaults(def, (props) => {
+const TextField: Defaulted<typeof def> = defaults(def, (props) => {
 
 	const { cls, class: cn, children, effect, assignOnEnter, value, inputType, placeholder, disabled, onChange, onKeyUp, label, ref, ...otherProps } = props
 
@@ -150,18 +150,56 @@ const TextField = defaults(def, (props) => {
 			}
 		}
 
+		// `assignOnEnter` used to write the observable on Enter and NOWHERE else, so
+		// typing a value and then clicking away — including clicking the property
+		// editor's "Commit Changes" button — silently threw the edit away. Leaving the
+		// field is a commit too; Escape-to-discard was never implemented here anyway.
+		const handleBlur = (e: FocusEvent) => {
+			if (!$$(assignOnEnter) || !isObservable(value)) return
+			value((e.target as HTMLInputElement).value)
+		}
+
 		input.addEventListener('keyup', handleKeyUp)
 		input.addEventListener('input', handleInput)
+		input.addEventListener('blur', handleBlur)
 		return () => {
 			input.removeEventListener('keyup', handleKeyUp)
 			input.removeEventListener('input', handleInput)
+			input.removeEventListener('blur', handleBlur)
 		}
 	})
 
 	const effectStyle = useMemo(() => {
 		const effectName = $$(effect)
-		return effectMap[effectName] || defaultStyle
+		if (effectMap[effectName]) return effectMap[effectName]
+		// `defaultStyle` styles the input alone and says nothing about where a
+		// label goes, so <wui-text-field label="Name"> with no effect rendered
+		// the label *below* the box. Only the labeled effects position it, so
+		// fall back to one whenever a label is present (same default TextArea
+		// already uses).
+		return $$(label) ? effect19a : defaultStyle
 	})
+
+	// ── Floating-label / placeholder reconciliation ──
+	// The labeled effects park the label over the field and float it up via
+	// `:not(:placeholder-shown)`. That selector only behaves when a *non-empty*
+	// placeholder exists, and any visible placeholder text sits exactly under the
+	// resting label. So when a label is present:
+	//   - substitute a single space when the caller gave no placeholder, otherwise
+	//     `:placeholder-shown` never matches and the label floats up permanently;
+	//   - hide the placeholder text until focus, so the two don't overprint.
+	const placeholderValue = useMemo(() => {
+		const p = $$(placeholder)
+		if (!$$(label)) return p
+		return p ? p : ' '
+	})
+	const labelPlaceholderClass = useMemo(() =>
+		$$(label) ? "placeholder:text-transparent focus:placeholder:text-gray-400" : "")
+
+	// `disabled` only reached the DOM attribute — text, border and cursor were
+	// unchanged, so a disabled field looked identical to an editable one. Match
+	// the greys Button already uses for its disabled state.
+	const disabledClass = "disabled:cursor-not-allowed disabled:text-[#00000061] disabled:border-[#0000001f] disabled:bg-[#0000000a] [&:disabled~label]:text-[#00000061]"
 
 	const handleFocus = () => {
 		if (inputRef()) {
@@ -235,20 +273,22 @@ const TextField = defaults(def, (props) => {
 							ref={inputRef}
 							class={() => [
 								effectStyle,
+								labelPlaceholderClass,
+								disabledClass,
 							]}
 							value={value}
 							disabled={disabled}
 							type={inputType}
-							placeholder={placeholder}
+							placeholder={placeholderValue}
 
 							{...otherProps}
 
-							onChange={(e) => {
+							onChange={(e: any) => {
 								// NOTE: Native handler (attached via addEventListener in useEffect) handles all value-setting.
 								// JSX handler's value() call would use retargeted e.target (shadow host), causing value(undefined).
 								onChange?.(e)
 							}}
-							onKeyUp={(e) => {
+							onKeyUp={(e: any) => {
 								console.log('[TextField onKeyUp]', { key: e.key, targetTag: e.target?.tagName, targetVal: e.target?.value, assignOnEnter: $$(assignOnEnter), isObs: isObservable(value), val: value })
 								// NOTE: Native handler (attached via addEventListener in useEffect) handles all value-setting.
 								// JSX handler's value() call would use retargeted e.target (shadow host), causing value(undefined).
@@ -276,19 +316,28 @@ const TextField = defaults(def, (props) => {
 
 
 const defStartAdornment = () => ({
-	cls: $('', HtmlClass) as JSX.Class | undefined,
-	children: $(null),
+	cls: $('', HtmlClass) as JSX.Class,
+	children: $(null) as CustomElementChildren,
 	'data-adnorment': 'start'
 })
 
 const defEndAdnorment = () => ({
-	cls: $('', HtmlClass) as JSX.Class | undefined,
-	children: $(null),
+	cls: $('', HtmlClass) as JSX.Class,
+	children: $(null) as CustomElementChildren,
 	'data-adnorment': 'end'
 })
 
-const StartAdornment = defaults(defStartAdornment, (props) => {
-	const { cls, children, ...otherProps } = props
+/**
+ * An adornment component carries a static `adornmentType` marker that `TextField` reads off the
+ * child function (see `getAdornmentType` above) to decide which side of the input it renders on.
+ */
+type Adornment<D extends () => Record<string, any>> = Defaulted<D> & { adornmentType?: 'start' | 'end' }
+
+const StartAdornment: Adornment<typeof defStartAdornment> = defaults(defStartAdornment, (props) => {
+	// `data-adnorment` is pulled out of the spread: it is part of `def` (so it reflects as an
+	// attribute on the custom element) but this component always renders the `start` marker, and
+	// leaving it in `otherProps` would overwrite the literal below.
+	const { cls, children, 'data-adnorment': _side, ...otherProps } = props
 
 	// const baseClass = "flex h-[0.01em] max-h-[2em] items-center whitespace-nowrap text-[rgba(0,0,0,0.54)] mr-2"
 	const baseClass = "flex h-[0.01em] max-h-[2em] items-center whitespace-nowrap text-[rgba(0,0,0,0.54)]"
@@ -301,8 +350,9 @@ const StartAdornment = defaults(defStartAdornment, (props) => {
 }) as typeof StartAdornment
 StartAdornment.adornmentType = 'start'// as typeof StartAdornment
 
-const EndAdornment = defaults(defEndAdnorment, (props) => {
-	const { cls, children, ...otherProps } = props
+const EndAdornment: Adornment<typeof defEndAdnorment> = defaults(defEndAdnorment, (props) => {
+	// See StartAdornment: the `data-adnorment` default is dropped so the literal `end` wins.
+	const { cls, children, 'data-adnorment': _side, ...otherProps } = props
 
 	// const baseClass = "flex h-[0.01em] max-h-[2em] items-center whitespace-nowrap text-[rgba(0,0,0,0.54)] ml-2"
 	const baseClass = "flex h-[0.01em] max-h-[2em] items-center whitespace-nowrap text-[rgba(0,0,0,0.54)]"

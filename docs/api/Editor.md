@@ -32,6 +32,35 @@ import "./Editor"; // registers <wui-editor>
 | **readonly**              | `boolean` (observable)                                                  | `false`  | Disable editing and hide the toolbar                     |
 | **...otherProps**         | HTML div attributes                                                     | —        | Any standard div attributes                              |
 
+## `externalPropertyPanel`
+
+Pass this to drive the property panel from outside the editor (a docked sidebar,
+a floating dialog). All three fields are **observables the editor writes into**:
+the editor uses them as the value of its `PropertyPanelContext.Provider` instead
+of creating its own, so the host holds the same references and can read the
+panel's state or open it programmatically.
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| **panelOpen** | `Observable<boolean>` | Whether the panel should be shown. The editor sets it `true` when the user opens properties for a selection. |
+| **propertyTarget** | `Observable<HTMLElement \| null>` | The element the panel is editing; `null` when the selection carries no editable target. |
+| **selectionType** | `Observable<SelectionType>` | What kind of selection drove the panel — see `detectSelectionType` in the PropertyExtractor API. |
+
+```tsx
+const panelOpen = $(false)
+const propertyTarget = $<HTMLElement | null>(null)
+const selectionType = $<SelectionType>('none')
+
+<Editor externalPropertyPanel={{ panelOpen, propertyTarget, selectionType }} />
+
+// The host can now observe or drive the panel:
+<button onClick={() => panelOpen(!panelOpen())}>Toggle properties</button>
+<span>Editing: {() => propertyTarget()?.tagName ?? 'nothing'}</span>
+```
+
+Leave it `null` (the default) and the editor creates the three observables
+itself, so the panel is entirely self-contained.
+
 ---
 
 # ⚙️ Internal Logic Overview

@@ -7,6 +7,7 @@ import '../PropertyForm/NumberEditor' // Side-effect: registers NumberEditor
 import '../PropertyForm/BooleanEditor' // Side-effect: registers BooleanEditor
 import '../PropertyForm/ColorEditor' // Side-effect: registers ColorEditor
 import '../PropertyForm/ObjectEditor' // Side-effect: registers ObjectEditor
+import '../PropertyForm/EnumEditor' // Side-effect: registers EnumEditor
 import {
     detectSelectionType,
     extractImageProperties,
@@ -33,7 +34,7 @@ export const PropertyPanelContext = createContext<{
     selectionType: Observable<SelectionType>
 }>()
 
-export const usePropertyPanel = () => useContext(PropertyPanelContext)
+export const usePropertyPanel = () => useContext(PropertyPanelContext)!
 
 /**
  * PropertyPanel: A right-side panel that renders <PropertyForm>
@@ -69,6 +70,13 @@ export const PropertyPanel = () => {
     // sync effect that was about to apply the new value).
     const lastExtractedTarget = $<HTMLElement | null>(null)
     const disposeEffects: (() => void)[] = []
+
+    // ── Floating dialog position ──
+    // null = "not moved yet", which renders at the default top-right corner. Once the
+    // user drags, we switch to explicit viewport coordinates and keep them for the rest
+    // of the session, so reopening the panel puts it back where they left it.
+    const panelPos = $<{ x: number, y: number } | null>(null)
+    const dragging = $(false)
 
     // Helper: extract properties from the current target based on selection type
     const extractFromTarget = (element: HTMLElement, type: SelectionType) => {
@@ -148,9 +156,24 @@ export const PropertyPanel = () => {
         // Create one effect per property observable. Each effect auto-tracks
         // its own observable via $(obs) and applies changes to the DOM element.
         Object.entries(obj).forEach(([key, obs]) => {
+            // CRITICAL: skip the effect's FIRST run. That run only replays the value
+            // we just extracted *from* the element, so writing it back is at best a
+            // no-op and at worst destructive:
+            //   - applyCustomElementProperty() deletes any attribute whose value
+            //     equals the plugin default, so merely OPENING the panel on
+            //     <wui-button type="contained" children="Button"> stripped both
+            //     attributes and left the button unstyled and unlabelled.
+            //   - propsObj and propertyTarget are set by two separate observable
+            //     writes, so between them this effect re-runs with the PREVIOUS
+            //     selection's props against the NEW element — that is how text
+            //     properties (fontweight/fontsize/color/...) ended up smeared onto
+            //     an embedded <wui-button> as attributes.
+            // Only a genuine user edit (a later run) may touch the DOM.
+            let extractionPass = true
             const dispose = useEffect(() => {
                 try {
                     const val = $$(obs)
+                    if (extractionPass) { extractionPass = false; return }
                     if (val === undefined || val === null) return
 
                     switch (type) {
@@ -202,7 +225,7 @@ export const PropertyPanel = () => {
                 console.log('[PropertyPanel] focusin detected INSIDE panel, setting panelFocused=true')
                 panelFocused(true)
             } else {
-                console.log('[PropertyPanel] focusin detected OUTSIDE panel, path:', path.map(p => p.tagName || p.nodeName).join(' > '))
+                console.log('[PropertyPanel] focusin detected OUTSIDE panel, path:', path.map(p => (p as HTMLElement).tagName || (p as Node).nodeName).join(' > '))
             }
         }
 
@@ -216,11 +239,11 @@ export const PropertyPanel = () => {
             }
         }
 
-        panel.addEventListener('focusin', handleFocusIn)
-        panel.addEventListener('focusout', handleFocusOut)
+        panel.addEventListener('focusin', handleFocusIn as EventListener)
+        panel.addEventListener('focusout', handleFocusOut as EventListener)
         return () => {
-            panel.removeEventListener('focusin', handleFocusIn)
-            panel.removeEventListener('focusout', handleFocusOut)
+            panel.removeEventListener('focusin', handleFocusIn as EventListener)
+            panel.removeEventListener('focusout', handleFocusOut as EventListener)
         }
     })
 
@@ -237,10 +260,15 @@ export const PropertyPanel = () => {
         // This fixes the text→image transition bug where clicking an image after
         // selecting text fails to update the property panel.
         let lastPointerTarget: HTMLElement | null = null
+        let lastPointerInPanel = false
         let imageCheckTimer: ReturnType<typeof setTimeout> | null = null
 
         const handlePointerDown = (e: PointerEvent) => {
-            lastPointerTarget = e.composedPath()[0] as HTMLElement
+            const path = e.composedPath()
+            lastPointerTarget = path[0] as HTMLElement
+            // Clicking (or dragging) the panel itself is not a selection change.
+            lastPointerInPanel = path.some(n =>
+                n instanceof HTMLElement && n.hasAttribute?.('data-property-panel'))
 
             // CRITICAL: Schedule a deferred check for image selection.
             // In shadow DOM mode, ImageResizer's mousedown handler calls
@@ -257,25 +285,54 @@ export const PropertyPanel = () => {
                 imageCheckTimer = null
                 const target = lastPointerTarget
                 if (!target) return
-                const img = target.closest('img') as HTMLImageElement | null
-                if (!img) return
-                // Verify the image is inside the editor (support both shadow and light DOM)
+                // Clicks inside the panel (including the drag handle) are edits, not
+                // selection changes — retargeting on them would wipe the form mid-edit.
+                if (lastPointerInPanel) return
+
+                // Verify the click landed inside the editor (support both shadow and light DOM)
                 const editorHost = document.querySelector('wui-editor') as HTMLElement | null
                 const shadow = editorHost?.shadowRoot
                 const editorRoot = shadow?.querySelector('[data-editor-root]') ?? document.querySelector('[data-editor-root]')
-                if (!editorRoot?.contains(img)) return
+
+                const img = target.closest('img') as HTMLImageElement | null
+                if (img) {
+                    if (!editorRoot?.contains(img)) return
+
+                    const currentTarget = $$(propertyTarget)
+                    if (currentTarget && img.isSameNode(currentTarget)) return
+
+                    console.log('[PropertyPanel] pointerdown timeout: image detected, updating panel target')
+                    selectionType('image')
+                    propertyTarget(img)
+                    propsObj(extractImageProperties(img))
+                    lastExtractedTarget(img)
+                    // NOTE: Panel is NOT auto-opened here — the user must click the InfoButton
+                    // to open the panel. This prevents the panel from popping up unexpectedly
+                    // when clicking an image.
+                    return
+                }
+
+                // ── Embedded custom element ──
+                // An embedded plugin element owns a shadow root, so a click on it is
+                // absorbed and the browser fires NO selectionchange — the handler below
+                // never runs, and an already-open panel kept showing the PREVIOUS
+                // element's props until the user clicked Properties again. Editor.tsx's
+                // capture-phase pointerdown has already moved the [data-element-selected]
+                // mark by the time this timeout fires, and detectSelectionType() gives
+                // that mark top priority, so a plain re-detect is enough.
+                const { type, element } = detectSelectionType()
+                if (!element || type !== 'custom') return
+                if (element.hasAttribute?.('data-editor-root')) return
+                if (!editorRoot?.contains(element)) return
 
                 const currentTarget = $$(propertyTarget)
-                if (currentTarget && img.isSameNode(currentTarget)) return
+                if (currentTarget && element.isSameNode(currentTarget)) return
 
-                console.log('[PropertyPanel] pointerdown timeout: image detected, updating panel target')
-                selectionType('image')
-                propertyTarget(img)
-                propsObj(extractImageProperties(img))
-                lastExtractedTarget(img)
-                // NOTE: Panel is NOT auto-opened here — the user must click the InfoButton
-                // to open the panel. This prevents the panel from popping up unexpectedly
-                // when clicking an image.
+                console.log('[PropertyPanel] pointerdown timeout: custom element switch, refreshing panel')
+                selectionType(type)
+                propertyTarget(element)
+                propsObj(extractFromTarget(element, type))
+                lastExtractedTarget(element)
             }, 0)
         }
         document.addEventListener('pointerdown', handlePointerDown, true)
@@ -366,6 +423,7 @@ export const PropertyPanel = () => {
                 // Check if element is still connected to any root (shadow or document)
                 // isConnected works across shadow DOM boundaries
                 if (!target.isConnected) {
+                    target.removeAttribute('data-element-selected')
                     panelOpen(false)
                     propertyTarget(null)
                     propsObj(null)
@@ -377,15 +435,92 @@ export const PropertyPanel = () => {
         return () => clearInterval(interval)
     })
 
+    // The dialog element itself — needed by the drag handler to read its own rect.
+    let panelEl: HTMLElement | null = null
+
+    /**
+     * Drag the dialog by its header.
+     *
+     * Wired through a ref (`el.onpointerdown = ...`) rather than a JSX `onPointerDown`
+     * prop: woby's delegated listeners don't reach elements inside the editor's shadow
+     * root — the same reason the close button below assigns `el.onclick` directly.
+     */
+    const startDrag = (e: PointerEvent) => {
+        // Let the close button (and anything else clickable in the header) do its job.
+        const hit = e.composedPath()[0] as HTMLElement
+        if (hit?.closest?.('button, input, select, textarea')) return
+        if (!panelEl) return
+
+        const rect = panelEl.getBoundingClientRect()
+        const dx = e.clientX - rect.left
+        const dy = e.clientY - rect.top
+        const w = rect.width
+        const h = rect.height
+
+        dragging(true)
+        e.preventDefault()
+        e.stopPropagation()
+
+        const onMove = (ev: PointerEvent) => {
+            // Clamp so the dialog can never be dragged fully off-screen — leaving the
+            // header unreachable would strand it there for the rest of the session.
+            const x = Math.min(Math.max(0, ev.clientX - dx), Math.max(0, window.innerWidth - w))
+            const y = Math.min(Math.max(0, ev.clientY - dy), Math.max(0, window.innerHeight - Math.min(h, 40)))
+            panelPos({ x, y })
+        }
+        const onUp = () => {
+            dragging(false)
+            document.removeEventListener('pointermove', onMove, true)
+            document.removeEventListener('pointerup', onUp, true)
+        }
+        document.addEventListener('pointermove', onMove, true)
+        document.addEventListener('pointerup', onUp, true)
+    }
+
+    /**
+     * "Commit Changes" — flush whatever the user has typed but not yet committed.
+     *
+     * String rows render a `<TextField assignOnEnter>`, which writes its observable on
+     * Enter or on blur. A value the user typed and left sitting in the input is still
+     * only in the DOM, so the per-property effects below have nothing to apply. Blurring
+     * the field pushes it through the normal observable → applyXxxProperty path.
+     *
+     * Deliberately NOT a "write every property back to the element": applyCustomElement-
+     * Property() deletes any attribute whose value equals the plugin default, so a
+     * blanket re-apply would strip `type="contained"` off a button that never changed.
+     */
+    const commitPending = () => {
+        const root = panelEl?.getRootNode() as Document | ShadowRoot | undefined
+        const active = root?.activeElement as HTMLElement | null
+        if (active && panelEl?.contains(active) && typeof active.blur === 'function') active.blur()
+
+        // ...and dispatch the blur explicitly on every field. Calling blur() only emits
+        // an event when the browser window itself has focus, and the click may already
+        // have moved focus off the field before this runs. Re-committing an untouched
+        // field is a no-op — it writes the observable's own value straight back, and
+        // observable equality stops the per-property effect from firing.
+        panelEl?.querySelectorAll('input, textarea').forEach(el =>
+            el.dispatchEvent(new FocusEvent('blur')))
+    }
+
     return (
         <div
             data-property-panel
+            ref={(el) => { panelEl = el as HTMLElement }}
             class={() => [
-                "absolute right-0 top-0 w-[300px] h-full overflow-auto z-50",
-                "bg-white border-l border-gray-200 shadow-[-2px_0_8px_rgba(0,0,0,0.1)]",
+                "fixed w-[300px] max-h-[70vh] overflow-auto z-[1100]",
+                "bg-white border border-gray-200 rounded-md shadow-xl",
                 $$(panelOpen) ? '' : 'hidden'
             ]}
-            onMouseDown={(e) => {
+            style={() => {
+                const p = $$(panelPos)
+                // Before the first drag the dialog parks near the editor's top-right,
+                // which is where the docked panel used to live.
+                return p
+                    ? { left: `${p.x}px`, top: `${p.y}px`, right: 'auto' }
+                    : { right: '24px', top: '96px', left: 'auto' }
+            }}
+            onMouseDown={(e: MouseEvent) => {
                 // CRITICAL: preventDefault here blocks focus + caret placement in <input>
                 // fields (and <button> activation). Only intercept mousedown on the panel
                 // background itself — never on interactive elements inside the panel.
@@ -399,8 +534,15 @@ export const PropertyPanel = () => {
                 e.stopPropagation()
             }}
         >
-            {/* Header */}
-            <div class="px-3 py-2 bg-gray-50 border-b border-gray-200 flex items-center justify-between">
+            {/* Header — doubles as the drag handle */}
+            <div
+                ref={(el) => { if (el) (el as HTMLElement).onpointerdown = startDrag }}
+                class={() => [
+                    "px-3 py-2 bg-gray-50 border-b border-gray-200 flex items-center justify-between select-none",
+                    "sticky top-0",
+                    $$(dragging) ? 'cursor-grabbing' : 'cursor-grab'
+                ]}
+            >
                 <h3 class="text-[11px] font-bold uppercase tracking-widest text-slate-400">
                     {() => {
                         const t = $$(selectionType)
@@ -420,7 +562,7 @@ export const PropertyPanel = () => {
             {() => {
                 const obj = $$(propsObj)
                 return obj ? (
-                    <PropertyForm obj={obj} class="m-0" />
+                    <PropertyForm obj={obj} class="m-0" onCommit={commitPending} />
                 ) : (
                     <div class="p-4 text-sm text-gray-400">Select an element to view properties</div>
                 )

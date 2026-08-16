@@ -11,7 +11,8 @@ export const getIndentSize = (element: HTMLElement) => {
         const computedStyle = window.getComputedStyle(element)
         return computedStyle.textIndent //|| textIndent
     } else {
-        const computedStyle = window.getComputedStyle(element.parentElement)
+        // Reached only for text nodes, which always have an element parent inside the editor.
+        const computedStyle = window.getComputedStyle(element.parentElement!)
         return computedStyle.textIndent //|| textIndent
     }
     // return textIndent
@@ -45,7 +46,7 @@ export const Indent = () => {
     // const { undos, saveDo } = useUndoRedo() // Removed
     const editor = useEditor()
 
-    return <Button buttonType='outlined' onClick={() => {
+    return <Button type='outlined' onClick={() => {
         // saveDo(undos) // Removed: MutationObserver in Editor.tsx should now handle this
 
         applyIndent(editor)
@@ -57,7 +58,7 @@ export const Outdent = () => {
     // const { undos, saveDo } = useUndoRedo() // Removed
     const editor = useEditor()
 
-    return <Button buttonType='outlined' onClick={() => {
+    return <Button type='outlined' onClick={() => {
         // saveDo(undos) // Removed: MutationObserver in Editor.tsx should now handle this
 
         applyIndent(editor, true)

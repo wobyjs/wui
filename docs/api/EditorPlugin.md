@@ -7,8 +7,18 @@ The **EditorPlugin API** defines the contract for third-party plugins that regis
 # Import
 
 ```tsx
-import { registerEditorPlugin, unregisterEditorPlugin, getEditorPlugins, serializeEditorContent } from "./EditorPlugin";
-import type { EditorPlugin, InsertMenuItem } from "./EditorPlugin";
+import {
+  registerEditorPlugin,
+  unregisterEditorPlugin,
+  getEditorPlugins,
+  getPluginForElement,
+  pluginsToInsertItems,
+  serializeEditorContent,
+} from "./EditorPlugin";
+import type { EditorPlugin, InsertMenuItem, PluginProp, PluginPropType } from "./EditorPlugin";
+
+// Registers the bundled wui-* component plugins as a side-effect.
+import "./Editor/WuiPlugins";
 ```
 
 ---
@@ -25,6 +35,79 @@ import type { EditorPlugin, InsertMenuItem } from "./EditorPlugin";
 | **onRender**| `(element: HTMLElement) => void`                             | No       | Called after the custom element is inserted into the editor   |
 | **toHTML**  | `(element: HTMLElement) => string`                           | No       | Serialize the custom element to an HTML string for output     |
 | **fromHTML**| `(html: string) => HTMLElement`                              | No       | Deserialize HTML back into the custom element when loading    |
+| **props**   | `PluginProp[]`                                               | No       | Typed property schema. When present the property panel renders typed editors instead of blind string fields |
+| **onPropChange** | `(element: HTMLElement, key: string, value: any) => void` | No     | Called after the panel writes an attribute, so a plugin can re-render or re-insert an element that cannot pick the change up on its own |
+
+---
+
+# Type: `PluginPropType`
+
+```ts
+type PluginPropType = 'string' | 'number' | 'boolean' | 'color' | 'enum'
+```
+
+Drives which editor row the property panel renders, and how the raw attribute
+string is coerced back to a runtime value:
+
+| Type        | Panel row       | Coercion from attribute                              | Value when the attribute is absent |
+| ----------- | --------------- | ---------------------------------------------------- | ---------------------------------- |
+| `'string'`  | `StringEditor`  | used verbatim                                         | `default ?? ''`                    |
+| `'number'`  | `NumberEditor`  | `Number(raw)`; falls back to `default` when `NaN`     | `default ?? 0`                     |
+| `'boolean'` | `BooleanEditor` | bare attribute → `true`, literal `"false"` → `false`  | `default ?? false`                 |
+| `'color'`   | `ColorEditor`   | used verbatim (a CSS colour string)                   | `default ?? '#000000'`             |
+| `'enum'`    | `EnumEditor`    | used verbatim                                         | `default ?? options[0].value`      |
+
+---
+
+# Interface: `PluginProp`
+
+| Field           | Type                                    | Required | Description                                                              |
+| --------------- | --------------------------------------- | -------- | ------------------------------------------------------------------------ |
+| **name**        | `string`                                | Yes      | Attribute name on the element, e.g. `'label'`, `'count'`, `'variant'`     |
+| **type**        | `PluginPropType`                        | Yes      | Value type; selects the editor row (see table above)                      |
+| **label**       | `string`                                | No       | Row label in the property panel; defaults to `name`                       |
+| **default**     | `string \| number \| boolean`           | No       | Value used when the attribute is absent, and the "unset" comparison value |
+| **options**     | `{ value: string; label?: string }[]`   | For enum | Choices offered by `EnumEditor`; required when `type` is `'enum'`         |
+| **readonly**    | `boolean`                               | No       | Rendered, but not editable (e.g. values resolved at construction time)    |
+| **hidden**      | `boolean`                               | No       | Never surfaced in the panel at all                                        |
+| **hint**        | `string`                                | No       | Tooltip / helper text for the row                                         |
+| **textContent** | `boolean`                               | No       | This prop is the element's light-DOM text, not an attribute (see below)   |
+
+## camelCase names become kebab-case attributes
+
+woby's `customElement()` maps a camelCase prop to a kebab-case attribute, so a
+prop declared as `inputType` lives on the DOM as `input-type`. Declare the prop
+under its **camelCase** name — the panel converts it when reading and writing.
+Writing `setAttribute('inputType', …)` directly produces a dead, lowercased
+`inputtype` attribute sitting next to woby's live `input-type` one, which makes
+the panel and the element disagree.
+
+## `textContent: true` — light-DOM text, not an attribute
+
+woby's `customElement()` always passes a `<slot>` as `children`, so a
+`children="Label"` **attribute** is silently ignored and the component renders
+blank. Any prop whose value has to reach a slot (typically `children`) must be
+declared with `textContent: true`; the panel then writes `el.textContent`
+instead of an attribute, leaving element children such as icons alone, and drops
+any legacy same-named attribute.
+
+## Write-back rules
+
+`applyCustomElementProperty` (used by the property panel) is type-directed:
+
+- `boolean` values → `setAttribute(attr, '')` when `true`, `removeAttribute` when `false`.
+- A value equal to the declared `default`, or an empty string, removes the attribute so the serialized HTML stays clean.
+- `readonly` props are never written.
+- After every write, the owning plugin's `onPropChange(element, attr, value)` is called.
+
+## Schema disables the blind attribute scrape
+
+When a plugin declares `props`, that schema is the contract: the panel stops
+scraping the element's other attributes. This matters because woby reflects
+every defaulted prop back as an attribute, which would otherwise surface junk
+rows (`Cls`, `Effect`) and — worse — a duplicate free-text `Input-type` row
+fighting the typed `inputType` enum. Elements with no registered schema still
+fall back to the blind string scrape.
 
 ---
 
@@ -55,6 +138,17 @@ Remove a previously registered plugin by its `name`.
 ## `getEditorPlugins(): Observable<EditorPlugin[]>`
 
 Returns the reactive observable array of registered plugins. Components can use `$$(getEditorPlugins())` to reactively read the list.
+
+## `getPluginForElement(el: HTMLElement): EditorPlugin | undefined`
+
+Resolves the plugin that owns a DOM element by case-insensitive `tagName` match,
+or `undefined` when no registered plugin claims the tag. The property panel calls
+this to find an element's `props` schema and its `onPropChange` hook.
+
+```ts
+const plugin = getPluginForElement(selectedEl);
+const schema = plugin?.props ?? [];
+```
 
 ## `pluginsToInsertItems(editorRoot: HTMLElement): InsertMenuItem[]`
 
@@ -110,6 +204,18 @@ class MyCounter extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: "open" });
+  }
+
+  // Required for property-panel edits to show up: reading the attribute once in
+  // connectedCallback leaves the element stale after every later write.
+  static get observedAttributes() { return ["count"]; }
+
+  attributeChangedCallback(name: string, _old: string | null, value: string | null) {
+    if (name !== "count") return;
+    const next = parseInt(value || "0", 10);
+    if (Number.isNaN(next) || next === this.count) return;
+    this.count = next;
+    this.updateDisplay();
   }
 
   connectedCallback() {
@@ -198,6 +304,76 @@ registerEditorPlugin({
 });
 ```
 
+## Plugin with a Typed Property Schema
+
+```tsx
+registerEditorPlugin({
+  name: "callout",
+  label: "Callout",
+  tagName: "my-callout",
+  props: [
+    {
+      name: "tone", type: "enum", label: "Tone", default: "info",
+      options: [
+        { value: "info", label: "Info" },
+        { value: "warn", label: "Warning" },
+        { value: "error", label: "Error" },
+      ],
+    },
+    // Light-DOM text: a children="…" attribute would be swallowed by the slot.
+    { name: "children", type: "string", label: "Text", default: "Note", textContent: true },
+    { name: "accent", type: "color", label: "Accent", default: "#3b82f6" },
+    { name: "collapsed", type: "boolean", label: "Collapsed", default: false },
+    // Declared camelCase; written to the DOM as icon-size.
+    { name: "iconSize", type: "number", label: "Icon Size", default: 16, hint: "Pixels" },
+  ],
+  // The element caches its tone in JS, so an attribute write alone would not repaint.
+  onPropChange: (element, key) => {
+    if (key === "tone") (element as any).refresh?.();
+  },
+  onInsert: (editorRoot, range) => {
+    const el = document.createElement("my-callout");
+    el.textContent = "Note";
+    range.deleteContents();
+    range.insertNode(el);
+  },
+});
+```
+
+Selecting a `<my-callout>` in the editor now yields a property panel with an
+enum dropdown, a text row bound to the element's light-DOM text, a colour
+swatch, a checkbox and a number spinner — no free-text attribute rows.
+
+## Bundled WUI Component Plugins
+
+`src/Editor/WuiPlugins.ts` registers the wui-* components as editor plugins,
+each with a typed `props` schema. It is a **side-effect module and is not
+re-exported from the package index** — import it explicitly (the demo app does so
+from `src/main.ts`), or the eleven plugins below never register:
+
+```ts
+import "./Editor/WuiPlugins";
+```
+
+| Plugin `name`     | `tagName`             | Declared props                                                        |
+| ----------------- | --------------------- | --------------------------------------------------------------------- |
+| `button`          | `wui-button`          | `type` (enum), `children` (text), `disabled`                           |
+| `toggle-button`   | `wui-toggle-button`   | `children` (text), `checked`, `disabled`                               |
+| `checkbox`        | `wui-checkbox`        | `children` (text), `checked`, `disabled`, `labelPosition` (enum)       |
+| `switch`          | `wui-switch`          | `on`, `off`, `checked`, `effect` (enum)                                |
+| `text-field`      | `wui-text-field`      | `label`, `value`, `placeholder`, `inputType` (enum), `disabled`        |
+| `text-area`       | `wui-text-area`       | `label`, `value`, `placeholder`                                        |
+| `number-field`    | `wui-number-field`    | `value`, `min`, `max`, `step` (numbers), `disabled`                    |
+| `icon-button`     | `wui-icon-button`     | `disabled`                                                             |
+| `badge`           | `wui-badge`           | `badgeContent`, `vertical` (enum), `horizontal` (enum)                 |
+| `fab`             | `wui-fab`             | `type` (enum), `children` (text), `disabled`                           |
+| `avatar`          | `wui-avatar`          | `size` (enum), `type` (enum), `src`, `children` (text initials)        |
+
+Props marked *(text)* are declared `textContent: true` because they feed the
+component's slot. Note that **Portal-based components (the Wheeler family) are
+deliberately excluded** — they render outside the document flow and are not
+document-centric, so they do not belong in an editor's insert menu.
+
 ## Side-Effect Import Pattern
 
 ```ts
@@ -223,6 +399,8 @@ The EditorPlugin system provides:
 - Reactive plugin registry that updates the insert menu automatically
 - Lifecycle hooks: `onInsert` (required), `onRender` (optional)
 - Serialization hooks: `toHTML` and `fromHTML` for custom output formats
+- A typed property schema (`props: PluginProp[]`) that drives the property panel's editors, plus an `onPropChange` hook for elements that cannot react to attribute writes on their own
+- `getPluginForElement(el)` to resolve a plugin from any DOM element
 - Built-in safety: duplicate plugin name detection, no-op on re-registration
 - Works with both shadow DOM and light DOM editor modes
-- Example plugin (`CounterPlugin.ts`) included in the source tree
+- Example plugin (`CounterPlugin.ts`) and eleven bundled wui-* plugins (`WuiPlugins.ts`) included in the source tree

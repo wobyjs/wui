@@ -24,8 +24,8 @@ export { applyStyle as applyStyleLegacy } from './utils'
 export { FocusManager } from './FocusManager'
 
 // Editor Plugin System
-export { registerEditorPlugin, unregisterEditorPlugin, getEditorPlugins, pluginsToInsertItems, serializeEditorContent } from './EditorPlugin'
-export type { EditorPlugin, InsertMenuItem } from './EditorPlugin'
+export { registerEditorPlugin, unregisterEditorPlugin, getEditorPlugins, getPluginForElement, pluginsToInsertItems, serializeEditorContent } from './EditorPlugin'
+export type { EditorPlugin, InsertMenuItem, PluginProp, PluginPropType } from './EditorPlugin'
 
 // Property Panel
 export { InfoButton } from './InfoButton'

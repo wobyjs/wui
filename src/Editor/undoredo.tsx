@@ -12,24 +12,28 @@ export const EditorContext = createContext<Observable<HTMLDivElement>>()
 // 2. CREATE A SHORTCUT (HOOK)
 // Instead of importing 'useContext' and 'EditorContext' in every file, components just call 'useEditor()'.
 // It returns the current Editor <div> so buttons can modify it.
-export const useEditor = () => useContext(EditorContext)
+// `createContext<T>()` with no default makes `useContext` return `T | undefined`. Every consumer
+// of these hooks is rendered inside `<Editor>`, which always provides the value, so the hooks
+// assert non-undefined here rather than forcing ~30 call sites to null-check a value that is
+// never actually missing.
+export const useEditor = () => useContext(EditorContext)!
 
 // FocusManager context — toolbar buttons call beginCommand/endCommand to preserve selection
 export const FocusManagerContext = createContext<FocusManager>()
-export const useFocusManager = () => useContext(FocusManagerContext)
+export const useFocusManager = () => useContext(FocusManagerContext)!
 
 // Readonly context — controls whether editor is in edit or readonly mode
 export const ReadonlyContext = createContext<Observable<boolean>>()
-export const useReadonly = () => useContext(ReadonlyContext)
+export const useReadonly = () => useContext(ReadonlyContext)!
 
 // 3. CREATE THE UNDO/REDO DATA STORE
 // This creates another storage box that holds an object with specific properties:
 // - undos/redos: Observable arrays (the history stacks).
 // - undo/redo/saveDo: The functions logic to move backwards/forwards in history.
 export const UndoRedoContext = createContext<{
-    undos: Observable<string[]>,
+    undos: Observable<HistoryEntry[]>,
     undo: () => void,
-    redos: Observable<string[]>,
+    redos: Observable<HistoryEntry[]>,
     redo: () => void,
     saveDo: () => void
 }>()
@@ -37,18 +41,18 @@ export const UndoRedoContext = createContext<{
 // 4. CREATE A SHORTCUT (HOOK)
 // Components call 'useUndoRedo()' to grab the functions defined above.
 // Example usage: const { undo } = useUndoRedo();
-export const useUndoRedo = () => useContext(UndoRedoContext)
+export const useUndoRedo = () => useContext(UndoRedoContext)!
 
 /**
  * Defines the structure of the Undo/Redo state and its controller functions.
  */
 export type UndoRedoType = {
     /** An observable array containing the history of HTML snapshots. */
-    undos: Observable<string[]>,
+    undos: Observable<HistoryEntry[]>,
     /** Moves the editor state one step backward in history. */
     undo: () => void,
     /** An observable array containing snapshots that were "undone" and can be restored. */
-    redos: Observable<string[]>,
+    redos: Observable<HistoryEntry[]>,
     /** Moves the editor state one step forward in history. */
     redo: () => void,
     /** Captures the current HTML of the editor and saves it into the undo history. */
@@ -64,9 +68,12 @@ const DEBOUNCE_MS = 300
 const MAX_STACK = 100
 
 /**
- * History entry type - stores content and selection for restoration
+ * History entry type - stores content and selection for restoration.
+ *
+ * The history stacks hold these rather than bare HTML strings so undo can also restore the caret;
+ * `UndoRedoContext` / `UndoRedoType` are typed against it.
  */
-type HistoryEntry = {
+export type HistoryEntry = {
     content: string
     selection?: {
         startOffset: number

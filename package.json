@@ -15,7 +15,8 @@
             "import": "./dist/index.es.js",
             "types": "./dist/types/index.d.ts"
         },
-        "./style.css": "./dist/wui.css"
+        "./style.css": "./dist/wui.css",
+        "./dist/wui.css": "./dist/wui.css"
     },
     "scripts": {
         "dev": "vite dev",
@@ -23,11 +24,13 @@
         "bump": "pnpm version patch --no-git-tag-version",
         "npmjs": "pnpm publish",
         "release": "run-s -c git bump npmjs",
-        "declaration": "tsc --build --force --declaration --emitDeclarationOnly --declarationMap --verbose --noEmitOnError false || echo 'TypeScript declaration completed with errors'",
+        "declaration": "tsc --declaration --emitDeclarationOnly --declarationMap --outDir dist",
         "declaration:watch": "tsc --build --force --declaration --emitDeclarationOnly --declarationMap  --verbose --watch",
         "watch": "run-p build:watch",
         "build:watch": "tsc --watch",
-        "build": "vite build",
+        "//build": "vite build empties dist (emptyOutDir), so `declaration` must run AFTER it — otherwise dist/types is wiped and the package ships without the types its \"types\" field points at.",
+        "build": "run-s build:only declaration",
+        "build:only": "vite build",
         "test": "pnpm ssr-test",
         "test:watch": "vitest watch",
         "ssr-test": "pnpm exec esbuild src/ssr/ssr-test-runner.tsx --bundle --platform=node --format=esm --loader:.css=empty --inject:src/ssr/ssr-shim.js --outfile=src/ssr/ssr-test-runner-bundled.mjs && node src/ssr/ssr-test-runner-bundled.mjs",

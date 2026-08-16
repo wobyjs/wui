@@ -6,10 +6,12 @@ export * as './test/TextArea.test' from './test/TextArea.test';
 export * as './test/Tabs.test' from './test/Tabs.test';
 export * as './test/Switch.test' from './test/Switch.test';
 export * as './test/Sidebar.test' from './test/Sidebar.test';
+export * as './test/SelectionManager.test' from './test/SelectionManager.test';
 export * as './test/Paper.test' from './test/Paper.test';
 export * as './test/NumberField.test' from './test/NumberField.test';
 export * as './test/IconButton.test' from './test/IconButton.test';
 export * as './test/Fab.test' from './test/Fab.test';
+export * as './test/DOMNormalizer.test' from './test/DOMNormalizer.test';
 export * as './test/Collapse.test' from './test/Collapse.test';
 export * as './test/Chip.test' from './test/Chip.test';
 export * as './test/Checkbox.test' from './test/Checkbox.test';
@@ -21,6 +23,7 @@ export * as './test/Appbar.test' from './test/Appbar.test';
 export * as './test/Wheeler/Wheeler.test' from './test/Wheeler/Wheeler.test';
 export * as './test/Wheeler/MultiWheeler.test' from './test/Wheeler/MultiWheeler.test';
 export * as './test/Wheeler/DateTimeWheeler.test' from './test/Wheeler/DateTimeWheeler.test';
+export * as './test/PropertyForm/PropertyForm.test' from './test/PropertyForm/PropertyForm.test';
 export * as './test/PropertyForm/Demo.test' from './test/PropertyForm/Demo.test';
 export * as './test/Editor/UnderlineButton.test' from './test/Editor/UnderlineButton.test';
 export * as './test/Editor/TextStyleButton.test' from './test/Editor/TextStyleButton.test';
@@ -40,3 +43,4 @@ export * as './test/Editor/AlignLeftButton.test' from './test/Editor/AlignLeftBu
 export * as './test/Editor/AlignJustifyButton.test' from './test/Editor/AlignJustifyButton.test';
 export * as './test/Editor/AlignCenterButton.test' from './test/Editor/AlignCenterButton.test';
 export * as './test/Editor/AlignButton.test' from './test/Editor/AlignButton.test';
+//# sourceMappingURL=index.test.d.ts.map

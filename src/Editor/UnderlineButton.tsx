@@ -7,14 +7,14 @@ import { updateStylesState } from "./TextStyleButton"
 import { applyUnderline } from './StyleEngine'
 
 const def = () => ({
-    cls: $('', HtmlClass) as JSX.Class | undefined,
-    class: $('', HtmlClass) as JSX.Class | undefined,
+    cls: $('', HtmlClass) as ObservableMaybe<string>,
+    class: $('', HtmlClass) as ObservableMaybe<string>,
     buttonType: $("outlined", HtmlString) as ObservableMaybe<ButtonStyles>,
     title: $("Underline", HtmlString) as ObservableMaybe<string>,
     disabled: $(false, HtmlBoolean) as Observable<boolean>,
 })
 
-const UnderlineButton = defaults(def, (props) => {
+const UnderlineButton: Defaulted<typeof def> = defaults(def, (props) => {
     const { buttonType: btnType, title, cls, class: cn, disabled, ...otherProps } = props
 
     const editorNode = useEditor()
@@ -65,7 +65,7 @@ const UnderlineButton = defaults(def, (props) => {
             type={btnType}
             title={title}
             class={() => [
-                () => $$(cls) ? $$(cls) : cn,
+                () => $$(cls) ? $$(cls) : $$(cn),
                 () => $$(isActive) ? '!bg-slate-200' : ''
             ]}
             aria-pressed={() => $$(isActive) ? "true" : "false"}

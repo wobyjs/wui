@@ -86,6 +86,28 @@
         </div>
 
         <wui-editor enableToolbar="true" id="editor-root">
+            <p style="margin-top: 0;"><strong>Embedded WUI Components (click to select, then edit props in the panel):</strong></p>
+            <div style="display: flex; gap: 16px; flex-wrap: wrap; padding: 12px; background: #f8faff; border-radius: 8px; border: 1px dashed #93c5fd; margin: 8px 0; align-items: center;">
+                <my-counter count="0"></my-counter>
+                <wui-button type="contained">Button</wui-button>
+                <wui-button type="outlined">Outlined</wui-button>
+                <wui-button type="text">Text</wui-button>
+                <wui-toggle-button>Toggle</wui-toggle-button>
+                <wui-checkbox label-position="right" checked="true">Checkbox</wui-checkbox>
+                <wui-switch effect="ios" checked="true" on="ON" off="OFF"></wui-switch>
+                <wui-text-field label="Name" placeholder="Enter name" style="width: 160px; display: inline-flex;"></wui-text-field>
+                <wui-text-area label="Notes" placeholder="Enter notes" style="width: 160px; display: inline-flex; vertical-align: top;"></wui-text-area>
+                <wui-number-field value="10" min="0" max="100" style="width: 120px; display: inline-flex;"></wui-number-field>
+                <wui-icon-button>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                </wui-icon-button>
+                <wui-badge badge-content="3" style="display: inline-flex;">
+                    <wui-icon-button>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V8l8 5 8-5v10zm-8-7L4 6h16l-8 5z"/></svg>
+                    </wui-icon-button>
+                </wui-badge>
+                <wui-avatar size="md">JD</wui-avatar>
+            </div>
             <h2>✏️ Editor Content - Test Here!</h2>
             <p>Welcome to the WUI Rich Text Editor!</p>
             <p>This is a <strong>full toolbar demo</strong> for testing Phase 18 fixes.</p>
@@ -129,6 +151,7 @@
         </div>
     </div>
 
+    <script type="module" src="/@vite/client"></script>
     <script type="module" src="./editor-demo-script.js"></script>
 </body>
 </html>

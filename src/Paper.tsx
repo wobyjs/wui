@@ -1,8 +1,10 @@
-import { $, $$, customElement, defaults, ElementAttributes, HtmlClass, HtmlNumber, ObservableMaybe, useMemo } from "woby"
+import { type CustomElementChildren, $, $$, customElement, defaults, ElementAttributes, HtmlClass, HtmlNumber, ObservableMaybe, useMemo } from "woby"
 
 const baseClass = "bg-white transition-shadow duration-300 ease-in-out rounded-lg "
 
-const preset = {
+// Indexed by the `type`/`variant`/`size` prop, which is a free-form string on the custom
+// element (attributes carry no enum), so the table needs a string index signature.
+const preset: Record<number, string> = {
     0: `shadow-none `,
     1: `shadow-sm `,
     2: `shadow `,
@@ -29,13 +31,13 @@ const def = () => ({
      * - User can override the default class by providing a `cls` prop
      * - `class` can be used to add additional classes to the component
      */
-    cls: $('', HtmlClass) as JSX.Class | undefined,
-    class: $('', HtmlClass) as JSX.Class | undefined,
-    children: $(null),
+    cls: $('', HtmlClass) as JSX.Class,
+    class: $('', HtmlClass) as JSX.Class,
+    children: $(null) as CustomElementChildren,
     elevation: $(1, HtmlNumber) as ObservableMaybe<number>,
 })
 
-const Paper = defaults(def, (props) => {
+const Paper: Defaulted<typeof def> = defaults(def, (props) => {
     const { class: cn, cls, children, elevation, ...otherProps } = props
 
     const elevationClass = useMemo(() => {

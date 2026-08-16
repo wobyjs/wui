@@ -72,7 +72,7 @@ const ImageResizer = () => {
         if (shadow) {
             (shadow as any).__activeImage = $$(activeImage)
         }
-    }, [activeImage])
+    })
 
     // Refs for direct DOM manipulation
     let overlayEl: HTMLDivElement | null = null
@@ -200,7 +200,7 @@ const ImageResizer = () => {
             const actualTarget = e.composedPath()[0] as HTMLElement
             // Skip if clicking on overlay, mini-toolbar, or main editor toolbar
             if (actualTarget.closest('[data-image-overlay],[data-image-mini-toolbar],.editor-toolbar')) return
-            if (actualTarget instanceof HTMLImageElement && editorSurface.contains(actualTarget)) {
+            if (actualTarget instanceof HTMLImageElement && editorSurface?.contains(actualTarget)) {
                 e.preventDefault()
                 e.stopPropagation()
                 // CRITICAL: Explicitly clear text selection when clicking an image.
@@ -234,7 +234,7 @@ const ImageResizer = () => {
         }
 
         editor.addEventListener('mousedown', onMouseDown, true)
-        root.addEventListener('mousedown', onMouseDown, true)
+        root.addEventListener('mousedown', onMouseDown as EventListener, true)
         document.addEventListener('keydown', onKey)
         window.addEventListener('scroll', onScrollOrResize, true)
         window.addEventListener('resize', onScrollOrResize)
@@ -318,7 +318,7 @@ const ImageResizer = () => {
         // Cleanup: remove all event listeners and observer on unmount
         return () => {
             editor.removeEventListener('mousedown', onMouseDown, true)
-            root.removeEventListener('mousedown', onMouseDown, true)
+            root.removeEventListener('mousedown', onMouseDown as EventListener, true)
             document.removeEventListener('keydown', onKey)
             window.removeEventListener('scroll', onScrollOrResize, true)
             window.removeEventListener('resize', onScrollOrResize)
@@ -444,7 +444,7 @@ const ImageResizer = () => {
                 lastTarget = drop.target
                 lastInsertBefore = drop.insertBefore
 
-                const targetRect = drop.target.getBoundingClientRect()
+                const targetRect = (drop.target as HTMLElement).getBoundingClientRect()
                 const surfaceRect = surface.getBoundingClientRect()
 
                 dropIndicator!.style.display = 'block'
@@ -526,9 +526,9 @@ const ImageResizer = () => {
         const img = $$(activeImage)
         if (!img) return
         applyImageAlignment(img, a)
-        currentAlign(a)
+        currentAlign(a);
         // Update button visuals
-        [alignLBtn, alignCBtn, alignRBtn].forEach(b => {
+        [alignLBtn, alignCBtn, alignRBtn].forEach((b: any) => {
             if (!b) return
             b.style.background = 'transparent'
             b.style.color = 'white'
@@ -551,6 +551,29 @@ const ImageResizer = () => {
         if (im) im.remove()
         activeImage(null)
         hideOverlay()
+    }
+
+    /**
+     * Re-show the selection chrome for `img`.
+     *
+     * The drag/drop handler runs outside the `useEffect` closure that owns the original
+     * `showOverlay`, so it needs its own copy: recompute the rect relative to the editor surface,
+     * publish it to `overlayRect` (the JSX reads that reactively) and unhide the chrome.
+     */
+    const showOverlay = (img: HTMLImageElement) => {
+        const surface = document.querySelector('wui-editor')?.shadowRoot
+            ?.querySelector('[data-editor-root]') as HTMLElement | null
+        if (!surface) return
+        const surfaceRect = surface.getBoundingClientRect()
+        const imgRect = img.getBoundingClientRect()
+        overlayRect({
+            left: imgRect.left - surfaceRect.left,
+            top: imgRect.top - surfaceRect.top,
+            width: imgRect.width,
+            height: imgRect.height,
+        })
+        if (overlayEl) overlayEl.style.display = ''
+        if (toolbarEl) toolbarEl.style.display = ''
     }
 
     const hideOverlay = () => {

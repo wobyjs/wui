@@ -8,14 +8,14 @@ import { applyFontSize as applyFontSizeStyle } from './StyleEngine'
 import { safeGetSelection, safeGetRange } from './BrowserCompat'
 
 const def = () => ({
-    cls: $('', HtmlClass) as JSX.Class | undefined,
+    cls: $('', HtmlClass) as JSX.Class,
     buttonType: $("outlined", HtmlString) as ObservableMaybe<ButtonStyles>,
     editable: $(false, HtmlBoolean) as Observable<boolean>,
     fontSize: $(16, HtmlNumber) as ObservableMaybe<number>,
     step: $(5, HtmlNumber) as ObservableMaybe<number>,
 })
 
-const FontSize = defaults(def, (props) => {
+const FontSize: Defaulted<typeof def> = defaults(def, (props) => {
     const { cls, buttonType, editable, fontSize, step, ...otherProps } = props as any
     const editor = useEditor()
     const BASE_BTN = "w-1/5 justify-center px-2 py-1 border border-gray-300";
@@ -134,7 +134,7 @@ const FontSize = defaults(def, (props) => {
             cls={[BASE_BTN, rounded]}
             title={`${type} Font Size`}
             onClick={onStepClick(delta)}
-            onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
+            onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation(); }}
         >
             <Icon class="w-full h-full text-gray-500" />
         </Button>
@@ -146,7 +146,7 @@ const FontSize = defaults(def, (props) => {
             disabled={() => !$$(editable)}
             readOnly={() => !$$(editable)}
             onFocus={onInputChange}
-            onBlur={(e) => e.currentTarget.value = $$(fontSize).toString()}
+            onBlur={(e: any) => e.currentTarget.value = $$(fontSize).toString()}
             class={[
                 "text-center text-sm h-auto w-3/5 border-y border-gray-300",
                 () => $$(editable) ? "bg-white" : "bg-gray-50 cursor-not-allowed",

@@ -2,15 +2,15 @@ import { $, $$, defaults, type JSX, customElement, type ElementAttributes, HtmlC
 import { Button, ButtonStyles } from '../Button'
 import UndoIcon from '../icons/undo'
 import RedoIcon from '../icons/redo'
-import { EditorContext, UndoRedo, useEditor, useUndoRedo } from "./undoredo"
+import { EditorContext, HistoryEntry, UndoRedo, useEditor, useUndoRedo } from "./undoredo"
 
 // #region Undo Redo Button
 type UndoRedoMode = 'undo' | 'redo'
 
 const def = () => ({
     type: $("outlined", HtmlString) as ObservableMaybe<ButtonStyles>,
-    cls: $('', HtmlClass) as JSX.Class | undefined,
-    class: $('', HtmlClass) as JSX.Class | undefined,
+    cls: $('', HtmlClass) as JSX.Class,
+    class: $('', HtmlClass) as JSX.Class,
     mode: $("undo", HtmlString) as ObservableMaybe<UndoRedoMode>,
 })
 
@@ -21,8 +21,8 @@ const UndoRedoButton = defaults(def, (props) => {
     const undoRedoContext = useUndoRedo();
 
     // Create default empty observables as fallback
-    const fallbackUndos = $([] as string[]);
-    const fallbackRedos = $([] as string[]);
+    const fallbackUndos = $([] as HistoryEntry[]);
+    const fallbackRedos = $([] as HistoryEntry[]);
     const fallbackUndo = () => console.warn('[UndoRedoButton] Undo not available');
     const fallbackRedo = () => console.warn('[UndoRedoButton] Redo not available');
 
@@ -54,7 +54,7 @@ const UndoRedoButton = defaults(def, (props) => {
             // disabled={isBtnDisabled}
             disabled={handleDisabled}
             onClick={handleClick}
-            onMouseDown={(e) => { e.preventDefault(); e.stopPropagation() }}
+            onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation() }}
             cls={() => [
                 "border-none p-1.5 transition-all",
                 "text-gray-700 hover:bg-gray-100 cursor-pointer",
@@ -72,8 +72,8 @@ const UndoRedoButton = defaults(def, (props) => {
 
 // #region Editor Provider
 const editorProviderDef = () => ({
-    cls: $('', HtmlClass) as JSX.Class | undefined,
-    class: $('', HtmlClass) as JSX.Class | undefined,
+    cls: $('', HtmlClass) as JSX.Class,
+    class: $('', HtmlClass) as JSX.Class,
 });
 
 /**
@@ -95,7 +95,9 @@ const EditorProvider = defaults(editorProviderDef, (props) => {
     const { children } = props;
 
     // Create an observable to hold the editor reference
-    const editorRef = $<HTMLDivElement | null>(null);
+    // `EditorContext` holds a settled editor reference; the ref observable starts empty until the
+    // surface mounts, which is exactly the window in which no consumer reads it.
+    const editorRef = $<HTMLDivElement>(null as any) as Observable<HTMLDivElement>;
 
     return (
         <EditorContext.Provider value={editorRef}>

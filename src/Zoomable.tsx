@@ -1,23 +1,27 @@
 import { useEventListener } from "@woby/use"
-import { createContext, customElement, defaults, ElementAttributes, HtmlClass, HtmlNumber, HtmlString, Observable, useContext, useEffect, useMemo, type ObservableMaybe } from "woby"
+import { createContext, type CustomElementChildren, customElement, defaults, ElementAttributes, HtmlClass, HtmlNumber, HtmlString, Observable, useContext, useEffect, useMemo, type ObservableMaybe } from "woby"
 import { $, $$ } from "woby"
 
 
 const wrapperStyles = "absolute top-0 left-0 w-full h-full origin-top-left will-change-transform"
 
-const zoomableStyles = {
+// Indexed by the `type`/`variant`/`size` prop, which is a free-form string on the custom
+// element (attributes carry no enum), so the table needs a string index signature.
+const zoomableStyles: Record<string, string> = {
     default: "relative overflow-hidden touch-none border border-gray-300 rounded-lg"
 }
 
 
-const imgStyles = {
+// Indexed by the `type`/`variant`/`size` prop, which is a free-form string on the custom
+// element (attributes carry no enum), so the table needs a string index signature.
+const imgStyles: Record<string, string> = {
     default: "absolute w-full h-full object-contain origin-top-left cursor-grab select-none pointer-events-none rounded-lg"
 }
 
 const def = () => ({
-    cls: $('', HtmlClass) as JSX.Class | undefined,
-    class: $('', HtmlClass) as JSX.Class | undefined,
-    children: $(null),
+    cls: $('', HtmlClass) as JSX.Class,
+    class: $('', HtmlClass) as JSX.Class,
+    children: $(null) as CustomElementChildren,
     minScale: $(1, HtmlNumber) as ObservableMaybe<number>,
     maxScale: $(5, HtmlNumber) as ObservableMaybe<number>,
     type: $("default", HtmlString) as ObservableMaybe<string>,
@@ -30,9 +34,9 @@ const def = () => ({
 })
 
 const defImg = () => ({
-    cls: $('', HtmlClass) as JSX.Class | undefined,
-    class: $('', HtmlClass) as JSX.Class | undefined,
-    children: $(null),
+    cls: $('', HtmlClass) as JSX.Class,
+    class: $('', HtmlClass) as JSX.Class,
+    children: $(null) as CustomElementChildren,
     type: $("default", HtmlString) as ObservableMaybe<string>,
     alt: $("Image", HtmlString) as ObservableMaybe<string>,
     src: $("", HtmlString) as ObservableMaybe<string>,
@@ -42,12 +46,12 @@ const ZoomableContext = createContext<{ style: JSX.Style, ref: Observable<HTMLIm
 export const useZoomable = () => useContext(ZoomableContext)
 
 
-const Zoomable = defaults(def, (props) => {
+const Zoomable: Defaulted<typeof def> = defaults(def, (props) => {
 
     const { cls, class: cn, children, minScale, maxScale, type, height, width, scale, x: translateX, y: translateY, ...otherProps } = props
 
-    const containerRef = $<HTMLDivElement>(null)
-    const wrapperRef = $<HTMLDivElement>(null) // NEW: Ref for the inner wrapper
+    const containerRef = $<HTMLDivElement>(null as any)
+    const wrapperRef = $<HTMLDivElement>(null as any) // NEW: Ref for the inner wrapper
 
 
     const getSize = (v: number | string) => typeof v === 'number' ? `${v}px` : v
@@ -315,7 +319,7 @@ const Zoomable = defaults(def, (props) => {
     )
 }) as typeof Zoomable
 
-const Img = defaults(defImg, (props) => {
+const Img: Defaulted<typeof defImg> = defaults(defImg, (props) => {
     // We just render the image. 
     // The Parent (Zoomable) handles the 'transform' via the wrapper div.
     const { cls, class: cn, type, alt, src, ...otherProps } = props

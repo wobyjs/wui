@@ -85,6 +85,12 @@ Best used for icon-only actions such as add, favorite, or notifications.
 
 Great for actions that require descriptive text.
 
+The pill variant sits in normal flow. To float it over the page, position it yourself:
+
+```tsx
+<Fab type="pill" class="fixed bottom-6 right-6">➕ Add Item</Fab>
+```
+
 ---
 
 # 🚫 Disabled FAB

@@ -4,3 +4,18 @@ dist
 *.png
 *.copy.*
 *.working.*
+
+# Generated declaration maps (tsc --declarationMap emits these next to the .d.ts)
+*.d.ts.map
+
+# Snapshot plugin output
+.snapshots/
+
+# Throwaway debug/repro artifacts — `pnpm git` runs `git add .`, keep them out
+repro*.html
+repro*-script.js
+browser_ssr.txt
+nodejs_ssr.txt
+ssr_output.txt
+dv4_console.json
+.dv-session.json

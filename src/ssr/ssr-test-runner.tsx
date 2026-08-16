@@ -50,11 +50,17 @@ const totalLogs = g.__consoleLogCount ?? 0
 const passLogs = g.__passLogCount ?? 0
 const failCount = g.__testFailures?.length ?? 0
 const passCount = g.__testPassCount ?? 0
+// Module-level render mismatches, collected by each TestXxx module instead of exiting on the spot
+// so that every module's actual/expected lines make it into the log.
+const moduleFailures: string[] = g.__ssrFailures ?? []
 console.log(`\n═══════════════════════════════════════`)
 console.log(`   📊 SSR Test Summary`)
 console.log(`   Total console.log calls: ${totalLogs}`)
 console.log(`   ✅ Pass log lines:       ${passLogs}`)
 console.log(`   Assertion passes:        ${passCount}`)
 console.log(`   Assertion failures:      ${failCount}`)
-console.log(`   Result: ${failCount > 0 ? '❌ SOME FAILED' : '✅ ALL PASSED'}`)
+console.log(`   Failed modules:          ${moduleFailures.length ? moduleFailures.join(', ') : 'none'}`)
+console.log(`   Result: ${failCount > 0 || moduleFailures.length > 0 ? '❌ SOME FAILED' : '✅ ALL PASSED'}`)
 console.log(`═══════════════════════════════════════\n`)
+
+if (failCount > 0 || moduleFailures.length > 0) process.exit(1)

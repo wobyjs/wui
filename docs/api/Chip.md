@@ -25,7 +25,8 @@ import './Chip'   // registers <wui-chip>
 |------|------|---------|-------------|
 | **children** | JSX.Child | `null` | Main chip content (text, avatar, etc.) |
 | **avatar** | JSX.Child | `null` | (Reserved) optional avatar slot |
-| **cls** | string | `""` | Custom classes applied to wrapper |
+| **cls** | `JSX.Class` | `""` | Primary class for the wrapper; when set it **replaces** the default classes |
+| **class** | `JSX.Class` | `""` | Additional classes that patch/extend the resolved classes (never replaces them) |
 | **deletable** | boolean \| Observable | `false` | Enables delete icon |
 | **visible** | boolean \| Observable | `true` | Controls chip visibility (auto-hide supported) |
 | **deleteIcon** | JSX.Element | `<DeleteIcon />` | Custom delete icon element |

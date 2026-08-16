@@ -48,16 +48,20 @@ TextField uses `StartAdornment` and `EndAdornment` children in place of the prev
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | **children** | JSX.Child | `null` | Content rendered as leading adornment |
-| **cls** | string | `""` | Additional classes |
+| **cls** | `JSX.Class` | `""` | Additional classes |
+| **data-adnorment** | `string` | `"start"` | Side marker reflected onto the wrapper `<div>`; see below |
 
 ### EndAdornment
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | **children** | JSX.Child | `null` | Content rendered as trailing adornment |
-| **cls** | string | `""` | Additional classes |
+| **cls** | `JSX.Class` | `""` | Additional classes |
+| **data-adnorment** | `string` | `"end"` | Side marker reflected onto the wrapper `<div>`; see below |
 
 Adornments are identified by an internal `adornmentType` property set to `'start'` or `'end'`. The TextField's `children` are split by adornment type; unrecognized children are rendered in the middle slot alongside the input.
+
+`data-adnorment` is the custom-element form of that same marker: `<wui-start-adornment>` / `<wui-end-adornment>` reach TextField as generic elements with no static `adornmentType`, so the side is read off this attribute instead. It is declared on the component's defaults so it reflects as an attribute, but it is pulled out of the props spread before rendering — the literal `data-adnorment="start"` / `"end"` on the wrapper always wins, and passing your own value does not flip an adornment to the other side.
 
 ---
 

@@ -6,8 +6,8 @@ import KeyboardDownArrow from '../icons/keyboard_down_arrow'
 import { applyBackgroundColor } from './StyleEngine'
 
 const def = () => ({
-    cls: $('', HtmlClass) as JSX.Class | undefined,
-    class: $('', HtmlClass) as JSX.Class | undefined,
+    cls: $('', HtmlClass) as JSX.Class,
+    class: $('', HtmlClass) as JSX.Class,
     color: $("#ffff00", HtmlString) as Observable<string>,
     buttonType: $("outlined", HtmlString) as ObservableMaybe<ButtonStyles>,
 })
@@ -20,7 +20,7 @@ const TextBackgroundColorPicker = defaults(def, (props) => {
     const editor = useEditor() // Editor context, likely the contentEditable div
     const undoRedoContext = useUndoRedo() // Undo/redo context
     const saveDo = undoRedoContext?.saveDo || (() => {})
-    const colorInputRef = $<HTMLInputElement>(null)
+    const colorInputRef = $<HTMLInputElement>(null as any)
 
     // Updates selectedBgColor when the color input changes
     const handleNativeBgColorInputChange = (e: JSX.TargetedEvent<HTMLInputElement, Event>) => {
@@ -61,7 +61,7 @@ const TextBackgroundColorPicker = defaults(def, (props) => {
                     cn,
                 ]}
                 title="Text background color"
-                onMouseDown={(e) => { e.preventDefault(); }}
+                onMouseDown={(e: any) => { e.preventDefault(); }}
                 onClick={applyPickedBgColor}
                 {...otherProps}
             >
@@ -73,11 +73,11 @@ const TextBackgroundColorPicker = defaults(def, (props) => {
                         value={selectedBgColor}
                         onInput={handleNativeBgColorInputChange}
                         class="w-full h-3 p-0 border-0"
-                        onClick={e => e.stopPropagation()}
+                        onClick={(e: any) => e.stopPropagation()}
                     />
                 </div>
 
-                <div class="flex justify-end" onClick={(e) => { e.preventDefault(); e.stopPropagation(); colorInputRef()?.click() }}>
+                <div class="flex justify-end" onClick={(e: any) => { e.preventDefault(); e.stopPropagation(); colorInputRef()?.click() }}>
                     <KeyboardDownArrow class="-mr-1 ml-2 size-5" />
                 </div>
             </Button>

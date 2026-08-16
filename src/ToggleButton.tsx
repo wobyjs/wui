@@ -1,23 +1,23 @@
-import { $, $$, isObservable, defaults, customElement, type ElementAttributes, HtmlBoolean, type JSX, ObservableMaybe, HtmlClass } from "woby"
+import { type CustomElementChildren, $, $$, isObservable, defaults, customElement, type ElementAttributes, HtmlBoolean, type JSX, ObservableMaybe, HtmlClass } from "woby"
 
 // 1. Define Base Styles (Common to both states)
 // const baseStyles = "inline-flex items-center justify-center relative box-border cursor-pointer select-none align-middle font-medium text-sm px-5 py-2.5 rounded transition-colors duration-200 border"
 
 const def = () => ({
-    children: $("" as JSX.Child),
+    children: $("" as JSX.Child) as CustomElementChildren,
     // 2. Updated Default Colors (Material UI / Tailwind style)
     onClass: $("text-[#1976d2] bg-[#1976d2]/10 border-[#1976d2]/50 hover:bg-[#1976d2]/20"),
     offClass: $("text-gray-600 bg-transparent border-transparent hover:bg-gray-100"),
 
-    checked: $(false, HtmlBoolean) as ObservableMaybe<boolean> | undefined,
-    cls: $('', HtmlClass) as JSX.Class | undefined,
-    class: $('', HtmlClass) as JSX.Class | undefined,
+    checked: $(false, HtmlBoolean) as ObservableMaybe<boolean>,
+    cls: $('', HtmlClass) as JSX.Class,
+    class: $('', HtmlClass) as JSX.Class,
     onClick: undefined as ((e: any) => void) | undefined,
-    disabled: $(false, HtmlBoolean) as ObservableMaybe<boolean> | undefined,
+    disabled: $(false, HtmlBoolean) as ObservableMaybe<boolean>,
 })
 
 
-const ToggleButton = defaults(def, (props) => {
+const ToggleButton: Defaulted<typeof def> = defaults(def, (props) => {
     const {
         children,
         onClass,

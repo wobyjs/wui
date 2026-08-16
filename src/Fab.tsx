@@ -1,4 +1,4 @@
-import { $, $$, isObservable, type JSX, defaults, customElement, ElementAttributes, HtmlBoolean, HtmlClass, ObservableMaybe, HtmlStyle, HtmlString } from 'woby'
+import { type CustomElementChildren, $, $$, isObservable, type JSX, defaults, customElement, ElementAttributes, HtmlBoolean, HtmlClass, ObservableMaybe, HtmlStyle, HtmlString } from 'woby'
 
 const def = () => ({
       /** 
@@ -13,25 +13,37 @@ const def = () => ({
        * - User can override the default class by providing a `cls` prop
        * - `class` can be used to add additional classes to the component
        */
-      cls: $('', HtmlClass) as JSX.Class | undefined,
-      class: $('', HtmlClass) as JSX.Class | undefined,
-      children: $(""),
-      type: $("pill", HtmlString) as ObservableMaybe<string> | undefined,
-      disabled: $(false, HtmlBoolean) as ObservableMaybe<boolean> | undefined,
+      cls: $('', HtmlClass) as JSX.Class,
+      class: $('', HtmlClass) as JSX.Class,
+      children: $("") as CustomElementChildren,
+      type: $("pill", HtmlString) as ObservableMaybe<string>,
+      disabled: $(false, HtmlBoolean) as ObservableMaybe<boolean>,
 })
 
-const variantStyle = {
+// `disabled` reached the <button> but nothing else: a disabled FAB kept the full blue
+// background, white text and a pointer cursor, so it read as live. Marked important
+// because the variants set their background with a flat class of equal weight.
+const disabledStyle = "disabled:!bg-[rgba(0,0,0,0.12)] disabled:!text-[rgba(0,0,0,0.26)] disabled:!shadow-none disabled:!cursor-default"
+
+// Indexed by the `type`/`variant`/`size` prop, which is a free-form string on the custom
+// element (attributes carry no enum), so the table needs a string index signature.
+const variantStyle: Record<string, string> = {
       circular: "inline-flex items-center justify-center relative box-border cursor-pointer select-none align-middle appearance-none no-underline font-medium text-lg z-[1050] shadow-[rgba(0,0,0,0.2)_0px_3px_5px_-1px,rgba(0,0,0,0.14)_0px_6px_10px_0px,rgba(0,0,0,0.12)_0px_1px_18px_0px] text-white m-2 p-0 rounded-[50%] border-0 [transition:background-color_250ms_cubic-bezier(0.4,0,0.2,1)0ms,box-shadow_250ms_cubic-bezier(0.4,0,0.2,1)0ms,border-color_250ms_cubic-bezier(0.4,0,0.2,1)0ms] outline-none w-14 h-14 bg-[rgb(25,118,210)] hover:bg-[rgb(21,101,192)]",
-      pill: "absolute bg-[rgb(25,118,210)] text-[white] text-4xl font-black cursor-pointer shadow-[0px_4px_8px_rgba(0,0,0,0.3)] transition-[background-color] duration-[0.3s] px-5 py-[15px] rounded-[50px] border-[none] [transition:top_0.3s_ease,left_0.3s_ease] z-[1050]",
+      // `absolute` used to live here. It made the variant unusable anywhere in normal
+      // flow — the <wui-fab> host collapsed to 0x0 and the button floated over whatever
+      // followed it, which is exactly what the docs' own inline `<Fab type="pill">`
+      // example does. A variant names a shape; floating is the caller's business, so the
+      // two positioned usages in docs/index.tsx now pass `absolute` themselves.
+      pill: "inline-flex items-center justify-center align-middle bg-[rgb(25,118,210)] text-[white] text-4xl font-black cursor-pointer shadow-[0px_4px_8px_rgba(0,0,0,0.3)] transition-[background-color] duration-[0.3s] px-5 py-[15px] rounded-[50px] border-[none] [transition:top_0.3s_ease,left_0.3s_ease] z-[1050]",
       custom: ""
 }
 
-const Fab = defaults(def, (props) => {
+const Fab: Defaulted<typeof def> = defaults(def, (props) => {
       const { class: cn, cls, children, type: variant, disabled, ...otherProps } = props
 
       return (
             <button
-                  class={[() => $$(cls) ? $$(cls) : variantStyle[$$(variant)], cn]}
+                  class={[() => $$(cls) ? $$(cls) : variantStyle[$$(variant)], disabledStyle, cn]}
                   disabled={disabled}
                   {...otherProps}
             >

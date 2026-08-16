@@ -13,15 +13,15 @@ type IndentMode = "increase" | "decrease"
 const def = () => ({
     buttonType: $("outlined", HtmlString) as ObservableMaybe<ButtonStyles>,
     title: $("", HtmlString) as ObservableMaybe<string>,
-    cls: $('', HtmlClass) as JSX.Class | undefined,
-    class: $('', HtmlClass) as JSX.Class | undefined,
+    cls: $('', HtmlClass) as ObservableMaybe<string>,
+    class: $('', HtmlClass) as ObservableMaybe<string>,
     mode: $("increase", HtmlString) as ObservableMaybe<IndentMode>,
     step: $(1, HtmlNumber) as ObservableMaybe<number>,
     disabled: $(false, HtmlBoolean) as Observable<boolean>,
     identPx: $(20, HtmlNumber) as ObservableMaybe<number>,
 })
 
-const Indent = defaults(def, (props) => {
+const Indent: Defaulted<typeof def> = defaults(def, (props) => {
     const { buttonType, title, cls, class: cn, mode, step, disabled, identPx, ...otherProps } = props
 
     const editor = useEditor()
@@ -101,10 +101,10 @@ const Indent = defaults(def, (props) => {
             type={buttonType}
             title={displayTitle}
             class={() => [
-                () => $$(cls) ? $$(cls) : cn
+                () => $$(cls) ? $$(cls) : $$(cn)
             ]}
             disabled={disabled}
-            onMouseDown={(e) => { e.preventDefault(); e.stopPropagation() }}
+            onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation() }}
             onClick={handleClick}
             {...otherProps}
         >

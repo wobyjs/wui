@@ -38,10 +38,10 @@ const clearFormatting = () => {
     removeFormat()
 }
 
-const transformCase = (transformType: 'lowercase' | 'uppercase' | 'capitalize', editorDiv: HTMLElement) => {
+const transformCase = (transformType: 'lowercase' | 'uppercase' | 'capitalize', editorDiv?: HTMLElement) => {
     // editorDiv is the [data-editor-root] content div, need to find the host element with shadow root
     // The host element is the parent wui-editor custom element that has the shadowRoot
-    const hostElement = editorDiv?.closest('wui-editor') || (editorDiv?.parentNode as Element)?.host || document.querySelector('wui-editor')
+    const hostElement = editorDiv?.closest('wui-editor') || (editorDiv?.parentNode as ShadowRoot)?.host || document.querySelector('wui-editor')
     const shadowRoot = hostElement?.shadowRoot
 
     const sel = shadowRoot ? shadowRoot.getSelection() : window.getSelection()
@@ -175,8 +175,8 @@ export const FORMAT_OPTIONS: FormatOption[] = [
 // type TextFormat = 'strikethrough' | 'subscript' | 'superscript' | 'highlight' | 'clear' | 'lowercase' | 'uppercase' | 'capitalize'
 // #region TextFormatOptionsDropDown Component
 const def = () => ({
-    cls: $('', HtmlClass) as JSX.Class | undefined,
-    class: $('', HtmlClass) as JSX.Class | undefined,
+    cls: $('', HtmlClass) as ObservableMaybe<string>,
+    class: $('', HtmlClass) as ObservableMaybe<string>,
     buttonType: $("outlined", HtmlString) as ObservableMaybe<ButtonStyles>,
     disabled: $(false, HtmlBoolean) as ObservableMaybe<boolean>,
 })
@@ -189,8 +189,8 @@ const TextFormatOptionsDropDown = defaults(def, (props) => {
 
     const editor = useEditor()
     const isOpen = $(false)
-    const dropdownRef = $<HTMLElement>(null)
-    const menuRef = $<HTMLElement>(null)
+    const dropdownRef = $<HTMLElement>(null as any)
+    const menuRef = $<HTMLElement>(null as any)
     const undoRedoContext = useUndoRedo()
     const saveDo = undoRedoContext?.saveDo || (() => {})
 
@@ -255,7 +255,7 @@ const TextFormatOptionsDropDown = defaults(def, (props) => {
                 role="menu"
                 aria-orientation="vertical"
                 aria-labelledby="format-options-menu-button"
-                onMouseDown={(e) => { e.stopPropagation(); e.preventDefault(); }}
+                onMouseDown={(e: any) => { e.stopPropagation(); e.preventDefault(); }}
             >
                 <div class="py-1" role="none">
                     {FORMAT_OPTIONS.map(opt => (
@@ -285,7 +285,7 @@ const TextFormatOptionsDropDown = defaults(def, (props) => {
                     class={() => [
                         () => $$(cls) ? $$(cls) : BASE_BTN, cn,
                     ]}
-                    onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                    onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation(); }}
                     onClick={toggleDropdown}
                     title="More text formats"
                     disabled={disabled}
@@ -310,19 +310,19 @@ const TextFormatOptionsDropDown = defaults(def, (props) => {
 const def_Strikethrough = () => ({
     buttonType: $("outlined", HtmlString) as ObservableMaybe<ButtonStyles>,
     title: $("Strikethrough", HtmlString) as ObservableMaybe<string>,
-    cls: $('', HtmlClass) as JSX.Class | undefined,
-    class: $('', HtmlClass) as JSX.Class | undefined,
+    cls: $('', HtmlClass) as ObservableMaybe<string>,
+    class: $('', HtmlClass) as ObservableMaybe<string>,
     disabled: $(false, HtmlBoolean) as Observable<boolean>,
 })
 
-const StrikethroughButton = defaults(def_Strikethrough, (props) => {
+const StrikethroughButton: Defaulted<typeof def_Strikethrough> = defaults(def_Strikethrough, (props) => {
     const { buttonType: btnType, title, cls, class: cn, disabled, ...otherProps } = props
 
     const editor = useEditor()
     const isActive = $(false)
     const undoRedoContext = useUndoRedo()
     const saveDo = undoRedoContext?.saveDo || (() => {})
-    const format = FORMAT_OPTIONS.find(f => f.label === 'Strikethrough')
+    const format = FORMAT_OPTIONS.find(f => f.label === 'Strikethrough')!
     const action = () => { format.action(); saveDo(); }
     const displayIcon = () => format.icon
 
@@ -340,19 +340,19 @@ const StrikethroughButton = defaults(def_Strikethrough, (props) => {
 const def_Subscript = () => ({
     buttonType: $("outlined", HtmlString) as ObservableMaybe<ButtonStyles>,
     title: $("Subscript", HtmlString) as ObservableMaybe<string>,
-    cls: $('', HtmlClass) as JSX.Class | undefined,
-    class: $('', HtmlClass) as JSX.Class | undefined,
+    cls: $('', HtmlClass) as ObservableMaybe<string>,
+    class: $('', HtmlClass) as ObservableMaybe<string>,
     disabled: $(false, HtmlBoolean) as Observable<boolean>,
 })
 
-const SubscriptButton = defaults(def_Subscript, (props) => {
+const SubscriptButton: Defaulted<typeof def_Subscript> = defaults(def_Subscript, (props) => {
     const { buttonType: btnType, title, cls, class: cn, disabled, ...otherProps } = props
 
     const editor = useEditor()
     const isActive = $(false)
     const undoRedoContext = useUndoRedo()
     const saveDo = undoRedoContext?.saveDo || (() => {})
-    const format = FORMAT_OPTIONS.find(f => f.label === 'Subscript')
+    const format = FORMAT_OPTIONS.find(f => f.label === 'Subscript')!
     const action = () => { format.action(); saveDo(); }
     const displayIcon = () => format.icon
 
@@ -370,19 +370,19 @@ const SubscriptButton = defaults(def_Subscript, (props) => {
 const def_Superscript = () => ({
     buttonType: $("outlined", HtmlString) as ObservableMaybe<ButtonStyles>,
     title: $("Superscript", HtmlString) as ObservableMaybe<string>,
-    cls: $('', HtmlClass) as JSX.Class | undefined,
-    class: $('', HtmlClass) as JSX.Class | undefined,
+    cls: $('', HtmlClass) as ObservableMaybe<string>,
+    class: $('', HtmlClass) as ObservableMaybe<string>,
     disabled: $(false, HtmlBoolean) as Observable<boolean>,
 })
 
-const SuperscriptButton = defaults(def_Superscript, (props) => {
+const SuperscriptButton: Defaulted<typeof def_Superscript> = defaults(def_Superscript, (props) => {
     const { buttonType: btnType, title, cls, class: cn, disabled, ...otherProps } = props
 
     const editor = useEditor()
     const isActive = $(false)
     const undoRedoContext = useUndoRedo()
     const saveDo = undoRedoContext?.saveDo || (() => {})
-    const format = FORMAT_OPTIONS.find(f => f.label === 'Superscript')
+    const format = FORMAT_OPTIONS.find(f => f.label === 'Superscript')!
     const action = () => { format.action(); saveDo(); }
     const displayIcon = () => format.icon
 
@@ -401,19 +401,19 @@ const def_Highlight = () => ({
     buttonType: $("outlined", HtmlString) as ObservableMaybe<ButtonStyles>,
     title: $("Highlight", HtmlString) as ObservableMaybe<string>,
     highlightColor: $('yellow', HtmlString) as ObservableMaybe<string>,
-    cls: $('', HtmlClass) as JSX.Class | undefined,
-    class: $('', HtmlClass) as JSX.Class | undefined,
+    cls: $('', HtmlClass) as ObservableMaybe<string>,
+    class: $('', HtmlClass) as ObservableMaybe<string>,
     disabled: $(false, HtmlBoolean) as Observable<boolean>,
 })
 
-const HighlightButton = defaults(def_Highlight, (props) => {
+const HighlightButton: Defaulted<typeof def_Highlight> = defaults(def_Highlight, (props) => {
     const { buttonType: btnType, title, cls, class: cn, disabled, highlightColor, ...otherProps } = props
 
     const editor = useEditor()
     const isActive = $(false)
     const undoRedoContext = useUndoRedo()
     const saveDo = undoRedoContext?.saveDo || (() => {})
-    const format = FORMAT_OPTIONS.find(f => f.label === 'Highlight')
+    const format = FORMAT_OPTIONS.find(f => f.label === 'Highlight')!
     const action = () => { applyHighlight($$(highlightColor)); saveDo(); }
     const displayIcon = () => format.icon
 
@@ -431,17 +431,17 @@ const HighlightButton = defaults(def_Highlight, (props) => {
 const def_ClearFormat = () => ({
     buttonType: $("outlined", HtmlString) as ObservableMaybe<ButtonStyles>,
     title: $("Clear Format", HtmlString) as ObservableMaybe<string>,
-    cls: $('', HtmlClass) as JSX.Class | undefined,
-    class: $('', HtmlClass) as JSX.Class | undefined,
+    cls: $('', HtmlClass) as ObservableMaybe<string>,
+    class: $('', HtmlClass) as ObservableMaybe<string>,
     disabled: $(false, HtmlBoolean) as Observable<boolean>,
 })
 
-const ClearFormatButton = defaults(def_ClearFormat, (props) => {
+const ClearFormatButton: Defaulted<typeof def_ClearFormat> = defaults(def_ClearFormat, (props) => {
     const { buttonType: btnType, title, cls, class: cn, disabled, ...otherProps } = props
     const isActive = false
     const undoRedoContext = useUndoRedo()
     const saveDo = undoRedoContext?.saveDo || (() => {})
-    const format = FORMAT_OPTIONS.find(f => f.label === 'Clear Formatting')
+    const format = FORMAT_OPTIONS.find(f => f.label === 'Clear Formatting')!
     const action = () => { format.action(); saveDo(); }
     const displayIcon = () => format.icon
 
@@ -454,12 +454,12 @@ const ClearFormatButton = defaults(def_ClearFormat, (props) => {
 const def_Lowercase = () => ({
     buttonType: $("outlined", HtmlString) as ObservableMaybe<ButtonStyles>,
     title: $("Lowercase", HtmlString) as ObservableMaybe<string>,
-    cls: $('', HtmlClass) as JSX.Class | undefined,
-    class: $('', HtmlClass) as JSX.Class | undefined,
+    cls: $('', HtmlClass) as ObservableMaybe<string>,
+    class: $('', HtmlClass) as ObservableMaybe<string>,
     disabled: $(false, HtmlBoolean) as Observable<boolean>,
 })
 
-const LowercaseButton = defaults(def_Lowercase, (props) => {
+const LowercaseButton: Defaulted<typeof def_Lowercase> = defaults(def_Lowercase, (props) => {
     const { buttonType: btnType, title, cls, class: cn, disabled, ...otherProps } = props
 
     const editor = useEditor()
@@ -467,7 +467,7 @@ const LowercaseButton = defaults(def_Lowercase, (props) => {
     const isActive = false
     const undoRedoContext = useUndoRedo()
     const saveDo = undoRedoContext?.saveDo || (() => {})
-    const format = FORMAT_OPTIONS.find(f => f.label === 'Lowercase')
+    const format = FORMAT_OPTIONS.find(f => f.label === 'Lowercase')!
     const action = () => {
         const el = editor || getCurrentEditor()
         if (!$$(el)) return
@@ -483,12 +483,12 @@ const LowercaseButton = defaults(def_Lowercase, (props) => {
 const def_Uppercase = () => ({
     buttonType: $("outlined", HtmlString) as ObservableMaybe<ButtonStyles>,
     title: $("Uppercase", HtmlString) as ObservableMaybe<string>,
-    cls: $('', HtmlClass) as JSX.Class | undefined,
-    class: $('', HtmlClass) as JSX.Class | undefined,
+    cls: $('', HtmlClass) as ObservableMaybe<string>,
+    class: $('', HtmlClass) as ObservableMaybe<string>,
     disabled: $(false, HtmlBoolean) as Observable<boolean>,
 })
 
-const UppercaseButton = defaults(def_Uppercase, (props) => {
+const UppercaseButton: Defaulted<typeof def_Uppercase> = defaults(def_Uppercase, (props) => {
     const { buttonType: btnType, title, cls, class: cn, disabled, ...otherProps } = props
 
     const editor = useEditor()
@@ -496,7 +496,7 @@ const UppercaseButton = defaults(def_Uppercase, (props) => {
     const isActive = false
     const undoRedoContext = useUndoRedo()
     const saveDo = undoRedoContext?.saveDo || (() => {})
-    const format = FORMAT_OPTIONS.find(f => f.label === 'Uppercase')
+    const format = FORMAT_OPTIONS.find(f => f.label === 'Uppercase')!
     const action = () => {
         const el = editor || getCurrentEditor()
         if (!$$(el)) return
@@ -512,12 +512,12 @@ const UppercaseButton = defaults(def_Uppercase, (props) => {
 const def_Capitalize = () => ({
     buttonType: $("outlined", HtmlString) as ObservableMaybe<ButtonStyles>,
     title: $("Capitalize", HtmlString) as ObservableMaybe<string>,
-    cls: $('', HtmlClass) as JSX.Class | undefined,
-    class: $('', HtmlClass) as JSX.Class | undefined,
+    cls: $('', HtmlClass) as ObservableMaybe<string>,
+    class: $('', HtmlClass) as ObservableMaybe<string>,
     disabled: $(false, HtmlBoolean) as Observable<boolean>,
 })
 
-const CapitalizeButton = defaults(def_Capitalize, (props) => {
+const CapitalizeButton: Defaulted<typeof def_Capitalize> = defaults(def_Capitalize, (props) => {
     const { buttonType: btnType, title, cls, class: cn, disabled, ...otherProps } = props
 
     const editor = useEditor()
@@ -525,7 +525,7 @@ const CapitalizeButton = defaults(def_Capitalize, (props) => {
     const isActive = false
     const undoRedoContext = useUndoRedo()
     const saveDo = undoRedoContext?.saveDo || (() => {})
-    const format = FORMAT_OPTIONS.find(f => f.label === 'Capitalize')
+    const format = FORMAT_OPTIONS.find(f => f.label === 'Capitalize')!
     const action = () => {
         const el = editor || getCurrentEditor()
         if (!$$(el)) return
@@ -602,18 +602,18 @@ function trackState(editor: ObservableMaybe<HTMLElement>, command: string, isAct
     }
 }
 
-function formatButton(btnType: ObservableMaybe<ButtonStyles>, title: ObservableMaybe<string>, cls: JSX.Class | undefined, cn: JSX.Class | undefined, isActive: ObservableMaybe<boolean>, disabled: Observable<boolean>, action: () => void, displayIcon: () => JSX.Element, otherProps: JSX.HTMLAttributes<HTMLButtonElement>) {
+function formatButton(btnType: ObservableMaybe<ButtonStyles>, title: ObservableMaybe<string>, cls: JSX.Class | undefined, cn: JSX.Class | undefined, isActive: ObservableMaybe<boolean>, disabled: Observable<boolean>, action: () => void, displayIcon: () => JSX.Element, otherProps: Record<string, any>) {
     return (
         <Button
             type={btnType}
             title={title}
             class={() => [
-                () => $$(cls) ? $$(cls) : cn,
+                () => $$(cls) ? $$(cls) : $$(cn),
                 () => $$(isActive) ? '!bg-slate-200' : ''
             ]}
             aria-pressed={() => $$(isActive) ? "true" : "false"}
             disabled={disabled}
-            onMouseDown={(e) => { e.preventDefault(); }}
+            onMouseDown={(e: any) => { e.preventDefault(); }}
             onClick={action}
             {...otherProps}
         >

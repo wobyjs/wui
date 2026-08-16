@@ -6,3 +6,4 @@ declare const ResizeableBorderEffects: () => import("woby").Child;
 declare const ResizeableFillEffects: () => import("woby").Child;
 declare const ResizeableLabelEffects: () => import("woby").Child;
 export { BorderEffectTextArea, FillEffects, LabelEffects, AlternativeEffects, ResizeableBorderEffects, ResizeableFillEffects, ResizeableLabelEffects };
+//# sourceMappingURL=TextArea.test.d.ts.map

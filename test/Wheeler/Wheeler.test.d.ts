@@ -21,3 +21,4 @@ declare const SearchWheelerWithJsonObjectArray: () => import("woby").Child;
 declare const SearchWheelerWithSimpleArray: () => import("woby").Child;
 declare const SearchWheelerWithCountryData: () => import("woby").Child;
 export { WheelerWithJsonObjectArray, WheelerWithSimpleArray, WheelerWithCountryData, CheckboxWheelerWithJsonObjectArray, CheckboxWheelerWithSimpleArrayFruit, CheckboxWheelerWithSimpleArrayFlavors, CheckboxWheelerWithCountryData, ControlledWheelerWithJsonObjectArray, ControlledWheelerWithSimpleArray, ControlledWheelerWithCountryData, HeaderWheelerWithJsonObjectArray, SearchWheelerWithJsonObjectArray, SearchWheelerWithSimpleArray, SearchWheelerWithCountryData, };
+//# sourceMappingURL=Wheeler.test.d.ts.map

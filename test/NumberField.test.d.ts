@@ -5,3 +5,4 @@ declare const StepNumberField: () => import("woby").Child;
 declare const DisabledNumberField: () => import("woby").Child;
 declare const CustomClassNumberField: () => import("woby").Child;
 export { DefaultNumberField, ValueNumberField, MinMaxNumberField, StepNumberField, DisabledNumberField, CustomClassNumberField };
+//# sourceMappingURL=NumberField.test.d.ts.map

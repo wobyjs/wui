@@ -30,7 +30,7 @@
     "noPropertyAccessFromIndexSignature": false,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
-    // "rootDir": "src",
+    "rootDir": "src",
     "outDir": "dist",
     "pretty": true,
     "skipDefaultLibCheck": true,
@@ -44,7 +44,16 @@
     "useDefineForClassFields": false,
     "useUnknownInCatchVariables": true,
     "noImplicitAny": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    // `@woby/styled`'s package.json points "types" at ./dist/types/index.d.ts, but its build emits
+    // to ./dist/types/src/index.d.ts, so the declarations are unreachable through normal resolution
+    // and `tw` would fall back to `any` (TS7016 under noImplicitAny). Map it explicitly until the
+    // dependency's own "types" field is corrected.
+    "paths": {
+      "@woby/styled": [
+        "./node_modules/@woby/styled/dist/types/src/index.d.ts"
+      ]
+    }
     // "tsBuildInfoFile": "./dist/tsconfig.tsbuildinfo",
     // "composite": true,
   },
@@ -65,6 +74,10 @@
     "dist*",
     "docs",
     "test/**/*",
+    "src/ssr/**/*",
+    "src/test.ts",
+    "src/app.tsx",
+    "src/main.ts",
     "index.test.ts"
   ],
   "include": [

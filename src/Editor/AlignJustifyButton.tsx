@@ -1,6 +1,9 @@
 import { $, $$, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlClass, HtmlString, Observable, ObservableMaybe, useEffect } from 'woby'
 import { Button, ButtonStyles } from '../Button'
-import { applyTextAlign as applyTextAlignStyle, updateActiveStatus, ALIGNMENT_MAP } from './AlignButton'
+import { updateActiveStatus, ALIGNMENT_MAP } from './AlignButton'
+// Same source AlignButton uses: the StyleEngine version resolves the editor's shadow root itself,
+// whereas AlignButton's own legacy `applyTextAlign` needs an explicit class pair and container.
+import { applyTextAlign as applyTextAlignStyle } from './StyleEngine'
 import { getCurrentEditor, useBlockEnforcer } from './utils'
 import { useEditor } from './undoredo'
 import { applyBlockCommandToSelectedImage } from './ImageActions'
@@ -10,12 +13,12 @@ const JUSTIFY_MAP = ALIGNMENT_MAP.justify
 const def = () => ({
     buttonType: $("outlined", HtmlString) as ObservableMaybe<ButtonStyles>,
     title: $(JUSTIFY_MAP.defaultTitle, HtmlString) as ObservableMaybe<string>,
-    cls: $('', HtmlClass) as JSX.Class | undefined,
-    class: $('', HtmlClass) as JSX.Class | undefined,
+    cls: $('', HtmlClass) as JSX.Class,
+    class: $('', HtmlClass) as JSX.Class,
     disabled: $(false, HtmlBoolean) as Observable<boolean>,
 })
 
-const AlignJustifyButton = defaults(def, (props) => {
+const AlignJustifyButton: Defaulted<typeof def> = defaults(def, (props) => {
     const { buttonType, title, cls, class: cn, disabled, ...otherProps } = props
     const editor = useEditor()
 
@@ -80,7 +83,7 @@ const AlignJustifyButton = defaults(def, (props) => {
             ]}
             disabled={disabled}
             onClick={handleClick}
-            onMouseDown={(e) => { e.preventDefault(); e.stopPropagation() }}
+            onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation() }}
             {...otherProps}
         >
             {JUSTIFY_MAP.icon}

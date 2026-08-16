@@ -33,3 +33,4 @@ declare const CustomPillFab: () => import("woby").Child;
  */
 declare const ClickableFab: () => import("woby").Child;
 export { DefaultFab, CircularFab, PillFab, DisabledFab, CustomFab, CustomPillFab, ClickableFab };
+//# sourceMappingURL=Fab.test.d.ts.map

@@ -1,6 +1,5 @@
 import { tw } from '@woby/styled'
-// @ts-expect-error -- complex import with mixed type/value specifiers
-import { $, $$, isObservable, type JSX, defaults, customElement, ElementAttributes, HtmlBoolean, type ObservableMaybe, HtmlClass } from 'woby'
+import { type CustomElementChildren, $, $$, isObservable, type JSX, defaults, customElement, ElementAttributes, HtmlBoolean, type ObservableMaybe, HtmlClass } from 'woby'
 
 /** color: [&_svg]:fill-current */
 // const IconButtonComponent = tw('button')`inline-flex items-center justify-center relative box-border bg-transparent cursor-pointer select-none align-middle appearance-none no-underline text-center flex-[0_0_auto] text-2xl overflow-visible text-[rgba(0,0,0,0.54)] transition-[background-color] duration ease-in-out delay-[0ms] m-0 p-2 rounded-[50%] border-0
@@ -39,13 +38,13 @@ const def = () => ({
      * - User can override the default class by providing a `cls` prop
      * - `class` can be used to add additional classes to the component
      */
-    cls: $('', HtmlClass) as JSX.Class | undefined,
-    class: $('', HtmlClass) as JSX.Class | undefined,
-    children: $(null as JSX.Child),
-    disabled: $(false, HtmlBoolean) as ObservableMaybe<boolean> | undefined,
+    cls: $('', HtmlClass) as JSX.Class,
+    class: $('', HtmlClass) as JSX.Class,
+    children: $(null as JSX.Child) as CustomElementChildren,
+    disabled: $(false, HtmlBoolean) as ObservableMaybe<boolean>,
 })
 
-const IconButton = defaults(def, (props) => {
+const IconButton: Defaulted<typeof def> = defaults(def, (props) => {
     const { class: cn, cls, children, disabled, ...otherProps } = props
 
     // const baseClass = "inline-flex items-center justify-center relative box-border bg-transparent cursor-pointer select-none align-middle appearance-none no-underline text-center flex-[0_0_auto] text-2xl overflow-visible text-[rgba(0,0,0,0.54)] transition-[background-color] duration ease-in-out delay-[0ms] m-0 p-2 rounded-[50%] border-0 " +

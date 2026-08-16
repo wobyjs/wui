@@ -6,7 +6,7 @@ import { TableRow } from "./PropertyForm"
 import { EditorProps } from "./EditorProps"
 
 export const ColorEditor = () => {
-	const renderCondition = (value: ObservableMaybe<string>, key) => {
+	const renderCondition = (value: ObservableMaybe<string>, key?: string) => {
 		if ($$(value) == undefined) return false
 		const colorVal = $$(value).length == 9 ? $$(value).slice(0, -2) : $$(value)
 		const hexColorReg = /^#[0-9A-F]{6}$/i
@@ -48,14 +48,14 @@ export const ColorEditor = () => {
 					type="color"
 					value={colorVal}
 					disabled={!isObservable(value)}
-					onChange={(e) => {
+					onChange={(e: any) => {
 						!$$(reactive) && isObservable(value) ? (value?.(e.target.value), onChange?.(e)) : undefined
 					}}
 				></input>
 				{hasAlpha && <input
 					type="range"
 					id="alpha"
-					onChange={(e) => {
+					onChange={(e: any) => {
 						const value = e.target.value
 					}}
 					min={"0"}

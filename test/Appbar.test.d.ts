@@ -9,3 +9,4 @@ declare const StickyAppBarHtml: () => import("woby").Child;
 declare const StaticAppBarHtml: () => import("woby").Child;
 declare const CustomAppBarHtml: () => import("woby").Child;
 export { DefaultAppBarTsx, DefaultAppBarHtml, FixedAppBarTsx, FixedAppBarHtml, StickyAppBarTsx, StickyAppBarHtml, StaticAppBarTsx, StaticAppBarHtml, CustomAppBarTsx, CustomAppBarHtml };
+//# sourceMappingURL=Appbar.test.d.ts.map

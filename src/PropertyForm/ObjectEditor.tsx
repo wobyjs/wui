@@ -4,7 +4,7 @@ import { Editors, UIProps, indent, skippedProperties } from "./Editors"
 import { PropertyRows } from "./PropertyRows"
 
 export const ObjectEditor = () => {
-	const renderCondition = (value: ObservableMaybe<any>, key) => {
+	const renderCondition = (value: ObservableMaybe<any>, key?: string) => {
 		const isObject = isObservable(value) ? typeof $$(value) == "object" : typeof value == "object"
 		const isArray = isObservable(value) ? Array.isArray($$(value)) : Array.isArray(value)
 
@@ -56,7 +56,7 @@ export const ObjectEditor = () => {
 						<td class="w-full" colSpan={2}>
 							<PropertyRows
 								obj={$$(value)}
-								className={["h-fit bg-white"]}
+								className={["h-fit bg-white"] as any}
 								indentLvl={indentLvl + 1}
 							/>
 						</td>

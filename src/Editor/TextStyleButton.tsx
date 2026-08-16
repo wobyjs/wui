@@ -1,4 +1,4 @@
-import { $, $$, defaults, type JSX, customElement, type ElementAttributes, type Observable, useEffect, type ObservableMaybe, HtmlClass, HtmlString, HtmlBoolean } from "woby"
+import { type CustomElementChildren, $, $$, defaults, type JSX, customElement, type ElementAttributes, type Observable, useEffect, type ObservableMaybe, HtmlClass, HtmlString, HtmlBoolean } from "woby"
 import { Button, ButtonStyles } from '../Button'
 import { useEditor } from './undoredo'
 import BoldIcon from '../icons/bold'
@@ -20,16 +20,16 @@ const COMMAND_STYLE_MAP: Record<string, { prop: string; value: string }> = {
 type TextStyleType = 'bold' | 'italic' | 'underline'
 
 const def = () => ({
-    cls: $('', HtmlClass) as JSX.Class | undefined,
-    class: $('', HtmlClass) as JSX.Class | undefined,
+    cls: $('', HtmlClass) as JSX.Class,
+    class: $('', HtmlClass) as JSX.Class,
     mode: $("bold", HtmlString) as ObservableMaybe<TextStyleType>,
     buttonType: $("outlined", HtmlString) as ObservableMaybe<ButtonStyles>,
     title: $("", HtmlString) as ObservableMaybe<string>,
     disabled: $(false, HtmlBoolean) as Observable<boolean>,
-    children: $(null) as ObservableMaybe<JSX.Element>,
+    children: $(null) as CustomElementChildren,
 })
 
-const TextStyleButton = defaults(def, (props) => {
+const TextStyleButton: Defaulted<typeof def> = defaults(def, (props) => {
     const { mode, buttonType: btnType, title, cls, class: cn, disabled, children, ...otherProps } = props
 
     const editorNode = useEditor()
@@ -118,7 +118,7 @@ const TextStyleButton = defaults(def, (props) => {
             aria-pressed={() => $$(isActive) ? "true" : $$(isMixed) ? "mixed" : "false"}
             disabled={disabled}
             onClick={handleClick}
-            onMouseDown={(e) => { e.preventDefault() }}
+            onMouseDown={(e: any) => { e.preventDefault() }}
             {...otherProps}
         >
             {displayIcon}
@@ -162,7 +162,7 @@ export const updateStylesState = (
         // Editor doesn't have direct focus — check shadow root
         if (shadowRoot) {
             // For shadow DOM: check if the shadow host is active and contains focused elements
-            const shadowHostActive = document.activeElement === el.getRootNode().host ||
+            const shadowHostActive = document.activeElement === (el.getRootNode() as ShadowRoot).host ||
                                      (shadowRoot.host && document.activeElement === shadowRoot.host)
 
             if (!shadowHostActive && !shadowRoot.contains(document.activeElement)) {

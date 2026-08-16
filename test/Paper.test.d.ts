@@ -17,3 +17,4 @@ declare const HighElevationPaper: () => import("woby").Child;
  */
 declare const CustomStyledPaper: () => import("woby").Child;
 export { DefaultPaper, NoElevationPaper, HighElevationPaper, CustomStyledPaper, };
+//# sourceMappingURL=Paper.test.d.ts.map

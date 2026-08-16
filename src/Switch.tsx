@@ -1,6 +1,5 @@
-// @ts-expect-error -- complex import with mixed type/value specifiers
 import { nanoid } from 'nanoid'
-import { ObservableMaybe, useEffect, $, $$, isObservable, Observable, type JSX, FunctionMaybe, defaults, customElement, type ElementAttributes, HtmlBoolean, HtmlString, useMemo, HtmlClass } from 'woby'
+import { type CustomElementChildren, ObservableMaybe, useEffect, $, $$, isObservable, Observable, type JSX, FunctionMaybe, defaults, customElement, type ElementAttributes, HtmlBoolean, HtmlString, useMemo, HtmlClass } from 'woby'
 import {
     effect1, effect2, effect3,
     effect4, effect5, effect6,
@@ -16,7 +15,7 @@ import {
 // const def = () => ({
 //     off: $("OFF"),
 //     on: $("ON"),
-//     checked: $(false, HtmlBoolean) as ObservableMaybe<boolean> | undefined,
+//     checked: $(false, HtmlBoolean) as ObservableMaybe<boolean>,
 //     id: $(undefined as string | undefined),
 //     cls: $('', HtmlClass) as ObservableMaybe<JSX.Class>|undefined,
 //     children: $(null as JSX.Child),
@@ -41,12 +40,12 @@ const def = () => {
     return ({
         off: $("OFF"),
         on: $("ON"),
-        checked: $(false, HtmlBoolean) as ObservableMaybe<boolean> | undefined,
+        checked: $(false, HtmlBoolean) as ObservableMaybe<boolean>,
         id: $(generatedId as string | undefined),
-        cls: $('', HtmlClass) as JSX.Class | undefined,
-        class: $('', HtmlClass) as JSX.Class | undefined,
-        children: $(null as JSX.Child),
-        effect: $("", HtmlString) as ObservableMaybe<string> | undefined,
+        cls: $('', HtmlClass) as JSX.Class,
+        class: $('', HtmlClass) as JSX.Class,
+        children: $(null as JSX.Child) as CustomElementChildren,
+        effect: $("", HtmlString) as ObservableMaybe<string>,
     })
 }
 
@@ -63,7 +62,7 @@ const def = () => {
  * 
  * Some special case may need to see the output html tree node and modify classes as needed
  */
-const Switch = defaults(def, (props) => {
+const Switch: Defaulted<typeof def> = defaults(def, (props) => {
     const { off, on, checked, id, cls, class: cn, children, effect, ...otherProps } = props
 
     const activeStyle = useMemo(() => {
@@ -78,7 +77,7 @@ const Switch = defaults(def, (props) => {
                 type="checkbox"
                 checked={checked}
                 /* onChange={v => checked(v.target.checked)} */
-                onChange={v => isObservable(checked) && checked(v.target.checked)}
+                onChange={(v: any) => isObservable(checked) && checked(v.target.checked)}
             />
             <div data-tg-on={on} data-tg-off={off}>
                 <span data-tg-on={on} data-tg-off={off}></span>

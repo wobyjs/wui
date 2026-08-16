@@ -1,5 +1,5 @@
 import { useOnClickOutside } from '@woby/use'
-import { $, $$, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlClass, JSX, Observable, ObservableMaybe, useEffect, useMemo, render } from 'woby' // Added useEffect
+import { $, $$, type CustomElementChildren, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlClass, JSX, Observable, ObservableMaybe, untrack, useEffect, useMemo } from 'woby' // Added useEffect
 import { Button } from '../Button'
 import UndoIcon from '../icons/undo'
 import RedoIcon from '../icons/redo'
@@ -29,6 +29,7 @@ import { TablePopupMenu } from './TablePopupMenu' // Table cell popup menu
 import { InfoButton } from './InfoButton' // Info button for property panel
 import { PropertyPanel, PropertyPanelContext } from './PropertyPanel' // Property panel for selected element
 import { SelectionType } from './PropertyExtractor' // Selection type enum
+import { getEditorPlugins } from './EditorPlugin' // For plugin tag name detection
 
 // StyleEngine imports for keyboard shortcuts
 import { applyBold, applyItalic, applyUnderline } from './StyleEngine'
@@ -58,9 +59,9 @@ const insertTable = (rowsIn?: number, colsIn?: number) => {
     const r = getCurrentRange()
     if (!r) return
 
-    const rows = rowsIn ?? parseInt(prompt('Enter number of rows:', '2'), 10)
+    const rows = rowsIn ?? parseInt(prompt('Enter number of rows:', '2') ?? '', 10)
     if (isNaN(rows)) return
-    const cols = colsIn ?? parseInt(prompt('Enter number of columns:', '3'), 10)
+    const cols = colsIn ?? parseInt(prompt('Enter number of columns:', '3') ?? '', 10)
 
     if (isNaN(rows) || isNaN(cols) || rows <= 0 || cols <= 0) return
 
@@ -84,7 +85,7 @@ const insertTable = (rowsIn?: number, colsIn?: number) => {
 
 
 const def = () => ({
-    children: $(null) as JSX.Element | string | (JSX.Element | string)[],
+    children: $(null) as CustomElementChildren,
     cls: $(null, HtmlClass) as ObservableMaybe<JSX.Class>,
     class: $(null, HtmlClass) as ObservableMaybe<JSX.Class>,
     enableToolbar: $(true, HtmlBoolean) as ObservableMaybe<boolean>,
@@ -99,8 +100,20 @@ const def = () => ({
 * This component manages the editable area, monitors HTML changes for history, 
 * and handles keyboard shortcuts for navigation and formatting.
 */
-const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, children }) => {
-    const { saveDo, undo, redo } = useUndoRedo()
+const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, children }: {
+    isEditing: Observable<boolean>
+    handleEditorClick: (e: any) => void
+    handleBlur: (e: any) => void
+    children?: JSX.Children
+}) => {
+    // Guard like every other consumer (BoldButton, FontFamilyDropDown, ...): when
+    // no UndoRedo provider is mounted these are undefined, and saveDo() is called
+    // from a MutationObserver on every mutation — an unguarded destructure throws
+    // "saveDo is not a function" on each one.
+    const undoRedoContext = useUndoRedo()
+    const saveDo = undoRedoContext?.saveDo ?? (() => { })
+    const undo = undoRedoContext?.undo ?? (() => { })
+    const redo = undoRedoContext?.redo ?? (() => { })
     const activeEditor = useEditor()
     const isReadonly = useReadonly()
 
@@ -136,26 +149,15 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, children }) =
         }
 
         // Get the host element (light DOM parent)
-        const host = el.getRootNode().host as HTMLElement | null
+        const host = (el.getRootNode() as ShadowRoot).host as HTMLElement | null
         if (!host) {
-            // Non-shadow-DOM mode: render children directly into the editor root element.
-            // This is used when <wui-editor> is created via JSX (no shadow DOM attached).
+            // Non-shadow-DOM mode: children are already rendered by the JSX tree,
+            // so no reactive re-render is needed. A reactive render(children, el)
+            // would create a new soby root, triggering Portal useRenderEffect →
+            // Effect.update recursion (stack overflow).
             //
-            // Use a data attribute flag instead of el.hasChildNodes() because the browser
-            // may have already inserted filler content (e.g. <p><br></p>) into the empty
-            // contentEditable div before this effect runs.
-            if (children && !el.hasAttribute('data-editor-content-initialized')) {
-                try {
-                    el.setAttribute('data-editor-content-initialized', 'true')
-                    // Clear any browser-added empty content before rendering
-                    while (el.firstChild) {
-                        el.removeChild(el.firstChild)
-                    }
-                    render(children, el)
-                } catch (e) {
-                    console.warn('[EditorSurface] Non-shadow-DOM render failed:', e)
-                }
-            }
+            // Use a data attribute flag to mark initialization complete.
+            el.setAttribute('data-editor-content-initialized', 'true')
             return
         }
 
@@ -166,7 +168,21 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, children }) =
         // MUST be inside useEffect closure (not component scope) — each effect instance owns its flag.
         let isSyncing = false
 
-        const syncChildren = () => {
+        // Custom-element upgrade watchdog: tracks tags whose definitions weren't
+        // loaded yet when we cloned them (document.createElement() fell back to
+        // HTMLUnknownElement). After a sync pass we wait for those definitions
+        // and re-sync, so the shadow clones end up as real upgraded elements.
+        const failedCustomTags = new Set<string>()
+
+        // untrack: deepClone() below calls document.createElement() on woby custom
+        // elements, which upgrades them synchronously and runs their render effects
+        // inline. Without untrack those components' signal reads are captured as
+        // dependencies of THIS effect, so their own initialization writes re-trigger
+        // the sync, which clones again, which upgrades again — an unbounded
+        // synchronous Effect.update → run → refresh → wrap recursion that overflows
+        // the stack (pure soby frames, no app frames, hence very hard to read).
+        // The sync builds DOM; it must never subscribe to what that DOM reads.
+        const syncChildren = () => untrack(() => {
             // D-07: prevent re-entrant sync from MutationObserver feedback loops
             if (isSyncing) return
             isSyncing = true
@@ -213,12 +229,41 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, children }) =
             }
 
             // Clone light DOM children into shadow DOM
+            // NOTE: cloneNode(true) does NOT preserve shadow roots on custom elements.
+            // Use a recursive deep-clone helper that re-creates custom elements via
+            // document.createElement() so the browser upgrades them and attaches shadow roots.
+            const deepClone = (node: Node): Node => {
+                if (node.nodeType === Node.TEXT_NODE) {
+                    return document.createTextNode(node.textContent ?? '')
+                }
+                if (node.nodeType !== Node.ELEMENT_NODE) {
+                    return node.cloneNode(false)
+                }
+                const el = node as Element
+                const tag = el.tagName.toLowerCase()
+                const isCustom = tag.includes('-')
+                const fresh = isCustom ? document.createElement(tag) : document.createElementNS(el.namespaceURI ?? '', tag)
+                // If the custom element wasn't upgraded yet, note it for retry.
+                // NOTE: do NOT test for HTMLUnknownElement here — a *hyphenated*
+                // undefined tag is a plain HTMLElement, not HTMLUnknownElement, so
+                // that check never matched and the retry below was dead code.
+                if (isCustom && !customElements.get(tag)) {
+                    failedCustomTags.add(tag)
+                }
+                for (const attr of Array.from(el.attributes)) {
+                    fresh.setAttribute(attr.name, attr.value)
+                }
+                for (const child of Array.from(el.childNodes)) {
+                    fresh.appendChild(deepClone(child))
+                }
+                return fresh
+            }
+
             const lightChildren = Array.from(host.children)
             lightChildren.forEach(child => {
                 // Don't clone script tags or style tags
-                if (child.tagName !== 'SCRIPT' && child.tagName !== 'STYLE') {
-                    el.appendChild(child.cloneNode(true))
-                }
+                if (child.tagName === 'SCRIPT' || child.tagName === 'STYLE') return
+                el.appendChild(deepClone(child))
             })
 
             // Restore selection after content sync
@@ -254,10 +299,20 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, children }) =
             } finally {
                 isSyncing = false
             }
-        }
+        })
 
         // Initial sync
         syncChildren()
+
+        // Retry: if any custom elements weren't upgraded yet, wait for their
+        // definitions and re-sync so the shadow clones become real upgraded elements.
+        if (failedCustomTags.size > 0) {
+            const tags = Array.from(failedCustomTags)
+            failedCustomTags.clear()
+            Promise.all(tags.map(t => customElements.whenDefined(t))).then(() => {
+                syncChildren()
+            })
+        }
 
         // Watch light DOM for changes and sync to shadow DOM
         const observer = new MutationObserver(() => {
@@ -273,6 +328,72 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, children }) =
         return () => observer.disconnect()
     })
     // #endregion
+
+    /**
+     * Effect: Click-to-select for embedded custom elements.
+     * Adds a capture-phase pointerdown listener on the editor root that marks
+     * plugin elements with data-element-selected, so the property panel has a
+     * target even when the embedded element owns a shadow root (which absorbs
+     * clicks and leaves no selection range pointing at the host).
+     */
+    useEffect(() => {
+        const el = $$(activeEditor)
+        if (!el) return
+
+        // Read plugin tags at setup time; re-registration happens rarely and
+        // re-running this effect would churn the listener.
+        const plugins = $$(getEditorPlugins())
+        const pluginTags = new Set(plugins.map(p => p.tagName.toUpperCase()))
+
+        const handler = (e: PointerEvent) => {
+            // Clear previous mark
+            const prev = el.querySelector('[data-element-selected]') as HTMLElement | null
+            if (prev) prev.removeAttribute('data-element-selected')
+
+            // Walk composedPath to find a plugin element or hyphenated non-wui tag
+            const path = e.composedPath()
+            for (const entry of path) {
+                if (!(entry instanceof HTMLElement)) continue
+                if (!el.contains(entry)) continue
+                const tag = entry.tagName.toLowerCase()
+                if (pluginTags.has(entry.tagName.toUpperCase()) || (tag.includes('-') && !tag.startsWith('wui-'))) {
+                    entry.setAttribute('data-element-selected', '')
+                    return
+                }
+            }
+        }
+
+        el.addEventListener('pointerdown', handler, true)
+        return () => el.removeEventListener('pointerdown', handler, true)
+    })
+
+    // Inject the selected-element outline style with a visible anchor indicator
+    useEffect(() => {
+        const id = 'wui-editor-selected-style'
+        if (document.getElementById(id)) return
+        const style = document.createElement('style')
+        style.id = id
+        style.textContent = `
+            [data-element-selected] {
+                outline: 2px solid #3b82f6;
+                outline-offset: 2px;
+                position: relative;
+            }
+            [data-element-selected]::before {
+                content: '⚓';
+                position: absolute;
+                top: -14px;
+                left: -2px;
+                font-size: 12px;
+                line-height: 1;
+                color: #3b82f6;
+                z-index: 9999;
+                pointer-events: none;
+            }
+        `
+        document.head.appendChild(style)
+        return () => { const s = document.getElementById(id); if (s) s.remove() }
+    })
 
     /**
      * Effect: Sets up a MutationObserver to monitor all changes in the editor content.
@@ -416,7 +537,7 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, children }) =
             <div
                 ref={activeEditor}
                 data-editor-root
-                contentEditable={() => $$(isReadonly) ? 'false' : 'true'}
+                contentEditable={() => $$(isReadonly) ? false : true}
                 onClick={handleEditorClick}
                 onBlur={handleBlur}
                 onKeyDown={handleKeyDown}
@@ -446,7 +567,9 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, children }) =
 * do not disrupt the user's text selection.
 */
 // #region Editor Toolbar
-const EditorToolbar = ({ toolbarRef }) => {
+// `toolbarRef` starts out empty (`$<HTMLDivElement>(null as any)`) and is only filled once the
+// toolbar element mounts, so the observable's value type includes `undefined`.
+const EditorToolbar = ({ toolbarRef }: { toolbarRef: Observable<HTMLDivElement | undefined> }) => {
     const { redo, undo } = useUndoRedo()
 
     // Helper for vertical dividers
@@ -562,7 +685,7 @@ const EditorToolbar = ({ toolbarRef }) => {
     }
 
     return (
-        <div class={() => [BASE_CLASS, "editor-toolbar"]} ref={toolbarRef} onKeyDown={(e) => { handleToolbarKeyDown(e) }}>
+        <div class={() => [BASE_CLASS, "editor-toolbar"]} ref={toolbarRef} onKeyDown={(e: any) => { handleToolbarKeyDown(e) }}>
             {FullToolbar}
             {/* {DebugToolbar} */}
         </div>
@@ -579,8 +702,8 @@ const Editor = defaults(def, (props) => {
     const isEditing = $(false)
     const isReadonly = $($$(_readonly) ?? false)
     useEffect(() => { isReadonly($$(_readonly) ?? false) })
-    const container = $<HTMLDivElement>(null)
-    const toolbarRef = $<HTMLDivElement>(null)
+    const container = $<HTMLDivElement>(null as any)
+    const toolbarRef = $<HTMLDivElement>(null as any)
     const focusManager = new FocusManager()
 
     // PropertyPanel shared state — use external props if provided, otherwise create internal state
@@ -589,7 +712,7 @@ const Editor = defaults(def, (props) => {
     const propertyTarget = externalCtx?.propertyTarget ?? $<HTMLElement | null>(null)
     const propertySelectionType = externalCtx?.selectionType ?? $<SelectionType>('none')
 
-    const _editor = $<HTMLDivElement>(null)
+    const _editor = $<HTMLDivElement>(null as any)
     const editor = ((...args: [HTMLDivElement?]) => {
         if (args.length === 0) {
             return _editor()
@@ -747,9 +870,9 @@ export default Editor
 // export const Editor = ({ onChange, children }: EditorProps) => {
 //     // const content = $(initialContent)
 //     const isEditing = $(false)
-//     const container = $<HTMLDivElement>(null)
-//     const editor = $<HTMLDivElement>(null)
-//     const toolbarRef = $<HTMLDivElement>(null)
+//     const container = $<HTMLDivElement>(null as any)
+//     const editor = $<HTMLDivElement>(null as any)
+//     const toolbarRef = $<HTMLDivElement>(null as any)
 
 //     const handleBlur = (e: JSX.FocusEventHandler<HTMLDivElement>) => {
 //         setTimeout(() => {

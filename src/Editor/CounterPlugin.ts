@@ -23,6 +23,23 @@ class MyCounter extends HTMLElement {
         this.attachShadow({ mode: 'open' })
     }
 
+    /**
+     * Without this the element read `count` once, in connectedCallback, and never
+     * again — so editing Count in the property panel rewrote the attribute while the
+     * display stayed on its original number. Any plugin element whose props are
+     * editable has to observe them.
+     */
+    static get observedAttributes() { return ['count'] }
+
+    attributeChangedCallback(name: string, _old: string | null, value: string | null) {
+        if (name !== 'count') return
+        const next = parseInt(value || '0', 10)
+        // updateDisplay() writes this attribute itself; bail on the echo.
+        if (Number.isNaN(next) || next === this._count) return
+        this._count = next
+        if (this._display) this._display.textContent = String(next)
+    }
+
     connectedCallback() {
         this._count = parseInt(this.getAttribute('count') || '0', 10)
         this.render()

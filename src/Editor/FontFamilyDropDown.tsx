@@ -17,8 +17,8 @@ const FONT_FAMILY = [
 
 
 const def = () => ({
-    cls: $('', HtmlClass) as JSX.Class | undefined,
-    class: $('', HtmlClass) as JSX.Class | undefined,
+    cls: $('', HtmlClass) as JSX.Class,
+    class: $('', HtmlClass) as JSX.Class,
     defaultIndex: $(0, HtmlNumber) as ObservableMaybe<number>,
 })
 
@@ -32,8 +32,8 @@ const FontFamilyDropDown = defaults(def, (props) => {
     const editor = useEditor()
     const isOpen = $(false) as Observable<boolean>
     const selectedFont = $(FONT_FAMILY[$$(defaultIndex)].label)
-    const dropdownRef = $<HTMLElement>(null)
-    const menuRef = $<HTMLElement>(null)
+    const dropdownRef = $<HTMLElement>(null as any)
+    const menuRef = $<HTMLElement>(null as any)
     const undoRedoContext = useUndoRedo()
     const saveDo = undoRedoContext?.saveDo || (() => {})
 
@@ -134,7 +134,7 @@ const FontFamilyDropDown = defaults(def, (props) => {
                 aria-orientation="vertical"
                 aria-labelledby="menu-button"
 
-                onMouseDown={(e) => {
+                onMouseDown={(e: any) => {
                     e.stopPropagation() // Prevents the menu from closing immediately
                     e.preventDefault()  // Prevents the editor from losing focus
                 }}
@@ -178,7 +178,7 @@ const FontFamilyDropDown = defaults(def, (props) => {
                 <Button
                     type='outlined'
                     cls={() => [BASE_BTN]}
-                    onMouseDown={(e) => { e.preventDefault(); e.stopPropagation() }}
+                    onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation() }}
                     onClick={handleApplyCurrent}
                     title="Font family"
                     {...otherProps}
@@ -191,7 +191,7 @@ const FontFamilyDropDown = defaults(def, (props) => {
                     type='outlined'
                     class="size-full inline-flex justify-center items-center rounded-md border border-gray-300 shadow-sm bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500 cursor-pointer px-2"
                     onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleDropdown(); }}
-                    onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                    onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation(); }}
                     title="Toggle dropdown"
                 >
                     <KeyboardDownArrow class="h-5 w-5" />

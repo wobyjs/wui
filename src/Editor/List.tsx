@@ -2,7 +2,7 @@ import { $, $$, render, customElement, defaults, ElementAttributes, HtmlClass, H
 import { Button, ButtonStyles } from '../Button'
 import { useEditor, useUndoRedo } from './undoredo'
 import { Checkbox } from '../Checkbox'
-import { getSelection, getCurrentEditor, getClosestElementFromSelection, BLOCK_TAGS, getSelectedBlocks, restoreRangePosition, LIST_TAGS, LI_TAG, P_TAG } from './utils'
+import { getSelection, getCurrentEditor, getClosestElementFromSelection, BLOCK_TAGS, getSelectedBlocks, restoreRangePosition, LiveSelection, LIST_TAGS, LI_TAG, P_TAG } from './utils'
 import { applyBlockCommandToSelectedImage } from './ImageActions'
 import ListBulleted from '../icons/list_bulleted'
 import ListNumbered from '../icons/list_numbered'
@@ -27,8 +27,8 @@ const WRAPPER_ID = { bullet: 'bullet-wrapper', number: 'number-wrapper', checkbo
 const CHECKLIST_ATTR = 'data-checklist';
 
 const def = () => ({
-    cls: $('', HtmlClass) as JSX.Class | undefined,
-    class: $('', HtmlClass) as JSX.Class | undefined,
+    cls: $('', HtmlClass) as ObservableMaybe<string>,
+    class: $('', HtmlClass) as ObservableMaybe<string>,
     buttonType: $("outlined", HtmlString) as ObservableMaybe<ButtonStyles>,
     mode: $("bullet", HtmlString) as ObservableMaybe<ListMode>,
 })
@@ -215,10 +215,10 @@ const List = defaults(def, (props) => {
         <Button
             type={btnType}
             onClick={handleClick}
-            onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
+            onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation(); }}
             title={() => listProps().title}
             class={() => [
-                () => $$(cls) ? $$(cls) : cn,
+                () => $$(cls) ? $$(cls) : $$(cn),
                 () => $$(isActive) ? '!bg-slate-200' : ''
             ]}
 
@@ -357,8 +357,9 @@ export const ListService = {
  * 2. list-decimal (number)
  * 3. list-none (checkbox)
  */
-const insertList = (editor: HTMLDivElement, targetList: { tag: 'ul' | 'ol', classes: { add: string, remove: string }, id }, mode: ListMode) => {
-    const { selection, state } = getSelection(editor);
+const insertList = (editor: HTMLDivElement, targetList: { tag: 'ul' | 'ol', classes: { add: string, remove: string }, id: string }, mode: ListMode) => {
+    // `state` is non-null whenever the range guard below passes; see LiveSelection.
+    const { selection, state } = getSelection(editor) as LiveSelection;
 
     if (!selection?.rangeCount) {
         return;
@@ -390,7 +391,10 @@ const insertList = (editor: HTMLDivElement, targetList: { tag: 'ul' | 'ol', clas
         });
 
         isPerformMergeList = true
-        range = restoreRangePosition(selection, start, end)
+        // `restoreRangePosition` returns null only when the saved boundary nodes were detached by the
+        // merge above. Falling back to the pre-merge range keeps the rest of this function working on
+        // a live range instead of widening `range` to nullable at every use below.
+        range = restoreRangePosition(selection, start, end) ?? range
     }
 
     const startElement = range.startContainer.parentElement!;
@@ -511,7 +515,10 @@ const insertList = (editor: HTMLDivElement, targetList: { tag: 'ul' | 'ol', clas
         // #region Case 2: Append/Split List (The Surgery)
         else if (startElement.tagName == "LI" || endElement.tagName == "LI") {
 
-            const currentList = startElement.tagName == "LI" ? startElement.closest('ul, ol') : endElement.closest('ul, ol');
+            // Cast rather than null-check, matching the two `closest('ul, ol') as HTMLElement` casts
+            // above: this branch only runs when one of the two boundary elements is an LI, which is by
+            // definition inside a list.
+            const currentList = (startElement.tagName == "LI" ? startElement.closest('ul, ol') : endElement.closest('ul, ol')) as HTMLElement;
 
             if (currentList.id && currentList.id == targetList.id) {
             const selectedBlocks = getSelectedBlocks(editor, range, BLOCK_TAGS.filter((tag) => ['P', 'LI'].includes(tag)))
@@ -564,7 +571,7 @@ const insertList = (editor: HTMLDivElement, targetList: { tag: 'ul' | 'ol', clas
                 if (startLi) {
                     let nodeToMove: ChildNode | null = startLi;
                     while (nodeToMove) {
-                        const next = nodeToMove.nextSibling;
+                        const next: ChildNode | null = nodeToMove.nextSibling;
                         newList.appendChild(nodeToMove);
                         nodeToMove = next;
                     }
@@ -732,7 +739,9 @@ const insertList_ = (editor: HTMLDivElement, listTag: 'ul' | 'ol', classToAdd: s
         unwrapParagraph(editor, listTag);
 
         const currentBlock = getClosestElementFromSelection(selection, listTag);
-        const liItems = currentBlock.querySelectorAll('li');
+        // No list element under the caret means execCommand did not produce one; an empty item list
+        // makes the length comparison below fail closed instead of throwing.
+        const liItems = currentBlock ? Array.from(currentBlock.querySelectorAll('li')) : [];
         if (liItems.length == selectedBlocks.length) {
             for (let index = 0; index < liItems.length; index++) {
                 const li = liItems[index];
@@ -831,7 +840,8 @@ const removeCheckboxWrapper_ = (listEl: HTMLElement) => {
 
 /** Logic to turn a list BACK into paragraphs (Toggle Off) */
 const toggleListOff = (listEl: HTMLElement, mode: ListMode, editor: HTMLElement) => {
-    const { selection, state } = getSelection(editor);
+    // `state` is non-null whenever the range guard below passes; see LiveSelection.
+    const { selection, state } = getSelection(editor) as LiveSelection;
 
     // 1. Cleanup Checkboxes
     if (mode === 'checkbox') removeCheckboxWrapper(listEl);
@@ -1119,7 +1129,7 @@ const styleActiveList = (editor: HTMLElement, listTag: string, mode: ListMode, c
 
 const styleActiveList_ = (editor: HTMLElement, listTag: string, mode: ListMode, classes: { add: string, remove: string }) => {
 
-    let { selection, state } = getSelection(editor);
+    let { selection, state } = getSelection(editor) as LiveSelection;
     if (!selection?.rangeCount) return;
 
     const listEl = getClosestElementFromSelection(selection, listTag);
@@ -1144,7 +1154,7 @@ const styleActiveList_ = (editor: HTMLElement, listTag: string, mode: ListMode, 
 
 /** Logic to unwrap a paragraph tag around a list element */
 const unwrapParagraph = (editor: HTMLDivElement, listTag: 'ul' | 'ol') => {
-    const postSelection = getSelection(editor);
+    const postSelection = getSelection(editor) as LiveSelection;
 
     if (postSelection && postSelection.selection.rangeCount > 0) {
 

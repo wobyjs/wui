@@ -1,7 +1,7 @@
 /* IMPORT */
 
 import type { JSX, Observable } from 'woby'
-import { useEffect, $, } from 'woby'
+import { useEffect, $, $$, } from 'woby'
 
 // Count every console.log so the full-suite log volume can be verified past
 // the devtools 1000-message buffer cap, via `dv eval` reading
@@ -191,12 +191,76 @@ export const useTimeout = (callback: () => void, delay: number) => {
 
 let staticIndex = 0
 
+/* ON-PAGE RESULT REGISTRY */
+
+// Every TestSnapshots instance publishes its latest actual/expected pair here so the
+// landing page can show the same information the console prints. The console remains
+// the source of truth for the Node runner; this is the browser-visible mirror.
+export type TestResult = {
+    index: number
+    name: string
+    status: Observable<'pending' | 'pass' | 'fail'>
+    actual: Observable<string>
+    expected: Observable<string>
+    checks: Observable<number>
+    fails: Observable<number>
+}
+
+export const testResults = $<TestResult[]>([])
+
+const registerTestResult = (index: number, name: string): TestResult => {
+    const result: TestResult = {
+        index, name,
+        status: $<'pending' | 'pass' | 'fail'>('pending'),
+        actual: $(''),
+        expected: $(''),
+        checks: $(0),
+        fails: $(0),
+    }
+    testResults(prev => [...prev, result])
+    return result
+}
+
+/** Aggregate pass/fail banner for the whole browser suite. */
+export const TestSummary = (): JSX.Element => {
+    const modules = () => $$(testResults)
+    const passed = () => modules().filter(r => $$(r.status) === 'pass').length
+    const failed = () => modules().filter(r => $$(r.status) === 'fail').length
+    const pending = () => modules().filter(r => $$(r.status) === 'pending').length
+    const checks = () => modules().reduce((n, r) => n + $$(r.checks), 0)
+    const allPassed = () => failed() === 0 && pending() === 0 && modules().length > 0
+
+    return (
+        <div class={() => `rounded border p-3 font-mono text-sm ${allPassed() ? 'border-green-500 bg-green-50 dark:bg-green-950' : failed() > 0 ? 'border-red-500 bg-red-50 dark:bg-red-950' : 'border-gray-400 bg-gray-50 dark:bg-gray-900'}`}>
+            <div class="font-bold">📊 Browser Snapshot Summary</div>
+            <div>Modules: {() => modules().length} &nbsp; ✅ {passed} &nbsp; ❌ {failed} &nbsp; ⏳ {pending}</div>
+            <div>Assertions run: {checks}</div>
+            <div class="font-bold">{() => allPassed() ? '✅ ALL PASSED' : failed() > 0 ? '❌ SOME FAILED' : '⏳ running…'}</div>
+        </div>
+    )
+}
+
 export const TestSnapshots = ({ Component, props }: { Component: (JSX.Component | Constructor<any>) & { test: { static?: boolean, enable?: () => boolean, wrap?: boolean, snapshots?: string[], compareActualValues?: boolean, expect?: () => string | string[] }, name?: string }, props?: Record<any, any> }): JSX.Element => {
     const ref = $<HTMLDivElement>()
     const index = staticIndex++
+    const result = registerTestResult(index, Component.name ?? `Test #${index}`)
     let htmlPrev = ''
     let ticks = 0
     let done = false
+    // Publishes the same actual/expected pair the console logs, so the page shows it too.
+    const record = (passed: boolean, actual: string, expected: string | string[]): boolean => {
+        result.actual(actual)
+        result.expected(Array.isArray(expected) ? expected.join('\n  or ') : expected)
+        result.checks(n => n + 1)
+        if (passed) {
+            // A module that has failed once stays failed — a later matching tick doesn't clear it.
+            if ($$(result.status) !== 'fail') result.status('pass')
+        } else {
+            result.fails(n => n + 1)
+            result.status('fail')
+        }
+        return passed
+    }
     const getHTML = (): string => {
         const element = ref()
         if (!element) return ''
@@ -231,6 +295,7 @@ export const TestSnapshots = ({ Component, props }: { Component: (JSX.Component 
 
                         // Check if actual matches any of the expected values
                         const matches = expectedValues.some(expected => actualForComparison === expected)
+                        record(matches, actualForComparison, expectedValues)
 
                         if (matches) {
                             //temp hide for assertion only
@@ -243,6 +308,7 @@ export const TestSnapshots = ({ Component, props }: { Component: (JSX.Component 
                         // without placeholder conversion
                         if (Component.test.compareActualValues) {
                             const matches = expectedValues.some(expected => actualSnapshot === expected)
+                            record(matches, actualSnapshot, expectedValues)
 
                             if (matches) {
                                 //temp hide for assertion only
@@ -257,6 +323,7 @@ export const TestSnapshots = ({ Component, props }: { Component: (JSX.Component 
 
                             if (nonEmptyExpected.length > 0) {
                                 const matches = nonEmptyExpected.some(expected => actualSnapshot === expected)
+                                record(matches, actualSnapshot, nonEmptyExpected)
 
                                 if (matches) {
                                     // temp hide for assertion only
@@ -265,6 +332,7 @@ export const TestSnapshots = ({ Component, props }: { Component: (JSX.Component 
                                     assert(false, `[${Component.name}]: Expected actual '${actualSnapshot}' to match one of the expected values '${JSON.stringify(nonEmptyExpected)}'`)
                                 }
                             } else {
+                                record(false, actualSnapshot, '(expect function returned an empty result)')
                                 assert(false, `[${Component.name}]: Expect function returned empty result: '${expectedValues.join(' or \n')}'`)
                             }
                         }
@@ -308,12 +376,37 @@ export const TestSnapshots = ({ Component, props }: { Component: (JSX.Component 
             }
         }
     })
+    // The parameter is typed as a component *or* a constructor, and that union carries no single
+    // call/construct signature for TSX to pick; the runtime value is always renderable.
+    const Renderable = Component as any
+
+    const badge = () => ({ pass: '✅ PASS', fail: '❌ FAIL', pending: '⏳ …' })[$$(result.status)]
+    const badgeClass = () => ({
+        pass: 'text-green-700 dark:text-green-400',
+        fail: 'text-red-700 dark:text-red-400',
+        pending: 'text-gray-500',
+    })[$$(result.status)]
+    // `pre` + break-all: snapshot strings are long single lines; wrapping keeps the
+    // grid cell from scrolling horizontally while staying character-exact.
+    const logClass = 'whitespace-pre-wrap break-all font-mono text-[11px] leading-snug m-0'
+
     return (
         <div>
-            <span><b>Test #{index}</b></span>
+            <span class={() => `font-bold ${badgeClass()}`}>Test #{index} — {result.name} {badge}</span>
             <div ref={ref}>
-                <Component {...props} />
+                <Renderable {...props} />
             </div>
+            <details class="mt-2 border-t pt-1 text-xs" open={() => $$(result.status) === 'fail'}>
+                <summary class="cursor-pointer select-none opacity-70">
+                    actual / expect ({() => $$(result.checks)} checks, {() => $$(result.fails)} failed)
+                </summary>
+                <div class="mt-1">
+                    <div class="opacity-60">actual:</div>
+                    <pre class={logClass}>{() => $$(result.actual) || '(not rendered yet)'}</pre>
+                    <div class="mt-1 opacity-60">expect:</div>
+                    <pre class={logClass}>{() => $$(result.expected) || '(not evaluated yet)'}</pre>
+                </div>
+            </details>
         </div>
     )
 }

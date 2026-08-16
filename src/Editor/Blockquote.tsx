@@ -11,8 +11,8 @@ const def = () => ({
     buttonType: $("outlined", HtmlString) as ObservableMaybe<ButtonStyles>,
     title: $("Convert to Blockquote", HtmlString) as ObservableMaybe<string>,
     label: $("Blockquote", HtmlString) as ObservableMaybe<string>,
-    cls: $('', HtmlClass) as JSX.Class | undefined,
-    class: $('', HtmlClass) as JSX.Class | undefined,
+    cls: $('', HtmlClass) as ObservableMaybe<string>,
+    class: $('', HtmlClass) as ObservableMaybe<string>,
     disabled: $(false, HtmlBoolean) as Observable<boolean>,
 })
 
@@ -77,11 +77,11 @@ const Blockquote = defaults(def, (props) => {
             disabled={disabled}
             title={buttonTitle}
             class={() => [
-                () => $$(cls) ? $$(cls) : cn,
+                () => $$(cls) ? $$(cls) : $$(cn),
                 () => $$(isActive) ? '!bg-slate-200' : ''
             ]}
             onClick={toggleBlockquote}
-            onMouseDown={(e) => { e.preventDefault(); e.stopPropagation() }}
+            onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation() }}
         >
             <span class="flex items-center gap-2">
                 {buttonLabel}

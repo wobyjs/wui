@@ -56,7 +56,7 @@ const applyAlignment = (command: string) => {
         const range = sel?.getRangeAt(0)
 
         if (range) {
-            let node = range.commonAncestorContainer
+            let node: Node | null = range.commonAncestorContainer
             while (node && node !== shadow) {
                 if (node instanceof HTMLElement) {
                     const tag = node.tagName.toUpperCase()
@@ -107,8 +107,8 @@ const alignmentOptions: AlignmentOption[] = [
 ]
 
 const def = () => ({
-    cls: $('', HtmlClass) as JSX.Class | undefined,
-    class: $('', HtmlClass) as JSX.Class | undefined,
+    cls: $('', HtmlClass) as JSX.Class,
+    class: $('', HtmlClass) as JSX.Class,
     selectedFormat: $("Left Align", HtmlString) as Observable<string>,
     buttonType: $("outlined", HtmlString) as ObservableMaybe<ButtonStyles>,
 })
@@ -121,7 +121,7 @@ const TextAlignDropDown = defaults(def, (props) => {
     const undoRedoContext = useUndoRedo()
     const saveDo = undoRedoContext?.saveDo || (() => {})
     const isOpen = $(false)
-    const dropdownRef = $<HTMLElement>(null)
+    const dropdownRef = $<HTMLElement>(null as any)
 
     const BASE_BTN = "size-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-black hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500 cursor-pointer"
 
@@ -129,10 +129,12 @@ const TextAlignDropDown = defaults(def, (props) => {
 
     const toggleDropdown = () => isOpen(!isOpen())
 
-    const handleSelectOption = (action: () => void) => {
+    // `action` is optional because `alignmentOptions` also carries divider entries, which have no
+    // label, icon or action; a divider can never be the selected format but the type allows it.
+    const handleSelectOption = (action?: () => void) => {
         if ($$(editor)) {
             saveDo()
-            action()
+            action?.()
         }
         isOpen(false)
     }
@@ -172,7 +174,7 @@ const TextAlignDropDown = defaults(def, (props) => {
                                 cls="w-full text-gray-700 group flex items-center px-4 py-2 text-sm hover:bg-gray-100 hover:text-gray-900"
                                 key={item.label}
                                 role="menuitem"
-                                onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                                onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation(); }}
                                 onClick={(e) => { e.preventDefault(); selectedFormat(item.label); handleSelectOption(item.action); }}
                                 title={item.hotkey}
                             >
@@ -195,7 +197,7 @@ const TextAlignDropDown = defaults(def, (props) => {
                     class={() => [
                         () => $$(cls) ? $$(cls) : BASE_BTN, cn,
                     ]}
-                    onMouseDown={(e) => { e.preventDefault(); e.stopPropagation() }}
+                    onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation() }}
                     onClick={handleApplyCurrent}
                     title="Text format"
                     {...otherProps}
@@ -204,7 +206,7 @@ const TextAlignDropDown = defaults(def, (props) => {
                         {() => {
                             const currentLabel = $$(selectedFormat)
                             const opt = alignmentOptions.find(o => o.label === currentLabel)
-                            if (opt) {
+                            if (opt?.icon) {
                                 return opt.icon()
                             }
                             return <AlignLeftIcon />
@@ -215,7 +217,7 @@ const TextAlignDropDown = defaults(def, (props) => {
                     type={btnType}
                     class="size-full inline-flex justify-center items-center rounded-md border border-gray-300 shadow-sm bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500 cursor-pointer px-2"
                     onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleDropdown(); }}
-                    onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                    onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation(); }}
                     title="Toggle dropdown"
                 >
                     <KeyboardDownArrow class="h-5 w-5" />
@@ -246,7 +248,7 @@ export const TextAlignDropDown_ = () => {
     const editor = $(EditorContext)
     const { undos, saveDo } = useUndoRedo()
     const isOpen = $(false)
-    const dropdownRef = $<HTMLElement>(null)
+    const dropdownRef = $<HTMLElement>(null as any)
     // const currentAlignment = $('Left Align') // TODO: Detect current alignment
 
 
@@ -286,7 +288,7 @@ export const TextAlignDropDown_ = () => {
                                 href="#"
                                 class="text-gray-700 group flex items-center px-4 py-2 text-sm hover:bg-gray-100 hover:text-gray-900"
                                 role="menuitem"
-                                onClick={(e) => { e.preventDefault(); handleSelectOption(item.action) }}
+                                onClick={(e: any) => { e.preventDefault(); handleSelectOption(item.action) }}
                                 title={item.hotkey}
                             >
                                 <item.icon />

@@ -10,7 +10,7 @@ import { use } from "@woby/use"
 const projAsia = {}
 
 export const DropDownEditor = () => {
-	const renderCondition = (value: ObservableMaybe<any>, key) => {
+	const renderCondition = (value: ObservableMaybe<any>, key?: string) => {
 		return Array.isArray($$(value)) && key != "thematic"
 	}
 
@@ -47,7 +47,7 @@ export const DropDownEditor = () => {
 			if (!(arrayObservable as any).selectedValue) {
 
 				// Grab the first item from the array to act as the initial default.
-				const firstValue = $$(arrayObservable)[0];
+				const firstValue = ($$(arrayObservable) as any[])[0];
 
 				// Create a new Woby observable and attach it to the array.
 				// This allows other parts of the app to access the selection via: 
@@ -110,9 +110,9 @@ export const DropDownEditor = () => {
 			{ value: "||", label: "||" },
 		]
 
-		let defaultValue
-		let data
-		let headers
+		let defaultValue: any[]
+		let data: any[]
+		let headers: ((v: any) => string)[]
 
 		switch (editorName) {
 			case "labels":
@@ -129,7 +129,6 @@ export const DropDownEditor = () => {
 				break
 			case "projectionName":
 				data = [Object.keys(projAsia)]
-				//@ts-expect-error
 				const projectionCode = $$(obj).projection
 				const projectionName = Object.keys(projAsia).filter(key => key.includes(projectionCode))
 				defaultValue = [$(projectionName[0])]
@@ -139,13 +138,16 @@ export const DropDownEditor = () => {
 				// Use the selectionStore we just ensured exists
 				defaultValue = [$(selectionStore ? $$(selectionStore) : $$(props.value)[0])]
 				data = [$$(props.value)]
-				headers = [v => editorName]
+				headers = [v => editorName!]
 			// defaultValue = [$($$(props.value)[0])]
 			// data = [$$(props.value)]
 			// headers = [v => editorName]
 		}
 
-		const inputValue = use(defaultValue)
+		// `use()` returns a getter/setter pair typed against the whole array; the wheels only
+		// ever push a single display string through it, so narrow it here rather than casting
+		// at each of the five call sites below.
+		const inputValue = use(defaultValue) as unknown as ((v?: string) => string)
 		const originalVal = $$(defaultValue[0])
 		const outerInputRef = $<HTMLInputElement>()
 		const innerInputRef = $<HTMLInputElement>()
@@ -166,8 +168,8 @@ export const DropDownEditor = () => {
 		useEffect(() => {
 			if (!$$(innerInputRef)) return
 
-			let innerInputValue = $$(innerInputRef).value
-			let outerInputValue = $$(outerInputRef).value
+			let innerInputValue = $$(innerInputRef)!.value
+			let outerInputValue = $$(outerInputRef)!.value
 
 			if (innerInputValue == originalVal) {
 				innerInputValue = $$(defaultValue[0])
@@ -198,8 +200,8 @@ export const DropDownEditor = () => {
 		useEffect(() => {
 			if (!$$(innerInputRef)) return
 
-			let innerInputValue = $$(innerInputRef).value
-			let outerInputValue = $$(outerInputRef).value
+			let innerInputValue = $$(innerInputRef)!.value
+			let outerInputValue = $$(outerInputRef)!.value
 
 			if ($$(defaultValue[1]) != "" && $$(defaultValue[1]) != undefined) {
 				innerInputValue += " " + $$(defaultValue[1])
@@ -226,8 +228,8 @@ export const DropDownEditor = () => {
 		useEffect(() => {
 			if (!$$(innerInputRef)) return
 
-			let innerInputValue = $$(innerInputRef).value
-			let outerInputValue = $$(outerInputRef).value
+			let innerInputValue = $$(innerInputRef)!.value
+			let outerInputValue = $$(outerInputRef)!.value
 
 			if ($$(defaultValue[1]) != "" && $$(defaultValue[1]) != undefined) {
 				innerInputValue += " " + $$(defaultValue[2])
@@ -305,7 +307,7 @@ export const DropDownEditor = () => {
 		useEffect(() => {
 			if (editorName == "thematicType") {
 				//sort array to make inputValue first
-				const thematicType = $$(obj["thematicType"]).sort((x, y) => { return x == $$(inputValue) ? -1 : y == $$(inputValue) ? 1 : 0 })
+				const thematicType = $$(obj["thematicType"]).sort((x: any, y: any) => { return x == $$(inputValue) ? -1 : y == $$(inputValue) ? 1 : 0 })
 				isObservable(obj["thematicType"]) ? obj["thematicType"](thematicType) : (obj["thematicType"] = thematicType)
 			}
 		})
@@ -353,7 +355,7 @@ export const DropDownEditor = () => {
 					headers={headers}
 					visible={open}
 					options={data}
-					value={inputValue}
+					value={inputValue as any}
 					bottom
 					mask
 					ok

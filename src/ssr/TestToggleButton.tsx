@@ -58,7 +58,11 @@ if (typeof globalThis.__isSSRTest__ !== 'undefined') {
 
     if (!allPassed) {
         console.error(`❌ [${name}] SSR test failed`)
-        process.exit(1)
+        // Recorded rather than `process.exit(1)`: the runner imports every TestXxx module, so an
+        // immediate exit here would hide the actual/expected output of every module after this one.
+        // `ssr-test-runner.tsx` reads this list and exits non-zero once the whole suite has run.
+        const g = globalThis as any
+        ;(g.__ssrFailures ??= []).push(name)
     }
 }
 
@@ -79,6 +83,9 @@ TestToggleButton.test = {
         if (ssrResult !== expectedFull) {
             assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
+            // Counted, not just logged: the runner summary reports assertion passes, and a
+            // silently-passing branch made a fully green suite still report zero passes.
+            assert(true, `[${name}] SSR match`)
             console.log(`✅ [${name}] SSR test passed: ${ssrResult}`)
         }
 

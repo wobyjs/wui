@@ -6,3 +6,4 @@ import "../../src/PropertyForm/ColorEditor";
 import "../../src/PropertyForm/ObjectEditor";
 declare const SampleEditorDemo: () => import("woby").Child;
 export { SampleEditorDemo, };
+//# sourceMappingURL=Demo.test.d.ts.map

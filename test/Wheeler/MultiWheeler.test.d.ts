@@ -3,3 +3,4 @@
  */
 declare const BasicMultiWheelerTwoColumns: () => import("woby").Child;
 export { BasicMultiWheelerTwoColumns, };
+//# sourceMappingURL=MultiWheeler.test.d.ts.map

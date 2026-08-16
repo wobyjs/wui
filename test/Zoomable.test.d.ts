@@ -4,3 +4,4 @@ declare const ZoomableWithCustomSize: () => import("woby").Child;
 declare const StyledZoomable: () => import("woby").Child;
 declare const ControlledZoomable: () => import("woby").Child;
 export { BasicZoomable, ZoomableWithCustomScale, ZoomableWithCustomSize, StyledZoomable, ControlledZoomable };
+//# sourceMappingURL=Zoomable.test.d.ts.map

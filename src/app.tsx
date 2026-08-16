@@ -54,26 +54,7 @@ import { AlignJustifyButton } from './Editor/AlignJustifyButton'
 import { EditorProvider, UndoRedoButton } from './Editor/UndoRedoButton'
 import { useEditor } from './Editor/undoredo'
 import { TestSnapshots, registerTestObservable, testObservables, TEST_INTERVAL, useInterval, assert } from './test-util'
-import TestAppbar from './ssr/TestAppbar'
-import TestAvatar from './ssr/TestAvatar'
-import TestBadge from './ssr/TestBadge'
-import TestButton from './ssr/TestButton'
-import TestCard from './ssr/TestCard'
-import TestCheckbox from './ssr/TestCheckbox'
-import TestChip from './ssr/TestChip'
-import TestCollapse from './ssr/TestCollapse'
-import TestFab from './ssr/TestFab'
-import TestIconButton from './ssr/TestIconButton'
-import TestNumberField from './ssr/TestNumberField'
-import TestPaper from './ssr/TestPaper'
-import TestSideBar from './ssr/TestSideBar'
-import TestSwitch from './ssr/TestSwitch'
-import TestTabs from './ssr/TestTabs'
-import TestTextArea from './ssr/TestTextArea'
-import TestTextField from './ssr/TestTextField'
-import TestToggleButton from './ssr/TestToggleButton'
-import TestToolbar from './ssr/TestToolbar'
-import TestZoomable from './ssr/TestZoomable'
+import { SsrSnapshotTests } from './ssr/tests'
 
 
 const isDev = typeof import.meta.env !== 'undefined' && import.meta.env.DEV
@@ -3692,7 +3673,7 @@ underline:  ${$$(isUnderline)}`}
             <h1 class="text-3xl font-bold mb-6">@woby/wui Component Library</h1>
 
             <p class="mb-4">
-                Real page - Click <a href="/test" class="text-blue-600 hover:underline font-semibold">here</a> to load the test runner
+                Demo cum test page — every component below is live, and the SSR Snapshot Tests section at the bottom shows each module’s actual vs. expected markup.
             </p>
 
             {/* Table of Contents Navigation */}
@@ -3740,35 +3721,9 @@ underline:  ${$$(isUnderline)}`}
                 {zoomableDemo}
             </div>
 
-            <div class="mt-8 p-4 bg-gray-100 rounded">
-                <p class="text-sm text-gray-600">💡 This is the main application view. The test runner at <code class="bg-gray-200 px-1 rounded">/test</code> will show snapshot tests for all components.</p>
-            </div>
-
-            {/* Three-way SSR + browser snapshot tests */}
+            {/* Three-way SSR + browser snapshot tests — module list lives in src/ssr/tests.tsx */}
             <div class="mt-8 p-4 border border-gray-300 rounded">
-                <h2 class="text-2xl font-bold mb-2">SSR Snapshot Tests</h2>
-                <p class="text-sm text-gray-600 mb-4">Each component runs a 3-way check: browser DOM snapshot, browser woby renderToString, and Node.js SSR. Open the console to see results (✅).</p>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <TestAppbar />
-                    <TestAvatar />
-                    <TestBadge />
-                    <TestButton />
-                    <TestCard />
-                    <TestCheckbox />
-                    <TestChip />
-                    <TestCollapse />
-                    <TestFab />
-                    <TestIconButton />
-                    <TestNumberField />
-                    <TestPaper />
-                    <TestSwitch />
-                    <TestTabs />
-                    <TestTextArea />
-                    <TestTextField />
-                    <TestToggleButton />
-                    <TestToolbar />
-                    <TestZoomable />
-                </div>
+                <SsrSnapshotTests />
             </div>
 
             <div class="mt-8">
@@ -4056,42 +4011,16 @@ const DebugTemplate = () => {
             <h1 class="text-3xl font-bold mb-6">@woby/wui Component Library</h1>
 
             <p class="mb-4">
-                Real page - Click <a href="/test" class="text-blue-600 hover:underline font-semibold">here</a> to load the test runner
+                Demo cum test page — every component below is live, and the SSR Snapshot Tests section at the bottom shows each module’s actual vs. expected markup.
             </p>
 
             <div class="space-y-4">
                 <Debug />
             </div>
 
-            {/* Three-way SSR + browser snapshot tests */}
+            {/* Three-way SSR + browser snapshot tests — module list lives in src/ssr/tests.tsx */}
             <div class="mt-8 p-4 border border-gray-300 rounded">
-                <h2 class="text-2xl font-bold mb-2">SSR Snapshot Tests</h2>
-                <p class="text-sm text-gray-600 mb-4">Each component runs a 3-way check: browser DOM snapshot, browser woby renderToString, and Node.js SSR. Open the console to see results (✅).</p>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <TestAppbar />
-                    <TestAvatar />
-                    <TestBadge />
-                    <TestButton />
-                    <TestCard />
-                    <TestCheckbox />
-                    <TestChip />
-                    <TestCollapse />
-                    <TestFab />
-                    <TestIconButton />
-                    <TestNumberField />
-                    <TestPaper />
-                    <TestSwitch />
-                    <TestTabs />
-                    <TestTextArea />
-                    <TestTextField />
-                    <TestToggleButton />
-                    <TestToolbar />
-                    <TestZoomable />
-                </div>
-            </div>
-
-            <div class="mt-8 p-4 bg-gray-100 rounded">
-                <p class="text-sm text-gray-600">💡 This is the main application view. The test runner at <code class="bg-gray-200 px-1 rounded">/test</code> will show snapshot tests for all components.</p>
+                <SsrSnapshotTests />
             </div>
 
             <div class="mt-8">

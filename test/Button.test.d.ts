@@ -7,3 +7,4 @@ declare const DisabledBtn: () => import("woby").Child;
 declare const CustomBtn: () => import("woby").Child;
 declare const CustomBtn2: () => import("woby").Child;
 export { DefaultBtn, TextBtn, ContainedBtn, OutlinedBtn, IconBtn, DisabledBtn, CustomBtn, CustomBtn2, };
+//# sourceMappingURL=Button.test.d.ts.map

@@ -1,5 +1,5 @@
 import { $, $$, Observable } from 'woby'
-import { getEditorPlugins } from './EditorPlugin'
+import { getEditorPlugins, getPluginForElement, type PluginProp } from './EditorPlugin'
 
 /**
  * PropertyExtractor: Utility for detecting the current selection type
@@ -24,6 +24,15 @@ export interface SelectionInfo {
 export function detectSelectionType(): SelectionInfo {
     const host = document.querySelector('wui-editor') as HTMLElement | null
     const shadow = host?.shadowRoot
+
+    // ── Marked-element priority (both modes) ──
+    // Click-to-select in EditorSurface marks an embedded custom element with
+    // data-element-selected. The mark outranks any selection-based detection,
+    // because a well-behaved embedded block owns a shadow root (so a click
+    // inside it leaves no light-DOM range pointing at the block at all).
+    const root = shadow?.querySelector('[data-editor-root]') ?? document.querySelector('[data-editor-root]')
+    const marked = root?.querySelector('[data-element-selected]') as HTMLElement | null
+    if (marked) return { type: 'custom', element: marked }
 
     // ── Shadow DOM mode ──
     if (shadow) {
@@ -129,12 +138,29 @@ export function detectSelectionType(): SelectionInfo {
     }
     if (!editorRoot) return { type: 'none', element: null }
 
+    // Get registered plugin tag names for custom element detection
+    const pluginTagNames = new Set($$(getEditorPlugins()).map(p => p.tagName.toUpperCase()))
+
     // Check for image selection (img node or inside img)
     let node: Node | null = range.commonAncestorContainer
     if (node.nodeType === Node.TEXT_NODE) node = node.parentElement
     while (node && node !== editorRoot) {
         if (node instanceof HTMLElement && node.tagName === 'IMG') {
             return { type: 'image', element: node }
+        }
+        node = node.parentNode
+    }
+
+    // Check for custom element (hyphenated tag or registered plugin tag) — backstop
+    // for light-DOM mode so a caret inside a custom element still reports 'custom'.
+    node = range.commonAncestorContainer
+    if (node.nodeType === Node.TEXT_NODE) node = node.parentElement
+    while (node && node !== editorRoot) {
+        if (node instanceof HTMLElement) {
+            const tag = node.tagName.toLowerCase()
+            if ((tag.includes('-') && !tag.startsWith('wui-')) || pluginTagNames.has(node.tagName.toUpperCase())) {
+                return { type: 'custom', element: node }
+            }
         }
         node = node.parentNode
     }
@@ -240,19 +266,89 @@ export function applyTextProperty(element: HTMLElement, key: string, value: any)
 }
 
 /**
+ * Attribute name for a schema prop.
+ *
+ * woby's customElement() maps a camelCase prop to a kebab-case attribute, so
+ * `inputType` lives on the DOM as `input-type`. Writing `spec.name` straight
+ * through gave `setAttribute('inputType')` → `inputtype="password"`, a dead
+ * attribute sitting next to woby's live `input-type="text"`: the panel showed
+ * "Password" while the field stayed a text box.
+ */
+const attrName = (name: string) => name.replace(/[A-Z]/g, c => '-' + c.toLowerCase())
+
+/**
+ * Coerce a raw attribute string to the runtime type declared in the plugin schema.
+ * When the attribute is absent, returns the declared default (or the type's zero value).
+ */
+function coerce(spec: PluginProp, raw: string | null): any {
+    if (raw === null) return spec.default ?? (
+        spec.type === 'number' ? 0 :
+        spec.type === 'boolean' ? false :
+        spec.type === 'color' ? '#000000' :
+        spec.type === 'enum' ? (spec.options?.[0]?.value ?? '') :
+        ''
+    )
+
+    switch (spec.type) {
+        case 'number': {
+            const n = Number(raw)
+            return isNaN(n) ? (spec.default ?? 0) : n
+        }
+        case 'boolean':
+            return raw !== 'false'   // bare attribute → true, explicit 'false' → false
+        case 'string':
+        case 'color':
+        default:
+            return raw
+    }
+}
+
+/**
  * Extract custom element attributes into observables for PropertyForm.
- * Skips style, class, and data-* attributes.
+ * When a plugin schema is registered, uses the declared types to produce
+ * correctly-typed observable values. Falls back to the blind string scrape
+ * when no schema exists.
  */
 export function extractCustomElementProperties(el: HTMLElement): Record<string, Observable<any>> {
-    const props: Record<string, Observable<any>> = {}
+    const props: Record<string, any> = { tagName: el.tagName.toLowerCase() }
 
-    // Read-only tagName field
-    props.tagName = el.tagName.toLowerCase() as any
+    const plugin = getPluginForElement(el)
+    const declared = new Set<string>()
 
-    for (const attr of Array.from(el.attributes)) {
-        // Skip internal attributes
-        if (attr.name === 'style' || attr.name === 'class' || attr.name.startsWith('data-')) continue
-        props[attr.name] = $(attr.value)
+    for (const p of plugin?.props ?? []) {
+        declared.add(p.name)
+        if (p.hidden) continue
+        // textContent props live in the light DOM; fall back to a legacy
+        // same-named attribute so older serialized content still round-trips.
+        const attr = attrName(p.name)
+        const raw = p.textContent
+            ? ((el.textContent ?? '').trim() || el.getAttribute(attr) || el.getAttribute(p.name))
+            : (el.getAttribute(attr) ?? el.getAttribute(p.name))
+        const obs = $(coerce(p, raw))
+
+        // Hang enum options on the observable so EnumEditor can detect it
+        if (p.type === 'enum' && p.options) {
+            ;(obs as any).options = p.options
+        }
+
+        props[p.label ?? p.name] = obs
+    }
+
+    // Blind string scrape — ONLY for elements with no registered schema.
+    //
+    // When a plugin declares props, that schema is the contract and the scrape
+    // does active harm: woby's customElement reflects every defaulted prop back
+    // as an attribute, so a <wui-text-field> ended up with extra "Cls", "Effect"
+    // and "Input-type" rows. "Input-type" is the worst of them — it is the kebab
+    // reflection of the declared `inputType` enum, so the panel showed the same
+    // property twice, once typed and once as a free-text field that could fight it.
+    if (!plugin?.props?.length) {
+        for (const attr of Array.from(el.attributes)) {
+            if (declared.has(attr.name)) continue
+            if (attr.name === 'style' || attr.name === 'class' || attr.name === 'contenteditable') continue
+            if (attr.name.startsWith('data-')) continue
+            props[attr.name] = $(attr.value)
+        }
     }
 
     return props
@@ -260,7 +356,42 @@ export function extractCustomElementProperties(el: HTMLElement): Record<string, 
 
 /**
  * Apply custom element property changes back to the DOM element.
+ * Type-directed: booleans become set/removeAttribute, values matching
+ * the default unset the attribute. Calls the plugin's onPropChange hook.
  */
 export function applyCustomElementProperty(el: HTMLElement, key: string, value: any): void {
-    el.setAttribute(key, String(value))
+    // tagName is an informational row (a plain string, not an attribute). Writing it
+    // back produced a junk tagname="wui-button" attribute on every edited element.
+    if (key === 'tagName') return
+
+    const plugin = getPluginForElement(el)
+    const spec = plugin?.props?.find(p => (p.label ?? p.name) === key)
+    const name = spec?.name ?? key
+    const attr = attrName(name)
+
+    if (spec?.readonly) return
+
+    // An earlier build wrote camelCase names straight to setAttribute, which the
+    // DOM lowercased into a dead `inputtype`-style attribute. Sweep it away so the
+    // kebab-case one below is the only value in the serialized HTML.
+    if (attr !== name) el.removeAttribute(name)
+
+    if (spec?.textContent) {
+        // Replace the light-DOM text only — leave element children (icons, etc.) alone.
+        const text = String(value)
+        if (el.textContent !== text) el.textContent = text
+        el.removeAttribute(attr)          // drop any legacy attribute form
+        plugin?.onPropChange?.(el, attr, value)
+        return
+    }
+
+    if (typeof value === 'boolean') {
+        value ? el.setAttribute(attr, '') : el.removeAttribute(attr)
+    } else if (value === '' || (spec && value === spec.default)) {
+        el.removeAttribute(attr)          // back to default → keep serialized HTML clean
+    } else {
+        el.setAttribute(attr, String(value))
+    }
+
+    plugin?.onPropChange?.(el, attr, value)
 }

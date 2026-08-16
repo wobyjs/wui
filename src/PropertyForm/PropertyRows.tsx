@@ -1,32 +1,36 @@
 /** @jsxImportSource woby */
 
-import { $, $$, type JSX, defaults, customElement, type ElementAttributes } from "woby"
+import { $, $$, type JSX, type ObservableMaybe, defaults, customElement, type ElementAttributes } from "woby"
 import { Button } from "../Button"
 import { changeEnumerable } from "./PropertyForm"
 import { Editors } from "./Editors"
 
 type PropertyRowProps = {
 	obj: any
-	order?: string[]
+	order?: ObservableMaybe<string[]>
 	className?: JSX.Class
 	indentLvl?: number
-	onCommit?: () => void
+	/** `defaults()` supplies `null` when no caller passes one — see the unwrap note below. */
+	onCommit?: (() => void) | null
 }
 
 export const PropertyRows = defaults(() => ({
 	obj: $(null as any),
-	order: $([]),
+	order: $([] as string[]),
 	className: $(''),
-	indentLvl: $(0),
+	// Plain `0`, not `$(0)`: `defaults()` wraps a non-observable into `observable(0)` anyway, so
+	// the runtime value is identical — but the inferred prop type stays `number`, which is what
+	// callers actually pass (`indentLvl={indentLvl + 1}` from ObjectEditor).
+	indentLvl: 0,
 	onCommit: null as (() => void) | null,
 }), (props: PropertyRowProps) => {
 	const { obj, order, indentLvl } = props
 	const getFormUI = () => $$(Editors).map((e) => e())
 	const dashMatchReg = /^-([a-zA-Z].*)-$/
 
-	const renderForm = (propertyData: object, title?: string, order?: string[]) => {
+	const renderForm = (propertyData: Record<string, any>, title?: string, order?: string[]) => {
 		changeEnumerable(propertyData)
-		const sortedKeys = Object.keys(propertyData).sort((a, b) => order?.indexOf(a) - order?.indexOf(b))
+		const sortedKeys = Object.keys(propertyData).sort((a, b) => (order?.indexOf(a) ?? -1) - (order?.indexOf(b) ?? -1))
 		if (sortedKeys.indexOf("colLabel") != -1) {
 			sortedKeys.splice(sortedKeys.indexOf("colLabel"), 1)
 		}
@@ -51,7 +55,7 @@ export const PropertyRows = defaults(() => ({
 							</tr>
 						) : null}
 					{() =>
-						($$(value) && !(value instanceof HTMLElement)) || $$(value) === 0 || $$(value) === false ? (
+						($$(value) !== null && $$(value) !== undefined && !(value instanceof HTMLElement)) ? (
 							<>
 								{getFormUI().map((formFields) => {
 									const { UI, renderCondition } = formFields
@@ -82,18 +86,24 @@ export const PropertyRows = defaults(() => ({
 		<>
 			{() => { $$(Editors); const data = $$(obj); return data ? renderForm(data, undefined, $$(order)) : null }}
 			<div>
-				{() =>
-					props.onCommit ? (
+				{() => {
+					// See PropertyForm: `defaults()` wraps the `null` default into
+					// observable(null), which is itself a function — so the guard always
+					// passed and the call only read the observable. Unwrap with
+					// `getFunction: false`, or $$ would CALL a real callback here.
+					const commit = $$(props.onCommit, false)
+					if (typeof commit !== 'function') return null
+					return (
 						<Button
-							onClick={(e) => {
+							onClick={(e: Event) => {
 								e.stopImmediatePropagation()
-								props.onCommit?.()
+								commit()
 							}}
 						>
 							Commit Changes
 						</Button>
-					) : null
-				}
+					)
+				}}
 			</div>
 		</>
 	)

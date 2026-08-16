@@ -10,12 +10,12 @@ import { applyItalic } from './StyleEngine'
 const def = () => ({
     buttonType: $("outlined", HtmlString) as ObservableMaybe<ButtonStyles>,
     title: $("Italic", HtmlString) as ObservableMaybe<string>,
-    cls: $('', HtmlClass) as JSX.Class | undefined,
-    class: $('', HtmlClass) as JSX.Class | undefined,
+    cls: $('', HtmlClass) as ObservableMaybe<string>,
+    class: $('', HtmlClass) as ObservableMaybe<string>,
     disabled: $(false, HtmlBoolean) as Observable<boolean>,
 })
 
-const ItalicButton = defaults(def, (props) => {
+const ItalicButton: Defaulted<typeof def> = defaults(def, (props) => {
     const { buttonType: btnType, title, cls, class: cn, disabled, ...otherProps } = props
 
     const editorNode = useEditor()
@@ -66,7 +66,7 @@ const ItalicButton = defaults(def, (props) => {
             type={btnType}
             title={title}
             class={() => [
-                () => $$(cls) ? $$(cls) : cn,
+                () => $$(cls) ? $$(cls) : $$(cn),
                 () => $$(isActive) ? '!bg-slate-200' : ''
             ]}
             aria-pressed={() => $$(isActive) ? "true" : "false"}

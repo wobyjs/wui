@@ -23,7 +23,7 @@ const def = () => ({
  * - onClick: detect selection, set target, toggle panel
  * - Uses usePropertyPanel() context to communicate with PropertyPanel
  */
-const InfoButton = defaults(def, (props) => {
+const InfoButton: Defaulted<typeof def> = defaults(def, (props) => {
     const { buttonType: btnType, title, cls, class: cn, disabled } = props
 
     const focusManager = useFocusManager()
@@ -82,7 +82,7 @@ const InfoButton = defaults(def, (props) => {
             type={btnType}
             title={title}
             class={() => [
-                () => $$(cls) ? $$(cls) : cn,
+                () => $$(cls) ? $$(cls) : $$(cn),
                 "border-none hover:bg-gray-100 p-1.5"
             ]}
             disabled={disabled}

@@ -7,3 +7,4 @@ declare const SquareAvatar: () => import("woby").Child;
 declare const CustomAvatar: () => import("woby").Child;
 declare const CustomAvatar2: () => import("woby").Child;
 export { DefaultAvatar, CircularAvatar, RoundedAvatar, SquareAvatar, SampleAvatar, HAvatar, CustomAvatar, CustomAvatar2, };
+//# sourceMappingURL=Avatar.test.d.ts.map

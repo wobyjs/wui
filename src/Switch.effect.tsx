@@ -103,14 +103,16 @@ export const iinput = [
 ].join(" ");
 
 export const ilabel = [
-    // Default State (Unchecked)
-    "[&>label]:after:content-[attr(data-tg-on)]",
+    // Default State (Unchecked) — the knob sits left and must read the OFF text.
+    // These two were swapped, so <wui-switch checked="true" on="ON" off="OFF">
+    // slid the knob to the ON position while displaying "OFF".
+    "[&>label]:after:content-[attr(data-tg-off)]",
     "[&>label]:after:flex",
     "[&>label]:after:justify-center",
     "[&>label]:after:align-center", // Note: In standard Tailwind, this is usually 'items-center'
 
     // Checked State
-    "[&>input:checked~label]:after:content-[attr(data-tg-off)]",
+    "[&>input:checked~label]:after:content-[attr(data-tg-on)]",
     "[&>input:checked~label]:after:flex",
     "[&>input:checked~label]:after:justify-center",
     "[&>input:checked~label]:after:align-center"

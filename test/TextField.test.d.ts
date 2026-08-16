@@ -4,3 +4,4 @@ declare const InputWithLabelEffects: () => import("woby").Child;
 declare const AlternativeLabelEffects: () => import("woby").Child;
 declare const AdornmentEffects: () => import("woby").Child;
 export { BorderEffects, BackgroundEffects, InputWithLabelEffects, AlternativeLabelEffects, AdornmentEffects, };
+//# sourceMappingURL=TextField.test.d.ts.map

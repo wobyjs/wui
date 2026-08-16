@@ -31,9 +31,9 @@ const TestNumberField = (): JSX.Element => {
 }
 
 const NUM_INPUT = "number-input inline-flex items-center bg-white border border-gray-300 rounded-lg transition-all duration-200 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 divide-x divide-gray-200"
-const INPUT_CLS = "w-16 text-center border-none bg-transparent focus:outline-none focus:ring-0 text-lg font-semibold text-gray-700 [-moz-appearance:textfield] [&::-webkit-inner-spin-button]:hidden [&::-webkit-outer-spin-button]:hidden"
-const BTN_DEC_CLS = "!rounded-none !rounded-l-md !w-10 !h-10 !border-r !border-gray-200 !bg-transparent"
-const BTN_INC_CLS = "!rounded-none !rounded-r-md !w-10 !h-10 !border-l !border-gray-200 !bg-transparent"
+const INPUT_CLS = "w-16 text-center border-none bg-transparent focus:outline-none focus:ring-0 text-lg font-semibold text-gray-700 disabled:text-[#00000061] disabled:cursor-not-allowed [-moz-appearance:textfield] [&::-webkit-inner-spin-button]:hidden [&::-webkit-outer-spin-button]:hidden"
+const BTN_DEC_CLS = "!rounded-none !rounded-l-md !w-10 !h-10 !border-r !border-gray-200 !bg-transparent disabled:!bg-[#d9dbda] disabled:!text-[#00000061] disabled:!cursor-not-allowed"
+const BTN_INC_CLS = "!rounded-none !rounded-r-md !w-10 !h-10 !border-l !border-gray-200 !bg-transparent disabled:!bg-[#d9dbda] disabled:!text-[#00000061] disabled:!cursor-not-allowed"
 const SPAN_CLS = "py-4 px-2 text-lg font-semibold"
 
 // SSR test (Node.js)
@@ -60,7 +60,11 @@ if (typeof globalThis.__isSSRTest__ !== 'undefined') {
 
     if (!allPassed) {
         console.error(`❌ [${name}] SSR test failed`)
-        process.exit(1)
+        // Recorded rather than `process.exit(1)`: the runner imports every TestXxx module, so an
+        // immediate exit here would hide the actual/expected output of every module after this one.
+        // `ssr-test-runner.tsx` reads this list and exits non-zero once the whole suite has run.
+        const g = globalThis as any
+        ;(g.__ssrFailures ??= []).push(name)
     }
 }
 
@@ -81,6 +85,9 @@ TestNumberField.test = {
         if (ssrResult !== expectedFull) {
             assert(false, `[${name}] SSR mismatch: got \n${ssrResult}, expected \n${expectedFull}`)
         } else {
+            // Counted, not just logged: the runner summary reports assertion passes, and a
+            // silently-passing branch made a fully green suite still report zero passes.
+            assert(true, `[${name}] SSR match`)
             console.log(`✅ [${name}] SSR test passed: ${ssrResult}`)
         }
 

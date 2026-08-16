@@ -9,13 +9,14 @@ This section contains guides and tutorials for using @woby/wui effectively.
 
 ## Component Usage
 
-- [Styling Components](./styling.md) - How to style components with Tailwind CSS
+- [Styling Components](./styling.md) - How to style components with Tailwind CSS, including the `cls` (replace) vs `class` (extend) rule
 - [Working with Observables](./observables.md) - Using Woby observables with components
-- [Customizing Components](./customization.md) - How to customize component appearance and behavior
 
 ## Advanced Topics
 
-- [Editor Plugin System](./editor-plugins.md) - How to register custom element insertion plugins for the wui-editor
-- [Creating Custom Components](./custom-components.md) - Building your own components that work with @woby/wui
-- [Performance Optimization](./performance.md) - Tips for optimizing performance
-- [Theming](./theming.md) - How to implement custom themes
+- [Editor Plugin System](./editor-plugins.md) - Registering custom elements with the wui-editor, and declaring typed `props` so the property panel renders real editors
+
+## Contributing
+
+- [Contributing](./contributing.md) - Development setup, conventions, and how to submit changes
+- [Maintaining Documentation](../MAINTAINING.md) - Deriving prop tables from `dist/types`, and the build/test commands docs changes must pass

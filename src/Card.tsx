@@ -1,5 +1,5 @@
 
-import { $, $$, defaults, type JSX, customElement, type ElementAttributes, type ObservableMaybe, useEffect, StyleEncapsulationProps, HtmlBoolean, HtmlClass } from "woby"
+import { type CustomElementChildren, $, $$, defaults, type JSX, customElement, type ElementAttributes, type ObservableMaybe, useEffect, StyleEncapsulationProps, HtmlBoolean, HtmlClass } from "woby"
 import "@woby/chk"
 import "./input.css"
 
@@ -67,13 +67,13 @@ const defCard = () => ({
      * - User can override the default class by providing a `cls` prop
      * - `class` can be used to add additional classes to the component
      */
-    cls: $('', HtmlClass) as JSX.Class | undefined,
-    class: $('', HtmlClass) as JSX.Class | undefined,
-    children: $(null as JSX.Child),
+    cls: $('', HtmlClass) as JSX.Class,
+    class: $('', HtmlClass) as JSX.Class,
+    children: $(null as JSX.Child) as CustomElementChildren,
     variant: $("elevated" as Variant),
     elevation: $(1 as Elevation, { type: 'number' } as const),
     // interactive: $(false, { type: 'boolean' } as const),
-    interactive: $(false, HtmlBoolean) as ObservableMaybe<boolean> | undefined,
+    interactive: $(false, HtmlBoolean) as ObservableMaybe<boolean>,
 })
 
 const defCardMedia = () => ({
@@ -94,8 +94,8 @@ const defCardMedia = () => ({
      * - User can override the default class by providing a `cls` prop
      * - `class` can be used to add additional classes to the component
      */
-    cls: $('', HtmlClass) as JSX.Class | undefined,
-    class: $('', HtmlClass) as JSX.Class | undefined,
+    cls: $('', HtmlClass) as JSX.Class,
+    class: $('', HtmlClass) as JSX.Class,
 })
 
 const defCardContent = () => ({
@@ -111,9 +111,9 @@ const defCardContent = () => ({
      * - User can override the default class by providing a `cls` prop
      * - `class` can be used to add additional classes to the component
      */
-    cls: $('', HtmlClass) as JSX.Class | undefined,
-    class: $('', HtmlClass) as JSX.Class | undefined,
-    children: $(null as JSX.Child),
+    cls: $('', HtmlClass) as JSX.Class,
+    class: $('', HtmlClass) as JSX.Class,
+    children: $(null as JSX.Child) as CustomElementChildren,
     padding: $("p-4" as JSX.Class),
 })
 
@@ -130,9 +130,9 @@ const defCardAction = () => ({
      * - User can override the default class by providing a `cls` prop
      * - `class` can be used to add additional classes to the component
      */
-    cls: $('', HtmlClass) as JSX.Class | undefined,
-    class: $('', HtmlClass) as JSX.Class | undefined,
-    children: $(null as JSX.Child),
+    cls: $('', HtmlClass) as JSX.Class,
+    class: $('', HtmlClass) as JSX.Class,
+    children: $(null as JSX.Child) as CustomElementChildren,
     align: $("start" as Justify),
     padding: $("p-2" as JSX.Class),
 })
@@ -167,7 +167,7 @@ const elevationCls = (e: Elevation) => {
 //     }
 // }
 
-const Card = defaults(defCard, (props) => {
+const Card: Defaulted<typeof defCard> = defaults(defCard, (props) => {
 
     const { class: cn, cls, children, variant, elevation, interactive, ...otherProps } = props
 
@@ -211,7 +211,7 @@ const Card = defaults(defCard, (props) => {
     )
 }) as typeof Card
 
-const CardMedia = defaults(defCardMedia, (props) => {
+const CardMedia: Defaulted<typeof defCardMedia> = defaults(defCardMedia, (props) => {
     const { class: cn, cls, src, alt, height, position, fit, ...otherProps } = props
 
     // const src = () => _src ?? ""
@@ -238,7 +238,7 @@ const CardMedia = defaults(defCardMedia, (props) => {
     )
 }) as typeof CardMedia & StyleEncapsulationProps
 
-const CardContent = defaults(defCardContent, (props) => {
+const CardContent: Defaulted<typeof defCardContent> = defaults(defCardContent, (props) => {
     const { class: cn, cls, padding, children, ...otherProps } = props
 
     // const pad = () => (padding) ?? "p-4"
@@ -252,7 +252,7 @@ const CardContent = defaults(defCardContent, (props) => {
     )
 }) as typeof CardContent & StyleEncapsulationProps
 
-const CardActions = defaults(defCardAction, (props) => {
+const CardActions: Defaulted<typeof defCardAction> = defaults(defCardAction, (props) => {
 
     const { class: cn, cls, children, align, padding, ...otherProps } = props
 

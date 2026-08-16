@@ -1,4 +1,4 @@
-import { $, $$, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlNumber, HtmlString, ObservableMaybe, useEffect, useMemo, isObservable, HtmlClass } from "woby"
+import { type CustomElementChildren, $, $$, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlNumber, HtmlString, ObservableMaybe, useEffect, useMemo, isObservable, HtmlClass } from "woby"
 
 
 // #region Sidebar Component
@@ -15,9 +15,9 @@ const sideBarDef = () => ({
      * - User can override the default class by providing a `cls` prop
      * - `class` can be used to add additional classes to the component
      */
-    cls: $("", HtmlClass) as JSX.Class | undefined,
-    class: $("", HtmlClass) as JSX.Class | undefined,    /** The content to be rendered inside the sidebar. */
-    children: $(null) as ObservableMaybe<JSX.Element>,
+    cls: $("", HtmlClass) as JSX.Class,
+    class: $("", HtmlClass) as JSX.Class,    /** The content to be rendered inside the sidebar. */
+    children: $(null) as CustomElementChildren,
     /** A boolean observable to control whether the sidebar is open or closed. */
     open: $(false, HtmlBoolean) as ObservableMaybe<boolean>,
     /** An observable reference to the main content element that the sidebar will push aside. */
@@ -26,11 +26,17 @@ const sideBarDef = () => ({
     width: $('250px', HtmlString) as ObservableMaybe<string | number>,
     /** When true, a dark overlay will appear over the main content, which closes the sidebar on click. */
     mask: $(false, HtmlBoolean) as ObservableMaybe<boolean>,
-    /** The top position of the sidebar (e.g., 0 or '56px'). Defaults to 0. */
-    top: $(0, HtmlString) as ObservableMaybe<number | string>,
+    /**
+     * The top position of the sidebar (e.g., '0' or '56px'). Defaults to '0'.
+     *
+     * Stored as the string `'0'` rather than the number `0` because the value flows through
+     * `HtmlString` (the attribute parser for string-valued attributes, which never yields a number)
+     * and is consumed only as a CSS `top` value, where `'0'` and `0` are equivalent.
+     */
+    top: $('0', HtmlString) as ObservableMaybe<number | string>,
 })
 
-const SideBar = defaults(sideBarDef, (props) => {
+const SideBar: Defaulted<typeof sideBarDef> = defaults(sideBarDef, (props) => {
     const { class: cn, cls, children, open, contentRef, width, mask, top, ...otherProps } = props
 
     const BASE_CLASS = `fixed h-full left-0 overflow-x-hidden transition-all duration-500 ease-in-out flex items-start z-[10]`
@@ -146,12 +152,12 @@ const menuItemDef = () => ({
      * - User can override the default class by providing a `cls` prop
      * - `class` can be used to add additional classes to the component
      */
-    class: $('', HtmlClass) as JSX.Class | undefined,
-    cls: $('', HtmlClass) as JSX.Class | undefined,
-    children: $(null as JSX.Child),
+    class: $('', HtmlClass) as JSX.Class,
+    cls: $('', HtmlClass) as JSX.Class,
+    children: $(null as JSX.Child) as CustomElementChildren,
 })
 
-const MenuItem = defaults(menuItemDef, (props) => {
+const MenuItem: Defaulted<typeof menuItemDef> = defaults(menuItemDef, (props) => {
     const { class: cn, cls, children, ...otherProps } = props
 
     return (
@@ -177,12 +183,12 @@ const menuTextDef = () => ({
      * - User can override the default class by providing a `cls` prop
      * - `class` can be used to add additional classes to the component
      */
-    cls: $('', HtmlClass) as JSX.Class | undefined,
-    class: $('', HtmlClass) as JSX.Class | undefined,
-    children: $(null as JSX.Child),
+    cls: $('', HtmlClass) as JSX.Class,
+    class: $('', HtmlClass) as JSX.Class,
+    children: $(null as JSX.Child) as CustomElementChildren,
 })
 
-const MenuText = defaults(menuTextDef, (props) => {
+const MenuText: Defaulted<typeof menuTextDef> = defaults(menuTextDef, (props) => {
     const { class: cn, cls, children, ...otherProps } = props
     return (
         <span class={[() => $$(cls) ? $$(cls) : 'ml-3 text-sm font-medium', cn]} {...otherProps}>

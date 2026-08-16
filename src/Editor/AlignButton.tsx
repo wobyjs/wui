@@ -1,6 +1,9 @@
 import { $, $$, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlClass, HtmlString, Observable, ObservableMaybe, useEffect } from 'woby'
 import { Button, ButtonStyles } from '../Button'
-import { getCurrentEditor, useBlockEnforcer, BLOCK_TAGS, getCurrentBlock, getSelectedBlocks } from './utils'
+// `getSelection` must come from './utils' — without the import it silently resolved to the global
+// `window.getSelection()`, which ignores the container argument and therefore returns the retargeted
+// host element instead of the caret inside the editor's shadow root.
+import { getCurrentEditor, useBlockEnforcer, BLOCK_TAGS, getCurrentBlock, getSelectedBlocks, getSelection } from './utils'
 import { useEditor } from './undoredo'
 import { applyTextAlign as applyTextAlignStyle } from './StyleEngine'
 import { applyBlockCommandToSelectedImage } from './ImageActions'
@@ -46,13 +49,13 @@ export const ALIGNMENT_MAP = {
 const def = () => ({
     type: $("outlined", HtmlString) as ObservableMaybe<ButtonStyles>,
     title: $("Align Left", HtmlString) as ObservableMaybe<string>,
-    cls: $('', HtmlClass) as JSX.Class | undefined,
-    class: $('', HtmlClass) as JSX.Class | undefined,
+    cls: $('', HtmlClass) as JSX.Class,
+    class: $('', HtmlClass) as JSX.Class,
     disabled: $(false, HtmlBoolean) as ObservableMaybe<boolean>,
     mode: $("left", HtmlString) as ObservableMaybe<ContentAlign>,
 })
 
-const AlignButton = defaults(def, (props) => {
+const AlignButton: Defaulted<typeof def> = defaults(def, (props) => {
     const { type: buttonType, title, cls, class: cn, disabled, mode, ...otherProps } = props as any
 
     const editor = useEditor()
@@ -138,7 +141,7 @@ const AlignButton = defaults(def, (props) => {
             ]}
             disabled={disabled}
             onClick={handleClick}
-            onMouseDown={(e) => { e.preventDefault(); e.stopPropagation() }}
+            onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation() }}
             {...otherProps}
         >
             {displayIcon}

@@ -8,8 +8,10 @@ import { EditorProps } from "./EditorProps"
 
 export const StringEditor = () => {
 
-	const renderCondition = (value: ObservableMaybe<string>, key) => {
+	const renderCondition = (value: ObservableMaybe<string>, key?: string) => {
 		if ($$(value) == undefined) return false
+		// Enum values (carrying .options) are handled by EnumEditor — exclude them here
+		if (Array.isArray((value as any)?.options)) return false
 		const hexColorReg = /^#[0-9A-F]{6}$/i
 		const isColor = $$(value).length == 9 ? hexColorReg.test($$(value).slice(0, -2)) : hexColorReg.test($$(value))
 		const isString = isObservable(value) ? typeof $$(value) == "string" : typeof value == "string"

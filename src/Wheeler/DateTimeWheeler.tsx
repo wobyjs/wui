@@ -1,6 +1,7 @@
 /* @jsxImportSource woby */
-import { $, $$, Observable, ObservableMaybe, useEffect, useMemo, untrack, Portal, type JSX, isObservable, defaults, customElement, ElementAttributes, useRenderEffect, HtmlBoolean } from 'woby'
-import { use, useClickAway, useViewportSize } from '@woby/use'
+import { $, $$, Observable, ObservableMaybe, useEffect, useMemo, untrack, Portal, type JSX, isObservable, defaults, customElement, ElementAttributes, HtmlBoolean, HtmlClass } from 'woby'
+import { useClickAway, useViewportSize } from '@woby/use'
+import { use } from '../use'
 import { Wheeler, def as wheelerDef } from './Wheeler' // Adjust path
 import { Button } from '../Button'
 import { pick } from '../helper/helper'
@@ -52,7 +53,11 @@ const def = () => {
         divider: $(true) as ObservableMaybe<boolean>,
         // title: (d: Date) => <div>{d.toISOString()}</div> as ObservableMaybe<(d: Date) => JSX.Element>,
         title: undefined as ((v: ObservableMaybe<any | any[]>) => JSX.Element) | undefined,
-        visible: $(true) as ObservableMaybe<boolean>,
+        // `visible` is not declared here: it is one of `inheritedKeys`, so the spread below already
+        // supplies Wheeler's own `$(true, HtmlBoolean)` — which additionally parses the attribute
+        // form. Declaring it above the spread only created a value that was immediately overwritten.
+        // Alias of `cls` for JSX callers; the render below merges both.
+        class: $('', HtmlClass) as JSX.Class,
         header: undefined as ((props: { ok: () => void, cancel: () => void, visible: (v: boolean) => void }) => JSX.Element) | undefined,
         ...inheritedDefaults,
         // `ok` truthy (default): the main `value` only updates via the OK button.
@@ -218,7 +223,7 @@ const DateTimeWheeler = defaults(def, (props) => {
         // --- Update Main Controlled Value if Changed ---
         const currentPropValue = parseDate($$(modDate))
         // Check if controlledValue is an observable function before calling it
-        if (typeof modDate === 'function' && (!currentPropValue || constrainedDate.getTime() !== currentPropValue.getTime())) {
+        if (!currentPropValue || constrainedDate.getTime() !== currentPropValue.getTime()) {
             modDate(constrainedDate) // Update the external observable
 
             // Reactive mode (`ok` falsy): commit every change to the main value
@@ -470,7 +475,7 @@ const DateTimeWheeler = defaults(def, (props) => {
         if ($$(cancelOnBlur))
             handleCancelClick() // treat click-away as Cancel: revert live commits, hide
 
-        if ($$(commitOnBlur)) //hide & save
+        else if ($$(commitOnBlur)) //hide & save
         {
             hide() //just hide, no save
             // if (!ok)
@@ -528,9 +533,11 @@ const DateTimeWheeler = defaults(def, (props) => {
         <div
             ref={cont}
             class={() => {
-                const clsVal = $$(cls)
+                // Both are read as plain strings: `JSX.Class` also admits nested thunks/arrays, and
+                // returning one of those from inside a class thunk is not a valid `Class` value.
+                const clsVal = $$(cls) as string
                 const baseCls = clsVal !== undefined && clsVal !== '' ? clsVal : DATETIME_WHEELER_CLS
-                const classVal = $$(className)
+                const classVal = $$(className) as string
                 return classVal ? [baseCls, classVal].filter(Boolean).join(" ") : baseCls
             }}
             style={{ display: () => $$(isVisible) ? null : 'none' }}

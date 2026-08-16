@@ -49182,6 +49182,7 @@ init_ssr_shim();
 
 // src/test-util.tsx
 init_ssr_shim();
+init_index_es();
 init_runtime_es();
 if (!globalThis.__consoleLogPatched) {
   ;
@@ -49225,6 +49226,7 @@ var useInterval2 = (callback, delay) => {
       clearInterval(id);
   }, delay);
 };
+var testResults = observable([]);
 
 // src/ssr/TestAppbar.tsx
 init_ssr_shim();
@@ -49260,6 +49262,8 @@ var def = () => ({
   class: observable("", HtmlClass),
   children: observable(""),
   type: observable("default"),
+  // Cast to the caller-facing type: `defaults()` exposes `Partial<ReturnType<def>>`, and
+  // `Observable<T>` is invariant, so an uncast def rejects the plain `position="fixed"` attribute.
   position: observable("fixed"),
   edge: observable("top")
 });
@@ -49269,7 +49273,7 @@ var variantStyle = {
 var Appbar = defaults(def, (props) => {
   const { class: cn2, cls, type: variant2, position, edge, children, ...otherProps } = props;
   const getPositionClass = () => {
-    const pos = position();
+    const pos = get(position);
     const edgePos = edge();
     let positionClass = "";
     switch (pos) {
@@ -49300,7 +49304,7 @@ var Appbar = defaults(def, (props) => {
     const host = root2?.host ?? null;
     const container = host?.parentElement ?? el.parentElement;
     if (!container) return;
-    const isFixed = () => position() === "fixed";
+    const isFixed = () => get(position) === "fixed";
     const doOffset = () => isFixed();
     const apply = () => {
       if (!doOffset()) {
@@ -49383,7 +49387,8 @@ if (typeof globalThis.__isSSRTest__ !== "undefined") {
 `);
   if (!allPassed) {
     console.error(`\u274C [${name}] SSR test failed`);
-    process.exit(1);
+    const g2 = globalThis;
+    (g2.__ssrFailures ??= []).push(name);
   }
 }
 TestAppbar.test = {
@@ -49401,6 +49406,7 @@ TestAppbar.test = {
 ${ssrResult}, expected 
 ${expectedFull}`);
     } else {
+      assert(true, `[${name}] SSR match`);
       console.log(`\u2705 [${name}] SSR test passed: ${ssrResult}`);
     }
     return expected;
@@ -49458,7 +49464,7 @@ var Avatar = defaults(def2, (props) => {
     const s = get(srcObs);
     const a = get(altObs);
     if (s) {
-      return /* @__PURE__ */ jsx("img", { src: s, alt: a, class: "w-full h-full object-cover", onerror: (e3) => {
+      return /* @__PURE__ */ jsx("img", { src: s, alt: a, class: "w-full h-full object-cover", onError: (e3) => {
         e3.target.style.display = "none";
       } });
     }
@@ -49531,7 +49537,8 @@ if (typeof globalThis.__isSSRTest__ !== "undefined") {
 `);
   if (!allPassed) {
     console.error(`\u274C [${name2}] SSR test failed`);
-    process.exit(1);
+    const g2 = globalThis;
+    (g2.__ssrFailures ??= []).push(name2);
   }
 }
 TestAvatar.test = {
@@ -49568,6 +49575,7 @@ TestAvatar.test = {
 ${ssrResult}, expected 
 ${expectedFull}`);
     } else {
+      assert(true, `[${name2}] SSR match`);
       console.log(`\u2705 [${name2}] SSR test passed: ${ssrResult}`);
     }
     return expected;
@@ -49611,12 +49619,13 @@ var Badge = defaults(def3, (props) => {
     if (contentValue) {
       return;
     }
-    if (otherProps["badgeContent"]) {
-      badgeContent(otherProps["badgeContent"]);
-    } else if (otherProps["badge-content"]) {
-      badgeContent(otherProps["badge-content"]);
-    } else if (otherProps["children"]) {
-      badgeContent(otherProps["children"]);
+    const attrs = otherProps;
+    if (attrs["badgeContent"]) {
+      badgeContent(attrs["badgeContent"]);
+    } else if (attrs["badge-content"]) {
+      badgeContent(attrs["badge-content"]);
+    } else if (attrs["children"]) {
+      badgeContent(attrs["children"]);
     } else {
     }
   });
@@ -49716,7 +49725,8 @@ if (typeof globalThis.__isSSRTest__ !== "undefined") {
 `);
   if (!allPassed) {
     console.error(`\u274C [${name3}] SSR test failed`);
-    process.exit(1);
+    const g2 = globalThis;
+    (g2.__ssrFailures ??= []).push(name3);
   }
 }
 TestBadge.test = {
@@ -49744,6 +49754,7 @@ TestBadge.test = {
 ${ssrResult}, expected 
 ${expectedFull}`);
     } else {
+      assert(true, `[${name3}] SSR match`);
       console.log(`\u2705 [${name3}] SSR test passed: ${ssrResult}`);
     }
     return expected;
@@ -49885,7 +49896,11 @@ var Button = defaults(def4, (props) => {
       type: () => get(buttonFunction),
       disabled,
       class: () => [
-        () => get(cls) ? get(cls) : variant[get(buttonType)],
+        // Fall back to the `contained` variant for an unknown/empty type.
+        // Removing the `type` attribute at runtime (the property panel does
+        // exactly that when the value equals the default) left buttonType ''
+        // and variant[''] undefined, rendering class="" — an invisible button.
+        () => get(cls) ? get(cls) : variant[get(buttonType)] ?? variant.contained,
         cn2
       ],
       ...otherProps,
@@ -49989,7 +50004,8 @@ if (typeof globalThis.__isSSRTest__ !== "undefined") {
 `);
   if (!allPassed) {
     console.error(`\u274C [${name4}] SSR test failed`);
-    process.exit(1);
+    const g2 = globalThis;
+    (g2.__ssrFailures ??= []).push(name4);
   }
 }
 TestButton.test = {
@@ -50011,6 +50027,7 @@ TestButton.test = {
 ${ssrResult}, expected 
 ${expectedFull}`);
     } else {
+      assert(true, `[${name4}] SSR match`);
       console.log(`\u2705 [${name4}] SSR test passed: ${ssrResult}`);
     }
     return expected;
@@ -50237,7 +50254,8 @@ if (typeof globalThis.__isSSRTest__ !== "undefined") {
 `);
   if (!allPassed) {
     console.error(`\u274C [${name5}] SSR test failed`);
-    process.exit(1);
+    const g2 = globalThis;
+    (g2.__ssrFailures ??= []).push(name5);
   }
 }
 TestCard.test = {
@@ -50270,6 +50288,7 @@ TestCard.test = {
 ${ssrResult}, expected 
 ${expectedFull}`);
     } else {
+      assert(true, `[${name5}] SSR match`);
       console.log(`\u2705 [${name5}] SSR test passed: ${ssrResult}`);
     }
     return expected;
@@ -50309,23 +50328,35 @@ var def5 = () => ({
 });
 var Checkbox = defaults(def5, (props) => {
   const { class: cn2, cls, children, labelPosition, checked, disabled, id, ...otherProps } = props;
-  const before = () => get(labelPosition) === "left" || get(labelPosition) === "top" ? /* @__PURE__ */ jsxs("label", { class: "pr-1.5 select-none", for: () => get(id), children: [
-    " ",
-    children,
-    " "
-  ] }) : null;
-  const after = () => get(labelPosition) === "right" || get(labelPosition) === "bottom" ? /* @__PURE__ */ jsxs("label", { class: "pl-1.5 select-none", for: () => get(id), children: [
-    " ",
-    children,
-    " "
-  ] }) : null;
-  const line = () => get(labelPosition) === "top" || get(labelPosition) === "bottom" ? /* @__PURE__ */ jsx("br", {}) : null;
-  return /* @__PURE__ */ jsxs("div", { class: [() => get(cls) ? get(cls) : "", cn2], children: [
-    before,
-    line,
+  const dirClass = memo(() => {
+    switch (get(labelPosition)) {
+      case "left":
+        return "flex-row-reverse items-center";
+      case "top":
+        return "flex-col-reverse items-start";
+      case "bottom":
+        return "flex-col items-start";
+      case "right":
+      default:
+        return "flex-row items-center";
+    }
+  });
+  const padClass = memo(() => {
+    switch (get(labelPosition)) {
+      case "left":
+        return "pr-1.5";
+      case "top":
+        return "pb-1.5";
+      case "bottom":
+        return "pt-1.5";
+      case "right":
+      default:
+        return "pl-1.5";
+    }
+  });
+  return /* @__PURE__ */ jsxs("div", { class: ["inline-flex", dirClass, () => get(cls) ? get(cls) : "", cn2], children: [
     /* @__PURE__ */ jsx("input", { id, type: "checkbox", checked, disabled, ...otherProps }),
-    line,
-    after
+    /* @__PURE__ */ jsx("label", { class: ["select-none", padClass], for: () => get(id), children })
   ] });
 });
 customElement("wui-checkbox", Checkbox);
@@ -50355,13 +50386,14 @@ var TestCheckbox = () => {
   registerTestObservable(`${name6}_ssr`, ret);
   return ret;
 };
+var WRAP = ["inline-flex flex-row-reverse items-center", "inline-flex flex-row items-center", "inline-flex flex-col-reverse items-start"];
+var PAD = ["select-none pr-1.5", "select-none pl-1.5", "select-none pb-1.5"];
+var TEXT2 = ["Remember", "Agree", "On"];
+var CHECKED = ["", "", ' checked=""'];
+var ssrElement = (i) => `<h3>Checkbox</h3><div class="${WRAP[i]}"><input id="${IDS[i]}" type="checkbox"${CHECKED[i]} /><label class="${PAD[i]}" for="${IDS[i]}">${TEXT2[i]}</label></div>`;
 if (typeof globalThis.__isSSRTest__ !== "undefined") {
   TestCheckbox();
-  const fullElements = [
-    `<h3>Checkbox</h3><div><label class="pr-1.5 select-none" for="${IDS[0]}"> Remember </label><input id="${IDS[0]}" type="checkbox" /></div>`,
-    `<h3>Checkbox</h3><div><input id="${IDS[1]}" type="checkbox" /><label class="pl-1.5 select-none" for="${IDS[1]}"> Agree </label></div>`,
-    `<h3>Checkbox</h3><div><label class="pr-1.5 select-none" for="${IDS[2]}"> On </label><br /><input id="${IDS[2]}" type="checkbox" checked="" /><br /></div>`
-  ];
+  const fullElements = [ssrElement(0), ssrElement(1), ssrElement(2)];
   console.log(`
 \u{1F4DD} Test: ${name6}`);
   let allPassed = true;
@@ -50379,7 +50411,8 @@ if (typeof globalThis.__isSSRTest__ !== "undefined") {
 `);
   if (!allPassed) {
     console.error(`\u274C [${name6}] SSR test failed`);
-    process.exit(1);
+    const g2 = globalThis;
+    (g2.__ssrFailures ??= []).push(name6);
   }
 }
 TestCheckbox.test = {
@@ -50388,25 +50421,16 @@ TestCheckbox.test = {
   compareActualValues: true,
   expect: () => {
     const idx = get(testObservables[name6]);
-    const elements = [
-      `<div><label class="pr-1.5 select-none" for="${IDS[0]}"> Remember </label><input id="${IDS[0]}" type="checkbox"></div>`,
-      `<div><input id="${IDS[1]}" type="checkbox"><label class="pl-1.5 select-none" for="${IDS[1]}"> Agree </label></div>`,
-      `<div><label class="pr-1.5 select-none" for="${IDS[2]}"> On </label><br><input id="${IDS[2]}" type="checkbox"><br></div>`
-    ];
-    const expected = elements[idx];
+    const expected = `<div class="${WRAP[idx]}"><input id="${IDS[idx]}" type="checkbox"><label class="${PAD[idx]}" for="${IDS[idx]}">${TEXT2[idx]}</label></div>`;
     const ssrComponent = testObservables[`${name6}_ssr`];
     const ssrResult = renderToString(ssrComponent);
-    const fullElements = [
-      `<h3>Checkbox</h3><div><label class="pr-1.5 select-none" for="${IDS[0]}"> Remember </label><input id="${IDS[0]}" type="checkbox" /></div>`,
-      `<h3>Checkbox</h3><div><input id="${IDS[1]}" type="checkbox" /><label class="pl-1.5 select-none" for="${IDS[1]}"> Agree </label></div>`,
-      `<h3>Checkbox</h3><div><label class="pr-1.5 select-none" for="${IDS[2]}"> On </label><br /><input id="${IDS[2]}" type="checkbox" checked="" /><br /></div>`
-    ];
-    const expectedFull = fullElements[idx];
+    const expectedFull = ssrElement(idx);
     if (ssrResult !== expectedFull) {
       assert(false, `[${name6}] SSR mismatch: got 
 ${ssrResult}, expected 
 ${expectedFull}`);
     } else {
+      assert(true, `[${name6}] SSR match`);
       console.log(`\u2705 [${name6}] SSR test passed: ${ssrResult}`);
     }
     return expected;
@@ -50557,7 +50581,8 @@ if (typeof globalThis.__isSSRTest__ !== "undefined") {
 `);
   if (!allPassed) {
     console.error(`\u274C [${name7}] SSR test failed`);
-    process.exit(1);
+    const g2 = globalThis;
+    (g2.__ssrFailures ??= []).push(name7);
   }
 }
 TestChip.test = {
@@ -50580,6 +50605,7 @@ TestChip.test = {
 ${ssrResult}, expected 
 ${expectedFull}`);
     } else {
+      assert(true, `[${name7}] SSR match`);
       console.log(`\u2705 [${name7}] SSR test passed: ${ssrResult}`);
     }
     return expected;
@@ -50685,7 +50711,8 @@ if (typeof globalThis.__isSSRTest__ !== "undefined") {
 `);
   if (!allPassed) {
     console.error(`\u274C [${name8}] SSR test failed`);
-    process.exit(1);
+    const g2 = globalThis;
+    (g2.__ssrFailures ??= []).push(name8);
   }
 }
 TestCollapse.test = {
@@ -50709,6 +50736,7 @@ TestCollapse.test = {
 ${ssrResult}, expected 
 ${expectedFull}`);
     } else {
+      assert(true, `[${name8}] SSR match`);
       console.log(`\u2705 [${name8}] SSR test passed: ${ssrResult}`);
     }
     return expected;
@@ -50742,9 +50770,15 @@ var def8 = () => ({
   type: observable("pill", HtmlString),
   disabled: observable(false, HtmlBoolean)
 });
+var disabledStyle = "disabled:!bg-[rgba(0,0,0,0.12)] disabled:!text-[rgba(0,0,0,0.26)] disabled:!shadow-none disabled:!cursor-default";
 var variantStyle3 = {
   circular: "inline-flex items-center justify-center relative box-border cursor-pointer select-none align-middle appearance-none no-underline font-medium text-lg z-[1050] shadow-[rgba(0,0,0,0.2)_0px_3px_5px_-1px,rgba(0,0,0,0.14)_0px_6px_10px_0px,rgba(0,0,0,0.12)_0px_1px_18px_0px] text-white m-2 p-0 rounded-[50%] border-0 [transition:background-color_250ms_cubic-bezier(0.4,0,0.2,1)0ms,box-shadow_250ms_cubic-bezier(0.4,0,0.2,1)0ms,border-color_250ms_cubic-bezier(0.4,0,0.2,1)0ms] outline-none w-14 h-14 bg-[rgb(25,118,210)] hover:bg-[rgb(21,101,192)]",
-  pill: "absolute bg-[rgb(25,118,210)] text-[white] text-4xl font-black cursor-pointer shadow-[0px_4px_8px_rgba(0,0,0,0.3)] transition-[background-color] duration-[0.3s] px-5 py-[15px] rounded-[50px] border-[none] [transition:top_0.3s_ease,left_0.3s_ease] z-[1050]",
+  // `absolute` used to live here. It made the variant unusable anywhere in normal
+  // flow — the <wui-fab> host collapsed to 0x0 and the button floated over whatever
+  // followed it, which is exactly what the docs' own inline `<Fab type="pill">`
+  // example does. A variant names a shape; floating is the caller's business, so the
+  // two positioned usages in docs/index.tsx now pass `absolute` themselves.
+  pill: "inline-flex items-center justify-center align-middle bg-[rgb(25,118,210)] text-[white] text-4xl font-black cursor-pointer shadow-[0px_4px_8px_rgba(0,0,0,0.3)] transition-[background-color] duration-[0.3s] px-5 py-[15px] rounded-[50px] border-[none] [transition:top_0.3s_ease,left_0.3s_ease] z-[1050]",
   custom: ""
 };
 var Fab = defaults(def8, (props) => {
@@ -50752,7 +50786,7 @@ var Fab = defaults(def8, (props) => {
   return /* @__PURE__ */ jsx(
     "button",
     {
-      class: [() => get(cls) ? get(cls) : variantStyle3[get(variant2)], cn2],
+      class: [() => get(cls) ? get(cls) : variantStyle3[get(variant2)], disabledStyle, cn2],
       disabled,
       ...otherProps,
       children: /* @__PURE__ */ jsx("div", { class: "flex items-center", children })
@@ -50784,8 +50818,8 @@ var TestFab = () => {
   registerTestObservable(`${name9}_ssr`, ret);
   return ret;
 };
-var PILL = "absolute bg-[rgb(25,118,210)] text-[white] text-4xl font-black cursor-pointer shadow-[0px_4px_8px_rgba(0,0,0,0.3)] transition-[background-color] duration-[0.3s] px-5 py-[15px] rounded-[50px] border-[none] [transition:top_0.3s_ease,left_0.3s_ease] z-[1050]";
-var CIRCULAR = "inline-flex items-center justify-center relative box-border cursor-pointer select-none align-middle appearance-none no-underline font-medium text-lg z-[1050] shadow-[rgba(0,0,0,0.2)_0px_3px_5px_-1px,rgba(0,0,0,0.14)_0px_6px_10px_0px,rgba(0,0,0,0.12)_0px_1px_18px_0px] text-white m-2 p-0 rounded-[50%] border-0 [transition:background-color_250ms_cubic-bezier(0.4,0,0.2,1)0ms,box-shadow_250ms_cubic-bezier(0.4,0,0.2,1)0ms,border-color_250ms_cubic-bezier(0.4,0,0.2,1)0ms] outline-none w-14 h-14 bg-[rgb(25,118,210)] hover:bg-[rgb(21,101,192)]";
+var PILL = "inline-flex items-center justify-center align-middle bg-[rgb(25,118,210)] text-[white] text-4xl font-black cursor-pointer shadow-[0px_4px_8px_rgba(0,0,0,0.3)] transition-[background-color] duration-[0.3s] px-5 py-[15px] rounded-[50px] border-[none] [transition:top_0.3s_ease,left_0.3s_ease] z-[1050] disabled:!bg-[rgba(0,0,0,0.12)] disabled:!text-[rgba(0,0,0,0.26)] disabled:!shadow-none disabled:!cursor-default";
+var CIRCULAR = "inline-flex items-center justify-center relative box-border cursor-pointer select-none align-middle appearance-none no-underline font-medium text-lg z-[1050] shadow-[rgba(0,0,0,0.2)_0px_3px_5px_-1px,rgba(0,0,0,0.14)_0px_6px_10px_0px,rgba(0,0,0,0.12)_0px_1px_18px_0px] text-white m-2 p-0 rounded-[50%] border-0 [transition:background-color_250ms_cubic-bezier(0.4,0,0.2,1)0ms,box-shadow_250ms_cubic-bezier(0.4,0,0.2,1)0ms,border-color_250ms_cubic-bezier(0.4,0,0.2,1)0ms] outline-none w-14 h-14 bg-[rgb(25,118,210)] hover:bg-[rgb(21,101,192)] disabled:!bg-[rgba(0,0,0,0.12)] disabled:!text-[rgba(0,0,0,0.26)] disabled:!shadow-none disabled:!cursor-default";
 if (typeof globalThis.__isSSRTest__ !== "undefined") {
   TestFab();
   const fullElements = [
@@ -50809,7 +50843,8 @@ if (typeof globalThis.__isSSRTest__ !== "undefined") {
 `);
   if (!allPassed) {
     console.error(`\u274C [${name9}] SSR test failed`);
-    process.exit(1);
+    const g2 = globalThis;
+    (g2.__ssrFailures ??= []).push(name9);
   }
 }
 TestFab.test = {
@@ -50832,6 +50867,7 @@ TestFab.test = {
 ${ssrResult}, expected 
 ${expectedFull}`);
     } else {
+      assert(true, `[${name9}] SSR match`);
       console.log(`\u2705 [${name9}] SSR test passed: ${ssrResult}`);
     }
     return expected;
@@ -50926,7 +50962,8 @@ if (typeof globalThis.__isSSRTest__ !== "undefined") {
 `);
   if (!allPassed) {
     console.error(`\u274C [${name10}] SSR test failed`);
-    process.exit(1);
+    const g2 = globalThis;
+    (g2.__ssrFailures ??= []).push(name10);
   }
 }
 TestIconButton.test = {
@@ -50949,6 +50986,7 @@ TestIconButton.test = {
 ${ssrResult}, expected 
 ${expectedFull}`);
     } else {
+      assert(true, `[${name10}] SSR match`);
       console.log(`\u2705 [${name10}] SSR test passed: ${ssrResult}`);
     }
     return expected;
@@ -51030,7 +51068,7 @@ var NumberField = defaults(def10, (props) => {
       const newValue = +get(value) - +get(step);
       value?.(newValue);
     } else if (!get(reactive) && isObservable(value)) {
-      const newValue = +get(inputRef).valueAsNumber - +get(step);
+      const newValue = +get(inputRef)?.valueAsNumber - +get(step);
       value?.(newValue);
     }
     updated();
@@ -51041,7 +51079,7 @@ var NumberField = defaults(def10, (props) => {
       const newValue = +get(value) + +get(step);
       value?.(newValue);
     } else if (!get(reactive) && isObservable(value)) {
-      const newValue = +get(inputRef).valueAsNumber + +get(step);
+      const newValue = +get(inputRef)?.valueAsNumber + +get(step);
       value?.(newValue);
     }
     updated();
@@ -51088,7 +51126,10 @@ var NumberField = defaults(def10, (props) => {
     // Nice focus state
     "divide-x divide-gray-200",
     // Subtle dividers between elements
-    () => get(disabled) ? "bg-gray-100 opacity-70" : "",
+    // `bg-gray-100` alone never won: it sits at the same specificity as the
+    // `bg-white` above and Tailwind emits bg-white later, so a disabled field
+    // stayed pure white and only `opacity-70` showed. Force it.
+    () => get(disabled) ? "!bg-gray-100 opacity-70 cursor-not-allowed" : "",
     // Style for disabled state
     () => get(cls) ? get(cls) : "",
     cn2
@@ -51097,7 +51138,7 @@ var NumberField = defaults(def10, (props) => {
       Button,
       {
         type: "icon",
-        cls: "!rounded-none !rounded-l-md !w-10 !h-10 !border-r !border-gray-200 !bg-transparent",
+        cls: "!rounded-none !rounded-l-md !w-10 !h-10 !border-r !border-gray-200 !bg-transparent disabled:!bg-[#d9dbda] disabled:!text-[#00000061] disabled:!cursor-not-allowed",
         buttonFunction: "button",
         onPointerDown: () => {
           startContinuousUpdate(false);
@@ -51114,6 +51155,7 @@ var NumberField = defaults(def10, (props) => {
         ref: inputRef,
         class: [
           "w-16 text-center border-none bg-transparent focus:outline-none focus:ring-0 text-lg font-semibold text-gray-700",
+          "disabled:text-[#00000061] disabled:cursor-not-allowed",
           "[-moz-appearance:textfield] [&::-webkit-inner-spin-button]:hidden [&::-webkit-outer-spin-button]:hidden",
           () => get(error) ? "text-red-500" : ""
         ],
@@ -51143,7 +51185,7 @@ var NumberField = defaults(def10, (props) => {
       Button,
       {
         type: "icon",
-        cls: "!rounded-none !rounded-r-md !w-10 !h-10 !border-l !border-gray-200 !bg-transparent",
+        cls: "!rounded-none !rounded-r-md !w-10 !h-10 !border-l !border-gray-200 !bg-transparent disabled:!bg-[#d9dbda] disabled:!text-[#00000061] disabled:!cursor-not-allowed",
         onPointerDown: () => {
           startContinuousUpdate(true);
         },
@@ -51182,9 +51224,9 @@ var TestNumberField = () => {
   return ret;
 };
 var NUM_INPUT = "number-input inline-flex items-center bg-white border border-gray-300 rounded-lg transition-all duration-200 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 divide-x divide-gray-200";
-var INPUT_CLS = "w-16 text-center border-none bg-transparent focus:outline-none focus:ring-0 text-lg font-semibold text-gray-700 [-moz-appearance:textfield] [&::-webkit-inner-spin-button]:hidden [&::-webkit-outer-spin-button]:hidden";
-var BTN_DEC_CLS = "!rounded-none !rounded-l-md !w-10 !h-10 !border-r !border-gray-200 !bg-transparent";
-var BTN_INC_CLS = "!rounded-none !rounded-r-md !w-10 !h-10 !border-l !border-gray-200 !bg-transparent";
+var INPUT_CLS = "w-16 text-center border-none bg-transparent focus:outline-none focus:ring-0 text-lg font-semibold text-gray-700 disabled:text-[#00000061] disabled:cursor-not-allowed [-moz-appearance:textfield] [&::-webkit-inner-spin-button]:hidden [&::-webkit-outer-spin-button]:hidden";
+var BTN_DEC_CLS = "!rounded-none !rounded-l-md !w-10 !h-10 !border-r !border-gray-200 !bg-transparent disabled:!bg-[#d9dbda] disabled:!text-[#00000061] disabled:!cursor-not-allowed";
+var BTN_INC_CLS = "!rounded-none !rounded-r-md !w-10 !h-10 !border-l !border-gray-200 !bg-transparent disabled:!bg-[#d9dbda] disabled:!text-[#00000061] disabled:!cursor-not-allowed";
 var SPAN_CLS = "py-4 px-2 text-lg font-semibold";
 if (typeof globalThis.__isSSRTest__ !== "undefined") {
   TestNumberField();
@@ -51209,7 +51251,8 @@ if (typeof globalThis.__isSSRTest__ !== "undefined") {
 `);
   if (!allPassed) {
     console.error(`\u274C [${name11}] SSR test failed`);
-    process.exit(1);
+    const g2 = globalThis;
+    (g2.__ssrFailures ??= []).push(name11);
   }
 }
 TestNumberField.test = {
@@ -51229,6 +51272,7 @@ TestNumberField.test = {
 ${ssrResult}, expected 
 ${expectedFull}`);
     } else {
+      assert(true, `[${name11}] SSR match`);
       console.log(`\u2705 [${name11}] SSR test passed: ${ssrResult}`);
     }
     return expected;
@@ -51330,7 +51374,8 @@ if (typeof globalThis.__isSSRTest__ !== "undefined") {
 `);
   if (!allPassed) {
     console.error(`\u274C [${name12}] SSR test failed`);
-    process.exit(1);
+    const g2 = globalThis;
+    (g2.__ssrFailures ??= []).push(name12);
   }
 }
 TestPaper.test = {
@@ -51348,6 +51393,7 @@ TestPaper.test = {
 ${ssrResult}, expected 
 ${expectedFull}`);
     } else {
+      assert(true, `[${name12}] SSR match`);
       console.log(`\u2705 [${name12}] SSR test passed: ${ssrResult}`);
     }
     return expected;
@@ -51387,8 +51433,14 @@ var sideBarDef = () => ({
   width: observable("250px", HtmlString),
   /** When true, a dark overlay will appear over the main content, which closes the sidebar on click. */
   mask: observable(false, HtmlBoolean),
-  /** The top position of the sidebar (e.g., 0 or '56px'). Defaults to 0. */
-  top: observable(0, HtmlString)
+  /**
+   * The top position of the sidebar (e.g., '0' or '56px'). Defaults to '0'.
+   *
+   * Stored as the string `'0'` rather than the number `0` because the value flows through
+   * `HtmlString` (the attribute parser for string-valued attributes, which never yields a number)
+   * and is consumed only as a CSS `top` value, where `'0'` and `0` are equivalent.
+   */
+  top: observable("0", HtmlString)
 });
 var SideBar = defaults(sideBarDef, (props) => {
   const { class: cn2, cls, children, open, contentRef, width: width2, mask, top, ...otherProps } = props;
@@ -51526,7 +51578,8 @@ if (typeof globalThis.__isSSRTest__ !== "undefined") {
 `);
   if (!allPassed) {
     console.error(`\u274C [${name13}] SSR test failed`);
-    process.exit(1);
+    const g2 = globalThis;
+    (g2.__ssrFailures ??= []).push(name13);
   }
 }
 TestSideBar.test = {
@@ -51549,6 +51602,7 @@ TestSideBar.test = {
 ${ssrResult}, expected 
 ${expectedFull}`);
     } else {
+      assert(true, `[${name13}] SSR match`);
       console.log(`\u2705 [${name13}] SSR test passed: ${ssrResult}`);
     }
     return expected;
@@ -51691,14 +51745,16 @@ var iinput = [
   "[&>input:checked~label]:after:left-2/4"
 ].join(" ");
 var ilabel = [
-  // Default State (Unchecked)
-  "[&>label]:after:content-[attr(data-tg-on)]",
+  // Default State (Unchecked) — the knob sits left and must read the OFF text.
+  // These two were swapped, so <wui-switch checked="true" on="ON" off="OFF">
+  // slid the knob to the ON position while displaying "OFF".
+  "[&>label]:after:content-[attr(data-tg-off)]",
   "[&>label]:after:flex",
   "[&>label]:after:justify-center",
   "[&>label]:after:align-center",
   // Note: In standard Tailwind, this is usually 'items-center'
   // Checked State
-  "[&>input:checked~label]:after:content-[attr(data-tg-off)]",
+  "[&>input:checked~label]:after:content-[attr(data-tg-on)]",
   "[&>input:checked~label]:after:flex",
   "[&>input:checked~label]:after:justify-center",
   "[&>input:checked~label]:after:align-center"
@@ -53050,7 +53106,8 @@ if (typeof globalThis.__isSSRTest__ !== "undefined") {
 `);
   if (!allPassed) {
     console.error(`\u274C [${name14}] SSR test failed`);
-    process.exit(1);
+    const g2 = globalThis;
+    (g2.__ssrFailures ??= []).push(name14);
   }
 }
 TestSwitch.test = {
@@ -53069,6 +53126,7 @@ TestSwitch.test = {
 ${ssrResult}, expected 
 ${expectedFull}`);
     } else {
+      assert(true, `[${name14}] SSR match`);
       console.log(`\u2705 [${name14}] SSR test passed: ${ssrResult}`);
     }
     return expected;
@@ -53249,7 +53307,8 @@ if (typeof globalThis.__isSSRTest__ !== "undefined") {
 `);
   if (!allPassed) {
     console.error(`\u274C [${name15}] SSR test failed`);
-    process.exit(1);
+    const g2 = globalThis;
+    (g2.__ssrFailures ??= []).push(name15);
   }
 }
 TestTabs.test = {
@@ -53267,6 +53326,7 @@ TestTabs.test = {
 ${ssrResult}, expected 
 ${expectedFull}`);
     } else {
+      assert(true, `[${name15}] SSR match`);
       console.log(`\u2705 [${name15}] SSR test passed: ${ssrResult}`);
     }
     return expected;
@@ -54544,6 +54604,12 @@ var TextArea = defaults(def13, (props) => {
     const effectName = get(effect25);
     return effectMap[effectName] || "";
   });
+  const placeholderValue = memo(() => {
+    const p = get(placeholder);
+    if (!get(label)) return p;
+    return p ? p : " ";
+  });
+  const labelPlaceholderClass = memo(() => get(label) ? "placeholder:text-transparent focus:placeholder:text-[#aaa]" : "");
   const commitValue = (e3) => {
     if (isObservable(value)) {
       value(e3.target.value);
@@ -54557,9 +54623,10 @@ var TextArea = defaults(def13, (props) => {
         class: () => [
           effectStyle,
           resizeStyle,
+          labelPlaceholderClass,
           "block bg-transparent size-full"
         ],
-        placeholder,
+        placeholder: placeholderValue,
         value,
         ...otherProps,
         onChange: (e3) => {
@@ -54579,6 +54646,9 @@ var TextArea = defaults(def13, (props) => {
             }
             onKeyUp?.(e3);
           }
+        },
+        onBlur: (e3) => {
+          if (get(assignOnEnter) && isObservable(value)) commitValue(e3);
         }
       }
     ),
@@ -54636,7 +54706,8 @@ if (typeof globalThis.__isSSRTest__ !== "undefined") {
 `);
   if (!allPassed) {
     console.error(`\u274C [${name16}] SSR test failed`);
-    process.exit(1);
+    const g2 = globalThis;
+    (g2.__ssrFailures ??= []).push(name16);
   }
 }
 TestTextArea.test = {
@@ -54656,6 +54727,7 @@ TestTextArea.test = {
 ${ssrResult}, expected 
 ${expectedFull}`);
     } else {
+      assert(true, `[${name16}] SSR match`);
       console.log(`\u2705 [${name16}] SSR test passed: ${ssrResult}`);
     }
     return expected;
@@ -54781,17 +54853,31 @@ var TextField = defaults(def14, (props) => {
         onChange?.(e3);
       }
     };
+    const handleBlur = (e3) => {
+      if (!get(assignOnEnter) || !isObservable(value)) return;
+      value(e3.target.value);
+    };
     input.addEventListener("keyup", handleKeyUp);
     input.addEventListener("input", handleInput);
+    input.addEventListener("blur", handleBlur);
     return () => {
       input.removeEventListener("keyup", handleKeyUp);
       input.removeEventListener("input", handleInput);
+      input.removeEventListener("blur", handleBlur);
     };
   });
   const effectStyle = memo(() => {
     const effectName = get(effect25);
-    return effectMap2[effectName] || defaultStyle;
+    if (effectMap2[effectName]) return effectMap2[effectName];
+    return get(label) ? effect19a : defaultStyle;
   });
+  const placeholderValue = memo(() => {
+    const p = get(placeholder);
+    if (!get(label)) return p;
+    return p ? p : " ";
+  });
+  const labelPlaceholderClass = memo(() => get(label) ? "placeholder:text-transparent focus:placeholder:text-gray-400" : "");
+  const disabledClass = "disabled:cursor-not-allowed disabled:text-[#00000061] disabled:border-[#0000001f] disabled:bg-[#0000000a] [&:disabled~label]:text-[#00000061]";
   const handleFocus = () => {
     if (inputRef()) {
       inputRef().focus();
@@ -54839,12 +54925,14 @@ var TextField = defaults(def14, (props) => {
             {
               ref: inputRef,
               class: () => [
-                effectStyle
+                effectStyle,
+                labelPlaceholderClass,
+                disabledClass
               ],
               value,
               disabled,
               type: inputType,
-              placeholder,
+              placeholder: placeholderValue,
               ...otherProps,
               onChange: (e3) => {
                 onChange?.(e3);
@@ -54874,13 +54962,13 @@ var defEndAdnorment = () => ({
   "data-adnorment": "end"
 });
 var StartAdornment = defaults(defStartAdornment, (props) => {
-  const { cls, children, ...otherProps } = props;
+  const { cls, children, "data-adnorment": _side, ...otherProps } = props;
   const baseClass2 = "flex h-[0.01em] max-h-[2em] items-center whitespace-nowrap text-[rgba(0,0,0,0.54)]";
   return /* @__PURE__ */ jsx("div", { class: [baseClass2, cls], "data-adnorment": "start", ...otherProps, children });
 });
 StartAdornment.adornmentType = "start";
 var EndAdornment = defaults(defEndAdnorment, (props) => {
-  const { cls, children, ...otherProps } = props;
+  const { cls, children, "data-adnorment": _side, ...otherProps } = props;
   const baseClass2 = "flex h-[0.01em] max-h-[2em] items-center whitespace-nowrap text-[rgba(0,0,0,0.54)]";
   return /* @__PURE__ */ jsx("div", { class: [baseClass2, cls], "data-adnorment": "end", ...otherProps, children });
 });
@@ -54912,7 +55000,7 @@ var TestTextField = () => {
   registerTestObservable(`${name17}_ssr`, ret);
   return ret;
 };
-var DEFAULT_STYLE = "block w-full py-1.5 px-2 text-base text-gray-900 placeholder:text-gray-400 focus:border-blue-500 sm:text-sm/6 truncate";
+var DEFAULT_STYLE = "block w-full py-1.5 px-2 text-base text-gray-900 placeholder:text-gray-400 focus:border-blue-500 sm:text-sm/6 truncate disabled:cursor-not-allowed disabled:text-[#00000061] disabled:border-[#0000001f] disabled:bg-[#0000000a] [&:disabled~label]:text-[#00000061]";
 var BASE_CLASS3 = "relative z-0 flex items-center";
 if (typeof globalThis.__isSSRTest__ !== "undefined") {
   TestTextField();
@@ -54937,7 +55025,8 @@ if (typeof globalThis.__isSSRTest__ !== "undefined") {
 `);
   if (!allPassed) {
     console.error(`\u274C [${name17}] SSR test failed`);
-    process.exit(1);
+    const g2 = globalThis;
+    (g2.__ssrFailures ??= []).push(name17);
   }
 }
 TestTextField.test = {
@@ -54957,6 +55046,7 @@ TestTextField.test = {
 ${ssrResult}, expected 
 ${expectedFull}`);
     } else {
+      assert(true, `[${name17}] SSR match`);
       console.log(`\u2705 [${name17}] SSR test passed: ${ssrResult}`);
     }
     return expected;
@@ -55070,7 +55160,8 @@ if (typeof globalThis.__isSSRTest__ !== "undefined") {
 `);
   if (!allPassed) {
     console.error(`\u274C [${name18}] SSR test failed`);
-    process.exit(1);
+    const g2 = globalThis;
+    (g2.__ssrFailures ??= []).push(name18);
   }
 }
 TestToggleButton.test = {
@@ -55090,6 +55181,7 @@ TestToggleButton.test = {
 ${ssrResult}, expected 
 ${expectedFull}`);
     } else {
+      assert(true, `[${name18}] SSR match`);
       console.log(`\u2705 [${name18}] SSR test passed: ${ssrResult}`);
     }
     return expected;
@@ -55171,7 +55263,8 @@ if (typeof globalThis.__isSSRTest__ !== "undefined") {
 `);
   if (!allPassed) {
     console.error(`\u274C [${name19}] SSR test failed`);
-    process.exit(1);
+    const g2 = globalThis;
+    (g2.__ssrFailures ??= []).push(name19);
   }
 }
 TestToolbar.test = {
@@ -55189,6 +55282,7 @@ TestToolbar.test = {
 ${ssrResult}, expected 
 ${expectedFull}`);
     } else {
+      assert(true, `[${name19}] SSR match`);
       console.log(`\u2705 [${name19}] SSR test passed: ${ssrResult}`);
     }
     return expected;
@@ -55496,7 +55590,8 @@ if (typeof globalThis.__isSSRTest__ !== "undefined") {
 `);
   if (!allPassed) {
     console.error(`\u274C [${name20}] SSR test failed`);
-    process.exit(1);
+    const g2 = globalThis;
+    (g2.__ssrFailures ??= []).push(name20);
   }
 }
 TestZoomable.test = {
@@ -55514,6 +55609,7 @@ TestZoomable.test = {
 ${ssrResult}, expected 
 ${expectedFull}`);
     } else {
+      assert(true, `[${name20}] SSR match`);
       console.log(`\u2705 [${name20}] SSR test passed: ${ssrResult}`);
     }
     return expected;
@@ -55560,6 +55656,7 @@ var totalLogs = g.__consoleLogCount ?? 0;
 var passLogs = g.__passLogCount ?? 0;
 var failCount = g.__testFailures?.length ?? 0;
 var passCount = g.__testPassCount ?? 0;
+var moduleFailures = g.__ssrFailures ?? [];
 console.log(`
 \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550`);
 console.log(`   \u{1F4CA} SSR Test Summary`);
@@ -55567,6 +55664,8 @@ console.log(`   Total console.log calls: ${totalLogs}`);
 console.log(`   \u2705 Pass log lines:       ${passLogs}`);
 console.log(`   Assertion passes:        ${passCount}`);
 console.log(`   Assertion failures:      ${failCount}`);
-console.log(`   Result: ${failCount > 0 ? "\u274C SOME FAILED" : "\u2705 ALL PASSED"}`);
+console.log(`   Failed modules:          ${moduleFailures.length ? moduleFailures.join(", ") : "none"}`);
+console.log(`   Result: ${failCount > 0 || moduleFailures.length > 0 ? "\u274C SOME FAILED" : "\u2705 ALL PASSED"}`);
 console.log(`\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550
 `);
+if (failCount > 0 || moduleFailures.length > 0) process.exit(1);

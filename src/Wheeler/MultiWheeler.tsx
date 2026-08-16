@@ -1,5 +1,6 @@
 import { $, $$, Observable, ObservableMaybe, useEffect, useMemo, untrack, type JSX, isObservable, ArrayMaybe, HtmlBoolean, defaults, customElement, ElementAttributes } from 'woby'
-import { use, useViewportSize } from '@woby/use'
+import { useViewportSize } from '@woby/use'
+import { use } from '../use'
 import { Wheeler, def as wheelerDef } from './Wheeler' // Adjust path
 import { Button } from '../Button'
 import { pick } from '../helper/helper'
@@ -142,6 +143,7 @@ const MultiWheeler = defaults(def, (props) => {
                             changeValueOnClickOnly={changeValueOnClickOnly}
                             bottom={false}
                             visible={true}
+                            ok={ok}
                             {...(searchableProp !== undefined ? { searchable: searchableProp } : {})}
                             {...(searchPlaceholderProp !== undefined ? { searchPlaceholder: searchPlaceholderProp } : {})}
                         />

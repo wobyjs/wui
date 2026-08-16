@@ -4,3 +4,4 @@ declare const DisabledIconButton: () => JSX.Child;
 declare const CustomIconButton: () => JSX.Child;
 declare const IconButtonWithOnClick: () => JSX.Child;
 export { DefaultIconButton, DisabledIconButton, CustomIconButton, IconButtonWithOnClick };
+//# sourceMappingURL=IconButton.test.d.ts.map

@@ -19,8 +19,8 @@ export const FORMAT_OPTIONS = [
 type TextFormatOptions = "Normal" | "Heading 1" | "Heading 2" | "Heading 3" | "Quote" | "Code Block"
 
 const def = () => ({
-    cls: $('', HtmlClass) as JSX.Class | undefined,
-    class: $('', HtmlClass) as JSX.Class | undefined,
+    cls: $('', HtmlClass) as JSX.Class,
+    class: $('', HtmlClass) as JSX.Class,
     disabled: $(false, HtmlBoolean) as ObservableMaybe<boolean>,
     selectedFormat: $("Normal", HtmlString) as Observable<TextFormatOptions>,
     buttonType: $("outlined", HtmlString) as ObservableMaybe<ButtonStyles>,
@@ -34,7 +34,7 @@ const TextFormatDropDown = defaults(def, (props) => {
     const editor = useEditor()
 
     const isOpen = $(false)
-    const dropdownRef = $<HTMLElement>(null)
+    const dropdownRef = $<HTMLElement>(null as any)
     const undoRedoContext = useUndoRedo()
     const saveDo = undoRedoContext?.saveDo || (() => {})
 
@@ -170,7 +170,7 @@ const TextFormatDropDown = defaults(def, (props) => {
                 role="menu"
                 aria-orientation="vertical"
                 aria-labelledby="menu-button"
-                onMouseDown={(e) => { e.stopPropagation(); e.preventDefault(); }}
+                onMouseDown={(e: any) => { e.stopPropagation(); e.preventDefault(); }}
             >
                 <div class="py-1" role="none">
                     {FORMAT_OPTIONS.map(opt => (
@@ -208,7 +208,7 @@ const TextFormatDropDown = defaults(def, (props) => {
                         () => $$(cls) ? $$(cls) : BASE_BTN, cn,
                     ]}
                     onClick={handleApplyCurrent}
-                    onMouseDown={(e) => { e.preventDefault(); e.stopPropagation() }}
+                    onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation() }}
                     title="Text format"
                     {...otherProps}
                 >
@@ -220,7 +220,7 @@ const TextFormatDropDown = defaults(def, (props) => {
                     type={btnType}
                     class="size-full inline-flex justify-center items-center rounded-md border border-gray-300 shadow-sm bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500 cursor-pointer px-2"
                     onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleDropdown(); }}
-                    onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                    onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation(); }}
                     title="Toggle dropdown"
                 >
                     <KeyboardDownArrow class="h-5 w-5" />

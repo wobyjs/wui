@@ -66,6 +66,58 @@ registerEditorPlugin({
 | `onRender` | `(element) => void` | ❌ | Called after a custom element is inserted. Use to attach event listeners or initialize state. |
 | `toHTML` | `(element) => string` | ❌ | Serialize the custom element to an HTML string for output. If omitted, `outerHTML` is used. |
 | `fromHTML` | `(html) => HTMLElement` | ❌ | Deserialize HTML back into the custom element when loading editor content. |
+| `props` | `PluginProp[]` | ❌ | Typed property schema that drives the property panel. Without it the panel falls back to blind free-text attribute rows. |
+| `onPropChange` | `(element, key, value) => void` | ❌ | Called after the panel writes an attribute, for elements that cannot repaint from an attribute change alone. |
+
+### Typed Props (`props`)
+
+Declare `props` and the property panel renders real editors — a dropdown for an
+enum, a spinner for a number, a swatch for a colour — instead of free-text
+attribute rows:
+
+```ts
+registerEditorPlugin({
+    name: 'callout',
+    label: 'Callout',
+    tagName: 'my-callout',
+    props: [
+        { name: 'tone', type: 'enum', label: 'Tone', default: 'info', options: [
+            { value: 'info', label: 'Info' },
+            { value: 'warn', label: 'Warning' },
+        ] },
+        { name: 'children', type: 'string', label: 'Text', default: 'Note', textContent: true },
+        { name: 'accent', type: 'color', label: 'Accent', default: '#3b82f6' },
+        { name: 'iconSize', type: 'number', label: 'Icon Size', default: 16 },
+    ],
+    onInsert: (editorRoot, range) => { /* ... */ },
+})
+```
+
+`type` is one of `'string' | 'number' | 'boolean' | 'color' | 'enum'` (enum
+requires `options`). Other useful fields: `label`, `default`, `hint`, `readonly`,
+`hidden`.
+
+Two rules are easy to get wrong:
+
+- **Declare camelCase names.** woby maps `iconSize` to the `icon-size`
+  attribute; the panel does the conversion for you. Writing
+  `setAttribute('iconSize', …)` yourself leaves a dead lowercased `iconsize`
+  attribute next to the live one.
+- **Slot content needs `textContent: true`.** woby's `customElement()` always
+  passes a `<slot>` as `children`, so a `children="Label"` *attribute* is
+  ignored and the element renders blank. With the flag, the panel writes
+  `el.textContent` instead.
+
+Declaring `props` also **turns off** the blind attribute scrape for that
+element, which is what keeps reflected defaults (`cls`, `effect`, a duplicate
+`input-type` row fighting the typed `inputType` enum) out of the panel.
+
+The bundled `src/Editor/WuiPlugins.ts` registers eleven wui-* components
+(`button`, `toggle-button`, `checkbox`, `switch`, `text-field`, `text-area`,
+`number-field`, `icon-button`, `badge`, `fab`, `avatar`) this way — read it as a
+worked reference. Portal-based components (the Wheeler family) are deliberately
+left out: they render outside the document flow and are not document-centric, so
+they do not belong in an editor insert menu.
 
 ### Other API Functions
 
@@ -75,6 +127,9 @@ unregisterEditorPlugin('my-plugin')
 
 // Get the observable array of registered plugins (reactive)
 getEditorPlugins()
+
+// Resolve the plugin that owns a DOM element (by tagName), or undefined
+getPluginForElement(el)
 
 // Serialize editor content with all plugin toHTML hooks
 serializeEditorContent(editorRoot)
@@ -93,6 +148,18 @@ class MyCounter extends HTMLElement {
     constructor() {
         super()
         this.attachShadow({ mode: 'open' })
+    }
+
+    // Required for property-panel edits to show up: reading the attribute once in
+    // connectedCallback leaves the element stale after every later write.
+    static get observedAttributes() { return ['count'] }
+
+    attributeChangedCallback(name: string, _old: string | null, value: string | null) {
+        if (name !== 'count') return
+        const next = parseInt(value || '0', 10)
+        if (Number.isNaN(next) || next === this._count) return
+        this._count = next
+        this.updateDisplay()
     }
 
     connectedCallback() {
@@ -176,6 +243,16 @@ registerEditorPlugin({ /* ... */ })
 ```
 
 The plugin then appears in the editor's **Insert → +** menu.
+
+The bundled wui-* component plugins live in their own side-effect module. The
+demo app registers them from `src/main.ts`:
+
+```ts
+import './Editor/WuiPlugins'   // button, checkbox, text-field, … (11 plugins)
+```
+
+Skip that import and the file is inert — the components never reach the Insert
+menu and the property panel falls back to blind attribute rows.
 
 ## Important Notes
 

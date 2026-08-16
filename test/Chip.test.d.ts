@@ -22,3 +22,4 @@ declare const DynamicChipList: () => import("woby").Child;
 declare const ManualVisibilityControlChip: () => import("woby").Child;
 declare const ComprehensiveChipTest: () => import("woby").Child;
 export { DefaultChip, SampleChip, VisibleChip, HiddenChip, VisibleChipObservable, HiddenChipObservable, ToggleVisibilityChip, ChipWithDelete, ChipWithoutDelete, DeletableAutoHideChip, DeletableCustomHandlerChip, VisibleDeletableChip, HiddenDeletableChip, ObservableVisibleDeletableChip, ChipWithAvatar, ChipWithAvatarAndDelete, CustomClassChip, ColoredChips, ClickableChip, MultipleDeletableChips, DynamicChipList, ManualVisibilityControlChip, ComprehensiveChipTest, };
+//# sourceMappingURL=Chip.test.d.ts.map

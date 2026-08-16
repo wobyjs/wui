@@ -621,11 +621,11 @@ export function applyStyle(prop: string, value: string): void {
  * Returns true if found and selected, false otherwise
  */
 function findAndSelectText(
-    editorRoot: HTMLElement,
+    editorRoot: HTMLElement | null,
     textToFind: string,
     approximateOffsetHint?: number
 ): boolean {
-    if (!textToFind) return false
+    if (!editorRoot || !textToFind) return false
 
     const walker = document.createTreeWalker(editorRoot, NodeFilter.SHOW_TEXT, null)
     let node: Node | null
@@ -1154,7 +1154,7 @@ export function removeStyle(prop: string, savedSelection?: { editorRoot: HTMLEle
 
                 // Determine which children are before, selected, and after
                 const children = Array.from(span.childNodes)
-                const selectedIdx = children.indexOf(selectedChild)
+                const selectedIdx = children.indexOf(selectedChild as ChildNode)
 
                 // Build the new structure:
                 // - before: children before selected, wrapped in span with current style
@@ -1431,7 +1431,7 @@ export function removeStyle(prop: string, savedSelection?: { editorRoot: HTMLEle
 
                     const selectedChildrenArr = Array.from(selectedChildren)
                     const children = Array.from(span.childNodes)
-                    const selectedIndices = selectedChildrenArr.map(c => children.indexOf(c)).filter(i => i >= 0).sort((a, b) => a - b)
+                    const selectedIndices = selectedChildrenArr.map(c => children.indexOf(c as ChildNode)).filter(i => i >= 0).sort((a, b) => a - b)
 
                     if (selectedIndices.length > 0) {
                         const firstIdx = selectedIndices[0]
@@ -1593,6 +1593,11 @@ export function removeStyle(prop: string, savedSelection?: { editorRoot: HTMLEle
 
                 // Get all direct children of the span
                 const children = Array.from(span.childNodes)
+
+                // The text the user actually selected. The child-distribution loop below matches
+                // against it; it was referenced but never bound, so this path threw a ReferenceError
+                // the moment a partial selection landed on a span with nested element children.
+                const selectionTextContent = liveRange.toString()
 
                 // Find which children intersect with the selection
                 // For simplicity, if ANY child is selected, we split around it
@@ -2012,9 +2017,9 @@ export function removeFormat(): void {
 
         // Find all parent spans with styles
         while (node && node.parentElement) {
-            const el = node.parentElement
+            const el: HTMLElement = node.parentElement
             if (el instanceof HTMLElement && el.tagName === 'SPAN' && el.hasAttribute('style')) {
-                const parent = el.parentNode
+                const parent: ParentNode | null = el.parentNode
                 if (parent) {
                     while (el.firstChild) {
                         parent.insertBefore(el.firstChild, el)
