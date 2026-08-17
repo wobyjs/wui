@@ -12,6 +12,8 @@ export const def = () => ({
     itemCount: $(5, HtmlNumber) as ObservableMaybe<number>,
     value: $(null) as ObservableMaybe<any>,
     cls: $("", HtmlClass) as ObservableMaybe<JSX.Class>,
+    /** Appended after `cls`, never replaces it — same convention as every other wui component. */
+    class: $("", HtmlClass) as ObservableMaybe<JSX.Class>,
     header: undefined as ((v: ObservableMaybe<any | any[]>) => JSX.Element) | undefined,
     /** implicit for multiple */
     all: $(null as any, HtmlString) as ObservableMaybe<string>,
@@ -29,7 +31,7 @@ export const def = () => ({
 })
 
 const Wheeler = defaults(def, (props) => {
-    const { options, itemHeight: ih, itemCount: vic, value: oriValue, cls, header, ok: okProp, visible: visibleProp, mask, bottom, all, cancelOnBlur, commitOnBlur, searchable, searchPlaceholder, changeValueOnClickOnly, ...otherProps } = props
+    const { options, itemHeight: ih, itemCount: vic, value: oriValue, cls, class: cn, header, ok: okProp, visible: visibleProp, mask, bottom, all, cancelOnBlur, commitOnBlur, searchable, searchPlaceholder, changeValueOnClickOnly, ...otherProps } = props
 
     const itemHeight = use(ih, 36)
     const itemCount = use(vic, 5)
@@ -1965,7 +1967,7 @@ const Wheeler = defaults(def, (props) => {
     const renderAsPopup = () => <>
         <BackgroundOverlay />
         <Portal mount={document.body}>
-            <div ref={wheeler} class={() => ['wheeler-widget z-[150]', $$(cls), "fixed inset-x-0 bottom-0 w-full z-200 bg-white"]}>
+            <div ref={wheeler} class={() => ['wheeler-widget z-[150]', $$(cls), "fixed inset-x-0 bottom-0 w-full z-200 bg-white", $$(cn)]}>
                 <WheelerContent />
             </div>
         </Portal>
@@ -1974,8 +1976,10 @@ const Wheeler = defaults(def, (props) => {
     const renderAsInline = () => (
         <div
             ref={wheeler}
-            // Combines base inline styles with custom classes from the `cls` prop
-            class={["wheeler-widget", $$(cls)]}
+            // Combines base inline styles with custom classes from `cls`, then `class`.
+            // Thunk, not a bare array: `$$` unwraps eagerly, so a plain array would
+            // snapshot both props at construction and never track later writes.
+            class={() => ["wheeler-widget", $$(cls), $$(cn)]}
             {...otherProps}
         >
             <WheelerContent />

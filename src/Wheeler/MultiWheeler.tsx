@@ -1,4 +1,4 @@
-import { $, $$, Observable, ObservableMaybe, useEffect, useMemo, untrack, type JSX, isObservable, ArrayMaybe, HtmlBoolean, defaults, customElement, ElementAttributes } from 'woby'
+import { $, $$, Observable, ObservableMaybe, useEffect, useMemo, untrack, type JSX, isObservable, ArrayMaybe, HtmlBoolean, HtmlClass, defaults, customElement, ElementAttributes } from 'woby'
 import { useViewportSize } from '@woby/use'
 import { use } from '../use'
 import { Wheeler, def as wheelerDef } from './Wheeler' // Adjust path
@@ -49,6 +49,10 @@ const def = () => {
         divider: $(false, HtmlBoolean) as ObservableMaybe<boolean>,
         visible: $(false, HtmlBoolean) as ObservableMaybe<boolean>,
 
+        // `cls` arrives via `inheritedKeys`; `class` is declared here because it is not
+        // in that list. Appended after `cls`, never replaces it.
+        class: $('', HtmlClass) as ObservableMaybe<JSX.Class>,
+
         // Spread in the inherited defaults
         ...inheritedDefaults
     };
@@ -56,7 +60,7 @@ const def = () => {
 
 
 const MultiWheeler = defaults(def, (props) => {
-    const { options, value, itemHeight = $(36), itemCount = $(5), headers, divider, bottom, title, mask, visible: visibleProp, changeValueOnClickOnly, ok, cancelOnBlur, commitOnBlur, cls, searchable = [], searchPlaceholder = [], ...otherProps } = props
+    const { options, value, itemHeight = $(36), itemCount = $(5), headers, divider, bottom, title, mask, visible: visibleProp, changeValueOnClickOnly, ok, cancelOnBlur, commitOnBlur, cls, class: cn, searchable = [], searchPlaceholder = [], ...otherProps } = props
 
     // --- Internal Selection State ---
     const modDate = options
@@ -180,7 +184,7 @@ const MultiWheeler = defaults(def, (props) => {
                     class="fixed inset-x-0 bottom-0 z-[100] flex justify-center items-end p-4 pointer-events-none"
                     {...otherProps}
                 >
-                    <div class={["bg-white rounded-lg overflow-hidden shadow-xl w-full pointer-events-auto", $$(cls)].join(" ").trim()}>
+                    <div class={() => ["bg-white rounded-lg overflow-hidden shadow-xl w-full pointer-events-auto", $$(cls), $$(cn)]}>
                         <WheelerContent />
                     </div>
                 </div>
@@ -189,7 +193,7 @@ const MultiWheeler = defaults(def, (props) => {
     };
 
     const renderAsInline = () => (
-        <div class={["inline-block", $$(cls)].join(" ")} {...otherProps} style={() => $$(isVisible) ? null : { display: 'none' }}>
+        <div class={() => ["inline-block", $$(cls), $$(cn)]} {...otherProps} style={() => $$(isVisible) ? null : { display: 'none' }}>
             <WheelerContent />
         </div>
     );

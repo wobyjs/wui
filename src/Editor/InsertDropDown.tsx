@@ -1,4 +1,4 @@
-import { $, $$, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlString, JSX, Observable, ObservableMaybe } from 'woby'
+import { $, $$, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlClass, HtmlString, JSX, Observable, ObservableMaybe } from 'woby'
 import { Button } from '../Button'
 import { EditorContext, useUndoRedo } from './undoredo'
 import { useOnClickOutside } from '@woby/use'
@@ -142,8 +142,11 @@ const getInsertOptions = (): InsertMenuItem[] => {
 }
 
 const def = () => ({
-    cls: $(""),
-    class: $(""),
+    // HtmlClass, not a bare $(""): without the codec the attribute never flattens
+    // array/dict class values, so `cls`/`class` round-trip differently here than on
+    // every other wui component.
+    cls: $("", HtmlClass) as JSX.Class,
+    class: $("", HtmlClass) as JSX.Class,
     disabled: $(false, HtmlBoolean) as ObservableMaybe<boolean>
 })
 

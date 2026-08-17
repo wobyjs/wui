@@ -295,7 +295,11 @@ function coerce(spec: PluginProp, raw: string | null): any {
             return isNaN(n) ? (spec.default ?? 0) : n
         }
         case 'boolean':
-            return raw !== 'false'   // bare attribute → true, explicit 'false' → false
+            // Must match woby's HtmlBoolean.fromHtml (`v === '' || v === 'true'`), which is
+            // what the component itself reads the attribute with. The looser `raw !== 'false'`
+            // used here before disagreed on hand-authored content: `disabled="disabled"` and
+            // `disabled="0"` showed a ticked checkbox while the component stayed enabled.
+            return raw === '' || raw === 'true'
         case 'string':
         case 'color':
         default:

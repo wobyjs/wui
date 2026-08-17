@@ -10,6 +10,32 @@
  */
 import { registerEditorPlugin, type PluginProp } from './EditorPlugin'
 
+/**
+ * Styling props shared by every wui component, appended last so they render
+ * below the semantic rows.
+ *
+ * These are declared rather than scraped on purpose. The blind attribute scrape
+ * in PropertyExtractor only runs for elements with no schema, and presence is
+ * the wrong signal for these two anyway: woby's customElement reflects the
+ * `cls: $('', HtmlClass)` default onto every upgraded element, so `cls=""` is
+ * always "present" (it would render an empty row everywhere), while `class` is
+ * never reflected, so it would be un-addable from the panel.
+ *
+ * `default: ''` matters: applyCustomElementProperty removes the attribute when
+ * the value equals the default, so clearing either box strips it from the
+ * serialized HTML instead of leaving `cls=""` behind.
+ */
+const styleProps: PluginProp[] = [
+    {
+        name: 'class', type: 'string', label: 'CSS Class', default: '',
+        hint: 'Extra classes, appended after the component styling',
+    },
+    {
+        name: 'cls', type: 'string', label: 'Class Override', default: '',
+        hint: 'Replaces the component base/variant class entirely — leave empty to keep the variant',
+    },
+]
+
 // ── wui-button ──
 
 const buttonProps: PluginProp[] = [
@@ -29,7 +55,7 @@ registerEditorPlugin({
     name: 'button',
     label: 'Button',
     tagName: 'wui-button',
-    props: buttonProps,
+    props: [...buttonProps, ...styleProps],
     icon: () => {
         const span = document.createElement('span')
         span.textContent = '🔘'
@@ -63,7 +89,7 @@ registerEditorPlugin({
     name: 'toggle-button',
     label: 'Toggle Button',
     tagName: 'wui-toggle-button',
-    props: toggleButtonProps,
+    props: [...toggleButtonProps, ...styleProps],
     icon: () => {
         const span = document.createElement('span')
         span.textContent = '🔀'
@@ -105,7 +131,7 @@ registerEditorPlugin({
     name: 'checkbox',
     label: 'Checkbox',
     tagName: 'wui-checkbox',
-    props: checkboxProps,
+    props: [...checkboxProps, ...styleProps],
     icon: () => {
         const span = document.createElement('span')
         span.textContent = '☑️'
@@ -152,7 +178,7 @@ registerEditorPlugin({
     name: 'switch',
     label: 'Switch',
     tagName: 'wui-switch',
-    props: switchProps,
+    props: [...switchProps, ...styleProps],
     icon: () => {
         const span = document.createElement('span')
         span.textContent = '🔛'
@@ -203,7 +229,7 @@ registerEditorPlugin({
     name: 'text-field',
     label: 'Text Field',
     tagName: 'wui-text-field',
-    props: textFieldProps,
+    props: [...textFieldProps, ...styleProps],
     icon: () => {
         const span = document.createElement('span')
         span.textContent = '📝'
@@ -238,7 +264,7 @@ registerEditorPlugin({
     name: 'text-area',
     label: 'Text Area',
     tagName: 'wui-text-area',
-    props: textAreaProps,
+    props: [...textAreaProps, ...styleProps],
     icon: () => {
         const span = document.createElement('span')
         span.textContent = '📄'
@@ -275,7 +301,7 @@ registerEditorPlugin({
     name: 'number-field',
     label: 'Number Field',
     tagName: 'wui-number-field',
-    props: numberFieldProps,
+    props: [...numberFieldProps, ...styleProps],
     icon: () => {
         const span = document.createElement('span')
         span.textContent = '🔢'
@@ -309,7 +335,7 @@ registerEditorPlugin({
     name: 'icon-button',
     label: 'Icon Button',
     tagName: 'wui-icon-button',
-    props: iconButtonProps,
+    props: [...iconButtonProps, ...styleProps],
     icon: () => {
         const span = document.createElement('span')
         span.textContent = '🔔'
@@ -362,7 +388,7 @@ registerEditorPlugin({
     name: 'badge',
     label: 'Badge',
     tagName: 'wui-badge',
-    props: badgeProps,
+    props: [...badgeProps, ...styleProps],
     icon: () => {
         const span = document.createElement('span')
         span.textContent = '🏷️'
@@ -417,7 +443,7 @@ registerEditorPlugin({
     name: 'fab',
     label: 'FAB',
     tagName: 'wui-fab',
-    props: fabProps,
+    props: [...fabProps, ...styleProps],
     icon: () => {
         const span = document.createElement('span')
         span.textContent = '➕'
@@ -469,7 +495,7 @@ registerEditorPlugin({
     name: 'avatar',
     label: 'Avatar',
     tagName: 'wui-avatar',
-    props: avatarProps,
+    props: [...avatarProps, ...styleProps],
     icon: () => {
         const span = document.createElement('span')
         span.textContent = '👤'

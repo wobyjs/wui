@@ -283,7 +283,7 @@ var init_ssr_shim = __esm({
   }
 });
 
-// ../woby/dist/setters-AZ8Dlk0c.js
+// ../woby/dist/setters-DtEb2Ino.js
 function deepResolve(value, returnFunction = false) {
   if (isFunction$1(value)) {
     if (isObservable(value)) return deepResolve(value(), returnFunction);
@@ -441,8 +441,8 @@ function getCreators() {
   }
 }
 var DEBUGGER, Stack, callStack, BATCH, OBSERVER, setBatch, setObserver, castArray$1, castError$1, is, isArray$1, isEqual, isFunction$1, isObject$1, isSymbol, noop$1, nope, counter, resolve$1, batch, SYMBOL_CACHED, SYMBOL_OBSERVABLE, SYMBOL_OBSERVABLE_BOOLEAN, SYMBOL_OBSERVABLE_FROZEN, SYMBOL_OBSERVABLE_READABLE, SYMBOL_OBSERVABLE_WRITABLE, SYMBOL_STORE, SYMBOL_STORE_KEYS, SYMBOL_STORE_OBSERVABLE, SYMBOL_STORE_TARGET, SYMBOL_STORE_VALUES, SYMBOL_STORE_UNTRACKED, SYMBOL_SUSPENSE$1, SYMBOL_UNCACHED, SYMBOL_UNTRACKED, SYMBOL_UNTRACKED_UNWRAPPED, isObservableBoolean, isObservableFrozen, isUntracked$1, isObservable, frozen, readable, writable, OBSERVABLE_FALSE, OBSERVABLE_TRUE, UNAVAILABLE, UNINITIALIZED, Scheduler$1, scheduler_sync_default, Observable, lazyArrayEach, lazyArrayEachRight, lazyArrayPush, lazySetAdd, lazySetDelete, lazySetEach, onCleanup, onDispose, Owner, SuperRoot, SUPER_OWNER, OWNER, setOwner, ObservablesArray, ObservablesSet, Observer, Memo, memo, boolean, cleanup, Context, disposed, Scheduler, scheduler_async_default, Effect, effect, Root, DUMMY_INDEX$1, MappedRoot$1, CacheKeyed, Suspense, suspense, DUMMY_INDEX, MappedRoot, CacheUnkeyed, isStore, warmup, match, ternary, isBatching, owner, isObservableWritable, target, readonly, root, isEqualForSelector, DisposableMap, SelectedObservable, selector, StoreMap, StoreCleanable, StoreKeys, StoreValues, StoreHas, StoreProperty, StoreListenersRegular, StoreListenersRoots, StoreScheduler, NODES, SPECIAL_SYMBOLS, UNREACTIVE_KEYS, STORE_TRAPS, STORE_UNTRACK_TRAPS, getNode, getNodeExisting, getNodeFromStore, getNodeKeys, getNodeValues, getNodeHas, getNodeObservable, getNodeProperty, getGettersAndSetters, getStore, getTarget, getUntracked, isEqualDescriptor, isFrozenLike, isListenable, isProxiable, isUntracked, throwNoSetterError, store, suspended, tick, tryCatch, _with, dist_default, CONTEXTS_DATA, DIRECTIVES, SYMBOL_TEMPLATE_ACCESSOR, SYMBOLS_DIRECTIVES, SYMBOL_CLONE, SYMBOL_CONTEXT, SYMBOL_ISSLOT, SYMBOL_JSX, SYMBOL_DEFAULT, SYMBOL_CONTEXT_WRAP, SimpleNodeList, BaseNode, Comment2, Style, Element3, createComment$1, createElement, createHTMLNode$1, SVGNode, createSVGNode$1, createText$1, createDocumentFragment$1, createDocument, document$1, isNodeEnvironment, createComment, createHTMLNode, createSVGNode, createText, createDocumentFragment, NOOP_CHILDREN, Node$1, FragmentUtils, useCheapDisposed, useMicrotask, options, useRenderEffect, assign, castArray, flatten, indexOf, isArray, isBoolean, isFunction, isClass, isFunctionReactive, isNil, isNode, isObject, isPrimitive, isPromise, isString, isSVG, isSVGElement, isTemplateAccessor, isVoidChild, isPureFunction, classesToggle, dummyNode, beforeDummyWrapper, afterDummyWrapper, diff, EnvironmentToken, DocumentToken, EnvironmentContext, useEnvironment, DocumentContext, resolveChild, resolveClass, resolveStyle, resolveArraysAndStatics, kebabToCamelCase, camelToKebabCase, normalizePropertyPath, setNestedAttribute, setAttributeStatic, setAttribute, setChildStatic, setChild, setClassStatic, setClass, setClassBooleanStatic, setClassBoolean, setClassesStatic, setClasses, setDirective, setEventStatic, setEvent, setHTMLStatic, setHTML, setPropertyStatic, setProperty, setRef, propertyNonDimensionalRe, setStyleStatic, setStyle, setStylesStatic, setStyles, setTemplateAccessor, setProp, setProps;
-var init_setters_AZ8Dlk0c = __esm({
-  "../woby/dist/setters-AZ8Dlk0c.js"() {
+var init_setters_DtEb2Ino = __esm({
+  "../woby/dist/setters-DtEb2Ino.js"() {
     "use strict";
     init_ssr_shim();
     DEBUGGER = {
@@ -3155,15 +3155,10 @@ var init_setters_AZ8Dlk0c = __esm({
       else setAttributeStatic(element, key, get(value));
     };
     setChildStatic = (parent, fragment, fragmentOnly, child, dynamic, childComp, stack) => {
-      const callId = setChildStatic._callId = (setChildStatic._callId || 0) + 1;
-      parent.tagName;
-      parent.className;
-      (parent.textContent || "").length;
-      parent.childNodes.length;
-      if (isVoidChild(child)) return;
       const prev = FragmentUtils.getChildren(fragment);
       const prevIsArray = prev instanceof Array;
       const prevLength = prevIsArray ? prev.length : 1;
+      if (isVoidChild(child) && prevLength === 0) return;
       const prevFirst = prevIsArray ? prev[0] : prev;
       const prevSibling = (prevIsArray ? prev[prevLength - 1] : prev)?.nextSibling || null;
       const isSSR = useEnvironment() === "ssr";
@@ -3231,13 +3226,10 @@ var init_setters_AZ8Dlk0c = __esm({
           else if (arrayChildType === "function") {
             const resolved = arrayChild();
             if (resolved !== null && resolved !== void 0) {
-              if (typeof resolved === "object" && typeof resolved.nodeType === "number") {
-                FragmentUtils.pushNode(fragmentNext, resolved);
-              } else if (Array.isArray(resolved)) {
-                resolved.forEach((item) => {
-                  if (typeof item === "object" && item !== null && typeof item.nodeType === "number") FragmentUtils.pushNode(fragmentNext, item);
-                });
-              }
+              if (typeof resolved === "object" && typeof resolved.nodeType === "number") FragmentUtils.pushNode(fragmentNext, resolved);
+              else if (Array.isArray(resolved)) resolved.forEach((item) => {
+                if (typeof item === "object" && item !== null && typeof item.nodeType === "number") FragmentUtils.pushNode(fragmentNext, item);
+              });
             }
           }
         }
@@ -3286,9 +3278,7 @@ var init_setters_AZ8Dlk0c = __esm({
           nextLength += 1;
         }
       }
-      if (!fragmentOnly) {
-        diff(parent, prev, next, prevSibling);
-      }
+      if (!fragmentOnly) diff(parent, prev, next, prevSibling);
       FragmentUtils.replaceWithFragment(fragment, fragmentNext);
     };
     setChild = (parent, child, fragment = FragmentUtils.make(), stack = callStack()) => {
@@ -3611,7 +3601,7 @@ var init_setters_AZ8Dlk0c = __esm({
   }
 });
 
-// ../woby/dist/create_element-Cv0Upzqo.js
+// ../woby/dist/create_element-rXGwxVN_.js
 function renderToString(child, options2) {
   const ssrDoc = options2?.document ?? createDocument();
   return EnvironmentContext.Provider("ssr", () => {
@@ -3741,11 +3731,11 @@ function jsx(component, props, ...children) {
   return wrapCloneElement(createElement2(component, props, props?.key), component, props);
 }
 var SYMBOL_STACK, wrapElement, Fragment, customElementsRegistry, customElements2, SSRCustomElement, SSRShadowRoot, WobyCustomElementsRegistry, wobyCustomElements, wrapCloneElement, wrapJsx, isJsx, jsxs, createElement2;
-var init_create_element_Cv0Upzqo = __esm({
-  "../woby/dist/create_element-Cv0Upzqo.js"() {
+var init_create_element_rXGwxVN = __esm({
+  "../woby/dist/create_element-rXGwxVN_.js"() {
     "use strict";
     init_ssr_shim();
-    init_setters_AZ8Dlk0c();
+    init_setters_DtEb2Ino();
     SYMBOL_STACK = /* @__PURE__ */ Symbol("STACK");
     wrapElement = (element) => {
       element[SYMBOL_UNTRACKED_UNWRAPPED] = true;
@@ -3955,7 +3945,7 @@ var init_create_element_Cv0Upzqo = __esm({
   }
 });
 
-// ../woby/dist/htm.module-CV57aFhr.js
+// ../woby/dist/htm.module-D8bNPOkD.js
 function scheduleStylesheetUpdate() {
   if (updateScheduled) return;
   updateScheduled = true;
@@ -4154,12 +4144,12 @@ function htm_module_default(s) {
   })(s)), r), arguments, [])).length > 1 ? r : r[0];
 }
 var Switch, useScheduler, useTimeout, cachedConstructedSheets, stylesheetObserver, loggedErrors, MAX_LOGGED_ERRORS, shadowRootRegistry, updateScheduled, set, isObject2, assign2, isJsxProp, make, merge, defaults, HtmlChild, contextRefRegistry, isContextRef, collectAncestorContextWrap$1, parseContextRef, resolveContextRef, createSSRCustomElement, _pendingContextWrapGlobal, consumePendingContextWrap, peekPendingContextWrap, composePendingContextWrap, collectAncestorContextWrap, createBrowserCustomElement, setObservableValue, setNestedProperty, customElement, HtmlHidden, n, t;
-var init_htm_module_CV57aFhr = __esm({
-  "../woby/dist/htm.module-CV57aFhr.js"() {
+var init_htm_module_D8bNPOkD = __esm({
+  "../woby/dist/htm.module-D8bNPOkD.js"() {
     "use strict";
     init_ssr_shim();
-    init_setters_AZ8Dlk0c();
-    init_create_element_Cv0Upzqo();
+    init_setters_DtEb2Ino();
+    init_create_element_rXGwxVN();
     Switch = ({ when, fallback, children }) => {
       return _switch(when, castArray(children).map((child) => child().metadata), fallback);
     };
@@ -4641,7 +4631,8 @@ var init_htm_module_CV57aFhr = __esm({
       }
       if (isObservable(obj[key])) {
         if (!isObservableWritable(obj[key])) return;
-        const { type: type2, fromHtml } = obj[key][SYMBOL_OBSERVABLE_WRITABLE].options ?? {};
+        const observable2 = obj[key];
+        const { type: type2, fromHtml } = observable2[SYMBOL_OBSERVABLE_WRITABLE].options ?? {};
         if (type2) switch (type2) {
           case "number":
             obj[key](fromHtml ? fromHtml(value) : Number(value));
@@ -4682,7 +4673,14 @@ var init_htm_module_CV57aFhr = __esm({
             obj[key](fromHtml ? fromHtml(value) : value);
             break;
         }
-        else obj[key](fromHtml ? fromHtml(value) : value);
+        else {
+          const current = get(observable2);
+          if (typeof current === "number") obj[key](Number(value));
+          else if (typeof current === "boolean") {
+            const lowerValue = value?.toLowerCase();
+            obj[key](lowerValue === "true" || lowerValue === "1" || lowerValue === "");
+          } else obj[key](fromHtml ? fromHtml(value) : value);
+        }
       } else obj[key] = value;
     };
     setNestedProperty = (obj, path, value) => {
@@ -4771,9 +4769,9 @@ var init_index_es = __esm({
   "../woby/dist/index.es.js"() {
     "use strict";
     init_ssr_shim();
-    init_setters_AZ8Dlk0c();
-    init_create_element_Cv0Upzqo();
-    init_htm_module_CV57aFhr();
+    init_setters_DtEb2Ino();
+    init_create_element_rXGwxVN();
+    init_htm_module_D8bNPOkD();
     IS_BROWSER = !!globalThis.CDATASection?.toString?.().match(/^\s*function\s+CDATASection\s*\(\s*\)\s*\{\s*\[native code\]\s*\}\s*$/);
     runWithSuperRoot = _with();
     render = (child, parent, options2) => {
@@ -4867,7 +4865,7 @@ var init_runtime_es = __esm({
   "../woby/dist/runtime.es.js"() {
     "use strict";
     init_ssr_shim();
-    init_create_element_Cv0Upzqo();
+    init_create_element_rXGwxVN();
   }
 });
 

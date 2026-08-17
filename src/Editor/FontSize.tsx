@@ -9,6 +9,8 @@ import { safeGetSelection, safeGetRange } from './BrowserCompat'
 
 const def = () => ({
     cls: $('', HtmlClass) as JSX.Class,
+    /** Appended after `cls`, never replaces it — same convention as every other wui component. */
+    class: $('', HtmlClass) as JSX.Class,
     buttonType: $("outlined", HtmlString) as ObservableMaybe<ButtonStyles>,
     editable: $(false, HtmlBoolean) as Observable<boolean>,
     fontSize: $(16, HtmlNumber) as ObservableMaybe<number>,
@@ -16,7 +18,7 @@ const def = () => ({
 })
 
 const FontSize: Defaulted<typeof def> = defaults(def, (props) => {
-    const { cls, buttonType, editable, fontSize, step, ...otherProps } = props as any
+    const { cls, class: cn, buttonType, editable, fontSize, step, ...otherProps } = props as any
     const editor = useEditor()
     const BASE_BTN = "w-1/5 justify-center px-2 py-1 border border-gray-300";
 
@@ -156,7 +158,7 @@ const FontSize: Defaulted<typeof def> = defaults(def, (props) => {
     // #endregion
 
     return (
-        <div class={[cls, "inline-flex items-stretch rounded-md shadow-sm"]}>
+        <div class={[cls, "inline-flex items-stretch rounded-md shadow-sm", cn]}>
             <StepButton type="Decrease" delta={-$$(step)} icon={TextDecrease} rounded="rounded-r-none" />
             <SizeInput />
             <StepButton type="Increase" delta={$$(step)} icon={TextIncrease} rounded="rounded-l-none" />

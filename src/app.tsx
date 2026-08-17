@@ -84,6 +84,13 @@ function App() {
         return <>
             <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-6 mb-8 shadow-sm">
                 <h2 class="text-xl font-bold mb-4 text-gray-800">📑 Quick Navigation</h2>
+                {/* Standalone pages — not anchors on this page. Served from public/ by vite,
+                    so the path is relative to whatever port `pnpm dev` picked. */}
+                <div class="flex flex-wrap gap-2 mb-4 pb-4 border-b border-blue-200">
+                    <a href="/editor-demo.html" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200">
+                        ✍️ Editor Full-Toolbar Demo ↗
+                    </a>
+                </div>
                 <div class="flex flex-wrap gap-2">
                     <a href="#appbar" class="px-4 py-2 bg-white hover:bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200">
                         AppBar

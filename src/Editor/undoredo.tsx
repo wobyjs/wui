@@ -20,7 +20,9 @@ export const useEditor = () => useContext(EditorContext)!
 
 // FocusManager context — toolbar buttons call beginCommand/endCommand to preserve selection
 export const FocusManagerContext = createContext<FocusManager>()
-export const useFocusManager = () => useContext(FocusManagerContext)!
+// Same object-valued-context unwrap as `useUndoRedo` below — without it
+// `focusManager.beginCommand` is undefined.
+export const useFocusManager = () => $$(useContext(FocusManagerContext))!
 
 // Readonly context — controls whether editor is in edit or readonly mode
 export const ReadonlyContext = createContext<Observable<boolean>>()
@@ -41,7 +43,15 @@ export const UndoRedoContext = createContext<{
 // 4. CREATE A SHORTCUT (HOOK)
 // Components call 'useUndoRedo()' to grab the functions defined above.
 // Example usage: const { undo } = useUndoRedo();
-export const useUndoRedo = () => useContext(UndoRedoContext)!
+// `useContext` hands back the raw Provider value, and woby stores that value in an
+// observable — so for a context whose value is a plain OBJECT (not an observable the
+// consumer is expected to unwrap) the hook returns a *function*, and every
+// `ctx.saveDo` / `ctx.undo` property read silently yields undefined. Consumers then
+// fell through to their no-op fallbacks, which is why nothing was ever pushed onto the
+// history stacks and the toolbar's Undo/Redo buttons did nothing.
+// `$$` unwraps functions recursively and passes plain values through untouched, so it
+// is correct whether or not the value arrives wrapped.
+export const useUndoRedo = () => $$(useContext(UndoRedoContext))!
 
 /**
  * Defines the structure of the Undo/Redo state and its controller functions.
