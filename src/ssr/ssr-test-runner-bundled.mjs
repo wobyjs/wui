@@ -283,7 +283,7 @@ var init_ssr_shim = __esm({
   }
 });
 
-// ../woby/dist/setters-DtEb2Ino.js
+// ../woby/dist/setters-DB8s8ITo.js
 function deepResolve(value, returnFunction = false) {
   if (isFunction$1(value)) {
     if (isObservable(value)) return deepResolve(value(), returnFunction);
@@ -441,8 +441,8 @@ function getCreators() {
   }
 }
 var DEBUGGER, Stack, callStack, BATCH, OBSERVER, setBatch, setObserver, castArray$1, castError$1, is, isArray$1, isEqual, isFunction$1, isObject$1, isSymbol, noop$1, nope, counter, resolve$1, batch, SYMBOL_CACHED, SYMBOL_OBSERVABLE, SYMBOL_OBSERVABLE_BOOLEAN, SYMBOL_OBSERVABLE_FROZEN, SYMBOL_OBSERVABLE_READABLE, SYMBOL_OBSERVABLE_WRITABLE, SYMBOL_STORE, SYMBOL_STORE_KEYS, SYMBOL_STORE_OBSERVABLE, SYMBOL_STORE_TARGET, SYMBOL_STORE_VALUES, SYMBOL_STORE_UNTRACKED, SYMBOL_SUSPENSE$1, SYMBOL_UNCACHED, SYMBOL_UNTRACKED, SYMBOL_UNTRACKED_UNWRAPPED, isObservableBoolean, isObservableFrozen, isUntracked$1, isObservable, frozen, readable, writable, OBSERVABLE_FALSE, OBSERVABLE_TRUE, UNAVAILABLE, UNINITIALIZED, Scheduler$1, scheduler_sync_default, Observable, lazyArrayEach, lazyArrayEachRight, lazyArrayPush, lazySetAdd, lazySetDelete, lazySetEach, onCleanup, onDispose, Owner, SuperRoot, SUPER_OWNER, OWNER, setOwner, ObservablesArray, ObservablesSet, Observer, Memo, memo, boolean, cleanup, Context, disposed, Scheduler, scheduler_async_default, Effect, effect, Root, DUMMY_INDEX$1, MappedRoot$1, CacheKeyed, Suspense, suspense, DUMMY_INDEX, MappedRoot, CacheUnkeyed, isStore, warmup, match, ternary, isBatching, owner, isObservableWritable, target, readonly, root, isEqualForSelector, DisposableMap, SelectedObservable, selector, StoreMap, StoreCleanable, StoreKeys, StoreValues, StoreHas, StoreProperty, StoreListenersRegular, StoreListenersRoots, StoreScheduler, NODES, SPECIAL_SYMBOLS, UNREACTIVE_KEYS, STORE_TRAPS, STORE_UNTRACK_TRAPS, getNode, getNodeExisting, getNodeFromStore, getNodeKeys, getNodeValues, getNodeHas, getNodeObservable, getNodeProperty, getGettersAndSetters, getStore, getTarget, getUntracked, isEqualDescriptor, isFrozenLike, isListenable, isProxiable, isUntracked, throwNoSetterError, store, suspended, tick, tryCatch, _with, dist_default, CONTEXTS_DATA, DIRECTIVES, SYMBOL_TEMPLATE_ACCESSOR, SYMBOLS_DIRECTIVES, SYMBOL_CLONE, SYMBOL_CONTEXT, SYMBOL_ISSLOT, SYMBOL_JSX, SYMBOL_DEFAULT, SYMBOL_CONTEXT_WRAP, SimpleNodeList, BaseNode, Comment2, Style, Element3, createComment$1, createElement, createHTMLNode$1, SVGNode, createSVGNode$1, createText$1, createDocumentFragment$1, createDocument, document$1, isNodeEnvironment, createComment, createHTMLNode, createSVGNode, createText, createDocumentFragment, NOOP_CHILDREN, Node$1, FragmentUtils, useCheapDisposed, useMicrotask, options, useRenderEffect, assign, castArray, flatten, indexOf, isArray, isBoolean, isFunction, isClass, isFunctionReactive, isNil, isNode, isObject, isPrimitive, isPromise, isString, isSVG, isSVGElement, isTemplateAccessor, isVoidChild, isPureFunction, classesToggle, dummyNode, beforeDummyWrapper, afterDummyWrapper, diff, EnvironmentToken, DocumentToken, EnvironmentContext, useEnvironment, DocumentContext, resolveChild, resolveClass, resolveStyle, resolveArraysAndStatics, kebabToCamelCase, camelToKebabCase, normalizePropertyPath, setNestedAttribute, setAttributeStatic, setAttribute, setChildStatic, setChild, setClassStatic, setClass, setClassBooleanStatic, setClassBoolean, setClassesStatic, setClasses, setDirective, setEventStatic, setEvent, setHTMLStatic, setHTML, setPropertyStatic, setProperty, setRef, propertyNonDimensionalRe, setStyleStatic, setStyle, setStylesStatic, setStyles, setTemplateAccessor, setProp, setProps;
-var init_setters_DtEb2Ino = __esm({
-  "../woby/dist/setters-DtEb2Ino.js"() {
+var init_setters_DB8s8ITo = __esm({
+  "../woby/dist/setters-DB8s8ITo.js"() {
     "use strict";
     init_ssr_shim();
     DEBUGGER = {
@@ -2604,7 +2604,6 @@ var init_setters_DtEb2Ino = __esm({
     });
     createHTMLNode$1 = createElement;
     SVGNode = class extends Element3 {
-      #className;
       constructor(tagName) {
         super(tagName);
         this.isSVG = true;
@@ -3158,7 +3157,6 @@ var init_setters_DtEb2Ino = __esm({
       const prev = FragmentUtils.getChildren(fragment);
       const prevIsArray = prev instanceof Array;
       const prevLength = prevIsArray ? prev.length : 1;
-      if (isVoidChild(child) && prevLength === 0) return;
       const prevFirst = prevIsArray ? prev[0] : prev;
       const prevSibling = (prevIsArray ? prev[prevLength - 1] : prev)?.nextSibling || null;
       const isSSR = useEnvironment() === "ssr";
@@ -3200,10 +3198,19 @@ var init_setters_DtEb2Ino = __esm({
           }
           return c;
         });
+        const resolveDeep = (item) => {
+          let v2 = item;
+          while (typeof v2 === "function") v2 = v2();
+          return v2;
+        };
         resolvedChildren = [];
         for (let i = 0; i < tempResolved.length; i++) {
           const item = tempResolved[i];
-          if (Array.isArray(item)) resolvedChildren.push(...item);
+          if (Array.isArray(item)) for (const sub of item) {
+            const resolved = resolveDeep(sub);
+            if (Array.isArray(resolved)) resolvedChildren.push(...resolved.map(resolveDeep));
+            else resolvedChildren.push(resolved);
+          }
           else resolvedChildren.push(item);
         }
         resolvedChildren = resolvedChildren.filter((c) => !isVoidChild(c));
@@ -3243,39 +3250,29 @@ var init_setters_DtEb2Ino = __esm({
       }
       let next = FragmentUtils.getChildren(fragmentNext);
       let nextLength = next instanceof Array ? next.length : 1;
+      const nextIsVoid = nextLength === 0;
+      if (nextIsVoid && prevLength === 1 && prevFirst.nodeType === 8) return;
+      if (nextIsVoid && (dynamic || prevLength > 0)) {
+        FragmentUtils.pushNode(fragmentNext, createComment$2(""));
+        next = FragmentUtils.getChildren(fragmentNext);
+        nextLength = next instanceof Array ? next.length : 1;
+      }
       if (prevLength === 0 && nextLength > 0 && !fragmentOnly) {
         if (next instanceof Array) for (const node of next) parent.appendChild(node);
         else parent.appendChild(next);
         FragmentUtils.replaceWithFragment(fragment, fragmentNext);
         return;
       }
-      if (nextLength === 0 && prevLength === 1 && prevFirst.nodeType === 8) return;
-      if (!fragmentOnly && (nextLength === 0 || prevLength === 1 && prevFirst.nodeType === 8 || children[SYMBOL_UNCACHED])) {
+      if (!fragmentOnly && (nextIsVoid || prevLength === 1 && prevFirst.nodeType === 8 || children[SYMBOL_UNCACHED])) {
         const { childNodes } = parent;
         if (childNodes.length === prevLength) {
           parent.textContent = "";
-          if (nextLength === 0) {
-            const placeholder = createComment$2("");
-            FragmentUtils.pushNode(fragmentNext, placeholder);
-            if (next !== fragmentNext.values) {
-              next = placeholder;
-              nextLength += 1;
-            }
-          }
           if (prevSibling) if (next instanceof Array) prevSibling.before.apply(prevSibling, next);
           else parent.insertBefore(next, prevSibling);
           else if (next instanceof Array) for (const node of next) parent.appendChild(node);
           else parent.appendChild(next);
           FragmentUtils.replaceWithFragment(fragment, fragmentNext);
           return;
-        }
-      }
-      if (nextLength === 0) {
-        const placeholder = createComment$2("");
-        FragmentUtils.pushNode(fragmentNext, placeholder);
-        if (next !== fragmentNext.values) {
-          next = placeholder;
-          nextLength += 1;
         }
       }
       if (!fragmentOnly) diff(parent, prev, next, prevSibling);
@@ -3601,7 +3598,7 @@ var init_setters_DtEb2Ino = __esm({
   }
 });
 
-// ../woby/dist/create_element-rXGwxVN_.js
+// ../woby/dist/create_element-BAd2lnON.js
 function renderToString(child, options2) {
   const ssrDoc = options2?.document ?? createDocument();
   return EnvironmentContext.Provider("ssr", () => {
@@ -3731,11 +3728,11 @@ function jsx(component, props, ...children) {
   return wrapCloneElement(createElement2(component, props, props?.key), component, props);
 }
 var SYMBOL_STACK, wrapElement, Fragment, customElementsRegistry, customElements2, SSRCustomElement, SSRShadowRoot, WobyCustomElementsRegistry, wobyCustomElements, wrapCloneElement, wrapJsx, isJsx, jsxs, createElement2;
-var init_create_element_rXGwxVN = __esm({
-  "../woby/dist/create_element-rXGwxVN_.js"() {
+var init_create_element_BAd2lnON = __esm({
+  "../woby/dist/create_element-BAd2lnON.js"() {
     "use strict";
     init_ssr_shim();
-    init_setters_DtEb2Ino();
+    init_setters_DB8s8ITo();
     SYMBOL_STACK = /* @__PURE__ */ Symbol("STACK");
     wrapElement = (element) => {
       element[SYMBOL_UNTRACKED_UNWRAPPED] = true;
@@ -3913,8 +3910,12 @@ var init_create_element_rXGwxVN = __esm({
       const props = _props ?? {};
       if (isFunction(component)) {
         if (isObservable(component)) return component;
+        const componentProps = hasChildren ? {
+          ...props,
+          children
+        } : props;
         return wrapElement(() => {
-          return untrack(() => isClass(component) ? new component(props) : component.call(component, props));
+          return untrack(() => isClass(component) ? new component(componentProps) : component.call(component, componentProps));
         });
       } else if (isString(component)) {
         const isSVG2 = isSVGElement(component);
@@ -3945,7 +3946,7 @@ var init_create_element_rXGwxVN = __esm({
   }
 });
 
-// ../woby/dist/htm.module-D8bNPOkD.js
+// ../woby/dist/htm.module-BBbo4eM4.js
 function scheduleStylesheetUpdate() {
   if (updateScheduled) return;
   updateScheduled = true;
@@ -4144,12 +4145,12 @@ function htm_module_default(s) {
   })(s)), r), arguments, [])).length > 1 ? r : r[0];
 }
 var Switch, useScheduler, useTimeout, cachedConstructedSheets, stylesheetObserver, loggedErrors, MAX_LOGGED_ERRORS, shadowRootRegistry, updateScheduled, set, isObject2, assign2, isJsxProp, make, merge, defaults, HtmlChild, contextRefRegistry, isContextRef, collectAncestorContextWrap$1, parseContextRef, resolveContextRef, createSSRCustomElement, _pendingContextWrapGlobal, consumePendingContextWrap, peekPendingContextWrap, composePendingContextWrap, collectAncestorContextWrap, createBrowserCustomElement, setObservableValue, setNestedProperty, customElement, HtmlHidden, n, t;
-var init_htm_module_D8bNPOkD = __esm({
-  "../woby/dist/htm.module-D8bNPOkD.js"() {
+var init_htm_module_BBbo4eM4 = __esm({
+  "../woby/dist/htm.module-BBbo4eM4.js"() {
     "use strict";
     init_ssr_shim();
-    init_setters_DtEb2Ino();
-    init_create_element_rXGwxVN();
+    init_setters_DB8s8ITo();
+    init_create_element_BAd2lnON();
     Switch = ({ when, fallback, children }) => {
       return _switch(when, castArray(children).map((child) => child().metadata), fallback);
     };
@@ -4674,7 +4675,7 @@ var init_htm_module_D8bNPOkD = __esm({
             break;
         }
         else {
-          const current = get(observable2);
+          const current = untrack(() => observable2());
           if (typeof current === "number") obj[key](Number(value));
           else if (typeof current === "boolean") {
             const lowerValue = value?.toLowerCase();
@@ -4769,9 +4770,9 @@ var init_index_es = __esm({
   "../woby/dist/index.es.js"() {
     "use strict";
     init_ssr_shim();
-    init_setters_DtEb2Ino();
-    init_create_element_rXGwxVN();
-    init_htm_module_D8bNPOkD();
+    init_setters_DB8s8ITo();
+    init_create_element_BAd2lnON();
+    init_htm_module_BBbo4eM4();
     IS_BROWSER = !!globalThis.CDATASection?.toString?.().match(/^\s*function\s+CDATASection\s*\(\s*\)\s*\{\s*\[native code\]\s*\}\s*$/);
     runWithSuperRoot = _with();
     render = (child, parent, options2) => {
@@ -4865,7 +4866,7 @@ var init_runtime_es = __esm({
   "../woby/dist/runtime.es.js"() {
     "use strict";
     init_ssr_shim();
-    init_create_element_rXGwxVN();
+    init_create_element_BAd2lnON();
   }
 });
 
