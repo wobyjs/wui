@@ -1,7 +1,7 @@
 import { $, $$, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlClass, HtmlString, JSX, Observable, ObservableMaybe } from 'woby'
 import { Button } from '../Button'
 import { EditorContext, useUndoRedo } from './undoredo'
-import { useOnClickOutside } from '@woby/use'
+import { useDropdownDismiss } from './useDropdownDismiss'
 import { range, getCurrentRange } from './utils' // Import getCurrentRange
 import KeyboardDownArrow from '../icons/keyboard_down_arrow'
 import Plus from '../icons/plus'
@@ -11,6 +11,8 @@ import { getEditorPlugins, pluginsToInsertItems, InsertMenuItem } from './Editor
 const HorizontalRuleIcon = () => <span>HR</span>
 const ImageIcon = () => <span>Img</span>
 const TableIcon = () => <span>Tbl</span>
+const ContainerIcon = () => <span>Box</span>
+const RowIcon = () => <span>Row</span>
 const GifIcon = () => <span>GIF</span>
 // ... other icons
 
@@ -122,6 +124,83 @@ const execInsertTable = () => {
 
     document.execCommand('insertHTML', false, sanitizeHTML(tableHTML))
 }
+/**
+ * A neutral container to format with: padding, a margin and a faint dashed edge so an
+ * empty one can be seen and grabbed. Everything here is inline style rather than a class
+ * precisely so the property panel can edit or strip any of it afterwards.
+ */
+const CONTAINER_STYLE = 'padding: 12px; margin: 8px 0; border: 1px dashed #cbd5e1; border-radius: 8px;'
+
+/** The same box laid out as a wrapping row -- the shape that makes components sit side by side. */
+const ROW_STYLE = 'display: flex; gap: 16px; flex-wrap: wrap; align-items: center; ' + CONTAINER_STYLE
+
+/** The child of the surface that `node` lives in, i.e. the top-level block around it. */
+const topLevelBlock = (node: Node | null, surface: HTMLElement): Node | null => {
+    let n: Node | null = node
+    while (n && n.parentNode && n.parentNode !== surface) n = n.parentNode
+    return n && n.parentNode === surface ? n : null
+}
+
+/**
+ * Insert a plain <div> to format with: empty at a caret, or wrapped around the blocks the
+ * selection covers.
+ *
+ * Built by hand rather than through `execCommand('insertHTML')` like the inserts above,
+ * because that one splices at the caret -- inside a paragraph it would leave a <div> nested
+ * in a <p>, which is invalid and which the next reparse pulls apart. Working in whole
+ * top-level blocks instead keeps the result valid whatever the caret was sitting in, and
+ * makes the wrap case mean the useful thing: "put these paragraphs in a box".
+ *
+ * The new container is left marked as the node selection, so its drag grip and the property
+ * panel are on it immediately -- an empty container is otherwise hard to select, since every
+ * click inside one lands on the text it wraps and a fresh one has no text to click.
+ */
+const insertContainer = (style: string) => {
+    const { selection } = getEditorSelection()
+    const surface = document.querySelector('wui-editor')?.shadowRoot
+        ?.querySelector('[data-editor-root]') as HTMLElement | null
+    if (!surface) return
+
+    const range = selection && selection.rangeCount > 0 ? selection.getRangeAt(0) : null
+    const withinSurface = !!range && surface.contains(range.commonAncestorContainer)
+    const first = withinSurface ? topLevelBlock(range!.startContainer, surface) : null
+    const last = withinSurface ? topLevelBlock(range!.endContainer, surface) : null
+
+    const div = document.createElement('div')
+    div.setAttribute('style', style)
+
+    if (range && !range.collapsed && first && last) {
+        // Wrap: park the container where the run starts, then walk the siblings into it.
+        // `nextSibling` is read before each move, since moving a node clears its own.
+        surface.insertBefore(div, first)
+        let node: Node | null = first
+        while (node) {
+            const next: Node | null = node === last ? null : node.nextSibling
+            div.appendChild(node)
+            node = next
+        }
+    } else {
+        // Empty: after the block holding the caret, or at the end when there is no caret
+        // in the content (the toolbar was clicked before the surface was ever focused).
+        // The <br> gives it a line box, so it has a height to click and a place to type.
+        if (first) surface.insertBefore(div, first.nextSibling)
+        else surface.appendChild(div)
+        div.appendChild(document.createElement('br'))
+
+        const caret = document.createRange()
+        caret.selectNodeContents(div)
+        caret.collapse(true)
+        selection?.removeAllRanges()
+        selection?.addRange(caret)
+    }
+
+    surface.querySelectorAll('[data-element-selected]')
+        .forEach(el => el.removeAttribute('data-element-selected'))
+    div.setAttribute('data-element-selected', '')
+}
+
+const execInsertContainer = () => insertContainer(CONTAINER_STYLE)
+const execInsertRow = () => insertContainer(ROW_STYLE)
 // #endregion
 
 const getInsertOptions = (): InsertMenuItem[] => {
@@ -129,6 +208,8 @@ const getInsertOptions = (): InsertMenuItem[] => {
         { label: 'Horizontal Rule', action: execInsertHorizontalRule, icon: HorizontalRuleIcon },
         { label: 'Image', action: execInsertImage, icon: ImageIcon },
         { label: 'Table', action: execInsertTable, icon: TableIcon },
+        { label: 'Container', action: execInsertContainer, icon: ContainerIcon },
+        { label: 'Row (flex)', action: execInsertRow, icon: RowIcon },
     ]
 
     // Merge registered plugin items
@@ -159,7 +240,7 @@ const InsertDropDown = defaults(def, (props) => {
     const isOpen = $(false)
     const dropdownRef = $<HTMLElement>(null as any)
 
-    useOnClickOutside(dropdownRef as any, () => isOpen(false))
+    useDropdownDismiss(dropdownRef as any, () => isOpen(false))
 
     const toggleDropdown = () => isOpen(!isOpen())
 
@@ -227,7 +308,7 @@ const InsertDropDown = defaults(def, (props) => {
                     class="size-full inline-flex justify-center items-center rounded-md border border-gray-300 shadow-sm bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500 cursor-pointer px-2"
                     onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleDropdown(); }}
                     onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation(); }}
-                    title="Toggle dropdown"
+                    title="Choose what to insert"
                     disabled={disabled}
                 >
                     <KeyboardDownArrow class="h-5 w-5" />

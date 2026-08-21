@@ -506,15 +506,31 @@ const TablePopupMenu = () => {
             }
         }
 
+        // The surface is its own scroll container, so a scroll moves the cell without
+        // firing a click or a keyup -- the popup would be left hanging over whatever
+        // scrolled into its place. Capture phase catches the surface's own scroll as
+        // well as any ancestor's.
+        const onScroll = () => {
+            if (!popupEl || popupEl.style.display === 'none') return
+            if (activeCell?.isConnected) showPopup(activeCell)
+            else hidePopup()
+        }
+
         editorSurface.addEventListener('click', onClickSurface, true)
         editorSurface.addEventListener('keyup', onKeyupSurface, true)
         document.addEventListener('click', onClickDocument)
+        window.addEventListener('scroll', onScroll, true)
+        // Scroll events do not cross the shadow boundary, so the surface's own scroll
+        // needs a direct listener on top of the capture-phase window one.
+        editorSurface.addEventListener('scroll', onScroll)
 
         // Cleanup: remove all event listeners on unmount
         return () => {
             editorSurface.removeEventListener('click', onClickSurface, true)
             editorSurface.removeEventListener('keyup', onKeyupSurface, true)
             document.removeEventListener('click', onClickDocument)
+            window.removeEventListener('scroll', onScroll, true)
+            editorSurface.removeEventListener('scroll', onScroll)
         }
     })
 

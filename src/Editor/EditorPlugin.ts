@@ -3,7 +3,7 @@ import { $, $$, JSX, Observable, ObservableMaybe } from 'woby'
 /**
  * Typed property schema for editor plugin custom elements.
  */
-export type PluginPropType = 'string' | 'number' | 'boolean' | 'color' | 'enum'
+export type PluginPropType = 'string' | 'number' | 'boolean' | 'color' | 'enum' | 'date'
 
 export interface PluginProp {
     /** Attribute name on the element, e.g. 'label', 'count', 'variant'. */
@@ -13,6 +13,16 @@ export interface PluginProp {
     label?: string
     /** Value used when the attribute is absent. Also the "unset" comparison value. */
     default?: string | number | boolean
+    /**
+     * Element-aware default, for a value the component computes rather than declares.
+     *
+     * Wins over {@link default} in both directions: the panel shows it when the
+     * attribute is absent or empty, and an edit back to it clears the attribute again.
+     * `cls` needs this -- the class it replaces is the element's own variant, so no
+     * single literal can stand in for it, and an empty box tells the user nothing
+     * about what an override would replace.
+     */
+    resolveDefault?: (el: HTMLElement) => string | number | boolean
     /** Required for type 'enum'. */
     options?: { value: string; label?: string }[]
     /** Rendered, but not editable (e.g. values resolved at construction time). */
@@ -30,6 +40,30 @@ export interface PluginProp {
      * renders blank. The label has to live in the light DOM to reach the slot.
      */
     textContent?: boolean
+    /**
+     * Bind the row to the component's *own* observable rather than to a snapshot
+     * of the attribute.
+     *
+     * Needed for any prop the element's UI mutates on its own. Ticking a
+     * `wui-checkbox`, dragging a `wui-switch` or typing into a `wui-number-field`
+     * updates the observable the component renders from and never touches the
+     * host attribute -- measured: after typing 77 into a number field the inner
+     * input read 77, `el.props.value()` read 77, and `value=` on the host still
+     * read 10. An attribute snapshot therefore goes stale the moment the user
+     * touches the widget, and no MutationObserver can see it happen because no
+     * mutation occurs.
+     *
+     * woby's customElement() parks the live observables on `el.props`, keyed by
+     * the camelCase prop name, so handing that same observable to the row makes
+     * the two genuinely share state. The per-property effect still writes the
+     * attribute afterwards, which is what keeps the change in `innerHTML` and so
+     * on the undo stack.
+     *
+     * Not for `cls`/`class` (the row shows a resolved base the observable does not
+     * hold) or for `textContent` props (woby's `children` observable holds a
+     * <slot>, not the text).
+     */
+    live?: boolean
 }
 
 /**

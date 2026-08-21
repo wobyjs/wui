@@ -1,6 +1,6 @@
 /** @jsxImportSource woby */
 
-import { $, $$, Observable, ObservableMaybe, createContext, useContext, useEffect, JSX } from 'woby'
+import { $, $$, Observable, ObservableMaybe, createContext, useContext, useEffect, isObservable, JSX } from 'woby'
 import { PropertyForm } from '../PropertyForm/PropertyForm' // Import component directly (not just side-effect)
 import '../PropertyForm/StringEditor' // Side-effect: registers StringEditor
 import '../PropertyForm/NumberEditor' // Side-effect: registers NumberEditor
@@ -13,11 +13,20 @@ import {
     extractImageProperties,
     extractTextProperties,
     extractCustomElementProperties,
+    customElementWatchSpec,
     applyImageProperty,
     applyTextProperty,
     applyCustomElementProperty,
+    classifyElement,
+    getSelectableParent,
+    deleteSelectedElement,
+    deleteRefusalReason,
     SelectionType,
 } from './PropertyExtractor'
+import { useEditor, useUndoRedo } from './undoredo'
+import { StyleEditor } from './StyleEditor'
+import ArrowUpward from '../icons/arrow_upward'
+import DeleteOutline from '../icons/delete_outline'
 
 /**
  * PropertyPanelContext: Shared state between InfoButton (toolbar)
@@ -78,6 +87,18 @@ export const PropertyPanel = () => {
     const panelPos = $<{ x: number, y: number } | null>(null)
     const dragging = $(false)
 
+    // ── Floating dialog size ──
+    // null = "not resized yet", which leaves the w-[300px] / max-h-[70vh] classes in
+    // charge. Once the user drags a grip we switch to explicit pixels (and clear the
+    // max-height, or the class would keep clamping the new height) and keep them for
+    // the rest of the session, same as panelPos.
+    const panelSize = $<{ w: number, h: number } | null>(null)
+    const resizing = $(false)
+
+    /** Below these the header and the first form row stop being usable. */
+    const MIN_W = 240
+    const MIN_H = 140
+
     // Helper: extract properties from the current target based on selection type
     const extractFromTarget = (element: HTMLElement, type: SelectionType) => {
         switch (type) {
@@ -90,6 +111,89 @@ export const PropertyPanel = () => {
             default:
                 return null
         }
+    }
+
+    // Guarded like every other consumer: PropertyPanel renders inside <UndoRedo> in the
+    // editor, but is a plain component that a test (or an embedder) can mount on its own,
+    // and an unguarded destructure throws on every call there.
+    const undoRedoContext = useUndoRedo()
+    const saveDo = undoRedoContext?.saveDo ?? (() => { })
+    // The editor content root, used to keep deletion inside the document.
+    const activeEditor = useEditor()
+    const editorRootEl = () => (activeEditor ? ($$(activeEditor) as HTMLElement | null) : null)
+
+    /**
+     * Remove the targeted element from the document.
+     *
+     * The panel needs its own control for this because native editing cannot do it:
+     * Chrome refuses to delete a shadow host, so Backspace over an embedded component
+     * is a silent no-op. See {@link deleteSelectedElement} for the measurements.
+     *
+     * The button is the touch-reachable half of the pair -- the keyboard path in
+     * EditorSurface deletes the same targets on Backspace/Delete, but only reaches a
+     * container once the parent arrow has walked the selection mark up to it, and only
+     * while that mark survives. This button works from the panel's own target, so it
+     * stays available on touch and after the caret has moved on.
+     *
+     * Panel state is cleared explicitly because nothing else would: the target is now a
+     * detached node, and no other code path drops it. Restoring the caret often fires a
+     * selectionchange that immediately retargets the panel at whatever the caret landed
+     * in -- measured, that is what usually happens -- which is fine and arguably better
+     * than an empty panel. Clearing first is what guarantees the panel never keeps
+     * pointing at a node that is no longer in the document.
+     */
+    const deleteTarget = () => {
+        const target = $$(propertyTarget)
+        const result = deleteSelectedElement(target, editorRootEl())
+        if (!result.ok) {
+            console.log('[PropertyPanel] delete refused:', result.reason, target?.tagName)
+            return
+        }
+        propertyTarget(null)
+        selectionType('none')
+        propsObj(null)
+        lastExtractedTarget(null)
+        saveDo()
+    }
+
+    /**
+     * Move the panel's target one level up the composed tree.
+     *
+     * The reason this exists: a click can only ever land on the innermost element under
+     * the pointer, so structural containers are unreachable by pointing at them. Clicking
+     * inside a table cell selects the `td` (or the text inside it) and there is no gesture
+     * that reaches the `tr` or the `table`. Same for a node rendered inside an embedded
+     * component's shadow root -- the click selects the inner node, and the component host
+     * that actually carries the authorable attributes is never the target.
+     *
+     * Three pieces of state move together, mirroring what the selectionchange handler does,
+     * so the climb is indistinguishable from an ordinary selection:
+     *
+     *  - `data-element-selected` moves to the new target. That is what draws the blue
+     *    outline and anchor glyph, so the user can see which box they climbed to -- without
+     *    it the panel contents change with no indication of where they now point. It also
+     *    keeps detectSelectionType() agreeing with the panel: the mark outranks every other
+     *    detection path, so leaving it on the child would make the next selectionchange
+     *    yank the target back down.
+     *  - `selectionType` is re-derived with classifyElement rather than carried over. A
+     *    `wui-badge` climbing to its containing `td` has to switch from the attribute
+     *    extractor to the computed-style one.
+     *  - `lastExtractedTarget` is set so the extract-on-change effect treats this as
+     *    already handled and does not re-read stale DOM values over the fresh ones.
+     */
+    const selectParent = () => {
+        const current = $$(propertyTarget)
+        const parent = getSelectableParent(current)
+        if (!parent) return
+
+        current?.removeAttribute('data-element-selected')
+        parent.setAttribute('data-element-selected', '')
+
+        const type = classifyElement(parent)
+        selectionType(type)
+        propertyTarget(parent)
+        propsObj(extractFromTarget(parent, type))
+        lastExtractedTarget(parent)
     }
 
     // When panel opens or target changes, extract properties
@@ -187,12 +291,128 @@ export const PropertyPanel = () => {
                             applyCustomElementProperty(target, key, val)
                             break
                     }
+
+                    // Property edits are content edits, so they belong on the same
+                    // history stack as typing. saveDo() snapshots the editor's
+                    // innerHTML, which already carries the attribute we just wrote,
+                    // and its 300ms debounce collapses a burst of keystrokes in one
+                    // field into a single undo step instead of one step per character.
+                    //
+                    // This also covers edits that did NOT originate in the panel: an
+                    // attribute changed by the element's own UI arrives here through
+                    // the mirror effect below, which is what makes a counter's +/-
+                    // undoable at all.
+                    saveDo()
                 } catch (e) {
                     console.error(`[PropertyPanel] per-property effect error for ${key}:`, e)
                 }
             })
             disposeEffects.push(dispose)
         })
+    })
+
+    /**
+     * Mirror the element back into the panel -- the DOM -> panel half of the
+     * two-way binding.
+     *
+     * Extraction takes a *snapshot*: `extractCustomElementProperties` builds a
+     * fresh observable per prop, so the rows hold values as they were at
+     * selection time and nothing links them back to the element. Every other
+     * writer -- the Styles chips, the element's own UI (a counter's +/- buttons,
+     * a switch's thumb), a script, an undo -- moves the DOM out from under a
+     * panel that goes on displaying the old value, and the next edit through a
+     * row writes that stale value back over them.
+     *
+     * The fix is to write into the *existing* observables rather than rebuild
+     * `propsObj`. Observable identity is what keeps the rows and the per-property
+     * effects above wired up; replacing the map would tear all of that down and
+     * re-run extraction, which is the exact race `lastExtractedTarget` exists to
+     * prevent. For the same reason only keys already present are synced -- a prop
+     * appearing or disappearing would need new rows, so it needs a full re-select.
+     *
+     * The round trip terminates on its own. A mirrored value re-runs that prop's
+     * effect, which writes the same value back to the attribute; the resulting
+     * mutation record extracts to a value the observable already holds, and
+     * writing an unchanged value into a woby observable notifies nobody.
+     */
+    useEffect(() => {
+        const target = $$(propertyTarget)
+        const obj = $$(propsObj)
+        if (!target || !obj || $$(selectionType) !== 'custom') return
+
+        const { attributeFilter, text } = customElementWatchSpec(target)
+
+        const mo = new MutationObserver(() => {
+            const fresh = extractCustomElementProperties(target)
+            for (const key of Object.keys(obj)) {
+                // Not every entry is an observable -- `tagName` is extracted as a
+                // plain string, and calling it would throw straight out of the
+                // MutationObserver callback, where nothing is left to catch it.
+                const cur = obj[key]
+                if (!isObservable(cur)) continue
+                const next = fresh[key]
+                if (next !== undefined) cur($$(next))
+            }
+        })
+        mo.observe(target, {
+            attributes: true,
+            // Omitted for a blind-scraped element, where every attribute is a row.
+            ...(attributeFilter ? { attributeFilter } : {}),
+            // A textContent prop reads the light DOM, so it needs the subtree too.
+            // The attribute filter still applies, so the wider scope costs at most a
+            // few redundant -- and idempotent -- re-extracts.
+            ...(text ? { childList: true, characterData: true, subtree: true } : {}),
+        })
+        return () => mo.disconnect()
+    })
+
+    /**
+     * Re-bind the panel after undo/redo rebuilds the editor's content.
+     *
+     * `undo()` restores by assigning `innerHTML` on the editor root, which destroys
+     * and recreates every node beneath it. The panel's target survives that as a
+     * *detached* node, and nothing about the panel looks wrong: the rows still
+     * render, the fields still accept input, and every edit lands on an element
+     * that is no longer in the document, so it is invisible, unsaved, and lost.
+     *
+     * `data-element-selected` is what finds the replacement. It is an ordinary
+     * attribute, so it serializes into the snapshot and comes back on the restored
+     * node, and adopting it keeps the outline, `detectSelectionType()` and the panel
+     * all pointing at the same element.
+     *
+     * Nothing else is tried. A recorded child-index path looks like a reasonable
+     * fallback and is not: on an ordinary removal -- one element deleted, siblings
+     * shifting up -- the old index resolves to the *neighbour*, and the panel
+     * silently starts editing an element the user never picked. Measured on the
+     * demo, deleting a `wui-button` retargeted the panel at the next `wui-button`
+     * with no visible change. Without the mark the target is simply gone, so the
+     * panel clears rather than guess.
+     */
+    useEffect(() => {
+        const root = editorRootEl()
+        if (!root) return
+
+        const mo = new MutationObserver(() => {
+            const target = $$(propertyTarget)
+            if (!target || target.isConnected) return
+
+            const restored = root.querySelector('[data-element-selected]') as HTMLElement | null
+            if (!restored || restored.tagName !== target.tagName) {
+                propertyTarget(null)
+                selectionType('none')
+                propsObj(null)
+                lastExtractedTarget(null)
+                return
+            }
+
+            const type = classifyElement(restored)
+            selectionType(type)
+            propertyTarget(restored)
+            propsObj(extractFromTarget(restored, type))
+            lastExtractedTarget(restored)
+        })
+        mo.observe(root, { childList: true, subtree: true })
+        return () => mo.disconnect()
     })
 
     // Track whether focus is inside the property panel.
@@ -230,13 +450,27 @@ export const PropertyPanel = () => {
         }
 
         const handleFocusOut = (e: FocusEvent) => {
-            const path = e.composedPath()
-            if (!path.includes(panel)) {
+            // Test where focus is GOING (relatedTarget), not where it came from.
+            // composedPath() here is the ancestor chain of the *blurring* element,
+            // which is by definition inside the panel — this listener is attached to
+            // the panel, so a focusout it receives always has the panel in its path.
+            // The old `!path.includes(panel)` test was therefore never true, and
+            // panelFocused latched at true forever after the first click inside the
+            // panel. With the flag stuck on, the selectionchange handler early-returns
+            // and the panel stops following the caret entirely.
+            const next = e.relatedTarget as Node | null
+            // relatedTarget is retargeted relative to this listener's tree, so a focus
+            // landing inside a nested component's shadow root surfaces as that
+            // component's host — still a descendant of the panel, still "inside".
+            if (next && !panel.contains(next)) {
                 console.log('[PropertyPanel] focusout detected, focus LEFT panel, setting panelFocused=false')
                 panelFocused(false)
-            } else {
-                // focus moved within the panel — keep panelFocused=true
             }
+            // A null relatedTarget is deliberately NOT treated as leaving. Pressing
+            // Enter in a panel input blurs to nothing, and clearing the flag there
+            // would let the following selectionchange re-extract and wipe the edit
+            // that is still being committed — the exact case this flag guards.
+            // Clicks that land outside the panel are handled by handlePointerDown.
         }
 
         panel.addEventListener('focusin', handleFocusIn as EventListener)
@@ -269,6 +503,15 @@ export const PropertyPanel = () => {
             // Clicking (or dragging) the panel itself is not a selection change.
             lastPointerInPanel = path.some(n =>
                 n instanceof HTMLElement && n.hasAttribute?.('data-property-panel'))
+
+            // Pointing at anything outside the panel is an unambiguous "I'm done
+            // editing here". This is the release for panelFocused that focusout
+            // cannot safely provide: focusout has to ignore blur-to-nothing so an
+            // in-progress commit survives Enter, which leaves clicking straight from
+            // a panel field into the document with nothing to clear the flag.
+            // Runs on pointerdown, which precedes selectionchange, so the handler
+            // sees the released flag on the very click that moved the caret.
+            if (!lastPointerInPanel) panelFocused(false)
 
             // CRITICAL: Schedule a deferred check for image selection.
             // In shadow DOM mode, ImageResizer's mousedown handler calls
@@ -312,7 +555,7 @@ export const PropertyPanel = () => {
                     return
                 }
 
-                // ── Embedded custom element ──
+                // ── Marked box / embedded custom element ──
                 // An embedded plugin element owns a shadow root, so a click on it is
                 // absorbed and the browser fires NO selectionchange — the handler below
                 // never runs, and an already-open panel kept showing the PREVIOUS
@@ -321,14 +564,26 @@ export const PropertyPanel = () => {
                 // mark by the time this timeout fires, and detectSelectionType() gives
                 // that mark top priority, so a plain re-detect is enough.
                 const { type, element } = detectSelectionType()
-                if (!element || type !== 'custom') return
+                if (!element) return
+                // Accept any type when the detection came from the [data-element-selected]
+                // mark. Alt+click marks whatever box the pointer is over -- routinely a
+                // plain div or p, which classifyElement() calls 'text', not 'custom'. The
+                // old `type !== 'custom'` guard dropped exactly those, so the panel kept
+                // showing the previously targeted element. A click with no mark still has
+                // to be a custom element to retarget from here: plain text clicks are the
+                // selectionchange handler's business, and retargeting them on pointerdown
+                // would fire before the caret has moved.
+                const markedNow = (editorRoot?.hasAttribute('data-element-selected')
+                    ? editorRoot as HTMLElement
+                    : editorRoot?.querySelector('[data-element-selected]')) as HTMLElement | null
+                if (type !== 'custom' && !(markedNow && element.isSameNode(markedNow))) return
                 if (element.hasAttribute?.('data-editor-root')) return
                 if (!editorRoot?.contains(element)) return
 
                 const currentTarget = $$(propertyTarget)
                 if (currentTarget && element.isSameNode(currentTarget)) return
 
-                console.log('[PropertyPanel] pointerdown timeout: custom element switch, refreshing panel')
+                console.log('[PropertyPanel] pointerdown timeout: marked/custom element switch, refreshing panel')
                 selectionType(type)
                 propertyTarget(element)
                 propsObj(extractFromTarget(element, type))
@@ -378,6 +633,29 @@ export const PropertyPanel = () => {
                         element = img
                     }
                 }
+            }
+
+            // Drop a stale climb mark. `data-element-selected` drives the blue outline
+            // and the anchor glyph, and the parent walk moves it up the tree; nothing
+            // moves it back down, so after climbing to a container and clicking
+            // elsewhere the container stayed outlined.
+            //
+            // Only clear when the marked node is not the one being targeted. The
+            // editor's own capture-phase pointerdown sets this mark on plugin and
+            // custom elements and fires BEFORE selectionchange, so an unconditional
+            // clear here would erase the mark for the very click that set it — in that
+            // case detectSelectionType returns the marked element itself and the guard
+            // below leaves it alone.
+            if (element) {
+                const editorHost = document.querySelector('wui-editor') as HTMLElement | null
+                const editorRoot = editorHost?.shadowRoot?.querySelector('[data-editor-root]')
+                    ?? document.querySelector('[data-editor-root]')
+                // Two queries: querySelector only sees descendants, and the walk can
+                // park the mark on the root itself.
+                const stale = editorRoot?.hasAttribute('data-element-selected')
+                    ? editorRoot as HTMLElement
+                    : editorRoot?.querySelector('[data-element-selected]') as HTMLElement | null
+                if (stale && !stale.isSameNode(element)) stale.removeAttribute('data-element-selected')
             }
 
             const currentTarget = $$(propertyTarget)
@@ -478,6 +756,64 @@ export const PropertyPanel = () => {
     }
 
     /**
+     * Resize the dialog from its left edge, right edge, bottom edge, or either
+     * bottom corner.
+     *
+     * Wired through a ref like `startDrag`, and for the same reason: woby's delegated
+     * listeners don't reach elements inside the editor's shadow root.
+     */
+    const startResize = (dir: 'e' | 's' | 'se' | 'w' | 'sw') => (e: PointerEvent) => {
+        if (!panelEl) return
+
+        const rect = panelEl.getBoundingClientRect()
+
+        // Pin the dialog to explicit left/top first. Until the user has dragged it the
+        // dialog hangs off `right: 24px`, so widening it would push the *left* edge out
+        // instead of following the grip under the pointer.
+        if (!$$(panelPos)) panelPos({ x: rect.left, y: rect.top })
+
+        const x0 = e.clientX, y0 = e.clientY
+        const w0 = rect.width, h0 = rect.height
+        const left = rect.left, top = rect.top
+        // A west drag moves the left edge, so the *right* edge is the one that has to
+        // stay put -- capture it as the anchor the new width is measured back from.
+        const right = rect.right
+
+        const west = dir === 'w' || dir === 'sw'
+        const vertical = dir !== 'e' && dir !== 'w'
+
+        resizing(true)
+        e.preventDefault()
+        e.stopPropagation()
+
+        const onMove = (ev: PointerEvent) => {
+            // Clamp to a usable minimum, and to the viewport edge so the dialog can't be
+            // grown past the point where its own grips are off-screen.
+            let w = w0
+            if (west) {
+                const x = Math.min(Math.max(0, left + ev.clientX - x0), Math.max(0, right - MIN_W))
+                // Position and size have to move together here: the left edge follows the
+                // pointer, and the width absorbs the difference so the right edge doesn't drift.
+                w = Math.max(MIN_W, right - x)
+                panelPos({ x, y: top })
+            } else if (dir !== 's') {
+                w = Math.min(Math.max(MIN_W, w0 + ev.clientX - x0), Math.max(MIN_W, window.innerWidth - left))
+            }
+            const h = vertical
+                ? Math.min(Math.max(MIN_H, h0 + ev.clientY - y0), Math.max(MIN_H, window.innerHeight - top))
+                : h0
+            panelSize({ w, h })
+        }
+        const onUp = () => {
+            resizing(false)
+            document.removeEventListener('pointermove', onMove, true)
+            document.removeEventListener('pointerup', onUp, true)
+        }
+        document.addEventListener('pointermove', onMove, true)
+        document.addEventListener('pointerup', onUp, true)
+    }
+
+    /**
      * "Commit Changes" — flush whatever the user has typed but not yet committed.
      *
      * String rows render a `<TextField assignOnEnter>`, which writes its observable on
@@ -508,17 +844,23 @@ export const PropertyPanel = () => {
             data-property-panel
             ref={(el) => { panelEl = el as HTMLElement }}
             class={() => [
-                "fixed w-[300px] max-h-[70vh] overflow-auto z-[1100]",
+                "fixed flex flex-col w-[300px] max-h-[70vh] overflow-hidden z-[1100]",
                 "bg-white border border-gray-200 rounded-md shadow-xl",
                 $$(panelOpen) ? '' : 'hidden'
             ]}
             style={() => {
                 const p = $$(panelPos)
+                const s = $$(panelSize)
                 // Before the first drag the dialog parks near the editor's top-right,
                 // which is where the docked panel used to live.
-                return p
+                const pos = p
                     ? { left: `${p.x}px`, top: `${p.y}px`, right: 'auto' }
                     : { right: '24px', top: '96px', left: 'auto' }
+                // Keys stay identical across both branches so clearing a resize actually
+                // hands the sizing back to the classes instead of leaving stale inline px.
+                return s
+                    ? { ...pos, width: `${s.w}px`, height: `${s.h}px`, maxHeight: 'none' }
+                    : { ...pos, width: '', height: '', maxHeight: '' }
             }}
             onMouseDown={(e: MouseEvent) => {
                 // CRITICAL: preventDefault here blocks focus + caret placement in <input>
@@ -539,34 +881,155 @@ export const PropertyPanel = () => {
                 ref={(el) => { if (el) (el as HTMLElement).onpointerdown = startDrag }}
                 class={() => [
                     "px-3 py-2 bg-gray-50 border-b border-gray-200 flex items-center justify-between select-none",
-                    "sticky top-0",
+                    "shrink-0",
                     $$(dragging) ? 'cursor-grabbing' : 'cursor-grab'
                 ]}
             >
-                <h3 class="text-[11px] font-bold uppercase tracking-widest text-slate-400">
-                    {() => {
-                        const t = $$(selectionType)
-                        return t === 'image' ? 'Image Properties'
-                            : t === 'text' ? 'Text Properties'
-                            : t === 'custom' ? 'Element Properties'
-                            : 'No Selection'
-                    }}
-                </h3>
-                <button
-                    ref={(el) => { if (el) el.onclick = () => { panelOpen(false) } }}
-                    class="text-gray-400 hover:text-gray-600 text-lg leading-none cursor-pointer w-6 h-6 flex items-center justify-center"
-                >×</button>
+                {/* Left cluster: climb-to-parent, then what is currently targeted. */}
+                <div class="flex items-center gap-2 min-w-0">
+                    <button
+                        ref={(el) => {
+                            // Ref-based onclick, matching the close button: woby's synthetic
+                            // onClick delegation does not reach inside a shadow root, which is
+                            // where this panel lives. Deliberately NO pointerdown handler --
+                            // the panel root already lets mousedown through for interactive
+                            // elements so focus lands in the panel, which is what sets
+                            // panelFocused and stops selectionchange from undoing the climb.
+                            if (el) el.onclick = selectParent
+                        }}
+                        title="Select parent element"
+                        class={() => [
+                            "shrink-0 w-6 h-6 flex items-center justify-center rounded leading-none",
+                            "cursor-pointer text-gray-400 hover:text-gray-700 hover:bg-gray-200",
+                            // Disabled rather than hidden. A control that disappears at the top
+                            // of the tree makes the header reflow and slides the close button
+                            // under a pointer that was aimed at the arrow.
+                            getSelectableParent($$(propertyTarget)) ? '' : 'opacity-30 pointer-events-none'
+                        ]}
+                    >
+                        <ArrowUpward class="w-4 h-4" />
+                    </button>
+
+                    {/* Tag name first, kind second. The tag is the part that changes as the
+                        user climbs (td -> tr -> table), so it carries the information; the
+                        kind only says which extractor is in use. */}
+                    <h3 class="flex items-baseline gap-1.5 min-w-0">
+                        <span class="font-mono text-[11px] text-slate-700 truncate">
+                            {() => {
+                                const el = $$(propertyTarget)
+                                return el ? el.tagName.toLowerCase() : ''
+                            }}
+                        </span>
+                        <span class="shrink-0 text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                            {() => {
+                                const t = $$(selectionType)
+                                return t === 'image' ? 'Image'
+                                    : t === 'text' ? 'Text'
+                                        : t === 'custom' ? 'Element'
+                                            : 'No Selection'
+                            }}
+                        </span>
+                    </h3>
+                </div>
+                {/* Right cluster: delete, then close. The delete control sits here rather
+                    than beside the up arrow deliberately -- the arrow gets clicked
+                    repeatedly while hunting for the right container, and putting an
+                    irreversible-looking action under that same pointer path invites
+                    misclicks. */}
+                <div class="flex items-center gap-1 shrink-0">
+                    <button
+                        ref={(el) => {
+                            // Ref-based onclick like the other header buttons: woby's
+                            // synthetic onClick delegation does not reach into a shadow
+                            // root, and this panel lives in one.
+                            if (el) el.onclick = deleteTarget
+                        }}
+                        title={() => {
+                            switch (deleteRefusalReason($$(propertyTarget), editorRootEl())) {
+                                case 'table': return 'Use the table menu to delete rows or columns'
+                                case 'editor-root': return 'The document itself cannot be deleted'
+                                case 'component-internal': return 'This is a component internal — select the component instead'
+                                case null: return 'Delete element'
+                                default: return 'Nothing selected'
+                            }
+                        }}
+                        class={() => [
+                            'shrink-0 w-6 h-6 flex items-center justify-center rounded leading-none',
+                            'cursor-pointer text-gray-400 hover:text-red-600 hover:bg-red-50',
+                            // Disabled, not hidden, for the same reason as the up arrow:
+                            // a control that vanishes reflows the header and slides the
+                            // close button under a pointer that was aimed elsewhere.
+                            deleteRefusalReason($$(propertyTarget), editorRootEl()) ? 'opacity-30 pointer-events-none' : ''
+                        ]}
+                    >
+                        <DeleteOutline class="w-4 h-4" />
+                    </button>
+                    <button
+                        ref={(el) => { if (el) el.onclick = () => { panelOpen(false) } }}
+                        class="text-gray-400 hover:text-gray-600 text-lg leading-none cursor-pointer w-6 h-6 flex items-center justify-center"
+                    >×</button>
+                </div>
             </div>
 
-            {/* Property Form — use JSX component directly (not custom element) for proper observable prop passing */}
-            {() => {
-                const obj = $$(propsObj)
-                return obj ? (
-                    <PropertyForm obj={obj} class="m-0" onCommit={commitPending} />
-                ) : (
-                    <div class="p-4 text-sm text-gray-400">Select an element to view properties</div>
-                )
-            }}
+            {/* Property Form — use JSX component directly (not custom element) for proper
+                observable prop passing. It owns the scrolling: the root has to stay
+                overflow-hidden so the absolutely positioned grips below sit on the
+                dialog's edge instead of scrolling away with the form. */}
+            {/* `[&>div]:h-auto` undoes PropertyForm's own `h-full` root: against a
+                definite panel height that resolves to 100%, which lets its card (an
+                `overflow-hidden` flex item) shrink below its rows and clip them with no
+                scrollbar. Auto height puts the rows back at natural size so this
+                container scrolls them, exactly as the panel did before it was sizable. */}
+            <div class="flex-1 min-h-0 overflow-auto [&>div]:h-auto">
+                {() => {
+                    const obj = $$(propsObj)
+                    return obj ? (
+                        <PropertyForm obj={obj} class="m-0" heading="" onCommit={commitPending} />
+                    ) : (
+                        <div class="p-4 text-sm text-gray-400">Select an element to view properties</div>
+                    )
+                }}
+
+                {/* Every CSS property, on both style surfaces. Appended rather than
+                    folded into PropertyForm because it edits the element itself, not
+                    the component's declared props: PropertyForm's rows come from a
+                    plugin's property list, while these rows exist for any element at
+                    all. Collapsed by default, so the panel opens at its usual height. */}
+                <StyleEditor target={propertyTarget} onEdit={saveDo} />
+            </div>
+
+            {/* Resize grips. The corners come last so they hit-test above the edges
+                they overlap. `position: fixed` on the root is their containing block. */}
+            <div
+                ref={(el) => { if (el) (el as HTMLElement).onpointerdown = startResize('e') }}
+                class="absolute top-0 right-0 w-1.5 h-full cursor-ew-resize"
+            />
+            <div
+                ref={(el) => { if (el) (el as HTMLElement).onpointerdown = startResize('s') }}
+                class="absolute bottom-0 left-0 h-1.5 w-full cursor-ns-resize"
+            />
+            <div
+                ref={(el) => { if (el) (el as HTMLElement).onpointerdown = startResize('w') }}
+                class="absolute top-0 left-0 w-1.5 h-full cursor-ew-resize"
+            />
+            <div
+                ref={(el) => { if (el) (el as HTMLElement).onpointerdown = startResize('se') }}
+                class="absolute bottom-0 right-0 w-4 h-4 cursor-nwse-resize"
+            >
+                <div class={() => [
+                    "absolute bottom-[3px] right-[3px] w-2 h-2 border-r-2 border-b-2 pointer-events-none",
+                    $$(resizing) ? 'border-blue-400' : 'border-gray-300'
+                ]} />
+            </div>
+            <div
+                ref={(el) => { if (el) (el as HTMLElement).onpointerdown = startResize('sw') }}
+                class="absolute bottom-0 left-0 w-4 h-4 cursor-nesw-resize"
+            >
+                <div class={() => [
+                    "absolute bottom-[3px] left-[3px] w-2 h-2 border-l-2 border-b-2 pointer-events-none",
+                    $$(resizing) ? 'border-blue-400' : 'border-gray-300'
+                ]} />
+            </div>
         </div>
     )
 }

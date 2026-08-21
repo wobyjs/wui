@@ -90,15 +90,15 @@ const ResizeableBorderEffects = () => {
     return (
         <div class="space-y-2">
             <h3 class="font-bold text-gray-500 uppercase">Underline Effect Resizeable TextArea (Effect 1 - 3)</h3>
-            <TextArea cls="w-[300px] h-[100px]" resize={resize} effect="effect1" placeholder="Underline Effect Textarea..." />
+            <TextArea class="w-[300px] h-[100px]" resize={resize} effect="effect1" placeholder="Underline Effect Textarea..." />
             <hr class="mx-auto my-2 border-gray-300 border-1" />
 
             <h3 class="font-bold text-gray-500 uppercase">Box Effect Resizeable TextArea (Effect 4 - 6)</h3>
-            <TextArea cls="w-[300px] h-[100px]" resize={resize} effect="effect4" placeholder="Box Effect Textarea..." />
+            <TextArea class="w-[300px] h-[100px]" resize={resize} effect="effect4" placeholder="Box Effect Textarea..." />
             <hr class="mx-auto my-2 border-gray-300 border-1" />
 
             <h3 class="font-bold text-gray-500 uppercase">Outline Effect Resizeable TextArea (Effect 7 - 9)</h3>
-            <TextArea cls="w-[300px] h-[100px]" resize={resize} effect="effect7" placeholder="Outline Effect Textarea..." />
+            <TextArea class="w-[300px] h-[100px]" resize={resize} effect="effect7" placeholder="Outline Effect Textarea..." />
         </div>
     )
 }
@@ -109,7 +109,7 @@ const ResizeableFillEffects = () => {
     return (
         <div class="space-y-2">
             <h3 class="font-bold text-gray-500 uppercase">Fill Effect Resizeable TextArea (Effect 10 - 15)</h3>
-            <TextArea cls="w-[300px] h-[100px]" resize={resize} effect="effect10" placeholder="Fill Effect Textarea..." />
+            <TextArea class="w-[300px] h-[100px]" resize={resize} effect="effect10" placeholder="Fill Effect Textarea..." />
         </div>
     )
 }
@@ -120,15 +120,15 @@ const ResizeableLabelEffects = () => {
     return (
         <div class="space-y-2">
             <h3 class="font-bold text-gray-500 uppercase">With Label Effect Resizeable TextArea (Effect 16 - 18)</h3>
-            <TextArea cls="w-[300px] h-[100px]" resize={resize} effect="effect16" label="Underline Effect Textarea..." />
+            <TextArea class="w-[300px] h-[100px]" resize={resize} effect="effect16" label="Underline Effect Textarea..." />
             <hr class="mx-auto my-2 border-gray-300 border-1" />
 
             <h3 class="font-bold text-gray-500 uppercase">With Label Effect Resizeable TextArea (Effect 19 - 21)</h3>
-            <TextArea cls="w-[300px] h-[100px]" resize={resize} effect="effect19" label="Box Effect Textarea..." />
+            <TextArea class="w-[300px] h-[100px]" resize={resize} effect="effect19" label="Box Effect Textarea..." />
             <hr class="mx-auto my-2 border-gray-300 border-1" />
 
             <h3 class="font-bold text-gray-500 uppercase">With Label Effect Resizeable TextArea (Effect 22 - 24)</h3>
-            <TextArea cls="w-[300px] h-[100px]" resize={resize} effect="effect22" label="Fill Effect Textarea..." />
+            <TextArea class="w-[300px] h-[100px]" resize={resize} effect="effect22" label="Fill Effect Textarea..." />
         </div>
     )
 }

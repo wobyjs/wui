@@ -23,7 +23,7 @@ const DisabledNumberField = () => {
 }
 
 const CustomClassNumberField = () => {
-    return <NumberField cls="m-2 p-2 border-2 rounded" />
+    return <NumberField class="m-2 p-2 border-2 rounded" />
 }
 
 export {

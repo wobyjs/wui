@@ -8,6 +8,8 @@ type PropertyFormProps = {
 	obj: any
 	order?: ObservableMaybe<string[]>
 	class?: JSX.Class
+	/** Heading above the rows. Empty string renders no heading bar. */
+	heading?: ObservableMaybe<string>
 	textAlign?: ObservableMaybe<string>
 	/** `defaults()` supplies `null` when no caller passes one — see the unwrap note below. */
 	onCommit?: (() => void) | null
@@ -82,6 +84,11 @@ const def = () => ({
 	obj: $(null as any) as any,
 	order: $([] as string[]) as ObservableMaybe<string[]>,
 	class: $('') as JSX.Class,
+	// Heading shown above the rows. Defaults to the historical text so the standalone
+	// <wui-property-form> is unchanged; pass an empty string to drop the bar entirely,
+	// which is what PropertyPanel does -- its own dialog header already names the
+	// target, and two stacked uppercase grey bars said the same thing twice.
+	heading: $('Component Properties') as ObservableMaybe<string>,
 	textAlign: $('') as ObservableMaybe<string>,
 	onCommit: null as (() => void) | null,
 })
@@ -148,11 +155,17 @@ export const PropertyForm: Defaulted<typeof def> = defaults(def, (props: Propert
 					($$(className) || "m-3")
 				]}
 			>
-				<div class="px-4 py-2 bg-gray-50 border-b border-gray-200">
-					<h3 class="text-[11px] font-bold uppercase tracking-widest text-slate-400">
-						Component Properties
-					</h3>
-				</div>
+				{() => {
+					const t = $$(props.heading)
+					if (!t) return null
+					return (
+						<div class="px-4 py-2 bg-gray-50 border-b border-gray-200">
+							<h3 class="text-[11px] font-bold uppercase tracking-widest text-slate-400">
+								{t}
+							</h3>
+						</div>
+					)
+				}}
 
 				<table class="w-full border-collapse table-sm">
 					<tbody class="flex flex-col">{renderRows}</tbody>

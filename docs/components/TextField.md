@@ -242,12 +242,17 @@ HTML:
 
 ---
 
-# 🎨 Custom Styling Using `cls`
+# 🎨 Custom Styling
+
+`cls` **replaces** the component's base classes — pass it only when you want to
+restyle the element from scratch. To *add* utilities on top of the base, use
+`class`, which is merged with whatever fills the `cls` slot.
+
 
 ```tsx
 <TextField
     label="Name"
-    cls="!bg-gray-50 !rounded-xl !p-3"
+    class="!bg-gray-50 !rounded-xl !p-3"
     effect="filled"
 />
 ```

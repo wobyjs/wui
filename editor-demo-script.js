@@ -27,6 +27,15 @@ import './src/Editor/WuiPlugins.ts'
 // Wait for custom element to be defined
 await customElements.whenDefined('wui-editor')
 
+// Compile Tailwind utilities in the browser so classes typed into the property
+// panel at runtime actually resolve — including the arbitrary values
+// that no build-time `@source inline(...)` list can enumerate. Started here rather
+// than imported by the editor because it pulls in the ~280 KB Tailwind compiler;
+// it is an authoring-surface tool, not part of the shipped bundle. Exposed on
+// `window` so the demo (and dv4) can inspect what it has compiled.
+const { startRuntimeTailwind } = await import('./src/RuntimeTailwind.ts')
+window.__runtimeTailwind = await startRuntimeTailwind()
+
 const editor = document.querySelector('#editor-root')
 const consoleOutput = document.getElementById('console-output')
 

@@ -1,6 +1,7 @@
 import { $, $$, defaults, type JSX, isObservable, customElement, type ElementAttributes, type Observable, type CustomElementChildren, type StyleEncapsulationProps, useEffect, HtmlBoolean, ObservableMaybe, HtmlClass, HtmlString } from "woby"
 import '@woby/chk'
 import './input.css'
+import { registerBaseCls } from './helper/baseCls'
 
 
 export type ButtonStyles = "text" | "contained" | "outlined" | "icon" | "custom";
@@ -69,6 +70,16 @@ const variant = {
         "hover:bg-[rgba(0,0,0,0.04)]",
     ].join(" "),
 }
+
+/**
+ * The class slot `cls` replaces: the variant table entry for `type`.
+ *
+ * Named rather than inlined so the render below and the registerBaseCls() call at
+ * the bottom cannot drift apart -- the editor shows the panel the same string the
+ * button will actually render.
+ */
+const baseCls = (type: string | null | undefined) =>
+    variant[(type || 'contained') as keyof typeof variant] ?? variant.contained
 
 const def = () => ({
     type: $("contained", HtmlString) as ObservableMaybe<ButtonStyles>,
@@ -157,7 +168,7 @@ const Button: Defaulted<typeof def> = defaults(def, (props) => {
                 // Removing the `type` attribute at runtime (the property panel does
                 // exactly that when the value equals the default) left buttonType ''
                 // and variant[''] undefined, rendering class="" — an invisible button.
-                () => $$(cls) ? $$(cls) : (variant[$$(buttonType) as keyof typeof variant] ?? variant.contained), cn
+                () => $$(cls) ? $$(cls) : baseCls($$(buttonType)), cn
             ]}
             {...otherProps}
         >
@@ -178,6 +189,7 @@ export { Button }
 
 // NOTE: Register the custom element
 customElement('wui-button', Button)
+registerBaseCls('wui-button', el => baseCls(el.getAttribute('type')))
 
 // NOTE: Add the custom element to the JSX namespace
 declare module 'woby' {

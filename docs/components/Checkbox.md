@@ -148,13 +148,18 @@ It supports both **TSX usage** and **Web Component usage (`<wui-checkbox>`)**.
 
 ---
 
-# 🎨 Custom Styling with `cls`
+# 🎨 Custom Styling
+
+`cls` **replaces** the component's base classes — pass it only when you want to
+restyle the element from scratch. To *add* utilities on top of the base, use
+`class`, which is merged with whatever fills the `cls` slot.
+
 
 ### TSX
 ```tsx
 <Checkbox
     labelPosition="right"
-    cls="!text-blue-500 !font-bold"
+    class="!text-blue-500 !font-bold"
 >
     Custom styled checkbox
 </Checkbox>
@@ -164,7 +169,7 @@ It supports both **TSX usage** and **Web Component usage (`<wui-checkbox>`)**.
 ```html
 <wui-checkbox
     label-position="right"
-    cls="!text-blue-500 !font-bold"
+    class="!text-blue-500 !font-bold"
 >
     Custom styled checkbox
 </wui-checkbox>
@@ -174,7 +179,7 @@ It supports both **TSX usage** and **Web Component usage (`<wui-checkbox>`)**.
 
 # 🧠 Notes
 
-- The component wraps everything in a root `<div>` so `cls` applies to the outer container.
+- The component wraps everything in a root `<div>`, so both `cls` and `class` apply to that outer container.
 - Label is associated with the checkbox using `for={id}`, allowing click toggling.
 - `checked` and `disabled` accept **reactive observables** or primitive booleans.
 - For `top` or `bottom`, line breaks (`<br>`) are inserted automatically.

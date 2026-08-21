@@ -1,7 +1,19 @@
 import { type CustomElementChildren, $, $$, isObservable, defaults, customElement, type ElementAttributes, HtmlBoolean, type JSX, ObservableMaybe, HtmlClass } from "woby"
+import { registerBaseCls } from './helper/baseCls'
 
 // 1. Define Base Styles (Common to both states)
 // const baseStyles = "inline-flex items-center justify-center relative box-border cursor-pointer select-none align-middle font-medium text-sm px-5 py-2.5 rounded transition-colors duration-200 border"
+
+/**
+ * The class slot `cls` replaces: the shape of the button, in either state.
+ *
+ * Module scope rather than a local, so the render below and the
+ * registerBaseCls() call at the bottom read the one string -- the editor shows
+ * the panel exactly what an override would displace. The on/off colours are not
+ * part of it: they change with `checked`, so an override that swallowed them
+ * would freeze the button in whichever state it was rendered.
+ */
+const BASE_CLASS = "inline-flex items-center justify-center px-2 py-1 rounded text-sm cursor-pointer select-none transition-colors duration-150 border border-transparent"
 
 const def = () => ({
     children: $("" as JSX.Child) as CustomElementChildren,
@@ -30,8 +42,6 @@ const ToggleButton: Defaulted<typeof def> = defaults(def, (props) => {
     } = props
 
 
-    const baseStyles = "inline-flex items-center justify-center px-2 py-1 rounded text-sm cursor-pointer select-none transition-colors duration-150 border border-transparent"
-
     const handleClick = (e: MouseEvent) => {
         // let parent listeners still run, just stop React/Woby double-handling if needed
         // e.stopPropagation()
@@ -53,12 +63,10 @@ const ToggleButton: Defaulted<typeof def> = defaults(def, (props) => {
             onClick={handleClick}
             aria-pressed={() => ($$(checked) ? "true" : "false")}
             class={[
-                baseStyles,
-                // ON / OFF styles
+                // user override, else the base shape
+                () => $$(cls) ? $$(cls) : BASE_CLASS,
+                // ON / OFF styles -- outside the slot, so an override keeps them
                 () => ($$(checked) ? $$(onClass) : $$(offClass)),
-
-                // user-provided overrides
-                () => $$(cls) ? $$(cls) : "",
                 cn,
             ]}
             {...otherProps}
@@ -72,6 +80,8 @@ export { ToggleButton }
 
 // Register as custom element
 customElement('wui-toggle-button', ToggleButton)
+// Publish the slot `cls` replaces, so the editor can show and edit it.
+registerBaseCls('wui-toggle-button', BASE_CLASS)
 
 // Add the custom element to the JSX namespace
 declare module 'woby' {

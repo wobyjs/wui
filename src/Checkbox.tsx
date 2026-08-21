@@ -1,8 +1,17 @@
-import { type CustomElementChildren, $, $$, defaults, type JSX, customElement, type ElementAttributes, type ObservableMaybe, useEffect, useMemo, StyleEncapsulationProps, HtmlBoolean, HtmlClass, HtmlString } from "woby"
+import { type CustomElementChildren, $, $$, defaults, isObservable, type Observable, type JSX, customElement, type ElementAttributes, type ObservableMaybe, useEffect, useMemo, StyleEncapsulationProps, HtmlBoolean, HtmlClass, HtmlString } from "woby"
 import "@woby/chk"
 import "./input.css"
+import { registerBaseCls } from './helper/baseCls'
 
 type LabelPosition = "left" | "right" | "bottom" | "top"
+
+/**
+ * The class slot `cls` replaces: the wrapper's own layout.
+ *
+ * The flex *direction* is not part of it -- that follows `labelPosition`, and an
+ * override that swallowed it would put the label back on the wrong side.
+ */
+const BASE_CLASS = "inline-flex"
 
 type CheckboxProps = JSX.InputHTMLAttributes<HTMLInputElement> & {
 	children?: ObservableMaybe<JSX.Child>
@@ -67,8 +76,20 @@ const Checkbox: Defaulted<typeof def> = defaults(def, (props) => {
 	})
 
 	return (
-		<div class={["inline-flex", dirClass, () => $$(cls) ? $$(cls) : "", cn]}>
-			<input id={id} type="checkbox" checked={checked} disabled={disabled} {...otherProps} />
+		<div class={[() => $$(cls) ? $$(cls) : BASE_CLASS, dirClass, cn]}>
+			<input
+				id={id}
+				type="checkbox"
+				checked={checked}
+				disabled={disabled}
+				// `checked` bound one way only would leave the observable stuck at its
+				// initial value: the browser flips the input's own checkedness and nothing
+				// reports it back, so every reader -- a consumer's $(), the editor's
+				// property panel -- keeps seeing the state the checkbox started in. Same
+				// write-back Switch already does.
+				onChange={(v: any) => isObservable(checked) && (checked as Observable<boolean>)(v.target.checked)}
+				{...otherProps}
+			/>
 			<label class={["select-none", padClass]} for={() => $$(id)}>{children}</label>
 		</div>
 	)
@@ -77,6 +98,8 @@ const Checkbox: Defaulted<typeof def> = defaults(def, (props) => {
 export { Checkbox }
 
 customElement("wui-checkbox", Checkbox)
+// Publish the slot `cls` replaces, so the editor can show and edit it.
+registerBaseCls("wui-checkbox", BASE_CLASS)
 
 declare module "woby" {
 	namespace JSX {

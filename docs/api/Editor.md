@@ -30,7 +30,29 @@ import "./Editor"; // registers <wui-editor>
 | **enableToolbar**         | `boolean` (observable)                                                  | `true`   | Show or hide the toolbar                                 |
 | **externalPropertyPanel** | `{ panelOpen, propertyTarget, selectionType }` or `null`                | `null`   | External control for PropertyPanel state                 |
 | **readonly**              | `boolean` (observable)                                                  | `false`  | Disable editing and hide the toolbar                     |
+| **height**                | `string` (observable)                                                   | `''`     | Fixed CSS height for the editable surface                |
+| **maxHeight**             | `string` (observable)                                                   | `'60vh'` | Ceiling the surface grows to before it scrolls           |
 | **...otherProps**         | HTML div attributes                                                     | —        | Any standard div attributes                              |
+
+## Scrolling
+
+The editable surface is its own scroll container: it grows with the document up to
+`maxHeight`, then scrolls internally instead of stretching the page. Set `height`
+for a box that stays the same size no matter how little content it holds — it wins
+over `maxHeight` when both are given. Set either to `''` to opt out and let the
+surface grow without limit.
+
+```html
+<wui-editor maxHeight="400px"></wui-editor>
+<wui-editor height="300px"></wui-editor>
+<wui-editor maxHeight=""></wui-editor>   <!-- unbounded, grows the page -->
+```
+
+Overscroll is contained, so reaching the end of the editor does not start scrolling
+the host page, and the scrollbar gutter is reserved so text does not reflow the
+moment the document grows past the ceiling. The editor's floating chrome — the drag
+grip, the image handles and the table cell menu — re-anchors on every scroll of the
+surface.
 
 ## `externalPropertyPanel`
 

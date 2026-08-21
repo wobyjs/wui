@@ -9,6 +9,7 @@
  *   import './Editor/WuiPlugins'
  */
 import { registerEditorPlugin, type PluginProp } from './EditorPlugin'
+import { getBaseCls } from '../helper/baseCls'
 
 /**
  * Styling props shared by every wui component, appended last so they render
@@ -24,6 +25,13 @@ import { registerEditorPlugin, type PluginProp } from './EditorPlugin'
  * `default: ''` matters: applyCustomElementProperty removes the attribute when
  * the value equals the default, so clearing either box strips it from the
  * serialized HTML instead of leaving `cls=""` behind.
+ *
+ * `cls` also carries a resolveDefault, because an empty box is a dead end for
+ * it: the class it would replace lives inside the component and is invisible
+ * from the outside, so there is nothing to start an override from. Components
+ * publish that string themselves (see helper/baseCls), the row opens pre-filled
+ * with it, and because it doubles as the unset value an unedited row still
+ * writes no attribute -- editing it is what turns it into a real override.
  */
 const styleProps: PluginProp[] = [
     {
@@ -32,7 +40,8 @@ const styleProps: PluginProp[] = [
     },
     {
         name: 'cls', type: 'string', label: 'Class Override', default: '',
-        hint: 'Replaces the component base/variant class entirely — leave empty to keep the variant',
+        resolveDefault: getBaseCls,
+        hint: 'Replaces the component base/variant class entirely — pre-filled with that base; edit it to override, clear it to go back',
     },
 ]
 
@@ -81,7 +90,7 @@ registerEditorPlugin({
 
 const toggleButtonProps: PluginProp[] = [
     { name: 'children', type: 'string', label: 'Label', default: 'Toggle', hint: 'Button text', textContent: true },
-    { name: 'checked', type: 'boolean', label: 'Checked', default: false },
+    { name: 'checked', type: 'boolean', label: 'Checked', default: false, live: true },
     { name: 'disabled', type: 'boolean', label: 'Disabled', default: false },
 ]
 
@@ -114,10 +123,13 @@ registerEditorPlugin({
 
 const checkboxProps: PluginProp[] = [
     { name: 'children', type: 'string', label: 'Label', default: 'Checkbox', hint: 'Label text', textContent: true },
-    { name: 'checked', type: 'boolean', label: 'Checked', default: false },
+    { name: 'checked', type: 'boolean', label: 'Checked', default: false, live: true },
     { name: 'disabled', type: 'boolean', label: 'Disabled', default: false },
     {
-        name: 'labelPosition', type: 'enum', label: 'Label Position', default: 'right',
+        // Component default is 'left' (Checkbox.tsx `labelPosition: $("left")`).
+        // A plugin default that disagrees makes picking it strip the attribute and
+        // silently snap the label to the other side.
+        name: 'labelPosition', type: 'enum', label: 'Label Position', default: 'left',
         options: [
             { value: 'left', label: 'Left' },
             { value: 'right', label: 'Right' },
@@ -158,9 +170,16 @@ registerEditorPlugin({
 const switchProps: PluginProp[] = [
     { name: 'on', type: 'string', label: 'On Text', default: 'ON', hint: 'Label shown when checked' },
     { name: 'off', type: 'string', label: 'Off Text', default: 'OFF', hint: 'Label shown when unchecked' },
-    { name: 'checked', type: 'boolean', label: 'Checked', default: false },
+    { name: 'checked', type: 'boolean', label: 'Checked', default: false, live: true },
     {
-        name: 'effect', type: 'enum', label: 'Effect', default: 'ios',
+        // `default` must be the component's own default (`effect: $("")`), not a
+        // nice-looking one: applyCustomElementProperty deletes an attribute equal
+        // to the plugin default, so declaring 'ios' here made picking "iOS" strip
+        // `effect` off the element -- the row read iOS while the switch rendered
+        // with no effect stylesheet at all.
+        name: 'effect', type: 'enum', label: 'Effect', default: '',
+        // Every key in Switch.tsx's styleMap. A switch *is* its effect, so an
+        // option missing here is a variant the editor cannot reach.
         options: [
             { value: '', label: 'Default' },
             { value: 'ios', label: 'iOS' },
@@ -169,7 +188,23 @@ const switchProps: PluginProp[] = [
             { value: 'flip', label: 'Flip' },
             { value: 'light', label: 'Light' },
             { value: 'effect1', label: 'Effect 1' },
+            { value: 'effect2', label: 'Effect 2' },
+            { value: 'effect3', label: 'Effect 3' },
+            { value: 'effect4', label: 'Effect 4' },
+            { value: 'effect5', label: 'Effect 5' },
+            { value: 'effect6', label: 'Effect 6' },
             { value: 'effect7', label: 'Effect 7' },
+            { value: 'effect8', label: 'Effect 8' },
+            { value: 'effect9', label: 'Effect 9' },
+            { value: 'effect10', label: 'Effect 10' },
+            { value: 'effect11', label: 'Effect 11' },
+            { value: 'effect12', label: 'Effect 12' },
+            { value: 'effect13', label: 'Effect 13' },
+            { value: 'effect14', label: 'Effect 14' },
+            { value: 'effect15', label: 'Effect 15' },
+            { value: 'effect16', label: 'Effect 16' },
+            { value: 'effect17', label: 'Effect 17' },
+            { value: 'effect18', label: 'Effect 18' },
         ],
     },
 ]
@@ -206,7 +241,7 @@ registerEditorPlugin({
 
 const textFieldProps: PluginProp[] = [
     { name: 'label', type: 'string', label: 'Label', hint: 'Floating label text' },
-    { name: 'value', type: 'string', label: 'Value', default: '' },
+    { name: 'value', type: 'string', label: 'Value', default: '', live: true },
     { name: 'placeholder', type: 'string', label: 'Placeholder', hint: 'Hint text inside the field' },
     {
         name: 'inputType', type: 'enum', label: 'Input Type', default: 'text',
@@ -223,6 +258,44 @@ const textFieldProps: PluginProp[] = [
         ],
     },
     { name: 'disabled', type: 'boolean', label: 'Disabled', default: false },
+    {
+        // Every key in TextField.tsx's effectMap -- the prop existed but the panel
+        // never exposed it, so all 27 focus animations were unreachable. Default ''
+        // matches the component (`effect: $("")`), so only "None" clears it.
+        name: 'effect', type: 'enum', label: 'Effect', default: '',
+        hint: 'Focus/label animation. Effects 16+ need a Label to look right.',
+        options: [
+            { value: '', label: 'None' },
+            { value: 'effect1', label: 'Effect 1 - Center-out underline' },
+            { value: 'effect2', label: 'Effect 2 - Left-to-right underline' },
+            { value: 'effect3', label: 'Effect 3 - Split center-out underline' },
+            { value: 'effect4', label: 'Effect 4 - Bottom-up fill border' },
+            { value: 'effect5', label: 'Effect 5 - Left-to-right fill border' },
+            { value: 'effect6', label: 'Effect 6 - Right-to-left fill border' },
+            { value: 'effect7', label: 'Effect 7 - Center-out split outline' },
+            { value: 'effect8', label: 'Effect 8 - Corner-to-corner outline' },
+            { value: 'effect9', label: 'Effect 9 - Snake/chasing outline' },
+            { value: 'effect10', label: 'Effect 10 - Fade in fill' },
+            { value: 'effect11', label: 'Effect 11 - Left-to-right fill' },
+            { value: 'effect12', label: 'Effect 12 - Center-out fill' },
+            { value: 'effect13', label: 'Effect 13 - Split center-out fill' },
+            { value: 'effect14', label: 'Effect 14 - Diagonal split fill' },
+            { value: 'effect15', label: 'Effect 15 - Center diamond fill' },
+            { value: 'effect16', label: 'Effect 16 - Center-out underline + label' },
+            { value: 'effect17', label: 'Effect 17 - Center-out from left + label' },
+            { value: 'effect18', label: 'Effect 18 - Split center-out + label' },
+            { value: 'effect19', label: 'Effect 19 - Split top/bottom border + label' },
+            { value: 'effect20', label: 'Effect 20 - Clockwise border + label' },
+            { value: 'effect21', label: 'Effect 21 - Snake border + label' },
+            { value: 'effect22', label: 'Effect 22 - Fade in fill + label' },
+            { value: 'effect23', label: 'Effect 23 - Split fill + label' },
+            { value: 'effect24', label: 'Effect 24 - Diagonal fill + label' },
+            { value: 'effect19a', label: 'Effect 19a - Split border, label cuts line' },
+            { value: 'effect20a', label: 'Effect 20a - Clockwise border, label cuts line' },
+            { value: 'effect21a', label: 'Effect 21a - Snake border, label cuts line' },
+        ],
+    },
+    { name: 'assignOnEnter', type: 'boolean', label: 'Commit On Enter', default: false, hint: 'Off: commit on every keystroke' },
 ]
 
 registerEditorPlugin({
@@ -256,8 +329,56 @@ registerEditorPlugin({
 
 const textAreaProps: PluginProp[] = [
     { name: 'label', type: 'string', label: 'Label', hint: 'Floating label text' },
-    { name: 'value', type: 'string', label: 'Value', default: '' },
+    { name: 'value', type: 'string', label: 'Value', default: '', live: true },
     { name: 'placeholder', type: 'string', label: 'Placeholder', hint: 'Hint text inside the field' },
+    {
+        // Same 27 effects as TextField, but TextArea's own default is 'effect19a'
+        // (`effect: $("effect19a")`), not '' -- so that is the value that unsets.
+        name: 'effect', type: 'enum', label: 'Effect', default: 'effect19a',
+        hint: 'Focus/label animation. Effects 16+ need a Label to look right.',
+        options: [
+            // No "None": TextArea's own default is 'effect19a', and an empty value
+            // just removes the attribute, so picking None would silently render 19a.
+            // Selecting 'Effect 19a' below is the real way back to the default.
+            { value: 'effect1', label: 'Effect 1 - Center-out underline' },
+            { value: 'effect2', label: 'Effect 2 - Left-to-right underline' },
+            { value: 'effect3', label: 'Effect 3 - Split center-out underline' },
+            { value: 'effect4', label: 'Effect 4 - Bottom-up fill border' },
+            { value: 'effect5', label: 'Effect 5 - Left-to-right fill border' },
+            { value: 'effect6', label: 'Effect 6 - Right-to-left fill border' },
+            { value: 'effect7', label: 'Effect 7 - Center-out split outline' },
+            { value: 'effect8', label: 'Effect 8 - Corner-to-corner outline' },
+            { value: 'effect9', label: 'Effect 9 - Snake/chasing outline' },
+            { value: 'effect10', label: 'Effect 10 - Fade in fill' },
+            { value: 'effect11', label: 'Effect 11 - Left-to-right fill' },
+            { value: 'effect12', label: 'Effect 12 - Center-out fill' },
+            { value: 'effect13', label: 'Effect 13 - Split center-out fill' },
+            { value: 'effect14', label: 'Effect 14 - Diagonal split fill' },
+            { value: 'effect15', label: 'Effect 15 - Center diamond fill' },
+            { value: 'effect16', label: 'Effect 16 - Center-out underline + label' },
+            { value: 'effect17', label: 'Effect 17 - Center-out from left + label' },
+            { value: 'effect18', label: 'Effect 18 - Split center-out + label' },
+            { value: 'effect19', label: 'Effect 19 - Split top/bottom border + label' },
+            { value: 'effect20', label: 'Effect 20 - Clockwise border + label' },
+            { value: 'effect21', label: 'Effect 21 - Snake border + label' },
+            { value: 'effect22', label: 'Effect 22 - Fade in fill + label' },
+            { value: 'effect23', label: 'Effect 23 - Split fill + label' },
+            { value: 'effect24', label: 'Effect 24 - Diagonal fill + label' },
+            { value: 'effect19a', label: 'Effect 19a - Split border, label cuts line' },
+            { value: 'effect20a', label: 'Effect 20a - Clockwise border, label cuts line' },
+            { value: 'effect21a', label: 'Effect 21a - Snake border, label cuts line' },
+        ],
+    },
+    {
+        name: 'resize', type: 'enum', label: 'Resize', default: 'none',
+        options: [
+            { value: 'none', label: 'None' },
+            { value: 'horizontal', label: 'Horizontal' },
+            { value: 'vertical', label: 'Vertical' },
+            { value: 'both', label: 'Both' },
+        ],
+    },
+    { name: 'assignOnEnter', type: 'boolean', label: 'Commit On Enter', default: false, hint: 'Off: commit on every keystroke' },
 ]
 
 registerEditorPlugin({
@@ -290,7 +411,9 @@ registerEditorPlugin({
 // ── wui-number-field ──
 
 const numberFieldProps: PluginProp[] = [
-    { name: 'value', type: 'number', label: 'Value', default: 10, hint: 'Current numeric value' },
+    // Default is the component's own (NumberField.tsx `value: $(0)`), not the demo's
+    // 10 -- otherwise typing 10 removes the attribute and the widget falls back to 0.
+    { name: 'value', type: 'number', label: 'Value', default: 0, hint: 'Current numeric value', live: true },
     { name: 'min', type: 'number', label: 'Min', default: 0 },
     { name: 'max', type: 'number', label: 'Max', default: 100 },
     { name: 'step', type: 'number', label: 'Step', default: 1 },
@@ -428,7 +551,8 @@ registerEditorPlugin({
 
 const fabProps: PluginProp[] = [
     {
-        name: 'type', type: 'enum', label: 'Shape', default: 'circular',
+        // Component default is 'pill' (Fab.tsx `type: $("pill")`).
+        name: 'type', type: 'enum', label: 'Shape', default: 'pill',
         options: [
             { value: 'circular', label: 'Circular' },
             { value: 'pill', label: 'Pill' },

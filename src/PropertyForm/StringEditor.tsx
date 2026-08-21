@@ -12,6 +12,9 @@ export const StringEditor = () => {
 		if ($$(value) == undefined) return false
 		// Enum values (carrying .options) are handled by EnumEditor — exclude them here
 		if (Array.isArray((value as any)?.options)) return false
+		// A date attribute is a string on the wire, so the typeof test below matches it
+		// too. Whoever registers the date picker owns the row; without this both render.
+		if ((value as any)?.propType === 'date') return false
 		const hexColorReg = /^#[0-9A-F]{6}$/i
 		const isColor = $$(value).length == 9 ? hexColorReg.test($$(value).slice(0, -2)) : hexColorReg.test($$(value))
 		const isString = isObservable(value) ? typeof $$(value) == "string" : typeof value == "string"
@@ -39,7 +42,12 @@ export const StringEditor = () => {
 		const { value } = props
 
 		return (
+			// w-full, not the field's shrink-to-fit default: the row's value cell
+			// already stretches with the dialog, but a flex item sizes to its content,
+			// so without this the input stayed at the <input> intrinsic width while
+			// the cell around it grew.
 			<TextField
+				class="w-full"
 				value={value}
 				assignOnEnter
 				disabled={!isObservable(value)}

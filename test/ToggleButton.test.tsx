@@ -10,7 +10,7 @@ const CheckedToggleButton = () => {
 }
 
 const CustomClassToggleButton = () => {
-    return <ToggleButton cls={"m-2 p-2 border-2 rounded"}>Toggle</ToggleButton>
+    return <ToggleButton class={"m-2 p-2 border-2 rounded"}>Toggle</ToggleButton>
 }
 
 const OnOffClassToggleButton = () => {

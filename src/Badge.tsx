@@ -1,6 +1,7 @@
 import { $, $$, defaults, type JSX, customElement, type ElementAttributes, type ObservableMaybe, type CustomElementChildren, isObservable, StyleEncapsulationProps, useEffect, HtmlClass, HtmlString } from "woby"
 import '@woby/chk'
 import './input.css'
+import { registerBaseCls } from './helper/baseCls'
 
 // Define types for better type safety
 type VerticalPosition = 'top' | 'bottom'
@@ -39,6 +40,9 @@ const def = () => ({
     vertical: $('top', HtmlString) as ObservableMaybe<VerticalPosition>,
     horizontal: $('right', HtmlString) as ObservableMaybe<HorizontalPosition>,
 })
+
+/** The wrapper class `cls` replaces. The inner badge dot is styled separately by `badgeClass`. */
+const BASE_CLASS = 'relative inline-flex align-middle shrink-0 m-4'
 
 const Badge: Defaulted<typeof def> = defaults(def, (props) => {
     const { class: cn, cls, children, badgeContent, badgeClass, vertical, horizontal, ...otherProps } = props
@@ -107,7 +111,7 @@ const Badge: Defaulted<typeof def> = defaults(def, (props) => {
 
     return (
         <div>
-            <span class={[() => $$(cls) ? $$(cls) : `relative inline-flex align-middle shrink-0 m-4`, cn]} {...otherProps}>
+            <span class={[() => $$(cls) ? $$(cls) : BASE_CLASS, cn]} {...otherProps}>
                 <span
                     class={() => {
                         const classes = [
@@ -136,6 +140,7 @@ export { Badge }
 
 // Register the custom element
 customElement('wui-badge', Badge)
+registerBaseCls('wui-badge', BASE_CLASS)
 
 // Add the custom element to the JSX namespace
 declare module 'woby' {

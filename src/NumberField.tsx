@@ -1,5 +1,20 @@
 import { type CustomElementChildren, $, $$, useEffect, isObservable, Observable, ObservableMaybe, type JSX, defaults, customElement, type ElementAttributes, HtmlBoolean, useMemo, HtmlNumber, HtmlClass } from 'woby'
 import { Button } from './Button'
+import { registerBaseCls } from './helper/baseCls'
+
+/**
+ * The class slot `cls` replaces: the box around the field and its buttons.
+ *
+ * The disabled styling stays outside the slot -- it follows the `disabled`
+ * attribute, so an override that swallowed it would leave a disabled field
+ * looking live. Module scope so the render and the registerBaseCls() call at the
+ * bottom agree on one string.
+ */
+const BASE_CLASS = [
+    "number-input inline-flex items-center bg-white border border-gray-300 rounded-lg transition-all duration-200",
+    "focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500", // Nice focus state
+    "divide-x divide-gray-200", // Subtle dividers between elements
+].join(' ')
 
 const btnCls = `bg-transparent items-center justify-center cursor-pointer relative m-0 border-[none] [outline:none] [-webkit-appearance:none] disabled:bg-[#d9dbda]`
 
@@ -167,14 +182,11 @@ const NumberField: Defaulted<typeof def> = defaults(def, (props) => {
     // return <div class={["number-input inline-flex border-2 border-solid border-[#ddd] box-border [&_*]:box-border", cls]}>
     return (
         <div class={[
-            "number-input inline-flex items-center bg-white border border-gray-300 rounded-lg transition-all duration-200",
-            "focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500", // Nice focus state
-            "divide-x divide-gray-200", // Subtle dividers between elements
+            () => $$(cls) ? $$(cls) : BASE_CLASS,
             // `bg-gray-100` alone never won: it sits at the same specificity as the
             // `bg-white` above and Tailwind emits bg-white later, so a disabled field
             // stayed pure white and only `opacity-70` showed. Force it.
             () => $$(disabled) ? "!bg-gray-100 opacity-70 cursor-not-allowed" : "", // Style for disabled state
-            () => $$(cls) ? $$(cls) : "",
             cn
         ]}>
             <Button
@@ -242,6 +254,8 @@ const NumberField: Defaulted<typeof def> = defaults(def, (props) => {
 export { NumberField }
 
 customElement('wui-number-field', NumberField)
+// Publish the slot `cls` replaces, so the editor can show and edit it.
+registerBaseCls('wui-number-field', BASE_CLASS)
 
 declare module 'woby' {
     namespace JSX {

@@ -3946,7 +3946,7 @@ var init_create_element_BAd2lnON = __esm({
   }
 });
 
-// ../woby/dist/htm.module-BBbo4eM4.js
+// ../woby/dist/htm.module-CZUpUM_y.js
 function scheduleStylesheetUpdate() {
   if (updateScheduled) return;
   updateScheduled = true;
@@ -4144,9 +4144,9 @@ function htm_module_default(s) {
     return p(), h;
   })(s)), r), arguments, [])).length > 1 ? r : r[0];
 }
-var Switch, useScheduler, useTimeout, cachedConstructedSheets, stylesheetObserver, loggedErrors, MAX_LOGGED_ERRORS, shadowRootRegistry, updateScheduled, set, isObject2, assign2, isJsxProp, make, merge, defaults, HtmlChild, contextRefRegistry, isContextRef, collectAncestorContextWrap$1, parseContextRef, resolveContextRef, createSSRCustomElement, _pendingContextWrapGlobal, consumePendingContextWrap, peekPendingContextWrap, composePendingContextWrap, collectAncestorContextWrap, createBrowserCustomElement, setObservableValue, setNestedProperty, customElement, HtmlHidden, n, t;
-var init_htm_module_BBbo4eM4 = __esm({
-  "../woby/dist/htm.module-BBbo4eM4.js"() {
+var Switch, useScheduler, useTimeout, cachedConstructedSheets, stylesheetObserver, loggedErrors, MAX_LOGGED_ERRORS, shadowRootRegistry, updateScheduled, set, isObject2, assign2, isJsxProp, make, merge, defaults, HtmlChild, contextRefRegistry, isContextRef, collectAncestorContextWrap$1, parseContextRef, resolveContextRef, createSSRCustomElement, _pendingContextWrapGlobal, consumePendingContextWrap, peekPendingContextWrap, composePendingContextWrap, collectAncestorContextWrap, createBrowserCustomElement, emptyValueFor, setObservableValue, setNestedProperty, customElement, HtmlHidden, n, t;
+var init_htm_module_CZUpUM_y = __esm({
+  "../woby/dist/htm.module-CZUpUM_y.js"() {
     "use strict";
     init_ssr_shim();
     init_setters_DB8s8ITo();
@@ -4445,6 +4445,7 @@ var init_htm_module_BBbo4eM4 = __esm({
           super();
           this.childs = [];
           this._attrObserver = null;
+          this._propDefaults = {};
           const defaultProps = defaultPropsFn() || {};
           if (props && isJsx(props)) {
             const mergeInto = (key, incoming) => {
@@ -4466,6 +4467,10 @@ var init_htm_module_BBbo4eM4 = __esm({
             defaultProps[SYMBOL_JSX] = true;
             this.props = defaultProps;
           } else this.props = !!props ? props : defaultProps;
+          for (const key in this.props) {
+            const obs = this.props[key];
+            if (isObservable(obs) && isObservableWritable(obs)) this._propDefaults[key] = untrack(() => obs());
+          }
           if (!isJsx(this.props)) {
             if (this.attributes) for (const attr of this.attributes) {
               const propName = kebabToCamelCase(attr.name);
@@ -4548,7 +4553,11 @@ var init_htm_module_BBbo4eM4 = __esm({
                 const name21 = m.attributeName;
                 const newValue = this.getAttribute(name21);
                 const oldValue = m.oldValue;
-                this.attributeChangedCallback1(name21, oldValue, newValue);
+                try {
+                  this.attributeChangedCallback1(name21, oldValue, newValue);
+                } catch (e3) {
+                  console.warn(`[woby] <${tagName}> failed to sync attribute "${name21}" to its prop:`, e3);
+                }
               }
             });
           });
@@ -4581,6 +4590,24 @@ var init_htm_module_BBbo4eM4 = __esm({
           if (name21.includes("$") || name21.includes(".")) {
             const normalizedPath = normalizePropertyPath(name21);
             setNestedProperty(this, normalizedPath, newValue);
+          } else if (newValue === null) {
+            const obs = props[propName];
+            if (isObservable(obs) && isObservableWritable(obs)) {
+              let restored = false;
+              if (propName in this._propDefaults) {
+                const d = this._propDefaults[propName];
+                try {
+                  if (typeof d === "function") obs(() => d);
+                  else obs(d);
+                  restored = true;
+                } catch {
+                }
+              }
+              if (!restored) {
+                const empty = emptyValueFor(obs);
+                if (empty.ok) obs(empty.value);
+              }
+            }
           } else setObservableValue(props, propName, newValue, this);
         }
       };
@@ -4588,6 +4615,52 @@ var init_htm_module_BBbo4eM4 = __esm({
       else wobyCustomElements.define(tagName, C2);
     };
     if (typeof window !== "undefined" && typeof document !== "undefined") observeStylesheetChanges();
+    emptyValueFor = (observable2) => {
+      const type2 = observable2[SYMBOL_OBSERVABLE_WRITABLE]?.options?.type;
+      if (type2 === void 0) return {
+        ok: true,
+        value: void 0
+      };
+      switch (type2) {
+        case "string":
+        case String:
+          return {
+            ok: true,
+            value: ""
+          };
+        case "number":
+        case Number:
+          return {
+            ok: true,
+            value: 0
+          };
+        case "boolean":
+        case Boolean:
+          return {
+            ok: true,
+            value: false
+          };
+        case "bigint":
+        case BigInt:
+          return {
+            ok: true,
+            value: BigInt(0)
+          };
+        case "object":
+        case Object:
+          return {
+            ok: true,
+            value: null
+          };
+        case "undefined":
+          return {
+            ok: true,
+            value: void 0
+          };
+        default:
+          return { ok: false };
+      }
+    };
     setObservableValue = (obj, key, value, element) => {
       if (typeof value === "string") {
         if (value.startsWith("@@")) value = value.slice(1);
@@ -4634,6 +4707,11 @@ var init_htm_module_BBbo4eM4 = __esm({
         if (!isObservableWritable(obj[key])) return;
         const observable2 = obj[key];
         const { type: type2, fromHtml } = observable2[SYMBOL_OBSERVABLE_WRITABLE].options ?? {};
+        if (value === null || value === void 0) {
+          const empty = emptyValueFor(observable2);
+          if (empty.ok) obj[key](empty.value);
+          return;
+        }
         if (type2) switch (type2) {
           case "number":
             obj[key](fromHtml ? fromHtml(value) : Number(value));
@@ -4772,7 +4850,7 @@ var init_index_es = __esm({
     init_ssr_shim();
     init_setters_DB8s8ITo();
     init_create_element_BAd2lnON();
-    init_htm_module_BBbo4eM4();
+    init_htm_module_CZUpUM_y();
     IS_BROWSER = !!globalThis.CDATASection?.toString?.().match(/^\s*function\s+CDATASection\s*\(\s*\)\s*\{\s*\[native code\]\s*\}\s*$/);
     runWithSuperRoot = _with();
     render = (child, parent, options2) => {
@@ -49419,6 +49497,15 @@ init_index_es();
 // src/Avatar.tsx
 init_ssr_shim();
 init_index_es();
+
+// src/helper/baseCls.ts
+init_ssr_shim();
+var registry2 = /* @__PURE__ */ new Map();
+var registerBaseCls = (tagName, base) => {
+  registry2.set(tagName.toLowerCase(), typeof base === "function" ? base : () => base);
+};
+
+// src/Avatar.tsx
 init_runtime_es();
 var def2 = () => ({
   /** 
@@ -49484,6 +49571,7 @@ var Avatar = defaults(def2, (props) => {
   );
 });
 customElement("wui-avatar", Avatar);
+registerBaseCls("wui-avatar", BASE_CLASS);
 
 // src/ssr/TestAvatar.tsx
 init_runtime_es();
@@ -49512,12 +49600,12 @@ var TestAvatar = () => {
 };
 if (typeof globalThis.__isSSRTest__ !== "undefined") {
   TestAvatar();
-  const BASE_CLASS4 = "relative flex items-center justify-center align-middle select-none leading-none overflow-hidden shrink-0 m-0 bg-[rgb(189,189,189)] text-white";
+  const BASE_CLASS10 = "relative flex items-center justify-center align-middle select-none leading-none overflow-hidden shrink-0 m-0 bg-[rgb(189,189,189)] text-white";
   const fullElements = [
-    `<h3>Avatar</h3><div class="rounded-full w-6 h-6 text-xs ${BASE_CLASS4}"></div>`,
-    `<h3>Avatar</h3><div class="rounded-xl w-8 h-8 text-sm ${BASE_CLASS4}"><img src="x.png" alt="Avatar" class="w-full h-full object-cover" /></div>`,
-    `<h3>Avatar</h3><div class="rounded-md w-10 h-10 text-base ${BASE_CLASS4}"></div>`,
-    `<h3>Avatar</h3><div class="rounded-full w-12 h-12 text-lg ${BASE_CLASS4}"><img src="y.png" alt="User" class="w-full h-full object-cover" /></div>`
+    `<h3>Avatar</h3><div class="rounded-full w-6 h-6 text-xs ${BASE_CLASS10}"></div>`,
+    `<h3>Avatar</h3><div class="rounded-xl w-8 h-8 text-sm ${BASE_CLASS10}"><img src="x.png" alt="Avatar" class="w-full h-full object-cover" /></div>`,
+    `<h3>Avatar</h3><div class="rounded-md w-10 h-10 text-base ${BASE_CLASS10}"></div>`,
+    `<h3>Avatar</h3><div class="rounded-full w-12 h-12 text-lg ${BASE_CLASS10}"><img src="y.png" alt="User" class="w-full h-full object-cover" /></div>`
   ];
   console.log(`
 \u{1F4DD} Test: ${name2}`);
@@ -49546,27 +49634,27 @@ TestAvatar.test = {
   compareActualValues: true,
   expect: () => {
     const idx = get(testObservables[name2]);
-    const BASE_CLASS4 = "relative flex items-center justify-center align-middle select-none leading-none overflow-hidden shrink-0 m-0 bg-[rgb(189,189,189)] text-white";
+    const BASE_CLASS10 = "relative flex items-center justify-center align-middle select-none leading-none overflow-hidden shrink-0 m-0 bg-[rgb(189,189,189)] text-white";
     const elements = [
-      `<div class="rounded-full w-6 h-6 text-xs ${BASE_CLASS4}"></div>`,
+      `<div class="rounded-full w-6 h-6 text-xs ${BASE_CLASS10}"></div>`,
       [
-        `<div class="rounded-xl w-8 h-8 text-sm ${BASE_CLASS4}"><img src="x.png" alt="Avatar" class="w-full h-full object-cover"></div>`,
-        `<div class="rounded-xl w-8 h-8 text-sm ${BASE_CLASS4}"><img src="x.png" alt="Avatar" class="w-full h-full object-cover" style="display: none;"></div>`
+        `<div class="rounded-xl w-8 h-8 text-sm ${BASE_CLASS10}"><img src="x.png" alt="Avatar" class="w-full h-full object-cover"></div>`,
+        `<div class="rounded-xl w-8 h-8 text-sm ${BASE_CLASS10}"><img src="x.png" alt="Avatar" class="w-full h-full object-cover" style="display: none;"></div>`
       ],
-      `<div class="rounded-md w-10 h-10 text-base ${BASE_CLASS4}"></div>`,
+      `<div class="rounded-md w-10 h-10 text-base ${BASE_CLASS10}"></div>`,
       [
-        `<div class="rounded-full w-12 h-12 text-lg ${BASE_CLASS4}"><img src="y.png" alt="User" class="w-full h-full object-cover"></div>`,
-        `<div class="rounded-full w-12 h-12 text-lg ${BASE_CLASS4}"><img src="y.png" alt="User" class="w-full h-full object-cover" style="display: none;"></div>`
+        `<div class="rounded-full w-12 h-12 text-lg ${BASE_CLASS10}"><img src="y.png" alt="User" class="w-full h-full object-cover"></div>`,
+        `<div class="rounded-full w-12 h-12 text-lg ${BASE_CLASS10}"><img src="y.png" alt="User" class="w-full h-full object-cover" style="display: none;"></div>`
       ]
     ];
     const expected = elements[idx];
     const ssrComponent = testObservables[`${name2}_ssr`];
     const ssrResult = renderToString(ssrComponent);
     const fullElements = [
-      `<h3>Avatar</h3><div class="rounded-full w-6 h-6 text-xs ${BASE_CLASS4}"></div>`,
-      `<h3>Avatar</h3><div class="rounded-xl w-8 h-8 text-sm ${BASE_CLASS4}"><img src="x.png" alt="Avatar" class="w-full h-full object-cover" /></div>`,
-      `<h3>Avatar</h3><div class="rounded-md w-10 h-10 text-base ${BASE_CLASS4}"></div>`,
-      `<h3>Avatar</h3><div class="rounded-full w-12 h-12 text-lg ${BASE_CLASS4}"><img src="y.png" alt="User" class="w-full h-full object-cover" /></div>`
+      `<h3>Avatar</h3><div class="rounded-full w-6 h-6 text-xs ${BASE_CLASS10}"></div>`,
+      `<h3>Avatar</h3><div class="rounded-xl w-8 h-8 text-sm ${BASE_CLASS10}"><img src="x.png" alt="Avatar" class="w-full h-full object-cover" /></div>`,
+      `<h3>Avatar</h3><div class="rounded-md w-10 h-10 text-base ${BASE_CLASS10}"></div>`,
+      `<h3>Avatar</h3><div class="rounded-full w-12 h-12 text-lg ${BASE_CLASS10}"><img src="y.png" alt="User" class="w-full h-full object-cover" /></div>`
     ];
     const expectedFull = fullElements[idx];
     if (ssrResult !== expectedFull) {
@@ -49611,6 +49699,7 @@ var def3 = () => ({
   vertical: observable("top", HtmlString),
   horizontal: observable("right", HtmlString)
 });
+var BASE_CLASS2 = "relative inline-flex align-middle shrink-0 m-4";
 var Badge = defaults(def3, (props) => {
   const { class: cn2, cls, children, badgeContent, badgeClass, vertical, horizontal, ...otherProps } = props;
   effect(() => {
@@ -49647,7 +49736,7 @@ var Badge = defaults(def3, (props) => {
     const posClass = `${vertical === "top" ? "top-0" : "bottom-0"} ${horizontal === "right" ? "right-0" : "left-0"}`;
     return posClass;
   };
-  return /* @__PURE__ */ jsx("div", { children: /* @__PURE__ */ jsxs("span", { class: [() => get(cls) ? get(cls) : `relative inline-flex align-middle shrink-0 m-4`, cn2], ...otherProps, children: [
+  return /* @__PURE__ */ jsx("div", { children: /* @__PURE__ */ jsxs("span", { class: [() => get(cls) ? get(cls) : BASE_CLASS2, cn2], ...otherProps, children: [
     /* @__PURE__ */ jsx(
       "span",
       {
@@ -49672,6 +49761,7 @@ var Badge = defaults(def3, (props) => {
   ] }) });
 });
 customElement("wui-badge", Badge);
+registerBaseCls("wui-badge", BASE_CLASS2);
 
 // src/ssr/TestBadge.tsx
 init_runtime_es();
@@ -49827,6 +49917,7 @@ var variant = {
     "hover:bg-[rgba(0,0,0,0.04)]"
   ].join(" ")
 };
+var baseCls = (type2) => variant[type2 || "contained"] ?? variant.contained;
 var def4 = () => ({
   type: observable("contained", HtmlString),
   buttonFunction: observable("button", HtmlString),
@@ -49899,7 +49990,7 @@ var Button = defaults(def4, (props) => {
         // Removing the `type` attribute at runtime (the property panel does
         // exactly that when the value equals the default) left buttonType ''
         // and variant[''] undefined, rendering class="" — an invisible button.
-        () => get(cls) ? get(cls) : variant[get(buttonType)] ?? variant.contained,
+        () => get(cls) ? get(cls) : baseCls(get(buttonType)),
         cn2
       ],
       ...otherProps,
@@ -49908,6 +49999,7 @@ var Button = defaults(def4, (props) => {
   );
 });
 customElement("wui-button", Button);
+registerBaseCls("wui-button", (el) => baseCls(el.getAttribute("type")));
 
 // src/ssr/TestButton.tsx
 init_runtime_es();
@@ -50302,6 +50394,7 @@ init_index_es();
 init_ssr_shim();
 init_index_es();
 init_runtime_es();
+var BASE_CLASS3 = "inline-flex";
 var def5 = () => ({
   children: observable(null),
   labelPosition: observable("left"),
@@ -50353,12 +50446,23 @@ var Checkbox = defaults(def5, (props) => {
         return "pl-1.5";
     }
   });
-  return /* @__PURE__ */ jsxs("div", { class: ["inline-flex", dirClass, () => get(cls) ? get(cls) : "", cn2], children: [
-    /* @__PURE__ */ jsx("input", { id, type: "checkbox", checked, disabled, ...otherProps }),
+  return /* @__PURE__ */ jsxs("div", { class: [() => get(cls) ? get(cls) : BASE_CLASS3, dirClass, cn2], children: [
+    /* @__PURE__ */ jsx(
+      "input",
+      {
+        id,
+        type: "checkbox",
+        checked,
+        disabled,
+        onChange: (v2) => isObservable(checked) && checked(v2.target.checked),
+        ...otherProps
+      }
+    ),
     /* @__PURE__ */ jsx("label", { class: ["select-none", padClass], for: () => get(id), children })
   ] });
 });
 customElement("wui-checkbox", Checkbox);
+registerBaseCls("wui-checkbox", BASE_CLASS3);
 
 // src/ssr/TestCheckbox.tsx
 init_runtime_es();
@@ -50493,7 +50597,7 @@ var Chip = defaults(def6, (props) => {
     return renderChip();
   };
   function renderChip() {
-    const baseClass2 = "relative cursor-pointer select-none appearance-none max-w-full text-[0.8125rem] inline-flex items-center justify-center h-8 text-[rgba(0,0,0,0.87)] bg-[rgba(0,0,0,0.08)] no-underline align-middle box-border m-0 p-0 rounded-2xl border-0 [transition:background-color_300ms_cubic-bezier(0.4,0,0.2,1)0ms,box-shadow_300ms_cubic-bezier(0.4,0,0.2,1)0ms] [outline:0px]";
+    const baseClass3 = "relative cursor-pointer select-none appearance-none max-w-full text-[0.8125rem] inline-flex items-center justify-center h-8 text-[rgba(0,0,0,0.87)] bg-[rgba(0,0,0,0.08)] no-underline align-middle box-border m-0 p-0 rounded-2xl border-0 [transition:background-color_300ms_cubic-bezier(0.4,0,0.2,1)0ms,box-shadow_300ms_cubic-bezier(0.4,0,0.2,1)0ms] [outline:0px]";
     const isDeletable = () => {
       if (deletable == true) {
         return /* @__PURE__ */ jsx(
@@ -50517,7 +50621,7 @@ var Chip = defaults(def6, (props) => {
     return /* @__PURE__ */ jsxs(
       "div",
       {
-        class: [() => get(cls) ? get(cls) : baseClass2, cn2],
+        class: [() => get(cls) ? get(cls) : baseClass3, cn2],
         tabIndex: 0,
         role: "button",
         ...otherProps,
@@ -50641,7 +50745,7 @@ var def7 = () => ({
 var Collapse = defaults(def7, (props) => {
   const { class: cn2, cls, children, open, background, ...otherProps } = props;
   const internalOpen = isObservable(open) ? open : observable(open ?? true);
-  const baseClass2 = "overflow-hidden transition-height duration-200 ease-in-out ";
+  const baseClass3 = "overflow-hidden transition-height duration-200 ease-in-out ";
   const isBackground = () => {
     return get(background) === true ? "bg-[#ccc]" : "";
   };
@@ -50649,7 +50753,7 @@ var Collapse = defaults(def7, (props) => {
     return /* @__PURE__ */ jsx(
       "div",
       {
-        class: [() => get(cls) ? get(cls) : baseClass2, () => isBackground(), cn2],
+        class: [() => get(cls) ? get(cls) : baseClass3, () => isBackground(), cn2],
         ...otherProps,
         children: /* @__PURE__ */ jsx("div", { class: "h-fit", children })
       }
@@ -50780,12 +50884,13 @@ var variantStyle3 = {
   pill: "inline-flex items-center justify-center align-middle bg-[rgb(25,118,210)] text-[white] text-4xl font-black cursor-pointer shadow-[0px_4px_8px_rgba(0,0,0,0.3)] transition-[background-color] duration-[0.3s] px-5 py-[15px] rounded-[50px] border-[none] [transition:top_0.3s_ease,left_0.3s_ease] z-[1050]",
   custom: ""
 };
+var baseCls2 = (type2) => variantStyle3[type2 || "pill"] ?? "";
 var Fab = defaults(def8, (props) => {
   const { class: cn2, cls, children, type: variant2, disabled, ...otherProps } = props;
   return /* @__PURE__ */ jsx(
     "button",
     {
-      class: [() => get(cls) ? get(cls) : variantStyle3[get(variant2)], disabledStyle, cn2],
+      class: [() => get(cls) ? get(cls) : baseCls2(get(variant2)), disabledStyle, cn2],
       disabled,
       ...otherProps,
       children: /* @__PURE__ */ jsx("div", { class: "flex items-center", children })
@@ -50793,6 +50898,7 @@ var Fab = defaults(def8, (props) => {
   );
 });
 customElement("wui-fab", Fab);
+registerBaseCls("wui-fab", (el) => baseCls2(el.getAttribute("type")));
 
 // src/ssr/TestFab.tsx
 init_runtime_es();
@@ -50899,20 +51005,21 @@ var def9 = () => ({
   children: observable(null),
   disabled: observable(false, HtmlBoolean)
 });
+var baseClass = "inline-flex items-center justify-center relative box-border bg-transparent cursor-pointer select-none align-middle appearance-none no-underline text-center flex-[0_0_auto] text-2xl overflow-visible text-[rgba(0,0,0,0.54)] transition-[background-color] duration ease-in-out delay-[0ms] m-0 p-2 rounded-[50%] border-0 [outline:0px] duration-[0.3s] hover:bg-[#dde0dd] [&_svg]:w-[1em] [&_svg]:h-[1em] [&_svg]:fill-current [&_img]:w-[1em] [&_img]:h-[1em] disabled:bg-transparent disabled:text-[rgba(0,0,0,0.26)] disabled:pointer-events-none disabled:cursor-default disabled:[&_svg]:fill-[rgba(0,0,0,0.26)]";
 var IconButton = defaults(def9, (props) => {
   const { class: cn2, cls, children, disabled, ...otherProps } = props;
-  const baseClass2 = "inline-flex items-center justify-center relative box-border bg-transparent cursor-pointer select-none align-middle appearance-none no-underline text-center flex-[0_0_auto] text-2xl overflow-visible text-[rgba(0,0,0,0.54)] transition-[background-color] duration ease-in-out delay-[0ms] m-0 p-2 rounded-[50%] border-0 [outline:0px] duration-[0.3s] hover:bg-[#dde0dd] [&_svg]:w-[1em] [&_svg]:h-[1em] [&_svg]:fill-current [&_img]:w-[1em] [&_img]:h-[1em] disabled:bg-transparent disabled:text-[rgba(0,0,0,0.26)] disabled:pointer-events-none disabled:cursor-default disabled:[&_svg]:fill-[rgba(0,0,0,0.26)]";
   return /* @__PURE__ */ jsx(
     "button",
     {
       disabled,
-      class: [() => get(cls) ? get(cls) : baseClass2, cn2],
+      class: [() => get(cls) ? get(cls) : baseClass, cn2],
       ...otherProps,
       children
     }
   );
 });
 customElement("wui-icon-button", IconButton);
+registerBaseCls("wui-icon-button", baseClass);
 
 // src/ssr/TestIconButton.tsx
 init_runtime_es();
@@ -51000,6 +51107,13 @@ init_index_es();
 init_ssr_shim();
 init_index_es();
 init_runtime_es();
+var BASE_CLASS4 = [
+  "number-input inline-flex items-center bg-white border border-gray-300 rounded-lg transition-all duration-200",
+  "focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500",
+  // Nice focus state
+  "divide-x divide-gray-200"
+  // Subtle dividers between elements
+].join(" ");
 var def10 = () => ({
   /** Child elements to be rendered inside the number field */
   children: observable(null),
@@ -51120,17 +51234,12 @@ var NumberField = defaults(def10, (props) => {
     };
   });
   return /* @__PURE__ */ jsxs("div", { class: [
-    "number-input inline-flex items-center bg-white border border-gray-300 rounded-lg transition-all duration-200",
-    "focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500",
-    // Nice focus state
-    "divide-x divide-gray-200",
-    // Subtle dividers between elements
+    () => get(cls) ? get(cls) : BASE_CLASS4,
     // `bg-gray-100` alone never won: it sits at the same specificity as the
     // `bg-white` above and Tailwind emits bg-white later, so a disabled field
     // stayed pure white and only `opacity-70` showed. Force it.
     () => get(disabled) ? "!bg-gray-100 opacity-70 cursor-not-allowed" : "",
     // Style for disabled state
-    () => get(cls) ? get(cls) : "",
     cn2
   ], children: [
     /* @__PURE__ */ jsx(
@@ -51198,6 +51307,7 @@ var NumberField = defaults(def10, (props) => {
   ] });
 });
 customElement("wui-number-field", NumberField);
+registerBaseCls("wui-number-field", BASE_CLASS4);
 
 // src/ssr/TestNumberField.tsx
 init_runtime_es();
@@ -51286,7 +51396,7 @@ init_index_es();
 init_ssr_shim();
 init_index_es();
 init_runtime_es();
-var baseClass = "bg-white transition-shadow duration-300 ease-in-out rounded-lg ";
+var baseClass2 = "bg-white transition-shadow duration-300 ease-in-out rounded-lg ";
 var preset = {
   0: `shadow-none `,
   1: `shadow-sm `,
@@ -51323,7 +51433,7 @@ var Paper = defaults(def11, (props) => {
     const elev = get(elevation);
     return preset[elev] ?? preset[0];
   });
-  return /* @__PURE__ */ jsx("div", { class: [() => get(cls) ? get(cls) : baseClass, elevationClass, cn2], ...otherProps, children });
+  return /* @__PURE__ */ jsx("div", { class: [() => get(cls) ? get(cls) : baseClass2, elevationClass, cn2], ...otherProps, children });
 });
 customElement("wui-paper", Paper);
 
@@ -51443,7 +51553,7 @@ var sideBarDef = () => ({
 });
 var SideBar = defaults(sideBarDef, (props) => {
   const { class: cn2, cls, children, open, contentRef, width: width2, mask, top, ...otherProps } = props;
-  const BASE_CLASS4 = `fixed h-full left-0 overflow-x-hidden transition-all duration-500 ease-in-out flex items-start z-[10]`;
+  const BASE_CLASS10 = `fixed h-full left-0 overflow-x-hidden transition-all duration-500 ease-in-out flex items-start z-[10]`;
   const sidebarWidth = memo(() => {
     if (!get(open)) return "0px";
     const w2 = get(width2);
@@ -51462,7 +51572,7 @@ var SideBar = defaults(sideBarDef, (props) => {
     return /* @__PURE__ */ jsx(
       "div",
       {
-        class: [BASE_CLASS4, () => get(cls) ? get(cls) : null, cn2],
+        class: [BASE_CLASS10, () => get(cls) ? get(cls) : null, cn2],
         style: { width: sidebarWidth, top: get(top) },
         ...otherProps,
         children: /* @__PURE__ */ jsx("slot", { children: /* @__PURE__ */ jsx("div", { class: "w-full h-full flex flex-col justify-end", children }) })
@@ -51553,12 +51663,12 @@ var TestSideBar = () => {
   registerTestObservable(`${name13}_ssr`, ret);
   return ret;
 };
-var BASE_CLASS2 = "fixed h-full left-0 overflow-x-hidden transition-all duration-500 ease-in-out flex items-start z-[10]";
+var BASE_CLASS5 = "fixed h-full left-0 overflow-x-hidden transition-all duration-500 ease-in-out flex items-start z-[10]";
 if (typeof globalThis.__isSSRTest__ !== "undefined") {
   TestSideBar();
   const fullElements = [
-    `<h3>SideBar</h3><div class="${BASE_CLASS2}" style="width: 0px; top: 56px;"><slot><div class="w-full h-full flex flex-col justify-end">Sidebar</div></slot></div>`,
-    `<h3>SideBar</h3><div class="${BASE_CLASS2}" style="width: 250px; top: 56px;"><slot><div class="w-full h-full flex flex-col justify-end">Sidebar</div></slot></div>`
+    `<h3>SideBar</h3><div class="${BASE_CLASS5}" style="width: 0px; top: 56px;"><slot><div class="w-full h-full flex flex-col justify-end">Sidebar</div></slot></div>`,
+    `<h3>SideBar</h3><div class="${BASE_CLASS5}" style="width: 250px; top: 56px;"><slot><div class="w-full h-full flex flex-col justify-end">Sidebar</div></slot></div>`
   ];
   console.log(`
 \u{1F4DD} Test: ${name13}`);
@@ -51588,12 +51698,12 @@ TestSideBar.test = {
   expect: () => {
     const idx = get(testObservables[name13]);
     const fullWidth = idx === 1 ? "250px" : "0px";
-    const expected = `<div class="${BASE_CLASS2}" style="width: ${fullWidth}; top: 56px;"></div>`;
+    const expected = `<div class="${BASE_CLASS5}" style="width: ${fullWidth}; top: 56px;"></div>`;
     const ssrComponent = testObservables[`${name13}_ssr`];
     const ssrResult = renderToString(ssrComponent);
     const fullElements = [
-      `<h3>SideBar</h3><div class="${BASE_CLASS2}" style="width: 0px; top: 56px;"><slot><div class="w-full h-full flex flex-col justify-end">Sidebar</div></slot></div>`,
-      `<h3>SideBar</h3><div class="${BASE_CLASS2}" style="width: 250px; top: 56px;"><slot><div class="w-full h-full flex flex-col justify-end">Sidebar</div></slot></div>`
+      `<h3>SideBar</h3><div class="${BASE_CLASS5}" style="width: 0px; top: 56px;"><slot><div class="w-full h-full flex flex-col justify-end">Sidebar</div></slot></div>`,
+      `<h3>SideBar</h3><div class="${BASE_CLASS5}" style="width: 250px; top: 56px;"><slot><div class="w-full h-full flex flex-col justify-end">Sidebar</div></slot></div>`
     ];
     const expectedFull = fullElements[idx];
     if (ssrResult !== expectedFull) {
@@ -53036,13 +53146,11 @@ var def12 = () => {
     effect: observable("", HtmlString)
   };
 };
+var baseCls3 = (effect25) => styleMap[effect25 || ""] || "";
 var Switch2 = defaults(def12, (props) => {
   const { off, on: on2, checked, id, cls, class: cn2, children, effect: effect25, ...otherProps } = props;
-  const activeStyle = memo(() => {
-    const effectName = get(effect25);
-    return styleMap[effectName] || "";
-  });
-  return /* @__PURE__ */ jsxs("div", { ...otherProps, class: [activeStyle, () => get(cls) ? get(cls) : "", cn2], children: [
+  const activeStyle = memo(() => baseCls3(get(effect25)));
+  return /* @__PURE__ */ jsxs("div", { ...otherProps, class: [() => get(cls) ? get(cls) : get(activeStyle), cn2], children: [
     /* @__PURE__ */ jsx(
       "input",
       {
@@ -53058,6 +53166,7 @@ var Switch2 = defaults(def12, (props) => {
   ] });
 });
 customElement("wui-switch", Switch2);
+registerBaseCls("wui-switch", (el) => baseCls3(el.getAttribute("effect")));
 
 // src/ssr/TestSwitch.tsx
 init_runtime_es();
@@ -54588,9 +54697,9 @@ var def13 = () => ({
   onChange: void 0,
   onKeyUp: void 0
 });
+var BASE_CLASS6 = "relative size-fit";
 var TextArea = defaults(def13, (props) => {
   const { cls, class: cn2, children, effect: effect25, assignOnEnter, value, placeholder, label, resize, onChange, onKeyUp, ...otherProps } = props;
-  const baseClass2 = "relative size-fit";
   const resizeStyle = memo(() => {
     const r = get(resize);
     return r == "none" ? "resize-none" : r == "horizontal" ? "resize-x" : r == "vertical" ? "resize-y" : "resize";
@@ -54614,7 +54723,7 @@ var TextArea = defaults(def13, (props) => {
       value(e3.target.value);
     }
   };
-  return /* @__PURE__ */ jsxs("div", { class: () => [baseClass2, () => get(cls) ? get(cls) : "", cn2], children: [
+  return /* @__PURE__ */ jsxs("div", { class: () => [() => get(cls) ? get(cls) : BASE_CLASS6, cn2], children: [
     /* @__PURE__ */ jsx(
       "textarea",
       {
@@ -54657,6 +54766,7 @@ var TextArea = defaults(def13, (props) => {
   ] });
 });
 customElement("wui-text-area", TextArea);
+registerBaseCls("wui-text-area", BASE_CLASS6);
 
 // src/ssr/TestTextArea.tsx
 init_runtime_es();
@@ -54820,9 +54930,9 @@ var def14 = () => ({
   label: observable("", HtmlString),
   ref: void 0
 });
+var BASE_CLASS7 = "relative z-0 flex items-center";
 var TextField = defaults(def14, (props) => {
   const { cls, class: cn2, children, effect: effect25, assignOnEnter, value, inputType, placeholder, disabled, onChange, onKeyUp, label, ref, ...otherProps } = props;
-  const baseClass2 = "relative z-0 flex items-center";
   const defaultStyle = "block w-full py-1.5 px-2 text-base text-gray-900 placeholder:text-gray-400 focus:border-blue-500 sm:text-sm/6 truncate";
   const inputRef = observable(null);
   effect(() => {
@@ -54913,7 +55023,7 @@ var TextField = defaults(def14, (props) => {
   return /* @__PURE__ */ jsx(
     "div",
     {
-      class: [baseClass2, () => get(cls) ? get(cls) : "", cn2],
+      class: [() => get(cls) ? get(cls) : BASE_CLASS7, cn2],
       tabIndex: -1,
       onFocus: handleFocus,
       children: /* @__PURE__ */ jsx("div", { class: "relative flex-1", children: /* @__PURE__ */ jsxs("div", { class: "relative flex items-center w-full gap-2", children: [
@@ -54962,17 +55072,18 @@ var defEndAdnorment = () => ({
 });
 var StartAdornment = defaults(defStartAdornment, (props) => {
   const { cls, children, "data-adnorment": _side, ...otherProps } = props;
-  const baseClass2 = "flex h-[0.01em] max-h-[2em] items-center whitespace-nowrap text-[rgba(0,0,0,0.54)]";
-  return /* @__PURE__ */ jsx("div", { class: [baseClass2, cls], "data-adnorment": "start", ...otherProps, children });
+  const baseClass3 = "flex h-[0.01em] max-h-[2em] items-center whitespace-nowrap text-[rgba(0,0,0,0.54)]";
+  return /* @__PURE__ */ jsx("div", { class: [baseClass3, cls], "data-adnorment": "start", ...otherProps, children });
 });
 StartAdornment.adornmentType = "start";
 var EndAdornment = defaults(defEndAdnorment, (props) => {
   const { cls, children, "data-adnorment": _side, ...otherProps } = props;
-  const baseClass2 = "flex h-[0.01em] max-h-[2em] items-center whitespace-nowrap text-[rgba(0,0,0,0.54)]";
-  return /* @__PURE__ */ jsx("div", { class: [baseClass2, cls], "data-adnorment": "end", ...otherProps, children });
+  const baseClass3 = "flex h-[0.01em] max-h-[2em] items-center whitespace-nowrap text-[rgba(0,0,0,0.54)]";
+  return /* @__PURE__ */ jsx("div", { class: [baseClass3, cls], "data-adnorment": "end", ...otherProps, children });
 });
 EndAdornment.adornmentType = "end";
 customElement("wui-text-field", TextField);
+registerBaseCls("wui-text-field", BASE_CLASS7);
 customElement("wui-start-adornment", StartAdornment);
 customElement("wui-end-adornment", EndAdornment);
 
@@ -55000,12 +55111,12 @@ var TestTextField = () => {
   return ret;
 };
 var DEFAULT_STYLE = "block w-full py-1.5 px-2 text-base text-gray-900 placeholder:text-gray-400 focus:border-blue-500 sm:text-sm/6 truncate disabled:cursor-not-allowed disabled:text-[#00000061] disabled:border-[#0000001f] disabled:bg-[#0000000a] [&:disabled~label]:text-[#00000061]";
-var BASE_CLASS3 = "relative z-0 flex items-center";
+var BASE_CLASS8 = "relative z-0 flex items-center";
 if (typeof globalThis.__isSSRTest__ !== "undefined") {
   TestTextField();
   const fullElements = [
-    `<h3>TextField</h3><div class="${BASE_CLASS3}" tabindex="-1"><div class="relative flex-1"><div class="relative flex items-center w-full gap-2"><div class="relative flex-1 min-w-0"><input class="${DEFAULT_STYLE}" value="" type="text" placeholder="Enter text" /><span class="focus-border focus-bg pointer-events-none"><i></i></span></div></div></div></div>`,
-    `<h3>TextField</h3><div class="${BASE_CLASS3}" tabindex="-1"><div class="relative flex-1"><div class="relative flex items-center w-full gap-2"><div class="relative flex-1 min-w-0"><input class="${DEFAULT_STYLE}" value="Hello" type="text" placeholder="Enter text" /><span class="focus-border focus-bg pointer-events-none"><i></i></span></div></div></div></div>`
+    `<h3>TextField</h3><div class="${BASE_CLASS8}" tabindex="-1"><div class="relative flex-1"><div class="relative flex items-center w-full gap-2"><div class="relative flex-1 min-w-0"><input class="${DEFAULT_STYLE}" value="" type="text" placeholder="Enter text" /><span class="focus-border focus-bg pointer-events-none"><i></i></span></div></div></div></div>`,
+    `<h3>TextField</h3><div class="${BASE_CLASS8}" tabindex="-1"><div class="relative flex-1"><div class="relative flex items-center w-full gap-2"><div class="relative flex-1 min-w-0"><input class="${DEFAULT_STYLE}" value="Hello" type="text" placeholder="Enter text" /><span class="focus-border focus-bg pointer-events-none"><i></i></span></div></div></div></div>`
   ];
   console.log(`
 \u{1F4DD} Test: ${name17}`);
@@ -55035,11 +55146,11 @@ TestTextField.test = {
   expect: () => {
     const idx = get(testObservables[name17]);
     const value = ["", "Hello"][idx];
-    const expected = `<div class="${BASE_CLASS3}" tabindex="-1"><div class="relative flex-1"><div class="relative flex items-center w-full gap-2"><div class="relative flex-1 min-w-0"><input class="${DEFAULT_STYLE}" type="text" placeholder="Enter text"><span class="focus-border focus-bg pointer-events-none"><i></i></span></div></div></div></div>`;
+    const expected = `<div class="${BASE_CLASS8}" tabindex="-1"><div class="relative flex-1"><div class="relative flex items-center w-full gap-2"><div class="relative flex-1 min-w-0"><input class="${DEFAULT_STYLE}" type="text" placeholder="Enter text"><span class="focus-border focus-bg pointer-events-none"><i></i></span></div></div></div></div>`;
     const ssrComponent = testObservables[`${name17}_ssr`];
     const ssrResult = renderToString(ssrComponent);
     const fullValue = ["", "Hello"][idx];
-    const expectedFull = `<h3>TextField</h3><div class="${BASE_CLASS3}" tabindex="-1"><div class="relative flex-1"><div class="relative flex items-center w-full gap-2"><div class="relative flex-1 min-w-0"><input class="${DEFAULT_STYLE}" value="${fullValue}" type="text" placeholder="Enter text" /><span class="focus-border focus-bg pointer-events-none"><i></i></span></div></div></div></div>`;
+    const expectedFull = `<h3>TextField</h3><div class="${BASE_CLASS8}" tabindex="-1"><div class="relative flex-1"><div class="relative flex items-center w-full gap-2"><div class="relative flex-1 min-w-0"><input class="${DEFAULT_STYLE}" value="${fullValue}" type="text" placeholder="Enter text" /><span class="focus-border focus-bg pointer-events-none"><i></i></span></div></div></div></div>`;
     if (ssrResult !== expectedFull) {
       assert(false, `[${name17}] SSR mismatch: got 
 ${ssrResult}, expected 
@@ -55060,6 +55171,7 @@ init_index_es();
 init_ssr_shim();
 init_index_es();
 init_runtime_es();
+var BASE_CLASS9 = "inline-flex items-center justify-center px-2 py-1 rounded text-sm cursor-pointer select-none transition-colors duration-150 border border-transparent";
 var def15 = () => ({
   children: observable(""),
   // 2. Updated Default Colors (Material UI / Tailwind style)
@@ -55082,7 +55194,6 @@ var ToggleButton = defaults(def15, (props) => {
     onClick,
     ...otherProps
   } = props;
-  const baseStyles = "inline-flex items-center justify-center px-2 py-1 rounded text-sm cursor-pointer select-none transition-colors duration-150 border border-transparent";
   const handleClick = (e3) => {
     onClick?.(e3);
     if (isObservable(checked)) {
@@ -55096,11 +55207,10 @@ var ToggleButton = defaults(def15, (props) => {
       onClick: handleClick,
       "aria-pressed": () => get(checked) ? "true" : "false",
       class: [
-        baseStyles,
-        // ON / OFF styles
+        // user override, else the base shape
+        () => get(cls) ? get(cls) : BASE_CLASS9,
+        // ON / OFF styles -- outside the slot, so an override keeps them
         () => get(checked) ? get(onClass) : get(offClass),
-        // user-provided overrides
-        () => get(cls) ? get(cls) : "",
         cn2
       ],
       ...otherProps,
@@ -55109,6 +55219,7 @@ var ToggleButton = defaults(def15, (props) => {
   );
 });
 customElement("wui-toggle-button", ToggleButton);
+registerBaseCls("wui-toggle-button", BASE_CLASS9);
 
 // src/ssr/TestToggleButton.tsx
 init_runtime_es();

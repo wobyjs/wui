@@ -168,16 +168,21 @@ Disabled NumberField:
 
 ---
 
-# 🖌️ Custom Styling (`cls`)
+# 🖌️ Custom Styling
+
+`cls` **replaces** the component's base classes — pass it only when you want to
+restyle the element from scratch. To *add* utilities on top of the base, use
+`class`, which is merged with whatever fills the `cls` slot.
+
 
 ### TSX
 ```tsx
-<NumberField cls="m-2 p-2 border-2 rounded-xl" />
+<NumberField class="m-2 p-2 border-2 rounded-xl" />
 ```
 
 ### HTML
 ```html
-<wui-number-field cls="m-2 p-2 border-2 rounded-xl"></wui-number-field>
+<wui-number-field class="m-2 p-2 border-2 rounded-xl"></wui-number-field>
 ```
 
 ---

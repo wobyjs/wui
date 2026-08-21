@@ -1,4 +1,5 @@
 import { type CustomElementChildren, $, $$, isObservable, type JSX, defaults, customElement, ElementAttributes, HtmlBoolean, HtmlClass, ObservableMaybe, HtmlStyle, HtmlString } from 'woby'
+import { registerBaseCls } from './helper/baseCls'
 
 const def = () => ({
       /** 
@@ -38,12 +39,19 @@ const variantStyle: Record<string, string> = {
       custom: ""
 }
 
+/**
+ * The class slot `cls` replaces: the variant table entry for `type`. `disabledStyle`
+ * sits outside it and survives an override, so a custom class cannot leave a disabled
+ * FAB looking live.
+ */
+const baseCls = (type: string | null | undefined) => variantStyle[type || 'pill'] ?? ''
+
 const Fab: Defaulted<typeof def> = defaults(def, (props) => {
       const { class: cn, cls, children, type: variant, disabled, ...otherProps } = props
 
       return (
             <button
-                  class={[() => $$(cls) ? $$(cls) : variantStyle[$$(variant)], disabledStyle, cn]}
+                  class={[() => $$(cls) ? $$(cls) : baseCls($$(variant)), disabledStyle, cn]}
                   disabled={disabled}
                   {...otherProps}
             >
@@ -58,6 +66,7 @@ export { Fab }
 
 // Register as custom elements
 customElement('wui-fab', Fab)
+registerBaseCls('wui-fab', el => baseCls(el.getAttribute('type')))
 
 // Augment JSX intrinsic elements for better TypeScript support
 declare module 'woby' {

@@ -1,4 +1,4 @@
-import { $, $$, customElement, defaults, ElementAttributes, HtmlClass, HtmlString, JSX, Observable, ObservableMaybe, ObservableReadonly } from 'woby'
+import { $, $$, useEffect, customElement, defaults, ElementAttributes, HtmlClass, HtmlString, JSX, Observable, ObservableMaybe, ObservableReadonly } from 'woby'
 import { Button, ButtonStyles } from '../Button'
 import { useEditor, useUndoRedo } from './undoredo'
 import FormatInkHighlighter from '../icons/format_ink_highlighter' // Import the highlighter icon
@@ -50,6 +50,29 @@ const TextBackgroundColorPicker = defaults(def, (props) => {
         }
     }
 
+
+    // ── Shadow-DOM click wiring ──
+    // Button binds `btn.onclick` on the element itself and ends the dispatch there
+    // with stopImmediatePropagation(), so the click never reaches document and woby's
+    // delegated onClick on these inner nodes never runs -- the arrow was dead and the
+    // native picker could not be opened from it. Bind on the elements themselves so
+    // they fire on the way up, before the button's own handler.
+    const arrowRef = $<HTMLDivElement>(null as any)
+    useEffect(() => {
+        const arrow = $$(arrowRef)
+        if (arrow) arrow.onclick = (e: MouseEvent) => {
+            e.preventDefault()
+            // Without this the button would also fire and paint the selection with the
+            // colour the user has only just set out to change.
+            e.stopPropagation()
+            $$(colorInputRef)?.click()
+        }
+        // The swatch opens the picker by itself (native activation behaviour); it only
+        // needs the same guard against the button's apply-on-click.
+        const input = $$(colorInputRef)
+        if (input) input.onclick = (e: MouseEvent) => e.stopPropagation()
+    })
+
     const icons = () => { return <FormatInkHighlighter class="w-7 h-6" fill={selectedBgColor} /> }
 
     return (
@@ -65,7 +88,7 @@ const TextBackgroundColorPicker = defaults(def, (props) => {
                 onClick={applyPickedBgColor}
                 {...otherProps}
             >
-                <div class="flex flex-col items-center justify-center leading-none text-center truncate" onClick={(e: MouseEvent) => { e.preventDefault(); e.stopPropagation(); applyPickedBgColor(); }}>
+                <div class="flex flex-col items-center justify-center leading-none text-center truncate">
                     {icons}
                     <input
                         ref={colorInputRef}
@@ -73,11 +96,10 @@ const TextBackgroundColorPicker = defaults(def, (props) => {
                         value={selectedBgColor}
                         onInput={handleNativeBgColorInputChange}
                         class="w-full h-3 p-0 border-0"
-                        onClick={(e: any) => e.stopPropagation()}
                     />
                 </div>
 
-                <div class="flex justify-end" onClick={(e: any) => { e.preventDefault(); e.stopPropagation(); colorInputRef()?.click() }}>
+                <div ref={arrowRef} class="flex justify-end">
                     <KeyboardDownArrow class="-mr-1 ml-2 size-5" />
                 </div>
             </Button>

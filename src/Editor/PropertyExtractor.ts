@@ -1,4 +1,4 @@
-import { $, $$, Observable } from 'woby'
+import { $, $$, isObservable, Observable } from 'woby'
 import { getEditorPlugins, getPluginForElement, type PluginProp } from './EditorPlugin'
 
 /**
@@ -32,7 +32,10 @@ export function detectSelectionType(): SelectionInfo {
     // inside it leaves no light-DOM range pointing at the block at all).
     const root = shadow?.querySelector('[data-editor-root]') ?? document.querySelector('[data-editor-root]')
     const marked = root?.querySelector('[data-element-selected]') as HTMLElement | null
-    if (marked) return { type: 'custom', element: marked }
+    // classifyElement rather than a hard-coded 'custom': the mark is no longer set
+    // only by click-to-select on plugin elements -- the panel's parent walk moves it
+    // onto whatever the user climbed to, which is routinely a plain tr/table/div.
+    if (marked) return { type: classifyElement(marked), element: marked }
 
     // ── Shadow DOM mode ──
     if (shadow) {
@@ -188,6 +191,189 @@ export function detectSelectionType(): SelectionInfo {
 }
 
 /**
+ * Classify a single element the same way {@link detectSelectionType} classifies a
+ * selection, without consulting the selection at all.
+ *
+ * Extracted so that a target chosen by other means -- the parent walk below, or the
+ * `data-element-selected` mark -- lands on the same extractor the selection path
+ * would have used, instead of being assumed to be a custom element.
+ */
+export function classifyElement(el: HTMLElement | null): SelectionType {
+    if (!el) return 'none'
+    if (el.tagName === 'IMG') return 'image'
+    const tag = el.tagName.toLowerCase()
+    if (tag.includes('-') && !tag.startsWith('wui-')) return 'custom'
+    const pluginTagNames = new Set($$(getEditorPlugins()).map(p => p.tagName.toUpperCase()))
+    if (pluginTagNames.has(el.tagName)) return 'custom'
+    return 'text'
+}
+
+/**
+ * The parent of `node` in the *composed* tree.
+ *
+ * `parentElement` alone stops dead at a shadow boundary: for the top-most element of
+ * a shadow root it is null, because the root is a DocumentFragment, not an Element.
+ * Stepping to `root.host` continues the walk into the light tree that owns the
+ * component -- which is what makes "select my parent" work for an element rendered
+ * inside an embedded component's shadow root.
+ *
+ * Slotted light-DOM children need no special case: their `parentElement` is already
+ * the host, since slotting changes where a node is *rendered*, not where it lives.
+ */
+function composedParent(node: Node | null): HTMLElement | null {
+    if (!node) return null
+    const parent = node.parentNode
+    if (parent instanceof ShadowRoot) return parent.host as HTMLElement
+    return (parent instanceof HTMLElement) ? parent : null
+}
+
+/**
+ * The element the property panel should move to when the user asks for "parent".
+ *
+ * The ceiling is the `[data-editor-root]` content container *inclusive* -- the walk
+ * can land on it, but not go past it. The root is the editor's document body, and
+ * styling it (font, colour, alignment for the whole document) is a real authoring
+ * operation, so refusing to select it would cut the chain one step short of the most
+ * useful target. Everything above it is the editor's own chrome -- surface wrapper,
+ * toolbar, the `wui-editor` host, the property panel itself -- which is not content,
+ * so the control disables once the root is reached.
+ *
+ * Note this is deliberately more permissive than the selectionchange handler, which
+ * refuses to *auto*-target the root: that guard exists so clicking empty space does
+ * not silently retarget the panel. An explicit click on the up arrow is not ambiguous.
+ *
+ * The walk crosses shadow boundaries via {@link composedParent}, so the useful chains
+ * are continuous: a `td` climbs to `tr` to `table`, and a node inside an embedded
+ * component's shadow root climbs out to the component host and on up from there.
+ */
+export function getSelectableParent(el: HTMLElement | null): HTMLElement | null {
+    if (!el) return null
+    // Already at the ceiling -- the root is selectable but has no selectable parent.
+    if (el.hasAttribute?.('data-editor-root')) return null
+    const parent = composedParent(el)
+    if (!parent) return null
+    // Stop at the document scaffolding too, for the light-DOM case where the element
+    // sits outside any editor root and the walk would otherwise run up to <html>.
+    if (parent.tagName === 'BODY' || parent.tagName === 'HTML') return null
+    if (parent.tagName === 'WUI-EDITOR') return null
+    return parent
+}
+
+
+/**
+ * Structural table boxes. Removing one of these raw leaves the table malformed --
+ * a `tr` whose cells vanish with it, a `tbody` orphaned from its `table` -- so they
+ * are refused here and routed to TablePopupMenu, which knows how to delete a row or
+ * a column while keeping the remaining geometry consistent.
+ *
+ * Reachable because the property panel's up arrow walks the target up the tree, so
+ * `td -> tr -> tbody -> table` are all legitimate panel targets even though no click
+ * can land on them directly.
+ */
+const TABLE_STRUCTURAL = new Set([
+    'TABLE', 'THEAD', 'TBODY', 'TFOOT', 'TR', 'TD', 'TH', 'COL', 'COLGROUP', 'CAPTION',
+])
+
+export type DeleteRefusal = 'no-target' | 'detached' | 'editor-root' | 'table' | 'component-internal'
+
+export interface DeleteResult {
+    ok: boolean
+    reason?: DeleteRefusal
+}
+
+/**
+ * Why {@link deleteSelectedElement} would refuse `el`, or null if it would go ahead.
+ *
+ * Split out so the panel's delete control can disable itself and explain why, instead
+ * of offering a button that silently does nothing.
+ */
+export function deleteRefusalReason(el: HTMLElement | null, editorRoot?: HTMLElement | null): DeleteRefusal | null {
+    if (!el) return 'no-target'
+    if (!el.isConnected) return 'detached'
+    // The content container is the document itself; deleting it would take the
+    // editable surface with it. The up arrow can land here, so this is reachable.
+    if (el.hasAttribute?.('data-editor-root')) return 'editor-root'
+    if (TABLE_STRUCTURAL.has(el.tagName)) return 'table'
+    if (editorRoot) {
+        // A different root node means the target lives inside an embedded component's
+        // own shadow tree -- the up arrow can climb out of one, so the panel can be
+        // pointed at a component's internals. Those are rendered by the component and
+        // would be recreated on its next update, so removing them is meaningless at
+        // best and corrupts the component at worst. Edit the host instead.
+        if (el.getRootNode() !== editorRoot.getRootNode()) return 'component-internal'
+        if (!editorRoot.contains(el)) return 'detached'
+    }
+    return null
+}
+
+/**
+ * Remove the element the property panel is pointing at, and leave a caret where it was.
+ *
+ * This exists because **the browser will not delete an embedded component.** Native
+ * editing -- Backspace, Delete, `execCommand('delete')` -- operates on the DOM
+ * Selection, and Chrome's editing engine treats a shadow host as a boundary it refuses
+ * to cross. Measured against this editor's own content:
+ *
+ *     strong        execCommand('delete')  ->  removed
+ *     img           execCommand('delete')  ->  removed
+ *     wui-button    execCommand('delete')  ->  returned true, removed nothing
+ *     my-counter    execCommand('delete')  ->  returned true, removed nothing
+ *
+ * The refusal is silent: `execCommand` reports success. Nor is it a matter of giving
+ * the engine a better range -- the two custom elements were the only cases where the
+ * Range stayed non-collapsed around the node, and they were still skipped. Setting
+ * `contenteditable="false"` on the host or its parent, with or without a forced
+ * reflow, changes nothing; the usual atomic-widget trick does not apply to shadow
+ * hosts. Placing the caret immediately after the element and pressing Backspace is
+ * also a no-op, and pressing Delete just before it inserts a stray node.
+ *
+ * So the only thing that works is `remove()`, and every deletion of an embedded
+ * component has to be driven explicitly. This is the same conclusion ImageResizer
+ * reached for images, where `deleteImage()` calls `remove()` behind a toolbar button.
+ *
+ * Callers own the undo snapshot: call `saveDo()` after a successful result, from a
+ * scope that has the UndoRedo context.
+ */
+export function deleteSelectedElement(el: HTMLElement | null, editorRoot?: HTMLElement | null): DeleteResult {
+    const reason = deleteRefusalReason(el, editorRoot)
+    if (reason) return { ok: false, reason }
+
+    const target = el as HTMLElement
+    const parent = target.parentNode
+    if (!parent) return { ok: false, reason: 'detached' }
+
+    // Record the slot before the node goes. Afterwards it is detached and its former
+    // index is unrecoverable, so the caret would have nowhere principled to land.
+    const index = Array.prototype.indexOf.call(parent.childNodes, target)
+
+    target.removeAttribute('data-element-selected')
+    target.remove()
+
+    // Put the caret where the element used to be, so typing continues from there
+    // rather than stranding focus in an editable surface with no insertion point.
+    try {
+        // window.getSelection(), NOT shadowRoot.getSelection(). Chrome hands a shadow
+        // root its own Selection object (they are not the same object), and that one
+        // cannot hold a range addressing content in the editor's tree -- every attempt
+        // collapses to the document's first text node. The window selection addresses
+        // nodes inside the shadow tree correctly.
+        const sel = window.getSelection()
+        if (sel) {
+            const range = document.createRange()
+            range.setStart(parent, Math.min(index, parent.childNodes.length))
+            range.collapse(true)
+            sel.removeAllRanges()
+            sel.addRange(range)
+        }
+    } catch {
+        // A restored caret is a nicety. A failure here must not report the delete as
+        // failed, because the element is already gone.
+    }
+
+    return { ok: true }
+}
+
+/**
  * Extract image properties into observables for PropertyForm.
  * Each property is an observable that PropertyForm editors can read/write.
  */
@@ -279,8 +465,17 @@ const attrName = (name: string) => name.replace(/[A-Z]/g, c => '-' + c.toLowerCa
 /**
  * Coerce a raw attribute string to the runtime type declared in the plugin schema.
  * When the attribute is absent, returns the declared default (or the type's zero value).
+ *
+ * A prop with a `resolveDefault` treats an empty attribute the same as an absent
+ * one. That is not a convenience: woby's customElement reflects `cls=""` onto
+ * every upgraded element, so an unset class override never arrives here as null,
+ * and keying off null alone would leave the row blank on exactly the elements it
+ * exists to describe.
  */
-function coerce(spec: PluginProp, raw: string | null): any {
+function coerce(spec: PluginProp, raw: string | null, el?: HTMLElement): any {
+    const resolved = el && spec.resolveDefault ? spec.resolveDefault(el) : undefined
+    if (resolved !== undefined && (raw === null || raw === '')) return resolved
+
     if (raw === null) return spec.default ?? (
         spec.type === 'number' ? 0 :
         spec.type === 'boolean' ? false :
@@ -308,6 +503,36 @@ function coerce(spec: PluginProp, raw: string | null): any {
 }
 
 /**
+ * What the panel has to watch on a custom element to stay in step with changes
+ * made anywhere else -- the element's own UI (a counter's +/- buttons), a
+ * script, or an undo that rebuilds the node.
+ *
+ * A schema-declared plugin yields an exact attribute list, so the observer stays
+ * narrow. Both spellings go in: `attrName()` is what the panel writes, but
+ * hand-authored content and older serialized HTML carry the raw prop name.
+ *
+ * An element with no schema is read by the blind scrape, where *every* attribute
+ * is a row -- there is no list to narrow to, so `attributeFilter` is omitted,
+ * which MutationObserver reads as "all attributes".
+ */
+export function customElementWatchSpec(el: HTMLElement): { attributeFilter?: string[], text: boolean } {
+    const props = getPluginForElement(el)?.props ?? []
+    if (!props.length) return { text: false }
+
+    const names = new Set<string>()
+    let text = false
+    for (const p of props) {
+        if (p.hidden) continue
+        // A textContent prop lives in the light DOM, but still falls back to a
+        // same-named attribute, so it needs watching in both places.
+        if (p.textContent) text = true
+        names.add(attrName(p.name))
+        names.add(p.name)
+    }
+    return { attributeFilter: Array.from(names), text }
+}
+
+/**
  * Extract custom element attributes into observables for PropertyForm.
  * When a plugin schema is registered, uses the declared types to produce
  * correctly-typed observable values. Falls back to the blind string scrape
@@ -328,12 +553,28 @@ export function extractCustomElementProperties(el: HTMLElement): Record<string, 
         const raw = p.textContent
             ? ((el.textContent ?? '').trim() || el.getAttribute(attr) || el.getAttribute(p.name))
             : (el.getAttribute(attr) ?? el.getAttribute(p.name))
-        const obs = $(coerce(p, raw))
+
+        // A `live` prop shares the component's own observable instead of snapshotting
+        // the attribute, so the row and the widget are the same piece of state and a
+        // tick, drag or keystroke on the element shows up in the panel with nothing in
+        // between. See PluginProp.live. The fallback covers an element that has not
+        // been upgraded yet, and a prop the component does not actually declare.
+        const shared = p.live ? (el as any).props?.[p.name] : undefined
+        const obs: Observable<any> = isObservable(shared) ? shared : $(coerce(p, raw, el))
 
         // Hang enum options on the observable so EnumEditor can detect it
         if (p.type === 'enum' && p.options) {
             ;(obs as any).options = p.options
         }
+
+        // The declared type, for editors that cannot infer it from the value alone.
+        // 'date' is the case that forced this: a date attribute IS a string, so
+        // StringEditor's typeof test matches it and the row rendered twice -- once as
+        // the registered date picker and once as a raw text box that could fight it.
+        // The observable is the only channel a row widget gets (PropertyRows hands its
+        // renderCondition just the value and the key), which is why this rides along
+        // with .options rather than being looked up from the schema.
+        ;(obs as any).propType = p.type
 
         props[p.label ?? p.name] = obs
     }
@@ -375,6 +616,12 @@ export function applyCustomElementProperty(el: HTMLElement, key: string, value: 
 
     if (spec?.readonly) return
 
+    // The "unset" value, which for a resolveDefault prop is whatever the element
+    // itself resolves to. Typing the pre-filled base back into the Class Override
+    // box has to clear the attribute, not bake a copy of the component's own
+    // styling into the serialized HTML where the next variant change cannot reach it.
+    const unset = spec?.resolveDefault ? spec.resolveDefault(el) : spec?.default
+
     // An earlier build wrote camelCase names straight to setAttribute, which the
     // DOM lowercased into a dead `inputtype`-style attribute. Sweep it away so the
     // kebab-case one below is the only value in the serialized HTML.
@@ -391,7 +638,7 @@ export function applyCustomElementProperty(el: HTMLElement, key: string, value: 
 
     if (typeof value === 'boolean') {
         value ? el.setAttribute(attr, '') : el.removeAttribute(attr)
-    } else if (value === '' || (spec && value === spec.default)) {
+    } else if (value === '' || (spec && value === unset)) {
         el.removeAttribute(attr)          // back to default → keep serialized HTML clean
     } else {
         el.setAttribute(attr, String(value))

@@ -29,7 +29,10 @@ export const NumberEditor = () => {
 		const { value, editorName } = props
 
 		return (
+			// See StringEditor: w-full so the field tracks the dialog width instead of
+			// sizing to its content.
 			<NumberField
+				class="w-full"
 				noMinMax={true}
 				reactive={true}
 				value={value}

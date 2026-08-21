@@ -164,18 +164,23 @@ const s = $(false)
 
 ---
 
-# 🎨 Custom Styling with `cls`
+# 🎨 Custom Styling
+
+`cls` **replaces** the component's base classes — pass it only when you want to
+restyle the element from scratch. To *add* utilities on top of the base, use
+`class`, which is merged with whatever fills the `cls` slot.
+
 
 ### Example
 
 ```tsx
-<Switch effect="ios" cls="!scale-125 ![&>div]:bg-blue-500"></Switch>
+<Switch effect="ios" class="!scale-125 ![&>div]:bg-blue-500"></Switch>
 ```
 
 ### HTML
 
 ```html
-<wui-switch effect="ios" cls="!scale-125 ![&>div]:bg-blue-500"></wui-switch>
+<wui-switch effect="ios" class="!scale-125 ![&>div]:bg-blue-500"></wui-switch>
 ```
 
 ---

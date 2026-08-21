@@ -22,6 +22,7 @@ export * from './Tabs'
 export * from './Zoomable'
 export * from './Editor/Editor'
 export * from './Editor/EditorPlugin'
+export * from './helper/baseCls'
 export * from './Wheeler/Wheeler'
 export * from './Wheeler/WheelerType'
 export * from './Wheeler/DateTimeWheeler'
@@ -31,6 +32,7 @@ export * from './Wheeler/useRecordWheeler'
 export * from "./PropertyForm/BooleanEditor"
 export * from "./PropertyForm/ColorEditor"
 export * from "./PropertyForm/DropdownEditor"
+export * from "./PropertyForm/Editors"
 export * from "./PropertyForm/EnumEditor"
 export * from "./PropertyForm/NumberEditor"
 export * from "./PropertyForm/ObjectEditor"

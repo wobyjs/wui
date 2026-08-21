@@ -1,7 +1,7 @@
 import { $, $$, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlClass, HtmlString, JSX, Observable, ObservableMaybe, useEffect } from 'woby'
 import { Button, ButtonStyles } from '../Button'
 import { useEditor, useUndoRedo } from './undoredo'
-import { useOnClickOutside } from '@woby/use'
+import { useDropdownDismiss } from './useDropdownDismiss'
 import KeyboardDownArrow from '../icons/keyboard_down_arrow'
 import { getCurrentEditor, getSelection } from './utils'
 import { applyStyle, applyBackgroundColor, removeFormat, saveSelectionAsOffsets, restoreSelectionFromOffsets, findEditorRoot } from './StyleEngine'
@@ -206,7 +206,7 @@ const TextFormatOptionsDropDown = defaults(def, (props) => {
         }
     })
 
-    useOnClickOutside(dropdownRef as any, () => isOpen(false))
+    useDropdownDismiss(dropdownRef as any, () => isOpen(false))
 
     const toggleDropdown = () => {
         const opening = !isOpen()

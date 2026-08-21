@@ -9,6 +9,7 @@ import {
     effect22, effect23, effect24,
     effect19a, effect20a, effect21a,
 } from './TextField.effect'
+import { registerBaseCls } from './helper/baseCls'
 
 import {
     ObservableMaybe, $$, $, type JSX, isObservable, Observable, type CustomElementChildren,
@@ -102,11 +103,18 @@ const def = () => ({
 /*  TextArea component (effect-compatible with TextField)             */
 /* ------------------------------------------------------------------ */
 
+/**
+ * The class slot `cls` replaces: the wrapper, which only positions the
+ * span/label and lets the floating label overflow.
+ *
+ * The `effect` stylesheet and the resize rule land on the <textarea> inside, not
+ * here, so an override cannot cost the field either. Module scope so the render
+ * and the registerBaseCls() call agree on one string.
+ */
+const BASE_CLASS = "relative size-fit" //  z-0 inline-block overflow-visible
+
 const TextArea: Defaulted<typeof def> = defaults(def, (props) => {
     const { cls, class: cn, children, effect, assignOnEnter, value, placeholder, label, resize, onChange, onKeyUp, ...otherProps } = props
-
-    // Wrapper: only positions span/label, allows overflow for floating label
-    const baseClass = "relative size-fit" //  z-0 inline-block overflow-visible
 
     // Resize is applied to the TEXTAREA, not the wrapper
     const resizeStyle = useMemo(() => {
@@ -144,7 +152,7 @@ const TextArea: Defaulted<typeof def> = defaults(def, (props) => {
     }
 
     return (
-        <div class={() => [baseClass, () => $$(cls) ? $$(cls) : "", cn]}>
+        <div class={() => [() => $$(cls) ? $$(cls) : BASE_CLASS, cn]}>
             {/* textarea defines the size and is resizable */}
             <textarea
                 style={() => ({ resize: resizeValue })}
@@ -209,6 +217,8 @@ const TextArea: Defaulted<typeof def> = defaults(def, (props) => {
 export { TextArea }
 
 customElement('wui-text-area', TextArea)
+// Publish the slot `cls` replaces, so the editor can show and edit it.
+registerBaseCls('wui-text-area', BASE_CLASS)
 
 // Add the custom element to the JSX namespace
 declare module 'woby' {

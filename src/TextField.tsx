@@ -9,6 +9,7 @@ import {
 	effect22, effect23, effect24,
 	effect19a, effect20a, effect21a,
 } from './TextField.effect'
+import { registerBaseCls } from './helper/baseCls'
 import { type CustomElementChildren, ObservableMaybe, $$, $, type JSX, isObservable, Observable, defaults, customElement, type ElementAttributes, HtmlBoolean, HtmlString, useMemo, HtmlClass, useEffect } from 'woby'
 
 //https://codepen.io/maheshambure21/pen/EozKKy
@@ -104,11 +105,19 @@ const def = () => ({
  *
  * label text: [&~label]:text-[red] [&:focus~label]:text-[red] [&:not(:placeholder-shown)~label]:text-[red]
  */
+/**
+ * The class slot `cls` replaces: the wrapper's layout.
+ *
+ * The `effect` stylesheet is not part of it -- that lands on the <input> inside,
+ * not on this wrapper, so an override here cannot cost the field its effect.
+ * Module scope so the render and the registerBaseCls() call agree on one string.
+ */
+const BASE_CLASS = "relative z-0 flex items-center"
+
 const TextField: Defaulted<typeof def> = defaults(def, (props) => {
 
 	const { cls, class: cn, children, effect, assignOnEnter, value, inputType, placeholder, disabled, onChange, onKeyUp, label, ref, ...otherProps } = props
 
-	const baseClass = "relative z-0 flex items-center"
 	const defaultStyle = "block w-full py-1.5 px-2 text-base text-gray-900 placeholder:text-gray-400 focus:border-blue-500 sm:text-sm/6 truncate"
 
 	const inputRef = $<HTMLInputElement | null>(null)
@@ -252,7 +261,7 @@ const TextField: Defaulted<typeof def> = defaults(def, (props) => {
 
 	return (
 		<div
-			class={[baseClass, () => $$(cls) ? $$(cls) : "", cn]}
+			class={[() => $$(cls) ? $$(cls) : BASE_CLASS, cn]}
 			tabIndex={-1}
 			onFocus={handleFocus}
 		>
@@ -373,6 +382,8 @@ export {
 
 // Register as custom element
 customElement('wui-text-field', TextField)
+// Publish the slot `cls` replaces, so the editor can show and edit it.
+registerBaseCls('wui-text-field', BASE_CLASS)
 customElement('wui-start-adornment', StartAdornment)
 customElement('wui-end-adornment', EndAdornment)
 

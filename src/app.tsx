@@ -902,7 +902,7 @@ function App() {
                     {/* Custom Class Checkbox */}
                     <div class="border border-gray-300 rounded-lg p-4">
                         <h3 class="text-lg font-semibold mb-2">Custom Class Checkbox</h3>
-                        <Checkbox id="custom-class-checkbox" labelPosition="right" cls="!text-blue-500 !font-bold" onChange={(e) => {
+                        <Checkbox id="custom-class-checkbox" labelPosition="right" class="!text-blue-500 !font-bold" onChange={(e) => {
                             const span = document.getElementById('custom-class-checkbox-log')
                             if (span) span.textContent = `Checkbox changed: ${e.currentTarget.checked}`
                         }}>

@@ -1,7 +1,7 @@
 import { $, $$, customElement, defaults, ElementAttributes, HtmlClass, HtmlNumber, JSX, ObservableMaybe, useEffect, type Observable } from 'woby'
 import { Button } from '../Button'
 import { EditorContext, useEditor, useUndoRedo } from './undoredo'
-import { useOnClickOutside } from '@woby/use'
+import { useDropdownDismiss } from './useDropdownDismiss'
 import { getCurrentRange } from './utils'
 import { applyFontFamily as applyFontFamilyStyle } from './StyleEngine'
 import KeyboardDownArrow from '../icons/keyboard_down_arrow'
@@ -38,7 +38,7 @@ const FontFamilyDropDown = defaults(def, (props) => {
     const saveDo = undoRedoContext?.saveDo || (() => {})
 
 
-    useOnClickOutside(dropdownRef as any, () => isOpen(false))
+    useDropdownDismiss(dropdownRef as any, () => isOpen(false))
 
     // Use direct DOM manipulation to show/hide menu (bypasses Woby reconciler)
     useEffect(() => {
@@ -192,7 +192,7 @@ const FontFamilyDropDown = defaults(def, (props) => {
                     class="size-full inline-flex justify-center items-center rounded-md border border-gray-300 shadow-sm bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500 cursor-pointer px-2"
                     onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleDropdown(); }}
                     onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation(); }}
-                    title="Toggle dropdown"
+                    title="Choose font family"
                 >
                     <KeyboardDownArrow class="h-5 w-5" />
                 </Button>

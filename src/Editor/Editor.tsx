@@ -1,5 +1,5 @@
 import { useOnClickOutside } from '@woby/use'
-import { $, $$, type CustomElementChildren, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlClass, JSX, Observable, ObservableMaybe, untrack, useEffect, useMemo } from 'woby' // Added useEffect
+import { $, $$, type CustomElementChildren, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlClass, HtmlString, JSX, Observable, ObservableMaybe, untrack, useContext, useEffect, useMemo } from 'woby' // Added useEffect
 import { Button } from '../Button'
 import UndoIcon from '../icons/undo'
 import RedoIcon from '../icons/redo'
@@ -25,10 +25,11 @@ import { InsertDropDown } from './InsertDropDown'
 import { TextAlignDropDown } from './TextAlignDropDown'
 import { UndoRedoButton } from './UndoRedoButton'
 import { ImageResizer } from './ImageResizer' // Image resize handles + align/indent mini-toolbar
+import { NodeMover } from './NodeMover' // Drag handle that repositions the node selection
 import { TablePopupMenu } from './TablePopupMenu' // Table cell popup menu
 import { InfoButton } from './InfoButton' // Info button for property panel
 import { PropertyPanel, PropertyPanelContext } from './PropertyPanel' // Property panel for selected element
-import { SelectionType } from './PropertyExtractor' // Selection type enum
+import { SelectionType, deleteSelectedElement, deleteRefusalReason } from './PropertyExtractor' // Selection type enum + node-selection delete + its guard
 import { getEditorPlugins } from './EditorPlugin' // For plugin tag name detection
 
 // StyleEngine imports for keyboard shortcuts
@@ -91,8 +92,37 @@ const def = () => ({
     enableToolbar: $(true, HtmlBoolean) as ObservableMaybe<boolean>,
     externalPropertyPanel: $(null) as ObservableMaybe<{ panelOpen: Observable<boolean>; propertyTarget: Observable<HTMLElement | null>; selectionType: Observable<SelectionType> } | null>,
     readonly: $(false, HtmlBoolean) as ObservableMaybe<boolean>,
+    // Scroll box for the editable surface. `maxHeight` is the ceiling the surface
+    // grows to before it starts scrolling its own content instead of stretching the
+    // host page; `height` pins it to a fixed box regardless of how little is in it.
+    // Set either to '' to opt out and let the surface grow without limit again.
+    height: $('', HtmlString) as ObservableMaybe<string>,
+    maxHeight: $('60vh', HtmlString) as ObservableMaybe<string>,
 })
 
+
+/**
+ * Whether a keystroke should drop the editor out of node-selection mode.
+ *
+ * "Node selection" is the state where `data-element-selected` marks an embedded
+ * component and the property panel is pointing at it. It is entered by clicking the
+ * component (or climbing to it with the panel's up arrow) and it has to end as soon as
+ * the user does anything else, or the mark outlives the gesture that set it and a
+ * Backspace several keystrokes later removes a component nobody was thinking about.
+ *
+ * Clicking elsewhere already ends it -- the capture-phase pointerdown handler clears
+ * the previous mark unconditionally. This is the keyboard half: anything that types a
+ * character or moves the caret counts. Modified keystrokes deliberately do not, so
+ * Ctrl+B on a selected component keeps it selected.
+ */
+const exitsNodeSelection = (e: KeyboardEvent) => {
+    if (e.ctrlKey || e.metaKey || e.altKey) return false
+    if (e.key.length === 1) return true // any printable character
+    return e.key.startsWith('Arrow')
+        || e.key === 'Enter' || e.key === 'Tab' || e.key === 'Escape'
+        || e.key === 'Home' || e.key === 'End'
+        || e.key === 'PageUp' || e.key === 'PageDown'
+}
 
 // #region Editor Surface
 /**
@@ -100,10 +130,12 @@ const def = () => ({
 * This component manages the editable area, monitors HTML changes for history, 
 * and handles keyboard shortcuts for navigation and formatting.
 */
-const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, children }: {
+const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, height, maxHeight, children }: {
     isEditing: Observable<boolean>
     handleEditorClick: (e: any) => void
     handleBlur: (e: any) => void
+    height?: ObservableMaybe<string>
+    maxHeight?: ObservableMaybe<string>
     children?: JSX.Children
 }) => {
     // Guard like every other consumer (BoldButton, FontFamilyDropDown, ...): when
@@ -116,6 +148,14 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, children }: {
     const redo = undoRedoContext?.redo ?? (() => { })
     const activeEditor = useEditor()
     const isReadonly = useReadonly()
+    // Optional: the surface is rendered inside PropertyPanelContext by <Editor>, but the
+    // withToolbar/withoutToolbar variants below mount it without one -- hence no `!` and a
+    // guarded read below. Only used to drop a target that has just been deleted out from
+    // under the panel.
+    //
+    // $$ because woby's useContext returns an observable wrapping the context value; without
+    // it every property reads as undefined. Same unwrap PropertyPanel does.
+    const panelCtx = $$(useContext(PropertyPanelContext))
 
     useEffect(() => {
         useBlockEnforcer($$(activeEditor) ?? $$(getCurrentEditor))
@@ -330,11 +370,31 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, children }: {
     // #endregion
 
     /**
-     * Effect: Click-to-select for embedded custom elements.
-     * Adds a capture-phase pointerdown listener on the editor root that marks
-     * plugin elements with data-element-selected, so the property panel has a
-     * target even when the embedded element owns a shadow root (which absorbs
-     * clicks and leaves no selection range pointing at the host).
+     * Effect: Click-to-select, the only thing that puts a node selection on screen.
+     *
+     * A plain click marks embedded custom elements, because those are the ones a caret
+     * cannot reach: the element owns a shadow root, which absorbs the click and leaves
+     * no selection range pointing at the host, so without this the property panel would
+     * have no target. Ordinary content is left to the caret -- clicking a paragraph has
+     * to keep meaning "put the cursor here".
+     *
+     * **Alt+click marks whatever box is under the cursor**, component or not. That is
+     * the way to select a plain <div>: a container is exactly the thing a caret can
+     * never land on, since every click inside one lands in the text it wraps. Before
+     * this, the only route to a container was clicking a component inside it and walking
+     * up with the property panel's parent arrow, which meant containers holding no
+     * component were unreachable, and empty ones doubly so. Alt is the conventional
+     * "select the box, not the text" modifier, and it is free here -- alt+click does
+     * nothing in a contenteditable otherwise.
+     *
+     * Innermost-first: composedPath runs from the target outwards, so alt+click selects
+     * the tightest box around the cursor and the parent arrow climbs from there, rather
+     * than guessing at which ancestor was meant. {@link deleteRefusalReason} filters the
+     * walk to boxes that can actually be acted on, so the mark never lands on the content
+     * root, on table structure, or inside a component's own shadow tree.
+     *
+     * Either way the mark is cleared first: it means "this box is selected *right now*",
+     * and NodeMover, the panel and the Backspace path all read it that way.
      */
     useEffect(() => {
         const el = $$(activeEditor)
@@ -350,8 +410,24 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, children }: {
             const prev = el.querySelector('[data-element-selected]') as HTMLElement | null
             if (prev) prev.removeAttribute('data-element-selected')
 
-            // Walk composedPath to find a plugin element or hyphenated non-wui tag
             const path = e.composedPath()
+
+            // Alt: select the box itself rather than the text inside it.
+            if (e.altKey) {
+                for (const entry of path) {
+                    if (!(entry instanceof HTMLElement)) continue
+                    // Stops the walk from leaving the editable content, and skips the
+                    // nodes inside an embedded component's shadow tree so the press lands
+                    // on the host -- the same reason the plugin walk below tests this.
+                    if (!el.contains(entry)) continue
+                    if (deleteRefusalReason(entry, el)) continue
+                    entry.setAttribute('data-element-selected', '')
+                    return
+                }
+                return
+            }
+
+            // Walk composedPath to find a plugin element or hyphenated non-wui tag
             for (const entry of path) {
                 if (!(entry instanceof HTMLElement)) continue
                 if (!el.contains(entry)) continue
@@ -367,7 +443,20 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, children }: {
         return () => el.removeEventListener('pointerdown', handler, true)
     })
 
-    // Inject the selected-element outline style with a visible anchor indicator
+    // Inject the selected-element outline style.
+    //
+    // Outline only -- the anchor indicator that used to be drawn here as a `::before`
+    // glyph is now <NodeMover>'s drag grip, which is both the marker and the thing you
+    // grab to reposition the selection. Moving it out of the content also retired a
+    // layout hazard this rule had to work around: generated content on a table-structural
+    // box gets wrapped in an ANONYMOUS TABLE CELL, so marking a <tr> grew the row an extra
+    // leading column and pushed the last real cell outside the table. That needed a
+    // :not(tr):not(tbody)... chain on both the glyph and the `position: relative` it
+    // needed as a containing block. An absolutely-positioned sibling of the surface cannot
+    // disturb the content's layout at all, so none of that applies to the grip.
+    //
+    // `outline` (not `border`) for the same reason: it is drawn outside the box and takes
+    // up no space, so marking an element never reflows the document around it.
     useEffect(() => {
         const id = 'wui-editor-selected-style'
         if (document.getElementById(id)) return
@@ -377,18 +466,6 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, children }: {
             [data-element-selected] {
                 outline: 2px solid #3b82f6;
                 outline-offset: 2px;
-                position: relative;
-            }
-            [data-element-selected]::before {
-                content: '⚓';
-                position: absolute;
-                top: -14px;
-                left: -2px;
-                font-size: 12px;
-                line-height: 1;
-                color: #3b82f6;
-                z-index: 9999;
-                pointer-events: none;
             }
         `
         document.head.appendChild(style)
@@ -465,6 +542,67 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, children }: {
                 applyIndentStyle(e.shiftKey, 20) // Normal text: Tab=indent, Shift+Tab=outdent
                 saveDo()
             }
+        }
+
+        // Node-selection delete: Backspace/Delete removes whatever is *explicitly*
+        // selected as a node, rather than editing text at a caret.
+        //
+        // This has to be driven by hand because native editing cannot do it. Chrome's
+        // editing engine treats a shadow host as a boundary it refuses to cross, so
+        // Backspace over a <wui-button> is a silent no-op -- execCommand('delete') even
+        // reports success while removing nothing. An image selected by ImageResizer has
+        // no DOM Selection at all (the resizer clears it on mousedown so the old text
+        // highlight does not linger), so there is nothing for the browser to delete
+        // either. See deleteSelectedElement() for the measurements.
+        //
+        // Two sources of an explicit node selection, in priority order:
+        //
+        //  - `data-element-selected`, set by the capture-phase pointerdown handler above
+        //    when a click lands on an embedded component, and moved up the tree by the
+        //    property panel's parent-select arrow. It is never set by a caret, and
+        //    exitsNodeSelection() below drops it the moment the user types or moves the
+        //    caret, so it always means "this box is selected right now" -- which is why
+        //    a plain container climbed to with the arrow is deletable here too.
+        //  - `__activeImage` on the shadow root, ImageResizer's own state, the thing that
+        //    puts the resize handles on screen. Read rather than the panel's target so
+        //    this works with the panel closed: if the handles are visible, the image is
+        //    selected, and Backspace is expected to remove it.
+        //
+        // A refused target (the document root, table structure, component internals) falls
+        // through untouched so native editing still gets its turn.
+        if (e.key === 'Backspace' || e.key === 'Delete') {
+            const rootEl = $$(activeEditor)
+            // Two queries: querySelector only sees descendants, and the parent walk can
+            // park the mark on the content root itself.
+            const marked = (rootEl?.hasAttribute('data-element-selected')
+                ? rootEl
+                : rootEl?.querySelector('[data-element-selected]')) as HTMLElement | null
+            const activeImage = (rootEl?.getRootNode() as any)?.__activeImage as HTMLElement | null
+            // The mark wins: if something is outlined, that is what the user sees selected,
+            // even when an image elsewhere still has handles on it.
+            const target = marked ?? (activeImage?.isConnected ? activeImage : null)
+            if (target) {
+                if (deleteSelectedElement(target, rootEl).ok) {
+                    // preventDefault matters even though the browser would do nothing to
+                    // the element itself: with the caret restored next to the gap, Delete
+                    // just before an element was measured to *insert* a stray node.
+                    e.preventDefault()
+                    // The panel is still aimed at a node that no longer exists. ImageResizer
+                    // needs no such call -- its MutationObserver drops the overlay when the
+                    // image leaves the DOM.
+                    panelCtx?.propertyTarget(null)
+                    panelCtx?.selectionType('none')
+                    saveDo()
+                    return
+                }
+            }
+        } else if (exitsNodeSelection(e)) {
+            // Typing or moving the caret leaves node-selection mode, the same way clicking
+            // elsewhere does (the pointerdown handler clears the mark unconditionally).
+            // Without this the mark outlives the gesture that set it, and a Backspace
+            // several keystrokes later would delete a component nobody was aiming at.
+            const marked = $$(activeEditor)?.querySelector('[data-element-selected]') as HTMLElement | null
+            if (marked) marked.removeAttribute('data-element-selected')
         }
 
         // Handle Backspace/Delete to ensure they work after double-tap/double-click
@@ -547,12 +685,27 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, children }: {
                 ]}
                 style={() => ({
                     outline: 'none',
-                    caretColor: 'auto'
+                    caretColor: 'auto',
+                    // Bounded box + overflow-y:auto is what puts the scrollbar on the
+                    // surface itself; without it a long document just stretches the host
+                    // page. A fixed `height` wins over `maxHeight` when both are set, and
+                    // an empty value leaves the property off so the box grows freely.
+                    height: $$(height) || undefined,
+                    maxHeight: $$(height) ? undefined : ($$(maxHeight) || undefined),
+                    overflowY: 'auto',
+                    // Hitting the end of the editor's scroll must not hand the gesture to
+                    // the page behind it.
+                    overscrollBehavior: 'contain',
+                    // Reserve the gutter so text does not reflow the moment the document
+                    // grows past the ceiling and the scrollbar appears.
+                    scrollbarGutter: 'stable',
+                    scrollbarWidth: 'thin'
                 })}
             >
                 {/* Children are cloned from light DOM into shadow DOM via the sync effect */}
             </div>
             <ImageResizer />
+            <NodeMover />
             <TablePopupMenu />
             <PropertyPanel />
         </div>
@@ -697,7 +850,7 @@ const EditorToolbar = ({ toolbarRef }: { toolbarRef: Observable<HTMLDivElement |
 // #region Editor
 const Editor = defaults(def, (props) => {
 
-    const { children, cls, class: cn, enableToolbar, readonly: _readonly, ...otherProps } = props
+    const { children, cls, class: cn, enableToolbar, readonly: _readonly, height, maxHeight, ...otherProps } = props
 
     const isEditing = $(false)
     const isReadonly = $($$(_readonly) ?? false)
@@ -769,6 +922,8 @@ const Editor = defaults(def, (props) => {
                             isEditing={isEditing}
                             handleEditorClick={handleEditorClick}
                             handleBlur={handleBlur}
+                            height={height}
+                            maxHeight={maxHeight}
                             children={children}
                         >
                         </EditorSurface>
@@ -788,6 +943,8 @@ const Editor = defaults(def, (props) => {
                             isEditing={isEditing}
                             handleEditorClick={handleEditorClick}
                             handleBlur={handleBlur}
+                            height={height}
+                            maxHeight={maxHeight}
                             children={children}
                         >
                         </EditorSurface>
@@ -809,6 +966,8 @@ const Editor = defaults(def, (props) => {
                                     isEditing={isEditing}
                                     handleEditorClick={handleEditorClick}
                                     handleBlur={handleBlur}
+                                    height={height}
+                                    maxHeight={maxHeight}
                                     children={children}
                                 >
                                 </EditorSurface>

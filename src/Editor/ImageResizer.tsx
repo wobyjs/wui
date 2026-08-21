@@ -230,7 +230,21 @@ const ImageResizer = () => {
 
         const onScrollOrResize = () => {
             const img = $$(activeImage)
-            if (img) showOverlay(img)
+            if (!img) return
+            // The surface scrolls its own content while the handles live outside it as
+            // positioned siblings, so nothing clips them: once the image has scrolled out
+            // of the surface's visible strip the handles would hang over whatever took its
+            // place. Park them instead of moving them, and keep activeImage so scrolling
+            // back brings the same selection straight back.
+            const s = editorSurface.getBoundingClientRect()
+            const r = img.getBoundingClientRect()
+            if (r.bottom < s.top || r.top > s.bottom) {
+                overlayRect(null)
+                if (overlayEl) overlayEl.style.display = 'none'
+                if (toolbarEl) toolbarEl.style.display = 'none'
+                return
+            }
+            showOverlay(img)
         }
 
         editor.addEventListener('mousedown', onMouseDown, true)
@@ -238,6 +252,9 @@ const ImageResizer = () => {
         document.addEventListener('keydown', onKey)
         window.addEventListener('scroll', onScrollOrResize, true)
         window.addEventListener('resize', onScrollOrResize)
+        // Scroll events are not composed, so the surface's own scrolling never escapes
+        // the shadow root to the window listener above: listen on it directly.
+        editorSurface.addEventListener('scroll', onScrollOrResize)
 
         const observer = new MutationObserver(() => {
             const img = $$(activeImage)
@@ -322,6 +339,7 @@ const ImageResizer = () => {
             document.removeEventListener('keydown', onKey)
             window.removeEventListener('scroll', onScrollOrResize, true)
             window.removeEventListener('resize', onScrollOrResize)
+            editorSurface.removeEventListener('scroll', onScrollOrResize)
             observer.disconnect()
         }
     })

@@ -9,6 +9,7 @@ import {
     effect16, effect17, effect18,
     ios, flat, skewed, flip, light
 } from './Switch.effect'
+import { registerBaseCls } from './helper/baseCls'
 
 // https://codepen.io/alvarotrigo/pen/oNoJePo
 
@@ -50,6 +51,16 @@ const def = () => {
 }
 
 /**
+ * The class slot `cls` replaces: the whole effect stylesheet for this switch.
+ *
+ * Unlike a component with a fixed base, a switch *is* its effect -- there is no
+ * shape underneath the `effect` variant to keep, so the variant is the slot.
+ * Named rather than inlined so the render and the registerBaseCls() call at the
+ * bottom cannot drift apart.
+ */
+const baseCls = (effect: string | null | undefined) => styleMap[effect || ''] || ''
+
+/**
  * Override
  * 
  * background color
@@ -65,13 +76,10 @@ const def = () => {
 const Switch: Defaulted<typeof def> = defaults(def, (props) => {
     const { off, on, checked, id, cls, class: cn, children, effect, ...otherProps } = props
 
-    const activeStyle = useMemo(() => {
-        const effectName = $$(effect) // Unwrap the observable
-        return styleMap[effectName] || "" // Return the CSS string or empty if not found
-    })
+    const activeStyle = useMemo(() => baseCls($$(effect)))
 
     return (
-        <div {...otherProps} class={[activeStyle, () => $$(cls) ? $$(cls) : "", cn]}>
+        <div {...otherProps} class={[() => $$(cls) ? $$(cls) : $$(activeStyle), cn]}>
             <input
                 id={id}
                 type="checkbox"
@@ -92,6 +100,8 @@ export { Switch }
 
 // Register as custom element
 customElement('wui-switch', Switch)
+// Publish the slot `cls` replaces, so the editor can show and edit it.
+registerBaseCls('wui-switch', el => baseCls(el.getAttribute('effect')))
 
 // Add the custom element to the JSX namespace
 declare module 'woby' {

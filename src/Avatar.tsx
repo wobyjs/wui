@@ -1,6 +1,7 @@
 import { $, $$, defaults, type JSX, isObservable, customElement, type ElementAttributes, type Observable, type ObservableMaybe, type CustomElementChildren, type StyleEncapsulationProps, useEffect, useMemo, HtmlClass, HtmlString } from "woby"
 import '@woby/chk'
 import './input.css'
+import { registerBaseCls } from './helper/baseCls'
 
 type Size = "xs" | "sm" | "md" | "lg"
 type Variant = "circular" | "rounded" | "square" | "custom"
@@ -97,6 +98,9 @@ const Avatar: Defaulted<typeof def> = defaults(def, (props) => {
 
 // NOTE: Register the custom element
 customElement('wui-avatar', Avatar)
+// NOTE: Publish the slot `cls` replaces, so the editor can show it. The variant
+// and size classes above it survive an override and are deliberately not part of it.
+registerBaseCls('wui-avatar', BASE_CLASS)
 
 // NOTE: Add the custom element to the JSX namespace
 declare module 'woby' {

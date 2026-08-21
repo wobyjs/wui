@@ -1,7 +1,7 @@
 import { $, $$, customElement, defaults, ElementAttributes, HtmlClass, HtmlString, JSX, Observable, ObservableMaybe, useEffect } from 'woby'
 import { Button, ButtonStyles } from '../Button'
 import { EditorContext, useEditor, useUndoRedo } from './undoredo'
-import { useOnClickOutside } from '@woby/use'
+import { useDropdownDismiss } from './useDropdownDismiss'
 
 import AlignCenter from '../icons/align_center'
 import AlignLeft from '../icons/align_left'
@@ -125,7 +125,7 @@ const TextAlignDropDown = defaults(def, (props) => {
 
     const BASE_BTN = "size-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-black hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500 cursor-pointer"
 
-    useOnClickOutside(dropdownRef as any, () => { isOpen(false) })
+    useDropdownDismiss(dropdownRef as any, () => isOpen(false))
 
     const toggleDropdown = () => isOpen(!isOpen())
 
@@ -199,7 +199,7 @@ const TextAlignDropDown = defaults(def, (props) => {
                     ]}
                     onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation() }}
                     onClick={handleApplyCurrent}
-                    title="Text format"
+                    title="Apply current alignment"
                     {...otherProps}
                 >
                     <span class="text-center truncate">
@@ -218,7 +218,7 @@ const TextAlignDropDown = defaults(def, (props) => {
                     class="size-full inline-flex justify-center items-center rounded-md border border-gray-300 shadow-sm bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500 cursor-pointer px-2"
                     onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleDropdown(); }}
                     onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation(); }}
-                    title="Toggle dropdown"
+                    title="Choose alignment or indent"
                 >
                     <KeyboardDownArrow class="h-5 w-5" />
                 </Button>
@@ -254,7 +254,7 @@ export const TextAlignDropDown_ = () => {
 
     const BASE_BTN = "size-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-black hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500 cursor-pointer"
 
-    useOnClickOutside(dropdownRef as any, () => isOpen(false))
+    useDropdownDismiss(dropdownRef as any, () => isOpen(false))
 
     const toggleDropdown = () => isOpen(!isOpen())
 
