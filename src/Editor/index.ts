@@ -25,7 +25,7 @@ export { FocusManager } from './FocusManager'
 
 // Editor Plugin System
 export { registerEditorPlugin, unregisterEditorPlugin, getEditorPlugins, getPluginForElement, pluginsToInsertItems, serializeEditorContent } from './EditorPlugin'
-export type { EditorPlugin, InsertMenuItem, PluginProp, PluginPropType } from './EditorPlugin'
+export type { EditorPlugin, InsertMenuItem, PluginProp, PluginPropType, PluginAction } from './EditorPlugin'
 
 // Property Panel
 export { InfoButton } from './InfoButton'

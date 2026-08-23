@@ -23,6 +23,7 @@ import {
     deleteRefusalReason,
     SelectionType,
 } from './PropertyExtractor'
+import { getPluginForElement } from './EditorPlugin'
 import { useEditor, useUndoRedo } from './undoredo'
 import { StyleEditor } from './StyleEditor'
 import ArrowUpward from '../icons/arrow_upward'
@@ -987,6 +988,58 @@ export const PropertyPanel = () => {
                         <PropertyForm obj={obj} class="m-0" heading="" onCommit={commitPending} />
                     ) : (
                         <div class="p-4 text-sm text-gray-400">Select an element to view properties</div>
+                    )
+                }}
+
+                {/* Plugin actions. Operations on the element that have no value to
+                    type: "reroll this block", "reset to defaults". They sit between the
+                    rows and the style editor because they belong to the component, like
+                    the rows, but to the element as a whole rather than to any one field.
+
+                    A thunk, so climbing to a different element re-reads the registry --
+                    each tag has its own plugin and so its own strip, or none. */}
+                {() => {
+                    const el = $$(propertyTarget)
+                    const isCustom = $$(selectionType) === 'custom'
+                    // Render nothing at all when a plugin declares no actions: an empty
+                    // container would still contribute its border and padding, and the
+                    // panel has to look untouched for the plugins that predate this.
+                    if (!el || !isCustom) return <></>
+                    const actions = getPluginForElement(el)?.actions
+                    if (!actions?.length) return <></>
+
+                    return (
+                        <div class="flex flex-wrap gap-1.5 px-3 py-2 border-t border-gray-200">
+                            {actions.map(a => (
+                                <button
+                                    // Ref-based onclick, like every other button in this
+                                    // panel: woby's synthetic onClick delegation does not
+                                    // reach into a shadow root, and this panel lives in one.
+                                    // An onClick={...} here compiles, reads fine, and does
+                                    // nothing at runtime.
+                                    ref={(b) => {
+                                        if (!b) return
+                                        b.onclick = () => {
+                                            // `el` is captured from this render pass, which is
+                                            // the element the user is looking at -- re-reading
+                                            // the observable on click would follow a selection
+                                            // that moved while the strip was on screen.
+                                            a.run(el)
+                                            // Attribute edits made through rows are undoable
+                                            // (see the per-property effect above); an action
+                                            // that writes one should be too. Debounced 300ms,
+                                            // so a burst of presses collapses into one step.
+                                            saveDo()
+                                        }
+                                    }}
+                                    title={a.title ?? a.label}
+                                    class="flex items-center gap-1 px-2 py-1 rounded border border-gray-300 bg-white text-xs text-gray-700 cursor-pointer hover:bg-gray-50 hover:border-gray-400 active:bg-gray-100"
+                                >
+                                    {a.icon ? a.icon() : null}
+                                    <span>{a.label}</span>
+                                </button>
+                            ))}
+                        </div>
                     )
                 }}
 

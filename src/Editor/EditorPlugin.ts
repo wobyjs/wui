@@ -67,6 +67,44 @@ export interface PluginProp {
 }
 
 /**
+ * A button the property panel offers for a plugin's element.
+ *
+ * `props` describes *values* -- every entry there resolves to a row that reads and
+ * writes an attribute. An action is the other thing a panel needs to offer: an
+ * operation on the element that has no value of its own. "Re-randomise this block",
+ * "recompute the layout", "reset to defaults" are all one function call and nothing
+ * the user can meaningfully type.
+ *
+ * Actions are rendered as a strip below the property rows rather than as rows
+ * themselves, because they belong to the element rather than to any one field.
+ */
+export interface PluginAction {
+    /** Button caption. Keep it short -- the strip wraps rather than scrolls. */
+    label: string
+    /** Tooltip. Worth setting when {@link label} is an icon or a single glyph. */
+    title?: string
+    /** Optional leading icon, same shape as {@link EditorPlugin.icon}. */
+    icon?: () => JSX.Child
+    /**
+     * Invoked with **the element the panel is bound to** -- the panel's current
+     * target, which is not necessarily the editor's selection and is never the
+     * editor root.
+     *
+     * Whatever this does to the DOM it does directly. That has two consequences
+     * worth knowing before writing one:
+     *
+     * - `onPropChange` does **not** fire. The panel's own write path is what calls
+     *   it, and an action bypasses that path entirely. A plugin that re-renders
+     *   from `onPropChange` will look broken; re-render from the attribute change
+     *   instead, or do it here.
+     * - The panel pushes an undo step once `run` returns, so an attribute written
+     *   here is undoable like any row edit. Nothing is snapshotted beforehand, so
+     *   an action that mutates state outside the editor DOM is on its own.
+     */
+    run: (el: HTMLElement) => void
+}
+
+/**
  * EditorPlugin: Interface for 3rd-party plugins that register custom elements
  * and toolbar insert items with the wui editor.
  */
@@ -123,6 +161,14 @@ export interface EditorPlugin {
      * blind string fields.
      */
     props?: PluginProp[]
+
+    /**
+     * Buttons rendered as a strip in the property panel for this element.
+     *
+     * Complementary to {@link props}, not a replacement: use a prop for anything the
+     * user supplies a value for, and an action for anything they merely trigger.
+     */
+    actions?: PluginAction[]
 
     /**
      * Called after the panel has written an attribute.
