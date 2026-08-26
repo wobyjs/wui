@@ -19,6 +19,7 @@ export const NumberEditor = () => {
 			<TableRow
 				optionName={optionName}
 				indentLvl={indentLvl}
+				action={(value as any)?.action}
 			>
 				<NumEditor value={value} editorName={editorName} />
 			</TableRow>

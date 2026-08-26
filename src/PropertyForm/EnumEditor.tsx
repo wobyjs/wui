@@ -31,6 +31,7 @@ export const EnumEditor = () => {
             <TableRow
                 optionName={optionName}
                 indentLvl={indentLvl}
+                action={(value as any)?.action}
             >
                 <EnumSelect value={value} />
             </TableRow>

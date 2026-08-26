@@ -26,6 +26,7 @@ export const ColorEditor = () => {
 			<TableRow
 				optionName={optionName}
 				indentLvl={indentLvl}
+				action={(value as any)?.action}
 			>
 				<ClrEditor
 					value={value}

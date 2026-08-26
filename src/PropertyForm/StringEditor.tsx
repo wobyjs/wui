@@ -32,6 +32,7 @@ export const StringEditor = () => {
 			<TableRow
 				optionName={optionName}
 				indentLvl={indentLvl}
+				action={(value as any)?.action}
 			>
 				<StringEditor value={value} />
 			</TableRow>

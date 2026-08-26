@@ -1,5 +1,6 @@
 import { $, $$, JSX, useEffect } from 'woby'
 import { applyImageAlignment, applyImageIndent } from './ImageActions'
+import { openImageEditor } from './ImageEditor'
 
 /**
  * ImageResizer: Overlays an <img> inside the editor with:
@@ -86,6 +87,7 @@ const ImageResizer = () => {
     let outdentBtn: HTMLButtonElement | null = null
     let indentBtn: HTMLButtonElement | null = null
     let deleteBtn: HTMLButtonElement | null = null
+    let editBtn: HTMLButtonElement | null = null
 
     // Set up event listeners in useEffect with cleanup to prevent memory leaks
     useEffect(() => {
@@ -294,6 +296,7 @@ const ImageResizer = () => {
                 attach(alignRBtn, () => align('right')) &&
                 attach(outdentBtn, () => indent(true)) &&
                 attach(indentBtn, () => indent(false)) &&
+                attach(editBtn, editImage) &&
                 attach(deleteBtn, deleteImage)
 
             // Also attach mousedown handler to toolbar container (stopPropagation only, not preventDefault)
@@ -564,6 +567,19 @@ const ImageResizer = () => {
         applyImageIndent(img, outdent)
     }
 
+    /**
+     * Hand the selected image to `<wui-image-editor>`.
+     *
+     * The overlay is dismissed first: it is positioned against the image's old box, and a
+     * crop changes that box. It comes back on the next click, measured against the result.
+     */
+    const editImage = () => {
+        const img = $$(activeImage)
+        if (!img) return
+        hideOverlay()
+        openImageEditor(img)
+    }
+
     const deleteImage = () => {
         const im = $$(activeImage)
         if (im) im.remove()
@@ -693,6 +709,9 @@ const ImageResizer = () => {
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3 21V3h2v18H3zm8-11v10l7-5-7-5z"/></svg>
                 </button>
                 <span data-image-mini-toolbar style={{ width: '1px', background: 'rgba(255,255,255,0.3)', margin: '2px' }} />
+                <button ref={(el: HTMLButtonElement) => { editBtn = el }} data-image-mini-toolbar title="Edit image (crop, zoom)" style={btnStyle}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M7 1h2v4h10v2H9v10H7V7H3V5h4V1zm10 22v-4H7v-2h10V7h2v10h4v2h-4v4h-2z"/></svg>
+                </button>
                 <button ref={(el: HTMLButtonElement) => { deleteBtn = el }} data-image-mini-toolbar title="Delete image" style={btnStyle}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
                 </button>

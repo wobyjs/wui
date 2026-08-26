@@ -576,6 +576,14 @@ export function extractCustomElementProperties(el: HTMLElement): Record<string, 
         // with .options rather than being looked up from the schema.
         ;(obs as any).propType = p.type
 
+        // A row-level action rides the same channel, already bound to this element:
+        // TableRow renders the button but knows nothing about plugins or selection,
+        // and the observable is the only thing that reaches it from here.
+        if (p.action) {
+            const a = p.action
+            ;(obs as any).action = { label: a.label, title: a.title, icon: a.icon, run: () => a.run(el) }
+        }
+
         props[p.label ?? p.name] = obs
     }
 

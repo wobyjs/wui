@@ -32,6 +32,24 @@ export interface PluginProp {
     /** Tooltip / helper text for the row. */
     hint?: string
     /**
+     * A button rendered *inside this row*, to the right of its editor.
+     *
+     * Same shape as an {@link EditorPlugin.actions} entry, placed differently: the
+     * plugin-level strip is for operations on the element as a whole, this is for one
+     * that belongs to a single value. "Reroll the seed" is the second kind -- the
+     * button and the box it refills are the same control, and a strip at the bottom of
+     * the panel makes the user work out which row it touched.
+     *
+     * The row updates itself afterwards with no help from the action. Writing the
+     * attribute is seen by the panel's mirror observer, which pushes the new value
+     * into this row's observable; that in turn runs the per-property effect, so the
+     * edit lands on the undo stack exactly like a typed one. The only requirement is
+     * that whatever `run` writes is a *declared* prop -- the observer's
+     * attributeFilter is built from the schema, so an undeclared attribute changes
+     * nothing on screen.
+     */
+    action?: PluginAction
+    /**
      * This prop is the element's light-DOM text, not an attribute.
      *
      * Needed for the `children` prop of every wui-* component: woby's

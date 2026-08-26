@@ -137,6 +137,8 @@ Rendered as siblings of the editor surface inside the `<div class="relative">` c
 - **ImageResizer** — Overlays selected images with 8 resize handles, a floating mini-toolbar for align/indent/outdent, and drag-and-drop repositioning.
 - **TablePopupMenu** — Floating popup for table row/column operations (insert/delete above/below/left/right) and cell formatting (background color, border color, text color, border style).
 - **PropertyPanel** — Right-side panel (300px) that renders a `<PropertyForm>` for the currently selected element. Supports image, text, and custom element property editing with bidirectional sync.
+- **ImageDialog** — Insert dialog for images: a URL field, a file picker and a drop zone, with an "embed as data URI" choice. Embedded images are downscaled to A4 at 150 DPI; SVG and animated GIF are inserted untouched.
+- **ImageEditor** — Crop, zoom, resize and source-replacement modal for an existing image. Registered as `<wui-image-editor>` and openable from anywhere via `openImageEditor(img)`, so it is not tied to this editor. See [ImageEditor.md](./ImageEditor.md).
 
 ## Read-Only Mode Toggle
 
@@ -156,9 +158,10 @@ A floating action button (FAB) in the bottom-right corner toggles between read-o
         <EditorToolbar />           <!-- sticky toolbar, hidden when readonly -->
         <div class="relative">
           <div contentEditable />   <!-- EditorSurface -->
-          <ImageResizer />          <!-- overlay -->
+          <ImageResizer />          <!-- overlay; its crop button opens the image editor -->
           <TablePopupMenu />        <!-- overlay -->
           <PropertyPanel />         <!-- right-side panel -->
+          <ImageDialog />           <!-- insert-image modal -->
         </div>
       </UndoRedo>
     </EditorContext.Provider>
@@ -299,6 +302,8 @@ The Editor component provides:
 - Focus management that preserves selection across toolbar interactions
 - Read-only mode with an interactive toggle
 - Image resizing with drag handles and align/indent controls
+- Image insertion by URL, file picker or drop, with optional A4-capped embedding
+- Image cropping, zooming and source replacement, with the original URL kept on record so a crop can be undone or re-taken from pristine pixels
 - Table editing with row/column operations and cell formatting
 - Property panel for editing element attributes (image, text, custom elements)
 - Plugin system for registering custom elements in the insert menu

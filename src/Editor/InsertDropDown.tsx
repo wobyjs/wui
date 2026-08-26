@@ -6,6 +6,7 @@ import { range, getCurrentRange } from './utils' // Import getCurrentRange
 import KeyboardDownArrow from '../icons/keyboard_down_arrow'
 import Plus from '../icons/plus'
 import { getEditorPlugins, pluginsToInsertItems, InsertMenuItem } from './EditorPlugin'
+import { INSERT_IMAGE_EVENT, type InsertImageDetail } from './ImageDialog'
 
 // Icons - placeholders, replace with actual SVGs or components
 const HorizontalRuleIcon = () => <span>HR</span>
@@ -16,20 +17,11 @@ const RowIcon = () => <span>Row</span>
 const GifIcon = () => <span>GIF</span>
 // ... other icons
 
-/**
- * Sanitize a string for safe insertion as an HTML attribute value.
- * Strips characters that could break out of the attribute context.
- * This prevents XSS when user input is interpolated into HTML strings
- * passed to document.execCommand('insertHTML').
- */
-const sanitizeAttr = (str: string): string => {
-    return str
-        .replace(/&/g, '&amp;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-}
+// The attribute escaper that used to live here went with the image path: images are now
+// built as detached DOM nodes by `ImageDialog`, where there is no attribute context to
+// break out of, and `ImageSource.isAllowedSource` vets the URL scheme by parsing rather
+// than by pattern-matching. Nothing else on this file's insert paths interpolates user
+// input into HTML.
 
 /**
  * Sanitize HTML content for safe insertion via document.execCommand('insertHTML').
@@ -69,22 +61,20 @@ const execInsertHorizontalRule = () => {
     document.execCommand('insertHTML', false, hrWithClasses)
 }
 
+/**
+ * Hand the caret to `ImageDialog` and let it do the rest.
+ *
+ * The caret has to be captured *here*, before anything steals focus: opening the dialog
+ * blurs the contenteditable surface, and a blurred shadow root reports no selection at
+ * all. The dialog restores this range when the user commits.
+ */
 const execInsertImage = () => {
-    const { selection, shadowRoot } = getEditorSelection()
+    const { selection } = getEditorSelection()
     if (!selection || selection.rangeCount === 0) return
     const range = selection.getRangeAt(0)
 
-    const imageUrl = prompt('Enter image URL:')
-    if (!imageUrl) return
-
-    // Restore selection after prompt
-    selection.removeAllRanges()
-    selection.addRange(range)
-
-    // Sanitize URL to prevent XSS via attribute injection
-    const safeUrl = sanitizeAttr(imageUrl)
-    const imgHtml = `<img src="${safeUrl}" class="max-w-full h-auto my-2" />`
-    document.execCommand('insertHTML', false, sanitizeHTML(imgHtml))
+    const editorHost = document.querySelector('wui-editor')
+    editorHost?.dispatchEvent(new CustomEvent<InsertImageDetail>(INSERT_IMAGE_EVENT, { detail: { range } }))
 }
 
 const execInsertTable = () => {

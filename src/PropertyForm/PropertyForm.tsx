@@ -53,8 +53,26 @@ export function changeEnumerable(json: Record<string, any>) {
 	return sorted
 }
 
-export const TableRow = (props: { optionName?: JSX.Child, children?: JSX.Child, indentLvl?: number }) => {
-	const { optionName, children, indentLvl } = props
+/**
+ * A button a row may carry to the right of its editor.
+ *
+ * Structural on purpose: `TableRow` is shared by the standalone
+ * `<wui-property-form>` and by the editor's property panel, so it must not import
+ * the editor's plugin types. `run` arrives already bound to whatever it acts on --
+ * the row has no idea what that is.
+ */
+export type RowAction = {
+	/** Caption. A single glyph is the usual case, which is why {@link title} matters. */
+	label?: JSX.Child
+	/** Tooltip. */
+	title?: string
+	/** Optional leading icon. */
+	icon?: () => JSX.Child
+	run: () => void
+}
+
+export const TableRow = (props: { optionName?: JSX.Child, children?: JSX.Child, indentLvl?: number, action?: RowAction }) => {
+	const { optionName, children, indentLvl, action } = props
 
 	return (
 		<tr class="flex w-full items-stretch border-x border-b border-gray-200 bg-white first:border-t transition-colors hover:bg-gray-50/30">
@@ -69,8 +87,30 @@ export const TableRow = (props: { optionName?: JSX.Child, children?: JSX.Child, 
 			</th>
 
 			<td class="flex flex-1 items-center px-4 py-1.5 min-h-[38px] text-sm text-slate-700">
-				<div class="w-full h-full flex items-center">
+				<div class="w-full h-full flex items-center gap-1.5">
 					{children}
+					{() => {
+						// `defaults()` is not in play here, but the caller may still pass an
+						// observable, and a bare truthiness test on one is always true.
+						const a = $$(action, false) as RowAction | undefined
+						if (!a || typeof a.run !== 'function') return null
+						return (
+							<button
+								// onclick via ref rather than onClick: this form is rendered
+								// inside <wui-editor>'s shadow root, where woby's delegated
+								// synthetic click never arrives. An onClick here would compile,
+								// read correctly, and silently do nothing.
+								ref={(b: HTMLButtonElement | null) => { if (b) b.onclick = () => a.run() }}
+								title={a.title}
+								// shrink-0 so the field keeps the space: the editor beside it is
+								// w-full, and without this the button is the one that collapses.
+								class="shrink-0 flex items-center gap-1 px-2 py-1 rounded border border-gray-300 bg-white text-xs text-gray-700 cursor-pointer hover:bg-gray-50 hover:border-gray-400 active:bg-gray-100"
+							>
+								{a.icon ? a.icon() : null}
+								{a.label}
+							</button>
+						)
+					}}
 				</div>
 			</td>
 		</tr>

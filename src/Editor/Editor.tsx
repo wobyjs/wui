@@ -27,6 +27,7 @@ import { UndoRedoButton } from './UndoRedoButton'
 import { ImageResizer } from './ImageResizer' // Image resize handles + align/indent mini-toolbar
 import { NodeMover } from './NodeMover' // Drag handle that repositions the node selection
 import { TablePopupMenu } from './TablePopupMenu' // Table cell popup menu
+import { ImageDialog, INSERT_IMAGE_EVENT, type InsertImageDetail } from './ImageDialog' // Insert-image modal (URL / file / drop / paste)
 import { InfoButton } from './InfoButton' // Info button for property panel
 import { PropertyPanel, PropertyPanelContext } from './PropertyPanel' // Property panel for selected element
 import { SelectionType, deleteSelectedElement, deleteRefusalReason } from './PropertyExtractor' // Selection type enum + node-selection delete + its guard
@@ -42,48 +43,10 @@ interface EditorProps {
 }
 
 
-const insertImage = (imageUrl?: string) => {
-    const r = getCurrentRange()
-    if (!r) return
 
-    const imgUrl = imageUrl || prompt('Enter image URL:')
-    if (!imgUrl) return
-
-    const imgElement = document.createElement('img')
-    imgElement.src = imgUrl
-    imgElement.style.maxWidth = '100%'
-    r.deleteContents()
-    r.insertNode(imgElement)
-}
-
-const insertTable = (rowsIn?: number, colsIn?: number) => {
-    const r = getCurrentRange()
-    if (!r) return
-
-    const rows = rowsIn ?? parseInt(prompt('Enter number of rows:', '2') ?? '', 10)
-    if (isNaN(rows)) return
-    const cols = colsIn ?? parseInt(prompt('Enter number of columns:', '3') ?? '', 10)
-
-    if (isNaN(rows) || isNaN(cols) || rows <= 0 || cols <= 0) return
-
-    let tableHTML = '<table class="border-1 border-collapse"><tbody>'
-    for (let i = 0; i < rows; i++) {
-        tableHTML += '<tr>'
-        for (let j = 0; j < cols; j++) {
-            tableHTML += '<td class="p-2">Cell</td>'
-        }
-        tableHTML += '</tr>'
-    }
-    tableHTML += '</tbody></table>'
-
-    const tempDiv = document.createElement('div')
-    tempDiv.innerHTML = tableHTML
-    const tableNode = tempDiv.firstChild as Node
-
-    r.deleteContents()
-    r.insertNode(tableNode)
-}
-
+// The image and table inserters that used to live here were dead: the toolbar's
+// insert menu has always gone through `InsertDropDown`, and nothing referenced these.
+// Images now go through `ImageDialog` (see `INSERT_IMAGE_EVENT` below).
 
 const def = () => ({
     children: $(null) as CustomElementChildren,
@@ -507,6 +470,105 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, height, maxHe
     // #endregion
 
     /**
+     * Pasted and dropped images.
+     *
+     * Both open `ImageDialog` with the file already chosen rather than inserting straight
+     * away, so a dropped photo gets the same crop-and-embed pass as one picked from the
+     * dialog -- otherwise the two routes would disagree about size, which is the whole
+     * thing the A4 cap exists to prevent.
+     *
+     * Attached imperatively here rather than as `onPaste`/`onDrop` JSX props: these fire
+     * inside the shadow root, where woby's synthetic delegation is unreliable, and the
+     * drop handler needs `preventDefault` to beat the browser's own default of navigating
+     * to the dropped file.
+     */
+    // #region Paste / drop images
+    useEffect(() => {
+        const el = $$(activeEditor)
+        if (!el || !(el instanceof HTMLElement)) return
+
+        const editorHost = () => {
+            const root = el.getRootNode()
+            return root instanceof ShadowRoot ? root.host as HTMLElement : document.querySelector('wui-editor') as HTMLElement | null
+        }
+
+        /**
+         * The image in a clipboard or drag payload. `files` covers a real file; `items`
+         * covers a screenshot pasted straight from the OS, which never appears in `files`
+         * during `dragover` and sometimes not at all.
+         */
+        const imageIn = (dt: DataTransfer | null): File | null => {
+            if (!dt) return null
+            const direct = Array.from(dt.files ?? []).find(f => f.type.startsWith('image/'))
+            if (direct) return direct
+            const item = Array.from(dt.items ?? []).find(i => i.kind === 'file' && i.type.startsWith('image/'))
+            return item?.getAsFile() ?? null
+        }
+
+        const openWith = (file: File, range: Range | null) => {
+            editorHost()?.dispatchEvent(new CustomEvent<InsertImageDetail>(INSERT_IMAGE_EVENT, {
+                detail: { range: range ?? undefined, file },
+            }))
+        }
+
+        /**
+         * Where a drop landed, so the image goes under the pointer instead of wherever the
+         * caret happened to be. Both APIs are non-standard in different directions --
+         * `caretRangeFromPoint` is Blink/WebKit, `caretPositionFromPoint` is the standard
+         * Firefox implements -- and neither is guaranteed to see into a shadow root, hence
+         * the fall back to the caret.
+         */
+        const rangeAtPoint = (x: number, y: number): Range | null => {
+            const root = el.getRootNode() as ShadowRoot | Document
+            const fromPoint = (root as any).caretRangeFromPoint ?? (document as any).caretRangeFromPoint
+            if (typeof fromPoint === 'function') {
+                const r = fromPoint.call(root, x, y) as Range | null
+                if (r && el.contains(r.startContainer)) return r
+            }
+            const pos = (document as any).caretPositionFromPoint?.(x, y)
+            if (pos && el.contains(pos.offsetNode)) {
+                const r = document.createRange()
+                r.setStart(pos.offsetNode, pos.offset)
+                r.collapse(true)
+                return r
+            }
+            return null
+        }
+
+        const onPaste = (e: ClipboardEvent) => {
+            const file = imageIn(e.clipboardData)
+            // No image in the payload means an ordinary text or HTML paste: leave it alone.
+            if (!file) return
+            e.preventDefault()
+            openWith(file, getCurrentRange())
+        }
+
+        const onDragOver = (e: DragEvent) => {
+            if (!imageIn(e.dataTransfer)) return
+            e.preventDefault()
+            if (e.dataTransfer) e.dataTransfer.dropEffect = 'copy'
+        }
+
+        const onDrop = (e: DragEvent) => {
+            const file = imageIn(e.dataTransfer)
+            if (!file) return
+            e.preventDefault()
+            openWith(file, rangeAtPoint(e.clientX, e.clientY) ?? getCurrentRange())
+        }
+
+        el.addEventListener('paste', onPaste)
+        el.addEventListener('dragover', onDragOver)
+        el.addEventListener('drop', onDrop)
+
+        return () => {
+            el.removeEventListener('paste', onPaste)
+            el.removeEventListener('dragover', onDragOver)
+            el.removeEventListener('drop', onDrop)
+        }
+    })
+    // #endregion
+
+    /**
     * handleKeyDown: Intercepts keyboard events to provide custom behavior.
     * - Tab: Navigates table cells OR indents paragraphs.
     * - Ctrl+Z / Ctrl+Y: Triggers custom Undo/Redo logic.
@@ -708,6 +770,7 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, height, maxHe
             <NodeMover />
             <TablePopupMenu />
             <PropertyPanel />
+            <ImageDialog />
         </div>
     )
 }

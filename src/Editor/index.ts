@@ -32,3 +32,19 @@ export { InfoButton } from './InfoButton'
 export { PropertyPanel, PropertyPanelContext, usePropertyPanel } from './PropertyPanel'
 export { detectSelectionType, extractImageProperties, extractTextProperties, extractCustomElementProperties } from './PropertyExtractor'
 export type { SelectionType, SelectionInfo } from './PropertyExtractor'
+
+// Image editing
+// `wui-image-editor` is registered as a side effect of this import -- the element is
+// usable from plain HTML once anything pulls the bundle in, and `openImageEditor` mounts
+// it on demand for callers that would rather not place the tag.
+export { ImageEditor, openImageEditor, EDIT_IMAGE_EVENT, IMAGE_APPLIED_EVENT } from './ImageEditor'
+export type { EditImageDetail } from './ImageEditor'
+export { ImageCropper } from './ImageCropper'
+export type { CropperHandle } from './ImageCropper'
+export {
+    A4, ORIGIN_ATTR, a4Box, bakeCrop, cropOutputSize, cropRect, dataUrlBytes, encodeCanvas,
+    fileToDataUrl, fitToA4, fitWithin, formatBytes, isAllowedSource, isRasterisable, loadImage,
+    mimeOf, naturalSize, pristineSource, readImageOrigin, rememberImageOrigin, resolveImageSource,
+    urlToDataUrl,
+} from './ImageSource'
+export type { CropFrame, CropTransform, PristineSource, ResolveResult } from './ImageSource'

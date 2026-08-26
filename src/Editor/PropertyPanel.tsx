@@ -24,6 +24,8 @@ import {
     SelectionType,
 } from './PropertyExtractor'
 import { getPluginForElement } from './EditorPlugin'
+import { openImageEditor } from './ImageEditor'
+import { ORIGIN_ATTR, readImageOrigin } from './ImageSource'
 import { useEditor, useUndoRedo } from './undoredo'
 import { StyleEditor } from './StyleEditor'
 import ArrowUpward from '../icons/arrow_upward'
@@ -1039,6 +1041,55 @@ export const PropertyPanel = () => {
                                     <span>{a.label}</span>
                                 </button>
                             ))}
+                        </div>
+                    )
+                }}
+
+                {/* The same idea for a selected image, which has no plugin to declare
+                    actions but has two worth offering. Cropping is destructive, so the
+                    way back is a first-class button rather than a hope that undo covers
+                    it: `Restore original` re-points the image at the URL it was inserted
+                    from, which `data-image-origin` kept.
+
+                    Read at render, not reactively -- the strip re-renders when the
+                    selection moves, which is when its answer can change. Applying a crop
+                    from here closes the panel's selection anyway. */}
+                {() => {
+                    const el = $$(propertyTarget)
+                    if (!el || $$(selectionType) !== 'image' || el.tagName !== 'IMG') return <></>
+                    const img = el as HTMLImageElement
+                    const origin = readImageOrigin(img)
+
+                    const btn = 'flex items-center gap-1 px-2 py-1 rounded border border-gray-300 bg-white text-xs text-gray-700 cursor-pointer hover:bg-gray-50 hover:border-gray-400 active:bg-gray-100'
+                    return (
+                        <div class="flex flex-wrap gap-1.5 px-3 py-2 border-t border-gray-200">
+                            <button
+                                ref={b => { if (b) b.onclick = () => openImageEditor(img) }}
+                                title="Crop, zoom and resize this image"
+                                class={btn}
+                            >
+                                <span>Edit image…</span>
+                            </button>
+                            {origin
+                                ? <button
+                                    ref={b => {
+                                        if (!b) return
+                                        b.onclick = () => {
+                                            // The image becomes the original, so nothing is
+                                            // left to restore to and the record is spent. A
+                                            // later crop re-records it from `src`.
+                                            img.removeAttribute(ORIGIN_ATTR)
+                                            img.src = origin
+                                            img.style.height = 'auto'
+                                            saveDo()
+                                        }
+                                    }}
+                                    title={`Discard every crop and go back to ${origin}`}
+                                    class={btn}
+                                >
+                                    <span>Restore original</span>
+                                </button>
+                                : null}
                         </div>
                     )
                 }}

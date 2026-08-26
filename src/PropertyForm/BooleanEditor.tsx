@@ -20,7 +20,7 @@ export const BooleanEditor = () => {
 		})
 
 		return skippedProperties.includes(editorName) ? null : (
-			<TableRow optionName={optionName}>
+			<TableRow optionName={optionName} action={(value as any)?.action}>
 				<BoolEditor
 					value={value}
 					reactive={reactive}
