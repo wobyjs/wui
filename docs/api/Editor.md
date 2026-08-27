@@ -134,7 +134,7 @@ The toolbar (`EditorToolbar`) is a sticky bar organized into six functional grou
 
 Rendered as siblings of the editor surface inside the `<div class="relative">` container:
 
-- **ImageResizer** — Overlays selected images with 8 resize handles, a floating mini-toolbar for align/indent/outdent, and drag-and-drop repositioning.
+- **ImageResizer** — Overlays selected images with 8 resize handles, a floating mini-toolbar for align/indent/outdent, and drag-and-drop repositioning. Selection can also be driven from outside via the `wui-select-image` event (`SELECT_IMAGE_EVENT`), which is how arrow navigation reaches images.
 - **TablePopupMenu** — Floating popup for table row/column operations (insert/delete above/below/left/right) and cell formatting (background color, border color, text color, border style).
 - **PropertyPanel** — Right-side panel (300px) that renders a `<PropertyForm>` for the currently selected element. Supports image, text, and custom element property editing with bidirectional sync.
 - **ImageDialog** — Insert dialog for images: a URL field, a file picker and a drop zone, with an "embed as data URI" choice. Embedded images are downscaled to A4 at 150 DPI; SVG and animated GIF are inserted untouched.
@@ -200,11 +200,59 @@ The toolbar only appears when the editor is in editing mode (`isEditing = true`)
 | `Ctrl+U`     | Underline (via StyleEngine) |
 | `Tab`        | Table cell navigation / indent paragraph |
 | `Shift+Tab`  | Outdent / previous table cell |
+| `←` `→` `↑` `↓` | Move the selection between embedded components and images |
+| `Enter`      | Open a new line immediately after the selected component |
+| `Backspace` / `Delete` | Delete the selected component |
+| `Escape`     | Clear the component selection |
+
+The last four rows apply **only while a component is selected**. When the
+caret is inside a text-entry component — a `wui-text-field`, a `wui-text-area`, a
+`wui-number-field` — those same keys belong to the component, not the editor. See
+**editsInPlace** below.
+
+## Node Selection & Navigation
+
+A caret cannot be placed inside a shadow host, so embedded components and images are selected
+as whole boxes rather than as a range of text. `data-element-selected` on the element is the
+single source of truth for that selection, set by a capture-phase `pointerdown` handler on
+the surface and read by `NodeMover`, `PropertyPanel`, `PropertyExtractor` and the delete path.
+
+While a box is selected, the arrow keys step from box to box and `Enter` opens a line
+immediately after the selection — in the selection's own parent, so a component nested in a
+container gets its line inside that container. The geometry and the insertion rules live in
+[NodeNavigation.md](./NodeNavigation.md); the editor only moves the mark.
+
+Image selection lives in `ImageResizer`'s closure rather than in the mark, so the keyboard
+reaches it through the `wui-select-image` event (`SELECT_IMAGE_EVENT`) dispatched on the
+shadow root with `detail.image` set to the image, or `null` to clear.
+
+### editsInPlace
+
+Some embedded components own a caret of their own. `editsInPlace(e)` walks the event's
+`composedPath()` — `e.target` is retargeted to the host and would never reveal what is inside
+— stopping at `[data-editor-root]`, and returns `true` when it finds a text `<input>`,
+a `<textarea>`, a `<select>` or a literal `contenteditable` attribute. Input types that hold
+no text (`checkbox`, `radio`, `button`, `submit`, `reset`, `file`, `image`, `range`, `color`)
+do not count.
+
+When it returns `true`, the editor keeps its hands off the keystroke: `Backspace` deletes a
+character instead of the component, `Enter` reaches the field, `Tab` moves through the form.
+
+This is also why a caret cannot be placed **between** two adjacent components by clicking:
+the click focuses the near one's own field and `Enter` then belongs to that field. Arrow onto
+the component from a neighbour instead — that marks it without focusing it — and press
+`Enter`.
 
 ## Focus Management
 
 - **handleEditorClick** — Sets `isEditing = true` and focuses the editor element.
 - **handleBlur** — Checks if focus has moved outside the editor/toolbar composite using `FocusManager.isFocused`. If focus truly left, sets `isEditing = false`.
+- **holdsFocus** — Answers "is the focus inside this element?" across shadow boundaries.
+  `document.activeElement` cannot: focus is retargeted at every boundary, so with the caret in
+  a `wui-text-field`'s `<input>` the document still reports the outermost host, `<wui-editor>`,
+  and every comparison against an element *inside* that shadow tree comes back false. The walk
+  descends one boundary at a time via each host's own `shadowRoot.activeElement`. The auto-focus
+  effect guards on this so it never seizes the surface from a component that already has the caret.
 - **FocusManager** — Uses capture-phase `mousedown` on the toolbar to prevent button clicks from moving focus away from the contentEditable element. Caches and restores the selection using offset arrays.
 
 ## Mutation Observer
