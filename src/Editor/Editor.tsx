@@ -24,14 +24,15 @@ import { TextFormatOptionsDropDown } from './TextFormatOptionsDropDown'
 import { InsertDropDown } from './InsertDropDown'
 import { TextAlignDropDown } from './TextAlignDropDown'
 import { UndoRedoButton } from './UndoRedoButton'
-import { ImageResizer } from './ImageResizer' // Image resize handles + align/indent mini-toolbar
+import { ImageResizer, SELECT_IMAGE_EVENT, type SelectImageDetail } from './ImageResizer' // Image resize handles + align/indent mini-toolbar
 import { NodeMover } from './NodeMover' // Drag handle that repositions the node selection
 import { TablePopupMenu } from './TablePopupMenu' // Table cell popup menu
 import { ImageDialog, INSERT_IMAGE_EVENT, type InsertImageDetail } from './ImageDialog' // Insert-image modal (URL / file / drop / paste)
 import { InfoButton } from './InfoButton' // Info button for property panel
 import { PropertyPanel, PropertyPanelContext } from './PropertyPanel' // Property panel for selected element
-import { SelectionType, deleteSelectedElement, deleteRefusalReason } from './PropertyExtractor' // Selection type enum + node-selection delete + its guard
+import { SelectionType, deleteSelectedElement, deleteRefusalReason, classifyElement } from './PropertyExtractor' // Selection type enum + node-selection delete + its guard
 import { getEditorPlugins } from './EditorPlugin' // For plugin tag name detection
+import { arrowDirection, insertLineAfter, navigableBoxes, navigateFrom, placeCaretIn } from './NodeNavigation' // Arrow/Enter handling while a component is selected
 
 // StyleEngine imports for keyboard shortcuts
 import { applyBold, applyItalic, applyUnderline } from './StyleEngine'
@@ -77,6 +78,11 @@ const def = () => ({
  * the previous mark unconditionally. This is the keyboard half: anything that types a
  * character or moves the caret counts. Modified keystrokes deliberately do not, so
  * Ctrl+B on a selected component keeps it selected.
+ *
+ * The arrows and Enter are listed here but rarely reach it: `navigateNodeSelection` gets
+ * them first and, while there is somewhere to go, keeps the selection rather than ending
+ * it. They fall through to here only at the ends of the document, where deselecting is
+ * the right answer anyway.
  */
 const exitsNodeSelection = (e: KeyboardEvent) => {
     if (e.ctrlKey || e.metaKey || e.altKey) return false
@@ -85,6 +91,64 @@ const exitsNodeSelection = (e: KeyboardEvent) => {
         || e.key === 'Enter' || e.key === 'Tab' || e.key === 'Escape'
         || e.key === 'Home' || e.key === 'End'
         || e.key === 'PageUp' || e.key === 'PageDown'
+}
+
+/**
+ * Does the focus currently sit inside `el`, however deeply nested in shadow roots?
+ *
+ * `document.activeElement` cannot answer this on its own. Focus is retargeted at every
+ * shadow boundary, so with the caret in a `wui-text-field`'s `<input>` the document still
+ * reports the outermost host -- `<wui-editor>` -- and every comparison against an element
+ * *inside* that shadow tree comes back false. The walk descends one boundary at a time,
+ * following each host's own `shadowRoot.activeElement`, until it reaches the element that
+ * really has focus or runs out of shadow roots.
+ */
+const holdsFocus = (el: HTMLElement) => {
+    let active: Element | null = el.ownerDocument.activeElement
+    while (active) {
+        if (active === el || el.contains(active)) return true
+        const root = active.shadowRoot
+        if (!root) return false
+        active = root.activeElement
+    }
+    return false
+}
+
+/**
+ * Input types that hold no caret, so a keystroke aimed at one is not text entry.
+ */
+const NON_TEXT_INPUTS = new Set(['checkbox', 'radio', 'button', 'submit', 'reset', 'file', 'image', 'range', 'color'])
+
+/**
+ * Is this keystroke being typed into a control that belongs to an embedded component?
+ *
+ * Components are not opaque boxes. `wui-text-field`, `wui-text-area` and `wui-number-field`
+ * each carry a real `<input>` or `<textarea>` in their shadow root, and clicking into one
+ * still marks the *host* as node-selected -- correctly, since that is the box the property
+ * panel should aim at. But the keystrokes are not the editor's to take. Without this guard
+ * the node-selection handlers win every time: Backspace deletes the entire widget instead
+ * of a character, the arrows jump to the next component instead of moving the caret in the
+ * field, and Enter opens a paragraph underneath instead of a line in the textarea.
+ *
+ * The walk is outward along `composedPath()`, not `e.target`, because retargeting reports
+ * the host for anything that happened inside a shadow root -- there is no way to see the
+ * `<textarea>` otherwise. It stops at the editor's own content root: past that point every
+ * ancestor is the editor itself, whose `contenteditable` would otherwise match and disable
+ * node selection everywhere.
+ *
+ * Checkboxes, radios and the like are deliberately not counted. They hold no caret, so
+ * arrowing off a selected `wui-checkbox` and deleting it with Backspace still work.
+ */
+const editsInPlace = (e: KeyboardEvent) => {
+    for (const node of e.composedPath()) {
+        if (!(node instanceof HTMLElement)) continue
+        if (node.hasAttribute('data-editor-root')) return false
+        if (node instanceof HTMLInputElement) return !NON_TEXT_INPUTS.has(node.type)
+        if (node instanceof HTMLTextAreaElement || node instanceof HTMLSelectElement) return true
+        // A component that rolls its own editable region rather than using a form control.
+        if (node.getAttribute('contenteditable') === '' || node.getAttribute('contenteditable') === 'true') return true
+    }
+    return false
 }
 
 // #region Editor Surface
@@ -127,13 +191,25 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, height, maxHe
     /**
      * Effect: Automatically focuses the editor element when editing mode is enabled.
      * This ensures the cursor is placed in the editor when the user clicks to start editing.
+     *
+     * It must not do so when something inside the editor is already focused -- an embedded
+     * component's text field is inside the editor and owns the caret while it is being typed
+     * into. See {@link holdsFocus}.
      */
     // #region Auto-focus Effect
     useEffect(() => {
         if ($$(isEditing)) {
             const el = $$(activeEditor);
 
-            if (el && document.activeElement !== el) { el.focus(); }
+            // `holdsFocus`, not `document.activeElement !== el`. That comparison could never
+            // be false -- focus inside the editor is retargeted to the `<wui-editor>` host, so
+            // the surface itself is never what the document reports -- which made this effect
+            // seize the surface every single time it re-ran. With the caret in an embedded
+            // component's own `<input>` or `<textarea>` that was a focus steal: the field lost
+            // the caret a moment after the click, typing went nowhere, and the next Backspace
+            // reached the node-selection handler and deleted the whole component instead of a
+            // character. Focus is only placed here when the editor does not already have it.
+            if (el && !holdsFocus(el)) { el.focus(); }
         }
     })
     // #endregion
@@ -569,6 +645,97 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, height, maxHe
     // #endregion
 
     /**
+     * The box the editor considers selected right now, or null.
+     *
+     * Two sources, in priority order: `data-element-selected`, and ImageResizer's
+     * `__activeImage`. Same pair the Backspace branch below reads, and for the same
+     * reason -- an image with handles on it is selected even though it never carries the
+     * mark, and the mark wins when both are set.
+     */
+    const currentNodeSelection = (rootEl: HTMLElement | null) => {
+        // Two queries: querySelector only sees descendants, and the panel's parent walk
+        // can park the mark on the content root itself.
+        const marked = (rootEl?.hasAttribute('data-element-selected')
+            ? rootEl
+            : rootEl?.querySelector('[data-element-selected]')) as HTMLElement | null
+        const activeImage = (rootEl?.getRootNode() as any)?.__activeImage as HTMLElement | null
+        return marked ?? (activeImage?.isConnected ? activeImage : null)
+    }
+
+    /**
+     * Move the node selection to `next`, taking it off whatever held it.
+     *
+     * Images and everything else are selected through different mechanisms -- the resize
+     * overlay for one, the `data-element-selected` outline for the other -- so each move
+     * has to set one and clear the other, or the outline and the handles end up on two
+     * different boxes at once.
+     */
+    const moveNodeSelection = (next: HTMLElement | null, rootEl: HTMLElement) => {
+        rootEl.querySelectorAll('[data-element-selected]')
+            .forEach(el => el.removeAttribute('data-element-selected'))
+        rootEl.removeAttribute('data-element-selected')
+
+        const image = next instanceof HTMLImageElement ? next : null
+        if (next && !image) next.setAttribute('data-element-selected', '')
+        // Before the overlay is told about it: scrollIntoView settles synchronously, and
+        // the handles are positioned from the image's rect at the moment they are shown.
+        next?.scrollIntoView({ block: 'nearest', inline: 'nearest' })
+        rootEl.dispatchEvent(new CustomEvent<SelectImageDetail>(SELECT_IMAGE_EVENT, {
+            detail: { image },
+            bubbles: true,
+        }))
+
+        // The panel follows the selection. Nothing else would tell it: arrow navigation
+        // changes no DOM selection, so the selectionchange listener it normally syncs from
+        // never fires.
+        panelCtx?.propertyTarget(next)
+        panelCtx?.selectionType(next ? classifyElement(next) : 'none')
+    }
+
+    /**
+     * Arrow keys and Enter while a component is selected. Returns whether the keystroke was
+     * used, so the caller can leave every other case to the browser.
+     *
+     * With a component selected there is no caret -- a shadow host cannot hold one -- so
+     * the native meaning of these keys is either nothing or a jump to somewhere the user
+     * was not looking. The arrows step to the next component instead, and Enter opens an
+     * empty line under this one, which is the only way to get past a component that is the
+     * last thing in the document.
+     *
+     * Modified keystrokes are left alone: Shift+Arrow and Ctrl+Arrow have their own
+     * meanings, and Shift+Enter is a soft break.
+     */
+    const navigateNodeSelection = (e: KeyboardEvent) => {
+        if (e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) return false
+        if (e.key !== 'Enter' && !arrowDirection(e.key)) return false
+
+        const rootEl = $$(activeEditor)
+        if (!rootEl) return false
+        const current = currentNodeSelection(rootEl)
+        if (!current) return false
+
+        if (e.key === 'Enter') {
+            const line = insertLineAfter(current, rootEl)
+            if (!line) return false
+            e.preventDefault()
+            // The new line takes the selection: node-selection mode ends, and the caret in
+            // the empty paragraph is what is selected now.
+            moveNodeSelection(null, rootEl)
+            placeCaretIn(line)
+            saveDo()
+            return true
+        }
+
+        const next = navigateFrom(current, arrowDirection(e.key)!, navigableBoxes(rootEl))
+        // No next box: fall through untouched, and exitsNodeSelection ends the selection
+        // the way any other caret move would.
+        if (!next || next === current) return false
+        e.preventDefault()
+        moveNodeSelection(next, rootEl)
+        return true
+    }
+
+    /**
     * handleKeyDown: Intercepts keyboard events to provide custom behavior.
     * - Tab: Navigates table cells OR indents paragraphs.
     * - Ctrl+Z / Ctrl+Y: Triggers custom Undo/Redo logic.
@@ -576,7 +743,9 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, height, maxHe
     * - Backspace/Delete: Ensure native deletion works (especially for mobile/double-tap).
     */
     const handleKeyDown = (e: KeyboardEvent) => {
-        if (e.key === 'Tab') {
+        // `editsInPlace` guards this too: Tab inside a component's own text field has to
+        // move focus to the next field, not indent the paragraph the component sits in.
+        if (e.key === 'Tab' && !editsInPlace(e)) {
             e.preventDefault(); e.stopPropagation();
             const editorEl = $$(activeEditor)
             const shadow = editorEl?.getRootNode() as ShadowRoot | null
@@ -632,7 +801,12 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, height, maxHe
         //
         // A refused target (the document root, table structure, component internals) falls
         // through untouched so native editing still gets its turn.
-        if (e.key === 'Backspace' || e.key === 'Delete') {
+        if (editsInPlace(e)) {
+            // A form control inside a component owns this keystroke: the caret is in its
+            // field, not in the document. Every node-selection handler below is skipped,
+            // including the one that ends the selection -- the component stays outlined and
+            // the panel stays aimed at it while its own field is being edited.
+        } else if (e.key === 'Backspace' || e.key === 'Delete') {
             const rootEl = $$(activeEditor)
             // Two queries: querySelector only sees descendants, and the parent walk can
             // park the mark on the content root itself.
@@ -658,6 +832,10 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, height, maxHe
                     return
                 }
             }
+        } else if (navigateNodeSelection(e)) {
+            // Arrows moved the selection to another component, or Enter opened a line under
+            // this one. Either way the keystroke is spent.
+            return
         } else if (exitsNodeSelection(e)) {
             // Typing or moving the caret leaves node-selection mode, the same way clicking
             // elsewhere does (the pointerdown handler clears the mark unconditionally).

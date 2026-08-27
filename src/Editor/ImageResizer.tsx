@@ -37,6 +37,22 @@ interface DragState {
     origRight: number
 }
 
+/**
+ * Select (or deselect) an image from outside this module.
+ *
+ * Dispatched on anything inside the editor's shadow root with
+ * `detail.image` set to the image to select, or null to clear. Image selection lives in
+ * ImageResizer's closure -- `activeImage`, the overlay elements, `__activeImage` on the
+ * root -- and there is no handle to it, so keyboard navigation needs a door in. Without
+ * one, arrowing onto an image would outline nothing and arrowing off it would leave the
+ * resize handles hanging on the image behind.
+ */
+export const SELECT_IMAGE_EVENT = 'wui-select-image'
+
+export interface SelectImageDetail {
+    image: HTMLImageElement | null
+}
+
 const HANDLE_SIZE = 10
 
 const cursorMap: Record<ResizeDirection, string> = {
@@ -222,6 +238,25 @@ const ImageResizer = () => {
             }
         }
 
+        /**
+         * The keyboard's half of image selection. Deliberately the same steps as the
+         * mousedown path above, including clearing the text selection: an image and a
+         * caret must never look selected at once.
+         */
+        const onSelectImage = (e: Event) => {
+            const img = (e as CustomEvent<SelectImageDetail>).detail?.image ?? null
+            if (img && editorSurface.contains(img)) {
+                window.getSelection()?.removeAllRanges()
+                activeImage(img)
+                if (root) (root as any).__activeImage = img
+                showOverlay(img)
+            } else if ($$(activeImage)) {
+                activeImage(null)
+                if (root) (root as any).__activeImage = null
+                hideOverlay()
+            }
+        }
+
         const onKey = (e: KeyboardEvent) => {
             if (e.key === 'Escape' && $$(activeImage)) {
                 activeImage(null)
@@ -251,6 +286,7 @@ const ImageResizer = () => {
 
         editor.addEventListener('mousedown', onMouseDown, true)
         root.addEventListener('mousedown', onMouseDown as EventListener, true)
+        root.addEventListener(SELECT_IMAGE_EVENT, onSelectImage)
         document.addEventListener('keydown', onKey)
         window.addEventListener('scroll', onScrollOrResize, true)
         window.addEventListener('resize', onScrollOrResize)
@@ -339,6 +375,7 @@ const ImageResizer = () => {
         return () => {
             editor.removeEventListener('mousedown', onMouseDown, true)
             root.removeEventListener('mousedown', onMouseDown as EventListener, true)
+            root.removeEventListener(SELECT_IMAGE_EVENT, onSelectImage)
             document.removeEventListener('keydown', onKey)
             window.removeEventListener('scroll', onScrollOrResize, true)
             window.removeEventListener('resize', onScrollOrResize)

@@ -33,6 +33,12 @@ export { PropertyPanel, PropertyPanelContext, usePropertyPanel } from './Propert
 export { detectSelectionType, extractImageProperties, extractTextProperties, extractCustomElementProperties } from './PropertyExtractor'
 export type { SelectionType, SelectionInfo } from './PropertyExtractor'
 
+// Node navigation -- arrow/Enter movement between embedded components and images
+export { arrowDirection, insertLineAfter, navigableBoxes, navigateFrom, placeCaretIn } from './NodeNavigation'
+export type { NavDirection } from './NodeNavigation'
+export { SELECT_IMAGE_EVENT } from './ImageResizer'
+export type { SelectImageDetail } from './ImageResizer'
+
 // Image editing
 // `wui-image-editor` is registered as a side effect of this import -- the element is
 // usable from plain HTML once anything pulls the bundle in, and `openImageEditor` mounts
