@@ -1,13 +1,20 @@
 import { $, $$, JSX, useEffect } from 'woby'
 import { applyImageAlignment, applyImageIndent } from './ImageActions'
 import { openImageEditor } from './ImageEditor'
+import { resolveResizable, resolveAnchor, applyResize, constrainResize, type ResizableSpec } from './EditorPlugin'
 
 /**
- * ImageResizer: Overlays an <img> inside the editor with:
+ * ImageResizer: Overlays a resizable box inside the editor with:
  * - A visible blue selection border when active
  * - 8 resize anchors (corners + edges) for size adjustment
  * - A floating mini-toolbar with align/indent/outdent actions
  * - Drag-and-drop repositioning
+ *
+ * Despite the name it is not image-only. Any element `resolveResizable()` answers for
+ * gets the same chrome: `<img>` always, plus any plugin element whose registration carries
+ * a `resizable` spec. The spec is what decouples the two -- an image takes `style.width`,
+ * a custom element may need an attribute instead, may have a locked aspect, and may not
+ * survive a write on every mousemove.
  *
  * Uses direct DOM manipulation for overlay visibility/positioning
  * because Woby's reactive expressions don't respond to observable
@@ -20,7 +27,9 @@ import { openImageEditor } from './ImageEditor'
 type ResizeDirection = 'nw' | 'n' | 'ne' | 'e' | 'se' | 's' | 'sw' | 'w'
 
 interface ResizeState {
-    img: HTMLImageElement
+    img: HTMLElement
+    /** Resolved once at mousedown, so the drag cannot change policy underneath itself. */
+    spec: ResizableSpec
     startX: number
     startY: number
     startWidth: number
@@ -30,7 +39,7 @@ interface ResizeState {
 }
 
 interface DragState {
-    img: HTMLImageElement
+    img: HTMLElement
     startX: number
     startY: number
     origLeft: number
@@ -50,7 +59,8 @@ interface DragState {
 export const SELECT_IMAGE_EVENT = 'wui-select-image'
 
 export interface SelectImageDetail {
-    image: HTMLImageElement | null
+    /** Any resizable element, not only an `<img>`. The name is kept for compatibility. */
+    image: HTMLElement | null
 }
 
 const HANDLE_SIZE = 10
@@ -75,20 +85,79 @@ const btnStyle: JSX.CSSProperties = {
 }
 
 const ImageResizer = () => {
-    const activeImage = $<HTMLImageElement | null>(null)
+    const activeImage = $<HTMLElement | null>(null)
     const resizing = $<ResizeState | null>(null)
     const dragging = $<DragState | null>(null)
     const currentAlign = $<'left' | 'center' | 'right' | null>(null)
     const overlayRect = $<{ left: number; top: number; width: number; height: number } | null>(null)
 
-    // Sync activeImage to shadow root so other components can detect image selection
+    /**
+     * This resizer's own outermost node, published once its ref lands.
+     *
+     * An observable and not a plain `let`, so the setup effect below re-runs when it
+     * arrives: effects are scheduled, refs are assigned during render, and the order
+     * between them is not something to bet the whole component on.
+     */
+    const selfRoot = $<HTMLElement | null>(null)
+
+    /**
+     * The contenteditable surface this resizer belongs to.
+     *
+     * Every lookup here used to be `document.querySelector('wui-editor')?.shadowRoot
+     * ?.querySelector('[data-editor-root]')`, which quietly assumes the editor is mounted
+     * as a custom element. It is not always -- `<Editor>` is an ordinary component, and an
+     * app that renders it directly has no `wui-editor` host and no shadow root, so that
+     * chain returned null and the entire resizer did nothing: no handles, on images either.
+     *
+     * `<ImageResizer />` is a sibling of the surface (Editor.tsx), so walking up from its
+     * own node finds the right one in either shape -- and finds the *right* one when a page
+     * holds more than one editor, which the global query could not. The old chain stays as
+     * a fallback for the window between mount and the ref landing.
+     */
+    const findSurface = (): HTMLElement | null =>
+        ($$(selfRoot)?.parentElement?.querySelector('[data-editor-root]') as HTMLElement | null)
+        ?? (document.querySelector('wui-editor')?.shadowRoot
+            ?.querySelector('[data-editor-root]') as HTMLElement | null)
+
+    /**
+     * Where `__activeImage` lives -- the shadow root when the editor is a custom element,
+     * the document when it is not. Editor.tsx reads it off `[data-editor-root]`'s root node,
+     * so writing it anywhere else is how the two selection systems fall out of step.
+     */
+    const findSelectionRoot = (): any => findSurface()?.getRootNode() ?? null
+
+    /**
+     * The box every overlay coordinate is measured from.
+     *
+     * The chrome is `position: absolute`, so the browser lays it out against its
+     * CONTAINING BLOCK -- the nearest positioned ancestor of the resizer root. Every
+     * measurement here used to subtract the editor SURFACE's rect instead, which is only
+     * the same box when the surface happens to sit flush inside that ancestor. It does not:
+     * `[data-editor-root]` carries `margin: 16px 0`, so the outline, all eight handles and
+     * the mini-toolbar were drawn 16px above the element they belong to -- a resize handle
+     * that is not on the corner it claims. Horizontal margin would skew x the same way.
+     *
+     * Falls back to the surface, then to the viewport, so a resizer whose ref has not landed
+     * yet degrades to the old behaviour rather than to NaN.
+     */
+    const overlayBasis = (): DOMRect => {
+        const el = $$(selfRoot)
+        const parent = (el?.offsetParent as HTMLElement | null) ?? null
+        return (parent ?? findSurface())?.getBoundingClientRect()
+            ?? new DOMRect(0, 0, 0, 0)
+    }
+
+    /** Tell the host something in the document changed. Whichever node is actually there. */
+    const notifyChange = () => {
+        const target = document.querySelector('wui-editor') ?? findSurface()
+        target?.dispatchEvent(new CustomEvent('editor-change', { bubbles: true }))
+    }
+
+    // Sync activeImage to the selection root so other components can detect image selection
     // Only sync when activeImage actually changes, not on every render
     useEffect(() => {
-        const editor = document.querySelector('wui-editor')
-        const shadow = editor?.shadowRoot
-        if (shadow) {
-            (shadow as any).__activeImage = $$(activeImage)
-        }
+        const selection = findSelectionRoot()
+        if (selection) selection.__activeImage = $$(activeImage)
     })
 
     // Refs for direct DOM manipulation
@@ -107,16 +176,22 @@ const ImageResizer = () => {
 
     // Set up event listeners in useEffect with cleanup to prevent memory leaks
     useEffect(() => {
-            const editor = document.querySelector('wui-editor') as HTMLElement | null
-            const root = editor?.shadowRoot
-            if (!editor || !root) return
-
-            const editorSurface = root.querySelector('[data-editor-root]') as HTMLElement | null
+            const editorSurface = findSurface()
             if (!editorSurface) return
 
-        const computeRect = (img: HTMLImageElement) => {
-            const surfaceRect = editorSurface.getBoundingClientRect()
-            const imgRect = img.getBoundingClientRect()
+            // Delegated listeners and the `__activeImage` marker hang off the surface's root
+            // node: a ShadowRoot under a `wui-editor` host, the Document without one. Both
+            // answer `addEventListener` / `contains` / `elementFromPoint`, which is all this
+            // module ever asks of it.
+            const root = editorSurface.getRootNode() as ShadowRoot | Document
+            // The host, when there is one. A shadow root does not see the capture-phase
+            // mousedown until it has passed the host, so that hop is worth listening on
+            // separately; in light DOM there is no hop and `root` alone covers it.
+            const editor = document.querySelector('wui-editor') as HTMLElement | null
+
+        const computeRect = (img: HTMLElement) => {
+            const surfaceRect = overlayBasis()
+            const imgRect = resolveAnchor(img).getBoundingClientRect()
             return {
                 left: imgRect.left - surfaceRect.left,
                 top: imgRect.top - surfaceRect.top,
@@ -125,7 +200,7 @@ const ImageResizer = () => {
             }
         }
 
-        const detectAlign = (img: HTMLImageElement) => {
+        const detectAlign = (img: HTMLElement) => {
             const inlineAlign = (img.style.display === 'block' && img.style.marginLeft === 'auto' && img.style.marginRight === 'auto')
                 ? 'center'
                 : img.style.float === 'left' ? 'left'
@@ -147,7 +222,7 @@ const ImageResizer = () => {
             return null
         }
 
-        const showOverlay = (img: HTMLImageElement) => {
+        const showOverlay = (img: HTMLElement) => {
             const rect = computeRect(img)
             const align = detectAlign(img)
 
@@ -200,6 +275,13 @@ const ImageResizer = () => {
             }
             updateAlignBtns(align)
             currentAlign(align)
+
+            // The mini-toolbar's crop/zoom editor takes an <img>; a plugin element has no
+            // pixels to crop, so hide the button rather than hand it something it cannot open.
+            // Restore the flex display btnStyle set inline -- `''` would clear it and drop
+            // the button back to the UA's `inline-block`, un-centering its icon against the
+            // rest of the strip.
+            if (editBtn) editBtn.style.display = img instanceof HTMLImageElement ? 'inline-flex' : 'none'
         }
 
         const hideOverlay = () => {
@@ -209,16 +291,36 @@ const ImageResizer = () => {
             if (root) (root as any).__activeImage = null
         }
 
+        /**
+         * The resizable box a click landed on, or null.
+         *
+         * Walks the composed path rather than testing `[0]`, because a custom element paints
+         * in its own shadow root: the innermost target is the plugin's canvas, and the host
+         * that owns the size sits further along. `contains()` does not cross a shadow
+         * boundary, which is exactly the filter wanted -- it skips the plugin's internals
+         * and matches its host. An `<img>` still matches at `[0]`, as it always did.
+         */
+        const findResizable = (path: EventTarget[]): HTMLElement | null => {
+            for (const entry of path) {
+                if (!(entry instanceof HTMLElement)) continue
+                if (!editorSurface.contains(entry)) continue
+                if (resolveResizable(entry)) return entry
+            }
+            return null
+        }
+
         const onMouseDown = (e: MouseEvent) => {
-            // Don't select images in readonly mode
-            const editorSurface = root.querySelector('[data-editor-root]')
-            if (editorSurface?.getAttribute('contenteditable') === 'false') return
+            // Don't select images in readonly mode. Deliberately the surface resolved at
+            // setup, not a fresh query off `root`: with a Document root that query would find
+            // whichever editor on the page happens to come first.
+            if (editorSurface.getAttribute('contenteditable') === 'false') return
 
             // Use composedPath()[0] to get the actual target before shadow DOM retargeting
             const actualTarget = e.composedPath()[0] as HTMLElement
             // Skip if clicking on overlay, mini-toolbar, or main editor toolbar
             if (actualTarget.closest('[data-image-overlay],[data-image-mini-toolbar],.editor-toolbar')) return
-            if (actualTarget instanceof HTMLImageElement && editorSurface?.contains(actualTarget)) {
+            const hit = findResizable(e.composedPath())
+            if (hit) {
                 e.preventDefault()
                 e.stopPropagation()
                 // CRITICAL: Explicitly clear text selection when clicking an image.
@@ -226,11 +328,11 @@ const ImageResizer = () => {
                 // text selection, leaving the old text highlight visible even though
                 // the image is now selected.
                 window.getSelection()?.removeAllRanges()
-                activeImage(actualTarget)
+                activeImage(hit)
                 // Directly set __activeImage on shadow root since Woby reactivity
                 // doesn't trigger from addEventListener callbacks
-                if (root) (root as any).__activeImage = actualTarget
-                showOverlay(actualTarget)
+                if (root) (root as any).__activeImage = hit
+                showOverlay(hit)
             } else if ($$(activeImage)) {
                 activeImage(null)
                 if (root) (root as any).__activeImage = null
@@ -245,7 +347,7 @@ const ImageResizer = () => {
          */
         const onSelectImage = (e: Event) => {
             const img = (e as CustomEvent<SelectImageDetail>).detail?.image ?? null
-            if (img && editorSurface.contains(img)) {
+            if (img && editorSurface.contains(img) && resolveResizable(img)) {
                 window.getSelection()?.removeAllRanges()
                 activeImage(img)
                 if (root) (root as any).__activeImage = img
@@ -284,7 +386,7 @@ const ImageResizer = () => {
             showOverlay(img)
         }
 
-        editor.addEventListener('mousedown', onMouseDown, true)
+        editor?.addEventListener('mousedown', onMouseDown, true)
         root.addEventListener('mousedown', onMouseDown as EventListener, true)
         root.addEventListener(SELECT_IMAGE_EVENT, onSelectImage)
         document.addEventListener('keydown', onKey)
@@ -320,9 +422,7 @@ const ImageResizer = () => {
                     e.stopPropagation()
                     handler()
                     // Restore focus to editor after click
-                    const editor = document.querySelector('wui-editor')
-                    const editorRoot = editor?.shadowRoot?.querySelector('[data-editor-root]') as HTMLElement
-                    if (editorRoot) editorRoot.focus()
+                    findSurface()?.focus()
                 }
                 return true
             }
@@ -373,7 +473,7 @@ const ImageResizer = () => {
 
         // Cleanup: remove all event listeners and observer on unmount
         return () => {
-            editor.removeEventListener('mousedown', onMouseDown, true)
+            editor?.removeEventListener('mousedown', onMouseDown, true)
             root.removeEventListener('mousedown', onMouseDown as EventListener, true)
             root.removeEventListener(SELECT_IMAGE_EVENT, onSelectImage)
             document.removeEventListener('keydown', onKey)
@@ -386,13 +486,15 @@ const ImageResizer = () => {
 
     const startResize = (e: MouseEvent, direction: ResizeDirection) => {
         const img = $$(activeImage)
-        if (!img) return
+        const spec = resolveResizable(img)
+        if (!img || !spec) return
         e.preventDefault()
         e.stopPropagation()
 
-        const rect = img.getBoundingClientRect()
+        const rect = resolveAnchor(img).getBoundingClientRect()
         resizing({
             img,
+            spec,
             startX: e.clientX,
             startY: e.clientY,
             startWidth: rect.width,
@@ -400,6 +502,10 @@ const ImageResizer = () => {
             direction,
             aspect: rect.width / rect.height || 1,
         })
+
+        // The last size the pointer asked for. Needed on mouseup for a deferred commit,
+        // and to tell a drag that moved from one that only pressed and released.
+        let pending: [number, number] | null = null
 
         const onMove = (ev: MouseEvent) => {
             const state = $$(resizing)
@@ -420,18 +526,32 @@ const ImageResizer = () => {
                 case 'nw': newWidth = state.startWidth - dx; newHeight = state.startHeight - dy; break
             }
 
-            newWidth = Math.max(20, newWidth)
-            newHeight = Math.max(20, newHeight)
+            const constrained = constrainResize(state.spec, state.direction, newWidth, newHeight, state.aspect)
+            newWidth = constrained[0]
+            newHeight = constrained[1]
+            pending = constrained
 
-            state.img.style.width = `${newWidth}px`
-            state.img.style.height = `${newHeight}px`
+            // `live: false` means the element cannot survive being written to on every
+            // mousemove -- a plugin that re-inserts its node on a size change would destroy
+            // the very element the drag is holding. Show the pending size on the overlay and
+            // commit once, on mouseup.
+            if (state.spec.live !== false) applyResize(state.img, state.spec, newWidth, newHeight)
 
             // Update overlay position during resize
-            const editor = document.querySelector('wui-editor') as HTMLElement
-            const surface = editor?.shadowRoot?.querySelector('[data-editor-root]') as HTMLElement
+            const surface = findSurface()
             if (surface && overlayEl) {
-                const surfaceRect = surface.getBoundingClientRect()
-                const imgRect = state.img.getBoundingClientRect()
+                const surfaceRect = overlayBasis()
+                const measured = resolveAnchor(state.img).getBoundingClientRect()
+                // With a deferred commit the element has not moved yet, so what it measures
+                // is still the OLD box: hold the corner the drag is anchored by and draw the
+                // new extent from it.
+                const imgRect = state.spec.live !== false
+                    ? measured
+                    : new DOMRect(
+                        state.direction.includes('w') ? measured.right - newWidth : measured.left,
+                        state.direction.includes('n') ? measured.bottom - newHeight : measured.top,
+                        newWidth,
+                        newHeight)
                 overlayEl.style.left = `${imgRect.left - surfaceRect.left}px`
                 overlayEl.style.top = `${imgRect.top - surfaceRect.top}px`
                 overlayEl.style.width = `${imgRect.width}px`
@@ -445,6 +565,19 @@ const ImageResizer = () => {
         }
 
         const onUp = () => {
+            const state = $$(resizing)
+            if (state && pending) {
+                if (state.spec.live === false) applyResize(state.img, state.spec, pending[0], pending[1])
+                // A resize is a content change like any other. Fired once here rather than
+                // from onMove, so a listener that re-renders does not do it per mousemove.
+                notifyChange()
+                // Twice: now, so the handles never lag a frame behind the pointer, and again
+                // after layout, because an element that re-renders from an attribute settles
+                // on its real box only after this tick. `isConnected` because that re-render
+                // may have replaced the node outright.
+                showOverlay(state.img)
+                requestAnimationFrame(() => { if (state.img.isConnected) showOverlay(state.img) })
+            }
             resizing(null)
             document.removeEventListener('mousemove', onMove)
             document.removeEventListener('mouseup', onUp)
@@ -462,10 +595,9 @@ const ImageResizer = () => {
 
         // Store reference to the image being dragged
         const draggedImg = img
-        const editor = document.querySelector('wui-editor') as HTMLElement
-        const root = editor?.shadowRoot
-        const surface = root?.querySelector('[data-editor-root]') as HTMLElement
-        if (!root || !surface) return
+        const surface = findSurface()
+        if (!surface) return
+        const root = surface.getRootNode() as ShadowRoot | Document
 
         // Hide overlay during drag
         if (overlayEl) overlayEl.style.opacity = '0.5'
@@ -573,7 +705,7 @@ const ImageResizer = () => {
 
             dragging(null)
             // Fire editor-change event
-            editor?.dispatchEvent?.(new CustomEvent('editor-change', { bubbles: true }))
+            notifyChange()
         }
 
         document.addEventListener('mousemove', onMove)
@@ -583,7 +715,7 @@ const ImageResizer = () => {
     const align = (a: 'left' | 'center' | 'right') => {
         const img = $$(activeImage)
         if (!img) return
-        applyImageAlignment(img, a)
+        applyImageAlignment(img as HTMLImageElement, a)
         currentAlign(a);
         // Update button visuals
         [alignLBtn, alignCBtn, alignRBtn].forEach((b: any) => {
@@ -594,14 +726,13 @@ const ImageResizer = () => {
         if (a === 'left' && alignLBtn) { alignLBtn.style.background = 'white'; alignLBtn.style.color = '#3b82f6' }
         if (a === 'center' && alignCBtn) { alignCBtn.style.background = 'white'; alignCBtn.style.color = '#3b82f6' }
         if (a === 'right' && alignRBtn) { alignRBtn.style.background = 'white'; alignRBtn.style.color = '#3b82f6' }
-        const editor = document.querySelector('wui-editor') as any
-        editor?.dispatchEvent?.(new CustomEvent('editor-change', { bubbles: true }))
+        notifyChange()
     }
 
     const indent = (outdent: boolean) => {
         const img = $$(activeImage)
         if (!img) return
-        applyImageIndent(img, outdent)
+        applyImageIndent(img as HTMLImageElement, outdent)
     }
 
     /**
@@ -612,7 +743,9 @@ const ImageResizer = () => {
      */
     const editImage = () => {
         const img = $$(activeImage)
-        if (!img) return
+        // Gated as well as hidden: the button is display:none for a non-image, but a stray
+        // click handler must not hand a custom element to the pixel editor.
+        if (!(img instanceof HTMLImageElement)) return
         hideOverlay()
         openImageEditor(img)
     }
@@ -631,12 +764,11 @@ const ImageResizer = () => {
      * `showOverlay`, so it needs its own copy: recompute the rect relative to the editor surface,
      * publish it to `overlayRect` (the JSX reads that reactively) and unhide the chrome.
      */
-    const showOverlay = (img: HTMLImageElement) => {
-        const surface = document.querySelector('wui-editor')?.shadowRoot
-            ?.querySelector('[data-editor-root]') as HTMLElement | null
+    const showOverlay = (img: HTMLElement) => {
+        const surface = findSurface()
         if (!surface) return
-        const surfaceRect = surface.getBoundingClientRect()
-        const imgRect = img.getBoundingClientRect()
+        const surfaceRect = overlayBasis()
+        const imgRect = resolveAnchor(img).getBoundingClientRect()
         overlayRect({
             left: imgRect.left - surfaceRect.left,
             top: imgRect.top - surfaceRect.top,
@@ -655,7 +787,7 @@ const ImageResizer = () => {
     const handles: ResizeDirection[] = ['nw', 'n', 'ne', 'e', 'se', 's', 'sw', 'w']
 
     return (
-        <div class="image-resizer-root" data-image-resizer-root>
+        <div class="image-resizer-root" data-image-resizer-root ref={(el: HTMLElement) => selfRoot(el)}>
             {/* Selection border + 8 handles (hidden by default) */}
             <div
                 ref={(el: HTMLDivElement) => { overlayEl = el }}

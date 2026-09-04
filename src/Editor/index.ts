@@ -24,8 +24,8 @@ export { applyStyle as applyStyleLegacy } from './utils'
 export { FocusManager } from './FocusManager'
 
 // Editor Plugin System
-export { registerEditorPlugin, unregisterEditorPlugin, getEditorPlugins, getPluginForElement, pluginsToInsertItems, serializeEditorContent } from './EditorPlugin'
-export type { EditorPlugin, InsertMenuItem, PluginProp, PluginPropType, PluginAction } from './EditorPlugin'
+export { registerEditorPlugin, unregisterEditorPlugin, getEditorPlugins, getPluginForElement, pluginsToInsertItems, serializeEditorContent, resolveResizable, resolveAnchor, applyResize, constrainResize } from './EditorPlugin'
+export type { EditorPlugin, InsertMenuItem, PluginProp, PluginPropType, PluginAction, ResizableSpec, ResizeWrite } from './EditorPlugin'
 
 // Property Panel
 export { InfoButton } from './InfoButton'

@@ -123,6 +123,49 @@ export interface PluginAction {
 }
 
 /**
+ * Where a resize writes its result.
+ *
+ * `'style'` sets `el.style[widthProp]` in px -- right for anything the browser lays out
+ * from CSS, `<img>` included. `'attr'` sets the HTML attribute instead, which is what a
+ * custom element that sizes itself off `width=` / `height=` actually reads; a `style.width`
+ * on such a host is inert. A function is the escape hatch for an element that has to be
+ * told some other way.
+ */
+export type ResizeWrite = 'style' | 'attr' | ((el: HTMLElement, width: number, height: number) => void)
+
+/**
+ * Opt a plugin's element into the editor's resize handles.
+ *
+ * `resizable: true` takes every default below, which is the `<img>` behaviour. Everything
+ * here exists because a custom element is not an image: it may not accept CSS sizing, it
+ * may have a fixed aspect, and it may not survive being resized on every mousemove.
+ */
+export interface ResizableSpec {
+    /** How the new size is committed. Default `'style'`. */
+    write?: ResizeWrite
+    /** Style property / attribute name carrying the width. Default `'width'`. */
+    widthProp?: string
+    /** Style property / attribute name carrying the height. Default `'height'`. */
+    heightProp?: string
+    /**
+     * `'free'` (default) lets width and height move independently, `'lock'` keeps the ratio
+     * the element had when the drag started, and a number pins width/height to that ratio.
+     */
+    aspect?: 'lock' | 'free' | number
+    /** Floor, `[width, height]` in px. Default `[20, 20]`. */
+    min?: [number, number]
+    /**
+     * Whether to write the size on every mousemove. Default `true`.
+     *
+     * Set `false` for an element whose size change tears it down and rebuilds it: a plugin
+     * that re-inserts its node on a prop change would destroy the element mid-drag, taking
+     * the drag with it. The overlay still follows the pointer; only the commit waits for
+     * mouseup.
+     */
+    live?: boolean
+}
+
+/**
  * EditorPlugin: Interface for 3rd-party plugins that register custom elements
  * and toolbar insert items with the wui editor.
  */
@@ -194,6 +237,26 @@ export interface EditorPlugin {
      * element cannot pick up from an attribute change on its own.
      */
     onPropChange?: (element: HTMLElement, key: string, value: any) => void
+
+    /**
+     * Give this plugin's element the editor's 8 resize handles -- the same ones an `<img>`
+     * gets. `true` accepts every default in {@link ResizableSpec}.
+     *
+     * Selection is not gated on this: the click-to-select outline already covers every
+     * custom element in the editor. This adds the handles, and with them a size the user
+     * can drag.
+     */
+    resizable?: boolean | ResizableSpec
+
+    /**
+     * The box the handles measure and draw around, when that is not the element itself.
+     *
+     * A custom-element host has no intrinsic size -- it defaults to `display: inline`, and
+     * once a class makes it `block` it fills the column no matter how small the thing it
+     * paints. The clean fix is inside the component (`:host { width: fit-content }`); this
+     * is the escape hatch for a component you cannot change.
+     */
+    anchor?: (el: HTMLElement) => HTMLElement
 }
 
 // Internal type for insert menu items (matches what InsertDropDown renders)
@@ -247,6 +310,79 @@ export const getEditorPlugins = (): Observable<EditorPlugin[]> => registeredPlug
  */
 export const getPluginForElement = (el: HTMLElement): EditorPlugin | undefined =>
     $$(registeredPlugins).find(p => p.tagName.toUpperCase() === el.tagName.toUpperCase())
+
+/** What `resizable: true`, and every omitted field of a {@link ResizableSpec}, mean. */
+const RESIZE_DEFAULTS = {
+    write: 'style',
+    widthProp: 'width',
+    heightProp: 'height',
+    aspect: 'free',
+    min: [20, 20],
+    live: true,
+} as const
+
+/**
+ * The resize spec for `el`, or null if it is not resizable.
+ *
+ * `<img>` answers first and always, with the bare defaults: it is resizable with no plugin
+ * behind it, and its path through the resizer has to stay exactly what it was.
+ */
+export const resolveResizable = (el: HTMLElement | null | undefined): ResizableSpec | null => {
+    if (!el) return null
+    if (el instanceof HTMLImageElement) return {}
+    const spec = getPluginForElement(el)?.resizable
+    if (!spec) return null
+    return spec === true ? {} : spec
+}
+
+/** The box to measure for `el` -- its plugin's {@link EditorPlugin.anchor}, else `el` itself. */
+export const resolveAnchor = (el: HTMLElement): HTMLElement =>
+    getPluginForElement(el)?.anchor?.(el) ?? el
+
+/** Commit a resized `width` / `height` (px) to `el`, the way its spec asks for. */
+export const applyResize = (el: HTMLElement, spec: ResizableSpec, width: number, height: number): void => {
+    const write = spec.write ?? RESIZE_DEFAULTS.write
+    if (typeof write === 'function') { write(el, width, height); return }
+    const wp = spec.widthProp ?? RESIZE_DEFAULTS.widthProp
+    const hp = spec.heightProp ?? RESIZE_DEFAULTS.heightProp
+    if (write === 'attr') {
+        // Attributes are integers by convention (`width="600"`); a fractional one would
+        // re-enter the element as a different number on every drag.
+        el.setAttribute(wp, String(Math.round(width)))
+        el.setAttribute(hp, String(Math.round(height)))
+        return
+    }
+    ;(el.style as any)[wp] = `${width}px`
+    ;(el.style as any)[hp] = `${height}px`
+}
+
+/**
+ * Clamp and aspect-correct a proposed size.
+ *
+ * `startAspect` is the ratio the element had at mousedown, which is what `'lock'` holds to.
+ */
+export const constrainResize = (
+    spec: ResizableSpec,
+    direction: string,
+    width: number,
+    height: number,
+    startAspect: number,
+): [number, number] => {
+    const aspect = spec.aspect ?? RESIZE_DEFAULTS.aspect
+    let w = width
+    let h = height
+    if (aspect !== 'free') {
+        const ratio = aspect === 'lock' ? startAspect : aspect
+        if (ratio > 0) {
+            // An edge handle has one degree of freedom, so the axis actually being dragged
+            // drives the other one. Corners drive from the width.
+            if (direction === 'n' || direction === 's') w = h * ratio
+            else h = w / ratio
+        }
+    }
+    const [minW, minH] = spec.min ?? RESIZE_DEFAULTS.min
+    return [Math.max(minW, w), Math.max(minH, h)]
+}
 
 /**
  * Convert registered plugins into insert menu items consumable by InsertDropDown.

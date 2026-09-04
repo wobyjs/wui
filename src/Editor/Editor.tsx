@@ -31,7 +31,7 @@ import { ImageDialog, INSERT_IMAGE_EVENT, type InsertImageDetail } from './Image
 import { InfoButton } from './InfoButton' // Info button for property panel
 import { PropertyPanel, PropertyPanelContext } from './PropertyPanel' // Property panel for selected element
 import { SelectionType, deleteSelectedElement, deleteRefusalReason, classifyElement } from './PropertyExtractor' // Selection type enum + node-selection delete + its guard
-import { getEditorPlugins } from './EditorPlugin' // For plugin tag name detection
+import { getEditorPlugins, resolveResizable } from './EditorPlugin' // For plugin tag name detection
 import { arrowDirection, insertLineAfter, navigableBoxes, navigateFrom, placeCaretIn } from './NodeNavigation' // Arrow/Enter handling while a component is selected
 
 // StyleEngine imports for keyboard shortcuts
@@ -675,8 +675,13 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, height, maxHe
             .forEach(el => el.removeAttribute('data-element-selected'))
         rootEl.removeAttribute('data-element-selected')
 
-        const image = next instanceof HTMLImageElement ? next : null
-        if (next && !image) next.setAttribute('data-element-selected', '')
+        // Anything resizable gets the overlay and its handles. Everything else gets the
+        // outline mark. An `<img>` is the one thing that takes the overlay and NOT the mark:
+        // the overlay already draws its border, and PropertyExtractor keys `'image'` off the
+        // absence of the mark. A resizable custom element takes both -- it still wants the
+        // outline, and its classification comes from its tag.
+        const image = next && resolveResizable(next) ? next : null
+        if (next && !(next instanceof HTMLImageElement)) next.setAttribute('data-element-selected', '')
         // Before the overlay is told about it: scrollIntoView settles synchronously, and
         // the handles are positioned from the image's rect at the moment they are shown.
         next?.scrollIntoView({ block: 'nearest', inline: 'nearest' })
