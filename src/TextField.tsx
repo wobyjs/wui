@@ -298,7 +298,6 @@ const TextField: Defaulted<typeof def> = defaults(def, (props) => {
 								onChange?.(e)
 							}}
 							onKeyUp={(e: any) => {
-								console.log('[TextField onKeyUp]', { key: e.key, targetTag: e.target?.tagName, targetVal: e.target?.value, assignOnEnter: $$(assignOnEnter), isObs: isObservable(value), val: value })
 								// NOTE: Native handler (attached via addEventListener in useEffect) handles all value-setting.
 								// JSX handler's value() call would use retargeted e.target (shadow host), causing value(undefined).
 								// Only invoke the callback here — native handler already set the observable.

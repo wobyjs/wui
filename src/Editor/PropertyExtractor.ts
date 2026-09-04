@@ -395,7 +395,6 @@ export function extractImageProperties(img: HTMLImageElement): Record<string, Ob
  * Apply image property changes back to the DOM element.
  */
 export function applyImageProperty(img: HTMLImageElement, key: string, value: any): void {
-    console.log('[applyImageProperty] called with', key, '=', value, 'img.style.width before:', img.style.width)
     switch (key) {
         case 'src':
             img.setAttribute('src', value)

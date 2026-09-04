@@ -225,7 +225,6 @@ const TextFormatOptionsDropDown = defaults(def, (props) => {
     }
 
     const handleSelectOption = (action: (editor?: HTMLElement) => void) => {
-        console.log('handleSelectOption called, closing dropdown')
         const el = editor ?? getCurrentEditor()
 
         if ($$(el)) {

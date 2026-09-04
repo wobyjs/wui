@@ -112,7 +112,6 @@ const FontFamilyDropDown = defaults(def, (props) => {
     const toggleDropdown = () => isOpen(!isOpen())
 
     const handleSelectFont = (fontValue: string, fontLabel: string) => {
-        console.log('handleSelectFont called, setting isOpen to false')
         try {
             applyFontFamilyStyle(fontValue)
             selectedFont(fontLabel)
@@ -122,7 +121,6 @@ const FontFamilyDropDown = defaults(def, (props) => {
         }
         // Always close dropdown regardless of style application success
         isOpen(false)
-        console.log('isOpen set to false, current value:', $$(isOpen))
     }
 
     const DropDownMenu = () => {

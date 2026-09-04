@@ -149,7 +149,6 @@ export const PropertyPanel = () => {
         const target = $$(propertyTarget)
         const result = deleteSelectedElement(target, editorRootEl())
         if (!result.ok) {
-            console.log('[PropertyPanel] delete refused:', result.reason, target?.tagName)
             return
         }
         propertyTarget(null)
@@ -205,7 +204,6 @@ export const PropertyPanel = () => {
     useEffect(() => {
         const isOpen = $$(panelOpen)
         if (!isOpen) {
-            console.log('[PropertyPanel] first effect: panel closed, clearing propsObj')
             propsObj(null)
             lastExtractedTarget(null)
             return
@@ -215,7 +213,6 @@ export const PropertyPanel = () => {
         const type = $$(selectionType)
 
         if (!target) {
-            console.log('[PropertyPanel] first effect: no target, clearing propsObj')
             propsObj(null)
             lastExtractedTarget(null)
             return
@@ -227,13 +224,11 @@ export const PropertyPanel = () => {
         // and overwriting the pending sync effect that was about to apply the new value.
         const prev = $$(lastExtractedTarget)
         if (prev && target.isSameNode(prev)) {
-            console.log('[PropertyPanel] first effect: same target, skipping re-extraction')
             return
         }
         lastExtractedTarget(target)
 
         const extracted = extractFromTarget(target, type)
-        console.log('[PropertyPanel] extractFromTarget', type, 'keys:', Object.keys(extracted || {}), 'width:', extracted?.width ? $$(extracted.width) : 'MISSING')
         propsObj(extracted)
     })
 
@@ -438,17 +433,13 @@ export const PropertyPanel = () => {
         const root = shadow ?? document
         const panel = root.querySelector('[data-property-panel]')
         if (!panel) {
-            console.log('[PropertyPanel] focus tracking: panel element not found')
             return
         }
 
         const handleFocusIn = (e: FocusEvent) => {
             const path = e.composedPath()
             if (path.includes(panel)) {
-                console.log('[PropertyPanel] focusin detected INSIDE panel, setting panelFocused=true')
                 panelFocused(true)
-            } else {
-                console.log('[PropertyPanel] focusin detected OUTSIDE panel, path:', path.map(p => (p as HTMLElement).tagName || (p as Node).nodeName).join(' > '))
             }
         }
 
@@ -466,7 +457,6 @@ export const PropertyPanel = () => {
             // landing inside a nested component's shadow root surfaces as that
             // component's host — still a descendant of the panel, still "inside".
             if (next && !panel.contains(next)) {
-                console.log('[PropertyPanel] focusout detected, focus LEFT panel, setting panelFocused=false')
                 panelFocused(false)
             }
             // A null relatedTarget is deliberately NOT treated as leaving. Pressing
@@ -547,7 +537,6 @@ export const PropertyPanel = () => {
                     const currentTarget = $$(propertyTarget)
                     if (currentTarget && img.isSameNode(currentTarget)) return
 
-                    console.log('[PropertyPanel] pointerdown timeout: image detected, updating panel target')
                     selectionType('image')
                     propertyTarget(img)
                     propsObj(extractImageProperties(img))
@@ -586,7 +575,6 @@ export const PropertyPanel = () => {
                 const currentTarget = $$(propertyTarget)
                 if (currentTarget && element.isSameNode(currentTarget)) return
 
-                console.log('[PropertyPanel] pointerdown timeout: marked/custom element switch, refreshing panel')
                 selectionType(type)
                 propertyTarget(element)
                 propsObj(extractFromTarget(element, type))
@@ -607,11 +595,6 @@ export const PropertyPanel = () => {
             // CRITICAL: Use panelFocused flag instead of shadow.activeElement because
             // shadow.activeElement is null after Enter keyup (the browser clears it).
             const pf = $$(panelFocused)
-            // CRITICAL: Query shadow root here instead of referencing outer-scope `shadow`
-            // which is not defined in this effect. In light DOM mode, use document.activeElement.
-            const host = document.querySelector('wui-editor') as HTMLElement | null
-            const activeEl = host?.shadowRoot?.activeElement ?? document.activeElement
-            console.log('[PropertyPanel] selectionchange handler, panelFocused:', pf, 'activeElement:', activeEl?.tagName || 'null')
             if (pf) return
 
             let { type, element } = detectSelectionType()
@@ -631,7 +614,6 @@ export const PropertyPanel = () => {
                     const shadow = editorHost?.shadowRoot
                     const editorRoot = shadow?.querySelector('[data-editor-root]') ?? document.querySelector('[data-editor-root]')
                     if (editorRoot?.contains(img)) {
-                        console.log('[PropertyPanel] selectionchange: image detected via pointerdown fallback')
                         type = 'image'
                         element = img
                     }
@@ -673,7 +655,6 @@ export const PropertyPanel = () => {
                 const isEditorRoot = element.hasAttribute?.('data-editor-root')
                 if (isEditorRoot) return
 
-                console.log('[PropertyPanel] selectionchange: new element detected, updating panel target for', type)
                 selectionType(type)
                 propertyTarget(element)
                 propsObj(extractFromTarget(element, type))
