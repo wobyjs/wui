@@ -12,7 +12,11 @@
             background: #f5f5f5;
         }
         .container {
-            max-width: 900px;
+            /* Was max-width: 900px. That cap is this demo page's own chrome -- nothing in
+               the library constrains the editor -- and it made the editor look like it
+               refused to use the window. Flow and Read now run the full width; Page mode
+               still shows a fixed-width sheet, because that one is paper. */
+            max-width: none;
             margin: 0 auto;
             background: white;
             padding: 40px;
@@ -108,6 +112,16 @@
                 </wui-badge>
                 <wui-avatar size="md">JD</wui-avatar>
             </div>
+            <!-- ── PAGE 1 ends here ────────────────────────────────────
+                 `wui-page-break` is the one plugin that looks like nothing in Page
+                 layout — the sheet boundary already says a page ended, and a marker
+                 with height would push the last line of every sheet onto the next
+                 one. It is in Flow that it has something to say, so that is where it
+                 draws the dashed rule. In Page it keeps only a small chip out in the
+                 margin beside the paper, so an accidental break is still selectable and
+                 deletable without switching layouts. Select it and the panel offers Break (page starts / page
+                 ends here) and a Name for the marker. -->
+            <wui-page-break></wui-page-break>
             <h2>✏️ Editor Content - Test Here!</h2>
             <p>Welcome to the WUI Rich Text Editor!</p>
             <p>This is a <strong>full toolbar demo</strong> for testing Phase 18 fixes.</p>
@@ -125,6 +139,50 @@
                     <tr><td style="border: 1px solid #ccc; padding: 8px;">Charlie</td><td style="border: 1px solid #ccc; padding: 8px;">42</td><td style="border: 1px solid #ccc; padding: 8px;">Tokyo</td></tr>
                 </tbody>
             </table>
+
+            <!-- ── PAGE 2: full-bleed cover ──────────────────────────────────────
+                 Was a hand-written div carrying six background-* declarations, a
+                 height and a break-before in one style attribute. `wui-cover-page`
+                 turns every one of those into a typed row in the property panel —
+                 click the photo, then Properties — and its `pageBreak: 'own-page'`
+                 replaces the break-before/296mm pair outright.
+
+                 The element is a *background*, not a template: everything below is
+                 plain light DOM, edited exactly like the rest of the document. A
+                 click on the photo selects the block; a click on the words puts the
+                 caret in them. -->
+            <wui-cover-page
+                src="https://picsum.photos/seed/wui-cover/1254/1776"
+                overlay="82">
+                <h1 style="margin: 0; font-size: 34pt; line-height: 1.1; letter-spacing: -.02em;">Full-bleed cover</h1>
+                <p style="margin: 6mm 0 0; font-size: 12pt; max-width: 130mm; line-height: 1.5;">One block, exactly one sheet tall — the image reaches every paper edge because a sheet carries no padding of its own. Everything you are reading is ordinary editable content sitting on top of it.</p>
+                <div style="display: flex; gap: 8mm; align-items: flex-end; margin-top: 8mm;">
+                    <table style="border-collapse: collapse; font-size: 10pt;">
+                        <tr><td style="border: 1px solid rgba(255,255,255,.35); padding: 2mm 4mm;">Edition</td><td style="border: 1px solid rgba(255,255,255,.35); padding: 2mm 4mm;">Third</td></tr>
+                        <tr><td style="border: 1px solid rgba(255,255,255,.35); padding: 2mm 4mm;">Sheet</td><td style="border: 1px solid rgba(255,255,255,.35); padding: 2mm 4mm;">3 of 4</td></tr>
+                    </table>
+                    <img src="https://picsum.photos/seed/wui-chip/220/140" width="110" height="70" alt="" style="border-radius: 4px; border: 1px solid rgba(255,255,255,.35);" />
+                </div>
+            </wui-cover-page>
+
+            <!-- ── PAGE 3: logo watermark ────────────────────────────────────────
+                 `wui-watermark` is a mark, not a page container: its host is zero
+                 pixels tall and the mark lives in an absolutely-positioned shadow
+                 layer, so the prose below is ordinary editable content that simply
+                 flows over it. The padded wrapper is only here because a sheet has
+                 no padding of its own — the cover above depends on that.
+
+                 Nothing about the mark is clickable — that is what lets the text
+                 over it be typed in — so the element grows a small “💧 Watermark”
+                 chip at the top-left corner of the page while the surface is
+                 editable. Click it to select the mark and open Properties. -->
+            <wui-watermark></wui-watermark>
+            <div style="padding: 22mm 20mm;">
+                <h2 style="margin: 0 0 6mm; font-size: 22pt;">Watermarked page</h2>
+                <p style="font-size: 11pt; line-height: 1.7;">The mark behind this text is a <code>&lt;wui-watermark&gt;</code> whose host is <code>height: 0</code>. It contributes nothing to the column, so <code>reflowOverflow()</code> never sees it as a break candidate and the sheet stays exactly one page tall.</p>
+                <p style="font-size: 11pt; line-height: 1.7;">It has no light DOM at all, so the caret cannot land inside it and a stray Backspace cannot take the page with it; <code>pointer-events: none</code> lets clicks fall through to the text. Which leaves nothing to click when you want to <em>change</em> the mark — hence the chip in the corner above, the one piece of it that does take a press.</p>
+                <p style="font-size: 11pt; line-height: 1.7;">Select it and the panel offers a word mark, an image (with the same crop dialog images use), opacity, angle, size, and whether it starts a page. Switch to <strong>Flow</strong> and the mark still covers a sheet's worth of column — it is sized from <code>--wui-page-h</code>, which falls back to 296mm when nothing is paginating.</p>
+            </div>
         </wui-editor>
 
         <div class="debug-info" style="margin-top: 30px;">

@@ -176,8 +176,18 @@ export interface CropFrame { w: number, h: number }
  */
 export interface CropTransform { scale: number, x: number, y: number }
 
-/** The source rectangle the frame is currently showing, in source pixels. */
-export const cropRect = (frame: CropFrame, t: CropTransform) => ({
+/** A rectangle in source pixels. */
+export interface SourceRect { sx: number, sy: number, sw: number, sh: number }
+
+/**
+ * The source rectangle the frame is currently showing, in source pixels -- the pure
+ * geometry, which is free to name pixels the image does not have when the frame is
+ * larger than the image or panned off it.
+ *
+ * Almost every caller wants {@link clipCropRect} instead. This one stays exported
+ * because it is the definition the transform is documented against.
+ */
+export const cropRect = (frame: CropFrame, t: CropTransform): SourceRect => ({
     sx: -t.x / t.scale,
     sy: -t.y / t.scale,
     sw: frame.w / t.scale,
@@ -185,28 +195,66 @@ export const cropRect = (frame: CropFrame, t: CropTransform) => ({
 })
 
 /**
+ * {@link cropRect} intersected with the pixels that actually exist, or `null` when the
+ * frame and the image do not overlap at all.
+ *
+ * Everything downstream is sized from this rather than from the raw rect. Without the
+ * intersection the empty space around a zoomed-out or panned-away image counts as
+ * "source resolution": a 400x300 photo reports a 1725x1200 crop after two zoom-out
+ * clicks, `bakeCrop` allocates a canvas that big, ~94% of it is transparent padding,
+ * and the transparency then pushes `encodeCanvas` down the PNG branch -- a multi-
+ * megabyte PNG of a mostly-empty upscale of a small JPEG. Panned fully clear of the
+ * image the same path committed a 100% transparent picture over the user's photo.
+ */
+export const clipCropRect = (frame: CropFrame, t: CropTransform, nat: { w: number, h: number }): SourceRect | null => {
+    const { sx, sy, sw, sh } = cropRect(frame, t)
+    const x0 = Math.max(0, sx)
+    const y0 = Math.max(0, sy)
+    const x1 = Math.min(nat.w, sx + sw)
+    const y1 = Math.min(nat.h, sy + sh)
+    // Sub-pixel slivers are not a crop anyone asked for, and a canvas cannot be 0 wide.
+    if (x1 - x0 < 1 || y1 - y0 < 1) return null
+    return { sx: x0, sy: y0, sw: x1 - x0, sh: y1 - y0 }
+}
+
+/** Whether the clipped rect is the whole image, i.e. there is nothing to crop away. */
+export const isWholeImage = (r: SourceRect, nat: { w: number, h: number }): boolean =>
+    r.sx < 1 && r.sy < 1 && r.sw >= nat.w - 1 && r.sh >= nat.h - 1
+
+/**
  * The pixel size a baked crop will have: the source resolution actually visible, capped
  * to A4. Shown live under the frame so the user can see what resizing costs them.
  *
  * Deliberately the *source* resolution rather than the frame's on-screen size -- zooming
  * in must not invent detail that is not in the file, and zooming out must not keep
- * resolution the user just discarded.
+ * resolution the user just discarded. Both halves depend on the rect being clipped to
+ * the image first, which is why `nat` is required.
  */
-export const cropOutputSize = (frame: CropFrame, t: CropTransform): { w: number, h: number } => {
-    const { sw, sh } = cropRect(frame, t)
-    return fitWithin(sw, sh, a4Box(sw, sh))
+export const cropOutputSize = (frame: CropFrame, t: CropTransform, nat: { w: number, h: number }): { w: number, h: number } => {
+    const r = clipCropRect(frame, t, nat)
+    if (!r) return { w: 0, h: 0 }
+    return fitWithin(r.sw, r.sh, a4Box(r.sw, r.sh))
 }
 
 /**
- * Render what the frame is showing to a `data:` URI.
+ * Render what the frame is showing to a `data:` URI, or `null` when there is nothing
+ * worth rendering.
  *
- * When the source rectangle runs past the edge of the image -- the user zoomed out until
- * it no longer fills the frame -- `drawImage` clips it and clips the destination in the
- * same proportion, so the image stays put and the margin is left transparent.
+ * Two cases return `null`, and the {@link CropperHandle.bake} contract already reads
+ * that as "use the source unchanged":
+ *
+ * - the frame has been panned clear of the image, so a bake would produce a blank;
+ * - the frame still shows the whole image at full resolution, so a bake would only
+ *   re-encode it -- generation loss, and a lossless source coming back as a bigger
+ *   file, in exchange for a crop the user did not make.
  */
-export const bakeCrop = (img: HTMLImageElement, frame: CropFrame, t: CropTransform): string => {
-    const { sx, sy, sw, sh } = cropRect(frame, t)
-    const out = cropOutputSize(frame, t)
+export const bakeCrop = (img: HTMLImageElement, frame: CropFrame, t: CropTransform): string | null => {
+    const nat = naturalSize(img)
+    const r = clipCropRect(frame, t, nat)
+    if (!r) return null
+
+    const out = fitWithin(r.sw, r.sh, a4Box(r.sw, r.sh))
+    if (isWholeImage(r, nat) && out.w >= nat.w && out.h >= nat.h) return null
 
     const canvas = document.createElement('canvas')
     canvas.width = out.w
@@ -214,7 +262,7 @@ export const bakeCrop = (img: HTMLImageElement, frame: CropFrame, t: CropTransfo
     const ctx = canvas.getContext('2d')!
     ctx.imageSmoothingEnabled = true
     ctx.imageSmoothingQuality = 'high'
-    ctx.drawImage(img, sx, sy, sw, sh, 0, 0, out.w, out.h)
+    ctx.drawImage(img, r.sx, r.sy, r.sw, r.sh, 0, 0, out.w, out.h)
     return encodeCanvas(canvas)
 }
 

@@ -1,5 +1,5 @@
 import { $, $$, isObservable, Observable } from 'woby'
-import { getEditorPlugins, getPluginForElement, type PluginProp } from './EditorPlugin'
+import { editableContentTagNames, getEditorPlugins, getPluginForElement, type PluginProp } from './EditorPlugin'
 
 /**
  * PropertyExtractor: Utility for detecting the current selection type
@@ -77,14 +77,24 @@ export function detectSelectionType(): SelectionInfo {
         if (!sel || sel.rangeCount === 0) return { type: 'none', element: null }
 
         const range = sel.getRangeAt(0)
-        let node: Node | null = range.commonAncestorContainer
+        const origin: Node = range.commonAncestorContainer
+        let node: Node | null = origin
 
         // Get registered plugin tag names for custom element detection
         const pluginTagNames = new Set($$(getEditorPlugins()).map(p => p.tagName.toUpperCase()))
+        const containerTags = new Set(editableContentTagNames())
 
         // Walk up from selection to find a custom element or the editor root
         while (node && node !== shadow) {
             if (node instanceof HTMLElement) {
+                // A container block stops the walk instead of answering it. Plugins that
+                // declare editableContent hold ordinary document content -- the cover page
+                // is a background with a whole page of prose, tables and images slotted on
+                // top -- and their descendants have to report as themselves, or every cell
+                // and paragraph inside one comes back as the block and the panel offers
+                // scrim and focus rows for a <td>. Only an ancestor is skipped: a selection
+                // that *is* the block still classifies as the block.
+                if (node !== origin && containerTags.has(node.tagName.toUpperCase())) break
                 const tag = node.tagName.toLowerCase()
                 // Custom elements have hyphens in tag name
                 if (tag.includes('-') && !tag.startsWith('wui-')) {
@@ -143,6 +153,7 @@ export function detectSelectionType(): SelectionInfo {
 
     // Get registered plugin tag names for custom element detection
     const pluginTagNames = new Set($$(getEditorPlugins()).map(p => p.tagName.toUpperCase()))
+    const containerTags = new Set(editableContentTagNames())
 
     // Check for image selection (img node or inside img)
     let node: Node | null = range.commonAncestorContainer
@@ -158,8 +169,11 @@ export function detectSelectionType(): SelectionInfo {
     // for light-DOM mode so a caret inside a custom element still reports 'custom'.
     node = range.commonAncestorContainer
     if (node.nodeType === Node.TEXT_NODE) node = node.parentElement
+    const origin = node
     while (node && node !== editorRoot) {
         if (node instanceof HTMLElement) {
+            // Same container rule as the shadow branch above.
+            if (node !== origin && containerTags.has(node.tagName.toUpperCase())) break
             const tag = node.tagName.toLowerCase()
             if ((tag.includes('-') && !tag.startsWith('wui-')) || pluginTagNames.has(node.tagName.toUpperCase())) {
                 return { type: 'custom', element: node }
@@ -644,7 +658,13 @@ export function applyCustomElementProperty(el: HTMLElement, key: string, value: 
     }
 
     if (typeof value === 'boolean') {
-        value ? el.setAttribute(attr, '') : el.removeAttribute(attr)
+        // Presence alone cannot express a boolean whose declared default is true:
+        // absent is how its reader spells *on*, so unticking the box by removing the
+        // attribute read straight back as ticked and the prop was write-once-on
+        // ("Start a new page" could never be turned off). Spell the off state out,
+        // and keep absent as the clean serialization of the default either way.
+        if (unset === true) value ? el.removeAttribute(attr) : el.setAttribute(attr, 'false')
+        else value ? el.setAttribute(attr, '') : el.removeAttribute(attr)
     } else if (value === '' || (spec && value === unset)) {
         el.removeAttribute(attr)          // back to default → keep serialized HTML clean
     } else {

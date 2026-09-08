@@ -3,6 +3,7 @@ import { $, $$, useEffect, JSX, useMemo, Observable, createContext, useContext, 
 import type { FocusManager } from './FocusManager'
 import { saveSelectionAsOffsets, restoreSelectionFromOffsets, findEditorRoot } from './StyleEngine'
 import { safeGetSelection } from './BrowserCompat'
+import { currentLayout, Layout, paginate, unpaginatedHTML } from './PageLayout'
 
 // 1. CREATE THE EDITOR DATA STORE
 // createContext: Creates a "global" storage box so we don't have to pass props everywhere.
@@ -78,6 +79,57 @@ const DEBOUNCE_MS = 300
 const MAX_STACK = 100
 
 /**
+ * What a history entry stores: the document with the page sheets taken back out.
+ *
+ * History has to be layout-independent or it is not history. Snapshots used to be the
+ * surface's raw `innerHTML`, so an entry taken in `page` mode carried the sheet wrappers
+ * and the page-number strips while one taken in `flow` mode did not — and since undo
+ * writes an entry back verbatim, a single Ctrl+Z could re-lay-out the whole document
+ * instead of reverting an edit.
+ *
+ * Normalising here fixes both halves at once. Restoring can no longer smuggle in a
+ * layout, and switching layout no longer *creates* an entry: the snapshot before and
+ * after the switch are byte-identical, so `saveDo`'s own "did anything change" test
+ * rejects it. That is why this is the real fix and the mutation filtering in
+ * `Editor.tsx` was not — it stops the entry existing rather than trying to catch the
+ * mutation that would have made it.
+ */
+const snapshot = (el: HTMLElement) => unpaginatedHTML(el.innerHTML)
+
+/**
+ * Rebuild the sheets after a snapshot has been written back.
+ *
+ * Entries are always flow markup (see `snapshot`), so in `page` mode restoring one
+ * leaves the document visibly un-paginated until some unrelated edit happens to trigger
+ * a reflow. `paginate` is idempotent and flattens first, so calling it is safe whatever
+ * the entry turned out to contain.
+ */
+const relayout = (el: HTMLElement) => {
+    if (currentLayout() === Layout.page) paginate(el)
+}
+
+/**
+ * Hold the viewport still across a snapshot restore.
+ *
+ * The editing surface is its own scroll container, and both undo and redo rewrite its
+ * innerHTML. For the instant between the wipe and the rebuild its scrollHeight is
+ * nothing, so the browser clamps scrollTop to 0 — and the rebuild does not put it back,
+ * because as far as it is concerned the scroll position was never anywhere else.
+ * Undoing a typo three pages down threw the reader to the top of the document.
+ *
+ * The document scroller is captured for the same reason: a surface with no height cap
+ * shrinks the page under it while it is empty, and the page clamps too. Nothing in
+ * between the two of them scrolls, so there is no ancestor walk here to get wrong.
+ */
+const captureScroll = (el: HTMLElement) => {
+    const page = el.ownerDocument.scrollingElement
+    const saved = (page && page !== el ? [el, page] : [el]).map(n => [n, n.scrollTop, n.scrollLeft] as const)
+    // Call this after the caret has been placed, not before: restoring a selection can
+    // scroll on its own, and the place the reader was actually looking should win.
+    return () => saved.forEach(([n, top, left]) => { n.scrollTop = top; n.scrollLeft = left })
+}
+
+/**
  * History entry type - stores content and selection for restoration.
  *
  * The history stacks hold these rather than bare HTML strings so undo can also restore the caret;
@@ -130,7 +182,11 @@ export const UndoRedo = ({ children, editor }: { children: JSX.Children, editor?
         if (currentEditor && !$$(isInitialized)) { // unwrap
             // D-14: Check if shadow DOM has content. If empty, delay initialization.
             // The EditorSurface will sync light DOM content into shadow DOM shortly after mount.
-            const initialContent = currentEditor.innerHTML
+            // Normalised, like every other entry — the editor can already be in `page`
+            // mode by the time this runs (the mode is re-asserted whenever the surface is
+            // rebuilt), and a paginated entry at the bottom of the stack is the one no
+            // amount of undoing can get you out of.
+            const initialContent = snapshot(currentEditor)
 
             // Check for meaningful content (not empty, not just whitespace, not just a br tag)
             const hasMeaningfulContent = initialContent &&
@@ -147,7 +203,7 @@ export const UndoRedo = ({ children, editor }: { children: JSX.Children, editor?
 
                 const pollForContent = () => {
                     retries++
-                    const polledContent = currentEditor.innerHTML
+                    const polledContent = snapshot(currentEditor)
                     const polledHasContent = polledContent &&
                         polledContent.trim() !== '' &&
                         polledContent !== '<br>' &&
@@ -199,8 +255,10 @@ export const UndoRedo = ({ children, editor }: { children: JSX.Children, editor?
             }
 
             const element = el as HTMLElement
-            // Capture shadow DOM innerHTML — formatting lives here, not in light DOM (host).
-            const currentContent = element.innerHTML
+            // Capture from the shadow DOM — formatting lives here, not in light DOM (host) —
+            // and with the page sheets normalised away, so the entry means the same thing
+            // whichever layout it was taken in. See `snapshot`.
+            const currentContent = snapshot(element)
             const u = $$(undos)
 
             // D-13: Capture selection state for restoration after undo/redo
@@ -293,7 +351,13 @@ export const UndoRedo = ({ children, editor }: { children: JSX.Children, editor?
         // Restoring host.innerHTML (light DOM) triggers syncChildren which would
         // overwrite the formatted shadow DOM with plain light DOM content.
         const el = $$(activeEditor) as HTMLElement
+        const restoreScroll = captureScroll(el)
         el.innerHTML = stateToRestore.content
+
+        // The entry is flow markup, so in `page` mode the sheets have to come back before
+        // the caret is placed — `restoreSelectionFromOffsets` walks the live tree, and the
+        // tree it walks has to be the one the user ends up looking at.
+        relayout(el)
 
         // D-13: Restore selection if saved with the snapshot
         if (stateToRestore.selection) {
@@ -306,6 +370,8 @@ export const UndoRedo = ({ children, editor }: { children: JSX.Children, editor?
                 )
             }
         }
+
+        restoreScroll()
     }
     // #endregion
 
@@ -351,7 +417,11 @@ export const UndoRedo = ({ children, editor }: { children: JSX.Children, editor?
             undos(newUndos)
             // Restore directly to shadow DOM — same source of truth as saveDo.
             const el = $$(activeEditor) as HTMLElement
+            const restoreScroll = captureScroll(el)
             el.innerHTML = entryToRestore.content
+
+            // Same as in `undo`: sheets first, then the caret.
+            relayout(el)
 
             // D-13: Restore selection if saved with the snapshot
             if (entryToRestore.selection) {
@@ -364,6 +434,8 @@ export const UndoRedo = ({ children, editor }: { children: JSX.Children, editor?
                     )
                 }
             }
+
+            restoreScroll()
         }
     }
     // #endregion

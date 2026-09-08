@@ -111,6 +111,18 @@ export const ImageEditor = defaults(def, (): JSX.Element => {
     let noteEl: HTMLElement | null = null
     let applyBtn: HTMLButtonElement | null = null
     let restoreBtn: HTMLButtonElement | null = null
+    let panelEl: HTMLElement | null = null
+
+    /**
+     * How far the panel has been dragged from the centre, in px.
+     *
+     * Kept as a pair of numbers rather than read back off the element because the panel is
+     * laid out by the overlay's `items-center justify-center` -- it has no left/top of its
+     * own to add to, and a `transform` is the one offset that composites without asking
+     * the flex container to reflow on every pointermove.
+     */
+    let dragX = 0
+    let dragY = 0
     let srcInput: HTMLInputElement | null = null
     let fileInput: HTMLInputElement | null = null
 
@@ -286,6 +298,7 @@ export const ImageEditor = defaults(def, (): JSX.Element => {
         setField(origin || (/^https?:\/\//i.test(openSrc) ? openSrc : ''))
 
         cropper?.clear()
+        recentre()
         if (rootEl) rootEl.style.display = 'flex'
         // Restore is only meaningful while an origin is on record; a local file never has
         // one, and applying Restore clears it because the image is then the original.
@@ -469,6 +482,46 @@ export const ImageEditor = defaults(def, (): JSX.Element => {
         el.onclick = (e: MouseEvent) => { e.preventDefault(); e.stopPropagation(); fn() }
     }
 
+    /**
+     * Drag the panel by its title bar.
+     *
+     * A modal that cannot move is a modal that hides the thing being edited: the cropper
+     * shows the image, but the *document* underneath is what tells you whether the crop
+     * suits the page it lands on. The overlay stays put and keeps swallowing clicks --
+     * only the panel moves.
+     *
+     * Listeners go on `window`, not on the handle: a pointer that leaves the 520px panel
+     * mid-drag would otherwise stop reporting, and the panel would stick. Pointer capture
+     * would also work, but `setPointerCapture` on an element inside a shadow root retargets
+     * the events in ways the rest of this file does not need to know about.
+     */
+    const startDrag = (e: PointerEvent) => {
+        if (!panelEl || e.button !== 0) return
+        const sx = e.clientX, sy = e.clientY
+        const ox = dragX, oy = dragY
+        const move = (m: PointerEvent) => {
+            dragX = ox + m.clientX - sx
+            dragY = oy + m.clientY - sy
+            panelEl!.style.transform = `translate(${dragX}px, ${dragY}px)`
+        }
+        const up = () => {
+            window.removeEventListener('pointermove', move)
+            window.removeEventListener('pointerup', up)
+        }
+        window.addEventListener('pointermove', move)
+        window.addEventListener('pointerup', up)
+        // Stops the press from selecting the title text, and from reaching the overlay's
+        // click-to-close.
+        e.preventDefault()
+        e.stopPropagation()
+    }
+
+    /** Put the panel back in the middle. Called on every open, so it never opens off-screen. */
+    const recentre = () => {
+        dragX = dragY = 0
+        if (panelEl) panelEl.style.transform = ''
+    }
+
     const field = 'w-full h-8 px-2 text-xs rounded border border-gray-300 bg-white text-gray-800 focus:outline-none focus:border-blue-500'
     const btn = 'h-8 px-3 text-xs rounded border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 disabled:opacity-50 whitespace-nowrap'
     const primaryBtn = 'h-8 px-3 text-xs rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 whitespace-nowrap'
@@ -488,13 +541,21 @@ export const ImageEditor = defaults(def, (): JSX.Element => {
                 ref={el => {
                     if (!el) return
                     const panel = el as HTMLElement
+                    panelEl = panel
                     panel.onclick = (e: MouseEvent) => e.stopPropagation()
                     // The whole panel takes drops, not just the field: aiming at a 32px
                     // input is a worse experience than aiming at the thing being replaced.
                     bindDropZone(panel)
                 }}
             >
-                <div class="text-sm font-medium text-gray-800">Edit image</div>
+                <div
+                    ref={el => { if (el) (el as HTMLElement).onpointerdown = startDrag }}
+                    class="-m-3 mb-0 px-3 py-2 flex items-center gap-2 text-sm font-medium text-gray-800 bg-gray-50 border-b border-gray-200 rounded-t-md cursor-move select-none"
+                    title="Drag to move this dialog"
+                >
+                    <span class="text-gray-400">&#x2725;</span>
+                    Edit image
+                </div>
 
                 <ImageCropper onHandle={h => { cropper = h }} />
 

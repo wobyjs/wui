@@ -99,7 +99,19 @@ export const PropertyPanel = () => {
     const resizing = $(false)
 
     /** Below these the header and the first form row stop being usable. */
-    const MIN_W = 240
+    /**
+ * The viewport as *layout* sees it, excluding any classic scrollbar.
+ *
+ * `window.innerWidth` counts the scrollbar gutter, so clamping the panel's right edge to
+ * it parked that edge under the scrollbar -- 15 px of overhang on a stock Chrome window,
+ * which is wider than the 6 px `e` grip. The one grip a user reaches for to shrink a
+ * too-wide panel was the one guaranteed to be unreachable, and the `se` corner kept about
+ * a pixel. `clientWidth` is the number the clamp's own comment was describing.
+ */
+const viewportW = () => document.documentElement.clientWidth || window.innerWidth
+const viewportH = () => document.documentElement.clientHeight || window.innerHeight
+
+const MIN_W = 240
     const MIN_H = 140
 
     // Helper: extract properties from the current target based on selection type
@@ -781,10 +793,10 @@ export const PropertyPanel = () => {
                 w = Math.max(MIN_W, right - x)
                 panelPos({ x, y: top })
             } else if (dir !== 's') {
-                w = Math.min(Math.max(MIN_W, w0 + ev.clientX - x0), Math.max(MIN_W, window.innerWidth - left))
+                w = Math.min(Math.max(MIN_W, w0 + ev.clientX - x0), Math.max(MIN_W, viewportW() - left))
             }
             const h = vertical
-                ? Math.min(Math.max(MIN_H, h0 + ev.clientY - y0), Math.max(MIN_H, window.innerHeight - top))
+                ? Math.min(Math.max(MIN_H, h0 + ev.clientY - y0), Math.max(MIN_H, viewportH() - top))
                 : h0
             panelSize({ w, h })
         }

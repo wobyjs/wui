@@ -1925,8 +1925,80 @@ export function applyTextAlign(align: string): void {
 }
 
 /**
- * Apply block-level formatting (Normal, Heading 1-3, Quote, Code Block)
- * This wraps the selection in the specified block element with optional class
+ * Blocks that are a structural part of something larger. Swapping a <td> for an <h2>
+ * tears a hole in the table and swapping an <li> unpicks the list, so these are
+ * formatted from the inside out: their contents become the new block.
+ */
+const CONTAINER_BLOCKS = ['TD', 'TH', 'LI']
+const BLOCK_SELECTOR = 'p,h1,h2,h3,h4,h5,h6,li,blockquote,pre,td,th'
+
+/**
+ * Turn one block into the given tag, in place. The element is replaced, never wrapped:
+ * a paragraph style is a property of the paragraph, so applying one twice has to land
+ * on the same thing as applying it once, and a block nested inside another block does
+ * not survive a serialize/parse round trip anyway.
+ */
+function retagBlock(el: HTMLElement, tag: string, className?: string): HTMLElement {
+    // Inside a cell or a list item, format the content rather than the container.
+    if (CONTAINER_BLOCKS.includes(el.tagName)) {
+        const only = el.childNodes.length === 1 ? el.firstElementChild as HTMLElement | null : null
+        if (only && only.matches(BLOCK_SELECTOR)) return retagBlock(only, tag, className)
+        const inner = document.createElement(tag)
+        inner.className = className || ''
+        while (el.firstChild) inner.appendChild(el.firstChild)
+        el.appendChild(inner)
+        return inner
+    }
+
+    const newEl = document.createElement(tag)
+    newEl.className = className || ''
+    while (el.firstChild) newEl.appendChild(el.firstChild)
+    if (newEl.childNodes.length === 0) newEl.appendChild(document.createElement('br'))
+    el.parentNode?.replaceChild(newEl, el)
+    return newEl
+}
+
+/**
+ * Every block the range genuinely overlaps, with no ancestor of another kept — a <td>
+ * and the <p> inside it must not both be retagged. The overlap test is strict on both
+ * ends, so a selection that stops exactly where the next paragraph begins does not
+ * drag that paragraph in.
+ */
+function blocksInRange(range: Range): HTMLElement[] {
+    const touches = (el: Element): boolean => {
+        const r = document.createRange()
+        r.selectNodeContents(el)
+        return range.compareBoundaryPoints(Range.END_TO_START, r) < 0
+            && range.compareBoundaryPoints(Range.START_TO_END, r) > 0
+    }
+
+    const found: HTMLElement[] = []
+    const add = (b: HTMLElement | null) => {
+        if (b && !found.includes(b) && touches(b)) found.push(b)
+    }
+
+    add(getBlockParent(range.startContainer))
+    const anchor = range.commonAncestorContainer
+    const scope = anchor instanceof HTMLElement ? anchor : anchor.parentElement
+    scope?.querySelectorAll(BLOCK_SELECTOR).forEach(el => add(el as HTMLElement))
+    add(getBlockParent(range.endContainer))
+
+    const blocks = found.filter(b => !found.some(other => other !== b && b.contains(other)))
+    if (blocks.length) return blocks
+
+    // Degenerate range (both ends on a boundary): fall back to what encloses it.
+    const enclosing = getBlockParent(anchor)
+    return enclosing ? [enclosing] : []
+}
+
+/**
+ * Apply block-level formatting (Normal, Heading 1-3, Quote, Code Block).
+ *
+ * A paragraph style applies to whole blocks. The old code took the opposite reading of
+ * a non-collapsed selection: it extracted the selected words and dropped a fresh block
+ * around only those, so "Heading 2" over half a sentence produced
+ * <p><em><h2>half </h2>the rest</em></p> — a block inside an em inside a p — and
+ * picking a style again nested one more level every time.
  */
 export function applyFormatBlock(tag: string, className?: string): void {
     const focusSr = findEditorShadowRoot()
@@ -1936,66 +2008,27 @@ export function applyFormatBlock(tag: string, className?: string): void {
     const sel = focusSr ? focusSr.getSelection() : safeGetSelection()
     if (!sel) return
 
-    // Find block parent
-    let block = getBlockParent(range.commonAncestorContainer)
+    const saved = saveSelectionAsOffsets(range)
 
-    // If no block found, use the editor root
-    if (!block) {
-        const editor = document.querySelector('[data-editor-root]') as HTMLElement
-        if (editor) block = editor
-    }
+    const targets = range.collapsed
+        ? ([getBlockParent(range.startContainer)].filter(Boolean) as HTMLElement[])
+        : blocksInRange(range)
+    if (targets.length === 0) return
 
-    if (!block) return
+    const rewritten = targets.map(t => retagBlock(t, tag, className))
 
-    // Check if selection is collapsed
-    if (range.collapsed) {
-        // For collapsed selection, just change the current block's tag/class
-        const currentBlock = getBlockParent(range.startContainer)
-        if (currentBlock) {
-            const newEl = document.createElement(tag)
-            newEl.className = className || ''
+    rewritten.forEach(el => { if (el.isConnected) normalizeDOM(el) })
 
-            // Move all children
-            while (currentBlock.firstChild) {
-                newEl.appendChild(currentBlock.firstChild)
-            }
-
-            // If no content, add a <br>
-            if (newEl.childNodes.length === 0) {
-                newEl.appendChild(document.createElement('br'))
-            }
-
-            currentBlock.parentNode?.replaceChild(newEl, currentBlock)
-
-            // Restore selection inside new block
-            const newRange = document.createRange()
-            newRange.selectNodeContents(newEl)
-            newRange.collapse(true)
-            sel.removeAllRanges()
-            sel.addRange(newRange)
-        }
+    // Only the containers changed, not a character of text, so the saved offsets still
+    // address the same characters and the selection survives the restyle intact.
+    if (saved.editorRoot && saved.startOffset >= 0 && saved.endOffset >= 0) {
+        restoreSelectionFromOffsets(saved.editorRoot, saved.startOffset, saved.endOffset)
     } else {
-        // Non-collapsed selection - wrap in block element
-        const contents = range.extractContents()
-
-        // Create new block element
-        const newBlock = document.createElement(tag)
-        newBlock.className = className || ''
-        newBlock.appendChild(contents)
-
-        // Insert at range position
-        range.insertNode(newBlock)
-
-        // Select the new block
         const newRange = document.createRange()
-        newRange.selectNode(newBlock)
+        newRange.selectNodeContents(rewritten[rewritten.length - 1])
+        newRange.collapse(false)
         sel.removeAllRanges()
         sel.addRange(newRange)
-    }
-
-    // Normalize the block
-    if (block) {
-        normalizeDOM(block)
     }
 }
 

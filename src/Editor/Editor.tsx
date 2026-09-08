@@ -13,6 +13,9 @@ import { List } from './List'
 import { Indent } from './Indent' // Will be part of TextAlignDropDown
 import { applyIndent as applyIndentStyle, applyListIndent } from './StyleEngine' // Import applyIndent from StyleEngine instead
 import { Blockquote } from './Blockquote'
+import { LayoutSwitch, editorLayout } from './LayoutSwitch'
+import { PrintButton } from './PrintButton'
+import { LAYOUT_ATTR, Layout, silenceDuringLayout } from './PageLayout'
 import { FocusManager } from './FocusManager'
 
 // New Imports
@@ -31,7 +34,7 @@ import { ImageDialog, INSERT_IMAGE_EVENT, type InsertImageDetail } from './Image
 import { InfoButton } from './InfoButton' // Info button for property panel
 import { PropertyPanel, PropertyPanelContext } from './PropertyPanel' // Property panel for selected element
 import { SelectionType, deleteSelectedElement, deleteRefusalReason, classifyElement } from './PropertyExtractor' // Selection type enum + node-selection delete + its guard
-import { getEditorPlugins, resolveResizable } from './EditorPlugin' // For plugin tag name detection
+import { editableContentTagNames, getEditorPlugins, resolveResizable } from './EditorPlugin' // For plugin tag name detection
 import { arrowDirection, insertLineAfter, navigableBoxes, navigateFrom, placeCaretIn } from './NodeNavigation' // Arrow/Enter handling while a component is selected
 
 // StyleEngine imports for keyboard shortcuts
@@ -443,6 +446,9 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, height, maxHe
         // re-running this effect would churn the listener.
         const plugins = $$(getEditorPlugins())
         const pluginTags = new Set(plugins.map(p => p.tagName.toUpperCase()))
+        // Plugins whose light DOM belongs to the document rather than to the widget. See
+        // EditorPlugin.editableContent, and the bail-out in the walk below.
+        const containerTags = new Set(editableContentTagNames())
 
         const handler = (e: PointerEvent) => {
             // Clear previous mark
@@ -466,12 +472,29 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, height, maxHe
                 return
             }
 
+            // What the press actually landed on, before shadow retargeting. `path[0]` is
+            // the deepest node, so a click inside a component's shadow tree reports the
+            // shadow node here even though `e.target` says the host.
+            const hit = path[0]
+
             // Walk composedPath to find a plugin element or hyphenated non-wui tag
             for (const entry of path) {
                 if (!(entry instanceof HTMLElement)) continue
                 if (!el.contains(entry)) continue
                 const tag = entry.tagName.toLowerCase()
                 if (pluginTags.has(entry.tagName.toUpperCase()) || (tag.includes('-') && !tag.startsWith('wui-'))) {
+                    // A container plugin's light DOM is the author's text: a click that
+                    // lands in it is a caret placement, not a selection of the block. Bail
+                    // out of the walk entirely rather than continuing outwards -- an outer
+                    // plugin is even less likely to be what was meant.
+                    //
+                    // `contains` does not cross shadow boundaries, so this is true only for
+                    // a light-DOM descendant; a click on the block's own backdrop reports a
+                    // shadow node and falls through to the selection below. `hit !== entry`
+                    // keeps a click on the host's own box (or on a bare text child, which
+                    // retargets to the host) selecting, since there is no child to type in.
+                    if (containerTags.has(entry.tagName.toUpperCase())
+                        && hit instanceof Node && hit !== entry && entry.contains(hit)) return
                     entry.setAttribute('data-element-selected', '')
                     return
                 }
@@ -527,7 +550,21 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, height, maxHe
         }
 
         // Watch shadow DOM element for content changes (content is now cloned into shadow DOM)
+        // `contenteditable` and `data-layout` on the surface itself are editor chrome, not
+        // document content: the layout switch writes both, and the read-only toggle writes
+        // the first. Neither changes a character of the document. They have to be filtered
+        // here rather than dropped by the layout engine's record flush, because woby
+        // re-asserts `contentEditable` from its own scheduler a beat after the switch has
+        // returned -- too late for any flush the switch itself could run.
+        const isChrome = (m: MutationRecord) =>
+            m.type === 'attributes' && m.target === el &&
+            (m.attributeName === 'contenteditable' || m.attributeName === LAYOUT_ATTR)
+
         const observer = new MutationObserver((mutations) => {
+            // A batch that is nothing but chrome is not an edit and must not become an
+            // undo step -- one such record per press is what used to put Flow/Page/Read on
+            // the stack, so a single Ctrl+Z undid the button instead of the last sentence.
+            if (mutations.every(isChrome)) return
             // Debounce saveDo to prevent saving on every keystroke
             saveDo()
         })
@@ -540,8 +577,16 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, height, maxHe
             characterData: true,
         })
 
+        // Changing the page layout is not an edit. Pagination re-parents the entire
+        // document into sheets and writes `data-layout`/`contenteditable` on this very
+        // element -- a subtree observer cannot tell that apart from the author replacing
+        // the document, so without this every press of Flow/Page/Read pushed a snapshot
+        // of the paginated markup onto the undo stack and cleared the redo stack. One
+        // Ctrl+Z would then undo the button instead of the last thing typed.
+        const unsilence = silenceDuringLayout(observer)
+
         // Cleanup function to disconnect observer when component unmounts
-        return () => { observer.disconnect() }
+        return () => { observer.disconnect(); unsilence() }
     }) // Auto-tracks $$(activeEditor) - runs when activeEditor reference changes
     // #endregion
 
@@ -876,7 +921,10 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, height, maxHe
         if (e.ctrlKey) {
             // e.preventDefault(); e.stopPropagation();
             switch (e.key.toLowerCase()) {
-                case 'z': undo(); break;
+                // Ctrl+Shift+Z is the Windows/Linux redo shortcut. Without the shift test
+                // it fell through to undo, so a user reaching for redo walked backwards
+                // through history and burned a redo entry on every press.
+                case 'z': e.shiftKey ? redo() : undo(); break;
                 case 'y': redo(); break;
                 case 'b':
                     e.preventDefault();
@@ -920,7 +968,12 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, height, maxHe
             <div
                 ref={activeEditor}
                 data-editor-root
-                contentEditable={() => $$(isReadonly) ? false : true}
+                // `screen` is a reading mode, so it is not editable -- and the mode
+                // switch writes this same attribute directly when it changes, because
+                // going through `isReadonly` would unmount the toolbar the switch lives
+                // in. Reading the layout here as well keeps the two in agreement when
+                // something else re-runs this binding.
+                contentEditable={() => $$(isReadonly) || $$(editorLayout) === Layout.screen ? false : true}
                 onClick={handleEditorClick}
                 onBlur={handleBlur}
                 onKeyDown={handleKeyDown}
@@ -980,8 +1033,10 @@ const EditorToolbar = ({ toolbarRef }: { toolbarRef: Observable<HTMLDivElement |
         e.preventDefault(); e.stopPropagation();
 
         if (e.ctrlKey)
-            switch (e.key) {
-                case 'z': undo(); break
+            switch (e.key.toLowerCase()) {
+                // Same shift rule as the editor handler above. Lowercased too: with shift
+                // held, `e.key` is 'Z', which this switch never matched at all.
+                case 'z': e.shiftKey ? redo() : undo(); break
                 case 'y': redo(); break
             }
         else
@@ -1063,7 +1118,18 @@ const EditorToolbar = ({ toolbarRef }: { toolbarRef: Observable<HTMLDivElement |
 
             <Divider />
 
-            {/* Group 6: Advanced Inserts */}
+            {/* Group 6: Layout -- authoring / proofing / reading, and the paper it ends on.
+                Print sits with the switch and not with the inserts because it is the same
+                subject: it puts the editor into `page` and prints exactly what that mode
+                shows. */}
+            <div class="flex items-center gap-1">
+                <LayoutSwitch />
+                <PrintButton />
+            </div>
+
+            <Divider />
+
+            {/* Group 7: Advanced Inserts */}
             <div class="flex items-center gap-1">
                 <InsertDropDown />
                 <Blockquote />

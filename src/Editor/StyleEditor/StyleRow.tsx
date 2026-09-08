@@ -83,14 +83,26 @@ export const StyleRow = ({ prop, el, variant, root, version, onEdit }: StyleRowP
     const invalid = $(false)
     const blocked = $<string[]>([])
 
-    let field: HTMLInputElement | null = null
-    let swatch: HTMLInputElement | null = null
+    /**
+     * The two controls, as observables rather than plain `let`s.
+     *
+     * They have to be tracked. The effect below is what puts a value on screen, and
+     * it runs the moment the component is created -- which is BEFORE the `ref`
+     * callbacks fire and hand it the inputs. With a plain `let` the effect saw
+     * `null`, skipped the assignment, and never ran again, because `state` does not
+     * change after mount: every row rendered blank while its tooltip correctly
+     * reported "style attribute". Reading them through `$$` makes the ref landing a
+     * dependency, so the effect re-runs with the element in hand.
+     */
+    const field = $<HTMLInputElement | null>(null)
+    const swatch = $<HTMLInputElement | null>(null)
 
     /** True while the user is typing here, so a re-read must not overwrite them. */
     const editing = () => {
-        if (!field) return false
-        const rootNode = field.getRootNode() as Document | ShadowRoot
-        return (rootNode as any).activeElement === field
+        const f = $$(field)
+        if (!f) return false
+        const rootNode = f.getRootNode() as Document | ShadowRoot
+        return (rootNode as any).activeElement === f
     }
 
     const commit = (raw: string) => {
@@ -132,10 +144,12 @@ export const StyleRow = ({ prop, el, variant, root, version, onEdit }: StyleRowP
     useEffect(() => {
         const s = $$(state)
         const value = s?.value ?? ''
-        if (field && !editing()) field.value = value
-        if (swatch) {
+        const f = $$(field)
+        const sw = $$(swatch)
+        if (f && !editing()) f.value = value
+        if (sw) {
             const hex = swatchValue(value)
-            if (hex) swatch.value = hex
+            if (hex) sw.value = hex
         }
     })
 
@@ -192,7 +206,7 @@ export const StyleRow = ({ prop, el, variant, root, version, onEdit }: StyleRowP
                         class="w-5 h-5 shrink-0 rounded border border-gray-200 bg-white p-0 cursor-pointer"
                         ref={(e: HTMLInputElement) => {
                             if (!e) return
-                            swatch = e
+                            swatch(e)
                             e.oninput = () => commit(e.value)
                         }}
                     />
@@ -212,7 +226,7 @@ export const StyleRow = ({ prop, el, variant, root, version, onEdit }: StyleRowP
                     }}
                     ref={(e: HTMLInputElement) => {
                         if (!e) return
-                        field = e
+                        field(e)
                         e.onchange = () => commit(e.value)
                         e.onkeydown = (ev: KeyboardEvent) => {
                             if (ev.key === 'Enter') { commit(e.value); return }

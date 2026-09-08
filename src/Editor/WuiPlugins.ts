@@ -47,6 +47,11 @@ const styleProps: PluginProp[] = [
 
 // ── wui-button ──
 
+/* Every `children` row below is `textContent: true`, and its `default` is only ever
+   read as the fallback when the element's light DOM is empty. A pretty default there
+   describes an element that does not exist: an empty <wui-button> rendered nothing
+   while the panel reported "Button". Each one is the component's own (`children:
+   $(null)` / `$('')`), so an empty element reads as empty. */
 const buttonProps: PluginProp[] = [
     {
         name: 'type', type: 'enum', label: 'Variant', default: 'contained',
@@ -56,7 +61,7 @@ const buttonProps: PluginProp[] = [
             { value: 'text', label: 'Text' },
         ],
     },
-    { name: 'children', type: 'string', label: 'Label', default: 'Button', hint: 'Button text', textContent: true },
+    { name: 'children', type: 'string', label: 'Label', default: '', hint: 'Button text', textContent: true },
     { name: 'disabled', type: 'boolean', label: 'Disabled', default: false },
 ]
 
@@ -89,7 +94,7 @@ registerEditorPlugin({
 // ── wui-toggle-button ──
 
 const toggleButtonProps: PluginProp[] = [
-    { name: 'children', type: 'string', label: 'Label', default: 'Toggle', hint: 'Button text', textContent: true },
+    { name: 'children', type: 'string', label: 'Label', default: '', hint: 'Button text', textContent: true },
     { name: 'checked', type: 'boolean', label: 'Checked', default: false, live: true },
     { name: 'disabled', type: 'boolean', label: 'Disabled', default: false },
 ]
@@ -122,7 +127,7 @@ registerEditorPlugin({
 // ── wui-checkbox ──
 
 const checkboxProps: PluginProp[] = [
-    { name: 'children', type: 'string', label: 'Label', default: 'Checkbox', hint: 'Label text', textContent: true },
+    { name: 'children', type: 'string', label: 'Label', default: '', hint: 'Label text', textContent: true },
     { name: 'checked', type: 'boolean', label: 'Checked', default: false, live: true },
     { name: 'disabled', type: 'boolean', label: 'Disabled', default: false },
     {
@@ -490,7 +495,10 @@ registerEditorPlugin({
 // ── wui-badge ──
 
 const badgeProps: PluginProp[] = [
-    { name: 'badgeContent', type: 'string', label: 'Badge Content', default: '3', hint: 'Text or number shown on the badge' },
+    // Default is the component's own (Badge.tsx `badgeContent: $(null)`), not the demo's
+    // 3 -- otherwise typing 3 removes the attribute and `Badge.tsx` renders an empty
+    // badge, i.e. the badge vanishes rather than reverting.
+    { name: 'badgeContent', type: 'string', label: 'Badge Content', default: '', hint: 'Text or number shown on the badge' },
     {
         name: 'vertical', type: 'enum', label: 'Vertical', default: 'top',
         options: [
@@ -559,7 +567,7 @@ const fabProps: PluginProp[] = [
             { value: 'custom', label: 'Custom' },
         ],
     },
-    { name: 'children', type: 'string', label: 'Content', default: '❤️', textContent: true },
+    { name: 'children', type: 'string', label: 'Content', default: '', textContent: true },
     { name: 'disabled', type: 'boolean', label: 'Disabled', default: false },
 ]
 
@@ -612,7 +620,7 @@ const avatarProps: PluginProp[] = [
         ],
     },
     { name: 'src', type: 'string', label: 'Image URL', hint: 'Image source; falls back to initials' },
-    { name: 'children', type: 'string', label: 'Initials', default: 'JD', hint: 'Fallback content when no image', textContent: true },
+    { name: 'children', type: 'string', label: 'Initials', default: '', hint: 'Fallback content when no image', textContent: true },
 ]
 
 registerEditorPlugin({

@@ -23,6 +23,7 @@ import './src/Avatar'
 
 import './src/Editor/CounterPlugin.ts'
 import './src/Editor/WuiPlugins.ts'
+import './src/Editor/PageBlockPlugins.ts'
 
 // Wait for custom element to be defined
 await customElements.whenDefined('wui-editor')

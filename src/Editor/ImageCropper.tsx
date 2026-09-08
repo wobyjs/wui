@@ -3,6 +3,7 @@
 import { JSX, useEffect } from 'woby'
 import {
     bakeCrop,
+    clipCropRect,
     cropOutputSize,
     isRasterisable,
     mimeOf,
@@ -51,6 +52,17 @@ const ZOOM_IN_LIMIT = 12
 /** Multiplier per zoom-button press. Wheel zoom is continuous and ignores this. */
 const ZOOM_STEP = 1.25
 
+/**
+ * How much of the image, in CSS px, must stay inside the frame while panning.
+ *
+ * Pan used to be unbounded, so one drag could put the image three thousand px away and
+ * leave the frame showing nothing -- and Apply committed that, replacing the photo with
+ * a fully transparent PNG of the same dimensions. Clipping in `bakeCrop` now refuses to
+ * write a blank, but the gesture should not be able to reach the state at all. Smaller
+ * than the frame, so pushing a detail right up against an edge still works.
+ */
+const PAN_KEEP = 48
+
 export interface CropperHandle {
     /** Decode `src` and fit it to the frame. Rejects if the image cannot be decoded. */
     load(src: string): Promise<void>
@@ -98,9 +110,15 @@ export const ImageCropper = ({ onHandle }: { onHandle?: (handle: CropperHandle) 
             if (!nat) readoutEl.textContent = ''
             else if (!isRasterisable(mime)) readoutEl.textContent = `${nat.w} x ${nat.h} px -- embedded as-is (${mime})`
             else {
-                const out = cropOutputSize(frame, t)
-                const visible = Math.round(frame.w / t.scale)
-                readoutEl.textContent = `output ${out.w} x ${out.h} px${out.w < visible ? ' (capped to A4)' : ''}`
+                const r = clipCropRect(frame, t, nat)
+                if (!r) readoutEl.textContent = 'the frame is off the image -- nothing to crop'
+                else {
+                    const out = cropOutputSize(frame, t, nat)
+                    // Compared against the clipped width, so empty space beside a zoomed-out
+                    // image no longer reads as resolution that A4 then took away.
+                    const capped = out.w < Math.round(r.sw) ? ' (capped to A4)' : ''
+                    readoutEl.textContent = `output ${out.w} x ${out.h} px${capped}`
+                }
             }
         }
     }
@@ -136,6 +154,22 @@ export const ImageCropper = ({ onHandle }: { onHandle?: (handle: CropperHandle) 
 
     /** Zoom about the frame's centre, for the +/- buttons. */
     const zoomCentre = (factor: number) => zoomAt(frame.w / 2, frame.h / 2, factor)
+
+    /**
+     * Keep the image overlapping the frame. The offset is the image's top-left corner
+     * relative to the frame's, so the image spans x .. x + nat.w * scale: requiring
+     * PAN_KEEP px of that span to fall inside 0 .. frame.w gives the two bounds below.
+     * An image smaller than PAN_KEEP is kept whole instead of being pushed half out.
+     */
+    const clampPan = (x: number, y: number): { x: number, y: number } => {
+        if (!nat) return { x, y }
+        const iw = nat.w * t.scale, ih = nat.h * t.scale
+        const kx = Math.min(PAN_KEEP, iw), ky = Math.min(PAN_KEEP, ih)
+        return {
+            x: Math.min(frame.w - kx, Math.max(kx - iw, x)),
+            y: Math.min(frame.h - ky, Math.max(ky - ih, y)),
+        }
+    }
 
     const handle: CropperHandle = {
         load: (src: string) => new Promise<void>((resolve, reject) => {
@@ -193,7 +227,8 @@ export const ImageCropper = ({ onHandle }: { onHandle?: (handle: CropperHandle) 
 
         const onPointerMove = (e: PointerEvent) => {
             if (!panning) return
-            t = { ...t, x: panning.ox + (e.clientX - panning.px), y: panning.oy + (e.clientY - panning.py) }
+            const p = clampPan(panning.ox + (e.clientX - panning.px), panning.oy + (e.clientY - panning.py))
+            t = { ...t, x: p.x, y: p.y }
             apply()
         }
 

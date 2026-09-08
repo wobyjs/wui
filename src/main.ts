@@ -10,6 +10,10 @@ import './Editor/CounterPlugin'
 // Portal-based components (the Wheeler family) are intentionally absent — they render outside
 // the document flow and are not document-centric, so they do not belong in the editor.
 import './Editor/WuiPlugins'
+// The two page-sized blocks: a full-bleed cover sheet and a watermark layer. Same reason as
+// above — without this import the tags exist as raw HTML but the Insert menu and the typed
+// property rows do not.
+import './Editor/PageBlockPlugins'
 
 // Initialize the global chk instance if it's not already
 // if (!window.checks) {

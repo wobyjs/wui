@@ -194,18 +194,27 @@ const NumberField: Defaulted<typeof def> = defaults(def, (props) => {
                 // `!bg-transparent` outranks Button's own `disabled:bg-...`, so a disabled
                 // step button was indistinguishable from a live one. The `disabled:` variant
                 // adds a pseudo-class, so at equal !important it wins over the flat rule.
-                type="icon" cls="!rounded-none !rounded-l-md !w-10 !h-10 !border-r !border-gray-200 !bg-transparent disabled:!bg-[#d9dbda] disabled:!text-[#00000061] disabled:!cursor-not-allowed"
+                //
+                // 8x9 and not a square 10: the field is used inside property rows, where a
+                // 40px step button stood taller than the text fields beside it and read as
+                // the loudest thing in the row. 36px matches their height, and a stepper
+                // wants less width than height anyway.
+                type="icon" cls="!rounded-none !rounded-l-md !w-8 !h-9 !border-r !border-gray-200 !bg-transparent disabled:!bg-[#d9dbda] disabled:!text-[#00000061] disabled:!cursor-not-allowed"
                 buttonFunction="button"
                 onPointerDown={() => { startContinuousUpdate(false); }}
                 onPointerUp={stopUpdate}
                 onPointerLeave={stopUpdate}
                 disabled={cantMin}>
-                <span class="py-4 px-2 text-lg font-semibold">-</span>
+                <span class="text-base leading-none font-semibold select-none">-</span>
             </Button>
             <input
                 ref={inputRef}
                 class={[
-                    "w-16 text-center border-none bg-transparent focus:outline-none focus:ring-0 text-lg font-semibold text-gray-700",
+                    // `flex-auto` and not a plain width: the field is handed `w-full` in a property
+                    // row, and with a fixed-width input the two step buttons huddled at the left
+                    // edge with a third of the box empty behind the `+`. Basis stays `auto`, so the
+                    // 4rem below is still the intrinsic size wherever the field is left to size itself.
+                    "w-16 flex-auto min-w-0 text-center border-none bg-transparent focus:outline-none focus:ring-0 text-base font-semibold text-gray-700",
                     "disabled:text-[#00000061] disabled:cursor-not-allowed",
                     "[-moz-appearance:textfield] [&::-webkit-inner-spin-button]:hidden [&::-webkit-outer-spin-button]:hidden",
                     () => $$(error) ? "text-red-500" : ""
@@ -239,12 +248,12 @@ const NumberField: Defaulted<typeof def> = defaults(def, (props) => {
             <Button
                 // class={[btnCls, "plus"]}
                 // cls="plus"
-                type="icon" cls="!rounded-none !rounded-r-md !w-10 !h-10 !border-l !border-gray-200 !bg-transparent disabled:!bg-[#d9dbda] disabled:!text-[#00000061] disabled:!cursor-not-allowed"
+                type="icon" cls="!rounded-none !rounded-r-md !w-8 !h-9 !border-l !border-gray-200 !bg-transparent disabled:!bg-[#d9dbda] disabled:!text-[#00000061] disabled:!cursor-not-allowed"
                 onPointerDown={() => { startContinuousUpdate(true); }}
                 onPointerUp={stopUpdate}
                 onPointerLeave={stopUpdate}
                 disabled={cantMax} >
-                <span class="py-4 px-2 text-lg font-semibold">+</span>
+                <span class="text-base leading-none font-semibold select-none">+</span>
             </Button >
             {children}
         </div >

@@ -257,6 +257,50 @@ export interface EditorPlugin {
      * is the escape hatch for a component you cannot change.
      */
     anchor?: (el: HTMLElement) => HTMLElement
+
+    /**
+     * Where a page ends, when this plugin's element is a page break of some kind.
+     *
+     * This is what lets the editor's `page` layout paginate a document without knowing a
+     * single one of the host app's tag names: pagination is *authored* in the document as
+     * ordinary blocks, and this field is how a block says so.
+     *
+     *   'before'    the page ends immediately before this element
+     *   'after'     the page ends immediately after it
+     *   'own-page'  the element is a page: nothing shares a sheet with it
+     *   'none'      not a break (the default, and the same as omitting the field)
+     *
+     * Use the function form when the answer lives in the element's own attributes -- a
+     * break block with a "break before / break after" switch is the usual case.
+     *
+     * A block with no plugin, or a plugin that omits this, can still break a page with
+     * plain CSS: `break-before: page` is honoured as a fallback. See PageLayout.ts.
+     */
+    pageBreak?: PageBreakKind | ((el: HTMLElement) => PageBreakKind)
+
+    /**
+     * This element's light DOM is the document's, not the plugin's.
+     *
+     * Most plugins keep everything in attributes, and that is what makes the plain
+     * click-to-select rule safe: click the host, the panel opens, Backspace removes the
+     * whole widget. A *container* -- a cover page whose photo is a backdrop for ordinary
+     * prose, a callout box -- inverts that. Its children are the author's text, and
+     * selecting the host every time the caret is placed in that text would put the whole
+     * page one Backspace away from deletion.
+     *
+     * Set this and the editor splits clicks by where they actually land:
+     *
+     *   shadow DOM / the host itself   selects the block (the panel, the handles, delete)
+     *   a light-DOM descendant        falls through to the caret, like any other text
+     *
+     * Which is why a container needs a piece of shadow chrome the author can aim at --
+     * `wui-cover-page` covers the whole sheet with the photo behind the text, so any click
+     * that misses the words selects the block.
+     *
+     * Off by default: `<wui-icon-button><svg/></wui-icon-button>` has light-DOM children
+     * too, and it is not a container -- it must stay selectable by clicking its icon.
+     */
+    editableContent?: boolean
 }
 
 // Internal type for insert menu items (matches what InsertDropDown renders)
@@ -311,6 +355,11 @@ export const getEditorPlugins = (): Observable<EditorPlugin[]> => registeredPlug
 export const getPluginForElement = (el: HTMLElement): EditorPlugin | undefined =>
     $$(registeredPlugins).find(p => p.tagName.toUpperCase() === el.tagName.toUpperCase())
 
+/**
+ * How an element interrupts the flow of pages. See {@link EditorPlugin.pageBreak}.
+ */
+export type PageBreakKind = 'none' | 'before' | 'after' | 'own-page'
+
 /** What `resizable: true`, and every omitted field of a {@link ResizableSpec}, mean. */
 const RESIZE_DEFAULTS = {
     write: 'style',
@@ -338,6 +387,28 @@ export const resolveResizable = (el: HTMLElement | null | undefined): ResizableS
 /** The box to measure for `el` -- its plugin's {@link EditorPlugin.anchor}, else `el` itself. */
 export const resolveAnchor = (el: HTMLElement): HTMLElement =>
     getPluginForElement(el)?.anchor?.(el) ?? el
+
+/** How `el` breaks a page, per its plugin's {@link EditorPlugin.pageBreak}. `'none'` if it does not. */
+export const resolvePageBreak = (el: HTMLElement | null | undefined): PageBreakKind => {
+    if (!el) return 'none'
+    const spec = getPluginForElement(el)?.pageBreak
+    if (!spec) return 'none'
+    return (typeof spec === 'function' ? spec(el) : spec) || 'none'
+}
+
+/**
+ * Tag names of every registered plugin that declares a {@link EditorPlugin.pageBreak}.
+ *
+ * Pagination uses this to find a break that is nested inside the flow-level node rather
+ * than being it -- an app that wraps each block in a frame of its own puts the break one
+ * level down, and this is how it is reached without wui knowing the wrapper's shape.
+ */
+export const pageBreakTagNames = (): string[] =>
+    $$(registeredPlugins).filter(p => p.pageBreak).map(p => p.tagName)
+
+/** Upper-case tag names of every plugin that declares {@link EditorPlugin.editableContent}. */
+export const editableContentTagNames = (): string[] =>
+    $$(registeredPlugins).filter(p => p.editableContent).map(p => p.tagName.toUpperCase())
 
 /** Commit a resized `width` / `height` (px) to `el`, the way its spec asks for. */
 export const applyResize = (el: HTMLElement, spec: ResizableSpec, width: number, height: number): void => {

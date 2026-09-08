@@ -221,47 +221,66 @@ const TablePopupMenu = () => {
     }
 
     // Cell formatting
+
+    /**
+     * A colour input only accepts #rrggbb. Reading one back off a style property
+     * gives rgb(r, g, b), which the input rejects and silently replaces with black
+     * -- so the picker opened on the wrong colour even once it opened at all.
+     */
+    const toHex = (v: string): string => {
+        const m = /rgba?\(([^)]+)\)/.exec(v)
+        if (m) {
+            const [r, g, b] = m[1].split(',').map(n => Math.max(0, Math.min(255, parseInt(n, 10) || 0)))
+            return '#' + [r, g, b].map(n => n.toString(16).padStart(2, '0')).join('')
+        }
+        return /^#[0-9a-f]{6}$/i.test(v) ? v : ''
+    }
+
+    /**
+     * Open a colour picker and apply what the user chose.
+     *
+     * The input has to be in the document. Chrome runs a colour input's activation
+     * behaviour only for an element with a layout object, so the detached
+     * createElement('input') these three buttons used raised no picker, never fired
+     * change, and made the buttons do nothing whatsoever. It is taken out again as
+     * soon as the picker settles, and any earlier one is swept first so a dismissed
+     * picker cannot leave a node behind.
+     */
+    const pickColour = (initial: string, apply: (hex: string) => void) => {
+        document.querySelectorAll('[data-wui-colour-probe]').forEach(n => n.remove())
+        const input = document.createElement('input')
+        input.type = 'color'
+        input.value = toHex(initial) || '#000000'
+        input.setAttribute('data-wui-colour-probe', '')
+        // Out of flow, invisible and untargetable: nothing shifts, nothing else can hit it.
+        input.style.cssText = 'position:fixed;left:-9999px;top:0;width:0;height:0;opacity:0;pointer-events:none'
+        input.onchange = () => { apply(input.value); saveDo(); input.remove() }
+        // A dismissed picker fires no change at all; losing focus is the only close signal.
+        input.addEventListener('blur', () => input.remove())
+        document.body.appendChild(input)
+        input.click()
+    }
+
     const setCellBgColor = () => {
         const cell = getCurrentCell()
         if (!cell) return
-        const input = document.createElement('input')
-        input.type = 'color'
-        input.value = cell.style.backgroundColor || '#ffffff'
-        input.onchange = () => {
-            cell.style.backgroundColor = input.value
-            saveDo()
-        }
-        input.click()
+        pickColour(cell.style.backgroundColor || '#ffffff', hex => { cell.style.backgroundColor = hex })
     }
 
     const setCellBorderColor = () => {
         const cell = getCurrentCell()
         if (!cell) return
-        const input = document.createElement('input')
-        input.type = 'color'
-        const currentBorder = cell.style.borderColor || '#cccccc'
-        input.value = currentBorder
-        input.onchange = () => {
-            cell.style.borderColor = input.value
-            // Ensure border is visible
-            if (!cell.style.borderWidth) cell.style.border = `1px solid ${input.value}`
-            else cell.style.borderColor = input.value
-            saveDo()
-        }
-        input.click()
+        pickColour(cell.style.borderColor || '#cccccc', hex => {
+            // A colour on a cell with no border width would not show; give it one.
+            if (!cell.style.borderWidth) cell.style.border = `1px solid ${hex}`
+            else cell.style.borderColor = hex
+        })
     }
 
     const setCellTextColor = () => {
         const cell = getCurrentCell()
         if (!cell) return
-        const input = document.createElement('input')
-        input.type = 'color'
-        input.value = '#000000'
-        input.onchange = () => {
-            cell.style.color = input.value
-            saveDo()
-        }
-        input.click()
+        pickColour(cell.style.color || '#000000', hex => { cell.style.color = hex })
     }
 
     const toggleBorder = () => {
