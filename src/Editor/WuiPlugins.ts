@@ -2,7 +2,7 @@
  * WUI Component Plugins for wui-editor.
  *
  * Registers wui-* components (button, toggle-button, checkbox, switch,
- * text-field, text-area, number-field, icon-button, badge, fab, avatar)
+ * text-field, text-area, number-field, icon-button, badge, fab, avatar, banner)
  * as editor plugins so they appear in the insert menu and support property editing.
  *
  * Import this file as a side-effect to register all plugins:
@@ -10,6 +10,8 @@
  */
 import { registerEditorPlugin, type PluginProp } from './EditorPlugin'
 import { getBaseCls } from '../helper/baseCls'
+import { insertAsBlock, editImageAttr } from './BlockInsert'
+import { BANNER } from '../Banner'
 
 /**
  * Styling props shared by every wui component, appended last so they render
@@ -648,5 +650,139 @@ registerEditorPlugin({
         const sel = (root instanceof ShadowRoot) ? root.getSelection() : window.getSelection()
         sel?.removeAllRanges()
         sel?.addRange(newRange)
+    },
+})
+// ── wui-banner ──
+
+/**
+ * The page header. Unlike every other plugin in this file it is a *block*, so it gets the
+ * shared block insertion from BlockInsert.ts rather than dropping at the caret — a banner
+ * dropped inside a `<p>` inherits that paragraph's margins and stops being a strip.
+ *
+ * `editableContent: true`, for the reason `wui-cover-page` has it: the words on a banner are
+ * the author's slotted light DOM, and a container that selected itself every time you clicked
+ * its text would put the heading one Backspace away from deletion. Clicking the backdrop
+ * selects the block and opens this panel; clicking the words places the caret.
+ *
+ * No `pageBreak`. A cover owns its sheet; a banner heads whatever page it happens to be on,
+ * including one that continues the page before it.
+ *
+ * Every default below is read from BANNER — the component's own fallbacks — because the panel
+ * strips an attribute whose value equals the schema default, and a schema that disagrees with
+ * the component makes the widget silently revert the moment you set that value.
+ */
+const bannerProps: PluginProp[] = [
+    {
+        name: 'type', type: 'enum', label: 'Background', default: BANNER.type,
+        options: [
+            { value: 'image', label: 'Image' },
+            { value: 'solid', label: 'Solid colour' },
+            { value: 'gradient', label: 'Gradient' },
+        ],
+    },
+    {
+        name: 'src', type: 'string', label: 'Image', default: BANNER.src,
+        hint: 'Any URL or data URI, used when Background is "Image". "Edit…" opens the crop/replace dialog.',
+        action: {
+            label: 'Edit…',
+            title: 'Crop or replace the banner image',
+            run: el => editImageAttr(el, 'src'),
+        },
+    },
+    {
+        name: 'focus', type: 'enum', label: 'Focus', default: BANNER.focus,
+        hint: 'Which part of the image survives the crop to the strip.',
+        options: [
+            { value: 'center', label: 'Center' },
+            { value: 'top', label: 'Top' },
+            { value: 'bottom', label: 'Bottom' },
+            { value: 'left', label: 'Left' },
+            { value: 'right', label: 'Right' },
+        ],
+    },
+    {
+        name: 'scrim', type: 'enum', label: 'Scrim', default: BANNER.scrim,
+        hint: 'The wash of colour between photo and words that keeps text readable over a busy image. Image backgrounds only.',
+        options: [
+            { value: 'left', label: 'Fade right from left' },
+            { value: 'right', label: 'Fade left from right' },
+            { value: 'bottom', label: 'Fade up from bottom' },
+            { value: 'top', label: 'Fade down from top' },
+            { value: 'full', label: 'Even, whole strip' },
+            { value: 'none', label: 'None (bare photo)' },
+        ],
+    },
+    {
+        name: 'overlay', type: 'number', label: 'Scrim %', default: BANNER.overlay,
+        hint: 'How strong that wash is, 0–100.',
+    },
+    {
+        name: 'tint', type: 'color', label: 'Tint', default: BANNER.tint,
+        hint: 'The scrim colour over an image, the fill for a solid, the first stop of a gradient.',
+    },
+    {
+        name: 'tint2', type: 'color', label: 'Gradient end', default: BANNER.tint2,
+        hint: 'The second stop, used when Background is "Gradient".',
+    },
+    { name: 'ink', type: 'color', label: 'Text colour', default: BANNER.ink },
+    {
+        name: 'shadow', type: 'boolean', label: 'Text shadow', default: BANNER.shadow,
+        hint: 'A soft halo that holds white text together over a photo. Dropped when printing.',
+    },
+    {
+        name: 'height', type: 'string', label: 'Height', default: BANNER.height,
+        hint: 'Any CSS length — 7rem, 28mm, 120px.',
+    },
+    {
+        name: 'pad', type: 'string', label: 'Padding', default: BANNER.pad,
+        hint: 'Any CSS padding shorthand, e.g. 0.75rem 1rem.',
+    },
+    {
+        name: 'align', type: 'enum', label: 'Text at', default: BANNER.align,
+        options: [
+            { value: 'start', label: 'Left' },
+            { value: 'center', label: 'Centre' },
+            { value: 'end', label: 'Right' },
+        ],
+    },
+    {
+        name: 'logo', type: 'string', label: 'Logo', default: BANNER.logo,
+        hint: 'Empty means no logo — that absence is the only "off" switch there is.',
+        action: {
+            label: 'Edit…',
+            title: 'Crop or replace the logo',
+            run: el => editImageAttr(el, 'logo'),
+        },
+    },
+    { name: 'logoHeight', type: 'string', label: 'Logo height', default: BANNER.logoHeight },
+    {
+        name: 'print', type: 'boolean', label: 'Print width', default: BANNER.print,
+        hint: 'The su-yen preset: 209mm wide, centred, ruled, and set large and bold.',
+    },
+]
+
+registerEditorPlugin({
+    name: 'banner',
+    label: 'Banner',
+    tagName: 'wui-banner',
+    props: [...bannerProps, ...styleProps],
+    // A backdrop, not a template: what sits on it is the author's, and clicking it types
+    // rather than selects. See EditorPlugin.editableContent.
+    editableContent: true,
+    icon: () => {
+        const span = document.createElement('span')
+        span.textContent = '🎏'
+        return span
+    },
+    onInsert: (editorRoot, range) => {
+        const el = document.createElement('wui-banner')
+        // Seeded rather than left empty, because an empty banner gives the caret nowhere to
+        // land: it would be a coloured strip you can select but not write on.
+        const h = document.createElement('h2')
+        h.textContent = 'Page title'
+        const p = document.createElement('p')
+        p.textContent = 'A line of subtitle.'
+        el.append(h, p)
+        insertAsBlock(editorRoot, range, el)
     },
 })

@@ -35,7 +35,8 @@
 
 import { registerEditorPlugin, type PluginProp } from './EditorPlugin'
 import { PAGE_H_VAR } from './PageLayout'
-import { openImageEditor } from './ImageEditor'
+import { rgbTriple } from './colorUtils'
+import { insertAsBlock, editImageAttr } from './BlockInsert'
 
 /**
  * The sheet height, as a CSS length.
@@ -59,98 +60,6 @@ const sheet = (css: string) => {
     const el = document.createElement('style')
     el.textContent = css
     return el
-}
-
-/**
- * `#rrggbb` (or `#rgb`) as the `r,g,b` triple an `rgba()` needs.
- *
- * The scrim fades from a colour to *that same colour at zero alpha*, and `transparent` is
- * not that — it is transparent black, so a light scrim would fade through grey on the way
- * out. Splitting the channels is the only way to hold the hue steady across the fade.
- * Anything unparseable falls back to the default slate rather than painting nothing.
- */
-const rgb = (hex: string): string => {
-    const h = hex.trim().replace('#', '')
-    const full = h.length === 3 ? h.split('').map(c => c + c).join('') : h
-    if (!/^[0-9a-f]{6}$/i.test(full)) return '15,23,42'
-    const n = parseInt(full, 16)
-    return `${(n >> 16) & 255},${(n >> 8) & 255},${n & 255}`
-}
-
-/**
- * Put `el` on the surface as a flow-level block and leave the caret after it.
- *
- * A page-sized block cannot be inserted at the caret the way an inline widget can: dropped
- * inside a `<p>` it becomes a block box in an inline context, and the paragraph's own
- * margins push it off the sheet it is supposed to fill. So climb to the flow-level ancestor
- * — the child of the surface the caret is inside — and insert after that instead.
- */
-const insertAsBlock = (editorRoot: HTMLElement, range: Range, el: HTMLElement) => {
-    const doc = editorRoot.ownerDocument
-
-    let anchor: Node | null = range.startContainer
-    while (anchor && anchor.parentNode && anchor.parentNode !== editorRoot) anchor = anchor.parentNode
-    if (anchor && anchor.parentNode === editorRoot) editorRoot.insertBefore(el, anchor.nextSibling)
-    else editorRoot.appendChild(el)
-
-    // A block inserted as the last child leaves nowhere to type; give the author a landing
-    // paragraph rather than a document that cannot be continued.
-    let after = el.nextElementSibling as HTMLElement | null
-    if (!after) {
-        after = doc.createElement('p')
-        after.appendChild(doc.createElement('br'))
-        editorRoot.appendChild(after)
-    }
-
-    const r = doc.createRange()
-    r.setStart(after, 0)
-    r.collapse(true)
-    const root = editorRoot.getRootNode()
-    const sel = root instanceof ShadowRoot ? (root as any).getSelection?.() : window.getSelection()
-    sel?.removeAllRanges()
-    sel?.addRange(r)
-}
-
-/**
- * Hand `el`'s image attribute to the shared image editor.
- *
- * `wui-image-editor` is the editor's one image dialog — the same crop/replace/restore panel
- * an ordinary `<img>` gets — and it works on an `<img>`. These plugins have no light-DOM
- * image to give it, so it gets a hidden proxy instead, seeded from the attribute, with
- * `onApply` diverting the result back to the attribute rather than to the proxy's `src`.
- *
- * One proxy **per host**, kept alive in a WeakMap, because the proxy is where the dialog
- * records `data-image-origin` — the pre-crop URL that "Restore original" restores to, and
- * that keeps a second crop from compounding on the first. A single shared proxy loses that
- * on every open, so Restore never appears; worse, `rememberImageOrigin` refuses to overwrite
- * an origin that is already on record, so the second block to be edited would inherit the
- * first one's original and Restore would put the *wrong* picture back.
- *
- * The proxy lives in `el.getRootNode()` — the editor's own shadow root — on purpose:
- * `openImageEditor` mounts its dialog into the image's root node, and a proxy parked inside
- * the cover's `overflow: hidden`, one-page-tall box would clip the dialog out of existence.
- */
-const proxies = new WeakMap<HTMLElement, HTMLImageElement>()
-
-const editImageAttr = (el: HTMLElement, attr: string) => {
-    const root = el.getRootNode()
-    const host = (root instanceof ShadowRoot ? root : document.body) as ParentNode & Node
-
-    let proxy = proxies.get(el)
-    if (!proxy || !proxy.isConnected) {
-        proxy = document.createElement('img')
-        proxy.setAttribute('data-wui-block-proxy', '')
-        proxy.style.display = 'none'
-        host.appendChild(proxy)
-        proxies.set(el, proxy)
-    }
-
-    // Only when it actually differs: assigning the same value still restarts the load, and
-    // the dialog measures the image as soon as it opens.
-    const src = el.getAttribute(attr) ?? ''
-    if ((proxy.getAttribute('src') ?? '') !== src) proxy.setAttribute('src', src)
-
-    openImageEditor(proxy, { onApply: next => el.setAttribute(attr, next) })
 }
 
 // ─────────────────────────────────────────────────────────────────────────────────────────
@@ -295,7 +204,7 @@ class WuiCoverPage extends HTMLElement {
         // Percent rather than a 0–1 fraction: the panel's number row steps by 1, which makes
         // a fraction a four-keystroke edit and a percentage a one-keystroke one.
         const a = Math.min(1, Math.max(0, num('overlay', COVER.overlay) / 100))
-        const c = rgb(attr('tint', COVER.tint))
+        const c = rgbTriple(attr('tint', COVER.tint))
         const stop = (at: number) => `rgba(${c},${at})`
         const scrim = attr('scrim', COVER.scrim)
         this.tint.style.background =

@@ -122,6 +122,30 @@
                  deletable without switching layouts. Select it and the panel offers Break (page starts / page
                  ends here) and a Name for the marker. -->
             <wui-page-break></wui-page-break>
+            <!-- ── A page banner ─────────────────────────────────────────────────
+                 `wui-banner` is the strip that heads a page — su-yen's `<sy-banner>`
+                 with everything it hard-codes pulled out into attributes. The photo,
+                 the wash of colour over it, the ink, the height and the logo are all
+                 typed rows in the property panel; `logo` empty is how a banner says
+                 it has no logo, which is why there is no separate flag for it.
+
+                 Like the cover below it, it is a *background*, not a template: the
+                 heading and the line under it are plain light DOM, edited exactly
+                 like the rest of the document. A click on the strip selects the
+                 block; a click on the words puts the caret in them.
+
+                 Unlike the cover it claims no sheet of its own — no `pageBreak` — so
+                 it heads whatever page it lands on, including one that continues the
+                 page before it. Turn on **Print width** in the panel for the su-yen
+                 preset: 209mm, centred, ruled, large and bold. -->
+            <wui-banner
+                src="https://picsum.photos/seed/wui-banner/1200/220"
+                logo="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><circle cx='32' cy='32' r='29' fill='none' stroke='%23fff' stroke-width='4'/><path d='M14 22l9 24 9-18 9 18 9-24' fill='none' stroke='%23fff' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'/></svg>"
+                overlay="70">
+                <h2 style="font-size: 20pt; line-height: 1.15; letter-spacing: -.01em;">Quarterly Report</h2>
+                <p style="font-size: 10pt; opacity: .9;">Everything on this strip is ordinary editable content — type in it.</p>
+            </wui-banner>
+
             <h2>✏️ Editor Content - Test Here!</h2>
             <p>Welcome to the WUI Rich Text Editor!</p>
             <p>This is a <strong>full toolbar demo</strong> for testing Phase 18 fixes.</p>

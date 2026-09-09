@@ -20,6 +20,7 @@ import './src/IconButton'
 import './src/Badge'
 import './src/Fab'
 import './src/Avatar'
+import './src/Banner'
 
 import './src/Editor/CounterPlugin.ts'
 import './src/Editor/WuiPlugins.ts'

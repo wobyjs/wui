@@ -83,3 +83,16 @@ export function hsvToRgb({ h, s, v }: HSV): RGB {
         b: Math.round(b * 255)
     }
 }
+
+/**
+ * `#rrggbb` (or `#rgb`) as the `r,g,b` triple an `rgba()` needs.
+ *
+ * A scrim fades from a colour to *that same colour at zero alpha*, and `transparent` is not
+ * that — it is transparent black, so a light scrim would fade through grey on the way out.
+ * Splitting the channels is the only way to hold the hue steady across the fade. Anything
+ * unparseable falls back to `fallback` rather than painting nothing.
+ */
+export function rgbTriple(hex: string, fallback = '15,23,42'): string {
+    const c = hexToRgb((hex ?? '').trim())
+    return c ? `${c.r},${c.g},${c.b}` : fallback
+}
