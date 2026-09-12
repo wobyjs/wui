@@ -90,6 +90,12 @@ export const ImageDialog = (): JSX.Element => {
     /** Guards against a slow fetch resolving after the user has moved on. */
     let previewToken = 0
 
+    /**
+     * The preview currently resolving, so {@link insert} can wait for it instead of
+     * racing it. See the comment there for what the race used to cost.
+     */
+    let previewing: Promise<void> | null = null
+
     const setNote = (text: string, tone: 'info' | 'warn' = 'info') => {
         if (!noteEl) return
         noteEl.textContent = text
@@ -99,9 +105,36 @@ export const ImageDialog = (): JSX.Element => {
             : 'text-[11px] leading-snug text-gray-500'
     }
 
+    /**
+     * Show that something is loading -- without taking the Insert button away.
+     *
+     * It used to disable Insert, and that was the whole of the "first press does nothing"
+     * bug rather than just half of it. Pressing Insert after typing a URL blurs the field,
+     * the blur starts a preview, the preview disables the button -- all between the press
+     * and the release, so the browser never dispatched a click at all. Nothing ran, nothing
+     * warned, and the author pressed again.
+     *
+     * {@link insert} waits for the preview instead, so there is nothing left for the
+     * disabled state to protect against; `aria-busy` says the same thing to assistive tech
+     * without intercepting the gesture.
+     */
     const setBusy = (busy: boolean) => {
-        if (insertBtn) insertBtn.disabled = busy
         if (rootEl) rootEl.style.cursor = busy ? 'progress' : ''
+        if (insertBtn) insertBtn.setAttribute('aria-busy', busy ? 'true' : 'false')
+    }
+
+    /**
+     * Start a preview and publish it, so callers can either fire and forget (`void
+     * preview()`) or wait for the result, which is what {@link insert} does.
+     */
+    const preview = () => {
+        const p = runPreview()
+        previewing = p
+        // Cleared whichever way it settles -- `runPreview` catches its own failures, but a
+        // stuck flag would make every later Insert await a promise that is already done.
+        const done = () => { if (previewing === p) previewing = null }
+        p.then(done, done)
+        return p
     }
 
     /**
@@ -109,8 +142,11 @@ export const ImageDialog = (): JSX.Element => {
      *
      * `resolveImageSource` is what decides whether the result is embeddable bytes or a
      * plain link, so the dialog does not repeat that judgement -- it only reports it.
+     *
+     * Never rejects: every failure ends as a note in the dialog, so the promise
+     * {@link preview} hands out is always safe to await.
      */
-    const preview = async () => {
+    const runPreview = async () => {
         const token = ++previewToken
         const source = rawSource.trim()
         if (!source) {
@@ -177,6 +213,9 @@ export const ImageDialog = (): JSX.Element => {
         previewSrc = ''
         embedded = false
         previewToken++
+        // Abandoned along with its token: a preview from the previous session must not
+        // be something the next Insert waits for.
+        previewing = null
         cropper?.clear()
         if (srcInput) srcInput.value = ''
         if (altInput) altInput.value = ''
@@ -189,6 +228,9 @@ export const ImageDialog = (): JSX.Element => {
 
     const close = () => {
         previewToken++
+        // Abandoned along with its token: a preview from the previous session must not
+        // be something the next Insert waits for.
+        previewing = null
         savedRange = null
         cropper?.clear()
         if (rootEl) rootEl.style.display = 'none'
@@ -201,7 +243,35 @@ export const ImageDialog = (): JSX.Element => {
         return document.querySelector('wui-editor')
     }
 
-    const insert = () => {
+    /**
+     * Guards {@link runInsert} against a second press arriving while the first is still
+     * waiting for a preview. Insert is no longer disabled while one loads (see
+     * {@link setBusy}), so without this an impatient double press inserted two images.
+     */
+    let inserting = false
+
+    const insert = async () => {
+        if (inserting) return
+        inserting = true
+        try { await runInsert() } finally { inserting = false }
+    }
+
+    const runInsert = async () => {
+        // Typing in the field only records the text: resolving it is deferred to `change`,
+        // Enter or blur, because every keystroke would otherwise start a fetch. Pressing
+        // Insert straight after typing therefore arrives with the preview that the press's
+        // own blur just started still in flight -- and reading `previewSrc` at that moment
+        // found it empty, so the click warned "Enter an image URL" and inserted nothing,
+        // after which the resolving preview overwrote the warning with "Embedded — 5 KB".
+        // The author saw a success message, no image, and had to press Insert twice.
+        //
+        // Three steps, in order: take whatever the field says (in case no event has fired
+        // at all), start a preview if nothing has resolved and nothing is running, then
+        // wait for whichever preview is in flight before judging the result.
+        if (!fieldShowsSummary && srcInput && srcInput.value !== rawSource) onSrcInput()
+        if (!previewing && !previewSrc && rawSource.trim()) void preview()
+        if (previewing) await previewing
+
         if (!previewSrc) {
             setNote('Enter an image URL, or choose a file.', 'warn')
             return

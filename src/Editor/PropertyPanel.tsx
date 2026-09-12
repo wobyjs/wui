@@ -478,11 +478,90 @@ const MIN_W = 240
             // Clicks that land outside the panel are handled by handlePointerDown.
         }
 
+        /**
+         * Committing a panel field leaves the focus nowhere, which takes the whole
+         * editor off the keyboard.
+         *
+         * Two field kinds do it. `TextField assignOnEnter` blurs itself to commit, and a
+         * native `<select>` drops focus once its popup closes; in both cases
+         * `document.activeElement` falls back to `<body>` and nothing claims it. The blur
+         * is deliberate -- it is what the `panelFocused` note above describes -- but the
+         * fallout is not: the undo shortcut is bound to the editable surface, so after
+         * editing one property Ctrl+Z did nothing at all. Not because the history was
+         * empty (the toolbar's Undo button unwound the very same edits) but because the
+         * keystroke was being delivered to the document body.
+         *
+         * So put it back on the surface the edit belongs to. The component stays
+         * node-selected, and undo, redo and the arrow navigation are live again on the
+         * next keystroke.
+         *
+         * Two events, not one. The commit is not synchronous with the keystroke that
+         * asks for it -- measured, a text field lets go of the focus about half a second
+         * after Enter -- so a deferred check on the keydown runs while the input still
+         * holds focus, reads that as "the field kept it", and does nothing at all. That
+         * was the first attempt, and it changed no behaviour. So the keystroke (or the
+         * `change`, for the fields that never see an Enter here at all: a select's popup
+         * swallows it) only arms this, and the focusout that follows acts on it.
+         *
+         * The arming matters as much as the acting. A bare "focus left the panel to
+         * nowhere" rule looks equivalent and is not: opening a select's popup blurs the
+         * page exactly that way *before* anything is committed, and pulling the focus
+         * back there drops the node selection and closes the panel mid-edit. Only a blur
+         * that follows a commit is one we may answer.
+         *
+         * A focusout that names where it is going is left alone -- a field handing focus
+         * onward, Tab to the next row, a click that has already chosen its target. So is
+         * one from a colour swatch, whose native picker fires `change` as you drag and
+         * would be dismissed the instant we pulled the focus back.
+         */
+        let commitArmed: ReturnType<typeof setTimeout> | undefined
+        const disarm = () => { clearTimeout(commitArmed); commitArmed = undefined }
+        // Long enough to outlast the field's own deferred commit, short enough that an
+        // idle blur minutes later is not mistaken for one.
+        const arm = () => { disarm(); commitArmed = setTimeout(disarm, 1500) }
+
+        const handleCommitKey = (e: KeyboardEvent) => {
+            if (e.key === 'Enter' && !e.shiftKey) arm()
+        }
+        const handleCommitChange = () => arm()
+
+        const handleCommitBlur = (e: FocusEvent) => {
+            if (commitArmed === undefined || e.relatedTarget) return
+            const from = e.composedPath()[0]
+            if (from instanceof HTMLInputElement && from.type === 'color') return
+            // After the focusout has settled, not during it. Two reasons, and the second
+            // is why this waits rather than deferring a bare tick: the focus is still
+            // formally on the blurring field while the event runs, so focusing anything
+            // else here is undone as the browser tears the old focus down -- and a select
+            // whose popup is open blurs the page while *keeping* the select focused
+            // underneath, reporting `<body>` for a moment in between. Look once the dust
+            // has settled and that case reads correctly as "the field still has it".
+            setTimeout(() => {
+                const active = (root as Document | ShadowRoot).activeElement
+                // Still in the panel: the field kept the focus, or handed it to a
+                // sibling row. Stay armed -- the commit's own blur may still be coming.
+                if (active && active !== host && panel.contains(active)) return
+                disarm()
+                const surface = shadow?.querySelector('[data-editor-root]')
+                    ?? document.querySelector('[data-editor-root]')
+                if (surface instanceof HTMLElement) surface.focus({ preventScroll: true })
+            }, 200)
+        }
+
         panel.addEventListener('focusin', handleFocusIn as EventListener)
         panel.addEventListener('focusout', handleFocusOut as EventListener)
+        // Capture on all three, so a field that stops its own Enter, or swallows the
+        // change or the focusout it causes, cannot hide them from this.
+        panel.addEventListener('keydown', handleCommitKey as EventListener, true)
+        panel.addEventListener('change', handleCommitChange, true)
+        panel.addEventListener('focusout', handleCommitBlur as EventListener, true)
         return () => {
             panel.removeEventListener('focusin', handleFocusIn as EventListener)
             panel.removeEventListener('focusout', handleFocusOut as EventListener)
+            panel.removeEventListener('keydown', handleCommitKey as EventListener, true)
+            panel.removeEventListener('change', handleCommitChange, true)
+            panel.removeEventListener('focusout', handleCommitBlur as EventListener, true)
+            disarm()
         }
     })
 
@@ -500,6 +579,7 @@ const MIN_W = 240
         // selecting text fails to update the property panel.
         let lastPointerTarget: HTMLElement | null = null
         let lastPointerInPanel = false
+        let lastPointerInEditor = false
         let imageCheckTimer: ReturnType<typeof setTimeout> | null = null
 
         const handlePointerDown = (e: PointerEvent) => {
@@ -508,6 +588,13 @@ const MIN_W = 240
             // Clicking (or dragging) the panel itself is not a selection change.
             lastPointerInPanel = path.some(n =>
                 n instanceof HTMLElement && n.hasAttribute?.('data-property-panel'))
+            // Whether the press landed on the editable surface at all. composedPath()
+            // is what makes this answer right for a click inside a plugin's shadow
+            // root, where contains() stops at the host. The deferred check below uses
+            // it to tell "the user clicked in the document" from "the user clicked a
+            // toolbar button while the caret happened to be in the document".
+            lastPointerInEditor = path.some(n =>
+                n instanceof HTMLElement && n.hasAttribute?.('data-editor-root'))
 
             // Pointing at anything outside the panel is an unambiguous "I'm done
             // editing here". This is the release for panelFocused that focusout
@@ -573,14 +660,23 @@ const MIN_W = 240
                 // mark. Alt+click marks whatever box the pointer is over -- routinely a
                 // plain div or p, which classifyElement() calls 'text', not 'custom'. The
                 // old `type !== 'custom'` guard dropped exactly those, so the panel kept
-                // showing the previously targeted element. A click with no mark still has
-                // to be a custom element to retarget from here: plain text clicks are the
-                // selectionchange handler's business, and retargeting them on pointerdown
-                // would fire before the caret has moved.
+                // showing the previously targeted element.
+                //
+                // A plain text click is normally the selectionchange handler's business,
+                // but that handler only runs when the selection actually *changes*:
+                // clicking the spot the caret already occupies fires nothing at all. The
+                // panel then keeps whatever it was pointing at -- after a climb with the
+                // up arrow, an ancestor -- and the click looks like it did nothing. Worse,
+                // the next climb starts from that ancestor and skips the element the user
+                // just clicked. So take text clicks here too, as long as the press landed
+                // on the editable surface. Doing that on pointerdown is only safe because
+                // this runs in a setTimeout(0), after the press has placed the caret;
+                // detectSelectionType() reads that caret, so the answer is already final.
                 const markedNow = (editorRoot?.hasAttribute('data-element-selected')
                     ? editorRoot as HTMLElement
                     : editorRoot?.querySelector('[data-element-selected]')) as HTMLElement | null
-                if (type !== 'custom' && !(markedNow && element.isSameNode(markedNow))) return
+                const fromMark = !!markedNow && element.isSameNode(markedNow)
+                if (type !== 'custom' && !fromMark && !lastPointerInEditor) return
                 if (element.hasAttribute?.('data-editor-root')) return
                 if (!editorRoot?.contains(element)) return
 
@@ -834,6 +930,76 @@ const MIN_W = 240
         panelEl?.querySelectorAll('input, textarea').forEach(el =>
             el.dispatchEvent(new FocusEvent('blur')))
     }
+
+    /**
+     * Keep the document out from under the docked panel.
+     *
+     * The panel is a floating dialog: `position: fixed`, draggable, resizable. That is the
+     * right shape for a tool window, but it meant that simply opening it buried the right
+     * third of every line of text -- measured at 230px of overlap on a stock window, with
+     * a hit test at 85% of the line width landing on the panel instead of the paragraph.
+     * Nothing was broken, and nothing could be read.
+     *
+     * The fix is the one the navigation rail already uses: take the room out of layout, so
+     * the document is narrower rather than covered. Padding goes on the editor's body row
+     * rather than on the surface's own column, so the rail steps aside as well; PageLayout
+     * fits paper to that column and re-fits from its own ResizeObserver, so `page` mode and
+     * a `Fit` zoom follow along with nothing here having to tell them.
+     *
+     * Only while the panel is DOCKED. Once the author has dragged it they have said where
+     * they want it, and a document that reflowed to chase a window around the screen would
+     * be worse than one that lets it overlap.
+     */
+    const PANEL_GAP = 16
+    /** The docked geometry, matching the `w-[300px]` class and the `right: 24px` default. */
+    const DOCKED_W = 300
+    const DOCKED_RIGHT = 24
+    /** Narrower than this and reserving room costs more than the overlap it avoids. */
+    const MIN_DOC_W = 320
+
+    useEffect(() => {
+        // Read every dependency up front and unconditionally, so the effect re-runs when
+        // the panel opens, closes, is dragged away, or is resized.
+        const open = $$(panelOpen)
+        const dragged = !!$$(panelPos)
+        $$(panelSize)
+
+        const body = editorRootEl()?.closest('[data-editor-body]') as HTMLElement | null
+        if (!body) return
+
+        const clear = () => { body.style.paddingRight = '' }
+        if (!open || dragged) { clear(); return }
+
+        const apply = () => {
+            // Measured rather than assumed: the panel is resizable, and reading its real
+            // box is what stops these numbers drifting away from the class that sets them.
+            const box = panelEl?.getBoundingClientRect()
+            const left = box && box.width ? box.left : viewportW() - DOCKED_RIGHT - DOCKED_W
+            // Padding is inside the border box, so the row's own right edge does not move
+            // when this is applied -- the measurement cannot feed back into itself.
+            const right = body.getBoundingClientRect().right
+            const want = Math.max(0, Math.round(right - left + PANEL_GAP))
+            // A narrow editor can sit almost entirely behind the docked panel, and there the
+            // honest gutter is wider than the row itself -- which would squeeze the document
+            // to nothing. Below `MIN_DOC_W` there is no arrangement worth having, so the
+            // panel is left to overlap: a covered document still beats a vanished one.
+            const roomy = body.getBoundingClientRect().width - want >= MIN_DOC_W
+            const gutter = roomy ? want : 0
+            body.style.paddingRight = gutter ? `${gutter}px` : ''
+        }
+
+        // The panel has only just lost its `hidden` class, so it has no box to measure
+        // until the next frame.
+        const frame = requestAnimationFrame(apply)
+        // The panel is pinned to the viewport's right edge and the document is not, so the
+        // distance between them is a function of the window width.
+        window.addEventListener('resize', apply)
+        return () => {
+            cancelAnimationFrame(frame)
+            window.removeEventListener('resize', apply)
+            clear()
+        }
+    })
 
     return (
         <div

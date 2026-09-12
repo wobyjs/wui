@@ -75,14 +75,40 @@ const sheet = (css: string) => {
  */
 const COVER = {
     src: '',
+    deck: '',
+    slide: '',
+    ext: '.png',
     fit: 'cover',
     focus: 'center',
+    bg: '#0f172a',
     overlay: 55,
     scrim: 'bottom',
     tint: '#0f172a',
     ink: '#ffffff',
     pad: 18,
     align: 'end',
+}
+
+/**
+ * `src`, or the numbered-deck URL built from `deck` + `slide` + `ext`.
+ *
+ * The deck half is su-yen's `<sy-图页>` folded in. That element was this one under another
+ * name - one A4 sheet whose whole surface is a picture, with the author's words over it -
+ * differing only in that its picture was usually page N of an exported slide deck, so it
+ * took a number rather than a URL: `前缀="/assets/images/bazistrategic/Slide" 页="7"` for
+ * `/assets/images/bazistrategic/Slide7.png`. That is worth keeping, because the alternative
+ * is pasting forty near-identical URLs that differ by one digit, and because renaming the
+ * deck then means editing one attribute per page instead of forty.
+ *
+ * `src` wins when both are set, the same precedence 图页 had: an explicit URL is the more
+ * specific statement, and it is how one page of a numbered deck gets replaced by a one-off.
+ */
+const coverSrc = (el: HTMLElement) => {
+    const src = (el.getAttribute('src') ?? COVER.src).trim()
+    if (src) return src
+    const slide = (el.getAttribute('slide') ?? COVER.slide).trim()
+    if (!slide) return ''
+    return `${el.getAttribute('deck') ?? COVER.deck}${slide}${el.getAttribute('ext') ?? COVER.ext}`
 }
 
 /**
@@ -104,7 +130,11 @@ const COVER_CSS = `
     position: relative;
     overflow: hidden;
     height: ${PAGE_H};
-    background: #0f172a;
+    /* The paper behind the picture. It shows wherever the picture does not reach: the
+       letterbox bars under fit="contain", and the whole sheet before an image is chosen.
+       Dark by default because a cover is a photograph, but a slide deck exported onto white
+       needs white here or every page arrives with navy margins. */
+    background: var(--wui-cover-bg, #0f172a);
     break-before: page;
     page-break-before: always;
     break-inside: avoid;
@@ -142,7 +172,7 @@ const COVER_CSS = `
 `
 
 class WuiCoverPage extends HTMLElement {
-    static get observedAttributes() { return ['src', 'fit', 'focus', 'overlay', 'scrim', 'tint', 'ink', 'pad', 'align'] }
+    static get observedAttributes() { return ['src', 'deck', 'slide', 'ext', 'fit', 'focus', 'bg', 'overlay', 'scrim', 'tint', 'ink', 'pad', 'align'] }
 
     private img!: HTMLImageElement
     private hint!: HTMLElement
@@ -171,7 +201,7 @@ class WuiCoverPage extends HTMLElement {
 
         this.hint = div('hint')
         this.hint.setAttribute('part', 'placeholder')
-        this.hint.textContent = 'No cover image — set one in the properties panel.'
+        this.hint.textContent = 'No cover image — set a URL, or a deck and a slide number, in the properties panel.'
 
         this.tint = div('tint')
         this.tint.setAttribute('part', 'scrim')
@@ -194,12 +224,16 @@ class WuiCoverPage extends HTMLElement {
             return Number.isFinite(v) ? v : d
         }
 
-        const src = attr('src', COVER.src)
+        const src = coverSrc(this)
         this.img.src = src
         this.img.style.display = src ? 'block' : 'none'
         this.hint.style.display = src ? 'none' : 'flex'
         this.img.style.objectFit = attr('fit', COVER.fit)
         this.img.style.objectPosition = attr('focus', COVER.focus)
+        // A custom property rather than `style.background`, so the shadow rule stays the
+        // single place the paper colour is written and the host's own style attribute is
+        // the only thing this line touches.
+        this.style.setProperty('--wui-cover-bg', attr('bg', COVER.bg))
 
         // Percent rather than a 0–1 fraction: the panel's number row steps by 1, which makes
         // a fraction a four-keystroke edit and a percentage a one-keystroke one.
@@ -238,6 +272,18 @@ const coverProps: PluginProp[] = [
         },
     },
     {
+        name: 'deck', type: 'string', label: 'Deck', default: COVER.deck,
+        hint: 'URL up to but not including the page number, e.g. /assets/deck/Slide. Used only when Image is empty.',
+    },
+    {
+        name: 'slide', type: 'string', label: 'Slide no.', default: COVER.slide,
+        hint: 'The number that finishes the deck URL. Empty means this page is not part of a deck.',
+    },
+    {
+        name: 'ext', type: 'string', label: 'Deck file type', default: COVER.ext,
+        hint: 'Whatever follows the number, extension included.',
+    },
+    {
         name: 'fit', type: 'enum', label: 'Fit', default: COVER.fit,
         options: [
             { value: 'cover', label: 'Cover (fill, crop)' },
@@ -269,6 +315,10 @@ const coverProps: PluginProp[] = [
     {
         name: 'overlay', type: 'number', label: 'Scrim %', default: COVER.overlay,
         hint: 'How strong that wash is, 0–100.',
+    },
+    {
+        name: 'bg', type: 'color', label: 'Paper', default: COVER.bg,
+        hint: 'Shows in the letterbox bars under Contain, and before an image is chosen.',
     },
     { name: 'tint', type: 'color', label: 'Scrim colour', default: COVER.tint },
     { name: 'ink', type: 'color', label: 'Text colour', default: COVER.ink },
@@ -806,4 +856,224 @@ registerEditorPlugin({
 })
 
 
-export { WuiCoverPage, WuiWatermark, WuiPageBreak, DEFAULT_MARK }
+/* --------------------------------------------------------------------------
+   <wui-rule> - a decorative horizontal rule.
+
+   `execCommand('insertHorizontalRule')` is what a contenteditable surface can do on its
+   own, and it produces a bare <hr> that the document stylesheet then draws however it
+   likes. That is fine for a divider and useless for a *device*: a book needs a rule it can
+   narrow, centre, colour, and - twice - draw as something that is not a border at all.
+   The gradient variant fades out at both ends, and the ornament variant is two half-rules
+   with a glyph between them; neither is expressible as a border on one element.
+
+   Promoted from su-yen's `<sy-横线>`, which had the same six controls as closed enums -
+   `粗="thick"`, `色="gold"`, `宽="1/2"` - because it indexed literal Tailwind class strings
+   and Tailwind only generates classes it can see in source text. Nothing here is a class,
+   so the enums that were only ever a build-system workaround become open values: `weight`
+   is a number of pixels, `color` is a colour and `width` a CSS length, which is what an
+   author meant anyway. The two that are genuinely closed sets - variant and align - stay
+   enums.
+   -------------------------------------------------------------------------- */
+
+/**
+ * Shared between the element and the plugin schema, for the reason COVER states: the panel
+ * drops an attribute equal to `PluginProp.default`, so the two must agree exactly.
+ *
+ * The values are su-yen's own defaults translated once - `thin` was `border-t` (1px),
+ * `slate` was `border-slate-300` (#cbd5e1), `full` was `w-full` - so a stored `<sy-横线>`
+ * with no attributes on it migrates to a `<wui-rule>` with no attributes on it and draws
+ * the identical line.
+ */
+const RULE = {
+    variant: 'solid',
+    weight: 1,
+    color: '#cbd5e1',
+    width: '100%',
+    align: 'center',
+    glyph: '\u2756',
+}
+
+/**
+ * `.wrap` carries the width and the alignment for all three shapes; only what is drawn
+ * inside it changes. Alignment is auto margins rather than a flex parent, because that is
+ * the one mechanism that works whether the rule is full width (both autos collapse to
+ * nothing) or narrowed (they do the centring).
+ *
+ * The `<hr>` gets its borders zeroed first: a UA stylesheet gives it an inset border on
+ * all four sides, and a rule drawn as `border-top` on top of that is a rule with a box
+ * around it.
+ */
+const RULE_CSS = `
+:host { display: block; margin: 0; }
+.wrap { box-sizing: border-box; }
+hr.line { border: 0 none; margin: 0; padding: 0; width: 100%; }
+.grad { width: 100%; }
+.orn { display: flex; align-items: center; gap: 0.75rem; }
+.orn .arm { flex: 1 1 auto; border: 0 none; }
+.orn .glyph { flex: 0 0 auto; font-size: 0.75rem; line-height: 1; }
+`
+
+class WuiRule extends HTMLElement {
+    static get observedAttributes() { return ['variant', 'weight', 'color', 'width', 'align', 'glyph'] }
+
+    private wrap!: HTMLElement
+    private line!: HTMLElement
+    private grad!: HTMLElement
+    private orn!: HTMLElement
+    private arms!: HTMLElement[]
+    private glyph!: HTMLElement
+
+    constructor() {
+        super()
+        this.attachShadow({ mode: 'open' })
+    }
+
+    connectedCallback() {
+        if (!this.shadowRoot!.childElementCount) this.build()
+        this.sync()
+    }
+
+    attributeChangedCallback() {
+        if (this.shadowRoot?.childElementCount) this.sync()
+    }
+
+    /**
+     * All three shapes are built once and shown one at a time. Rebuilding the subtree on
+     * every attribute change would be shorter to write and would also make each keystroke
+     * in the panel's colour field destroy and recreate a node - the editor's
+     * MutationObserver sits on the light tree, not this one, so it would not bank an undo
+     * entry, but the flicker is real and free to avoid.
+     */
+    private build() {
+        this.line = document.createElement('hr')
+        this.line.className = 'line'
+        this.line.setAttribute('part', 'line')
+
+        this.grad = div('grad')
+        this.grad.setAttribute('part', 'line')
+
+        this.arms = [div('arm'), div('arm')]
+        this.glyph = document.createElement('span')
+        this.glyph.className = 'glyph'
+        this.glyph.setAttribute('part', 'glyph')
+        this.orn = div('orn')
+        this.orn.setAttribute('part', 'line')
+        this.orn.append(this.arms[0], this.glyph, this.arms[1])
+
+        this.wrap = div('wrap')
+        this.wrap.setAttribute('part', 'wrap')
+        this.wrap.append(this.line, this.grad, this.orn)
+
+        this.shadowRoot!.append(sheet(RULE_CSS), this.wrap)
+    }
+
+    private sync() {
+        const attr = (n: string, d: string) => this.getAttribute(n) ?? d
+        const variant = attr('variant', RULE.variant)
+        const color = attr('color', RULE.color)
+
+        const raw = Number(attr('weight', String(RULE.weight)))
+        // A double border has to fit two strokes and the gap between them; below 3px the
+        // browser draws one line and the variant silently stops being a double rule. This
+        // is the same allowance su-yen's 粗细表 made by starting `double` at 4px.
+        const weight = Math.max(variant === 'double' ? 3 : 1, Number.isFinite(raw) ? raw : RULE.weight)
+
+        this.wrap.style.width = attr('width', RULE.width)
+        const align = attr('align', RULE.align)
+        this.wrap.style.marginLeft = align === 'start' ? '0' : 'auto'
+        this.wrap.style.marginRight = align === 'end' ? '0' : 'auto'
+
+        const shape = variant === 'gradient' ? 'grad' : variant === 'ornament' ? 'orn' : 'line'
+        this.line.style.display = shape === 'line' ? 'block' : 'none'
+        this.grad.style.display = shape === 'grad' ? 'block' : 'none'
+        this.orn.style.display = shape === 'orn' ? 'flex' : 'none'
+
+        if (shape === 'line') {
+            this.line.style.borderTopStyle = variant
+            this.line.style.borderTopWidth = `${weight}px`
+            this.line.style.borderTopColor = color
+        }
+
+        if (shape === 'grad') {
+            // Driven by `color` like every other shape. su-yen's version hard-coded
+            // slate-400 here, which made the colour control a lie for exactly this one
+            // setting; the fade is the shape, not the hue.
+            const c = rgbTriple(color)
+            this.grad.style.height = `${weight}px`
+            this.grad.style.background =
+                `linear-gradient(to right, rgba(${c},0), rgba(${c},1) 50%, rgba(${c},0))`
+        }
+
+        if (shape === 'orn') {
+            for (const arm of this.arms) {
+                arm.style.borderTopStyle = 'solid'
+                arm.style.borderTopWidth = `${weight}px`
+                arm.style.borderTopColor = color
+            }
+            this.glyph.style.color = color
+            this.glyph.textContent = attr('glyph', RULE.glyph)
+        }
+    }
+}
+
+if (!customElements.get('wui-rule')) customElements.define('wui-rule', WuiRule)
+
+const ruleProps: PluginProp[] = [
+    {
+        // Not `style`: that is a reserved HTML attribute, and an element whose appearance
+        // is driven by its own `style=` could not also carry an author's inline CSS.
+        name: 'variant', type: 'enum', label: 'Style', default: RULE.variant,
+        hint: 'Gradient fades out at both ends; ornament splits the rule around a glyph.',
+        options: [
+            { value: 'solid', label: 'Solid' },
+            { value: 'dashed', label: 'Dashed' },
+            { value: 'dotted', label: 'Dotted' },
+            { value: 'double', label: 'Double' },
+            { value: 'gradient', label: 'Gradient (fades out)' },
+            { value: 'ornament', label: 'Ornament (glyph in the middle)' },
+        ],
+    },
+    {
+        name: 'weight', type: 'number', label: 'Thickness (px)', default: RULE.weight,
+        hint: 'Double is held at 3px minimum - below that a browser draws one line, not two.',
+    },
+    { name: 'color', type: 'color', label: 'Colour', default: RULE.color },
+    {
+        name: 'width', type: 'string', label: 'Width', default: RULE.width,
+        hint: 'Any CSS length: 100%, 50%, 60mm.',
+    },
+    {
+        name: 'align', type: 'enum', label: 'Align', default: RULE.align,
+        hint: 'Only visible once the rule is narrower than its column.',
+        options: [
+            { value: 'start', label: 'Left' },
+            { value: 'center', label: 'Center' },
+            { value: 'end', label: 'Right' },
+        ],
+    },
+    {
+        name: 'glyph', type: 'string', label: 'Ornament', default: RULE.glyph,
+        hint: 'Used by the ornament style only.',
+    },
+]
+
+registerEditorPlugin({
+    name: 'rule',
+    label: 'Rule',
+    tagName: 'wui-rule',
+    props: ruleProps,
+    // No `pageBreak` and no `editableContent`: a rule holds nothing and starts nothing. It
+    // is a block only so that it takes the full column and cannot end up sharing a line
+    // with the paragraph it is there to separate.
+    icon: () => {
+        const span = document.createElement('span')
+        span.textContent = '\u2796'
+        return span
+    },
+    onInsert: (editorRoot, range) => {
+        insertAsBlock(editorRoot, range, document.createElement('wui-rule'))
+    },
+})
+
+
+export { WuiCoverPage, WuiWatermark, WuiPageBreak, WuiRule, DEFAULT_MARK }

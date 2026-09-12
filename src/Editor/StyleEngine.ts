@@ -2110,59 +2110,70 @@ export function removeFormat(): void {
 }
 
 /**
- * Tailwind margin-left class management
- * Maps ml-0 through ml-96 (Tailwind scale: 0, 1=4px, 2=8px, 3=12px, 4=16px, 5=20px, 6=24px, 8=32px, 10=40px, 12=48px, ...)
+ * Block indentation, as an exact pixel margin.
+ *
+ * It used to be written as a Tailwind `ml-*` class picked by nearest match from the
+ * scale. The scale is not linear past `ml-12`, so a 20px step off `ml-14` (56px) landed
+ * on `ml-20` (80px) — a 24px move — and the error compounded: four indents followed by
+ * four outdents did not come back to where they started. The table also ended at
+ * `ml-24`, so 96px was as far right as a block could ever go.
+ *
+ * Inline `margin-left` has neither problem, and a document carrying it renders the same
+ * anywhere, with or without Tailwind's stylesheet — which matters here, because the
+ * editor lives in a shadow root that a CDN Tailwind build does not scan.
+ *
+ * The old classes are still READ, so documents written by the previous code keep their
+ * indentation and step from exactly where they appear to be.
  */
-const ML_CLASS_PATTERN = /^ml-\d+$/
 
-function getMlClass(px: number): string {
-    // Map px to nearest Tailwind ml-* class
-    const twScale: Record<number, string> = {
-        0: 'ml-0', 4: 'ml-1', 8: 'ml-2', 12: 'ml-3', 16: 'ml-4',
-        20: 'ml-5', 24: 'ml-6', 28: 'ml-7', 32: 'ml-8', 36: 'ml-9',
-        40: 'ml-10', 48: 'ml-12', 56: 'ml-14', 64: 'ml-16', 80: 'ml-20', 96: 'ml-24'
+/** Matches the legacy indent classes. Read on the way in, removed on the way out. */
+const ML_CLASS_PATTERN = /^ml-(\d+)$/
+
+/** The non-linear part of Tailwind's spacing scale. Below `ml-12` the step is a flat 4px. */
+const ML_CLASS_PX: Record<number, number> = { 12: 48, 14: 56, 16: 64, 20: 80, 24: 96 }
+
+/** Where a block currently sits, in px, whichever way its indent was written. */
+function getIndentPx(el: HTMLElement): number {
+    const inline = el.style.marginLeft
+    if (inline.endsWith('px')) {
+        const n = parseFloat(inline)
+        if (Number.isFinite(n)) return n
+    } else if (inline) {
+        // Authored in some other unit — em, rem, a percentage. Only the browser knows what
+        // it came to, and stepping from a wrong number would jump the block.
+        const n = parseFloat(el.ownerDocument.defaultView?.getComputedStyle(el).marginLeft ?? '')
+        if (Number.isFinite(n)) return n
     }
-    if (twScale[px]) return twScale[px]
-    // Fallback: use closest
-    const keys = Object.keys(twScale).map(Number).sort((a, b) => a - b)
-    const closest = keys.reduce((prev, curr) => Math.abs(curr - px) < Math.abs(prev - px) ? curr : prev)
-    return twScale[closest]
-}
-
-function getMlPx(el: HTMLElement): number {
-    // Extract current ml-* class px value
     for (const cls of el.classList) {
-        const m = cls.match(/^ml-(\d+)$/)
+        const m = ML_CLASS_PATTERN.exec(cls)
         if (m) {
-            const n = parseInt(m[1])
-            // Tailwind ml-* to px: 1=4px, 2=8px, etc.
-            const twToPx: Record<number, number> = {
-                0: 0, 1: 4, 2: 8, 3: 12, 4: 16, 5: 20, 6: 24, 7: 28,
-                8: 32, 9: 36, 10: 40, 12: 48, 14: 56, 16: 64, 20: 80, 24: 96
-            }
-            return twToPx[n] ?? n * 4
+            const n = parseInt(m[1], 10)
+            return ML_CLASS_PX[n] ?? n * 4
         }
     }
     return 0
 }
 
-function setMlClass(el: HTMLElement, px: number): void {
-    // Remove existing ml-* classes
+/** Put a block at exactly `px` from the left, and leave no second opinion behind. */
+function setIndentPx(el: HTMLElement, px: number): void {
+    // A legacy class left in place would fight the inline style the moment specificity
+    // or load order changed, so the class goes whenever the indent is touched.
     const toRemove: string[] = []
-    for (const cls of el.classList) {
-        if (ML_CLASS_PATTERN.test(cls)) toRemove.push(cls)
-    }
+    for (const cls of el.classList) if (ML_CLASS_PATTERN.test(cls)) toRemove.push(cls)
     toRemove.forEach(c => el.classList.remove(c))
-    // Also clear inline marginLeft if any
-    el.style.marginLeft = ''
+    if (!el.classList.length) el.removeAttribute('class')
 
-    if (px > 0) {
-        el.classList.add(getMlClass(px))
-    }
+    // Whole pixels: a computed value read back from `em` can carry a fraction, and
+    // accumulating those makes two blocks indented the same number of times not line up.
+    const n = Math.max(0, Math.round(px))
+    el.style.marginLeft = n > 0 ? `${n}px` : ''
+    // An empty `style=""` left on every block it has ever touched would bloat the saved
+    // document and show up as a diff for an edit that was undone.
+    if (!el.getAttribute('style')) el.removeAttribute('style')
 }
 
 /**
- * Apply indent to selected blocks using Tailwind ml-* classes
+ * Apply indent to selected blocks as an exact left margin
  * For non-list blocks (P, H1-H6, DIV, etc.)
  */
 export function applyIndent(isDecrease: boolean, amount: number = 20): void {
@@ -2231,9 +2242,9 @@ export function applyIndent(isDecrease: boolean, amount: number = 20): void {
             }
         }
 
-        const currentPx = getMlPx(targetElement)
+        const currentPx = getIndentPx(targetElement)
         const newPx = currentPx + (isDecrease ? -amount : amount)
-        setMlClass(targetElement, newPx < 0 ? 0 : newPx)
+        setIndentPx(targetElement, newPx < 0 ? 0 : newPx)
     })
 
     if (savedSelection.editorRoot && savedSelection.startOffset >= 0 && savedSelection.endOffset >= 0) {
@@ -2286,9 +2297,9 @@ export function applyListIndent(isDecrease: boolean, amount: number = 20): void 
     }
 
     selectedLIs.forEach((li) => {
-        const currentPx = getMlPx(li)
+        const currentPx = getIndentPx(li)
         const newPx = currentPx + (isDecrease ? -amount : amount)
-        setMlClass(li, newPx < 0 ? 0 : newPx)
+        setIndentPx(li, newPx < 0 ? 0 : newPx)
     })
 
     if (savedSelection.editorRoot && savedSelection.startOffset >= 0 && savedSelection.endOffset >= 0) {

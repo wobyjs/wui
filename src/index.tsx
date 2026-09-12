@@ -28,6 +28,20 @@ export * from './Editor/PageStyles'
 export * from './Editor/LayoutSwitch'
 export * from './Editor/ImageEditor'
 export * from './Editor/ImageSource'
+
+/* Editor plugins — side-effect registrations.
+
+   Both modules used to be imported only by `main.ts`, the demo entry, so nothing they
+   register reached the built library: `wui-page-break`, `wui-cover-page` and
+   `wui-watermark` were not even *defined* in `dist/index.es.js` (PageBlockPlugins.ts is
+   where those three custom elements live), and `wui-banner` shipped as an element with no
+   property schema — an editor embedding it got a wall of blind free-text attribute rows.
+
+   PageBlockPlugins is re-exported rather than merely imported because its three element
+   classes are part of the public surface (a host may want `instanceof WuiCoverPage`).
+   WuiPlugins exports nothing; it is a pure registration side effect. */
+import './Editor/WuiPlugins'
+export * from './Editor/PageBlockPlugins'
 export * from './helper/baseCls'
 export * from './Wheeler/Wheeler'
 export * from './Wheeler/WheelerType'

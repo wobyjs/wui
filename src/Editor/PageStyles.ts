@@ -16,7 +16,7 @@
  */
 
 import {
-    LAYOUT_ATTR, Layout, PAGE_ATTR, PAGE_CHROME_ATTR, OVERFLOW_ATTR,
+    LAYOUT_ATTR, Layout, PAGE_ATTR, PAGE_CHROME_ATTR, OVERFLOW_ATTR, NO_SCALE_ATTR,
     PAGE_SCALE_VAR, PAGE_W_VAR, PAGE_H_VAR, OVERFLOW_LABEL_VAR,
 } from './PageLayout'
 
@@ -29,13 +29,85 @@ import {
  * constants are always there by the time they are read.
  */
 const buildCss = () => `
+/* Document zoom, in every mode.
+
+   The scale lives on one property and one declaration so that "fit a sheet to the window"
+   and "the author asked for 150%" cannot end up as two different mechanisms that fight
+   over the same element. \`flow\` and \`screen\` reach this rule too — a document zoom that
+   only worked on the proofing view would be the wrong feature.
+
+   \`zoom\`, not \`transform: scale()\`. A transform paints the document smaller but leaves
+   its hit-testing and caret geometry at full size, so clicks land in the wrong place and
+   typed characters appear where the pointer is not. \`zoom\` scales layout itself, so a
+   zoomed document is still an editable one.
+
+   ## Why the children and not the surface
+
+   \`zoom\` scales an element's own box, not only its contents — and the surface IS the
+   scroll container: bounded height, \`overflow-y: auto\`. Put the declaration on it and
+   zooming out shrinks the editor's frame to a quarter of its height, which is the exact
+   opposite of what zooming out is for: the box should hold still and simply fit more of
+   the document. (Width survived only by accident — an auto width resolves against the
+   containing block in the zoomed coordinate space and paints back to the same number.
+   A specified height is a literal length and just gets scaled.)
+
+   Zooming the children instead leaves the frame, its border, its padding and its
+   scrollbar at full size, and the document inside it takes as much room as its scale
+   says it should. Layout inside a child is identical either way: a block child's width
+   still resolves from the surface's content box in the child's own zoomed space, so
+   \`page\` sheets stay centred by their \`margin: 0 auto\` and a \`flow\` block still resolves
+   against the surface, just smaller. (What a flow block resolves *to* is the next rule's
+   business — on its own, this one would leave it spanning the full width.)
+
+   \`:not([${NO_SCALE_ATTR}])\` is the escape hatch for the one kind of thing that lives in
+   a surface without being document — see the constant's own note. */
+[${LAYOUT_ATTR}] > *:not([${NO_SCALE_ATTR}]) {
+    zoom: var(${PAGE_SCALE_VAR}, 1);
+}
+
+/* Zooming out has to narrow the column too, in the modes that have no paper.
+
+   Scaling the children is not by itself enough to shrink a \`flow\` or \`screen\` document,
+   and the difference is easy to mistake for the zoom being ignored. A sheet has a width in
+   millimetres, so halving its scale halves the paper. A flow block has an *auto* width,
+   which resolves against the surface in the child's own zoomed coordinate space: at 50% the
+   surface is twice as wide there, so the block is twice as wide in layout and paints back to
+   exactly the number of pixels it had at 100%. Text and fixed-size images shrink; the column
+   -- and every table, cover and banner that fills it -- does not. What the author sees is a
+   full-width document in tiny type rather than a smaller document.
+
+   Padding the surface puts the missing width back: at scale \`s\` the content box is narrowed
+   to \`s\` of itself, so a block that still fills it paints at \`s\`. The document scales whole,
+   the way the paginated one does, and the gutters grow the way they do around a shrinking
+   sheet.
+
+   This belongs on the surface rather than on the children. A margin on a child cannot narrow
+   one that carries \`width: 100%\` -- a table, most often -- because an over-constrained block
+   drops the margin and keeps the width; and neither a margin nor a width can be handed out
+   blindly to arbitrary document nodes, where a \`width\` would stretch a top-level image to
+   fill the line and a \`margin\` would flatten a blockquote's indent at every scale, 100%
+   included. Narrowing what the children resolve against touches none of them.
+
+   The \`1.5rem\` restates the surface's own \`p-6\`, because a padding cannot be added to -- only
+   replaced; it appears twice because the gutter has to grow out of the content box rather
+   than out of the border box, or the base padding is counted into the shrink and the column
+   comes out narrower than the scale asked for. \`!important\` for the reason the page backdrop below has it: the class is still
+   on the element and a host stylesheet may add more. Owning the inline padding in these two
+   modes is the same bargain page mode already strikes.
+
+   \`max(0px, ...)\` because zooming *in* deliberately adds nothing. Past 100% the calc goes
+   negative, and a view with no page width should keep filling the window and reflowing rather
+   than grow a horizontal scrollbar. Paper scrolls sideways when it is magnified; this is not
+   paper. */
+[${LAYOUT_ATTR}="${Layout.flow}"],
+[${LAYOUT_ATTR}="${Layout.screen}"] {
+    padding-inline: calc(1.5rem + max(0px, (1 - var(${PAGE_SCALE_VAR}, 1)) * (50% - 1.5rem))) !important;
+}
+
 /* The light-box the sheets float in.
 
-   \`zoom\`, not \`transform: scale()\`. A transform paints the sheet smaller but leaves its
-   hit-testing and caret geometry at full size, so on a narrow window clicks land in the
-   wrong place and typed characters appear where the pointer is not. \`zoom\` scales layout
-   itself, so the editor keeps working. fitScale() sets the property from the parent's
-   width; the fallback of 1 means an unmeasured surface is simply full size.
+   Backdrop only — the scale is on the sheets, by the rule above. This element is the
+   scroll container, so what it must NOT do is change size when the zoom does.
 
    \`!important\` on the padding because the editor surface hands out its own spacing and a
    host stylesheet may add more: in page mode the backdrop's padding is the only gap that
@@ -43,7 +115,6 @@ const buildCss = () => `
 [${LAYOUT_ATTR}="${Layout.page}"] {
     background: #e2e8f0;
     padding: 1rem 0 !important;
-    zoom: var(${PAGE_SCALE_VAR}, 1);
 }
 
 /* One sheet.
@@ -142,10 +213,20 @@ const buildCss = () => `
    flattened the height of any block that means its own. */
 @media print {
 
+    /* Paper is paper. A screen zoom is a reading aid and has no business reaching the
+       printer, so it is reset for every mode, not just the paginated one. */
+    [${LAYOUT_ATTR}] > *:not([${NO_SCALE_ATTR}]) {
+        zoom: 1;
+    }
+
+    [${LAYOUT_ATTR}="${Layout.flow}"],
+    [${LAYOUT_ATTR}="${Layout.screen}"] {
+        padding-inline: 0 !important;
+    }
+
     [${LAYOUT_ATTR}="${Layout.page}"] {
         background: none;
         padding: 0 !important;
-        zoom: 1;
     }
 
     [${PAGE_ATTR}] {

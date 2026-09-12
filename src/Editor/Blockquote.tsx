@@ -35,7 +35,7 @@ const Blockquote = defaults(def, (props) => {
         } else {
             applyFormatBlock(editorDiv, QUOTE_TAG, QUOTE_CLASSES)
         }
-        $$(editorDiv).focus()
+        $$(editorDiv).focus({ preventScroll: true })
     }
 
     /**

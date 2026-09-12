@@ -1090,13 +1090,13 @@ export const convertToSemanticElement = (
 ) => {
     const selection = window.getSelection()
     if (!selection || selection.rangeCount === 0) {
-        editorRoot.focus() // Ensure focus if no selection
+        editorRoot.focus({ preventScroll: true }) // Ensure focus if no selection
         return
     }
 
     const currentRange = selection.getRangeAt(0).cloneRange()
     if (!currentRange) {
-        editorRoot.focus()
+        editorRoot.focus({ preventScroll: true })
         return
     }
 
@@ -1182,11 +1182,11 @@ export const convertToSemanticElement = (
         } catch (e) {
             console.error("Error restoring selection in convertToSemanticElement:", e)
             // Fallback: select the editor div or do nothing further with selection
-            editorRoot.focus()
+            editorRoot.focus({ preventScroll: true })
         }
     } else {
         // If newElement is null (should not happen with current logic but as a safeguard)
-        editorRoot.focus()
+        editorRoot.focus({ preventScroll: true })
     }
     // editorRoot.focus(); // Already handled or implicitly handled by selection
 }

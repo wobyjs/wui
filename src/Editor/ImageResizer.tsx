@@ -2,6 +2,7 @@ import { $, $$, JSX, useEffect } from 'woby'
 import { applyImageAlignment, applyImageIndent } from './ImageActions'
 import { openImageEditor } from './ImageEditor'
 import { resolveResizable, resolveAnchor, applyResize, constrainResize, type ResizableSpec } from './EditorPlugin'
+import { NO_SCALE_ATTR } from './PageLayout'
 
 /**
  * ImageResizer: Overlays a resizable box inside the editor with:
@@ -309,7 +310,20 @@ const ImageResizer = () => {
             return null
         }
 
-        const onMouseDown = (e: MouseEvent) => {
+        /**
+         * Select the box under the pointer. Bound to `pointerdown` — the one press event that
+         * covers mouse, touch and pen alike.
+         *
+         * NOT `mousedown`, which is what this used to listen to. `mousedown` is a
+         * *compatibility* event, synthesized only after the `pointerdown` it follows goes
+         * un-prevented — and a plugin that drives its own gesture off `pointerdown`
+         * legitimately prevents it. three.js OrbitControls, mounted inside `<sy-compass>`
+         * whenever its `touch` layer is the WebGL canvas, does exactly that: the host was
+         * selectable but never resizable, because no `mousedown` ever arrived here. Editor.tsx
+         * marks `[data-element-selected]` from `pointerdown`, so the two halves of selection
+         * only agree once they read the same event.
+         */
+        const onSelectDown = (e: MouseEvent) => {
             // Don't select images in readonly mode. Deliberately the surface resolved at
             // setup, not a fresh query off `root`: with a Document root that query would find
             // whichever editor on the page happens to come first.
@@ -321,10 +335,22 @@ const ImageResizer = () => {
             if (actualTarget.closest('[data-image-overlay],[data-image-mini-toolbar],.editor-toolbar')) return
             const hit = findResizable(e.composedPath())
             if (hit) {
-                e.preventDefault()
-                e.stopPropagation()
+                // Suppress the browser's own press behaviour for a plain `<img>` only: a picture
+                // has no gesture of its own, and without this the press starts a drag-image or
+                // drags a text selection across it. `preventDefault()` here is what the old
+                // `mousedown` suppression amounted to — it stops the compat `mousedown` from
+                // being synthesized at all, so the caret never lands in the image's block.
+                //
+                // Deliberately NO `stopPropagation()`. This listener sits on the CAPTURE phase,
+                // so stopping the event would also starve Editor.tsx's own `pointerdown` —
+                // the half that draws `[data-element-selected]` — and any gesture a plugin runs
+                // off the same event. That is what kept `<sy-compass>` from being resizable in
+                // the first place: three.js OrbitControls prevents the pointerdown, no compat
+                // `mousedown` is ever synthesized, and the old listener heard nothing. A plugin
+                // that needs the press suppressed prevents it itself, downstream.
+                if (hit.tagName === 'IMG') e.preventDefault()
                 // CRITICAL: Explicitly clear text selection when clicking an image.
-                // preventDefault() on mousedown prevents the browser from clearing the
+                // preventDefault() on the press prevents the browser from clearing the
                 // text selection, leaving the old text highlight visible even though
                 // the image is now selected.
                 window.getSelection()?.removeAllRanges()
@@ -342,7 +368,7 @@ const ImageResizer = () => {
 
         /**
          * The keyboard's half of image selection. Deliberately the same steps as the
-         * mousedown path above, including clearing the text selection: an image and a
+         * pointerdown path above, including clearing the text selection: an image and a
          * caret must never look selected at once.
          */
         const onSelectImage = (e: Event) => {
@@ -386,8 +412,9 @@ const ImageResizer = () => {
             showOverlay(img)
         }
 
-        editor?.addEventListener('mousedown', onMouseDown, true)
-        root.addEventListener('mousedown', onMouseDown as EventListener, true)
+        // `pointerdown`, not `mousedown` — see onSelectDown's header.
+        editor?.addEventListener('pointerdown', onSelectDown as EventListener, true)
+        root.addEventListener('pointerdown', onSelectDown as EventListener, true)
         root.addEventListener(SELECT_IMAGE_EVENT, onSelectImage)
         document.addEventListener('keydown', onKey)
         window.addEventListener('scroll', onScrollOrResize, true)
@@ -421,8 +448,12 @@ const ImageResizer = () => {
                 btn.onclick = (e: MouseEvent) => {
                     e.stopPropagation()
                     handler()
-                    // Restore focus to editor after click
-                    findSurface()?.focus()
+                    // Restore focus to editor after click. `preventScroll` because in Page
+                    // layout the surface *is* the scroll container: a plain focus() asks the
+                    // browser to reveal it, and revealing a container taller than its own box
+                    // means scrolling it to the top -- the document jumps away from the image
+                    // you just clicked a button on.
+                    findSurface()?.focus({ preventScroll: true })
                 }
                 return true
             }
@@ -473,8 +504,8 @@ const ImageResizer = () => {
 
         // Cleanup: remove all event listeners and observer on unmount
         return () => {
-            editor?.removeEventListener('mousedown', onMouseDown, true)
-            root.removeEventListener('mousedown', onMouseDown as EventListener, true)
+            editor?.removeEventListener('pointerdown', onSelectDown, true)
+            root.removeEventListener('pointerdown', onSelectDown as EventListener, true)
             root.removeEventListener(SELECT_IMAGE_EVENT, onSelectImage)
             document.removeEventListener('keydown', onKey)
             window.removeEventListener('scroll', onScrollOrResize, true)
@@ -610,6 +641,10 @@ const ImageResizer = () => {
         // Create drop indicator
         let dropIndicator: HTMLElement | null = document.createElement('div')
         dropIndicator.style.cssText = 'position:absolute;height:2px;background:#3b82f6;pointer-events:none;z-index:1000;display:none;'
+        // A direct child of the surface, but not document: the document zoom is applied to
+        // the surface's children, and this one is positioned from painted client rects
+        // against the surface's own (unzoomed) box, so it has to opt out of the scaling.
+        dropIndicator.setAttribute(NO_SCALE_ATTR, '')
         surface.appendChild(dropIndicator)
 
         let lastTarget: Node | null = null

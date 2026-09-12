@@ -148,7 +148,7 @@ const TextAlignDropDown = defaults(def, (props) => {
         if (opt) {
             if ($$(editor)) {
                 handleSelectOption(opt.action)
-                $$(editor).focus()
+                $$(editor).focus({ preventScroll: true })
             }
         }
     }

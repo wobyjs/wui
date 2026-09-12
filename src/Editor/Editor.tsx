@@ -15,7 +15,9 @@ import { applyIndent as applyIndentStyle, applyListIndent } from './StyleEngine'
 import { Blockquote } from './Blockquote'
 import { LayoutSwitch, editorLayout } from './LayoutSwitch'
 import { PrintButton } from './PrintButton'
-import { LAYOUT_ATTR, Layout, silenceDuringLayout } from './PageLayout'
+import { ZoomControl } from './ZoomControl'
+import { DocScroller, ScrollerToggle } from './DocScroller'
+import { LAYOUT_ATTR, Layout, SELECTED_ATTR, silenceDuringLayout } from './PageLayout'
 import { FocusManager } from './FocusManager'
 
 // New Imports
@@ -212,7 +214,7 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, height, maxHe
             // the caret a moment after the click, typing went nowhere, and the next Backspace
             // reached the node-selection handler and deleted the whole component instead of a
             // character. Focus is only placed here when the editor does not already have it.
-            if (el && !holdsFocus(el)) { el.focus(); }
+            if (el && !holdsFocus(el)) { el.focus({ preventScroll: true }); }
         }
     })
     // #endregion
@@ -450,10 +452,49 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, height, maxHe
         // EditorPlugin.editableContent, and the bail-out in the walk below.
         const containerTags = new Set(editableContentTagNames())
 
+        /**
+         * Stop the click that this press is about to become from reaching the component
+         * it just selected.
+         *
+         * Selecting a widget and operating it are different gestures that arrive as the
+         * same click. `wui-button` and `wui-toggle-button` bind their handler straight onto
+         * their inner `<button>` with `.onclick`, so clicking one to select it also flipped
+         * its `checked` observable -- and because `checked` is declared `HtmlBoolean`, that
+         * flip was reflected straight back out as an attribute. Selecting a plain button in
+         * the editor wrote `checked=""` into the document and pushed an undo entry for a
+         * change the author never made.
+         *
+         * `preventDefault` alone does not cover this: it is what already spares
+         * `wui-checkbox` and `wui-switch`, whose state changes come from the browser
+         * activating a real `<input>`, but a handler bound in JS runs regardless. Only
+         * stopping the event does, and it has to be in the capture phase on the host's
+         * light-DOM ancestor, which the event passes through on its way *into* the shadow
+         * tree where that handler lives.
+         *
+         * Scoped to presses that actually marked a component: a caret placement inside a
+         * container plugin's text bails out before this is armed, and clicks anywhere else
+         * are untouched. The timer is for the press that never becomes a click -- a drag
+         * off the element -- so the trap is not left waiting for an unrelated one.
+         *
+         * Scoped further to presses that CHANGE the selection (`entry !== prev` at both call
+         * sites). Selecting and operating being different gestures cuts both ways: once a
+         * component is marked, the next press on it is the operating one, and swallowing that
+         * too makes every control a component draws unreachable inside the editor. That is
+         * not hypothetical -- `<sy-compass>` only shows its FAB stack while it is selected,
+         * so every one of its buttons is by construction on the second press, and arming the
+         * trap unconditionally killed all of them.
+         */
+        const swallowSelectingClick = () => {
+            const swallow = (ev: Event) => { ev.stopPropagation(); ev.preventDefault(); done() }
+            const done = () => { el.removeEventListener('click', swallow, true); clearTimeout(timer) }
+            const timer = setTimeout(done, 700)
+            el.addEventListener('click', swallow, true)
+        }
+
         const handler = (e: PointerEvent) => {
             // Clear previous mark
-            const prev = el.querySelector('[data-element-selected]') as HTMLElement | null
-            if (prev) prev.removeAttribute('data-element-selected')
+            const prev = el.querySelector(`[${SELECTED_ATTR}]`) as HTMLElement | null
+            if (prev) prev.removeAttribute(SELECTED_ATTR)
 
             const path = e.composedPath()
 
@@ -466,7 +507,8 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, height, maxHe
                     // on the host -- the same reason the plugin walk below tests this.
                     if (!el.contains(entry)) continue
                     if (deleteRefusalReason(entry, el)) continue
-                    entry.setAttribute('data-element-selected', '')
+                    entry.setAttribute(SELECTED_ATTR, '')
+                    if (entry !== prev) swallowSelectingClick()
                     return
                 }
                 return
@@ -495,7 +537,8 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, height, maxHe
                     // retargets to the host) selecting, since there is no child to type in.
                     if (containerTags.has(entry.tagName.toUpperCase())
                         && hit instanceof Node && hit !== entry && entry.contains(hit)) return
-                    entry.setAttribute('data-element-selected', '')
+                    entry.setAttribute(SELECTED_ATTR, '')
+                    if (entry !== prev) swallowSelectingClick()
                     return
                 }
             }
@@ -525,7 +568,7 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, height, maxHe
         const style = document.createElement('style')
         style.id = id
         style.textContent = `
-            [data-element-selected] {
+            [${SELECTED_ATTR}] {
                 outline: 2px solid #3b82f6;
                 outline-offset: 2px;
             }
@@ -556,9 +599,16 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, height, maxHe
         // here rather than dropped by the layout engine's record flush, because woby
         // re-asserts `contentEditable` from its own scheduler a beat after the switch has
         // returned -- too late for any flush the switch itself could run.
+        // `SELECTED_ATTR` is tested on ANY target, not just the surface: it is written on
+        // whichever embedded element the author just clicked. It is already stripped from
+        // every snapshot (see `unpaginatedHTML`), so letting it through would not corrupt
+        // history -- it would just re-serialise and re-parse the whole document on every
+        // click to prove nothing had changed.
         const isChrome = (m: MutationRecord) =>
-            m.type === 'attributes' && m.target === el &&
-            (m.attributeName === 'contenteditable' || m.attributeName === LAYOUT_ATTR)
+            m.type === 'attributes' && (
+                m.attributeName === SELECTED_ATTR ||
+                (m.target === el &&
+                    (m.attributeName === 'contenteditable' || m.attributeName === LAYOUT_ATTR)))
 
         const observer = new MutationObserver((mutations) => {
             // A batch that is nothing but chrome is not an edit and must not become an
@@ -700,9 +750,9 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, height, maxHe
     const currentNodeSelection = (rootEl: HTMLElement | null) => {
         // Two queries: querySelector only sees descendants, and the panel's parent walk
         // can park the mark on the content root itself.
-        const marked = (rootEl?.hasAttribute('data-element-selected')
+        const marked = (rootEl?.hasAttribute(SELECTED_ATTR)
             ? rootEl
-            : rootEl?.querySelector('[data-element-selected]')) as HTMLElement | null
+            : rootEl?.querySelector(`[${SELECTED_ATTR}]`)) as HTMLElement | null
         const activeImage = (rootEl?.getRootNode() as any)?.__activeImage as HTMLElement | null
         return marked ?? (activeImage?.isConnected ? activeImage : null)
     }
@@ -716,9 +766,9 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, height, maxHe
      * different boxes at once.
      */
     const moveNodeSelection = (next: HTMLElement | null, rootEl: HTMLElement) => {
-        rootEl.querySelectorAll('[data-element-selected]')
-            .forEach(el => el.removeAttribute('data-element-selected'))
-        rootEl.removeAttribute('data-element-selected')
+        rootEl.querySelectorAll(`[${SELECTED_ATTR}]`)
+            .forEach(el => el.removeAttribute(SELECTED_ATTR))
+        rootEl.removeAttribute(SELECTED_ATTR)
 
         // Anything resizable gets the overlay and its handles. Everything else gets the
         // outline mark. An `<img>` is the one thing that takes the overlay and NOT the mark:
@@ -726,7 +776,7 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, height, maxHe
         // absence of the mark. A resizable custom element takes both -- it still wants the
         // outline, and its classification comes from its tag.
         const image = next && resolveResizable(next) ? next : null
-        if (next && !(next instanceof HTMLImageElement)) next.setAttribute('data-element-selected', '')
+        if (next && !(next instanceof HTMLImageElement)) next.setAttribute(SELECTED_ATTR, '')
         // Before the overlay is told about it: scrollIntoView settles synchronously, and
         // the handles are positioned from the image's rect at the moment they are shown.
         next?.scrollIntoView({ block: 'nearest', inline: 'nearest' })
@@ -860,9 +910,9 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, height, maxHe
             const rootEl = $$(activeEditor)
             // Two queries: querySelector only sees descendants, and the parent walk can
             // park the mark on the content root itself.
-            const marked = (rootEl?.hasAttribute('data-element-selected')
+            const marked = (rootEl?.hasAttribute(SELECTED_ATTR)
                 ? rootEl
-                : rootEl?.querySelector('[data-element-selected]')) as HTMLElement | null
+                : rootEl?.querySelector(`[${SELECTED_ATTR}]`)) as HTMLElement | null
             const activeImage = (rootEl?.getRootNode() as any)?.__activeImage as HTMLElement | null
             // The mark wins: if something is outlined, that is what the user sees selected,
             // even when an image elsewhere still has handles on it.
@@ -891,8 +941,8 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, height, maxHe
             // elsewhere does (the pointerdown handler clears the mark unconditionally).
             // Without this the mark outlives the gesture that set it, and a Backspace
             // several keystrokes later would delete a component nobody was aiming at.
-            const marked = $$(activeEditor)?.querySelector('[data-element-selected]') as HTMLElement | null
-            if (marked) marked.removeAttribute('data-element-selected')
+            const marked = $$(activeEditor)?.querySelector(`[${SELECTED_ATTR}]`) as HTMLElement | null
+            if (marked) marked.removeAttribute(SELECTED_ATTR)
         }
 
         // Handle Backspace/Delete to ensure they work after double-tap/double-click
@@ -965,6 +1015,21 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, height, maxHe
 
     return (
         <div class="relative">
+            {/* The surface and the navigation rail sit side by side.
+
+                The surface gets a column of its own rather than being a direct flex child
+                next to the rail, because PageLayout fits a sheet to `root.parentElement`'s
+                width: if the rail shared that box, the fit would be computed from room the
+                rail is already using and the paper would run under it. The column is what
+                the surface actually has, so the existing ResizeObserver re-fits by itself
+                whenever the rail is toggled -- nothing has to tell it.
+
+                `data-editor-body` is how PropertyPanel finds this row: while the panel is
+                parked in its docked corner it reserves a gutter here, so the document is
+                laid out beside the panel rather than underneath it. Padding on the row and
+                not on the column so the rail moves out of the way too. */}
+            <div data-editor-body class="flex items-stretch gap-2">
+            <div class="flex-1 min-w-0">
             <div
                 ref={activeEditor}
                 data-editor-root
@@ -1001,6 +1066,9 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, height, maxHe
                 })}
             >
                 {/* Children are cloned from light DOM into shadow DOM via the sync effect */}
+            </div>
+            </div>
+            <DocScroller />
             </div>
             <ImageResizer />
             <NodeMover />
@@ -1124,6 +1192,8 @@ const EditorToolbar = ({ toolbarRef }: { toolbarRef: Observable<HTMLDivElement |
                 shows. */}
             <div class="flex items-center gap-1">
                 <LayoutSwitch />
+                <ZoomControl />
+                <ScrollerToggle />
                 <PrintButton />
             </div>
 

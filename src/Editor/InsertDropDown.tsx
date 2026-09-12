@@ -7,6 +7,8 @@ import KeyboardDownArrow from '../icons/keyboard_down_arrow'
 import Plus from '../icons/plus'
 import { getEditorPlugins, pluginsToInsertItems, InsertMenuItem } from './EditorPlugin'
 import { INSERT_IMAGE_EVENT, type InsertImageDetail } from './ImageDialog'
+import { TableGridPicker } from './TableGridPicker'
+import { insertionRange } from './BlockInsert'
 
 // Icons - placeholders, replace with actual SVGs or components
 const HorizontalRuleIcon = () => <span>HR</span>
@@ -47,15 +49,33 @@ function getEditorSelection(): { selection: Selection | null, shadowRoot: Shadow
     return { selection, shadowRoot }
 }
 
+/** The contenteditable surface itself, which is what an insert has to land inside. */
+const editorSurface = (): HTMLElement | null =>
+    document.querySelector('wui-editor')?.shadowRoot
+        ?.querySelector('[data-editor-root]') as HTMLElement | null
+
+/**
+ * Put the caret where the insertion is about to happen and make sure the surface holds it.
+ *
+ * These inserts go through `execCommand`, which does nothing at all unless the editable
+ * element is focused and carries the selection -- so a menu opened while focus was elsewhere
+ * used to make every one of them a no-op with no error to show for it. {@link insertionRange}
+ * supplies the end of the document when there is no caret to use.
+ */
+const seatCaret = (surface: HTMLElement): Range => {
+    const range = insertionRange(surface)
+    surface.focus({ preventScroll: true })
+    const { selection } = getEditorSelection()
+    selection?.removeAllRanges()
+    selection?.addRange(range)
+    return range
+}
+
 // #region Insert Actions
 const execInsertHorizontalRule = () => {
-    const { selection, shadowRoot } = getEditorSelection()
-    if (!selection || selection.rangeCount === 0) return
-    const range = selection.getRangeAt(0)
-
-    // Restore selection after potential focus loss
-    selection.removeAllRanges()
-    selection.addRange(range)
+    const surface = editorSurface()
+    if (!surface) return
+    seatCaret(surface)
 
     const hrWithClasses = '<hr class="my-4 mx-auto border-gray-400" />'
     document.execCommand('insertHTML', false, hrWithClasses)
@@ -69,36 +89,28 @@ const execInsertHorizontalRule = () => {
  * all. The dialog restores this range when the user commits.
  */
 const execInsertImage = () => {
-    const { selection } = getEditorSelection()
-    if (!selection || selection.rangeCount === 0) return
-    const range = selection.getRangeAt(0)
+    const surface = editorSurface()
+    if (!surface) return
+    const range = insertionRange(surface)
 
     const editorHost = document.querySelector('wui-editor')
     editorHost?.dispatchEvent(new CustomEvent<InsertImageDetail>(INSERT_IMAGE_EVENT, { detail: { range } }))
 }
 
-const execInsertTable = () => {
-    const { selection, shadowRoot } = getEditorSelection()
-    if (!selection || selection.rangeCount === 0) return
-    const range = selection.getRangeAt(0)
-
-    const rowsStr = prompt('Enter number of rows:', '2')
-    if (rowsStr === null) return
-
-    const colsStr = prompt('Enter number of columns:', '3')
-    if (colsStr === null) return
-
-    const rows = parseInt(rowsStr, 10)
-    const cols = parseInt(colsStr, 10)
-
-    if (isNaN(rows) || isNaN(cols) || rows <= 0 || cols <= 0) {
-        alert('Invalid number of rows or columns.')
-        return
-    }
-
-    // Restore selection after prompts
-    selection.removeAllRanges()
-    selection.addRange(range)
+/**
+ * Insert an empty `rows`×`cols` table at the caret.
+ *
+ * The size used to come from two stacked `prompt()` boxes; it now comes from
+ * {@link TableGridPicker}, so this function only builds and inserts. That is why there is
+ * no longer a saved range to put back: a native prompt is modal to the page and took the
+ * selection with it, while the grid never touches focus at all, so `insertHTML` runs
+ * against the caret that was already there.
+ */
+const insertTable = (rows: number, cols: number) => {
+    const surface = editorSurface()
+    if (!surface) return
+    if (!(rows > 0) || !(cols > 0)) return
+    seatCaret(surface)
 
     // Build HTML String
     let tableHTML = '<table class="w-full border-collapse border border-gray-400 my-2"><tbody>'
@@ -193,11 +205,16 @@ const execInsertContainer = () => insertContainer(CONTAINER_STYLE)
 const execInsertRow = () => insertContainer(ROW_STYLE)
 // #endregion
 
-const getInsertOptions = (): InsertMenuItem[] => {
+/**
+ * @param openTableGrid What the "Table" row does. It is passed in rather than being a
+ *   module-level action because, alone among these items, Table does not insert anything
+ *   when clicked — it swaps the menu over to the size grid, which is per-menu state.
+ */
+const getInsertOptions = (openTableGrid: () => void): InsertMenuItem[] => {
     const builtIn = [
         { label: 'Horizontal Rule', action: execInsertHorizontalRule, icon: HorizontalRuleIcon },
         { label: 'Image', action: execInsertImage, icon: ImageIcon },
-        { label: 'Table', action: execInsertTable, icon: TableIcon },
+        { label: 'Table', action: openTableGrid, icon: TableIcon },
         { label: 'Container', action: execInsertContainer, icon: ContainerIcon },
         { label: 'Row (flex)', action: execInsertRow, icon: RowIcon },
     ]
@@ -228,11 +245,18 @@ const InsertDropDown = defaults(def, (props) => {
     const editor = $(EditorContext)
     // const { undos, saveDo } = useUndoRedo() // Removed as saveDo is handled by MutationObserver
     const isOpen = $(false)
+    // The menu has two faces: the list of things to insert, and the table size grid. The
+    // grid replaces the list in place instead of flying out beside it, because this menu is
+    // `max-h-80 overflow-y-auto` and would clip anything positioned outside its own box.
+    const showGrid = $(false)
     const dropdownRef = $<HTMLElement>(null as any)
 
-    useDropdownDismiss(dropdownRef as any, () => isOpen(false))
+    /** Back to the list, closed, so the next open never starts on the grid. */
+    const closeDropdown = () => { isOpen(false); showGrid(false) }
 
-    const toggleDropdown = () => isOpen(!isOpen())
+    useDropdownDismiss(dropdownRef as any, closeDropdown)
+
+    const toggleDropdown = () => { if ($$(isOpen)) closeDropdown(); else isOpen(true) }
 
     const handleSelectOption = (action: () => void) => {
         if ($$(editor)) {
@@ -240,13 +264,20 @@ const InsertDropDown = defaults(def, (props) => {
             action()
             // $$(editor)?.focus() // Re-focus editor
         }
-        isOpen(false)
+        // Every other item has inserted by now and the menu is done. Table has not: it just
+        // asked for the grid, so leave the menu up for it.
+        if (!$$(showGrid)) isOpen(false)
     }
 
     const DropDownMenu = () => {
         return (
             <div
-                class="origin-top-left absolute left-0 mt-2 w-64 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10 max-h-80 overflow-y-auto"
+                // The list is a fixed-width scrolling column; the grid is neither. A grid grown
+                // to its full 16×16 is both wider and taller than those limits, and the limits
+                // would clip it rather than scroll it usefully, so they come off while it is up.
+                class={() => $$(showGrid)
+                    ? "origin-top-left absolute left-0 mt-2 w-auto rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10"
+                    : "origin-top-left absolute left-0 mt-2 w-64 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10 max-h-80 overflow-y-auto"}
                 role="menu"
                 aria-orientation="vertical"
                 aria-labelledby="insert-menu-button"
@@ -255,24 +286,35 @@ const InsertDropDown = defaults(def, (props) => {
                     e.preventDefault()  // Prevents the editor from losing focus
                 }}
             >
-                <div class="py-1" role="none">
-                    {getInsertOptions().map(opt => (
-                        <Button
-                            type='outlined'
-                            cls="w-full flex items-center text-gray-700 px-4 py-2 text-sm hover:bg-gray-100 hover:text-gray-900"
-                            role="menuitem"
-                            onClick={(e) => { e.preventDefault(); handleSelectOption(opt.action) }}
-                        >
-                            <span class="w-1/5 flex justify-center shrink-0">
-                                <opt.icon />
-                            </span>
+                {() => $$(showGrid)
+                    ? <TableGridPicker
+                        onPick={(rows, cols) => { insertTable(rows, cols); closeDropdown() }}
+                        onCancel={() => showGrid(false)}
+                    />
+                    : <OptionList />}
+            </div>
+        )
+    }
 
-                            <span class="w-4/5 text-left truncate">
-                                {opt.label}
-                            </span>
-                        </Button>
-                    ))}
-                </div>
+    const OptionList = () => {
+        return (
+            <div class="py-1" role="none">
+                {getInsertOptions(() => showGrid(true)).map(opt => (
+                    <Button
+                        type='outlined'
+                        cls="w-full flex items-center text-gray-700 px-4 py-2 text-sm hover:bg-gray-100 hover:text-gray-900"
+                        role="menuitem"
+                        onClick={(e) => { e.preventDefault(); handleSelectOption(opt.action) }}
+                    >
+                        <span class="w-1/5 flex justify-center shrink-0">
+                            <opt.icon />
+                        </span>
+
+                        <span class="w-4/5 text-left truncate">
+                            {opt.label}
+                        </span>
+                    </Button>
+                ))}
             </div>
         )
     }

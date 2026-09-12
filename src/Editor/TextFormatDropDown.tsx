@@ -102,7 +102,7 @@ const TextFormatDropDown = defaults(def, (props) => {
                         saveDo()
                         selectedFormat(opt.label as TextFormatOptions)
                         isOpen(false)
-                        $$(el).focus()
+                        $$(el).focus({ preventScroll: true })
                         break
                     }
                 }

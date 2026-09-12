@@ -109,6 +109,30 @@ export const PAGE_CHROME_ATTR = 'data-wui-page-chrome'
 /** Set on a sheet whose first block is taller than one page and so cannot be split. */
 export const OVERFLOW_ATTR = 'data-wui-overflow'
 
+/**
+ * Marks the one embedded element the author currently has selected as a node.
+ *
+ * Transient chrome, exactly like the page strips: it is what draws the outline, it is
+ * never authored, and it must never reach anything that stores the document. It lives
+ * here rather than in Editor.tsx so that `unpaginate` can strip it without importing
+ * the editor, and so that everything agreeing on the spelling is one constant.
+ *
+ * Not prefixed `data-wui-` like its neighbours because it predates them and is already
+ * in saved documents and in plugin CSS; renaming it would silently stop matching.
+ */
+export const SELECTED_ATTR = 'data-element-selected'
+
+/**
+ * Opt a direct child of the surface out of the document zoom.
+ *
+ * The zoom is applied to the surface's children rather than to the surface itself (see
+ * PageStyles), so anything parked in there that is NOT document -- a drag drop-indicator,
+ * a measuring rule -- would be scaled along with the text. Such overlays are positioned
+ * from painted client rects against the surface's own box, and the surface's box is the
+ * one thing the zoom no longer touches, so they want to stay at 1.
+ */
+export const NO_SCALE_ATTR = 'data-wui-noscale'
+
 /** Custom property carrying the fit-to-window scale. Consumed by `zoom` in the CSS. */
 export const PAGE_SCALE_VAR = '--wui-page-scale'
 
@@ -444,13 +468,122 @@ const numberSheets = (root: HTMLElement) => {
 
    The width is read off the PARENT, which carries no zoom of its own. Reading it off
    the zoomed element would feed the previous scale back into the next one. */
+/**
+ * What the author asked the document to be scaled to.
+ *
+ * `'fit'` is not a number because it is not a scale — it is a deferral: "whatever makes a
+ * sheet fit the space there is", which only has an answer once the surface has been
+ * measured, and a different answer after every resize. A number is taken literally, so
+ * `1` is actual size in `page` mode even when that means the paper is wider than the
+ * window and has to be scrolled sideways — the same bargain every office suite strikes,
+ * and the only one under which "100%" means anything.
+ */
+export type ZoomLevel = number | 'fit'
+
+/** Floor and ceiling for a zoom the UI hands in. A document at 4% is not navigable. */
+export const ZOOM_MIN = 0.25
+export const ZOOM_MAX = 4
+
+let userZoom: ZoomLevel = 'fit'
+
+/** The scale at which one sheet fits `avail` px of room, with a gutter either side. */
+const fitRatio = (avail: number) =>
+    Math.max(0.25, Math.min(1, (avail - 24) / pageMetrics().width))
+
+/**
+ * Write the surface's scale.
+ *
+ * `flow` and `screen` have no paper to fit, so `'fit'` there means 1: there is nothing to
+ * shrink towards. An explicit number applies in all three modes, which is what makes this
+ * a DOCUMENT zoom and not a page-preview zoom — an author who wants bigger text while
+ * drafting gets it without switching to `page` first.
+ *
+ * The property is REMOVED rather than set to 1, so a surface at natural size carries no
+ * `zoom` at all and cannot pay for one: `zoom` establishes a containing block for fixed
+ * descendants, and anything that costs should be absent when it buys nothing.
+ */
+/**
+ * Notified whenever the painted scale actually moves.
+ *
+ * `'fit'` is recomputed from the surface's width, and the width changes for reasons no
+ * zoom control ever hears about -- a navigation rail opening beside the document, a
+ * sidebar collapsing, a split pane dragged. A readout that only refreshed when a button
+ * was pressed would go stale the moment any of those happened, so the engine announces
+ * the result instead of the UI guessing at it.
+ *
+ * A plain callback set rather than an observable, because PageLayout is the bottom of the
+ * import graph here: the UI imports the engine, never the other way round.
+ *
+ * @returns an unsubscribe function.
+ */
+const scaleWatchers = new Set<(scale: number) => void>()
+
+export const onZoomApplied = (cb: (scale: number) => void) => {
+    scaleWatchers.add(cb)
+    return () => { scaleWatchers.delete(cb) }
+}
+
+/** The last value announced, so an unchanged re-apply stays silent. */
+let lastApplied = 1
+
+const applyScale = (root: HTMLElement, avail: number) => {
+    const scale = userZoom === 'fit'
+        ? (currentMode === Layout.page ? fitRatio(avail) : 1)
+        : Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, userZoom))
+    const v = Math.round(scale * 1000) / 1000
+    if (v === 1) root.style.removeProperty(PAGE_SCALE_VAR)
+    else root.style.setProperty(PAGE_SCALE_VAR, String(v))
+    if (v !== lastApplied) { lastApplied = v; scaleWatchers.forEach(cb => cb(v)) }
+    return v
+}
+
+const availableWidth = (root: HTMLElement) =>
+    (root.parentElement?.clientWidth ?? 0) || root.clientWidth
+
 const fitScale = (root: HTMLElement) => {
-    const parent = root.parentElement
-    const avail = (parent?.clientWidth ?? 0) || root.clientWidth
+    const avail = availableWidth(root)
     if (!avail) return 0
-    const ratio = Math.max(0.25, Math.min(1, (avail - 24) / pageMetrics().width))
-    root.style.setProperty(PAGE_SCALE_VAR, String(Math.round(ratio * 1000) / 1000))
+    applyScale(root, avail)
     return avail
+}
+
+/**
+ * Set the document zoom and apply it immediately. Returns the scale actually in force.
+ *
+ * No repagination follows, and none is needed: the sheet is sized in millimetres and its
+ * LAYOUT width does not move when `zoom` does, so every break stays exactly where it was
+ * measured. The overflow test reads its scale off the sheet's own width for the same
+ * reason — see the header. Zooming a paginated document is therefore free.
+ *
+ * The page rules are re-asserted because they carry the `zoom` declaration, and a surface
+ * that has only ever been in `flow` has never installed them.
+ */
+export const setLayoutZoom = (root: HTMLElement | null | undefined, z: ZoomLevel) => {
+    userZoom = z
+    if (!root) return 1
+    ensurePageStyles(root)
+    // Every rule in that stylesheet hangs off the layout attribute, and a surface that has
+    // never been switched out of the default mode carries no attribute for the zoom rule to
+    // match -- the custom property would be written and nothing would read it. Stamping the
+    // mode it is already in is a no-op for everything except that match.
+    if (!root.hasAttribute(LAYOUT_ATTR)) root.setAttribute(LAYOUT_ATTR, currentMode)
+    return applyScale(root, availableWidth(root))
+}
+
+/** The zoom as the author set it — a number, or `'fit'` if they left it to the surface. */
+export const layoutZoom = (): ZoomLevel => userZoom
+
+/**
+ * The scale actually painted right now, with `'fit'` resolved against `root`.
+ *
+ * This is what a percentage readout should show: "Fit" is a choice, but the reader still
+ * wants to know what it came to.
+ */
+export const resolvedZoom = (root: HTMLElement | null | undefined) => {
+    if (userZoom !== 'fit') return Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, userZoom))
+    if (!root || currentMode !== Layout.page) return 1
+    const avail = availableWidth(root)
+    return avail ? Math.round(fitRatio(avail) * 1000) / 1000 : 1
 }
 
 /**
@@ -502,7 +635,41 @@ export const unpaginate = (root: ParentNode, move: Mover = plainMove) => {
 export const unpaginatedHTML = (html: string) => {
     const doc = new DOMParser().parseFromString(html, 'text/html')
     unpaginate(doc.body)
+    // Node selection is a highlight, not a fact about the document, so it is dropped on the
+    // way out with the sheets. That is what keeps clicking a component out of the undo
+    // stack: the snapshot taken after the click is byte-identical to the one before it, so
+    // `saveDo` rejects the entry. Left in, it cost the author a wasted Ctrl+Z -- the first
+    // press only cleared an outline, and the second undid the edit they had meant to
+    // revert. Restoring is fixed by the same line: an entry can no longer put an outline
+    // back around an element the author is not pointing at.
+    //
+    // Stripped HERE and not in `unpaginate`, which also runs against the live surface on
+    // every pagination pass: doing it there would blank the author's selection every time
+    // an edit three pages up reflowed the document.
+    for (const el of Array.from(doc.body.querySelectorAll(`[${SELECTED_ATTR}]`))) el.removeAttribute(SELECTED_ATTR)
     return doc.body.innerHTML
+}
+
+/**
+ * Hold the viewport still across a rebuild, and hand back the undo.
+ *
+ * Every pass here empties `root` and fills it again. For the instant in between, its
+ * scrollHeight is nothing, so the browser clamps scrollTop -- and the rebuild does not
+ * put it back, because as far as it is concerned the scroll position was never anywhere
+ * else. An edit three pages down threw the reader to the top of the document.
+ *
+ * The document scroller is captured for the same reason: a surface with no height cap
+ * shrinks the page under it while it is empty, and the page clamps too. Nothing in
+ * between the two of them scrolls, so there is no ancestor walk here to get wrong.
+ *
+ * Call the returned function AFTER the caret has been placed, not before: restoring a
+ * selection can scroll on its own, and the place the reader was actually looking should
+ * win.
+ */
+export const captureScroll = (el: HTMLElement) => {
+    const page = el.ownerDocument.scrollingElement
+    const saved = (page && page !== el ? [el, page] : [el]).map(n => [n, n.scrollTop, n.scrollLeft] as const)
+    return () => saved.forEach(([n, top, left]) => { n.scrollTop = top; n.scrollLeft = left })
 }
 
 /**
@@ -515,6 +682,10 @@ export const paginate = (root: HTMLElement) => {
     // directly. Cheap when they are already installed; see `ensurePageStyles`.
     ensurePageStyles(root)
     const rec = saveSelection(root)
+    // Scroll as well as caret: this runs on a debounce after any edit, so a pass that
+    // did not preserve it would undo whatever the caller had already restored -- which
+    // is exactly what defeated `undo`'s own scroll capture 250ms after the click.
+    const restoreScroll = captureScroll(root)
     unpaginate(root, moveNode)
     for (const group of groupNodes(Array.from(root.childNodes))) {
         const sheet = makeSheet(root, group[0])
@@ -523,6 +694,7 @@ export const paginate = (root: HTMLElement) => {
     reflowOverflow(root)
     numberSheets(root)
     restoreSelection(root, rec)
+    restoreScroll()
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
@@ -676,7 +848,11 @@ export const applyLayout = (root: HTMLElement | null | undefined, mode: LayoutMo
     if (mode !== Layout.page) {
         const rec = saveSelection(root)
         unpaginate(root, moveNode)
-        root.style.removeProperty(PAGE_SCALE_VAR)
+        // An explicit zoom belongs to the DOCUMENT, not to the paginated view of it, so it
+        // survives the mode switch. `'fit'` does not: there is no paper left to fit, and
+        // leaving the last page mode's ratio behind would shrink a flow for no reason.
+        if (userZoom === 'fit') root.style.removeProperty(PAGE_SCALE_VAR)
+        else { ensurePageStyles(root); applyScale(root, 0) }
         root.style.removeProperty(PAGE_W_VAR)
         root.style.removeProperty(PAGE_H_VAR)
         root.style.removeProperty(OVERFLOW_LABEL_VAR)

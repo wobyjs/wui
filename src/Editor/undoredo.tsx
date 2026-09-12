@@ -3,7 +3,7 @@ import { $, $$, useEffect, JSX, useMemo, Observable, createContext, useContext, 
 import type { FocusManager } from './FocusManager'
 import { saveSelectionAsOffsets, restoreSelectionFromOffsets, findEditorRoot } from './StyleEngine'
 import { safeGetSelection } from './BrowserCompat'
-import { currentLayout, Layout, paginate, unpaginatedHTML } from './PageLayout'
+import { captureScroll, currentLayout, Layout, paginate, unpaginatedHTML } from './PageLayout'
 
 // 1. CREATE THE EDITOR DATA STORE
 // createContext: Creates a "global" storage box so we don't have to pass props everywhere.
@@ -106,27 +106,6 @@ const snapshot = (el: HTMLElement) => unpaginatedHTML(el.innerHTML)
  */
 const relayout = (el: HTMLElement) => {
     if (currentLayout() === Layout.page) paginate(el)
-}
-
-/**
- * Hold the viewport still across a snapshot restore.
- *
- * The editing surface is its own scroll container, and both undo and redo rewrite its
- * innerHTML. For the instant between the wipe and the rebuild its scrollHeight is
- * nothing, so the browser clamps scrollTop to 0 — and the rebuild does not put it back,
- * because as far as it is concerned the scroll position was never anywhere else.
- * Undoing a typo three pages down threw the reader to the top of the document.
- *
- * The document scroller is captured for the same reason: a surface with no height cap
- * shrinks the page under it while it is empty, and the page clamps too. Nothing in
- * between the two of them scrolls, so there is no ancestor walk here to get wrong.
- */
-const captureScroll = (el: HTMLElement) => {
-    const page = el.ownerDocument.scrollingElement
-    const saved = (page && page !== el ? [el, page] : [el]).map(n => [n, n.scrollTop, n.scrollLeft] as const)
-    // Call this after the caret has been placed, not before: restoring a selection can
-    // scroll on its own, and the place the reader was actually looking should win.
-    return () => saved.forEach(([n, top, left]) => { n.scrollTop = top; n.scrollLeft = left })
 }
 
 /**

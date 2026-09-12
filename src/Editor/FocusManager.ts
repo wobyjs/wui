@@ -114,7 +114,7 @@ export class FocusManager {
 
         // Ensure editor has focus
         if (!this.isEditorFocused()) {
-            this.editorElement.focus()
+            this.editorElement.focus({ preventScroll: true })
         }
 
         return this.restoreSelectionFromOffsets(
@@ -213,7 +213,7 @@ export class FocusManager {
     private restoreFocus(): void {
         if (this.editorElement) {
             this.suppressBlur = false
-            this.editorElement.focus()
+            this.editorElement.focus({ preventScroll: true })
             this.restoreSelection()
         }
     }

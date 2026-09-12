@@ -71,7 +71,7 @@ const AlignCenterButton: Defaulted<typeof def> = defaults(def, (props) => {
         isActive(true)
 
         document.dispatchEvent(new Event('selectionchange'))
-        $$(editorDiv).focus()
+        $$(editorDiv).focus({ preventScroll: true })
     }
 
     return (

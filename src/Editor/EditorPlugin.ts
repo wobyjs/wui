@@ -1,4 +1,5 @@
 import { $, $$, JSX, Observable, ObservableMaybe } from 'woby'
+import { insertionRange } from './BlockInsert'
 
 /**
  * Typed property schema for editor plugin custom elements.
@@ -467,18 +468,23 @@ export const pluginsToInsertItems = (editorRoot: HTMLElement): ObservableMaybe<I
         label: plugin.label,
         icon: plugin.icon ?? (() => null),
         action: () => {
-            // Get the shadow root selection
-            const root = editorRoot.getRootNode()
-            const sel = (root instanceof ShadowRoot) ? root.getSelection() : window.getSelection()
-            const range = sel?.getRangeAt(0)
-            if (!range) {
-                console.warn(`[EditorPlugin] Cannot insert "${plugin.name}": no selection range`)
-                return
-            }
+            // The caret when there is one, the end of the document when there is not. Never
+            // `getRangeAt(0)` unguarded: on a surface that has lost focus that throws, and a
+            // throw here kills the whole action silently -- the menu closes and nothing is
+            // inserted, with no error the author could act on. See `insertionRange`.
+            const range = insertionRange(editorRoot)
+
+            // The surface has to hold the caret for the insertion to be visible afterwards,
+            // and it may not: the fallback branch above exists precisely for the case where
+            // it was not focused. `preventScroll` because the author is looking at the menu,
+            // not at wherever the browser would otherwise scroll the caret into view.
+            editorRoot.focus({ preventScroll: true })
 
             // Restore selection (may have been lost from dropdown interaction)
-            sel!.removeAllRanges()
-            sel!.addRange(range)
+            const root = editorRoot.getRootNode()
+            const sel = (root instanceof ShadowRoot) ? root.getSelection() : window.getSelection()
+            sel?.removeAllRanges()
+            sel?.addRange(range)
 
             // Call the plugin's insert handler
             plugin.onInsert(editorRoot, range)
