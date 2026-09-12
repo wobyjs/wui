@@ -113,6 +113,8 @@ export const ImageEditor = defaults(def, (): JSX.Element => {
     let applyBtn: HTMLButtonElement | null = null
     let restoreBtn: HTMLButtonElement | null = null
     let panelEl: HTMLElement | null = null
+    /** Whether the gesture in progress began on the backdrop. See the root's wiring. */
+    let pressedBackdrop = false
 
     /**
      * How far the panel has been dragged from the centre, in px.
@@ -454,6 +456,12 @@ export const ImageEditor = defaults(def, (): JSX.Element => {
             if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); close() }
         }
 
+        // Capture phase, so a handler inside the panel that stops `pointerdown` -- the crop
+        // grip does, to keep the press off the pan handler behind it -- cannot leave this
+        // flag reading the *previous* gesture.
+        const onRootPointerDown = (e: PointerEvent) => { pressedBackdrop = e.target === el }
+        el.addEventListener('pointerdown', onRootPointerDown, true)
+
         host.addEventListener(EDIT_IMAGE_EVENT, onOpen)
         // Capture phase: Escape has to win over the key handling of whatever surface this
         // was opened over, and that surface is usually behind a shadow boundary a bubbling
@@ -472,6 +480,7 @@ export const ImageEditor = defaults(def, (): JSX.Element => {
         }
 
         return () => {
+            el.removeEventListener('pointerdown', onRootPointerDown, true)
             host.removeEventListener(EDIT_IMAGE_EVENT, onOpen)
             document.removeEventListener('keydown', onKeyDown, true)
         }
@@ -531,7 +540,17 @@ export const ImageEditor = defaults(def, (): JSX.Element => {
         <div
             ref={el => {
                 rootEl = el as HTMLElement
-                if (el) (el as HTMLElement).onclick = () => close()
+                if (!el) return
+                const root = el as HTMLElement
+                // Dismiss only when the gesture *started* on the backdrop. A drag that begins
+                // inside the panel -- resizing the crop frame, moving the dialog by its header --
+                // can release over the backdrop once the panel has shrunk out from under the
+                // pointer, and the browser then dispatches `click` on the common ancestor of the
+                // press and the release, which is this element. Closing on that throws the edit
+                // away mid-gesture. Touch never showed the bug: `startResize` cancels the
+                // `pointerdown`, which suppresses the compatibility mouse events for touch and
+                // pen but not for a mouse.
+                root.onclick = () => { if (pressedBackdrop) close() }
             }}
             data-image-editor
             class="fixed inset-0 z-[1200] items-center justify-center bg-black/30"

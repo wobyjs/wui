@@ -64,6 +64,8 @@ export const ImageDialog = (): JSX.Element => {
     const saveDo = undoRedo?.saveDo ?? (() => { })
 
     let rootEl: HTMLElement | null = null
+    /** Whether the gesture in progress began on the backdrop. See the root's wiring. */
+    let pressedBackdrop = false
     let srcInput: HTMLInputElement | null = null
     let altInput: HTMLInputElement | null = null
     let embedInput: HTMLInputElement | null = null
@@ -441,9 +443,18 @@ export const ImageDialog = (): JSX.Element => {
         <div
             ref={el => {
                 rootEl = el as HTMLElement
+                if (!el) return
+                const root = el as HTMLElement
                 // Clicking the backdrop cancels, which is what a modal is expected to do.
-                // The panel below stops its own clicks from reaching here.
-                if (el) (el as HTMLElement).onclick = () => close()
+                // The panel below stops its own clicks from reaching here -- but only for
+                // clicks that happen inside it. A drag that starts in a field and releases
+                // over the backdrop is dispatched as a `click` on the common ancestor of the
+                // press and the release, which is this element, and cancelling then would
+                // throw away what was typed. So the press has to have started here too.
+                // Capture phase, so a handler inside the panel that stops `pointerdown` cannot
+                // leave the flag reading the *previous* gesture.
+                root.addEventListener('pointerdown', (e: PointerEvent) => { pressedBackdrop = e.target === root }, true)
+                root.onclick = () => { if (pressedBackdrop) close() }
             }}
             data-image-dialog
             class="fixed inset-0 z-[1200] items-center justify-center bg-black/30"

@@ -329,6 +329,17 @@ purely to refuse the caret. The `mousedown` half is load-bearing; it is not left
 The same rule is why toolbar caret guards (`onMouseDown={e => { e.preventDefault(); e.stopPropagation() }}`)
 stay on `mousedown` and are *not* converted -- see FocusManager above.
 
+**A modal backdrop cannot dismiss on `click` alone.** `click` is dispatched on the nearest
+common ancestor of the press and the release, so a drag that *starts* inside the panel and
+*ends* over the backdrop -- shrinking the crop frame until the panel no longer reaches the
+pointer, moving the dialog by its title bar, selecting text out of a field -- produces a
+click on the backdrop itself and used to throw the edit away mid-gesture. Both modals
+(`ImageEditor`, `ImageDialog`) therefore track, in the **capture** phase, whether the
+`pointerdown` landed on the backdrop, and close only if it did. Capture, because a handler
+inside the panel that stops `pointerdown` -- the crop grip does -- would otherwise leave the
+flag describing the *previous* gesture. Touch never showed the bug: cancelling the
+`pointerdown` suppresses the compatibility mouse events, `click` included, for touch and pen.
+
 State-refresh listeners are a separate case: the toolbar's active-state trackers listen to
 `selectionchange`, which fires for every input modality and keeps firing throughout a
 drag-select. A `pointerup` companion would fire *before* the selection settles, so there is no
