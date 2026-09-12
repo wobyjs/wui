@@ -4,6 +4,7 @@ import { useEditor, useUndoRedo } from './undoredo'
 import FormatInkHighlighter from '../icons/format_ink_highlighter' // Import the highlighter icon
 import KeyboardDownArrow from '../icons/keyboard_down_arrow'
 import { applyBackgroundColor } from './StyleEngine'
+import { t } from '../i18n'
 
 const def = () => ({
     cls: $('', HtmlClass) as JSX.Class,
@@ -83,7 +84,7 @@ const TextBackgroundColorPicker = defaults(def, (props) => {
                     () => $$(cls) ? $$(cls) : BASE_BTN,
                     cn,
                 ]}
-                title="Text background color"
+                title={() => t('editor.textBackgroundColor')}
                 onMouseDown={(e: any) => { e.preventDefault(); }}
                 onClick={applyPickedBgColor}
                 {...otherProps}

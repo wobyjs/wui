@@ -3,6 +3,7 @@ import { applyImageAlignment, applyImageIndent } from './ImageActions'
 import { openImageEditor } from './ImageEditor'
 import { resolveResizable, resolveAnchor, applyResize, constrainResize, type ResizableSpec } from './EditorPlugin'
 import { NO_SCALE_ATTR } from './PageLayout'
+import { t } from '../i18n'
 
 /**
  * ImageResizer: Overlays a resizable box inside the editor with:
@@ -896,27 +897,27 @@ const ImageResizer = () => {
                     pointerEvents: 'auto',
                 })}
             >
-                <button ref={(el: HTMLButtonElement) => { alignLBtn = el }} data-image-mini-toolbar title="Align left" style={btnStyle}>
+                <button ref={(el: HTMLButtonElement) => { alignLBtn = el }} data-image-mini-toolbar title={() => t('editor.alignLeftTitle')} style={btnStyle}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3 3h18v2H3V3zm0 6h12v2H3V9zm0 6h18v2H3v-2zm0 6h12v2H3v-2z"/></svg>
                 </button>
-                <button ref={(el: HTMLButtonElement) => { alignCBtn = el }} data-image-mini-toolbar title="Align center" style={btnStyle}>
+                <button ref={(el: HTMLButtonElement) => { alignCBtn = el }} data-image-mini-toolbar title={() => t('editor.alignCenterTitle')} style={btnStyle}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3 3h18v2H3V3zm4 6h10v2H7V9zm0 6h10v2H7v-2zm-4 6h18v2H3v-2z"/></svg>
                 </button>
-                <button ref={(el: HTMLButtonElement) => { alignRBtn = el }} data-image-mini-toolbar title="Align right" style={btnStyle}>
+                <button ref={(el: HTMLButtonElement) => { alignRBtn = el }} data-image-mini-toolbar title={() => t('editor.alignRightTitle')} style={btnStyle}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3 3h18v2H3V3zm6 6h12v2H9V9zm-6 6h18v2H3v-2zm6 6h12v2H9v-2z"/></svg>
                 </button>
                 <span data-image-mini-toolbar style={{ width: '1px', background: 'rgba(255,255,255,0.3)', margin: '2px' }} />
-                <button ref={(el: HTMLButtonElement) => { outdentBtn = el }} data-image-mini-toolbar title="Outdent" style={btnStyle}>
+                <button ref={(el: HTMLButtonElement) => { outdentBtn = el }} data-image-mini-toolbar title={() => t('editor.outdent')} style={btnStyle}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3 21V3h2v18H3zm8-11v10l-7-5 7-5z"/></svg>
                 </button>
-                <button ref={(el: HTMLButtonElement) => { indentBtn = el }} data-image-mini-toolbar title="Indent" style={btnStyle}>
+                <button ref={(el: HTMLButtonElement) => { indentBtn = el }} data-image-mini-toolbar title={() => t('editor.indent')} style={btnStyle}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3 21V3h2v18H3zm8-11v10l7-5-7-5z"/></svg>
                 </button>
                 <span data-image-mini-toolbar style={{ width: '1px', background: 'rgba(255,255,255,0.3)', margin: '2px' }} />
-                <button ref={(el: HTMLButtonElement) => { editBtn = el }} data-image-mini-toolbar title="Edit image (crop, zoom)" style={btnStyle}>
+                <button ref={(el: HTMLButtonElement) => { editBtn = el }} data-image-mini-toolbar title={() => t('editor.image.edit')} style={btnStyle}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M7 1h2v4h10v2H9v10H7V7H3V5h4V1zm10 22v-4H7v-2h10V7h2v10h4v2h-4v4h-2z"/></svg>
                 </button>
-                <button ref={(el: HTMLButtonElement) => { deleteBtn = el }} data-image-mini-toolbar title="Delete image" style={btnStyle}>
+                <button ref={(el: HTMLButtonElement) => { deleteBtn = el }} data-image-mini-toolbar title={() => t('editor.image.delete')} style={btnStyle}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
                 </button>
             </div>

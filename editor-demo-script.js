@@ -120,3 +120,43 @@ if (editor) {
 
     console.log('[Editor Demo] Full toolbar editor initialized')
 }
+
+// --- Language registry demo -------------------------------------------------
+// `availableLocales()` lists packs that are merely *offered* as well as those
+// already fetched, which is what lets this menu be built before a single
+// translation has been downloaded. `setLocale` resolves once the chunk lands.
+const { availableLocales, setLocale, locale, onLocaleChange } = await import('./src/i18n/index.ts')
+
+const localeSelect = document.getElementById('demo-locale')
+const localeStatus = document.getElementById('demo-locale-status')
+
+if (localeSelect) {
+    for (const info of availableLocales()) {
+        const opt = document.createElement('option')
+        opt.value = info.code
+        // The name is written in the language itself; the English name is the hint
+        // for someone who cannot read it yet.
+        opt.textContent = info.english && info.english !== info.name
+            ? `${info.name} — ${info.english}`
+            : info.name
+        localeSelect.appendChild(opt)
+    }
+    localeSelect.value = locale()
+
+    localeSelect.addEventListener('change', async () => {
+        const code = localeSelect.value
+        localeStatus.textContent = 'loading…'
+        const t0 = performance.now()
+        await setLocale(code)
+        console.log(`[i18n] ${code} ready in ${Math.round(performance.now() - t0)}ms`)
+    })
+
+    // Fires after the pack is published, so it also covers a switch made from the
+    // toolbar's own globe button.
+    onLocaleChange(code => {
+        localeSelect.value = code
+        localeStatus.textContent = `active: ${code}`
+    })
+
+    localeStatus.textContent = `active: ${locale()}`
+}

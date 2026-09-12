@@ -11,6 +11,8 @@ import {
     type CropFrame,
     type CropTransform,
 } from './ImageSource'
+// Aliased: `t` is already taken here by the crop transform.
+import { t as msg } from '../i18n'
 
 /**
  * ImageCropper: the editable preview inside the image dialog.
@@ -312,9 +314,9 @@ export const ImageCropper = ({ onHandle }: { onHandle?: (handle: CropperHandle) 
     return (
         <div class="flex flex-col gap-1.5">
             <div class="flex items-center gap-1">
-                <button type="button" class={toolBtn} title="Zoom out" ref={bindClick(() => zoomCentre(1 / ZOOM_STEP))}>&minus;</button>
-                <button type="button" class={toolBtn} title="Zoom in" ref={bindClick(() => zoomCentre(ZOOM_STEP))}>+</button>
-                <button type="button" class={toolBtn} title="Fit the whole image in the frame" ref={bindClick(fit)}>Fit</button>
+                <button type="button" class={toolBtn} title={() => msg('editor.zoom.out')} ref={bindClick(() => zoomCentre(1 / ZOOM_STEP))}>&minus;</button>
+                <button type="button" class={toolBtn} title={() => msg('editor.zoom.in')} ref={bindClick(() => zoomCentre(ZOOM_STEP))}>+</button>
+                <button type="button" class={toolBtn} title={() => msg('editor.image.fitWhole')} ref={bindClick(fit)}>{() => msg('editor.zoom.fit')}</button>
                 <span class="ml-auto text-[11px] text-gray-500 select-none">drag to pan &middot; ctrl+wheel to zoom</span>
             </div>
 
@@ -344,7 +346,7 @@ export const ImageCropper = ({ onHandle }: { onHandle?: (handle: CropperHandle) 
 
                 <div
                     data-crop-resize
-                    title="Drag to resize the crop frame"
+                    title={() => msg('editor.image.dragToResizeCrop')}
                     class="absolute right-0 bottom-0 w-3.5 h-3.5 bg-blue-600 rounded-tl-sm cursor-se-resize touch-none"
                     ref={el => { if (el) (el as HTMLElement).onpointerdown = startResize }}
                 />

@@ -37,6 +37,7 @@ import { getCurrentEditor } from './utils'
 import { useDropdownDismiss } from './useDropdownDismiss'
 import { setLayoutZoom, resolvedZoom, onZoomApplied, ZOOM_MIN, ZOOM_MAX, type ZoomLevel } from './PageLayout'
 import { editorLayout } from './LayoutSwitch'
+import { t } from '../i18n'
 
 /** The stops `−` and `+` walk between. Coarse at the ends, fine around 100%. */
 const STEPS = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 2, 3, 4]
@@ -91,14 +92,44 @@ export interface ZoomText {
     menuTitle: string
 }
 
-export const zoomText = $<ZoomText>({
-    fit: 'Fit',
-    out: '−',
-    in: '+',
-    outTitle: 'Zoom out',
-    inTitle: 'Zoom in',
-    menuTitle: 'Document zoom',
-})
+/**
+ * Catalogue key per string. `out` and `in` are absent on purpose: they are the glyphs `−`
+ * and `+`, which read the same in every language wui ships and are not worth a translator's
+ * attention. They fall to {@link ZOOM_GLYPHS} instead.
+ */
+const ZOOM_KEYS: Partial<Record<keyof ZoomText, string>> = {
+    fit: 'editor.zoom.fit',
+    outTitle: 'editor.zoom.out',
+    inTitle: 'editor.zoom.in',
+    menuTitle: 'editor.zoom.menu',
+}
+
+/** The two strings that are symbols rather than words. */
+const ZOOM_GLYPHS: Partial<Record<keyof ZoomText, string>> = { out: '−', in: '+' }
+
+/**
+ * Per-string overrides, app-wide — the same escape hatch {@link layoutText} has, and empty
+ * for the same reason: the wording comes from the i18n catalogue now, and this is for a
+ * host that wants to differ from it *within* a language.
+ *
+ * ```ts
+ * zoomText({ ...$$(zoomText), fit: 'Whole page' })
+ * ```
+ */
+export const zoomText = $<Partial<ZoomText>>({})
+
+/**
+ * One of the control's strings: the override if there is one, the catalogue otherwise.
+ *
+ * Reads `zoomText` and (through `t`) the active locale, so every call site must keep it
+ * inside a thunk or the strip will not re-label when either changes.
+ */
+export const zoomStr = (key: keyof ZoomText): string => {
+    const over = $$(zoomText)[key]
+    if (over) return over
+    const k = ZOOM_KEYS[key]
+    return k ? t(k) : (ZOOM_GLYPHS[key] ?? '')
+}
 
 const def = () => ({
     buttonType: $('text', HtmlString) as ObservableMaybe<ButtonStyles>,
@@ -127,7 +158,7 @@ const ZoomControl = defaults(def, (props) => {
     }
 
     const label = () => $$(editorZoom) === 'fit'
-        ? `${$$(zoomText).fit} ${Math.round(current() * 100)}%`
+        ? `${zoomStr('fit')} ${Math.round(current() * 100)}%`
         : `${Math.round(current() * 100)}%`
 
     const step = (dir: 1 | -1) => () => {
@@ -166,16 +197,16 @@ const ZoomControl = defaults(def, (props) => {
     return <div class={() => ['relative inline-flex items-center gap-0.5', () => $$(cls) ? $$(cls) : $$(cn)]} ref={dropdownRef}>
         <Button
             type={buttonType}
-            title={() => $$(zoomText).outTitle}
+            title={() => zoomStr('outTitle')}
             onClick={step(-1)}
             onMouseDown={hold}
         >
-            <span class="w-4 text-center leading-none">{() => $$(zoomText).out}</span>
+            <span class="w-4 text-center leading-none">{() => zoomStr('out')}</span>
         </Button>
 
         <Button
             type={buttonType}
-            title={() => $$(zoomText).menuTitle}
+            title={() => zoomStr('menuTitle')}
             onClick={() => isOpen(!$$(isOpen))}
             onMouseDown={hold}
         >
@@ -186,11 +217,11 @@ const ZoomControl = defaults(def, (props) => {
 
         <Button
             type={buttonType}
-            title={() => $$(zoomText).inTitle}
+            title={() => zoomStr('inTitle')}
             onClick={step(1)}
             onMouseDown={hold}
         >
-            <span class="w-4 text-center leading-none">{() => $$(zoomText).in}</span>
+            <span class="w-4 text-center leading-none">{() => zoomStr('in')}</span>
         </Button>
 
         <div
@@ -208,7 +239,7 @@ const ZoomControl = defaults(def, (props) => {
                     onClick={pickPreset(z)}
                     onMouseDown={hold}
                 >
-                    {z === 'fit' ? () => $$(zoomText).fit : `${Math.round((z as number) * 100)}%`}
+                    {z === 'fit' ? () => zoomStr('fit') : `${Math.round((z as number) * 100)}%`}
                 </Button>
             )}
         </div>

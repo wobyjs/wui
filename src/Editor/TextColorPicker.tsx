@@ -4,6 +4,7 @@ import { useEditor, useUndoRedo } from './undoredo'
 import A from '../icons/a'
 import KeyboardDownArrow from '../icons/keyboard_down_arrow'
 import { applyTextColor } from './StyleEngine'
+import { t } from '../i18n'
 
 const def = () => ({
     cls: $('', HtmlClass) as JSX.Class,
@@ -77,7 +78,7 @@ const TextColorPicker = defaults(def, (props) => {
                 class={() => [
                     () => $$(cls) ? $$(cls) : BASE_BTN, cn,
                 ]}
-                title="Text color"
+                title={() => t('editor.textColor')}
                 onMouseDown={(e: any) => { e.preventDefault(); }}
                 onClick={applyPickedColor}
                 {...otherProps}

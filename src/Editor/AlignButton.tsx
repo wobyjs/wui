@@ -11,6 +11,7 @@ import AlignCenter from '../icons/align_center'
 import AlignLeft from '../icons/align_left'
 import AlignRight from '../icons/align_right'
 import AlignJustify from '../icons/align_justify'
+import { t } from '../i18n'
 
 type ContentAlign = 'left' | 'center' | 'right' | 'justify'
 
@@ -18,28 +19,28 @@ export const ALIGNMENT_MAP = {
     'left': {
         icon: <AlignLeft />,
         align: 'left' as const,
-        defaultTitle: 'Align Left',
+        titleKey: 'editor.alignLeft',
         classToAdd: 'text-left',
         classToRemove: 'text-center text-right text-justify'
     },
     'center': {
         icon: <AlignCenter />,
         align: 'center' as const,
-        defaultTitle: 'Align Center',
+        titleKey: 'editor.alignCenter',
         classToAdd: 'text-center',
         classToRemove: 'text-left text-right text-justify'
     },
     'right': {
         icon: <AlignRight />,
         align: 'right' as const,
-        defaultTitle: 'Align Right',
+        titleKey: 'editor.alignRight',
         classToAdd: 'text-right',
         classToRemove: 'text-left text-center text-justify'
     },
     'justify': {
         icon: <AlignJustify />,
         align: 'justify' as const,
-        defaultTitle: 'Align Justify',
+        titleKey: 'editor.alignJustify',
         classToAdd: 'text-justify',
         classToRemove: 'text-left text-center text-right'
     },
@@ -48,7 +49,9 @@ export const ALIGNMENT_MAP = {
 // Default props
 const def = () => ({
     type: $("outlined", HtmlString) as ObservableMaybe<ButtonStyles>,
-    title: $("Align Left", HtmlString) as ObservableMaybe<string>,
+    // Empty, not "Align Left": a baked-in English default is indistinguishable from a
+    // host-set title, and would beat the catalogue forever. See `displayTitle`.
+    title: $("", HtmlString) as ObservableMaybe<string>,
     cls: $('', HtmlClass) as JSX.Class,
     class: $('', HtmlClass) as JSX.Class,
     disabled: $(false, HtmlBoolean) as ObservableMaybe<boolean>,
@@ -110,7 +113,9 @@ const AlignButton: Defaulted<typeof def> = defaults(def, (props) => {
 
     const displayIcon = () => { return currentAlignment().icon; }
 
-    const displayTitle = () => { return currentAlignment().defaultTitle; }
+    // The prop wins when the host set one; otherwise the catalogue answers, in whatever
+    // language is current.
+    const displayTitle = () => $$(title) || t(currentAlignment().titleKey)
 
     const handleClick = (e: any) => {
         if (customOnClick) {

@@ -9,6 +9,7 @@ import { getEditorPlugins, pluginsToInsertItems, InsertMenuItem, BUILT_IN_ORDER 
 import { INSERT_IMAGE_EVENT, type InsertImageDetail } from './ImageDialog'
 import { TableGridPicker } from './TableGridPicker'
 import { insertionRange } from './BlockInsert'
+import { t, tx } from '../i18n'
 
 // Emoji, to match every registered plugin's icon. The built-in rows used to be the three
 // letters of their own label ("Img", "Tbl"), which made the top of a sorted menu read as
@@ -42,18 +43,59 @@ const sanitizeHTML = (html: string): string => {
     return html
 }
 
-// Helper to get shadow root selection for wui-editor
-function getEditorSelection(): { selection: Selection | null, shadowRoot: ShadowRoot | null } {
-    const editorHost = document.querySelector('wui-editor')
-    const shadowRoot = editorHost?.shadowRoot || null
-    const selection = shadowRoot ? shadowRoot.getSelection() : window.getSelection()
-    return { selection, shadowRoot }
+/**
+ * The contenteditable surface an insert has to land inside, found from the menu outwards.
+ *
+ * Every lookup on this file used to be `document.querySelector('wui-editor')?.shadowRoot
+ * ?.querySelector('[data-editor-root]')`, which assumes the editor is mounted as a custom
+ * element. `<Editor>` is an ordinary component too, and an app that renders it directly has
+ * no `wui-editor` host and no shadow root -- so that chain returned null and every entry in
+ * this menu did nothing: the built-ins returned early on the null surface, and the plugin
+ * rows, which are handed the surface rather than testing it, threw instead.
+ *
+ * The same climb ImageResizer and DocScroller do, and for the same reason: the toolbar is a
+ * sibling of the surface under Editor's own container, so walking up from the menu's node
+ * finds it in either shape -- and finds the *right* one on a page holding more than one
+ * editor, which the global query could not. The shadow hop keeps the walk going when the
+ * menu itself sits behind a boundary; the old chain stays last, for the window between
+ * mount and the ref landing.
+ */
+const editorSurface = (from?: HTMLElement | null): HTMLElement | null => {
+    let n: HTMLElement | null = from ?? null
+    while (n) {
+        const s = n.querySelector?.('[data-editor-root]') as HTMLElement | null
+        if (s) return s
+        n = n.parentElement ?? ((n.getRootNode() as ShadowRoot)?.host as HTMLElement | null) ?? null
+    }
+    return document.querySelector('wui-editor')?.shadowRoot
+        ?.querySelector('[data-editor-root]') as HTMLElement | null
 }
 
-/** The contenteditable surface itself, which is what an insert has to land inside. */
-const editorSurface = (): HTMLElement | null =>
-    document.querySelector('wui-editor')?.shadowRoot
-        ?.querySelector('[data-editor-root]') as HTMLElement | null
+/**
+ * The element the editor's own events are addressed to: its custom-element host when it has
+ * one, and the surface itself when it does not. {@link ImageDialog} resolves the same way
+ * from its side, which is what keeps the insert-image request and its listener on one node.
+ */
+const editorHostOf = (surface: HTMLElement | null): HTMLElement | null => {
+    if (!surface) return document.querySelector('wui-editor')
+    const root = surface.getRootNode()
+    return root instanceof ShadowRoot ? root.host as HTMLElement : surface
+}
+
+/**
+ * The selection object that owns the caret in `surface`.
+ *
+ * A shadow root keeps its own; a light-DOM editor uses the window's. Reading the wrong one
+ * reports no selection at all, which is how an insert silently lands nowhere.
+ */
+function getEditorSelection(surface?: HTMLElement | null): { selection: Selection | null, shadowRoot: ShadowRoot | null } {
+    const root = surface?.getRootNode?.() ?? document.querySelector('wui-editor')?.shadowRoot ?? null
+    const shadowRoot = root instanceof ShadowRoot ? root : null
+    const selection = shadowRoot
+        ? (shadowRoot as unknown as { getSelection?: () => Selection | null }).getSelection?.() ?? window.getSelection()
+        : window.getSelection()
+    return { selection, shadowRoot }
+}
 
 /**
  * Put the caret where the insertion is about to happen and make sure the surface holds it.
@@ -66,7 +108,7 @@ const editorSurface = (): HTMLElement | null =>
 const seatCaret = (surface: HTMLElement): Range => {
     const range = insertionRange(surface)
     surface.focus({ preventScroll: true })
-    const { selection } = getEditorSelection()
+    const { selection } = getEditorSelection(surface)
     selection?.removeAllRanges()
     selection?.addRange(range)
     return range
@@ -80,13 +122,15 @@ const seatCaret = (surface: HTMLElement): Range => {
  * blurs the contenteditable surface, and a blurred shadow root reports no selection at
  * all. The dialog restores this range when the user commits.
  */
-const execInsertImage = () => {
-    const surface = editorSurface()
+const execInsertImage = (from?: HTMLElement | null) => {
+    const surface = editorSurface(from)
     if (!surface) return
     const range = insertionRange(surface)
 
-    const editorHost = document.querySelector('wui-editor')
-    editorHost?.dispatchEvent(new CustomEvent<InsertImageDetail>(INSERT_IMAGE_EVENT, { detail: { range } }))
+    // Bubbling because ImageDialog listens on the document: it cannot resolve its own
+    // editor host at mount time, only when the request arrives.
+    editorHostOf(surface)?.dispatchEvent(
+        new CustomEvent<InsertImageDetail>(INSERT_IMAGE_EVENT, { detail: { range }, bubbles: true }))
 }
 
 /**
@@ -98,8 +142,8 @@ const execInsertImage = () => {
  * selection with it, while the grid never touches focus at all, so `insertHTML` runs
  * against the caret that was already there.
  */
-const insertTable = (rows: number, cols: number) => {
-    const surface = editorSurface()
+const insertTable = (rows: number, cols: number, from?: HTMLElement | null) => {
+    const surface = editorSurface(from)
     if (!surface) return
     if (!(rows > 0) || !(cols > 0)) return
     seatCaret(surface)
@@ -149,11 +193,10 @@ const topLevelBlock = (node: Node | null, surface: HTMLElement): Node | null => 
  * panel are on it immediately -- an empty container is otherwise hard to select, since every
  * click inside one lands on the text it wraps and a fresh one has no text to click.
  */
-const insertContainer = (style: string) => {
-    const { selection } = getEditorSelection()
-    const surface = document.querySelector('wui-editor')?.shadowRoot
-        ?.querySelector('[data-editor-root]') as HTMLElement | null
+const insertContainer = (style: string, from?: HTMLElement | null) => {
+    const surface = editorSurface(from)
     if (!surface) return
+    const { selection } = getEditorSelection(surface)
 
     const range = selection && selection.rangeCount > 0 ? selection.getRangeAt(0) : null
     const withinSurface = !!range && surface.contains(range.commonAncestorContainer)
@@ -193,16 +236,19 @@ const insertContainer = (style: string) => {
     div.setAttribute('data-element-selected', '')
 }
 
-const execInsertContainer = () => insertContainer(CONTAINER_STYLE)
-const execInsertRow = () => insertContainer(ROW_STYLE)
+const execInsertContainer = (from?: HTMLElement | null) => insertContainer(CONTAINER_STYLE, from)
+const execInsertRow = (from?: HTMLElement | null) => insertContainer(ROW_STYLE, from)
 // #endregion
 
 /**
  * @param openTableGrid What the "Table" row does. It is passed in rather than being a
  *   module-level action because, alone among these items, Table does not insert anything
  *   when clicked — it swaps the menu over to the size grid, which is per-menu state.
+ * @param self The menu's own node, which every action resolves its surface from. A thunk
+ *   and not the node: the menu is built as it opens and its actions run on a click after
+ *   that, so the ref is read at the moment it is needed rather than captured early.
  */
-const getInsertOptions = (openTableGrid: () => void): InsertMenuItem[] => {
+const getInsertOptions = (openTableGrid: () => void, self: () => HTMLElement | null): InsertMenuItem[] => {
     // No 'Horizontal Rule' here: the `rule` plugin is the same insert with a property
     // panel behind it, so the built-in row was two menu entries for one idea. See the
     // note above <wui-rule> in PageBlockPlugins.ts.
@@ -212,17 +258,22 @@ const getInsertOptions = (openTableGrid: () => void): InsertMenuItem[] => {
     // with every unordered plugin and hand the tie-break back to import order, which is the
     // thing `order` exists to take away.
     const builtIn: InsertMenuItem[] = [
-        { label: 'Image', action: execInsertImage, icon: ImageIcon, order: BUILT_IN_ORDER },
-        { label: 'Table', action: openTableGrid, icon: TableIcon, order: BUILT_IN_ORDER },
-        { label: 'Container', action: execInsertContainer, icon: ContainerIcon, order: BUILT_IN_ORDER },
-        { label: 'Row (flex)', action: execInsertRow, icon: RowIcon, order: BUILT_IN_ORDER },
+        { label: 'Image', key: 'editor.insert.image', action: () => execInsertImage(self()), icon: ImageIcon, order: BUILT_IN_ORDER },
+        { label: 'Table', key: 'editor.insert.table', action: openTableGrid, icon: TableIcon, order: BUILT_IN_ORDER },
+        { label: 'Container', key: 'editor.insert.container', action: () => execInsertContainer(self()), icon: ContainerIcon, order: BUILT_IN_ORDER },
+        { label: 'Row (flex)', key: 'editor.insert.row', action: () => execInsertRow(self()), icon: RowIcon, order: BUILT_IN_ORDER },
     ]
 
     // Merge registered plugin items
     const plugins = $$(getEditorPlugins())
     if (plugins.length === 0) return builtIn
 
-    const pluginItems = pluginsToInsertItems(document.querySelector('wui-editor')?.shadowRoot?.querySelector('[data-editor-root]') as HTMLElement) as InsertMenuItem[]
+    // No surface, no plugin rows: `pluginsToInsertItems` focuses and inserts into the
+    // element it is handed, so a null one throws out of the click rather than declining it.
+    const surface = editorSurface(self())
+    if (!surface) return builtIn
+
+    const pluginItems = pluginsToInsertItems(surface) as InsertMenuItem[]
 
     // One sort over the whole menu rather than `[...builtIn, ...pluginItems]`, so that a
     // plugin's `order` can place it anywhere in the list and not merely among its peers --
@@ -292,7 +343,7 @@ const InsertDropDown = defaults(def, (props) => {
             >
                 {() => $$(showGrid)
                     ? <TableGridPicker
-                        onPick={(rows, cols) => { insertTable(rows, cols); closeDropdown() }}
+                        onPick={(rows, cols) => { insertTable(rows, cols, $$(dropdownRef)); closeDropdown() }}
                         onCancel={() => showGrid(false)}
                     />
                     : <OptionList />}
@@ -303,7 +354,7 @@ const InsertDropDown = defaults(def, (props) => {
     const OptionList = () => {
         return (
             <div class="py-1" role="none">
-                {getInsertOptions(() => showGrid(true)).map(opt => (
+                {getInsertOptions(() => showGrid(true), () => $$(dropdownRef) ?? null).map(opt => (
                     <Button
                         type='outlined'
                         cls="w-full flex items-center text-gray-700 px-4 py-2 text-sm hover:bg-gray-100 hover:text-gray-900"
@@ -315,7 +366,8 @@ const InsertDropDown = defaults(def, (props) => {
                         </span>
 
                         <span class="w-4/5 text-left truncate">
-                            {opt.label}
+                            {/* Built-ins have a catalogue id; a plugin row is keyed by its own English. */}
+                            {() => opt.key ? t(opt.key) : tx(opt.label)}
                         </span>
                     </Button>
                 ))}
@@ -331,7 +383,7 @@ const InsertDropDown = defaults(def, (props) => {
                     type='outlined'
                     cls={() => [BASE_BTN]}
                     onClick={toggleDropdown}
-                    title="Insert content"
+                    title={() => t('editor.insertContent')}
                     disabled={disabled}
                     onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation() }}
                 >
@@ -344,7 +396,7 @@ const InsertDropDown = defaults(def, (props) => {
                     class="size-full inline-flex justify-center items-center rounded-md border border-gray-300 shadow-sm bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500 cursor-pointer px-2"
                     onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleDropdown(); }}
                     onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation(); }}
-                    title="Choose what to insert"
+                    title={() => t('editor.chooseWhatToInsert')}
                     disabled={disabled}
                 >
                     <KeyboardDownArrow class="h-5 w-5" />

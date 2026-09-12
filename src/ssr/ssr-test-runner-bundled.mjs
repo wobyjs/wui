@@ -283,7 +283,7 @@ var init_ssr_shim = __esm({
   }
 });
 
-// ../woby/dist/setters-DB8s8ITo.js
+// ../woby/dist/setters-Bw8p6kfU.js
 function deepResolve(value, returnFunction = false) {
   if (isFunction$1(value)) {
     if (isObservable(value)) return deepResolve(value(), returnFunction);
@@ -403,6 +403,14 @@ function $(value, options2) {
   const stack = callStack();
   return writable(new Observable(value, options2), stack);
 }
+function* descendantElements(root2) {
+  const kids = root2?.childNodes ?? [];
+  for (const child of kids) {
+    if (!\u662F\u5143\u7D20(child)) continue;
+    yield child;
+    yield* descendantElements(child);
+  }
+}
 function getCreators() {
   if (isNodeEnvironment) return {
     createComment: createComment$1,
@@ -440,9 +448,9 @@ function getCreators() {
     };
   }
 }
-var DEBUGGER, Stack, callStack, BATCH, OBSERVER, setBatch, setObserver, castArray$1, castError$1, is, isArray$1, isEqual, isFunction$1, isObject$1, isSymbol, noop$1, nope, counter, resolve$1, batch, SYMBOL_CACHED, SYMBOL_OBSERVABLE, SYMBOL_OBSERVABLE_BOOLEAN, SYMBOL_OBSERVABLE_FROZEN, SYMBOL_OBSERVABLE_READABLE, SYMBOL_OBSERVABLE_WRITABLE, SYMBOL_STORE, SYMBOL_STORE_KEYS, SYMBOL_STORE_OBSERVABLE, SYMBOL_STORE_TARGET, SYMBOL_STORE_VALUES, SYMBOL_STORE_UNTRACKED, SYMBOL_SUSPENSE$1, SYMBOL_UNCACHED, SYMBOL_UNTRACKED, SYMBOL_UNTRACKED_UNWRAPPED, isObservableBoolean, isObservableFrozen, isUntracked$1, isObservable, frozen, readable, writable, OBSERVABLE_FALSE, OBSERVABLE_TRUE, UNAVAILABLE, UNINITIALIZED, Scheduler$1, scheduler_sync_default, Observable, lazyArrayEach, lazyArrayEachRight, lazyArrayPush, lazySetAdd, lazySetDelete, lazySetEach, onCleanup, onDispose, Owner, SuperRoot, SUPER_OWNER, OWNER, setOwner, ObservablesArray, ObservablesSet, Observer, Memo, memo, boolean, cleanup, Context, disposed, Scheduler, scheduler_async_default, Effect, effect, Root, DUMMY_INDEX$1, MappedRoot$1, CacheKeyed, Suspense, suspense, DUMMY_INDEX, MappedRoot, CacheUnkeyed, isStore, warmup, match, ternary, isBatching, owner, isObservableWritable, target, readonly, root, isEqualForSelector, DisposableMap, SelectedObservable, selector, StoreMap, StoreCleanable, StoreKeys, StoreValues, StoreHas, StoreProperty, StoreListenersRegular, StoreListenersRoots, StoreScheduler, NODES, SPECIAL_SYMBOLS, UNREACTIVE_KEYS, STORE_TRAPS, STORE_UNTRACK_TRAPS, getNode, getNodeExisting, getNodeFromStore, getNodeKeys, getNodeValues, getNodeHas, getNodeObservable, getNodeProperty, getGettersAndSetters, getStore, getTarget, getUntracked, isEqualDescriptor, isFrozenLike, isListenable, isProxiable, isUntracked, throwNoSetterError, store, suspended, tick, tryCatch, _with, dist_default, CONTEXTS_DATA, DIRECTIVES, SYMBOL_TEMPLATE_ACCESSOR, SYMBOLS_DIRECTIVES, SYMBOL_CLONE, SYMBOL_CONTEXT, SYMBOL_ISSLOT, SYMBOL_JSX, SYMBOL_DEFAULT, SYMBOL_CONTEXT_WRAP, SimpleNodeList, BaseNode, Comment2, Style, Element3, createComment$1, createElement, createHTMLNode$1, SVGNode, createSVGNode$1, createText$1, createDocumentFragment$1, createDocument, document$1, isNodeEnvironment, createComment, createHTMLNode, createSVGNode, createText, createDocumentFragment, NOOP_CHILDREN, Node$1, FragmentUtils, useCheapDisposed, useMicrotask, options, useRenderEffect, assign, castArray, flatten, indexOf, isArray, isBoolean, isFunction, isClass, isFunctionReactive, isNil, isNode, isObject, isPrimitive, isPromise, isString, isSVG, isSVGElement, isTemplateAccessor, isVoidChild, isPureFunction, classesToggle, dummyNode, beforeDummyWrapper, afterDummyWrapper, diff, EnvironmentToken, DocumentToken, EnvironmentContext, useEnvironment, DocumentContext, resolveChild, resolveClass, resolveStyle, resolveArraysAndStatics, kebabToCamelCase, camelToKebabCase, normalizePropertyPath, setNestedAttribute, setAttributeStatic, setAttribute, setChildStatic, setChild, setClassStatic, setClass, setClassBooleanStatic, setClassBoolean, setClassesStatic, setClasses, setDirective, setEventStatic, setEvent, setHTMLStatic, setHTML, setPropertyStatic, setProperty, setRef, propertyNonDimensionalRe, setStyleStatic, setStyle, setStylesStatic, setStyles, setTemplateAccessor, setProp, setProps;
-var init_setters_DB8s8ITo = __esm({
-  "../woby/dist/setters-DB8s8ITo.js"() {
+var DEBUGGER, Stack, callStack, BATCH, OBSERVER, setBatch, setObserver, castArray$1, castError$1, is, isArray$1, isEqual, isFunction$1, isObject$1, isSymbol, noop$1, nope, counter, resolve$1, batch, SYMBOL_CACHED, SYMBOL_OBSERVABLE, SYMBOL_OBSERVABLE_BOOLEAN, SYMBOL_OBSERVABLE_FROZEN, SYMBOL_OBSERVABLE_READABLE, SYMBOL_OBSERVABLE_WRITABLE, SYMBOL_STORE, SYMBOL_STORE_KEYS, SYMBOL_STORE_OBSERVABLE, SYMBOL_STORE_TARGET, SYMBOL_STORE_VALUES, SYMBOL_STORE_UNTRACKED, SYMBOL_SUSPENSE$1, SYMBOL_UNCACHED, SYMBOL_UNTRACKED, SYMBOL_UNTRACKED_UNWRAPPED, isObservableBoolean, isObservableFrozen, isUntracked$1, isObservable, frozen, readable, writable, OBSERVABLE_FALSE, OBSERVABLE_TRUE, UNAVAILABLE, UNINITIALIZED, Scheduler$1, scheduler_sync_default, Observable, lazyArrayEach, lazyArrayEachRight, lazyArrayPush, lazySetAdd, lazySetDelete, lazySetEach, onCleanup, onDispose, Owner, SuperRoot, SUPER_OWNER, OWNER, setOwner, ObservablesArray, ObservablesSet, Observer, Memo, memo, boolean, cleanup, Context, disposed, Scheduler, scheduler_async_default, Effect, effect, Root, DUMMY_INDEX$1, MappedRoot$1, CacheKeyed, Suspense, suspense, DUMMY_INDEX, MappedRoot, CacheUnkeyed, isStore, warmup, match, ternary, isBatching, owner, isObservableWritable, target, readonly, root, isEqualForSelector, DisposableMap, SelectedObservable, selector, StoreMap, StoreCleanable, StoreKeys, StoreValues, StoreHas, StoreProperty, StoreListenersRegular, StoreListenersRoots, StoreScheduler, NODES, SPECIAL_SYMBOLS, UNREACTIVE_KEYS, STORE_TRAPS, STORE_UNTRACK_TRAPS, getNode, getNodeExisting, getNodeFromStore, getNodeKeys, getNodeValues, getNodeHas, getNodeObservable, getNodeProperty, getGettersAndSetters, getStore, getTarget, getUntracked, isEqualDescriptor, isFrozenLike, isListenable, isProxiable, isUntracked, throwNoSetterError, store, suspended, tick, tryCatch, _with, dist_default, CONTEXTS_DATA, DIRECTIVES, SYMBOL_TEMPLATE_ACCESSOR, SYMBOLS_DIRECTIVES, SYMBOL_CLONE, SYMBOL_CONTEXT, SYMBOL_ISSLOT, SYMBOL_JSX, SYMBOL_DEFAULT, SYMBOL_CONTEXT_WRAP, SimpleNodeList, IDENT, SPACE, \u8BED\u6CD5\u9519\u8BEF, readIdent, readAttr, cache, parseSelector, \u662F\u5143\u7D20, \u7C7B\u5217\u8868, matchSimple, matchCompound, matchFrom, matchAny, matchesSelector, closestSelector, querySelectorAll, querySelector, getElementById, BaseNode, Comment2, Style, Element3, createComment$1, createElement, createHTMLNode$1, SVGNode, createSVGNode$1, createText$1, createDocumentFragment$1, createDocument, document$1, isNodeEnvironment, createComment, createHTMLNode, createSVGNode, createText, createDocumentFragment, NOOP_CHILDREN, Node3, FragmentUtils, useCheapDisposed, useMicrotask, options, useRenderEffect, assign, castArray, flatten, indexOf, isArray, isBoolean, isFunction, isClass, isFunctionReactive, isNil, isNode, isObject, isPrimitive, isPromise, isString, isSVG, isSVGElement, isTemplateAccessor, isVoidChild, isPureFunction, classesToggle, \u8282\u70B9\u7C7B, dummyNode, beforeDummyWrapper, afterDummyWrapper, diff, EnvironmentToken, DocumentToken, EnvironmentContext, useEnvironment, DocumentContext, resolveChild, resolveClass, resolveStyle, resolveArraysAndStatics, kebabToCamelCase, camelToKebabCase, normalizePropertyPath, setNestedAttribute, SYMBOL_SELF_REMOVED_ATTRIBUTES, trackSelfRemovedAttributes, markSelfRemovedAttribute, consumeSelfRemovedAttribute, setAttributeStatic, setAttribute, setChildStatic, setChild, setClassStatic, setClass, setClassBooleanStatic, setClassBoolean, setClassesStatic, setClasses, setDirective, setEventStatic, setEvent, setHTMLStatic, setHTML, setPropertyStatic, setProperty, setRef, propertyNonDimensionalRe, setStyleStatic, setStyle, setStylesStatic, setStyles, setTemplateAccessor, setProp, setProps;
+var init_setters_Bw8p6kfU = __esm({
+  "../woby/dist/setters-Bw8p6kfU.js"() {
     "use strict";
     init_ssr_shim();
     DEBUGGER = {
@@ -1077,12 +1085,12 @@ var init_setters_DB8s8ITo = __esm({
         this.cleanup = () => {
           if (!this.prevCount) return;
           if (this.prevCount === this.reuseCount) return;
-          const { cache, bool } = this;
-          if (!cache.size) return;
-          if (this.nextCount) cache.forEach((mapped, value) => {
+          const { cache: cache2, bool } = this;
+          if (!cache2.size) return;
+          if (this.nextCount) cache2.forEach((mapped, value) => {
             if (mapped.bool === bool) return;
             mapped.dispose(true);
-            cache.delete(value);
+            cache2.delete(value);
           });
           else {
             this.cache.forEach((mapped) => {
@@ -1111,7 +1119,7 @@ var init_setters_DB8s8ITo = __esm({
         };
         this.map = (values) => {
           this.before();
-          const { cache, bool, fn: fn3, fnWithIndex } = this;
+          const { cache: cache2, bool, fn: fn3, fnWithIndex } = this;
           const results = new Array(values.length);
           let resultsCached = true;
           let resultsUncached = true;
@@ -1119,7 +1127,7 @@ var init_setters_DB8s8ITo = __esm({
           const stack = callStack();
           for (let i = 0, l2 = values.length; i < l2; i++) {
             const value = values[i];
-            const cached = cache.get(value);
+            const cached = cache2.get(value);
             if (cached && cached.bool !== bool) {
               resultsUncached = false;
               reuseCount += 1;
@@ -1139,7 +1147,7 @@ var init_setters_DB8s8ITo = __esm({
                 const result = results[i] = resolve(fn3(value, index));
                 mapped.bool = bool;
                 mapped.result = result;
-                if (!cached) cache.set(value, mapped);
+                if (!cached) cache2.set(value, mapped);
               }, void 0, void 0, stack);
             }
           }
@@ -1242,7 +1250,7 @@ var init_setters_DB8s8ITo = __esm({
           });
         };
         this.map = (values) => {
-          const { cache, fn: fn3, fnWithIndex } = this;
+          const { cache: cache2, fn: fn3, fnWithIndex } = this;
           const cacheNext = /* @__PURE__ */ new Map();
           const results = new Array(values.length);
           const pool2 = this.pool;
@@ -1251,12 +1259,12 @@ var init_setters_DB8s8ITo = __esm({
           let resultsUncached = true;
           let leftovers = [];
           const stack = callStack();
-          if (cache.size) for (let i = 0, l2 = values.length; i < l2; i++) {
+          if (cache2.size) for (let i = 0, l2 = values.length; i < l2; i++) {
             const value = values[i];
-            const cached = cache.get(value);
+            const cached = cache2.get(value);
             if (cached) {
               resultsUncached = false;
-              cache.delete(value);
+              cache2.delete(value);
               cacheNext.set(value, cached);
               cached.index?.set(i);
               results[i] = cached.result;
@@ -1267,8 +1275,8 @@ var init_setters_DB8s8ITo = __esm({
             const index = leftovers[i] || i;
             const value = values[index];
             const isDuplicate = cacheNext.has(value);
-            if (!isDuplicate) for (const [key, mapped2] of cache.entries()) {
-              cache.delete(key);
+            if (!isDuplicate) for (const [key, mapped2] of cache2.entries()) {
+              cache2.delete(key);
               cacheNext.set(value, mapped2);
               mapped2.index?.set(index);
               mapped2.value?.set(value);
@@ -2112,8 +2120,226 @@ var init_setters_DB8s8ITo = __esm({
         return this.nodes[Symbol.iterator]();
       }
     };
+    IDENT = /[A-Za-z0-9_\u00A0-\uFFFF-]/;
+    SPACE = /[ \t\r\n\f]/;
+    \u8BED\u6CD5\u9519\u8BEF = (sel, at2, why) => {
+      throw new SyntaxError(`'${sel}' is not a valid selector for the SSR selector engine (${why}, at offset ${at2}).`);
+    };
+    readIdent = (sel, i) => {
+      let out = "";
+      while (i < sel.length && IDENT.test(sel[i])) {
+        out += sel[i];
+        i++;
+      }
+      return [out, i];
+    };
+    readAttr = (sel, i) => {
+      while (i < sel.length && SPACE.test(sel[i])) i++;
+      const [name21, afterName] = readIdent(sel, i);
+      if (!name21) return \u8BED\u6CD5\u9519\u8BEF(sel, i, "empty attribute name");
+      i = afterName;
+      while (i < sel.length && SPACE.test(sel[i])) i++;
+      if (sel[i] === "]") return [{
+        t: "attr",
+        name: name21
+      }, i + 1];
+      let op = "";
+      if (i < sel.length && "~|^$*".includes(sel[i])) {
+        op = sel[i];
+        i++;
+      }
+      if (sel[i] !== "=") return \u8BED\u6CD5\u9519\u8BEF(sel, i, 'expected "=" in an attribute selector');
+      op += "=";
+      i++;
+      while (i < sel.length && SPACE.test(sel[i])) i++;
+      let value = "";
+      const quote = sel[i];
+      if (quote === '"' || quote === "'") {
+        i++;
+        while (i < sel.length && sel[i] !== quote) {
+          if (sel[i] === "\\" && i + 1 < sel.length) i++;
+          value += sel[i];
+          i++;
+        }
+        if (sel[i] !== quote) return \u8BED\u6CD5\u9519\u8BEF(sel, i, "unterminated string");
+        i++;
+      } else {
+        const [bare, afterBare] = readIdent(sel, i);
+        value = bare;
+        i = afterBare;
+      }
+      while (i < sel.length && SPACE.test(sel[i])) i++;
+      if (i < sel.length && "iIsS".includes(sel[i])) {
+        i++;
+        while (i < sel.length && SPACE.test(sel[i])) i++;
+      }
+      if (sel[i] !== "]") return \u8BED\u6CD5\u9519\u8BEF(sel, i, 'expected "]"');
+      return [{
+        t: "attr",
+        name: name21,
+        op,
+        value
+      }, i + 1];
+    };
+    cache = /* @__PURE__ */ new Map();
+    parseSelector = (sel) => {
+      const hit = cache.get(sel);
+      if (hit) return hit;
+      const list = [];
+      let complex = [];
+      let compound = [];
+      let combinator = null;
+      let pendingSpace = false;
+      let i = 0;
+      const flushCompound = () => {
+        if (compound.length) {
+          complex.push({
+            compound,
+            combinator
+          });
+          compound = [];
+          combinator = null;
+        }
+      };
+      const flushComplex = () => {
+        flushCompound();
+        if (complex.length) list.push(complex);
+        complex = [];
+      };
+      while (i < sel.length) {
+        const c = sel[i];
+        if (SPACE.test(c)) {
+          i++;
+          pendingSpace = compound.length > 0;
+          continue;
+        }
+        if (c === ",") {
+          flushComplex();
+          pendingSpace = false;
+          i++;
+          continue;
+        }
+        if (c === ">") {
+          flushCompound();
+          combinator = ">";
+          pendingSpace = false;
+          i++;
+          continue;
+        }
+        if (pendingSpace) {
+          flushCompound();
+          if (combinator === null) combinator = " ";
+          pendingSpace = false;
+        }
+        if (c === "*") {
+          compound.push({ t: "any" });
+          i++;
+          continue;
+        }
+        if (c === "#" || c === ".") {
+          const [v2, next2] = readIdent(sel, i + 1);
+          if (!v2) return \u8BED\u6CD5\u9519\u8BEF(sel, i, `empty ${c === "#" ? "id" : "class"}`);
+          compound.push({
+            t: c === "#" ? "id" : "class",
+            v: v2
+          });
+          i = next2;
+          continue;
+        }
+        if (c === "[") {
+          const [simple, next2] = readAttr(sel, i + 1);
+          compound.push(simple);
+          i = next2;
+          continue;
+        }
+        if (c === ":") return \u8BED\u6CD5\u9519\u8BEF(sel, i, "pseudo-classes are not supported");
+        if (c === "+" || c === "~") return \u8BED\u6CD5\u9519\u8BEF(sel, i, "sibling combinators are not supported");
+        const [tag, next] = readIdent(sel, i);
+        if (!tag) return \u8BED\u6CD5\u9519\u8BEF(sel, i, `unexpected "${c}"`);
+        compound.push({
+          t: "tag",
+          v: tag
+        });
+        i = next;
+      }
+      flushComplex();
+      if (!list.length) return \u8BED\u6CD5\u9519\u8BEF(sel, 0, "empty selector");
+      cache.set(sel, list);
+      return list;
+    };
+    \u662F\u5143\u7D20 = (n3) => !!n3 && n3.nodeType === 1;
+    \u7C7B\u5217\u8868 = (el) => {
+      const raw = el.attributes?.["class"];
+      return typeof raw === "string" && raw ? raw.split(/[ \t\r\n\f]+/).filter(Boolean) : [];
+    };
+    matchSimple = (el, s) => {
+      switch (s.t) {
+        case "any":
+          return true;
+        case "tag":
+          return typeof el.tagName === "string" && el.tagName.toLowerCase() === s.v.toLowerCase();
+        case "id":
+          return el.attributes?.["id"] === s.v;
+        case "class":
+          return \u7C7B\u5217\u8868(el).includes(s.v);
+        case "attr": {
+          const v2 = el.attributes?.[s.name];
+          if (v2 === void 0 || v2 === null) return false;
+          if (!s.op) return true;
+          const want = s.value ?? "";
+          switch (s.op) {
+            case "=":
+              return String(v2) === want;
+            case "~=":
+              return want !== "" && String(v2).split(/[ \t\r\n\f]+/).includes(want);
+            case "|=":
+              return String(v2) === want || String(v2).startsWith(want + "-");
+            case "^=":
+              return want !== "" && String(v2).startsWith(want);
+            case "$=":
+              return want !== "" && String(v2).endsWith(want);
+            case "*=":
+              return want !== "" && String(v2).includes(want);
+          }
+          return false;
+        }
+      }
+    };
+    matchCompound = (el, compound) => compound.every((s) => matchSimple(el, s));
+    matchFrom = (node, complex, i) => {
+      if (!\u662F\u5143\u7D20(node)) return false;
+      if (!matchCompound(node, complex[i].compound)) return false;
+      const combinator = complex[i].combinator;
+      if (combinator === null) return true;
+      if (combinator === ">") return matchFrom(node.parentNode, complex, i - 1);
+      for (let p = node.parentNode; \u662F\u5143\u7D20(p); p = p.parentNode) if (matchFrom(p, complex, i - 1)) return true;
+      return false;
+    };
+    matchAny = (el, parsed) => parsed.some((complex) => matchFrom(el, complex, complex.length - 1));
+    matchesSelector = (el, selector2) => \u662F\u5143\u7D20(el) && matchAny(el, parseSelector(selector2));
+    closestSelector = (el, selector2) => {
+      const parsed = parseSelector(selector2);
+      for (let n3 = el; \u662F\u5143\u7D20(n3); n3 = n3.parentNode) if (matchAny(n3, parsed)) return n3;
+      return null;
+    };
+    querySelectorAll = (root2, selector2) => {
+      const parsed = parseSelector(selector2);
+      const out = [];
+      for (const el of descendantElements(root2)) if (matchAny(el, parsed)) out.push(el);
+      return out;
+    };
+    querySelector = (root2, selector2) => {
+      const parsed = parseSelector(selector2);
+      for (const el of descendantElements(root2)) if (matchAny(el, parsed)) return el;
+      return null;
+    };
+    getElementById = (root2, id) => {
+      for (const el of descendantElements(root2)) if (el.attributes?.["id"] === id) return el;
+      return null;
+    };
     BaseNode = class {
       constructor(nodeType) {
+        this._ownerDocument = null;
         this._observers = [];
         this.nodeType = nodeType;
         this.attributes = {};
@@ -2156,6 +2382,7 @@ var init_setters_DB8s8ITo = __esm({
         return true;
       }
       appendChild(child) {
+        if (child?.parentNode) child.parentNode.removeChild(child);
         const previousSibling = this.childNodes.length > 0 ? this.childNodes[this.childNodes.length - 1] : null;
         if (child) child.parentNode = this;
         this.childNodes.push(child);
@@ -2179,6 +2406,7 @@ var init_setters_DB8s8ITo = __esm({
       }
       insertBefore(newNode, referenceNode) {
         if (referenceNode === null) return this.appendChild(newNode);
+        if (newNode?.parentNode) newNode.parentNode.removeChild(newNode);
         const index = this.childNodes.indexOf(referenceNode);
         if (index === -1) throw new Error("Reference node not found");
         const previousSibling = index > 0 ? this.childNodes[index - 1] : null;
@@ -2362,20 +2590,94 @@ var init_setters_DB8s8ITo = __esm({
       get nodeName() {
         return "";
       }
+      /**
+      * The document this node belongs to: the one it was created by, or failing that the
+      * one an ancestor was created by. A node built off-document still has an owner, which
+      * is what lets code do `node.ownerDocument.createElement(...)` before it is inserted.
+      */
       get ownerDocument() {
+        if (this._ownerDocument) return this._ownerDocument;
+        for (let p = this.parentNode; p; p = p.parentNode) {
+          if (p.nodeType === 9) return p;
+          if (p._ownerDocument) return p._ownerDocument;
+        }
         return null;
       }
+      /** The parent, but only when it is an element — a document or fragment parent gives null. */
       get parentElement() {
-        return this.parentNode;
+        return this.parentNode?.nodeType === 1 ? this.parentNode : null;
+      }
+      /** Element children only, skipping text and comment nodes. */
+      get children() {
+        return this.childNodes.filter((c) => c?.nodeType === 1);
+      }
+      get firstElementChild() {
+        return this.children[0] ?? null;
+      }
+      get lastElementChild() {
+        const els = this.children;
+        return els[els.length - 1] ?? null;
+      }
+      get nextElementSibling() {
+        const sibs = this.parentNode?.childNodes ?? [];
+        for (let i = sibs.indexOf(this) + 1; i > 0 && i < sibs.length; i++) if (sibs[i]?.nodeType === 1) return sibs[i];
+        return null;
+      }
+      get previousElementSibling() {
+        const sibs = this.parentNode?.childNodes ?? [];
+        for (let i = sibs.indexOf(this) - 1; i >= 0; i--) if (sibs[i]?.nodeType === 1) return sibs[i];
+        return null;
+      }
+      /** Detach this node from its parent. No-op when it has none, exactly like the DOM. */
+      remove() {
+        this.parentNode?.removeChild(this);
+      }
+      /** Does this node itself match the selector? Always false for non-elements. */
+      matches(selector2) {
+        return matchesSelector(this, selector2);
+      }
+      /** Nearest self-or-ancestor matching the selector, or null. */
+      closest(selector2) {
+        return closestSelector(this, selector2);
+      }
+      /** First descendant matching the selector, in document order. Shadow trees are not entered. */
+      querySelector(selector2) {
+        return querySelector(this, selector2);
+      }
+      /** Every descendant matching the selector, in document order, as a plain array. */
+      querySelectorAll(selector2) {
+        return querySelectorAll(this, selector2);
+      }
+      getElementsByTagName(tagName) {
+        if (tagName === "*") return [...descendantElements(this)];
+        const want = tagName.toLowerCase();
+        return [...descendantElements(this)].filter((el) => el.tagName?.toLowerCase() === want);
+      }
+      getElementsByClassName(classNames) {
+        const want = classNames.split(/\s+/).filter(Boolean);
+        if (!want.length) return [];
+        return [...descendantElements(this)].filter((el) => {
+          const have = String(el.attributes?.["class"] ?? "").split(/\s+/);
+          return want.every((c) => have.includes(c));
+        });
       }
       compareDocumentPosition(other) {
         return 0;
       }
+      /** True for self and for any descendant, as the DOM defines it. */
       contains(other) {
+        for (let n3 = other; n3; n3 = n3.parentNode) if (n3 === this) return true;
         return false;
       }
+      /**
+      * The topmost node of this node's tree — the document when connected, otherwise the
+      * outermost detached ancestor. (It used to return `ownerDocument`, which is a
+      * different thing entirely once a node can have one while still being detached.)
+      */
       getRootNode() {
-        return this.ownerDocument || this;
+        let n3 = this;
+        while (n3.parentNode) n3 = n3.parentNode;
+        return n3;
       }
       hasChildNodes() {
         return this.childNodes.length > 0;
@@ -2490,6 +2792,7 @@ var init_setters_DB8s8ITo = __esm({
       }
       removeAttribute(name21) {
         delete this.attributes[name21];
+        if (name21 === "class" || name21 === "className") this.#className = "";
         super.removeAttribute(name21);
       }
       hasAttribute(name21) {
@@ -2590,8 +2893,8 @@ var init_setters_DB8s8ITo = __esm({
           parent.removeChild(this);
           for (let i = 0; i < convertedNodes.length; i++) {
             const node = convertedNodes[i];
-            if (i === 0) parent.insertBefore(node, parent.childNodes[index]);
-            else parent.insertBefore(node, parent.childNodes[index + i]);
+            if (i === 0) parent.insertBefore(node, parent.childNodes[index] ?? null);
+            else parent.insertBefore(node, parent.childNodes[index + i] ?? null);
           }
         }
       }
@@ -2663,6 +2966,10 @@ var init_setters_DB8s8ITo = __esm({
     createDocument = () => {
       const body = createElement("body");
       const head = createElement("head");
+      const \u5F52\u5C5E = (node) => {
+        node._ownerDocument = doc;
+        return node;
+      };
       const doc = {
         _eventListeners: /* @__PURE__ */ new Map(),
         addEventListener: function(type2, listener, options2) {
@@ -2682,27 +2989,39 @@ var init_setters_DB8s8ITo = __esm({
         _getEventListeners: function(type2) {
           return this._eventListeners.get(type2) || [];
         },
-        createComment: createComment$1,
+        createComment: ((content) => \u5F52\u5C5E(createComment$1(content))),
         createElement: ((tagName) => {
-          return createElement(tagName);
+          return \u5F52\u5C5E(createElement(tagName));
         }),
         createElementNS: ((namespaceURI, qualifiedName) => {
-          if (namespaceURI === "http://www.w3.org/2000/svg") return createSVGNode$1(qualifiedName);
-          return createElement(qualifiedName);
+          if (namespaceURI === "http://www.w3.org/2000/svg") return \u5F52\u5C5E(createSVGNode$1(qualifiedName));
+          return \u5F52\u5C5E(createElement(qualifiedName));
         }),
-        createTextNode: createText$1,
-        createDocumentFragment: createDocumentFragment$1,
+        createTextNode: ((text) => \u5F52\u5C5E(createText$1(text))),
+        createDocumentFragment: (() => \u5F52\u5C5E(createDocumentFragment$1())),
+        /**
+        * Tree queries over the document. head and body are searched explicitly rather
+        * than through a `childNodes` array, because this document is a plain object and
+        * giving it real child bookkeeping would put it in the render path's way for no
+        * gain — nothing ever inserts a sibling of <body> here.
+        */
+        querySelector: (selector2) => querySelector(head, selector2) ?? querySelector(body, selector2),
+        querySelectorAll: (selector2) => [...querySelectorAll(head, selector2), ...querySelectorAll(body, selector2)],
+        getElementById: (id) => getElementById(head, id) ?? getElementById(body, id),
+        contains: (node) => head.contains(node) || body.contains(node),
         body,
         head
       };
       body.parentNode = doc;
+      body._ownerDocument = doc;
+      head._ownerDocument = doc;
       return doc;
     };
     document$1 = createDocument();
     isNodeEnvironment = typeof window === "undefined" && typeof document === "undefined";
     ({ createComment, createHTMLNode, createSVGNode, createText, createDocumentFragment } = getCreators());
     NOOP_CHILDREN = [];
-    Node$1 = globalThis.Node ?? BaseNode;
+    Node3 = globalThis.Node ?? BaseNode;
     FragmentUtils = {
       make: () => {
         return {
@@ -2728,10 +3047,10 @@ var init_setters_DB8s8ITo = __esm({
         if (!length) return children;
         if (values instanceof Array) for (let i = 0, l2 = values.length; i < l2; i++) {
           const value = values[i];
-          if (value instanceof Node$1) children.push(value);
+          if (value instanceof Node3) children.push(value);
           else FragmentUtils.getChildrenFragmented(value, children);
         }
-        else if (values instanceof Node$1) children.push(values);
+        else if (values instanceof Node3) children.push(values);
         else FragmentUtils.getChildrenFragmented(values, children);
         return children;
       },
@@ -2825,7 +3144,7 @@ var init_setters_DB8s8ITo = __esm({
       return value === null || value === void 0;
     };
     isNode = (value) => {
-      return value instanceof Node;
+      return !!value && typeof value.nodeType === "number";
     };
     isObject = (value) => {
       return typeof value === "object" && value !== null;
@@ -2876,13 +3195,14 @@ var init_setters_DB8s8ITo = __esm({
       });
       else element.classList.toggle(classes, !!force);
     };
+    \u8282\u70B9\u7C7B = globalThis.Node ?? BaseNode;
     dummyNode = createComment("");
     beforeDummyWrapper = [dummyNode];
     afterDummyWrapper = [dummyNode];
     diff = (parent, before, after, nextSibling) => {
       if (before === after) return;
-      if (before instanceof Node) {
-        if (after instanceof Node) {
+      if (before instanceof \u8282\u70B9\u7C7B) {
+        if (after instanceof \u8282\u70B9\u7C7B) {
           if (before.parentNode === parent) {
             parent.replaceChild(after, before);
             return;
@@ -2891,7 +3211,7 @@ var init_setters_DB8s8ITo = __esm({
         beforeDummyWrapper[0] = before;
         before = beforeDummyWrapper;
       }
-      if (after instanceof Node) {
+      if (after instanceof \u8282\u70B9\u7C7B) {
         afterDummyWrapper[0] = after;
         after = afterDummyWrapper;
       }
@@ -3088,6 +3408,21 @@ var init_setters_DB8s8ITo = __esm({
       const propName = kebabToCamelCase(normalizedPath);
       element[propName] = value;
     };
+    SYMBOL_SELF_REMOVED_ATTRIBUTES = /* @__PURE__ */ Symbol("woby.selfRemovedAttributes");
+    trackSelfRemovedAttributes = (element) => element[SYMBOL_SELF_REMOVED_ATTRIBUTES] ??= /* @__PURE__ */ new Map();
+    markSelfRemovedAttribute = (element, key) => {
+      const pending = element[SYMBOL_SELF_REMOVED_ATTRIBUTES];
+      if (!pending || !element.hasAttribute(key)) return;
+      pending.set(key, (pending.get(key) ?? 0) + 1);
+    };
+    consumeSelfRemovedAttribute = (element, key) => {
+      const pending = element[SYMBOL_SELF_REMOVED_ATTRIBUTES];
+      const count = pending?.get(key);
+      if (!count) return false;
+      if (count > 1) pending.set(key, count - 1);
+      else pending.delete(key);
+      return true;
+    };
     setAttributeStatic = /* @__PURE__ */ (() => {
       const attributesBoolean = /* @__PURE__ */ new Set([
         "allowfullscreen",
@@ -3133,8 +3468,10 @@ var init_setters_DB8s8ITo = __esm({
           else element.setAttribute(key, String(value));
         } else {
           const normalizedKey = key.toLowerCase();
-          if (isNil(value) || value === false) element.removeAttribute(normalizedKey);
-          else if (value === true && attributesBoolean.has(normalizedKey)) element.setAttribute(normalizedKey, "");
+          if (isNil(value) || value === false) {
+            markSelfRemovedAttribute(element, normalizedKey);
+            element.removeAttribute(normalizedKey);
+          } else if (value === true && attributesBoolean.has(normalizedKey)) element.setAttribute(normalizedKey, "");
           else {
             value = String(value);
             element.setAttribute(normalizedKey, value);
@@ -3598,7 +3935,7 @@ var init_setters_DB8s8ITo = __esm({
   }
 });
 
-// ../woby/dist/create_element-BAd2lnON.js
+// ../woby/dist/create_element-UafkJvc0.js
 function renderToString(child, options2) {
   const ssrDoc = options2?.document ?? createDocument();
   return EnvironmentContext.Provider("ssr", () => {
@@ -3728,11 +4065,11 @@ function jsx(component, props, ...children) {
   return wrapCloneElement(createElement2(component, props, props?.key), component, props);
 }
 var SYMBOL_STACK, wrapElement, Fragment, customElementsRegistry, customElements2, SSRCustomElement, SSRShadowRoot, WobyCustomElementsRegistry, wobyCustomElements, wrapCloneElement, wrapJsx, isJsx, jsxs, createElement2;
-var init_create_element_BAd2lnON = __esm({
-  "../woby/dist/create_element-BAd2lnON.js"() {
+var init_create_element_UafkJvc0 = __esm({
+  "../woby/dist/create_element-UafkJvc0.js"() {
     "use strict";
     init_ssr_shim();
-    init_setters_DB8s8ITo();
+    init_setters_Bw8p6kfU();
     SYMBOL_STACK = /* @__PURE__ */ Symbol("STACK");
     wrapElement = (element) => {
       element[SYMBOL_UNTRACKED_UNWRAPPED] = true;
@@ -3946,7 +4283,7 @@ var init_create_element_BAd2lnON = __esm({
   }
 });
 
-// ../woby/dist/htm.module-CZUpUM_y.js
+// ../woby/dist/htm.module-CWd03XrA.js
 function scheduleStylesheetUpdate() {
   if (updateScheduled) return;
   updateScheduled = true;
@@ -4145,12 +4482,12 @@ function htm_module_default(s) {
   })(s)), r), arguments, [])).length > 1 ? r : r[0];
 }
 var Switch, useScheduler, useTimeout, cachedConstructedSheets, stylesheetObserver, loggedErrors, MAX_LOGGED_ERRORS, shadowRootRegistry, updateScheduled, set, isObject2, assign2, isJsxProp, make, merge, defaults, HtmlChild, contextRefRegistry, isContextRef, collectAncestorContextWrap$1, parseContextRef, resolveContextRef, createSSRCustomElement, _pendingContextWrapGlobal, consumePendingContextWrap, peekPendingContextWrap, composePendingContextWrap, collectAncestorContextWrap, createBrowserCustomElement, emptyValueFor, setObservableValue, setNestedProperty, customElement, HtmlHidden, n, t;
-var init_htm_module_CZUpUM_y = __esm({
-  "../woby/dist/htm.module-CZUpUM_y.js"() {
+var init_htm_module_CWd03XrA = __esm({
+  "../woby/dist/htm.module-CWd03XrA.js"() {
     "use strict";
     init_ssr_shim();
-    init_setters_DB8s8ITo();
-    init_create_element_BAd2lnON();
+    init_setters_Bw8p6kfU();
+    init_create_element_UafkJvc0();
     Switch = ({ when, fallback, children }) => {
       return _switch(when, castArray(children).map((child) => child().metadata), fallback);
     };
@@ -4408,6 +4745,7 @@ var init_htm_module_CZUpUM_y = __esm({
         }
       }
       customElements2.define(tagName, ComponentCustomElement);
+      wobyCustomElements.define(tagName, ComponentCustomElement);
     };
     consumePendingContextWrap = () => {
       const w2 = _pendingContextWrapGlobal;
@@ -4446,13 +4784,14 @@ var init_htm_module_CZUpUM_y = __esm({
           this.childs = [];
           this._attrObserver = null;
           this._propDefaults = {};
+          trackSelfRemovedAttributes(this);
           const defaultProps = defaultPropsFn() || {};
           if (props && isJsx(props)) {
             const mergeInto = (key, incoming) => {
               const obs = defaultProps[key];
               if (isObservable(incoming)) {
                 const consumerOpts = obs?.[SYMBOL_OBSERVABLE_WRITABLE]?.options;
-                const incomingOpts = incoming[SYMBOL_OBSERVABLE_WRITABLE]?.options;
+                const incomingOpts = (incoming[SYMBOL_OBSERVABLE_WRITABLE] ?? incoming[SYMBOL_OBSERVABLE_READABLE])?.options;
                 if (consumerOpts?.type && consumerOpts.type !== incomingOpts?.type) console.warn(`[woby] prop "${key}" type mismatch: default observable expects type "${consumerOpts.type}" but the JSX-provided observable has type "${incomingOpts?.type ?? "none"}". HTML-attribute syncs on this prop will not be type-converted.`);
                 defaultProps[key] = incoming;
               } else if (typeof incoming === "function") obs(() => incoming);
@@ -4561,6 +4900,7 @@ var init_htm_module_CZUpUM_y = __esm({
               }
             });
           });
+          trackSelfRemovedAttributes(this).clear();
           this._attrObserver.observe(this, {
             attributes: true,
             attributeOldValue: true
@@ -4591,6 +4931,7 @@ var init_htm_module_CZUpUM_y = __esm({
             const normalizedPath = normalizePropertyPath(name21);
             setNestedProperty(this, normalizedPath, newValue);
           } else if (newValue === null) {
+            if (consumeSelfRemovedAttribute(this, name21)) return;
             const obs = props[propName];
             if (isObservable(obs) && isObservableWritable(obs)) {
               let restored = false;
@@ -4807,7 +5148,7 @@ var init_htm_module_CZUpUM_y = __esm({
       setObservableValue(obj, kebabToCamelCase(path), value, obj);
     };
     customElement = (tagName, component) => {
-      if (globalThis.window && globalThis.document) createBrowserCustomElement(tagName, component);
+      if (globalThis.window && globalThis.document && typeof globalThis.HTMLElement === "function") createBrowserCustomElement(tagName, component);
       else createSSRCustomElement(tagName, component);
     };
     HtmlHidden = {
@@ -4848,9 +5189,9 @@ var init_index_es = __esm({
   "../woby/dist/index.es.js"() {
     "use strict";
     init_ssr_shim();
-    init_setters_DB8s8ITo();
-    init_create_element_BAd2lnON();
-    init_htm_module_CZUpUM_y();
+    init_setters_Bw8p6kfU();
+    init_create_element_UafkJvc0();
+    init_htm_module_CWd03XrA();
     IS_BROWSER = !!globalThis.CDATASection?.toString?.().match(/^\s*function\s+CDATASection\s*\(\s*\)\s*\{\s*\[native code\]\s*\}\s*$/);
     runWithSuperRoot = _with();
     render = (child, parent, options2) => {
@@ -4944,7 +5285,7 @@ var init_runtime_es = __esm({
   "../woby/dist/runtime.es.js"() {
     "use strict";
     init_ssr_shim();
-    init_create_element_BAd2lnON();
+    init_create_element_UafkJvc0();
   }
 });
 
@@ -51246,7 +51587,7 @@ var NumberField = defaults(def10, (props) => {
       Button,
       {
         type: "icon",
-        cls: "!rounded-none !rounded-l-md !w-10 !h-10 !border-r !border-gray-200 !bg-transparent disabled:!bg-[#d9dbda] disabled:!text-[#00000061] disabled:!cursor-not-allowed",
+        cls: "!rounded-none !rounded-l-md !w-8 !h-9 !border-r !border-gray-200 !bg-transparent disabled:!bg-[#d9dbda] disabled:!text-[#00000061] disabled:!cursor-not-allowed",
         buttonFunction: "button",
         onPointerDown: () => {
           startContinuousUpdate(false);
@@ -51254,7 +51595,7 @@ var NumberField = defaults(def10, (props) => {
         onPointerUp: stopUpdate,
         onPointerLeave: stopUpdate,
         disabled: cantMin,
-        children: /* @__PURE__ */ jsx("span", { class: "py-4 px-2 text-lg font-semibold", children: "-" })
+        children: /* @__PURE__ */ jsx("span", { class: "text-base leading-none font-semibold select-none", children: "-" })
       }
     ),
     /* @__PURE__ */ jsx(
@@ -51262,7 +51603,11 @@ var NumberField = defaults(def10, (props) => {
       {
         ref: inputRef,
         class: [
-          "w-16 text-center border-none bg-transparent focus:outline-none focus:ring-0 text-lg font-semibold text-gray-700",
+          // `flex-auto` and not a plain width: the field is handed `w-full` in a property
+          // row, and with a fixed-width input the two step buttons huddled at the left
+          // edge with a third of the box empty behind the `+`. Basis stays `auto`, so the
+          // 4rem below is still the intrinsic size wherever the field is left to size itself.
+          "w-16 flex-auto min-w-0 text-center border-none bg-transparent focus:outline-none focus:ring-0 text-base font-semibold text-gray-700",
           "disabled:text-[#00000061] disabled:cursor-not-allowed",
           "[-moz-appearance:textfield] [&::-webkit-inner-spin-button]:hidden [&::-webkit-outer-spin-button]:hidden",
           () => get(error) ? "text-red-500" : ""
@@ -51293,14 +51638,14 @@ var NumberField = defaults(def10, (props) => {
       Button,
       {
         type: "icon",
-        cls: "!rounded-none !rounded-r-md !w-10 !h-10 !border-l !border-gray-200 !bg-transparent disabled:!bg-[#d9dbda] disabled:!text-[#00000061] disabled:!cursor-not-allowed",
+        cls: "!rounded-none !rounded-r-md !w-8 !h-9 !border-l !border-gray-200 !bg-transparent disabled:!bg-[#d9dbda] disabled:!text-[#00000061] disabled:!cursor-not-allowed",
         onPointerDown: () => {
           startContinuousUpdate(true);
         },
         onPointerUp: stopUpdate,
         onPointerLeave: stopUpdate,
         disabled: cantMax,
-        children: /* @__PURE__ */ jsx("span", { class: "py-4 px-2 text-lg font-semibold", children: "+" })
+        children: /* @__PURE__ */ jsx("span", { class: "text-base leading-none font-semibold select-none", children: "+" })
       }
     ),
     children
@@ -55047,7 +55392,6 @@ var TextField = defaults(def14, (props) => {
                 onChange?.(e3);
               },
               onKeyUp: (e3) => {
-                console.log("[TextField onKeyUp]", { key: e3.key, targetTag: e3.target?.tagName, targetVal: e3.target?.value, assignOnEnter: get(assignOnEnter), isObs: isObservable(value), val: value });
                 onKeyUp?.(e3);
               }
             }

@@ -26,6 +26,11 @@ export * from './Editor/EditorPlugin'
 export * from './Editor/PageLayout'
 export * from './Editor/PageStyles'
 export * from './Editor/LayoutSwitch'
+export * from './Editor/LanguageSwitch'
+/* The locale registry: `t`, `tx`, `setLocale`, `registerLocale` and the three packs
+   filed as loaders. Importing it registers English eagerly; the rest are fetched the
+   first time something asks for them. */
+export * from './i18n'
 /* The document zoom, the navigation rail and the print path. Registered as custom
    elements by the toolbar either way, but their module-level control surfaces --
    `setEditorZoom`, `toggleScroller`, `printEditor` -- were unreachable from the package:

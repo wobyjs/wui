@@ -4,6 +4,7 @@ import IndentIcon from '../icons/indent'
 import OutdentIcon from '../icons/outdent'
 import { useEditor } from './undoredo' // Removed useUndoRedo
 import { applyStyle, expandRange, getElementsInRange, isTags, range } from './utils'
+import { t } from '../i18n'
 
 export const getIndentSize = (element: HTMLElement) => {
     // let textIndent = '0px'
@@ -51,7 +52,7 @@ export const Indent = () => {
 
         applyIndent(editor)
 
-    }} title="Indent"><OutdentIcon /></Button>
+    }} title={() => t('editor.indent')}><OutdentIcon /></Button>
 }
 
 export const Outdent = () => {
@@ -63,5 +64,5 @@ export const Outdent = () => {
 
         applyIndent(editor, true)
 
-    }} title="Outdent"><IndentIcon /></Button>
+    }} title={() => t('editor.outdent')}><IndentIcon /></Button>
 }

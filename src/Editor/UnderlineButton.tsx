@@ -5,12 +5,13 @@ import { useEditor, useUndoRedo, useFocusManager } from './undoredo'
 import { getCurrentEditor } from "./utils"
 import { updateStylesState } from "./TextStyleButton"
 import { applyUnderline } from './StyleEngine'
+import { localized } from '../i18n'
 
 const def = () => ({
     cls: $('', HtmlClass) as ObservableMaybe<string>,
     class: $('', HtmlClass) as ObservableMaybe<string>,
     buttonType: $("outlined", HtmlString) as ObservableMaybe<ButtonStyles>,
-    title: $("Underline", HtmlString) as ObservableMaybe<string>,
+    title: $("", HtmlString) as ObservableMaybe<string>,
     disabled: $(false, HtmlBoolean) as Observable<boolean>,
 })
 
@@ -63,7 +64,7 @@ const UnderlineButton: Defaulted<typeof def> = defaults(def, (props) => {
     return (
         <Button
             type={btnType}
-            title={title}
+            title={localized(title, 'editor.underline')}
             class={() => [
                 () => $$(cls) ? $$(cls) : $$(cn),
                 () => $$(isActive) ? '!bg-slate-200' : ''

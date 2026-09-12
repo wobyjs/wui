@@ -80,6 +80,7 @@ One or more examples showing how to use the API in TSX and HTML.
 - `EditorPlugin.md`
 - `EditorProps.md`
 - `Fab.md`
+- `I18n.md`
 - `IconButton.md`
 - `ImageEditor.md`
 - `MultiWheeler.md`

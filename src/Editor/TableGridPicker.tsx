@@ -1,4 +1,5 @@
 import { $, $$, useEffect } from 'woby'
+import { t } from '../i18n'
 
 /**
  * The size picker every office suite has: a grid of empty squares you sweep a pointer
@@ -199,7 +200,7 @@ export const TableGridPicker = ({ onPick, onCancel }: TableGridPickerProps) => {
                     ref={backRef}
                     type="button"
                     class="text-sm text-gray-600 hover:text-gray-900 cursor-pointer bg-transparent border-0 p-0"
-                    title="Back to the insert menu"
+                    title={() => t('editor.backToInsertMenu')}
                 >
                     &lsaquo; Insert
                 </button>

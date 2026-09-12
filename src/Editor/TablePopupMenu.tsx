@@ -1,6 +1,7 @@
 import { $, $$, JSX, useEffect } from 'woby'
 import { useUndoRedo } from './undoredo'
 import { getCurrentEditor } from './utils'
+import { t } from '../i18n'
 
 /**
  * TablePopupMenu: Floating popup menu that appears when a table cell is focused.
@@ -570,17 +571,17 @@ const TablePopupMenu = () => {
         >
             <div style={{ display: 'flex', alignItems: 'center', gap: '2px', flexWrap: 'wrap' }}>
                 {/* Row operations */}
-                <button data-table-popup title="Insert row above" style={btnStyle}
+                <button data-table-popup title={() => t('editor.table.insertRowAbove')} style={btnStyle}
                     onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation() }}
                     onClick={(e: any) => { e.preventDefault(); insertRow(true) }}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d={icons.rowAbove} /></svg>
                 </button>
-                <button data-table-popup title="Insert row below" style={btnStyle}
+                <button data-table-popup title={() => t('editor.table.insertRowBelow')} style={btnStyle}
                     onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation() }}
                     onClick={(e: any) => { e.preventDefault(); insertRow(false) }}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d={icons.rowBelow} /></svg>
                 </button>
-                <button data-table-popup title="Delete row" style={btnStyle}
+                <button data-table-popup title={() => t('editor.table.deleteRow')} style={btnStyle}
                     onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation() }}
                     onClick={(e: any) => { e.preventDefault(); deleteRow() }}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d={icons.deleteRow} /></svg>
@@ -589,17 +590,17 @@ const TablePopupMenu = () => {
                 <span data-table-popup style={separatorStyle} />
 
                 {/* Column operations */}
-                <button data-table-popup title="Insert column left" style={btnStyle}
+                <button data-table-popup title={() => t('editor.table.insertColumnLeft')} style={btnStyle}
                     onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation() }}
                     onClick={(e: any) => { e.preventDefault(); insertColumn(true) }}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d={icons.colLeft} /></svg>
                 </button>
-                <button data-table-popup title="Insert column right" style={btnStyle}
+                <button data-table-popup title={() => t('editor.table.insertColumnRight')} style={btnStyle}
                     onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation() }}
                     onClick={(e: any) => { e.preventDefault(); insertColumn(false) }}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d={icons.colRight} /></svg>
                 </button>
-                <button data-table-popup title="Delete column" style={btnStyle}
+                <button data-table-popup title={() => t('editor.table.deleteColumn')} style={btnStyle}
                     onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation() }}
                     onClick={(e: any) => { e.preventDefault(); deleteColumn() }}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d={icons.deleteCol} /></svg>
@@ -608,7 +609,7 @@ const TablePopupMenu = () => {
                 <span data-table-popup style={separatorStyle} />
 
                 {/* Cell formatting */}
-                <button data-table-popup title="Cell background color" style={btnStyle}
+                <button data-table-popup title={() => t('editor.table.cellBackgroundColor')} style={btnStyle}
                     onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation() }}
                     onClick={(e: any) => { e.preventDefault(); setCellBgColor() }}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
@@ -616,14 +617,14 @@ const TablePopupMenu = () => {
                         <rect x="7" y="7" width="10" height="10" fill="currentColor" opacity="0.5" />
                     </svg>
                 </button>
-                <button data-table-popup title="Cell border color" style={btnStyle}
+                <button data-table-popup title={() => t('editor.table.cellBorderColor')} style={btnStyle}
                     onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation() }}
                     onClick={(e: any) => { e.preventDefault(); setCellBorderColor() }}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z" fill="none" stroke="currentColor" strokeWidth="2" />
                     </svg>
                 </button>
-                <button data-table-popup title="Cell text color" style={btnStyle}
+                <button data-table-popup title={() => t('editor.table.cellTextColor')} style={btnStyle}
                     onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation() }}
                     onClick={(e: any) => { e.preventDefault(); setCellTextColor() }}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
@@ -634,12 +635,12 @@ const TablePopupMenu = () => {
                 <span data-table-popup style={separatorStyle} />
 
                 {/* Border toggle */}
-                <button data-table-popup title="Toggle cell border" style={btnStyle}
+                <button data-table-popup title={() => t('editor.table.toggleCellBorder')} style={btnStyle}
                     onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation() }}
                     onClick={(e: any) => { e.preventDefault(); toggleBorder() }}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d={icons.borderAll} /></svg>
                 </button>
-                <button data-table-popup title="Toggle all borders" style={btnStyle}
+                <button data-table-popup title={() => t('editor.table.toggleAllBorders')} style={btnStyle}
                     onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation() }}
                     onClick={(e: any) => { e.preventDefault(); toggleTableBorders() }}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d={icons.table} /></svg>
@@ -648,12 +649,12 @@ const TablePopupMenu = () => {
                 <span data-table-popup style={separatorStyle} />
 
                 {/* Merge/Split */}
-                <button data-table-popup title="Merge cells" style={btnStyle}
+                <button data-table-popup title={() => t('editor.table.mergeCells')} style={btnStyle}
                     onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation() }}
                     onClick={(e: any) => { e.preventDefault(); mergeCells() }}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d={icons.mergeCells} /></svg>
                 </button>
-                <button data-table-popup title="Split cell" style={btnStyle}
+                <button data-table-popup title={() => t('editor.table.splitCell')} style={btnStyle}
                     onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation() }}
                     onClick={(e: any) => { e.preventDefault(); splitCell() }}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d={icons.splitCells} /></svg>
@@ -662,7 +663,7 @@ const TablePopupMenu = () => {
                 <span data-table-popup style={separatorStyle} />
 
                 {/* Delete table */}
-                <button data-table-popup title="Delete table" style={{ ...btnStyle, color: '#ff6b6b' }}
+                <button data-table-popup title={() => t('editor.table.deleteTable')} style={{ ...btnStyle, color: '#ff6b6b' }}
                     onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation() }}
                     onClick={(e: any) => { e.preventDefault(); deleteTable() }}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" /></svg>

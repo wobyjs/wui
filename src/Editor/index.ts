@@ -43,6 +43,7 @@ export type { LayoutMode, PageLayoutOptions, Mover } from './PageLayout'
 export { ensurePageStyles } from './PageStyles'
 export { LayoutSwitch, editorLayout, layoutText, setEditorLayout } from './LayoutSwitch'
 export type { LayoutText } from './LayoutSwitch'
+export { LanguageSwitch } from './LanguageSwitch'
 export { PrintButton } from './PrintButton'
 export { printEditor, isPrinting, PRINT_PATH_ATTR, PRINT_HIDE_ATTR } from './Print'
 export type { PrintOptions } from './Print'
@@ -50,7 +51,7 @@ export type { PrintOptions } from './Print'
 // Document zoom. `setEditorZoom` is the one to call: it writes the scale through
 // PageLayout *and* publishes it to `editorZoom`, so the toolbar readout stays honest.
 // `setLayoutZoom` alone does not, which is why the engine's setter is not the public one.
-export { ZoomControl, editorZoom, setEditorZoom, notifyZoomChanged, zoomText } from './ZoomControl'
+export { ZoomControl, editorZoom, setEditorZoom, notifyZoomChanged, zoomText, zoomStr } from './ZoomControl'
 export type { ZoomText } from './ZoomControl'
 export { onZoomApplied, layoutZoom, resolvedZoom, setLayoutZoom, ZOOM_MIN, ZOOM_MAX } from './PageLayout'
 export type { ZoomLevel } from './PageLayout'

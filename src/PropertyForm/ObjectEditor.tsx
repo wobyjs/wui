@@ -1,6 +1,6 @@
 /** @jsxImportSource woby */
 import { $, $$, ObservableMaybe, isObservable, useEffect } from "woby"
-import { Editors, UIProps, indent, skippedProperties } from "./Editors"
+import { Editors, UIProps, indent, skippedProperties, rowLabel } from "./Editors"
 import { PropertyRows } from "./PropertyRows"
 
 export const ObjectEditor = () => {
@@ -13,9 +13,9 @@ export const ObjectEditor = () => {
 
 	const UI = (props: UIProps<any>) => {
 		const { value, editorName, indentLvl = -1, button } = props
-		let optionName = $(editorName.replace(/([a-z])([A-Z])/g, "$1 $2").replace(/^./, function (str) {
-			return str.toUpperCase()
-		}))
+		// Written to below when the row names a column pair, so this one stays an
+		// observable holding a snapshot rather than a thunk over rowLabel().
+		let optionName = $(rowLabel(editorName))
 		const open = props.open ?? $(false)
 
 		if (parseInt(editorName) && value["column"] || parseInt(editorName) == 0) {

@@ -7,6 +7,7 @@ import { getCurrentEditor, getSelection } from './utils'
 import { applyStyle, applyBackgroundColor, removeFormat, saveSelectionAsOffsets, restoreSelectionFromOffsets, findEditorRoot } from './StyleEngine'
 
 import StrikethroughIcon from '../icons/strikethrough'
+import { localized, t } from '../i18n'
 
 // Icons (placeholders, replace with actual icons)
 const Strikethrough = () => <span class="font-bold">S</span>
@@ -152,7 +153,10 @@ const transformCase = (transformType: 'lowercase' | 'uppercase' | 'capitalize', 
 }
 
 interface FormatOption {
+    /** English, and the identity `FORMAT_OPTIONS.find` looks up. */
     label: string;
+    /** Catalogue id for the caption the user reads. */
+    key: string;
     hotkey: string;
     action: (editorDiv?: HTMLElement) => void;
     icon: any;
@@ -160,14 +164,14 @@ interface FormatOption {
 
 
 export const FORMAT_OPTIONS: FormatOption[] = [
-    { label: 'Strikethrough', hotkey: 'Ctrl+Shift+S', action: applyStrikethrough, icon: Strikethrough },
-    { label: 'Subscript', hotkey: 'Ctrl+,', action: applySubscript, icon: SubscriptIcon },
-    { label: 'Superscript', hotkey: 'Ctrl+.', action: applySuperscript, icon: SuperscriptIcon },
-    { label: 'Highlight', hotkey: '', action: () => applyHighlight('yellow'), icon: HighlightIcon },
-    { label: 'Clear Formatting', hotkey: 'Ctrl+\\', action: clearFormatting, icon: ClearFormattingIcon },
-    { label: 'Lowercase', hotkey: 'Ctrl+Shift+1', action: (editorDiv) => transformCase('lowercase', editorDiv), icon: CaseTransformIcon },
-    { label: 'Uppercase', hotkey: 'Ctrl+Shift+2', action: (editorDiv) => transformCase('uppercase', editorDiv), icon: CaseTransformIcon },
-    { label: 'Capitalize', hotkey: 'Ctrl+Shift+3', action: (editorDiv) => transformCase('capitalize', editorDiv), icon: CaseTransformIcon },
+    { label: 'Strikethrough', key: 'editor.strikethrough', hotkey: 'Ctrl+Shift+S', action: applyStrikethrough, icon: Strikethrough },
+    { label: 'Subscript', key: 'editor.subscript', hotkey: 'Ctrl+,', action: applySubscript, icon: SubscriptIcon },
+    { label: 'Superscript', key: 'editor.superscript', hotkey: 'Ctrl+.', action: applySuperscript, icon: SuperscriptIcon },
+    { label: 'Highlight', key: 'editor.highlight', hotkey: '', action: () => applyHighlight('yellow'), icon: HighlightIcon },
+    { label: 'Clear Formatting', key: 'editor.clearFormatting', hotkey: 'Ctrl+\\', action: clearFormatting, icon: ClearFormattingIcon },
+    { label: 'Lowercase', key: 'editor.lowercase', hotkey: 'Ctrl+Shift+1', action: (editorDiv) => transformCase('lowercase', editorDiv), icon: CaseTransformIcon },
+    { label: 'Uppercase', key: 'editor.uppercase', hotkey: 'Ctrl+Shift+2', action: (editorDiv) => transformCase('uppercase', editorDiv), icon: CaseTransformIcon },
+    { label: 'Capitalize', key: 'editor.capitalize', hotkey: 'Ctrl+Shift+3', action: (editorDiv) => transformCase('capitalize', editorDiv), icon: CaseTransformIcon },
 ]
 
 
@@ -266,7 +270,7 @@ const TextFormatOptionsDropDown = defaults(def, (props) => {
                             title={opt.hotkey}
                         >
                             <opt.icon />
-                            <span class="ml-3">{opt.label}</span>
+                            <span class="ml-3">{() => t(opt.key)}</span>
                             {opt.hotkey && <span class="ml-auto text-xs text-gray-500">{opt.hotkey}</span>}
                         </Button>
                     ))}
@@ -286,7 +290,7 @@ const TextFormatOptionsDropDown = defaults(def, (props) => {
                     ]}
                     onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation(); }}
                     onClick={toggleDropdown}
-                    title="More text formats"
+                    title={() => t('editor.moreTextFormats')}
                     disabled={disabled}
                     {...otherProps}
                 >
@@ -308,7 +312,7 @@ const TextFormatOptionsDropDown = defaults(def, (props) => {
 // #region Strikethrough Button Component
 const def_Strikethrough = () => ({
     buttonType: $("outlined", HtmlString) as ObservableMaybe<ButtonStyles>,
-    title: $("Strikethrough", HtmlString) as ObservableMaybe<string>,
+    title: $("", HtmlString) as ObservableMaybe<string>,
     cls: $('', HtmlClass) as ObservableMaybe<string>,
     class: $('', HtmlClass) as ObservableMaybe<string>,
     disabled: $(false, HtmlBoolean) as Observable<boolean>,
@@ -330,7 +334,7 @@ const StrikethroughButton: Defaulted<typeof def_Strikethrough> = defaults(def_St
         return trackState(el, 'strikeThrough', isActive)
     })
 
-    return formatButton(btnType, title, cls, cn, isActive, disabled, action, displayIcon, otherProps)
+    return formatButton(btnType, localized(title, 'editor.strikethrough'), cls, cn, isActive, disabled, action, displayIcon, otherProps)
 
 }) as typeof StrikethroughButton
 // #endregion
@@ -338,7 +342,7 @@ const StrikethroughButton: Defaulted<typeof def_Strikethrough> = defaults(def_St
 // #region Subscript Button Component
 const def_Subscript = () => ({
     buttonType: $("outlined", HtmlString) as ObservableMaybe<ButtonStyles>,
-    title: $("Subscript", HtmlString) as ObservableMaybe<string>,
+    title: $("", HtmlString) as ObservableMaybe<string>,
     cls: $('', HtmlClass) as ObservableMaybe<string>,
     class: $('', HtmlClass) as ObservableMaybe<string>,
     disabled: $(false, HtmlBoolean) as Observable<boolean>,
@@ -360,7 +364,7 @@ const SubscriptButton: Defaulted<typeof def_Subscript> = defaults(def_Subscript,
         return trackState(el, 'subscript', isActive)
     })
 
-    return formatButton(btnType, title, cls, cn, isActive, disabled, action, displayIcon, otherProps)
+    return formatButton(btnType, localized(title, 'editor.subscript'), cls, cn, isActive, disabled, action, displayIcon, otherProps)
 
 }) as typeof SubscriptButton
 // #endregion
@@ -368,7 +372,7 @@ const SubscriptButton: Defaulted<typeof def_Subscript> = defaults(def_Subscript,
 // #region Superscript Button Component
 const def_Superscript = () => ({
     buttonType: $("outlined", HtmlString) as ObservableMaybe<ButtonStyles>,
-    title: $("Superscript", HtmlString) as ObservableMaybe<string>,
+    title: $("", HtmlString) as ObservableMaybe<string>,
     cls: $('', HtmlClass) as ObservableMaybe<string>,
     class: $('', HtmlClass) as ObservableMaybe<string>,
     disabled: $(false, HtmlBoolean) as Observable<boolean>,
@@ -390,7 +394,7 @@ const SuperscriptButton: Defaulted<typeof def_Superscript> = defaults(def_Supers
         return trackState(el, 'superscript', isActive)
     })
 
-    return formatButton(btnType, title, cls, cn, isActive, disabled, action, displayIcon, otherProps)
+    return formatButton(btnType, localized(title, 'editor.superscript'), cls, cn, isActive, disabled, action, displayIcon, otherProps)
 
 }) as typeof SuperscriptButton
 // #endregion
@@ -398,7 +402,7 @@ const SuperscriptButton: Defaulted<typeof def_Superscript> = defaults(def_Supers
 // #region Highlight Button Component
 const def_Highlight = () => ({
     buttonType: $("outlined", HtmlString) as ObservableMaybe<ButtonStyles>,
-    title: $("Highlight", HtmlString) as ObservableMaybe<string>,
+    title: $("", HtmlString) as ObservableMaybe<string>,
     highlightColor: $('yellow', HtmlString) as ObservableMaybe<string>,
     cls: $('', HtmlClass) as ObservableMaybe<string>,
     class: $('', HtmlClass) as ObservableMaybe<string>,
@@ -421,7 +425,7 @@ const HighlightButton: Defaulted<typeof def_Highlight> = defaults(def_Highlight,
         return trackState(el, 'hiliteColor', isActive)
     })
 
-    return formatButton(btnType, title, cls, cn, isActive, disabled, action, displayIcon, otherProps)
+    return formatButton(btnType, localized(title, 'editor.highlight'), cls, cn, isActive, disabled, action, displayIcon, otherProps)
 
 }) as typeof HighlightButton
 // #endregion
@@ -429,7 +433,7 @@ const HighlightButton: Defaulted<typeof def_Highlight> = defaults(def_Highlight,
 // #region Clear Format Button Component
 const def_ClearFormat = () => ({
     buttonType: $("outlined", HtmlString) as ObservableMaybe<ButtonStyles>,
-    title: $("Clear Format", HtmlString) as ObservableMaybe<string>,
+    title: $("", HtmlString) as ObservableMaybe<string>,
     cls: $('', HtmlClass) as ObservableMaybe<string>,
     class: $('', HtmlClass) as ObservableMaybe<string>,
     disabled: $(false, HtmlBoolean) as Observable<boolean>,
@@ -444,7 +448,7 @@ const ClearFormatButton: Defaulted<typeof def_ClearFormat> = defaults(def_ClearF
     const action = () => { format.action(); saveDo(); }
     const displayIcon = () => format.icon
 
-    return formatButton(btnType, title, cls, cn, isActive, disabled, action, displayIcon, otherProps)
+    return formatButton(btnType, localized(title, 'editor.clearFormat'), cls, cn, isActive, disabled, action, displayIcon, otherProps)
 }) as typeof ClearFormatButton
 
 // #endregion
@@ -452,7 +456,7 @@ const ClearFormatButton: Defaulted<typeof def_ClearFormat> = defaults(def_ClearF
 // #region Lowercase Button Component
 const def_Lowercase = () => ({
     buttonType: $("outlined", HtmlString) as ObservableMaybe<ButtonStyles>,
-    title: $("Lowercase", HtmlString) as ObservableMaybe<string>,
+    title: $("", HtmlString) as ObservableMaybe<string>,
     cls: $('', HtmlClass) as ObservableMaybe<string>,
     class: $('', HtmlClass) as ObservableMaybe<string>,
     disabled: $(false, HtmlBoolean) as Observable<boolean>,
@@ -474,14 +478,14 @@ const LowercaseButton: Defaulted<typeof def_Lowercase> = defaults(def_Lowercase,
         saveDo()
     }
     const displayIcon = () => format.icon
-    return formatButton(btnType, title, cls, cn, isActive, disabled, action, displayIcon, otherProps)
+    return formatButton(btnType, localized(title, 'editor.lowercase'), cls, cn, isActive, disabled, action, displayIcon, otherProps)
 }) as typeof LowercaseButton
 // #endregion
 
 // #region Uppercase Button Component
 const def_Uppercase = () => ({
     buttonType: $("outlined", HtmlString) as ObservableMaybe<ButtonStyles>,
-    title: $("Uppercase", HtmlString) as ObservableMaybe<string>,
+    title: $("", HtmlString) as ObservableMaybe<string>,
     cls: $('', HtmlClass) as ObservableMaybe<string>,
     class: $('', HtmlClass) as ObservableMaybe<string>,
     disabled: $(false, HtmlBoolean) as Observable<boolean>,
@@ -503,14 +507,14 @@ const UppercaseButton: Defaulted<typeof def_Uppercase> = defaults(def_Uppercase,
         saveDo()
     }
     const displayIcon = () => format.icon
-    return formatButton(btnType, title, cls, cn, isActive, disabled, action, displayIcon, otherProps)
+    return formatButton(btnType, localized(title, 'editor.uppercase'), cls, cn, isActive, disabled, action, displayIcon, otherProps)
 }) as typeof UppercaseButton
 // #endregion
 
 // #region Capitalize Button Component
 const def_Capitalize = () => ({
     buttonType: $("outlined", HtmlString) as ObservableMaybe<ButtonStyles>,
-    title: $("Capitalize", HtmlString) as ObservableMaybe<string>,
+    title: $("", HtmlString) as ObservableMaybe<string>,
     cls: $('', HtmlClass) as ObservableMaybe<string>,
     class: $('', HtmlClass) as ObservableMaybe<string>,
     disabled: $(false, HtmlBoolean) as Observable<boolean>,
@@ -532,7 +536,7 @@ const CapitalizeButton: Defaulted<typeof def_Capitalize> = defaults(def_Capitali
         saveDo()
     }
     const displayIcon = () => format.icon
-    return formatButton(btnType, title, cls, cn, isActive, disabled, action, displayIcon, otherProps)
+    return formatButton(btnType, localized(title, 'editor.capitalize'), cls, cn, isActive, disabled, action, displayIcon, otherProps)
 }) as typeof CapitalizeButton
 // #endregion
 

@@ -7,6 +7,7 @@ import UnderlineIcon from '../icons/underline'
 import { getCurrentEditor } from "./utils"
 import { safeGetRange } from './BrowserCompat'
 import { getStyleStateInRange, applyBold, applyItalic, applyUnderline, applyStrikethrough } from './StyleEngine'
+import { t } from '../i18n'
 
 // Map command names to CSS property+value pairs for StyleEngine detection.
 // D-05: replaces queryCommandState which is shadow-DOM-blind.
@@ -40,17 +41,17 @@ const TextStyleButton: Defaulted<typeof def> = defaults(def, (props) => {
     const styleMap = {
         'bold': {
             icon: <BoldIcon />,
-            defaultTitle: 'Bold',
+            titleKey: 'editor.bold',
             command: 'bold'
         },
         'italic': {
             icon: <ItalicIcon />,
-            defaultTitle: 'Italic',
+            titleKey: 'editor.italic',
             command: 'italic'
         },
         'underline': {
             icon: <UnderlineIcon />,
-            defaultTitle: 'Underline',
+            titleKey: 'editor.underline',
             command: 'underline'
         },
     }
@@ -67,7 +68,7 @@ const TextStyleButton: Defaulted<typeof def> = defaults(def, (props) => {
     const displayTitle = () => {
         const titleValue = $$(title)
         if (titleValue) return titleValue
-        return currentStyleConfig().defaultTitle
+        return t(currentStyleConfig().titleKey)
     }
 
 

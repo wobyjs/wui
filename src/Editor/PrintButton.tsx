@@ -18,12 +18,13 @@ import { useEditor } from './undoredo'
 import { getCurrentEditor } from './utils'
 import { setEditorLayout } from './LayoutSwitch'
 import { printEditor } from './Print'
+import { localized } from '../i18n'
 
 const def = () => ({
     type: $('outlined', HtmlString) as ObservableMaybe<ButtonStyles>,
     /** Empty means "icon only", which is what the toolbar wants. */
     label: $('', HtmlString) as ObservableMaybe<string>,
-    title: $('Print — proofs on paper-sized sheets first', HtmlString) as ObservableMaybe<string>,
+    title: $('', HtmlString) as ObservableMaybe<string>,
     cls: $('', HtmlClass) as JSX.Class,
     class: $('', HtmlClass) as JSX.Class,
 })
@@ -46,7 +47,7 @@ const PrintButton = defaults(def, (props) => {
 
     return (
         <Button
-            title={title}
+            title={localized(title, 'editor.print')}
             onClick={handleClick}
             // Same guard the rest of the toolbar uses: a mousedown that reaches the
             // document collapses the selection, and pagination restores the caret it was

@@ -1,5 +1,6 @@
 import { $, $$, useEffect } from 'woby'
 import { deleteRefusalReason } from './PropertyExtractor'
+import { t } from '../i18n'
 
 /**
  * NodeMover: drag-to-reposition for the editor's node selection.
@@ -348,7 +349,7 @@ const NodeMover = () => {
             <div
                 ref={(el: HTMLDivElement) => { gripEl = el }}
                 data-node-drag-handle
-                title="Drag to move this element (or alt+drag the element itself)"
+                title={() => t('editor.dragToMoveElement')}
                 style={() => ({
                     position: 'absolute',
                     display: $$(spot) ? 'flex' : 'none',

@@ -14,6 +14,7 @@ import { Indent } from './Indent' // Will be part of TextAlignDropDown
 import { applyIndent as applyIndentStyle, applyListIndent } from './StyleEngine' // Import applyIndent from StyleEngine instead
 import { Blockquote } from './Blockquote'
 import { LayoutSwitch, editorLayout } from './LayoutSwitch'
+import { LanguageSwitch } from './LanguageSwitch'
 import { PrintButton } from './PrintButton'
 import { ZoomControl } from './ZoomControl'
 import { DocScroller, ScrollerToggle } from './DocScroller'
@@ -658,9 +659,16 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, height, maxHe
         const el = $$(activeEditor)
         if (!el || !(el instanceof HTMLElement)) return
 
+        /**
+         * The node an insert-image request is addressed to: the custom-element host when
+         * the editor has one, and the surface itself when it does not. The fallback used
+         * to be a global `wui-editor` query, which is null on a page that renders
+         * `<Editor>` directly -- there, a pasted or dropped image dispatched onto nothing
+         * and never reached the dialog. `InsertDropDown.editorHostOf` resolves identically.
+         */
         const editorHost = () => {
             const root = el.getRootNode()
-            return root instanceof ShadowRoot ? root.host as HTMLElement : document.querySelector('wui-editor') as HTMLElement | null
+            return root instanceof ShadowRoot ? root.host as HTMLElement : el
         }
 
         /**
@@ -678,7 +686,7 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, height, maxHe
 
         const openWith = (file: File, range: Range | null) => {
             editorHost()?.dispatchEvent(new CustomEvent<InsertImageDetail>(INSERT_IMAGE_EVENT, {
-                detail: { range: range ?? undefined, file },
+                detail: { range: range ?? undefined, file }, bubbles: true,
             }))
         }
 
@@ -1204,6 +1212,9 @@ const EditorToolbar = ({ toolbarRef }: { toolbarRef: Observable<HTMLDivElement |
                 <InsertDropDown />
                 <Blockquote />
                 <InfoButton />
+                {/* Last in the row: it relabels the whole toolbar, so it reads as a
+                    property of the editor rather than of any one group above it. */}
+                <LanguageSwitch />
             </div>
         </>
     }

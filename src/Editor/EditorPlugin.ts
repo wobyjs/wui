@@ -339,6 +339,12 @@ export const BUILT_IN_ORDER = -100
 // Internal type for insert menu items (matches what InsertDropDown renders)
 export type InsertMenuItem = {
     label: string
+    /**
+     * Catalogue id for the caption, when there is one. Built-in rows carry it; plugin rows
+     * do not, and fall back to `tx(label)` — their English *is* the key, so a locale pack
+     * can translate a plugin that has never heard of i18n.
+     */
+    key?: string
     action: () => void
     icon: () => JSX.Child
     /** See `EditorPlugin.order`. Absent means `0`. */

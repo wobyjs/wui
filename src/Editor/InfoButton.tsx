@@ -5,10 +5,11 @@ import { Button, ButtonStyles } from '../Button'
 import { useFocusManager, useUndoRedo } from './undoredo'
 import { usePropertyPanel } from './PropertyPanel'
 import { detectSelectionType } from './PropertyExtractor'
+import { localized } from '../i18n'
 
 const def = () => ({
     buttonType: $("outlined", HtmlString) as ObservableMaybe<ButtonStyles>,
-    title: $("Properties", HtmlString) as ObservableMaybe<string>,
+    title: $("", HtmlString) as ObservableMaybe<string>,
     cls: $('', HtmlClass) as ObservableMaybe<string>,
     class: $('', HtmlClass) as ObservableMaybe<string>,
     disabled: $(false, HtmlBoolean) as ObservableMaybe<boolean>,
@@ -80,7 +81,7 @@ const InfoButton: Defaulted<typeof def> = defaults(def, (props) => {
     return (
         <Button
             type={btnType}
-            title={title}
+            title={localized(title, 'editor.properties')}
             class={() => [
                 () => $$(cls) ? $$(cls) : $$(cn),
                 "border-none hover:bg-gray-100 p-1.5"

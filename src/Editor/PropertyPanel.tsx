@@ -27,6 +27,7 @@ import { getPluginForElement } from './EditorPlugin'
 import { openImageEditor } from './ImageEditor'
 import { ORIGIN_ATTR, readImageOrigin } from './ImageSource'
 import { useEditor, useUndoRedo } from './undoredo'
+import { t, tx } from '../i18n'
 import { StyleEditor } from './StyleEditor'
 import ArrowUpward from '../icons/arrow_upward'
 import DeleteOutline from '../icons/delete_outline'
@@ -1059,7 +1060,7 @@ const MIN_W = 240
                             // panelFocused and stops selectionchange from undoing the climb.
                             if (el) el.onclick = selectParent
                         }}
-                        title="Select parent element"
+                        title={() => t('editor.selectParent')}
                         class={() => [
                             "shrink-0 w-6 h-6 flex items-center justify-center rounded leading-none",
                             "cursor-pointer text-gray-400 hover:text-gray-700 hover:bg-gray-200",
@@ -1148,7 +1149,7 @@ const MIN_W = 240
                     return obj ? (
                         <PropertyForm obj={obj} class="m-0" heading="" onCommit={commitPending} />
                     ) : (
-                        <div class="p-4 text-sm text-gray-400">Select an element to view properties</div>
+                        <div class="p-4 text-sm text-gray-400">{() => t('editor.property.empty')}</div>
                     )
                 }}
 
@@ -1193,11 +1194,11 @@ const MIN_W = 240
                                             saveDo()
                                         }
                                     }}
-                                    title={a.title ?? a.label}
+                                    title={() => tx(a.title ?? a.label)}
                                     class="flex items-center gap-1 px-2 py-1 rounded border border-gray-300 bg-white text-xs text-gray-700 cursor-pointer hover:bg-gray-50 hover:border-gray-400 active:bg-gray-100"
                                 >
                                     {a.icon ? a.icon() : null}
-                                    <span>{a.label}</span>
+                                    <span>{() => tx(a.label)}</span>
                                 </button>
                             ))}
                         </div>
@@ -1224,10 +1225,10 @@ const MIN_W = 240
                         <div class="flex flex-wrap gap-1.5 px-3 py-2 border-t border-gray-200">
                             <button
                                 ref={b => { if (b) b.onclick = () => openImageEditor(img) }}
-                                title="Crop, zoom and resize this image"
+                                title={() => t('editor.image.cropZoomResize')}
                                 class={btn}
                             >
-                                <span>Edit image…</span>
+                                <span>{() => t('editor.image.editShort')}</span>
                             </button>
                             {origin
                                 ? <button
@@ -1243,10 +1244,10 @@ const MIN_W = 240
                                             saveDo()
                                         }
                                     }}
-                                    title={`Discard every crop and go back to ${origin}`}
+                                    title={() => t('editor.image.discardCrops', { origin })}
                                     class={btn}
                                 >
-                                    <span>Restore original</span>
+                                    <span>{() => t('editor.image.restoreOriginal')}</span>
                                 </button>
                                 : null}
                         </div>

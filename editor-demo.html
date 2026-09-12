@@ -75,6 +75,15 @@
         <h1>WUI Rich Text Editor</h1>
         <p class="subtitle">Phase 18 fixes verified - All 7 test dimensions working correctly</p>
 
+        <!-- The toolbar carries its own globe button; this one is here to show the
+             programmatic side of the same registry. Both drive `setLocale`, and the
+             toolbar redraws either way. -->
+        <p class="subtitle" style="display: flex; align-items: center; gap: 8px;">
+            <label for="demo-locale">Interface language</label>
+            <select id="demo-locale" style="padding: 4px 8px; border: 1px solid #cbd5e1; border-radius: 6px;"></select>
+            <span id="demo-locale-status" style="color: #64748b;"></span>
+        </p>
+
         <div class="debug-info">
             <h3>📋 Test Instructions (READ BEFORE TESTING)</h3>
             <ol>

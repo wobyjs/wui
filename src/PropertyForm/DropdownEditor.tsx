@@ -1,7 +1,7 @@
 /** @jsxImportSource woby */
 
 import { $, $$, isObservable, ObservableMaybe, untrack, useEffect } from "woby"
-import { Editors, UIProps, skippedProperties } from "./Editors"
+import { Editors, UIProps, skippedProperties, rowLabel } from "./Editors"
 import { TableRow } from "./PropertyForm"
 import { EditorProps } from "./EditorProps"
 import { MultiWheeler } from "../Wheeler/MultiWheeler"
@@ -16,12 +16,9 @@ export const DropDownEditor = () => {
 
 	const UI = (props: UIProps<ObservableMaybe<[]>>) => {
 		const { value, data, editorName } = props
-		const optionName = editorName.replace(/([a-z])([A-Z])/g, "$1 $2").replace(/^./, function (str) {
-			return str.toUpperCase()
-		})
 
 		return skippedProperties.includes(editorName) ? null : (
-			<TableRow optionName={optionName} action={(value as any)?.action}>
+			<TableRow optionName={() => rowLabel(editorName)} action={(value as any)?.action}>
 				<DropDown
 					value={value}
 					obj={data}

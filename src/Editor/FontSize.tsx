@@ -6,6 +6,7 @@ import { useEditor } from './undoredo'
 import { getCurrentEditor } from './utils'
 import { applyFontSize as applyFontSizeStyle } from './StyleEngine'
 import { safeGetSelection, safeGetRange } from './BrowserCompat'
+import { t } from '../i18n'
 
 const def = () => ({
     cls: $('', HtmlClass) as JSX.Class,
@@ -134,7 +135,7 @@ const FontSize: Defaulted<typeof def> = defaults(def, (props) => {
         <Button
             type="outlined"
             cls={[BASE_BTN, rounded]}
-            title={`${type} Font Size`}
+            title={() => t(type === 'decrease' ? 'editor.decreaseFontSize' : 'editor.increaseFontSize')}
             onClick={onStepClick(delta)}
             onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation(); }}
         >
@@ -159,9 +160,9 @@ const FontSize: Defaulted<typeof def> = defaults(def, (props) => {
 
     return (
         <div class={[cls, "inline-flex items-stretch rounded-md shadow-sm", cn]}>
-            <StepButton type="Decrease" delta={-$$(step)} icon={TextDecrease} rounded="rounded-r-none" />
+            <StepButton type="decrease" delta={-$$(step)} icon={TextDecrease} rounded="rounded-r-none" />
             <SizeInput />
-            <StepButton type="Increase" delta={$$(step)} icon={TextIncrease} rounded="rounded-l-none" />
+            <StepButton type="increase" delta={$$(step)} icon={TextIncrease} rounded="rounded-l-none" />
         </div>
     );
 }) as typeof FontSize;

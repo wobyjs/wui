@@ -13,6 +13,7 @@ import KeyboardDownArrow from '../icons/keyboard_down_arrow'
 import { applyTextAlign } from './StyleEngine'
 import { applyIndent as applyIndentStyle, applyListIndent } from './StyleEngine'
 import { applyBlockCommandToSelectedImage } from './ImageActions'
+import { t } from '../i18n'
 
 // Icons - placeholders, replace with actual SVGs or components
 const AlignLeftIcon = () => <AlignLeft class="size-5" />
@@ -76,7 +77,10 @@ const applyAlignment = (command: string) => {
 }
 
 interface AlignmentOptionItem {
+    /** English, and the identity: this is what `selectedFormat` carries. */
     label: string
+    /** Catalogue id for the caption the user reads. */
+    key: string
     hotkey: string
     action: () => void
     icon: () => JSX.Element
@@ -87,6 +91,7 @@ interface DividerOptionItem {
     type: 'divider'
     // Ensure other properties are not present or are optional and undefined
     label?: undefined
+    key?: undefined
     hotkey?: undefined
     action?: undefined
     icon?: undefined
@@ -97,14 +102,20 @@ type AlignmentOption = AlignmentOptionItem | DividerOptionItem
 // Note: 'Start Align' and 'End Align' are context-dependent (LTR/RTL).
 // For simplicity, mapping to Left/Right.
 const alignmentOptions: AlignmentOption[] = [
-    { label: 'Left Align', hotkey: 'Ctrl+Shift+L', action: () => applyAlignment('justifyLeft'), icon: AlignLeftIcon },
-    { label: 'Center Align', hotkey: 'Ctrl+Shift+E', action: () => applyAlignment('justifyCenter'), icon: AlignCenterIcon },
-    { label: 'Right Align', hotkey: 'Ctrl+Shift+R', action: () => applyAlignment('justifyRight'), icon: AlignRightIcon },
-    { label: 'Justify Align', hotkey: 'Ctrl+Shift+J', action: () => applyAlignment('justifyFull'), icon: AlignJustifyIcon },
+    { label: 'Left Align', key: 'editor.alignLeft', hotkey: 'Ctrl+Shift+L', action: () => applyAlignment('justifyLeft'), icon: AlignLeftIcon },
+    { label: 'Center Align', key: 'editor.alignCenter', hotkey: 'Ctrl+Shift+E', action: () => applyAlignment('justifyCenter'), icon: AlignCenterIcon },
+    { label: 'Right Align', key: 'editor.alignRight', hotkey: 'Ctrl+Shift+R', action: () => applyAlignment('justifyRight'), icon: AlignRightIcon },
+    { label: 'Justify Align', key: 'editor.alignJustify', hotkey: 'Ctrl+Shift+J', action: () => applyAlignment('justifyFull'), icon: AlignJustifyIcon },
     { type: 'divider' },
-    { label: 'Outdent', hotkey: 'Ctrl+[', action: () => applyAlignment('outdent'), icon: OutdentIcon },
-    { label: 'Indent', hotkey: 'Ctrl+]', action: () => applyAlignment('indent'), icon: IndentIcon },
+    { label: 'Outdent', key: 'editor.outdent', hotkey: 'Ctrl+[', action: () => applyAlignment('outdent'), icon: OutdentIcon },
+    { label: 'Indent', key: 'editor.indent', hotkey: 'Ctrl+]', action: () => applyAlignment('indent'), icon: IndentIcon },
 ]
+
+/** The translated caption for one of the English identities above. */
+const alignLabel = (label: string): string => {
+    const opt = alignmentOptions.find(o => o.label === label)
+    return opt?.key ? t(opt.key) : label
+}
 
 const def = () => ({
     cls: $('', HtmlClass) as JSX.Class,
@@ -179,7 +190,7 @@ const TextAlignDropDown = defaults(def, (props) => {
                                 title={item.hotkey}
                             >
                                 <item.icon />
-                                <span class="ml-3">{item.label}</span>
+                                <span class="ml-3">{() => alignLabel(item.label)}</span>
                                 {item.hotkey && <span class="ml-auto text-xs text-gray-500">{item.hotkey}</span>}
                             </Button>
                         )
@@ -199,7 +210,7 @@ const TextAlignDropDown = defaults(def, (props) => {
                     ]}
                     onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation() }}
                     onClick={handleApplyCurrent}
-                    title="Apply current alignment"
+                    title={() => t('editor.applyAlignment')}
                     {...otherProps}
                 >
                     <span class="text-center truncate">
@@ -218,7 +229,7 @@ const TextAlignDropDown = defaults(def, (props) => {
                     class="size-full inline-flex justify-center items-center rounded-md border border-gray-300 shadow-sm bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500 cursor-pointer px-2"
                     onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleDropdown(); }}
                     onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation(); }}
-                    title="Choose alignment or indent"
+                    title={() => t('editor.chooseAlignOrIndent')}
                 >
                     <KeyboardDownArrow class="h-5 w-5" />
                 </Button>
@@ -292,7 +303,7 @@ export const TextAlignDropDown_ = () => {
                                 title={item.hotkey}
                             >
                                 <item.icon />
-                                <span class="ml-3">{item.label}</span>
+                                <span class="ml-3">{() => alignLabel(item.label)}</span>
                                 {item.hotkey && <span class="ml-auto text-xs text-gray-500">{item.hotkey}</span>}
                             </a>
                         )
@@ -309,7 +320,7 @@ export const TextAlignDropDown_ = () => {
                     type='outlined'
                     cls="p-2"
                     onClick={toggleDropdown}
-                    title="Text alignment"
+                    title={() => t('editor.align')}
                 >
                     <AlignLeftIcon />
                     <svg className="ml-1 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">

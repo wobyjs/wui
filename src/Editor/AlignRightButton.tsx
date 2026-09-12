@@ -4,12 +4,13 @@ import { applyTextAlign, updateActiveStatus, ALIGNMENT_MAP } from './AlignButton
 import { getCurrentEditor, useBlockEnforcer } from './utils'
 import { useEditor } from './undoredo'
 import { applyBlockCommandToSelectedImage } from './ImageActions'
+import { localized } from '../i18n'
 
 const RIGHT_MAP = ALIGNMENT_MAP.right
 
 const def = () => ({
     buttonType: $("outlined", HtmlString) as ObservableMaybe<ButtonStyles>,
-    title: $(RIGHT_MAP.defaultTitle, HtmlString) as ObservableMaybe<string>,
+    title: $("", HtmlString) as ObservableMaybe<string>,
     cls: $('', HtmlClass) as JSX.Class,
     class: $('', HtmlClass) as JSX.Class,
     disabled: $(false, HtmlBoolean) as Observable<boolean>,
@@ -77,7 +78,7 @@ const AlignRightButton: Defaulted<typeof def> = defaults(def, (props) => {
     return (
         <Button
             type={buttonType}
-            title={title}
+            title={localized(title, RIGHT_MAP.titleKey)}
             class={[
                 () => $$(cls) ? $$(cls) : "",
                 cn,

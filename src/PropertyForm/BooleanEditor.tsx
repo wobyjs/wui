@@ -1,7 +1,7 @@
 /** @jsxImportSource woby */
 
 import { $, $$, ObservableMaybe, isObservable, useEffect } from "woby"
-import { Editors, UIProps, skippedProperties } from "./Editors"
+import { Editors, UIProps, skippedProperties, rowLabel } from "./Editors"
 import { TableRow } from "./PropertyForm"
 import { Checkbox } from "../Checkbox"
 import { EditorProps } from "./EditorProps"
@@ -15,12 +15,9 @@ export const BooleanEditor = () => {
 
 	const UI = (props: UIProps<boolean>) => {
 		const { value, reactive, editorName } = props
-		const optionName = editorName.replace(/([a-z])([A-Z])/g, "$1 $2").replace(/^./, function (str) {
-			return str.toUpperCase()
-		})
 
 		return skippedProperties.includes(editorName) ? null : (
-			<TableRow optionName={optionName} action={(value as any)?.action}>
+			<TableRow optionName={() => rowLabel(editorName)} action={(value as any)?.action}>
 				<BoolEditor
 					value={value}
 					reactive={reactive}

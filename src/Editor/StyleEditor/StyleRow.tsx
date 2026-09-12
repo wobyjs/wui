@@ -22,6 +22,7 @@ import { $, $$, useEffect, useMemo, type Observable } from 'woby'
 import { CSS_WIDE, KEYWORDS, controlFor } from './propertyCatalog'
 import { type Variant } from './TwBridge'
 import { type Target, applyStyle, clearStyle, readStyleState, validate } from './StyleModel'
+import { t } from '../../i18n'
 
 export type StyleRowProps = {
     prop: string
@@ -261,7 +262,7 @@ export const StyleRow = ({ prop, el, variant, root, version, onEdit }: StyleRowP
                 <button
                     type="button"
                     class={toggleClass('tw')}
-                    title="Write this property as a Tailwind class"
+                    title={() => t('editor.property.asTailwind')}
                     ref={(e: HTMLButtonElement) => { if (e) e.onclick = () => target('tw') }}
                 >tw</button>
 
@@ -288,7 +289,7 @@ export const StyleRow = ({ prop, el, variant, root, version, onEdit }: StyleRowP
                                 : 'text-transparent pointer-events-none',
                         ].join(' ')
                     }}
-                    title="Remove this property"
+                    title={() => t('editor.property.remove')}
                     ref={(e: HTMLButtonElement) => { if (e) e.onclick = clear }}
                 >&times;</button>
             </div>

@@ -27,6 +27,22 @@ import { allProperties, propertyGroups } from './propertyCatalog'
 import { VARIANTS, type Variant, refresh, splitVariant, trackRoot } from './TwBridge'
 import { classTokens, clsTokens, componentTokens, removeClsToken, setProperties } from './StyleModel'
 import { StyleRow } from './StyleRow'
+import { t } from '../../i18n'
+
+/**
+ * A group's heading, translated.
+ *
+ * The English name stays the identity everywhere else -- `openGroups` keys on it and
+ * `groupOf` returns it -- so it is translated at the last possible moment, here. A group
+ * with no catalogue entry (a browser-only one, or a group added later) comes back from
+ * `t` as its own id, which would put `style.group.Foo` on screen; fall back to the raw
+ * name instead.
+ */
+const groupLabel = (name: string): string => {
+    const id = 'style.group.' + name
+    const s = t(id)
+    return s === id ? name : s
+}
 
 export type StyleEditorProps = {
     /** The element being edited. `null` renders the empty state. */
@@ -179,7 +195,7 @@ export const StyleEditor = ({ target, onEdit, open }: StyleEditorProps) => {
                     <button
                         type="button"
                         class={variantClass(v)}
-                        title={v === 'base' ? 'Normal state' : `Styles applied on :${v}`}
+                        title={() => v === 'base' ? t('style.normalState') : t('style.pseudoState', { state: v })}
                         ref={(e: HTMLButtonElement) => { if (e) e.onclick = () => variant(v) }}
                     >{v}</button>
                 ))}
@@ -191,7 +207,7 @@ export const StyleEditor = ({ target, onEdit, open }: StyleEditorProps) => {
             <div class="px-2 py-1.5 border-b border-gray-200">
                 <input
                     type="text"
-                    placeholder="Search properties"
+                    placeholder={() => t('style.searchProperties')}
                     spellCheck={false}
                     class="w-full px-2 py-1 text-[11px] rounded border border-gray-200 bg-white outline-none focus:border-[#1976d2]"
                     ref={(e: HTMLInputElement) => {
@@ -253,7 +269,8 @@ export const StyleEditor = ({ target, onEdit, open }: StyleEditorProps) => {
                                 {() => $$(openGroups)[group.name] ? '\u25be' : '\u25b8'}
                             </span>
                             <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500">
-                                {group.name}
+                                {/* A thunk: `groupLabel` reads the locale observable. */}
+                                {() => groupLabel(group.name)}
                             </span>
                             <span class="ml-auto text-[10px] text-gray-400 font-mono">{group.props.length}</span>
                         </button>
@@ -292,19 +309,19 @@ export const StyleEditor = ({ target, onEdit, open }: StyleEditorProps) => {
     const classBar = () => (
         <div class="border-t border-gray-200 bg-gray-50/60">
             <div class="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-500">
-                Classes
+                {() => t('style.classes')}
             </div>
             <div class="flex flex-wrap gap-1 px-2 pb-1.5">
                 {() => $$(slot).map(token => (
                     <span
                         class="flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono border border-gray-300 bg-gray-100 text-gray-500"
-                        title={`From the component's base classes — removing it rewrites Class Override`}
+                        title={() => t('style.fromBase')}
                     >
                         {token}
                         <button
                             type="button"
                             class="text-gray-400 hover:text-red-500 leading-none"
-                            title={`Remove ${token}`}
+                            title={() => t('style.removeToken', { token })}
                             ref={(e: HTMLButtonElement) => { if (e) e.onclick = () => removeSlotClass(token) }}
                         >&times;</button>
                     </span>
@@ -312,7 +329,7 @@ export const StyleEditor = ({ target, onEdit, open }: StyleEditorProps) => {
                 {() => $$(inherited).map(token => (
                     <span
                         class="flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono border border-dashed border-gray-300 bg-gray-100 text-gray-400"
-                        title={`From the component's variant/size — change it through the property row, not here`}
+                        title={() => t('style.fromVariant')}
                     >
                         {token}
                     </span>
@@ -330,7 +347,7 @@ export const StyleEditor = ({ target, onEdit, open }: StyleEditorProps) => {
                             <button
                                 type="button"
                                 class="text-gray-400 hover:text-red-500 leading-none"
-                                title={`Remove ${token}`}
+                                title={() => t('style.removeToken', { token })}
                                 ref={(e: HTMLButtonElement) => { if (e) e.onclick = () => removeClass(token) }}
                             >&times;</button>
                         </span>

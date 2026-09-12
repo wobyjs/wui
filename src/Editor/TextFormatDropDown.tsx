@@ -6,16 +6,27 @@ import KeyboardDownArrow from '../icons/keyboard_down_arrow'
 import { getCurrentEditor, getSelection } from './utils'
 import { QUOTE_TAG, QUOTE_CLASSES } from './Blockquote'
 import { applyFormatBlock as applyFormatBlockStyle } from './StyleEngine'
+import { t } from '../i18n'
 
-// Dropdown items configuration
+// Dropdown items configuration.
+//
+// `label` stays English and stays the identity: it is the value of the `selected-format`
+// attribute, the key `handleSelectFormat` writes back, and what the detection pass in
+// `syncFromSelection` compares against. `key` is what the user actually reads.
 export const FORMAT_OPTIONS = [
-    { label: 'Normal', tag: 'p', hotkey: 'Ctrl+Alt+0', class: '' },
-    { label: 'Heading 1', tag: 'h1', hotkey: 'Ctrl+Alt+1', class: 'text-3xl font-bold mb-4' },
-    { label: 'Heading 2', tag: 'h2', hotkey: 'Ctrl+Alt+2', class: 'text-2xl font-semibold mb-3' },
-    { label: 'Heading 3', tag: 'h3', hotkey: 'Ctrl+Alt+3', class: 'text-xl font-medium mb-2' },
-    { label: 'Quote', tag: QUOTE_TAG, hotkey: 'Ctrl+Alt+Q', class: QUOTE_CLASSES },
-    { label: 'Code Block', tag: 'pre', hotkey: 'Ctrl+Alt+C', class: 'bg-gray-100 p-2 rounded font-mono text-sm overflow-x-auto' },
+    { label: 'Normal', key: 'editor.normalText', tag: 'p', hotkey: 'Ctrl+Alt+0', class: '' },
+    { label: 'Heading 1', key: 'editor.heading1', tag: 'h1', hotkey: 'Ctrl+Alt+1', class: 'text-3xl font-bold mb-4' },
+    { label: 'Heading 2', key: 'editor.heading2', tag: 'h2', hotkey: 'Ctrl+Alt+2', class: 'text-2xl font-semibold mb-3' },
+    { label: 'Heading 3', key: 'editor.heading3', tag: 'h3', hotkey: 'Ctrl+Alt+3', class: 'text-xl font-medium mb-2' },
+    { label: 'Quote', key: 'editor.quote', tag: QUOTE_TAG, hotkey: 'Ctrl+Alt+Q', class: QUOTE_CLASSES },
+    { label: 'Code Block', key: 'editor.codeBlock', tag: 'pre', hotkey: 'Ctrl+Alt+C', class: 'bg-gray-100 p-2 rounded font-mono text-sm overflow-x-auto' },
 ]
+
+/** The translated caption for one of the English identities above. */
+const formatLabel = (label: string): string => {
+    const opt = FORMAT_OPTIONS.find(o => o.label === label)
+    return opt ? t(opt.key) : label
+}
 type TextFormatOptions = "Normal" | "Heading 1" | "Heading 2" | "Heading 3" | "Quote" | "Code Block"
 
 const def = () => ({
@@ -183,7 +194,7 @@ const TextFormatDropDown = defaults(def, (props) => {
                         >
                             <div class="w-full flex items-center justify-between pointer-events-none">
                                 <span class="text-left truncate">
-                                    {opt.label}
+                                    {() => formatLabel(opt.label)}
                                 </span>
 
                                 <span class="text-xs text-right text-gray-500 shrink-0 ml-4">
@@ -209,11 +220,11 @@ const TextFormatDropDown = defaults(def, (props) => {
                     ]}
                     onClick={handleApplyCurrent}
                     onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation() }}
-                    title="Text format"
+                    title={() => t('editor.textFormat')}
                     {...otherProps}
                 >
                     <span class="text-center truncate">
-                        {() => $$(selectedFormat)}
+                        {() => formatLabel($$(selectedFormat))}
                     </span>
                 </Button>
                 <Button
@@ -221,7 +232,7 @@ const TextFormatDropDown = defaults(def, (props) => {
                     class="size-full inline-flex justify-center items-center rounded-md border border-gray-300 shadow-sm bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500 cursor-pointer px-2"
                     onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleDropdown(); }}
                     onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation(); }}
-                    title="Choose paragraph style"
+                    title={() => t('editor.paragraphStyle')}
                 >
                     <KeyboardDownArrow class="h-5 w-5" />
                 </Button>

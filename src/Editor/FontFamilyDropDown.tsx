@@ -5,6 +5,7 @@ import { useDropdownDismiss } from './useDropdownDismiss'
 import { getCurrentRange } from './utils'
 import { applyFontFamily as applyFontFamilyStyle } from './StyleEngine'
 import KeyboardDownArrow from '../icons/keyboard_down_arrow'
+import { t } from '../i18n'
 
 const FONT_FAMILY = [
     { label: 'Arial', value: 'Arial, Helvetica, sans-serif' },
@@ -178,7 +179,7 @@ const FontFamilyDropDown = defaults(def, (props) => {
                     cls={() => [BASE_BTN]}
                     onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation() }}
                     onClick={handleApplyCurrent}
-                    title="Font family"
+                    title={() => t('editor.fontFamily')}
                     {...otherProps}
                 >
                     <span class="text-center truncate">
@@ -190,7 +191,7 @@ const FontFamilyDropDown = defaults(def, (props) => {
                     class="size-full inline-flex justify-center items-center rounded-md border border-gray-300 shadow-sm bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500 cursor-pointer px-2"
                     onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleDropdown(); }}
                     onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation(); }}
-                    title="Choose font family"
+                    title={() => t('editor.chooseFontFamily')}
                 >
                     <KeyboardDownArrow class="h-5 w-5" />
                 </Button>

@@ -3,6 +3,7 @@
 import { $, $$, ObservableMaybe, Observable, type JSX, defaults, customElement, type ElementAttributes } from "woby"
 import { Button } from "../Button"
 import { Editors, UIProps, skippedProperties, indent } from "./Editors"
+import { tx } from "../i18n"
 
 type PropertyFormProps = {
 	obj: any
@@ -101,13 +102,17 @@ export const TableRow = (props: { optionName?: JSX.Child, children?: JSX.Child, 
 								// synthetic click never arrives. An onClick here would compile,
 								// read correctly, and silently do nothing.
 								ref={(b: HTMLButtonElement | null) => { if (b) b.onclick = () => a.run() }}
-								title={a.title}
+								// Thunks, not bare calls: `tx` reads the `locale` observable, and a
+								// row action's caption and tooltip are plugin-authored English, which
+								// is exactly what the text catalogue is keyed by. A non-string label
+								// (an icon element, say) passes straight through -- nothing to look up.
+								title={() => a.title ? tx(a.title) : undefined}
 								// shrink-0 so the field keeps the space: the editor beside it is
 								// w-full, and without this the button is the one that collapses.
 								class="shrink-0 flex items-center gap-1 px-2 py-1 rounded border border-gray-300 bg-white text-xs text-gray-700 cursor-pointer hover:bg-gray-50 hover:border-gray-400 active:bg-gray-100"
 							>
 								{a.icon ? a.icon() : null}
-								{a.label}
+								{() => typeof a.label === 'string' ? tx(a.label) : a.label}
 							</button>
 						)
 					}}

@@ -75,6 +75,7 @@
 
 import { pageBreakTagNames, resolvePageBreak, type PageBreakKind } from './EditorPlugin'
 import { ensurePageStyles } from './PageStyles'
+import { onLocaleChange, t } from '../i18n'
 
 export type { PageBreakKind }
 
@@ -167,11 +168,17 @@ export interface PageLayoutOptions {
     pageWidthMm: number
     /** Sheet height in millimetres. Default 296 (A4 less 1mm). */
     pageHeightMm: number
-    /** Text of the injected page-number strip. Default `Page N / M`. */
+    /**
+     * Text of the injected page-number strip. Defaults to the `editor.page.label` entry of
+     * the active language pack — `Page N / M` in English — so a host only sets this to say
+     * something *other* than what the catalogue says, not to translate it.
+     */
     pageLabel: (page: number, total: number) => string
     /**
      * What the rule drawn across an over-tall sheet says. Screen only — it is hidden in
      * print, because by then the author has either fixed it or decided to live with it.
+     *
+     * Empty means the catalogue's `editor.page.overflow`, which is the default.
      */
     overflowLabel: string
     /**
@@ -185,8 +192,11 @@ export interface PageLayoutOptions {
 const options: PageLayoutOptions = {
     pageWidthMm: 209,
     pageHeightMm: 296,
-    pageLabel: (page, total) => `Page ${page} / ${total}`,
-    overflowLabel: 'This block is taller than one page and cannot be split automatically',
+    // Both read the catalogue at *use* time rather than at module load, so a pack that
+    // arrives after this file is evaluated — which every lazily-loaded one does — still
+    // gets a look in.
+    pageLabel: (page, total) => t('editor.page.label', { page, total }),
+    overflowLabel: '',
 }
 
 /**
@@ -819,7 +829,7 @@ const writePageVars = (root: HTMLElement) => {
     // JSON.stringify, because `content` takes a CSS *string* and the label is arbitrary
     // host text: a stray quote in it would otherwise break the declaration and silently
     // drop the whole rule.
-    root.style.setProperty(OVERFLOW_LABEL_VAR, JSON.stringify(options.overflowLabel))
+    root.style.setProperty(OVERFLOW_LABEL_VAR, JSON.stringify(options.overflowLabel || t('editor.page.overflow')))
 }
 
 /**
@@ -876,6 +886,31 @@ export const applyLayout = (root: HTMLElement | null | undefined, mode: LayoutMo
     // pass after it rides the debounce. See `settle`.
     void settle(root).then(() => schedule(0))
 }
+
+/**
+ * Rewrite the strings this module has already stamped into the DOM.
+ *
+ * The page-number strips are plain text nodes written once during pagination, and the
+ * overflow warning is a custom property read by a `content` declaration — neither is a
+ * reactive binding, so neither notices a language switch on its own. This rewrites both
+ * in place; it does not re-measure or re-paginate, because nothing about the geometry
+ * has changed.
+ */
+export const relabelPages = () => {
+    const root = currentRoot
+    if (!root) return
+    writePageVars(root)
+    const sheets = Array.from(root.querySelectorAll<HTMLElement>(`[${PAGE_ATTR}]`))
+    sheets.forEach((sheet, i) => {
+        const strip = sheet.querySelector<HTMLElement>(`[${PAGE_CHROME_ATTR}]`)
+        if (strip) strip.textContent = options.pageLabel(i + 1, sheets.length)
+    })
+}
+
+// The strips are chrome, not content: rewriting them must not reach the undo stack or the
+// host's change listener, so the records it queues are dropped the way every layout pass
+// drops its own.
+onLocaleChange(() => { if (currentRoot) { relabelPages(); flushLayoutSilenced() } })
 
 /** Tear the session down. Call from the host page's own teardown. */
 export const disposeLayout = () => {

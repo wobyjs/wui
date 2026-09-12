@@ -1,7 +1,7 @@
 /** @jsxImportSource woby */
 
 import { $$, ObservableMaybe, isObservable } from "woby"
-import { Editors, UIProps, skippedProperties } from "./Editors"
+import { Editors, UIProps, skippedProperties, rowLabel } from "./Editors"
 import { TableRow } from "./PropertyForm"
 import { EditorProps } from "./EditorProps"
 
@@ -18,13 +18,10 @@ export const ColorEditor = () => {
 
 	const UI = (props: UIProps<string>) => {
 		const { value, editorName, indentLvl } = props
-		const optionName = editorName.replace(/([a-z])([A-Z])/g, "$1 $2").replace(/^./, function (str) {
-			return str.toUpperCase()
-		})
 
 		return skippedProperties.includes(editorName) ? null : (
 			<TableRow
-				optionName={optionName}
+				optionName={() => rowLabel(editorName)}
 				indentLvl={indentLvl}
 				action={(value as any)?.action}
 			>

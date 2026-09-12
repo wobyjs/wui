@@ -6,6 +6,7 @@ import OutdentIcon from '../icons/outdent'
 import { getCurrentEditor } from "./utils"
 import { applyIndent as applyIndentStyle, applyListIndent } from './StyleEngine'
 import { applyBlockCommandToSelectedImage } from './ImageActions'
+import { t } from '../i18n'
 
 type IndentMode = "increase" | "decrease"
 
@@ -35,9 +36,9 @@ const Indent: Defaulted<typeof def> = defaults(def, (props) => {
     const displayIcon = () => $$(isDecrease) ? <OutdentIcon class="size-5" /> : <IndentIcon class="size-5" />
 
     const displayTitle = () => {
-        const t = $$(title)
-        if (t) return t
-        return $$(isDecrease) ? "Decrease Indent" : "Increase Indent"
+        const given = $$(title)
+        if (given) return given
+        return $$(isDecrease) ? t('editor.decreaseIndent') : t('editor.increaseIndent')
     }
 
     const handleClick = (e: any) => {

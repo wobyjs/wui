@@ -15,6 +15,7 @@ import {
     rememberImageOrigin,
     resolveImageSource,
 } from './ImageSource'
+import { t } from '../i18n'
 
 /**
  * `<wui-image-editor>`: pan / zoom / resize / crop, pointed at an `<img>` that already
@@ -551,7 +552,7 @@ export const ImageEditor = defaults(def, (): JSX.Element => {
                 <div
                     ref={el => { if (el) (el as HTMLElement).onpointerdown = startDrag }}
                     class="-m-3 mb-0 px-3 py-2 flex items-center gap-2 text-sm font-medium text-gray-800 bg-gray-50 border-b border-gray-200 rounded-t-md cursor-move select-none"
-                    title="Drag to move this dialog"
+                    title={() => t('editor.dragToMoveDialog')}
                 >
                     <span class="text-gray-400">&#x2725;</span>
                     Edit image
@@ -560,7 +561,7 @@ export const ImageEditor = defaults(def, (): JSX.Element => {
                 <ImageCropper onHandle={h => { cropper = h }} />
 
                 <div class="flex flex-col gap-1.5">
-                    <label class="text-[11px] text-gray-600">Source &mdash; edit the URL, browse, or drop an image on this panel to replace it</label>
+                    <label class="text-[11px] text-gray-600">{() => t('editor.image.sourceEdit')}</label>
                     <div class="flex items-center gap-2">
                         <input
                             ref={el => {
@@ -584,7 +585,7 @@ export const ImageEditor = defaults(def, (): JSX.Element => {
                             placeholder="https://example.com/photo.jpg"
                             spellCheck={false}
                         />
-                        <button type="button" class={btn} ref={bindClick(() => fileInput?.click())}>Browse&hellip;</button>
+                        <button type="button" class={btn} ref={bindClick(() => fileInput?.click())}>{() => t('common.browse')}</button>
                     </div>
                     <input
                         ref={el => {
@@ -613,20 +614,20 @@ export const ImageEditor = defaults(def, (): JSX.Element => {
                     <button
                         type="button"
                         class={btn}
-                        title="Discard every crop and go back to the image this was made from"
+                        title={() => t('editor.image.discardCropsPlain')}
                         ref={el => { restoreBtn = el as HTMLButtonElement; bindClick(restore)(el) }}
                         style={{ display: 'none' } as JSX.CSSProperties}
                     >
-                        Restore original
+                        {() => t('editor.image.restoreOriginal')}
                     </button>
                     <div class="ml-auto flex gap-2">
-                        <button type="button" class={btn} ref={bindClick(close)}>Cancel</button>
+                        <button type="button" class={btn} ref={bindClick(close)}>{() => t('common.cancel')}</button>
                         <button
                             type="button"
                             class={primaryBtn}
                             ref={el => { applyBtn = el as HTMLButtonElement; bindClick(apply)(el) }}
                         >
-                            Apply
+                            {() => t('common.apply')}
                         </button>
                     </div>
                 </div>

@@ -3,6 +3,7 @@ import { Button, ButtonStyles } from '../Button'
 import UndoIcon from '../icons/undo'
 import RedoIcon from '../icons/redo'
 import { EditorContext, HistoryEntry, UndoRedo, useEditor, useUndoRedo } from "./undoredo"
+import { t } from '../i18n'
 
 // #region Undo Redo Button
 type UndoRedoMode = 'undo' | 'redo'
@@ -35,7 +36,7 @@ const UndoRedoButton = defaults(def, (props) => {
     const isUndo = () => { return $$(mode) == 'undo' }
 
     // Dynamic Title
-    const displayTitle = () => $$(isUndo) ? 'Undo' : 'Redo'
+    const displayTitle = () => $$(isUndo) ? t('editor.undo') : t('editor.redo')
 
     // Dynamic Icon
     const displayIcon = () => {

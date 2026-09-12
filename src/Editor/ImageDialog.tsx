@@ -11,6 +11,7 @@ import {
     resolveImageSource,
 } from './ImageSource'
 import { useUndoRedo } from './undoredo'
+import { t } from '../i18n'
 
 /**
  * ImageDialog: the one way an image gets into the editor.
@@ -236,10 +237,28 @@ export const ImageDialog = (): JSX.Element => {
         if (rootEl) rootEl.style.display = 'none'
     }
 
-    /** The editor host this dialog was rendered into. */
+    /**
+     * The editor host this dialog was rendered into, i.e. the node the editor's own events
+     * are addressed to.
+     *
+     * The custom-element host when there is one. When there is not -- `<Editor>` rendered
+     * directly, with no shadow boundary anywhere -- it is the contenteditable surface, a
+     * sibling of this dialog under Editor's container. The old fallback was a global
+     * `wui-editor` query, which on such a page is null: the listener below then never
+     * attached and the toolbar's Image row opened nothing at all. InsertDropDown's
+     * `editorHostOf` picks the same node from its side, which is what keeps the request
+     * and this listener on one element.
+     */
     const host = (): HTMLElement | null => {
         const root = rootEl?.getRootNode?.()
         if (root instanceof ShadowRoot) return root.host as HTMLElement
+
+        let n: HTMLElement | null = rootEl?.parentElement ?? null
+        while (n) {
+            const surface = n.querySelector('[data-editor-root]') as HTMLElement | null
+            if (surface) return surface
+            n = n.parentElement
+        }
         return document.querySelector('wui-editor')
     }
 
@@ -330,28 +349,40 @@ export const ImageDialog = (): JSX.Element => {
     // --- wiring ------------------------------------------------------------------
 
     useEffect(() => {
-        const el = rootEl
-        if (!el) return
-        const editorHost = host()
-        if (!editorHost) return
-
-        const onOpen = (e: Event) => open((e as CustomEvent<InsertImageDetail>).detail ?? {})
+        /**
+         * Which editor a request belongs to, decided when it arrives.
+         *
+         * `host()` cannot be resolved in this effect: it runs before the dialog can reach
+         * the surface, so on a light-DOM editor it returns null at mount -- and the old
+         * code, which bound the listener to that host, then bound it to nothing at all and
+         * returned early. The toolbar's Image row opened no dialog whatsoever, with no
+         * error to show for it. A null host here means the same editor as always (there is
+         * nothing to tell apart yet), so the request is taken rather than dropped.
+         */
+        const onOpen = (e: Event) => {
+            const mine = host()
+            if (mine && e.target !== mine) return
+            open((e as CustomEvent<InsertImageDetail>).detail ?? {})
+        }
+        // `rootEl` read per event, not captured: this effect runs before the ref lands.
         const onKeyDown = (e: KeyboardEvent) => {
-            if (el.style.display === 'none') return
+            if (!rootEl || rootEl.style.display === 'none') return
             if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); close() }
         }
 
-        editorHost.addEventListener(INSERT_IMAGE_EVENT, onOpen)
+        // On the document, not on the editor host, for the reason `onOpen` gives: the
+        // host is not knowable this early. The request bubbles up from it, so every
+        // editor's passes through here and `onOpen` keeps only this one's.
+        document.addEventListener(INSERT_IMAGE_EVENT, onOpen)
         // Capture phase on the document: Escape must win over the editor's own key
         // handling while the modal is up, and the modal lives behind a shadow boundary
         // that a bubbling listener on the host would not see first.
         document.addEventListener('keydown', onKeyDown, true)
 
-        el.style.display = 'none'
         setNote('')
 
         return () => {
-            editorHost.removeEventListener(INSERT_IMAGE_EVENT, onOpen)
+            document.removeEventListener(INSERT_IMAGE_EVENT, onOpen)
             document.removeEventListener('keydown', onKeyDown, true)
         }
     })
@@ -425,7 +456,7 @@ export const ImageDialog = (): JSX.Element => {
                     if (el) (el as HTMLElement).onclick = (e: MouseEvent) => e.stopPropagation()
                 }}
             >
-                <div class="text-sm font-medium text-gray-800">Insert image</div>
+                <div class="text-sm font-medium text-gray-800">{() => t('editor.image.insert')}</div>
 
                 <div ref={bindDropZone} class="flex flex-col gap-2 rounded p-2 -m-2">
                     {/* `for`/`id` rather than a wrapping label, because the row below holds the Browse
@@ -434,7 +465,7 @@ export const ImageDialog = (): JSX.Element => {
                         placeholder stops being announced the moment the user types, leaving a text box
                         with no name at all. The ids need no prefix: this subtree lives in the editor's
                         shadow root, where an id cannot collide with the host page's. */}
-                    <label class="text-[11px] text-gray-600" for="wui-img-src">Source &mdash; paste a URL, browse, or drop an image here</label>
+                    <label class="text-[11px] text-gray-600" for="wui-img-src">{() => t('editor.image.source')}</label>
                     <div class="flex items-center gap-2">
                         <input
                             ref={el => {
@@ -455,10 +486,10 @@ export const ImageDialog = (): JSX.Element => {
                             id="wui-img-src"
                             type="text"
                             class={field}
-                            placeholder="https://example.com/photo.jpg"
+                            placeholder={() => t('editor.image.urlPlaceholder')}
                             spellCheck={false}
                         />
-                        <button type="button" class={btn} ref={bindClick(() => fileInput?.click())}>Browse&hellip;</button>
+                        <button type="button" class={btn} ref={bindClick(() => fileInput?.click())}>{() => t('common.browse')}</button>
                     </div>
 
                     <input
@@ -482,8 +513,8 @@ export const ImageDialog = (): JSX.Element => {
                 <div ref={el => { noteEl = el as HTMLElement }} class="text-[11px] leading-snug text-gray-500" style={{ display: 'none' } as JSX.CSSProperties} />
 
                 <div class="flex items-center gap-2">
-                    <label class="text-[11px] text-gray-600 w-16 shrink-0" for="wui-img-alt">Alt text</label>
-                    <input ref={el => { altInput = el as HTMLInputElement }} id="wui-img-alt" type="text" class={field} placeholder="Describes the image for screen readers" />
+                    <label class="text-[11px] text-gray-600 w-16 shrink-0" for="wui-img-alt">{() => t('editor.image.altText')}</label>
+                    <input ref={el => { altInput = el as HTMLInputElement }} id="wui-img-alt" type="text" class={field} placeholder={() => t('editor.image.altPlaceholder')} />
                 </div>
 
                 <label class="flex items-center gap-2 text-[11px] text-gray-700 select-none">
@@ -496,17 +527,17 @@ export const ImageDialog = (): JSX.Element => {
                         checked
                         class="w-3.5 h-3.5"
                     />
-                    Embed the image in the document (data: URI)
+                    {() => t('editor.image.embed')}
                 </label>
 
                 <div class="flex justify-end gap-2 pt-1">
-                    <button type="button" class={btn} ref={bindClick(close)}>Cancel</button>
+                    <button type="button" class={btn} ref={bindClick(close)}>{() => t('common.cancel')}</button>
                     <button
                         type="button"
                         class={primaryBtn}
                         ref={el => { insertBtn = el as HTMLButtonElement; bindClick(insert)(el) }}
                     >
-                        Insert
+                        {() => t('common.insert')}
                     </button>
                 </div>
             </div>

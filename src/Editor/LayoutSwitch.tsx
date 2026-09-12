@@ -24,6 +24,7 @@ import { Button, ButtonStyles } from '../Button'
 import { useEditor } from './undoredo'
 import { getCurrentEditor } from './utils'
 import { applyLayout, flushLayoutSilenced, Layout, type LayoutMode } from './PageLayout'
+import { t } from '../i18n'
 
 /**
  * The mode the editor is in, as an observable, so anything else in the editor can react
@@ -62,27 +63,34 @@ export interface LayoutText {
     screenTitle: string
 }
 
+/** Where each string comes from when nobody has overridden it. See {@link layoutText}. */
+const LAYOUT_KEYS: Record<keyof LayoutText, string> = {
+    flow: 'editor.layout.flow',
+    page: 'editor.layout.page',
+    screen: 'editor.layout.screen',
+    flowTitle: 'editor.layout.flowTitle',
+    pageTitle: 'editor.layout.pageTitle',
+    screenTitle: 'editor.layout.screenTitle',
+}
+
 /**
- * The control's wording, app-wide.
+ * Per-string overrides for the control's wording, app-wide.
  *
- * The switch is rendered by wui's own toolbar, so a host has no call site to pass props
- * through — an app in another language would otherwise be stuck with English buttons in
- * the middle of its own chrome. Assign this once at start-up:
+ * Empty by default: the words now come from the i18n catalogue, so switching the editor to
+ * Malay relabels this strip with everything else rather than leaving three English buttons
+ * in the middle of translated chrome. This observable is the escape hatch above that — for
+ * a host that wants different wording *within* a language ("Draft" instead of "Flow"), or
+ * a word in a language wui does not ship a pack for.
  *
  * ```ts
- * layoutText({ ...$$(layoutText), flow: '流', page: '页', screen: '览' })
+ * layoutText({ ...$$(layoutText), flow: 'Draft' })   // one string, catalogue for the rest
+ * setLocale('zh-Hans')                               // or just translate the lot
  * ```
  *
- * A prop set explicitly on a hand-placed `<LayoutSwitch>` still wins over it.
+ * Precedence is prop, then this, then the catalogue. A prop set explicitly on a hand-placed
+ * `<LayoutSwitch>` still wins over both.
  */
-export const layoutText = $<LayoutText>({
-    flow: 'Flow',
-    page: 'Page',
-    screen: 'Read',
-    flowTitle: 'Continuous editing, layout markers shown',
-    pageTitle: 'Paginated sheets — what the printer gets',
-    screenTitle: 'Read-only, no paper width',
-})
+export const layoutText = $<Partial<LayoutText>>({})
 
 const def = () => ({
     buttonType: $('outlined', HtmlString) as ObservableMaybe<ButtonStyles>,
@@ -131,10 +139,11 @@ const LayoutSwitch = defaults(def, (props) => {
             <span class="flex items-center gap-2">{label}</span>
         </Button>
 
-    // Prop first, global text second, and both read inside the `() =>` so a host that
-    // sets `layoutText` after the toolbar has mounted still re-labels it.
+    // Prop first, global override second, catalogue last — all three read inside the
+    // `() =>` so a host that sets `layoutText`, or a reader who switches language, after
+    // the toolbar has mounted still re-labels it.
     const pick = (prop: ObservableMaybe<string>, key: keyof LayoutText) =>
-        () => $$(prop) || $$(layoutText)[key]
+        () => $$(prop) || $$(layoutText)[key] || t(LAYOUT_KEYS[key])
 
     return <div class="flex items-center gap-0.5">
         <Mode mode={Layout.flow} label={pick(flowLabel, 'flow')} title={pick(flowTitle, 'flowTitle')} />
