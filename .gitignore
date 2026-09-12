@@ -19,3 +19,6 @@ nodejs_ssr.txt
 ssr_output.txt
 dv4_console.json
 .dv-session.json
+
+# Cygwin crash dumps (git bash, dv4) -- an artifact of a tool dying, never source
+*.stackdump
