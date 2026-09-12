@@ -211,16 +211,23 @@ export interface EditorPlugin {
     /**
      * Deserialize HTML back into the custom element when loading editor content.
      *
-     * NOT YET CALLED. {@link toHTML} has its counterpart in
-     * {@link serializeEditorContent}; this half has no loader behind it, so a hook
-     * written here never fires and the browser's innerHTML parser runs instead.
-     * That is the correct behaviour for every plugin shipped so far -- all of them
-     * round-trip through plain `outerHTML` -- but a plugin whose serialized form
-     * differs from its live DOM cannot be loaded back today. Declared rather than
-     * deleted because the asymmetry is the thing worth seeing.
+     * The inverse of {@link toHTML}, and called by {@link deserializeEditorContent}.
+     * Omit it and the browser's own parser is the whole story, which is right for
+     * every plugin shipped so far -- they all round-trip through plain `outerHTML`.
+     * Provide it when the serialized form is not the live form: markup that has to be
+     * rehydrated, an attribute that encodes state the element rebuilds on load, a
+     * legacy shape that has to be migrated forward.
      *
-     * @param html - The HTML string to parse
-     * @returns The parsed custom element
+     * The element you are handed back has already been parsed and upgraded, so the
+     * hook is a *replacement* step, not a parse step: return the element you want in
+     * the document and it is swapped in. Return the same node to leave it alone.
+     *
+     * Matching is by {@link tagName}, so a serialized form that does not keep the
+     * custom element's own tag cannot be found again -- keep the tag and move the
+     * detail into attributes or children.
+     *
+     * @param html - The outerHTML of one matched element
+     * @returns The element to put in its place
      */
     fromHTML?: (html: string) => HTMLElement
 
@@ -572,6 +579,40 @@ export const serializeEditorContent = (editorRoot: HTMLElement): string => {
     }
 
     return html
+}
+
+/**
+ * Load serialized HTML into the editor, running all registered plugin fromHTML hooks.
+ *
+ * The counterpart to {@link serializeEditorContent}, and for a long time the missing
+ * half of it: `toHTML` had a caller and `fromHTML` had none, so a plugin could write a
+ * serialized form it was then unable to read back.
+ *
+ * Content is parsed first and revived second. Assigning `innerHTML` hands the markup to
+ * the browser's parser and upgrades any custom elements in it, which is what makes the
+ * elements passed to `fromHTML` live, upgraded nodes rather than inert ones -- a plugin
+ * that needs to inspect its own shadow root or props can. The cost is that an element is
+ * built once and possibly replaced; that is cheap next to the clarity, and no shipped
+ * plugin defines the hook at all.
+ *
+ * Elements are collected before any replacement runs. Replacing a node while iterating a
+ * live NodeList is how you silently skip half of them.
+ *
+ * @param editorRoot - The editor's contenteditable element
+ * @param html - Serialized HTML, typically from {@link serializeEditorContent}
+ */
+export const deserializeEditorContent = (editorRoot: HTMLElement, html: string): void => {
+    editorRoot.innerHTML = html
+
+    const plugins = $$(registeredPlugins)
+    for (const plugin of plugins) {
+        if (!plugin.fromHTML) continue
+        const elements = Array.from(editorRoot.querySelectorAll(plugin.tagName))
+        for (const el of elements) {
+            const revived = plugin.fromHTML((el as HTMLElement).outerHTML)
+            if (revived && revived !== el) el.replaceWith(revived)
+        }
+    }
 }
 
 export default EditorPlugin

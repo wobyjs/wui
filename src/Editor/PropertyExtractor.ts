@@ -593,6 +593,13 @@ export function extractCustomElementProperties(el: HTMLElement): Record<string, 
         // rendered by nobody until now -- 44 plugins had written one into the void.
         if (p.hint) (obs as any).hint = p.hint
 
+        // Same channel again, for the same reason: `applyCustomElementProperty` below
+        // honours `readonly` by dropping the write, but the row widget never saw the
+        // flag, so it kept rendering a live input. You could type into a readonly row,
+        // watch the text appear, and lose it on commit with nothing said. The editors
+        // read this through `isLocked` and disable the control instead.
+        if (p.readonly) (obs as any).readonly = true
+
         // A row-level action rides the same channel, already bound to this element:
         // TableRow renders the button but knows nothing about plugins or selection,
         // and the observable is the only thing that reaches it from here.

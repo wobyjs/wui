@@ -65,7 +65,7 @@ registerEditorPlugin({
 | `onInsert` | `(editorRoot, range) => void` | ✅ | Called when the user selects this plugin from the insert menu. Receives the editor's contenteditable element and the current cursor Range. |
 | `onRender` | `(element) => void` | ❌ | Called after a custom element is inserted. Use to attach event listeners or initialize state. |
 | `toHTML` | `(element) => string` | ❌ | Serialize the custom element to an HTML string for output. If omitted, `outerHTML` is used. |
-| `fromHTML` | `(html) => HTMLElement` | ❌ | Deserialize HTML back into the custom element when loading editor content. |
+| `fromHTML` | `(html) => HTMLElement` | ❌ | Deserialize HTML back into the custom element when loading editor content. Run by `deserializeEditorContent`; load content through that rather than assigning `innerHTML`, or the hook never fires. |
 | `props` | `PluginProp[]` | ❌ | Typed property schema that drives the property panel. Without it the panel falls back to blind free-text attribute rows. |
 | `onPropChange` | `(element, key, value) => void` | ❌ | Called after the panel writes an attribute, for elements that cannot repaint from an attribute change alone. |
 
@@ -96,6 +96,9 @@ registerEditorPlugin({
 `type` is one of `'string' | 'number' | 'boolean' | 'color' | 'enum'` (enum
 requires `options`). Other useful fields: `label`, `default`, `hint`, `readonly`,
 `hidden`.
+
+`readonly` is enforced in both places it has to be: the row's control is disabled, and the write
+path refuses the value. `hint` becomes the row's tooltip.
 
 Two rules are easy to get wrong:
 

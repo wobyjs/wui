@@ -1,7 +1,7 @@
 /** @jsxImportSource woby */
 
 import { $, $$, ObservableMaybe, isObservable, useEffect } from "woby"
-import { Editors, UIProps, skippedProperties, rowLabel } from "./Editors"
+import { Editors, UIProps, skippedProperties, rowLabel, isLocked } from "./Editors"
 import { TableRow } from "./PropertyForm"
 import { Checkbox } from "../Checkbox"
 import { EditorProps } from "./EditorProps"
@@ -38,7 +38,7 @@ export const BooleanEditor = () => {
 				// stale while string rows updated fine. woby's setProperty only writes
 				// observable → DOM, so the onChange below still owns the other direction.
 				checked={value}
-				disabled={!isObservable(value)}
+				disabled={isLocked(value)}
 				onChange={(e: any) => {
 					value((e.target as HTMLInputElement).checked)
 					onChange?.(e)

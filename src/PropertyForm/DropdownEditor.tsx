@@ -1,7 +1,7 @@
 /** @jsxImportSource woby */
 
 import { $, $$, isObservable, ObservableMaybe, untrack, useEffect } from "woby"
-import { Editors, UIProps, skippedProperties, rowLabel } from "./Editors"
+import { Editors, UIProps, skippedProperties, rowLabel, isLocked } from "./Editors"
 import { TableRow } from "./PropertyForm"
 import { EditorProps } from "./EditorProps"
 import { MultiWheeler } from "../Wheeler/MultiWheeler"
@@ -321,6 +321,7 @@ export const DropDownEditor = () => {
 				<input
 					class="m-0 w-full p-2"
 					ref={outerInputRef}
+					disabled={isLocked(arrayObservable)}
 					value={inputValue}
 					onClick={() => {
 						open(!$$(open))

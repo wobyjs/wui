@@ -1,7 +1,7 @@
 /** @jsxImportSource woby */
 
 import { $, $$, isObservable, ObservableMaybe } from "woby"
-import { Editors, UIProps, skippedProperties, rowLabel } from "./Editors"
+import { Editors, UIProps, skippedProperties, rowLabel, isLocked } from "./Editors"
 import { tx } from "../i18n"
 import { TableRow } from "./PropertyForm"
 import { EditorProps } from "./EditorProps"
@@ -45,7 +45,7 @@ export const EnumEditor = () => {
             <select
                 class="w-full px-2 py-1.5 text-sm border border-gray-300 rounded bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
                 value={$$(value)}
-                disabled={!isObservable(value)}
+                disabled={isLocked(value)}
                 onChange={(e: any) => {
                     if (isObservable(value)) {
                         ;(value as any)((e.target as HTMLSelectElement).value)

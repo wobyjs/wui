@@ -1,7 +1,7 @@
 /** @jsxImportSource woby */
 
 import { $$, ObservableMaybe, isObservable } from "woby"
-import { Editors, UIProps, skippedProperties, rowLabel } from "./Editors"
+import { Editors, UIProps, skippedProperties, rowLabel, isLocked } from "./Editors"
 import { TableRow } from "./PropertyForm"
 import { EditorProps } from "./EditorProps"
 
@@ -46,7 +46,7 @@ export const ColorEditor = () => {
 				<input
 					type="color"
 					value={colorVal}
-					disabled={!isObservable(value)}
+					disabled={isLocked(value)}
 					onChange={(e: any) => {
 						!$$(reactive) && isObservable(value) ? (value?.(e.target.value), onChange?.(e)) : undefined
 					}}

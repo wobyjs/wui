@@ -14,6 +14,7 @@ import {
   getPluginForElement,
   pluginsToInsertItems,
   serializeEditorContent,
+  deserializeEditorContent,
 } from "./EditorPlugin";
 import type { EditorPlugin, InsertMenuItem, PluginProp, PluginPropType } from "./EditorPlugin";
 
@@ -34,7 +35,7 @@ import "./Editor/WuiPlugins";
 | **onInsert**| `(editorRoot: HTMLElement, range: Range) => void`            | Yes      | Called when the user selects this plugin from the insert menu |
 | **onRender**| `(element: HTMLElement) => void`                             | No       | Called after the custom element is inserted into the editor   |
 | **toHTML**  | `(element: HTMLElement) => string`                           | No       | Serialize the custom element to an HTML string for output     |
-| **fromHTML**| `(html: string) => HTMLElement`                              | No       | Deserialize HTML back into the custom element when loading    |
+| **fromHTML**| `(html: string) => HTMLElement`                              | No       | Deserialize HTML back into the custom element when loading. Run by `deserializeEditorContent` |
 | **props**   | `PluginProp[]`                                               | No       | Typed property schema. When present the property panel renders typed editors instead of blind string fields |
 | **onPropChange** | `(element: HTMLElement, key: string, value: any) => void` | No     | Called after the panel writes an attribute, so a plugin can re-render or re-insert an element that cannot pick the change up on its own |
 | **actions** | `PluginAction[]`                                             | No       | Buttons rendered as a strip at the bottom of the property panel, for operations on the element as a whole |
@@ -181,7 +182,7 @@ string is coerced back to a runtime value:
 | **default**     | `string \| number \| boolean`           | No       | Value used when the attribute is absent, and the "unset" comparison value |
 | **resolveDefault** | `(el: HTMLElement) => string \| number \| boolean` | No | A default computed from the element. Wins over `default` in both directions |
 | **options**     | `{ value: string; label?: string }[]`   | For enum | Choices offered by `EnumEditor`; required when `type` is `'enum'`         |
-| **readonly**    | `boolean`                               | No       | Rendered, but not editable (e.g. values resolved at construction time)    |
+| **readonly**    | `boolean`                               | No       | Rendered, but not editable (e.g. values resolved at construction time). The row's control is disabled, and the write path drops the value too |
 | **hidden**      | `boolean`                               | No       | Never surfaced in the panel at all                                        |
 | **hint**        | `string`                                | No       | Tooltip / helper text for the row                                         |
 | **action**      | `PluginAction`                          | No       | A button rendered **inside this row**, to the right of its editor         |
@@ -227,7 +228,7 @@ any legacy same-named attribute.
 
 - `boolean` values → `setAttribute(attr, '')` when `true`, `removeAttribute` when `false`.
 - A value equal to the declared `default`, or an empty string, removes the attribute so the serialized HTML stays clean.
-- `readonly` props are never written.
+- `readonly` props are never written, and the row's control is disabled so the keystroke is refused rather than silently discarded on commit.
 - After every write, the owning plugin's `onPropChange(element, attr, value)` is called.
 
 ## Schema disables the blind attribute scrape
@@ -331,6 +332,24 @@ than while writing in it:
 
 Serializes the editor's HTML content, running each registered plugin's `toHTML` hook on matching elements. If a plugin does not provide `toHTML`, the element's outerHTML is used as-is.
 
+## `deserializeEditorContent(editorRoot: HTMLElement, html: string): void`
+
+The inverse. Loads `html` into the editor and runs each registered plugin's `fromHTML` hook on
+matching elements, replacing any element the hook returns a different node for.
+
+Use it instead of assigning `editorRoot.innerHTML` yourself whenever plugins are in play. Assigning
+directly skips every `fromHTML` hook, so a plugin that writes a serialized form other than its own
+live markup gets no chance to read that form back.
+
+The markup is parsed *first* and revived *second*. That ordering is deliberate: assigning
+`innerHTML` hands the markup to the browser's parser and upgrades any custom elements in it, so the
+element passed to `fromHTML` is a live, upgraded node — a plugin that needs to look at its own props
+or shadow root can. The cost is that an element may be built and then immediately replaced, which is
+cheap next to the clarity.
+
+Elements are collected into an array before any replacement runs, because replacing a node while
+iterating a live `NodeList` silently skips half of them.
+
 ---
 
 # Internal Logic
@@ -362,6 +381,18 @@ When `serializeEditorContent` is called:
 2. Iterates over registered plugins.
 3. For each plugin with a `toHTML` hook, finds all elements matching the plugin's `tagName` and substitutes their outerHTML with the serialized output.
 4. Returns the final HTML string.
+
+## Deserialization Flow
+
+When `deserializeEditorContent` is called:
+1. Assigns the HTML to the editor's innerHTML, which parses it and upgrades the custom elements in it.
+2. Iterates over registered plugins.
+3. For each plugin with a `fromHTML` hook, collects all elements matching the plugin's `tagName` into an array, then calls the hook with each element's outerHTML.
+4. Replaces an element only when the hook returns a *different* node, so returning the element unchanged is a valid no-op.
+
+Matching is by `tagName` in both directions. A `toHTML` that does not keep the custom element's own
+tag produces markup `fromHTML` can never be found for — keep the tag and move the detail into
+attributes or children.
 
 ---
 
@@ -614,7 +645,7 @@ The EditorPlugin system provides:
 - A clean interface for registering custom elements with the WUI Editor
 - Reactive plugin registry that updates the insert menu automatically
 - Lifecycle hooks: `onInsert` (required), `onRender` (optional)
-- Serialization hooks: `toHTML` and `fromHTML` for custom output formats
+- Serialization hooks: `toHTML` and `fromHTML` for custom output formats, driven by `serializeEditorContent` / `deserializeEditorContent`
 - A typed property schema (`props: PluginProp[]`) that drives the property panel's editors, plus an `onPropChange` hook for elements that cannot react to attribute writes on their own
 - `getPluginForElement(el)` to resolve a plugin from any DOM element
 - Built-in safety: duplicate plugin name detection, no-op on re-registration

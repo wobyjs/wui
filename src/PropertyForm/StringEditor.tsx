@@ -1,7 +1,7 @@
 /** @jsxImportSource woby */
 
 import { $$, isObservable, ObservableMaybe } from "woby"
-import { Editors, UIProps, skippedProperties, rowLabel } from "./Editors"
+import { Editors, UIProps, skippedProperties, rowLabel, isLocked } from "./Editors"
 import { TableRow } from "./PropertyForm"
 import { TextField } from "../TextField"
 import { EditorProps } from "./EditorProps"
@@ -49,7 +49,7 @@ export const StringEditor = () => {
 				class="w-full"
 				value={value}
 				assignOnEnter
-				disabled={!isObservable(value)}
+				disabled={isLocked(value)}
 			></TextField>
 		)
 	}

@@ -1,6 +1,6 @@
 /** @jsxImportSource woby */
 import { $$, ObservableMaybe, isObservable, useEffect, useMemo } from "woby"
-import { Editors, UIProps, skippedProperties, rowLabel } from "./Editors"
+import { Editors, UIProps, skippedProperties, rowLabel, isLocked } from "./Editors"
 import { TableRow } from "./PropertyForm"
 import { NumberField } from "../NumberField"
 import { EditorProps } from "./EditorProps"
@@ -37,7 +37,7 @@ export const NumberEditor = () => {
 				noMinMax={true}
 				reactive={true}
 				value={value}
-				disabled={!isObservable(value)}
+				disabled={isLocked(value)}
 			></NumberField>
 		)
 	}

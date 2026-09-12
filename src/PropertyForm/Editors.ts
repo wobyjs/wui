@@ -1,6 +1,6 @@
 /** @jsxImportSource woby */
 
-import { $, $$, ObservableMaybe, Observable, type JSX } from "woby"
+import { $, $$, isObservable, ObservableMaybe, Observable, type JSX } from "woby"
 import { tx } from "../i18n"
 
 export type UIProps<T> = {
@@ -51,3 +51,23 @@ export const indent = ["pl-4", "pl-8", "pl-12", "pl-16"]
  */
 export const rowLabel = (editorName: string): string =>
 	tx(editorName.replace(/([a-z])([A-Z])/g, "$1 $2").replace(/^./, str => str.toUpperCase()))
+
+/**
+ * Whether a row's control should refuse input.
+ *
+ * Two reasons, and a row widget cannot tell them apart from the value alone:
+ *
+ *  - the value is not an observable, so there is nowhere to write a change *to*;
+ *  - the schema declared `PluginProp.readonly`, so the write path in
+ *    `applyCustomElementProperty` drops the edit on the floor.
+ *
+ * The second case is the one this was added for. `readonly` was enforced only on
+ * that write path, which meant the input stayed live: you could focus it, type into
+ * it, watch your text appear, and have it silently discarded on commit. Refusing the
+ * keystroke is the honest version of the same rule.
+ *
+ * `readonly` rides the observable itself, like `.options`, `.propType`, `.hint` and
+ * `.action` — see the note in `PropertyExtractor.extractCustomElementProps`.
+ */
+export const isLocked = (value: ObservableMaybe<any>): boolean =>
+	!isObservable(value) || !!(value as any)?.readonly
