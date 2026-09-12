@@ -291,13 +291,19 @@ export const ImageCropper = ({ onHandle }: { onHandle?: (handle: CropperHandle) 
             if (nat) fitScale = Math.min(frame.w / nat.w, frame.h / nat.h)
             apply()
         }
+        // `pointercancel` ends the drag too. Without it a cancelled gesture -- the browser
+        // claiming the touch, the element going away mid-drag -- leaves `move` attached to
+        // the grip, and the next press resizes the frame from the previous gesture's
+        // `start`. Same reason `pointerDrag.ts` binds all three.
         const up = (ev: PointerEvent) => {
             grip.removeEventListener('pointermove', move)
             grip.removeEventListener('pointerup', up)
+            grip.removeEventListener('pointercancel', up)
             try { grip.releasePointerCapture(ev.pointerId) } catch { /* already released */ }
         }
         grip.addEventListener('pointermove', move)
         grip.addEventListener('pointerup', up)
+        grip.addEventListener('pointercancel', up)
     }
 
     /**

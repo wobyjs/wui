@@ -90,7 +90,6 @@ const AlignButton: Defaulted<typeof def> = defaults(def, (props) => {
         document.addEventListener('selectionchange', handler);
         unwrapped.addEventListener('click', handler);
         unwrapped.addEventListener('keyup', handler);
-        unwrapped.addEventListener('mouseup', handler);
 
         // Run initial check
         handler();
@@ -99,7 +98,6 @@ const AlignButton: Defaulted<typeof def> = defaults(def, (props) => {
             document.removeEventListener('selectionchange', handler);
             unwrapped.removeEventListener('click', handler);
             unwrapped.removeEventListener('keyup', handler);
-            unwrapped.removeEventListener('mouseup', handler);
         };
     });
 

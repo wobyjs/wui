@@ -55,11 +55,10 @@ const Blockquote = defaults(def, (props) => {
         // 1. Listen for global selection changes
         document.addEventListener('selectionchange', updateActiveStatus)
 
-        // 2. Also listen for keyup/mouseup inside the editor for immediate feedback
+        // 2. Also listen for keyup inside the editor for immediate feedback
         const editorDiv = $$(editor) ?? $$(getCurrentEditor())
         if (editorDiv) {
             editorDiv.addEventListener('keyup', updateActiveStatus)
-            editorDiv.addEventListener('mouseup', updateActiveStatus)
         }
 
         // Cleanup listeners
@@ -67,7 +66,6 @@ const Blockquote = defaults(def, (props) => {
             document.removeEventListener('selectionchange', updateActiveStatus)
             if (editorDiv) {
                 editorDiv.removeEventListener('keyup', updateActiveStatus)
-                editorDiv.removeEventListener('mouseup', updateActiveStatus)
             }
         }
     })

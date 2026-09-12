@@ -139,7 +139,7 @@ export type ResizeWrite = 'style' | 'attr' | ((el: HTMLElement, width: number, h
  *
  * `resizable: true` takes every default below, which is the `<img>` behaviour. Everything
  * here exists because a custom element is not an image: it may not accept CSS sizing, it
- * may have a fixed aspect, and it may not survive being resized on every mousemove.
+ * may have a fixed aspect, and it may not survive being resized on every pointermove.
  */
 export interface ResizableSpec {
     /** How the new size is committed. Default `'style'`. */
@@ -156,12 +156,12 @@ export interface ResizableSpec {
     /** Floor, `[width, height]` in px. Default `[20, 20]`. */
     min?: [number, number]
     /**
-     * Whether to write the size on every mousemove. Default `true`.
+     * Whether to write the size on every pointermove. Default `true`.
      *
      * Set `false` for an element whose size change tears it down and rebuilds it: a plugin
      * that re-inserts its node on a prop change would destroy the element mid-drag, taking
      * the drag with it. The overlay still follows the pointer; only the commit waits for
-     * mouseup.
+     * pointerup.
      */
     live?: boolean
 }

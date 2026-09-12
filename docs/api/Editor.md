@@ -306,6 +306,34 @@ the component from a neighbour instead — that marks it without focusing it —
   effect guards on this so it never seizes the surface from a component that already has the caret.
 - **FocusManager** — Uses capture-phase `mousedown` on the toolbar to prevent button clicks from moving focus away from the contentEditable element. Caches and restores the selection using offset arrays.
 
+## Pointer Events
+
+Every drag in the editor -- the image resize handles, the image move handle, the node-move
+grip, alt+drag, the crop frame -- runs on **pointer events**, so it works with a finger and a
+stylus, not only a mouse. `src/Editor/pointerDrag.ts` holds the shared helper.
+
+- **`startPointerDrag(down, { onMove, onUp })`** attaches `pointermove`, `pointerup` *and*
+  `pointercancel` to the `document`, filters every event by the originating `pointerId`, and
+  detaches all three before `onUp` runs. It returns the detach function so a component that
+  unmounts mid-drag can stop the gesture itself.
+- **`DRAG_HANDLE_STYLE`** is `{ touchAction: 'none' }`. Spread it into a drag handle's style,
+  or the browser claims the gesture for scrolling and the `pointermove` stream simply stops
+  after the first event.
+
+**A drag handle needs two listeners, not one.** `preventDefault()` on `pointerdown` suppresses
+the compatibility mouse events for touch and pen, but it does *not* stop a mouse press from
+moving the caret or collapsing the selection -- only cancelling `mousedown` does. So every
+handle that sits over the editable surface binds `pointerdown` for the gesture and `mousedown`
+purely to refuse the caret. The `mousedown` half is load-bearing; it is not leftover code.
+
+The same rule is why toolbar caret guards (`onMouseDown={e => { e.preventDefault(); e.stopPropagation() }}`)
+stay on `mousedown` and are *not* converted -- see FocusManager above.
+
+State-refresh listeners are a separate case: the toolbar's active-state trackers listen to
+`selectionchange`, which fires for every input modality and keeps firing throughout a
+drag-select. A `pointerup` companion would fire *before* the selection settles, so there is no
+`mouseup`/`pointerup` listener beside them.
+
 ## Mutation Observer
 
 A `MutationObserver` on the editor element watches for attribute changes, child list changes, subtree changes, and character data changes. Each mutation triggers `saveDo()` to capture the current state into the undo history.

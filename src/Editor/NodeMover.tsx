@@ -1,6 +1,7 @@
 import { $, $$, useEffect } from 'woby'
 import { deleteRefusalReason } from './PropertyExtractor'
 import { t } from '../i18n'
+import { startPointerDrag, DRAG_HANDLE_STYLE } from './pointerDrag'
 
 /**
  * NodeMover: drag-to-reposition for the editor's node selection.
@@ -240,17 +241,21 @@ const NodeMover = () => {
 
         /**
          * @param explicit  The element to move, when the caller already knows it. The
-         *                  alt+drag path passes this: EditorSurface marks the box on the
-         *                  pointerdown of the very same gesture, one event earlier, and the
-         *                  `target` observable does not catch up until the next animation
-         *                  frame -- so reading the observable here would drag the *previous*
-         *                  selection, or nothing at all on the first gesture.
+         *                  alt+drag path passes this: the box it picks is selected by the
+         *                  very same press, and the `target` observable does not catch up
+         *                  until the next animation frame -- so reading the observable here
+         *                  would drag the *previous* selection, or nothing at all on the
+         *                  first gesture.
          */
-        const startDrag = (down: MouseEvent, explicit?: HTMLElement) => {
+        const startDrag = (down: PointerEvent, explicit?: HTMLElement) => {
             const dragged = explicit ?? $$(target)
             if (!dragged) return
             // The grip sits over the editable surface; without this the press would run the
             // editor's own pointerdown handling and clear the very mark being dragged.
+            //
+            // `preventDefault` here also suppresses the compatibility mouse events for touch
+            // and pen. It does *not* stop a mouse press from moving the caret -- that needs
+            // the separate `mousedown` guards below. See `pointerDrag.ts`.
             down.preventDefault()
             down.stopPropagation()
 
@@ -262,7 +267,7 @@ const NodeMover = () => {
             // see the boxes it is being dropped between.
             const origPointerEvents = dragged.style.pointerEvents
 
-            const onMove = (move: MouseEvent) => {
+            const onMove = (move: PointerEvent) => {
                 if (!started) {
                     if (Math.abs(move.clientX - down.clientX) < DRAG_THRESHOLD
                         && Math.abs(move.clientY - down.clientY) < DRAG_THRESHOLD) return
@@ -275,8 +280,6 @@ const NodeMover = () => {
             }
 
             const onUp = () => {
-                document.removeEventListener('mousemove', onMove)
-                document.removeEventListener('mouseup', onUp)
                 paintIndicator(null)
                 dragging(false)
                 if (!started) return
@@ -300,14 +303,20 @@ const NodeMover = () => {
                 }
             }
 
-            document.addEventListener('mousemove', onMove)
-            document.addEventListener('mouseup', onUp)
+            startPointerDrag(down, { onMove, onUp })
         }
 
-        // Direct assignment rather than an onMouseDown prop: woby's synthetic event
+        // Direct assignment rather than an onPointerDown prop: woby's synthetic event
         // delegation is rooted at the document and does not reach listeners registered
         // inside a shadow root.
-        if (gripEl) gripEl.onmousedown = startDrag
+        //
+        // Two listeners, not one. `pointerdown` runs the gesture for mouse, touch and pen
+        // alike; the `mousedown` guard is what actually stops a *mouse* press from dropping
+        // the caret into the text under the grip -- cancelling the pointer event does not.
+        if (gripEl) {
+            gripEl.onpointerdown = startDrag
+            gripEl.onmousedown = (e: MouseEvent) => { e.preventDefault(); e.stopPropagation() }
+        }
 
         /**
          * Alt+drag anywhere on the selected box, as an alternative to aiming at the grip.
@@ -322,25 +331,58 @@ const NodeMover = () => {
          * Capture phase so the press is claimed before contenteditable starts a text
          * selection from it.
          */
-        const onSurfaceMouseDown = (down: MouseEvent) => {
-            if (!down.altKey || down.button !== 0) return
-            const marked = surface.querySelector('[data-element-selected]') as HTMLElement | null
-            if (!marked || deleteRefusalReason(marked, surface)) return
-            startDrag(down, marked)
+        /**
+         * The box an alt+press picks, computed from the event rather than read back out of
+         * `[data-element-selected]`.
+         *
+         * Editor sets that mark from its own capture-phase `pointerdown` on this same
+         * element, so now that this listener is also `pointerdown` the order between them is
+         * registration order -- not something either side controls. Reading the mark here
+         * would therefore drag the *previous* selection whenever this handler happened to
+         * run first. Walking `composedPath` with the rule Editor's alt branch uses gives the
+         * same answer regardless of order. (`stopPropagation` in `startDrag` does not rob
+         * Editor of its turn: listeners on the same node are only cut off by
+         * `stopImmediatePropagation`.)
+         */
+        const altDragTarget = (down: MouseEvent | PointerEvent): HTMLElement | null => {
+            if (!down.altKey || down.button !== 0) return null
+            for (const entry of down.composedPath()) {
+                if (!(entry instanceof HTMLElement)) continue
+                if (!surface.contains(entry)) continue
+                if (deleteRefusalReason(entry, surface)) continue
+                return entry
+            }
+            return null
         }
+        const onSurfacePointerDown = (down: PointerEvent) => {
+            const marked = altDragTarget(down)
+            if (marked) startDrag(down, marked)
+        }
+        // The mouse half only has to refuse the caret; the pointer half above has already
+        // started the drag by the time this runs.
+        const onSurfaceMouseDown = (down: MouseEvent) => {
+            if (!altDragTarget(down)) return
+            down.preventDefault()
+            down.stopPropagation()
+        }
+        surface.addEventListener('pointerdown', onSurfacePointerDown, true)
         surface.addEventListener('mousedown', onSurfaceMouseDown, true)
 
         readMark()
         measure()
 
         return () => {
+            surface.removeEventListener('pointerdown', onSurfacePointerDown, true)
             surface.removeEventListener('mousedown', onSurfaceMouseDown, true)
             observer.disconnect()
             window.removeEventListener('scroll', onScroll, true)
             window.removeEventListener('resize', onResize)
             surface.removeEventListener('scroll', onScroll)
             if (frame) cancelAnimationFrame(frame)
-            if (gripEl) gripEl.onmousedown = null
+            if (gripEl) {
+                gripEl.onpointerdown = null
+                gripEl.onmousedown = null
+            }
         }
     })
 
@@ -365,6 +407,7 @@ const NodeMover = () => {
                     cursor: $$(dragging) ? 'grabbing' : 'grab',
                     pointerEvents: 'auto',
                     userSelect: 'none',
+                    ...DRAG_HANDLE_STYLE,
                     zIndex: 30,
                 })}
             >

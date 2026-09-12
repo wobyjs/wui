@@ -102,7 +102,6 @@ const List = defaults(def, (props) => {
         }
 
         document.addEventListener('selectionchange', updateState)
-        document.addEventListener('mouseup', updateState)
         document.addEventListener('keyup', updateState)
 
         // Run once on mount
@@ -110,7 +109,6 @@ const List = defaults(def, (props) => {
 
         return () => {
             document.removeEventListener('selectionchange', updateState)
-            document.removeEventListener('mouseup', updateState)
             document.removeEventListener('keyup', updateState)
         }
     })

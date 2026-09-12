@@ -3,6 +3,7 @@ import { applyImageAlignment, applyImageIndent } from './ImageActions'
 import { openImageEditor } from './ImageEditor'
 import { resolveResizable, resolveAnchor, applyResize, constrainResize, type ResizableSpec } from './EditorPlugin'
 import { NO_SCALE_ATTR } from './PageLayout'
+import { startPointerDrag, DRAG_HANDLE_STYLE } from './pointerDrag'
 import { t } from '../i18n'
 
 /**
@@ -16,7 +17,7 @@ import { t } from '../i18n'
  * gets the same chrome: `<img>` always, plus any plugin element whose registration carries
  * a `resizable` spec. The spec is what decouples the two -- an image takes `style.width`,
  * a custom element may need an attribute instead, may have a locked aspect, and may not
- * survive a write on every mousemove.
+ * survive a write on every pointermove.
  *
  * Uses direct DOM manipulation for overlay visibility/positioning
  * because Woby's reactive expressions don't respond to observable
@@ -444,7 +445,10 @@ const ImageResizer = () => {
         const attachClickHandlers = () => {
             const attach = (btn: HTMLButtonElement | null, handler: () => void) => {
                 if (!btn) return false
-                // Just stop propagation to prevent event reaching other handlers
+                // Just stop propagation to prevent event reaching other handlers.
+                // Both events, because the editor's own selection handling listens on
+                // `pointerdown` while other listeners here are still on `mousedown`.
+                btn.onpointerdown = (e: PointerEvent) => { e.stopPropagation() }
                 btn.onmousedown = (e: MouseEvent) => { e.stopPropagation() }
                 btn.onclick = (e: MouseEvent) => {
                     e.stopPropagation()
@@ -469,6 +473,7 @@ const ImageResizer = () => {
 
             // Also attach mousedown handler to toolbar container (stopPropagation only, not preventDefault)
             if (toolbarEl) {
+                toolbarEl.onpointerdown = (e: PointerEvent) => { e.stopPropagation() }
                 toolbarEl.onmousedown = (e: MouseEvent) => { e.stopPropagation() }
             }
 
@@ -477,21 +482,30 @@ const ImageResizer = () => {
                 setTimeout(attachClickHandlers, 50)
             }
         }
-        // Attach direct mousedown handlers for drag and resize handles
-        // (Woby's onMouseDown delegation doesn't work in shadow DOM)
+        // Attach the drag/resize handlers natively rather than through JSX props, because
+        // woby's delegation is rooted at the document and does not reach into a shadow root.
+        //
+        // Two listeners per handle, and both are load-bearing -- see the note in
+        // `pointerDrag.ts`. `pointerdown` runs the gesture, for mouse, touch and pen alike.
+        // `mousedown` exists only to cancel the caret: these handles float over the editable
+        // surface, and cancelling `pointerdown` does not stop a *mouse* press from collapsing
+        // the selection underneath.
         const attachDragHandlers = () => {
+            const guardCaret = (e: MouseEvent) => { e.preventDefault(); e.stopPropagation() }
             if (dragHandleEl) {
-                dragHandleEl.onmousedown = (e: MouseEvent) => {
+                dragHandleEl.onpointerdown = (e: PointerEvent) => {
                     startDrag(e)
                 }
+                dragHandleEl.onmousedown = guardCaret
             }
             let allResizeAttached = true
             handleInnerEls.forEach((el, i) => {
                 if (el) {
                     const dir = handles[i]
-                    el.onmousedown = (e: MouseEvent) => {
+                    el.onpointerdown = (e: PointerEvent) => {
                         startResize(e, dir)
                     }
+                    el.onmousedown = guardCaret
                 } else {
                     allResizeAttached = false
                 }
@@ -516,7 +530,7 @@ const ImageResizer = () => {
         }
     })
 
-    const startResize = (e: MouseEvent, direction: ResizeDirection) => {
+    const startResize = (e: PointerEvent, direction: ResizeDirection) => {
         const img = $$(activeImage)
         const spec = resolveResizable(img)
         if (!img || !spec) return
@@ -535,11 +549,11 @@ const ImageResizer = () => {
             aspect: rect.width / rect.height || 1,
         })
 
-        // The last size the pointer asked for. Needed on mouseup for a deferred commit,
+        // The last size the pointer asked for. Needed on pointerup for a deferred commit,
         // and to tell a drag that moved from one that only pressed and released.
         let pending: [number, number] | null = null
 
-        const onMove = (ev: MouseEvent) => {
+        const onMove = (ev: PointerEvent) => {
             const state = $$(resizing)
             if (!state) return
             const dx = ev.clientX - state.startX
@@ -564,9 +578,9 @@ const ImageResizer = () => {
             pending = constrained
 
             // `live: false` means the element cannot survive being written to on every
-            // mousemove -- a plugin that re-inserts its node on a size change would destroy
+            // pointermove -- a plugin that re-inserts its node on a size change would destroy
             // the very element the drag is holding. Show the pending size on the overlay and
-            // commit once, on mouseup.
+            // commit once, on pointerup.
             if (state.spec.live !== false) applyResize(state.img, state.spec, newWidth, newHeight)
 
             // Update overlay position during resize
@@ -601,7 +615,7 @@ const ImageResizer = () => {
             if (state && pending) {
                 if (state.spec.live === false) applyResize(state.img, state.spec, pending[0], pending[1])
                 // A resize is a content change like any other. Fired once here rather than
-                // from onMove, so a listener that re-renders does not do it per mousemove.
+                // from onMove, so a listener that re-renders does not do it per pointermove.
                 notifyChange()
                 // Twice: now, so the handles never lag a frame behind the pointer, and again
                 // after layout, because an element that re-renders from an attribute settles
@@ -611,15 +625,12 @@ const ImageResizer = () => {
                 requestAnimationFrame(() => { if (state.img.isConnected) showOverlay(state.img) })
             }
             resizing(null)
-            document.removeEventListener('mousemove', onMove)
-            document.removeEventListener('mouseup', onUp)
         }
 
-        document.addEventListener('mousemove', onMove)
-        document.addEventListener('mouseup', onUp)
+        startPointerDrag(e, { onMove, onUp })
     }
 
-    const startDrag = (e: MouseEvent) => {
+    const startDrag = (e: PointerEvent) => {
         const img = $$(activeImage)
         if (!img) return
         e.preventDefault()
@@ -663,7 +674,7 @@ const ImageResizer = () => {
             return { target: el, insertBefore }
         }
 
-        const onMove = (ev: MouseEvent) => {
+        const onMove = (ev: PointerEvent) => {
             const drop = findDropTarget(ev.clientX, ev.clientY)
 
             if (drop) {
@@ -694,10 +705,7 @@ const ImageResizer = () => {
             }
         }
 
-        const onUp = (ev: MouseEvent) => {
-            document.removeEventListener('mousemove', onMove)
-            document.removeEventListener('mouseup', onUp)
-
+        const onUp = (ev: PointerEvent) => {
             // Restore image pointer-events
             draggedImg.style.pointerEvents = origPointerEvents
 
@@ -744,8 +752,7 @@ const ImageResizer = () => {
             notifyChange()
         }
 
-        document.addEventListener('mousemove', onMove)
-        document.addEventListener('mouseup', onUp)
+        startPointerDrag(e, { onMove, onUp })
     }
 
     const align = (a: 'left' | 'center' | 'right') => {
@@ -852,6 +859,7 @@ const ImageResizer = () => {
                         height: '60%',
                         cursor: 'move',
                         pointerEvents: 'auto',
+                        ...DRAG_HANDLE_STYLE,
                         background: 'transparent',
                         zIndex: 6,
                     }}
@@ -872,6 +880,7 @@ const ImageResizer = () => {
                                 borderRadius: '2px',
                                 cursor: cursorMap[dir],
                                 zIndex: 10,
+                                ...DRAG_HANDLE_STYLE,
                             }}
                         />
                     </div>

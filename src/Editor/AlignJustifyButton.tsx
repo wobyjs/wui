@@ -49,7 +49,6 @@ const AlignJustifyButton: Defaulted<typeof def> = defaults(def, (props) => {
         document.addEventListener('selectionchange', handler);
         $$(el).addEventListener('click', handler);
         $$(el).addEventListener('keyup', handler);
-        $$(el).addEventListener('mouseup', handler);
 
         // Run initial check
         handler();
@@ -58,7 +57,6 @@ const AlignJustifyButton: Defaulted<typeof def> = defaults(def, (props) => {
             document.removeEventListener('selectionchange', handler);
             $$(el).removeEventListener('click', handler);
             $$(el).removeEventListener('keyup', handler);
-            $$(el).removeEventListener('mouseup', handler);
         };
     });
 

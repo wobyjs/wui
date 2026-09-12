@@ -592,16 +592,15 @@ function trackState(editor: ObservableMaybe<HTMLElement>, command: string, isAct
         isActive(false)
     }
 
-    // Listen for selection changes and mouse clicks (which move the cursor)
+    // Selection changes cover every way the caret can move -- typing, clicking, dragging,
+    // touch -- and fire continuously during a drag-select, which a pointerup would not.
     document.addEventListener('selectionchange', updateState)
-    document.addEventListener('mouseup', updateState)
 
     // Check initial state
     updateState()
 
     return () => {
         document.removeEventListener('selectionchange', updateState)
-        document.removeEventListener('mouseup', updateState)
     }
 }
 

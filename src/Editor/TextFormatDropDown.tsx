@@ -130,7 +130,7 @@ const TextFormatDropDown = defaults(def, (props) => {
     // #region useEffect for Selection Change
     /**
      * TEXT FORMAT TRACKER
-     * Listens for 'selectionchange', 'mouseup', and 'keyup' events to determine the current 
+     * Listens for 'selectionchange' and 'keyup' events to determine the current 
      * block-level tag (H1, P, etc.) at the selection point. 
      * If the selection is inside the editor, it maps the tag to a FORMAT_OPTION and updates the UI.
      */
@@ -159,7 +159,6 @@ const TextFormatDropDown = defaults(def, (props) => {
         }
 
         document.addEventListener('selectionchange', handleSelectionChange)
-        document.addEventListener('mouseup', handleSelectionChange)
         document.addEventListener('keyup', handleSelectionChange)
 
         // Initial check
@@ -167,7 +166,6 @@ const TextFormatDropDown = defaults(def, (props) => {
 
         return () => {
             document.removeEventListener('selectionchange', handleSelectionChange)
-            document.removeEventListener('mouseup', handleSelectionChange)
             document.removeEventListener('keyup', handleSelectionChange)
         }
     })
