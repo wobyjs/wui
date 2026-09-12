@@ -47,6 +47,21 @@ export { PrintButton } from './PrintButton'
 export { printEditor, isPrinting, PRINT_PATH_ATTR, PRINT_HIDE_ATTR } from './Print'
 export type { PrintOptions } from './Print'
 
+// Document zoom. `setEditorZoom` is the one to call: it writes the scale through
+// PageLayout *and* publishes it to `editorZoom`, so the toolbar readout stays honest.
+// `setLayoutZoom` alone does not, which is why the engine's setter is not the public one.
+export { ZoomControl, editorZoom, setEditorZoom, notifyZoomChanged, zoomText } from './ZoomControl'
+export type { ZoomText } from './ZoomControl'
+export { onZoomApplied, layoutZoom, resolvedZoom, setLayoutZoom, ZOOM_MIN, ZOOM_MAX } from './PageLayout'
+export type { ZoomLevel } from './PageLayout'
+
+// The navigation rail beside the surface, and the toolbar button that shows it.
+export { DocScroller, ScrollerToggle, scrollerOpen, toggleScroller } from './DocScroller'
+
+// The insert menu's table sizer, exported so a host's own menu can reuse it.
+export { TableGridPicker } from './TableGridPicker'
+export type { TableGridPickerProps } from './TableGridPicker'
+
 // Property Panel
 export { InfoButton } from './InfoButton'
 export { PropertyPanel, PropertyPanelContext, usePropertyPanel } from './PropertyPanel'

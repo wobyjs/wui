@@ -37,6 +37,117 @@ import "./Editor/WuiPlugins";
 | **fromHTML**| `(html: string) => HTMLElement`                              | No       | Deserialize HTML back into the custom element when loading    |
 | **props**   | `PluginProp[]`                                               | No       | Typed property schema. When present the property panel renders typed editors instead of blind string fields |
 | **onPropChange** | `(element: HTMLElement, key: string, value: any) => void` | No     | Called after the panel writes an attribute, so a plugin can re-render or re-insert an element that cannot pick the change up on its own |
+| **actions** | `PluginAction[]`                                             | No       | Buttons rendered as a strip at the bottom of the property panel, for operations on the element as a whole |
+| **resizable** | `boolean \| ResizableSpec`                                 | No       | Drag handles on the element. `true` means the defaults (see below) |
+| **anchor**  | `(el: HTMLElement) => HTMLElement`                           | No       | The box to measure for handles and overlays, when it is not the host itself |
+| **pageBreak** | `PageBreakKind \| ((el: HTMLElement) => PageBreakKind)`    | No       | How this element interrupts the flow of pages (see below) |
+| **editableContent** | `boolean`                                            | No       | This element's light DOM is the document's, not the plugin's (see below) |
+
+---
+
+# Type: `PageBreakKind`
+
+```ts
+type PageBreakKind = 'none' | 'before' | 'after' | 'own-page'
+```
+
+| Value | Meaning |
+| --- | --- |
+| `'before'` | The page ends immediately **before** this element |
+| `'after'` | The page ends immediately **after** it |
+| `'own-page'` | The element **is** a page — nothing shares a sheet with it |
+| `'none'` | Not a break. The default, and the same as omitting the field |
+
+Use the function form when the answer lives in the element's own attributes — a break block with a
+"break before / break after" switch is the usual case:
+
+```ts
+pageBreak: el => el.getAttribute('where') === 'after' ? 'after' : 'before'
+```
+
+A block with no plugin, or a plugin that omits this field, can still break a page with plain CSS:
+`break-before: page` is honoured as a fallback. See [PageLayout.md](./PageLayout.md).
+
+```ts
+resolvePageBreak(el)   // 'none' if el's plugin declares nothing
+pageBreakTagNames()    // every registered plugin that declares a pageBreak
+```
+
+---
+
+# `editableContent` — containers vs widgets
+
+Most plugins keep everything in attributes, and that is what makes the plain click-to-select rule
+safe: click the host, the panel opens, `Backspace` removes the whole widget.
+
+A **container** inverts that. A cover page whose photo is a backdrop for ordinary prose, a callout
+box, a banner — their children are the *author's text*, and selecting the host every time the caret
+is placed in that text would put the whole page one `Backspace` away from deletion.
+
+Set `editableContent: true` and the editor splits clicks by where they actually land:
+
+| Click lands on | Result |
+| --- | --- |
+| the shadow DOM, or the host itself | **selects the block** — panel, handles, delete |
+| a light-DOM descendant | falls through to the **caret**, like any other text |
+
+Which is why a container needs a piece of shadow chrome the author can aim at. `wui-cover-page`
+covers the whole sheet with the photo behind the text, so any click that misses the words selects
+the block; `wui-banner`'s backdrop does the same job.
+
+Off by default: `<wui-icon-button><svg/></wui-icon-button>` has light-DOM children too, and it is
+not a container — it must stay selectable by clicking its icon.
+
+```ts
+editableContentTagNames()   // upper-case tag names of every plugin that declares it
+```
+
+---
+
+# Interface: `PluginAction`
+
+```ts
+interface PluginAction {
+    label: string
+    title?: string
+    icon?: () => JSX.Child
+    run: (el: HTMLElement) => void
+}
+```
+
+The same shape serves two placements:
+
+| Placed as | Where it renders | For |
+| --- | --- | --- |
+| `EditorPlugin.actions` | a strip at the bottom of the panel | operations on the element **as a whole** — "Replace image", "Reset" |
+| `PluginProp.action` | **inside one row**, to the right of its editor | an operation belonging to a **single value** — "Reroll the seed", "Edit…" on a logo URL |
+
+The row updates itself afterwards with no help from the action: writing the attribute is seen by
+the panel's mirror observer, which pushes the new value into the row's observable, which runs the
+per-property effect — so the edit lands on the undo stack exactly like a typed one.
+
+The one requirement is that whatever `run` writes is a **declared** prop. The observer's
+`attributeFilter` is built from the schema, so an undeclared attribute changes nothing on screen.
+
+---
+
+# Interface: `ResizableSpec`
+
+`resizable: true` means all of these defaults; an object overrides the ones it names.
+
+| Field | Type | Default | Description |
+| --- | --- | --- | --- |
+| **write** | `ResizeWrite` | `'style'` | Where the new size is written — inline style or attributes |
+| **widthProp** | `string` | `'width'` | Name of the width property/attribute |
+| **heightProp** | `string` | `'height'` | Name of the height property/attribute |
+| **aspect** | `'lock' \| 'free' \| number` | `'free'` | Aspect constraint while dragging |
+| **min** | `[number, number]` | `[20, 20]` | Minimum width and height in px |
+| **live** | `boolean` | `true` | Write during the drag, not only on release |
+
+```ts
+resolveResizable(el)   // the spec, or null. <img> answers first and always, with bare defaults
+resolveAnchor(el)      // the plugin's anchor(el), else el itself
+```
 
 ---
 
@@ -67,11 +178,29 @@ string is coerced back to a runtime value:
 | **type**        | `PluginPropType`                        | Yes      | Value type; selects the editor row (see table above)                      |
 | **label**       | `string`                                | No       | Row label in the property panel; defaults to `name`                       |
 | **default**     | `string \| number \| boolean`           | No       | Value used when the attribute is absent, and the "unset" comparison value |
+| **resolveDefault** | `(el: HTMLElement) => string \| number \| boolean` | No | A default computed from the element. Wins over `default` in both directions |
 | **options**     | `{ value: string; label?: string }[]`   | For enum | Choices offered by `EnumEditor`; required when `type` is `'enum'`         |
 | **readonly**    | `boolean`                               | No       | Rendered, but not editable (e.g. values resolved at construction time)    |
 | **hidden**      | `boolean`                               | No       | Never surfaced in the panel at all                                        |
 | **hint**        | `string`                                | No       | Tooltip / helper text for the row                                         |
+| **action**      | `PluginAction`                          | No       | A button rendered **inside this row**, to the right of its editor         |
 | **textContent** | `boolean`                               | No       | This prop is the element's light-DOM text, not an attribute (see below)   |
+
+> ### ⚠️ `default` must equal the component's own default
+>
+> The panel treats "value equals `default`" as *unset* and **removes the attribute**. If the
+> schema's default disagrees with the component's `def()` fallback, setting that value strips the
+> attribute and the widget visibly reverts to something else. Read the default from the same
+> exported table the component uses — that is what `BANNER` in `Banner.tsx` is for.
+
+## `resolveDefault` — when no literal will do
+
+`resolveDefault` wins over `default` in both directions: the panel shows it when the attribute is
+absent or empty, and an edit back to it clears the attribute again.
+
+`cls` needs this. The class it replaces is the element's own variant, so no single literal can
+stand in for it, and an empty box tells the user nothing about what an override would replace.
+`registerBaseCls(tag, BASE_CLASS)` is how a component publishes that value.
 
 ## camelCase names become kebab-case attributes
 
@@ -349,7 +478,7 @@ swatch, a checkbox and a number spinner — no free-text attribute rows.
 `src/Editor/WuiPlugins.ts` registers the wui-* components as editor plugins,
 each with a typed `props` schema. It is a **side-effect module and is not
 re-exported from the package index** — import it explicitly (the demo app does so
-from `src/main.ts`), or the eleven plugins below never register:
+from `src/main.ts`), or the twelve plugins below never register:
 
 ```ts
 import "./Editor/WuiPlugins";
@@ -368,6 +497,29 @@ import "./Editor/WuiPlugins";
 | `badge`           | `wui-badge`           | `badgeContent`, `vertical` (enum), `horizontal` (enum)                 |
 | `fab`             | `wui-fab`             | `type` (enum), `children` (text), `disabled`                           |
 | `avatar`          | `wui-avatar`          | `size` (enum), `type` (enum), `src`, `children` (text initials)        |
+| `banner`          | `wui-banner`          | `type` (enum), `src`, `focus` (enum), `scrim` (enum), `overlay` (number), `tint`/`tint2`/`ink` (color), `shadow`, `height`, `pad`, `align` (enum), `logo` (+ `Edit…` action), `logoHeight`, `print` |
+
+`banner` is the one with `editableContent: true`: its backdrop selects the block, its words take
+the caret. Insertion seeds an `<h2>` and a `<p>` so the caret has somewhere to land. Its defaults
+come from the exported `BANNER` table, shared with the component — see [Banner.md](./Banner.md).
+
+## Bundled Page-Block Plugins
+
+`src/Editor/PageBlockPlugins.ts` registers the blocks that exist to shape the *paper*. Same
+side-effect import rule as above.
+
+| Plugin `name` | `tagName` | `pageBreak` | `editableContent` |
+| --- | --- | --- | --- |
+| `cover-page` | `wui-cover-page` | `'own-page'` | Yes — the photo is a backdrop for the author's prose |
+| `watermark` | `wui-watermark` | `el => startsPage(el) ? 'before' : 'none'` | No |
+| `page-break` | `wui-page-break` | `el => el.getAttribute('where') === 'after' ? 'after' : 'before'` | No |
+| `rule` | `wui-rule` | — | No |
+
+A watermark that already sits at the top of a sheet does not need to force a break; one that does
+not, does. That conditional is exactly why `pageBreak` takes a function.
+
+In `flow` mode these render as **visible labelled markers** so the author can see and delete them;
+in `page` mode they are consumed into real breaks, and in `screen` they are hidden.
 
 Props marked *(text)* are declared `textContent: true` because they feed the
 component's slot. Note that **Portal-based components (the Wheeler family) are

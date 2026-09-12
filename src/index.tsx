@@ -26,6 +26,16 @@ export * from './Editor/EditorPlugin'
 export * from './Editor/PageLayout'
 export * from './Editor/PageStyles'
 export * from './Editor/LayoutSwitch'
+/* The document zoom, the navigation rail and the print path. Registered as custom
+   elements by the toolbar either way, but their module-level control surfaces --
+   `setEditorZoom`, `toggleScroller`, `printEditor` -- were unreachable from the package:
+   the only entry point is this file, and it did not name them. A host that wants to drive
+   the editor from its own chrome rather than from the built-in toolbar needs them. */
+export * from './Editor/ZoomControl'
+export * from './Editor/DocScroller'
+export * from './Editor/Print'
+export * from './Editor/PrintButton'
+export * from './Editor/TableGridPicker'
 export * from './Editor/ImageEditor'
 export * from './Editor/ImageSource'
 

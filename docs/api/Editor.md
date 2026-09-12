@@ -119,7 +119,7 @@ Shared state between the `InfoButton` (toolbar) and `PropertyPanel` (editor surf
 
 ## Toolbar Modules
 
-The toolbar (`EditorToolbar`) is a sticky bar organized into six functional groups:
+The toolbar (`EditorToolbar`) is a sticky bar organized into seven functional groups:
 
 | Group               | Components                                                                            |
 | ------------------- | ------------------------------------------------------------------------------------- |
@@ -128,7 +128,12 @@ The toolbar (`EditorToolbar`) is a sticky bar organized into six functional grou
 | **Inline Styles**   | `BoldButton`, `ItalicButton`, `UnderlineButton`                                       |
 | **Colors**          | `TextColorPicker`, `TextBackgroundColorPicker`, `TextFormatOptionsDropDown`            |
 | **Lists & Align**   | `List` (bullet/number/checkbox), `TextAlignDropDown`, `Indent` (increase/decrease)    |
+| **Layout**          | `LayoutSwitch`, `ZoomControl`, `ScrollerToggle`, `PrintButton`                         |
 | **Advanced Inserts**| `InsertDropDown`, `Blockquote`, `InfoButton`                                          |
+
+Print sits with the layout switch rather than with the inserts because it is the same subject: it
+puts the editor into `page` mode and prints exactly what that mode shows. See
+[Layout, Zoom and Printing](#-layout-zoom-and-printing) below.
 
 ## Overlay Modules
 
@@ -139,6 +144,47 @@ Rendered as siblings of the editor surface inside the `<div class="relative">` c
 - **PropertyPanel** — Right-side panel (300px) that renders a `<PropertyForm>` for the currently selected element. Supports image, text, and custom element property editing with bidirectional sync.
 - **ImageDialog** — Insert dialog for images: a URL field, a file picker and a drop zone, with an "embed as data URI" choice. Embedded images are downscaled to A4 at 150 DPI; SVG and animated GIF are inserted untouched.
 - **ImageEditor** — Crop, zoom, resize and source-replacement modal for an existing image. Registered as `<wui-image-editor>` and openable from anywhere via `openImageEditor(img)`, so it is not tied to this editor. See [ImageEditor.md](./ImageEditor.md).
+- **DocScroller** — The navigation rail beside the surface: sheet thumbnails in `page` mode, a fisheye map of top-level blocks in `flow` and `screen`. It is a sibling of the scroll box, not a child, so it hides and shows with the editor and scrolls itself instead of stretching it. See [DocScroller.md](./DocScroller.md).
+
+---
+
+# 📄 Layout, Zoom and Printing
+
+The editor surface is paginated by the **PageLayout** engine. Three modes:
+
+| Mode | For | Sheets | Markers | Editable |
+| --- | --- | --- | --- | --- |
+| `flow` | Authoring | No | **Visible** — page breaks, watermarks and rules show as labelled markers | Yes |
+| `page` | Proofing | Yes — real 209×296mm sheets, numbered | Consumed into real breaks | **Yes** |
+| `screen` | Reading | No — reflows to the viewport | Hidden | No |
+
+```ts
+import { setEditorLayout, editorLayout, Layout } from "@woby/wui";
+setEditorLayout(surface, Layout.page)
+```
+
+| Control | Drives | Observable |
+| --- | --- | --- |
+| `LayoutSwitch` | `setEditorLayout` → `applyLayout` | `editorLayout` |
+| `ZoomControl` | `setEditorZoom` → `setLayoutZoom` | `editorZoom` |
+| `ScrollerToggle` | `toggleScroller` | `scrollerOpen` |
+| `PrintButton` | `printEditor` | — |
+
+Each of those setters is exported, so a host can drive the editor from its own chrome or a
+keyboard shortcut without reaching into the toolbar for a button to press. Prefer the `setEditor*`
+functions over the engine's own `applyLayout` / `setLayoutZoom`: they also publish to the
+observable the toolbar reads, so the readout stays honest.
+
+Three things worth knowing before building on this:
+
+- **`page` mode is fully editable.** Sheets are built by *re-parenting* nodes, never by cloning —
+  a cloned custom element reconstructs itself and loses its identity.
+- **A layout switch is not an undo step.** History snapshots go through `unpaginatedHTML`, so they
+  are byte-identical across a mode change.
+- **Persist the unpaginated form.** Sheets are a view, not content:
+  `const html = unpaginatedHTML(surface.innerHTML)`.
+
+Full reference: [PageLayout.md](./PageLayout.md).
 
 ## Read-Only Mode Toggle
 
@@ -157,7 +203,12 @@ A floating action button (FAB) in the bottom-right corner toggles between read-o
       <UndoRedo>
         <EditorToolbar />           <!-- sticky toolbar, hidden when readonly -->
         <div class="relative">
-          <div contentEditable />   <!-- EditorSurface -->
+          <div class="flex flex-row">
+            <div>                   <!-- scroll box -->
+              <div contentEditable />   <!-- EditorSurface -->
+            </div>
+            <DocScroller />         <!-- navigation rail, a sibling of the scroll box -->
+          </div>
           <ImageResizer />          <!-- overlay; its crop button opens the image editor -->
           <TablePopupMenu />        <!-- overlay -->
           <PropertyPanel />         <!-- right-side panel -->

@@ -65,6 +65,7 @@ One or more examples showing how to use the API in TSX and HTML.
 - `Appbar.md`
 - `Avatar.md`
 - `Badge.md`
+- `Banner.md`
 - `BooleanEditor.md`
 - `Button.md`
 - `Card.md`
@@ -73,6 +74,7 @@ One or more examples showing how to use the API in TSX and HTML.
 - `Collapse.md`
 - `ColorEditor.md`
 - `DateTimeWheeler.md`
+- `DocScroller.md`
 - `DropdownEditor.md`
 - `Editor.md`
 - `EditorPlugin.md`
@@ -84,12 +86,14 @@ One or more examples showing how to use the API in TSX and HTML.
 - `NumberEditor.md`
 - `NumberField.md`
 - `ObjectEditor.md`
+- `PageLayout.md`
 - `Paper.md`
 - `PropertyForm.md`
 - `SideBar.md`
 - `StringEditor.md`
 - `Switch.md`
 - `Tabs.md`
+- `TableGridPicker.md`
 - `TextArea.md`
 - `TextField.md`
 - `ToggleButton.md`
