@@ -52,7 +52,7 @@ export const Indent = () => {
 
         applyIndent(editor)
 
-    }} title={() => t('editor.indent')}><OutdentIcon /></Button>
+    }} title={() => t('editor.indent')}><IndentIcon /></Button>
 }
 
 export const Outdent = () => {
@@ -64,5 +64,5 @@ export const Outdent = () => {
 
         applyIndent(editor, true)
 
-    }} title={() => t('editor.outdent')}><IndentIcon /></Button>
+    }} title={() => t('editor.outdent')}><OutdentIcon /></Button>
 }

@@ -72,12 +72,32 @@ export type RowAction = {
 	run: () => void
 }
 
-export const TableRow = (props: { optionName?: JSX.Child, children?: JSX.Child, indentLvl?: number, action?: RowAction }) => {
-	const { optionName, children, indentLvl, action } = props
+export const TableRow = (props: { optionName?: JSX.Child, children?: JSX.Child, indentLvl?: number, action?: RowAction, hint?: string }) => {
+	const { optionName, children, indentLvl, action, hint } = props
+
+	// Read once into a thunk so both the tooltip and the cursor affordance see the same
+	// value, and so `tx` -- which reads the `locale` observable -- is only ever called
+	// from inside a reaction. Hints are plugin-authored English, which is what the text
+	// catalogue is keyed by.
+	const hintText = () => {
+		const h = $$(hint, false) as string | undefined
+		return h ? tx(h) : undefined
+	}
 
 	return (
 		<tr class="flex w-full items-stretch border-x border-b border-gray-200 bg-white first:border-t transition-colors hover:bg-gray-50/30">
-			<th class="flex w-[150px] shrink-0 items-center px-4 py-2 bg-gray-50/50 border-r border-gray-200 select-none">
+			{/*
+			  * `title` sits on the cell, not on the <span> inside it: that span carries
+			  * `pointer-events-none`, and an element the pointer cannot reach never shows a
+			  * native tooltip. `cursor-help` is the whole affordance -- at 150px wide and 44
+			  * hints deep, visible helper text under every row would double the panel.
+			  */}
+			<th
+				title={hintText}
+				class={[
+					"flex w-[150px] shrink-0 items-center px-4 py-2 bg-gray-50/50 border-r border-gray-200 select-none",
+					() => hintText() ? "cursor-help" : "",
+				]}>
 				<span class={[
 					indent[indentLvl!] ?? '',
 					"text-[10px] uppercase tracking-wider font-bold text-slate-500",

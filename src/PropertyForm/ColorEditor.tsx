@@ -24,6 +24,7 @@ export const ColorEditor = () => {
 				optionName={() => rowLabel(editorName)}
 				indentLvl={indentLvl}
 				action={(value as any)?.action}
+				hint={(value as any)?.hint}
 			>
 				<ClrEditor
 					value={value}

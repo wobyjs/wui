@@ -8,7 +8,7 @@ import { BoldButton } from './BoldButton'
 import { ItalicButton } from './ItalicButton'
 import { UnderlineButton } from './UnderlineButton' // Added UnderlineButton
 import { EditorContext, UndoRedo, useEditor, useUndoRedo, FocusManagerContext, ReadonlyContext, useReadonly } from './undoredo'
-import { FontSize } from './FontSize' // import { FontSizeInput } from './FontSizeCopy' // Changed from Increase/Decrease
+import { FontSize } from './FontSize'
 import { List } from './List'
 import { Indent } from './Indent' // Will be part of TextAlignDropDown
 import { applyIndent as applyIndentStyle, applyListIndent } from './StyleEngine' // Import applyIndent from StyleEngine instead

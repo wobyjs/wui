@@ -18,7 +18,7 @@ export const DropDownEditor = () => {
 		const { value, data, editorName } = props
 
 		return skippedProperties.includes(editorName) ? null : (
-			<TableRow optionName={() => rowLabel(editorName)} action={(value as any)?.action}>
+			<TableRow optionName={() => rowLabel(editorName)} action={(value as any)?.action} hint={(value as any)?.hint}>
 				<DropDown
 					value={value}
 					obj={data}

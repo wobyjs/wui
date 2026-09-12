@@ -209,8 +209,15 @@ export interface EditorPlugin {
     toHTML?: (element: HTMLElement) => string
 
     /**
-     * Optional: Deserialize HTML back into the custom element when loading
-     * editor content. If not provided, the browser's innerHTML parser is used.
+     * Deserialize HTML back into the custom element when loading editor content.
+     *
+     * NOT YET CALLED. {@link toHTML} has its counterpart in
+     * {@link serializeEditorContent}; this half has no loader behind it, so a hook
+     * written here never fires and the browser's innerHTML parser runs instead.
+     * That is the correct behaviour for every plugin shipped so far -- all of them
+     * round-trip through plain `outerHTML` -- but a plugin whose serialized form
+     * differs from its live DOM cannot be loaded back today. Declared rather than
+     * deleted because the asymmetry is the thing worth seeing.
      *
      * @param html - The HTML string to parse
      * @returns The parsed custom element
