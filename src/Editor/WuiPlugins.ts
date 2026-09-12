@@ -763,6 +763,10 @@ const bannerProps: PluginProp[] = [
 
 registerEditorPlugin({
     name: 'banner',
+    // Alone among the widgets in this file, a banner is page furniture -- so it sorts
+    // with the page-structure family in PageBlockPlugins, not with the buttons it is
+    // registered beside. See `EditorPlugin.order`.
+    order: -50,
     label: 'Banner',
     tagName: 'wui-banner',
     props: [...bannerProps, ...styleProps],

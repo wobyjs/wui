@@ -42,6 +42,7 @@ import "./Editor/WuiPlugins";
 | **anchor**  | `(el: HTMLElement) => HTMLElement`                           | No       | The box to measure for handles and overlays, when it is not the host itself |
 | **pageBreak** | `PageBreakKind \| ((el: HTMLElement) => PageBreakKind)`    | No       | How this element interrupts the flow of pages (see below) |
 | **editableContent** | `boolean`                                            | No       | This element's light DOM is the document's, not the plugin's (see below) |
+| **order**   | `number`                                                     | No       | Where the plugin sits in the insert menu. Lower sorts earlier; the default is `0` (see below) |
 
 ---
 
@@ -281,7 +282,50 @@ const schema = plugin?.props ?? [];
 
 ## `pluginsToInsertItems(editorRoot: HTMLElement): InsertMenuItem[]`
 
-Converts registered plugins into `InsertMenuItem` objects consumable by `InsertDropDown`. Each plugin becomes an item with its `label`, `icon`, and an `action` that calls `onInsert` with the editor's shadow root selection.
+Converts registered plugins into `InsertMenuItem` objects consumable by `InsertDropDown`. Each plugin becomes an item with its `label`, `icon`, its `order`, and an `action` that calls `onInsert` with the editor's shadow root selection.
+
+The list comes back **sorted by `order`**, not in registration order.
+
+---
+
+# `order` — where a plugin lands in the insert menu
+
+Registration order is really *module import order*, which means a plugin's position in the menu
+would depend on the order of the `import` lines in whichever app bundled it. That is neither
+stable nor something the plugin author controls, so position is declared instead:
+
+```ts
+registerEditorPlugin({ name: 'banner', order: -50, /* … */ })
+```
+
+Lower sorts earlier. `InsertDropDown` sorts its own rows and the plugin items together as **one
+list**, so `order` can place a plugin anywhere in the menu rather than only among its peers. The
+scale:
+
+| `order` | Where it lands |
+| --- | --- |
+| `BUILT_IN_ORDER` (`-100`) | The menu's own rows: Image, Table, Container, Row (flex) |
+| `-99` … `-1` | Below the built-ins, above every plugin that did not ask |
+| `0` — the default | The ordinary plugins, in registration order |
+| `> 0` | Below everything that did not ask |
+
+`BUILT_IN_ORDER` is exported, because it is the only fixed point on the scale: a plugin that means
+"just under the built-ins" has to know where they are, and one that means "above them" has to be
+able to say so without guessing how negative is negative enough.
+
+The sort is stable, so every plugin that omits `order` keeps the order it registered in.
+
+The bundled page-structure family sits in the middle band — under `Row (flex)`, above `counter`
+and the widgets. They are the blocks an author reaches for while laying a document *out* rather
+than while writing in it:
+
+| Plugin | `order` |
+| --- | --- |
+| `banner` | `-50` |
+| `cover-page` | `-49` |
+| `watermark` | `-48` |
+| `page-break` | `-47` |
+| `rule` | `-46` |
 
 ## `serializeEditorContent(editorRoot: HTMLElement): string`
 
@@ -302,7 +346,8 @@ The registry is a Woby observable array. When `registerEditorPlugin` is called, 
 ## Insert Flow
 
 1. User clicks the "Insert" button in the toolbar, causing the dropdown to open.
-2. Dropdown renders built-in items (Horizontal Rule, Image, Table) followed by registered plugin items.
+2. Dropdown merges its built-in items (Image, Table, Container, Row) with the registered plugin
+   items and sorts the whole list by `order`.
 3. When a plugin item is clicked, `pluginsToInsertItems` creates an action that:
    - Retrieves the current selection range from the shadow root (or document).
    - Restores the selection (may have been lost from the dropdown interaction).
@@ -514,6 +559,25 @@ side-effect import rule as above.
 | `watermark` | `wui-watermark` | `el => startsPage(el) ? 'before' : 'none'` | No |
 | `page-break` | `wui-page-break` | `el => el.getAttribute('where') === 'after' ? 'after' : 'before'` | No |
 | `rule` | `wui-rule` | — | No |
+
+`rule` replaced the menu's old built-in **Horizontal Rule** row, which ran
+`execCommand('insertHTML', '<hr class="my-4 mx-auto border-gray-400" />')`. Both insert a
+horizontal line and only one of them is editable afterwards: a bare `<hr>` has no plugin, so
+clicking it opens no property panel and its appearance is frozen in a class string, while
+`<wui-rule>` carries `variant` / `weight` / `color` / `width` / `align` / `glyph` and can draw a
+gradient or an ornament, neither of which is expressible as a border on one element. Two menu
+rows for one idea, so the built-in one is gone. Documents that already contain a plain `<hr>`
+still render — nothing rewrites them, they just have no panel.
+
+Taking the built-in row away made two of its properties the plugin's problem. The old `<hr>`
+carried `my-4`, so replacing it with a flush line was a visible regression; and a 1px line is a
+1px *block*, which cannot be clicked — the press lands on the surface behind it, `<wui-rule>`
+never appears in the `composedPath` the selection walk reads, and the property panel that
+justified the merge is unreachable. `wui-rule` therefore pads itself vertically. The padding
+goes on a node **inside** its shadow tree, not on `:host`: for normal declarations the outer
+tree wins regardless of specificity, and the editor adopts Tailwind's preflight, whose
+`*, ::after, ::before { padding: 0 }` matches the host and silently zeroes it. That is the same
+cascade rule that makes cover page's `::slotted(*)` need `!important`.
 
 A watermark that already sits at the top of a sheet does not need to force a break; one that does
 not, does. That conditional is exactly why `pageBreak` takes a function.

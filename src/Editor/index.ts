@@ -24,7 +24,7 @@ export { applyStyle as applyStyleLegacy } from './utils'
 export { FocusManager } from './FocusManager'
 
 // Editor Plugin System
-export { registerEditorPlugin, unregisterEditorPlugin, getEditorPlugins, getPluginForElement, pluginsToInsertItems, serializeEditorContent, resolveResizable, resolveAnchor, applyResize, constrainResize, resolvePageBreak, pageBreakTagNames } from './EditorPlugin'
+export { BUILT_IN_ORDER, registerEditorPlugin, unregisterEditorPlugin, getEditorPlugins, getPluginForElement, pluginsToInsertItems, serializeEditorContent, resolveResizable, resolveAnchor, applyResize, constrainResize, resolvePageBreak, pageBreakTagNames } from './EditorPlugin'
 export type { EditorPlugin, InsertMenuItem, PluginProp, PluginPropType, PluginAction, ResizableSpec, ResizeWrite, PageBreakKind } from './EditorPlugin'
 
 // Page layout -- flow / page / screen.

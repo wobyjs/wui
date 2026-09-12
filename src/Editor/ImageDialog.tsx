@@ -428,7 +428,13 @@ export const ImageDialog = (): JSX.Element => {
                 <div class="text-sm font-medium text-gray-800">Insert image</div>
 
                 <div ref={bindDropZone} class="flex flex-col gap-2 rounded p-2 -m-2">
-                    <label class="text-[11px] text-gray-600">Source &mdash; paste a URL, browse, or drop an image here</label>
+                    {/* `for`/`id` rather than a wrapping label, because the row below holds the Browse
+                        button too and wrapping would fold that into the field's name. Without the
+                        association the only accessible name either field has is its placeholder -- and a
+                        placeholder stops being announced the moment the user types, leaving a text box
+                        with no name at all. The ids need no prefix: this subtree lives in the editor's
+                        shadow root, where an id cannot collide with the host page's. */}
+                    <label class="text-[11px] text-gray-600" for="wui-img-src">Source &mdash; paste a URL, browse, or drop an image here</label>
                     <div class="flex items-center gap-2">
                         <input
                             ref={el => {
@@ -446,6 +452,7 @@ export const ImageDialog = (): JSX.Element => {
                                     input.onblur = () => { if (!fieldShowsSummary) void preview() }
                                 }
                             }}
+                            id="wui-img-src"
                             type="text"
                             class={field}
                             placeholder="https://example.com/photo.jpg"
@@ -475,8 +482,8 @@ export const ImageDialog = (): JSX.Element => {
                 <div ref={el => { noteEl = el as HTMLElement }} class="text-[11px] leading-snug text-gray-500" style={{ display: 'none' } as JSX.CSSProperties} />
 
                 <div class="flex items-center gap-2">
-                    <label class="text-[11px] text-gray-600 w-16 shrink-0">Alt text</label>
-                    <input ref={el => { altInput = el as HTMLInputElement }} type="text" class={field} placeholder="Describes the image for screen readers" />
+                    <label class="text-[11px] text-gray-600 w-16 shrink-0" for="wui-img-alt">Alt text</label>
+                    <input ref={el => { altInput = el as HTMLInputElement }} id="wui-img-alt" type="text" class={field} placeholder="Describes the image for screen readers" />
                 </div>
 
                 <label class="flex items-center gap-2 text-[11px] text-gray-700 select-none">

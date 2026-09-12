@@ -5,19 +5,20 @@ import { useDropdownDismiss } from './useDropdownDismiss'
 import { range, getCurrentRange } from './utils' // Import getCurrentRange
 import KeyboardDownArrow from '../icons/keyboard_down_arrow'
 import Plus from '../icons/plus'
-import { getEditorPlugins, pluginsToInsertItems, InsertMenuItem } from './EditorPlugin'
+import { getEditorPlugins, pluginsToInsertItems, InsertMenuItem, BUILT_IN_ORDER } from './EditorPlugin'
 import { INSERT_IMAGE_EVENT, type InsertImageDetail } from './ImageDialog'
 import { TableGridPicker } from './TableGridPicker'
 import { insertionRange } from './BlockInsert'
 
-// Icons - placeholders, replace with actual SVGs or components
-const HorizontalRuleIcon = () => <span>HR</span>
-const ImageIcon = () => <span>Img</span>
-const TableIcon = () => <span>Tbl</span>
-const ContainerIcon = () => <span>Box</span>
-const RowIcon = () => <span>Row</span>
-const GifIcon = () => <span>GIF</span>
-// ... other icons
+// Emoji, to match every registered plugin's icon. The built-in rows used to be the three
+// letters of their own label ("Img", "Tbl"), which made the top of a sorted menu read as
+// a column of grey text with the coloured glyphs starting underneath it. None of these
+// repeats a plugin's: the picture frame is already the cover page's, so an image is a
+// camera.
+const ImageIcon = () => <span>📷</span>
+const TableIcon = () => <span>📊</span>
+const ContainerIcon = () => <span>📦</span>
+const RowIcon = () => <span>↔️</span>
 
 // The attribute escaper that used to live here went with the image path: images are now
 // built as detached DOM nodes by `ImageDialog`, where there is no attribute context to
@@ -72,15 +73,6 @@ const seatCaret = (surface: HTMLElement): Range => {
 }
 
 // #region Insert Actions
-const execInsertHorizontalRule = () => {
-    const surface = editorSurface()
-    if (!surface) return
-    seatCaret(surface)
-
-    const hrWithClasses = '<hr class="my-4 mx-auto border-gray-400" />'
-    document.execCommand('insertHTML', false, hrWithClasses)
-}
-
 /**
  * Hand the caret to `ImageDialog` and let it do the rest.
  *
@@ -211,22 +203,34 @@ const execInsertRow = () => insertContainer(ROW_STYLE)
  *   when clicked — it swaps the menu over to the size grid, which is per-menu state.
  */
 const getInsertOptions = (openTableGrid: () => void): InsertMenuItem[] => {
-    const builtIn = [
-        { label: 'Horizontal Rule', action: execInsertHorizontalRule, icon: HorizontalRuleIcon },
-        { label: 'Image', action: execInsertImage, icon: ImageIcon },
-        { label: 'Table', action: openTableGrid, icon: TableIcon },
-        { label: 'Container', action: execInsertContainer, icon: ContainerIcon },
-        { label: 'Row (flex)', action: execInsertRow, icon: RowIcon },
+    // No 'Horizontal Rule' here: the `rule` plugin is the same insert with a property
+    // panel behind it, so the built-in row was two menu entries for one idea. See the
+    // note above <wui-rule> in PageBlockPlugins.ts.
+    //
+    // BUILT_IN_ORDER, not 0: the menu is one sorted list, so the built-ins need a rank of
+    // their own to keep the head of it. Leaving them at the plugin default would tie them
+    // with every unordered plugin and hand the tie-break back to import order, which is the
+    // thing `order` exists to take away.
+    const builtIn: InsertMenuItem[] = [
+        { label: 'Image', action: execInsertImage, icon: ImageIcon, order: BUILT_IN_ORDER },
+        { label: 'Table', action: openTableGrid, icon: TableIcon, order: BUILT_IN_ORDER },
+        { label: 'Container', action: execInsertContainer, icon: ContainerIcon, order: BUILT_IN_ORDER },
+        { label: 'Row (flex)', action: execInsertRow, icon: RowIcon, order: BUILT_IN_ORDER },
     ]
 
     // Merge registered plugin items
     const plugins = $$(getEditorPlugins())
-    if (plugins.length > 0) {
-        const pluginItems = pluginsToInsertItems(document.querySelector('wui-editor')?.shadowRoot?.querySelector('[data-editor-root]') as HTMLElement) as InsertMenuItem[]
-        return [...builtIn, ...pluginItems]
-    }
+    if (plugins.length === 0) return builtIn
 
-    return builtIn
+    const pluginItems = pluginsToInsertItems(document.querySelector('wui-editor')?.shadowRoot?.querySelector('[data-editor-root]') as HTMLElement) as InsertMenuItem[]
+
+    // One sort over the whole menu rather than `[...builtIn, ...pluginItems]`, so that a
+    // plugin's `order` can place it anywhere in the list and not merely among its peers --
+    // the page-structure blocks (banner, cover page, watermark, page break, rule) sit in the
+    // gap between the built-ins and the default 0, which is what puts them under Row (flex)
+    // and above counter. The sort is stable, so everything at the default keeps the order it
+    // registered in.
+    return [...builtIn, ...pluginItems].sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
 }
 
 const def = () => ({

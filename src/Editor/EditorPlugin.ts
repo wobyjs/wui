@@ -302,13 +302,47 @@ export interface EditorPlugin {
      * too, and it is not a container -- it must stay selectable by clicking its icon.
      */
     editableContent?: boolean
+
+    /**
+     * Where this plugin sits in the insert menu. Lower sorts earlier; the default is `0`.
+     *
+     * Without it the menu is in *registration* order, which is really module import order --
+     * a plugin's position would then depend on the order of the `import` lines in whichever
+     * app bundled it, which is neither stable nor something the plugin author controls.
+     *
+     * The menu is one sorted list, built-ins included, so the scale runs:
+     *
+     *   BUILT_IN_ORDER (-100)   Image, Table, Container, Row (flex)
+     *   -99 .. -1               above the ordinary plugins, below the built-ins
+     *   0 (the default)         the ordinary plugins, in registration order
+     *   > 0                     below everything that did not ask
+     *
+     * The page-structure family (banner, cover page, watermark, page break, rule) sits in
+     * the middle band, because those are the blocks an author reaches for while laying a
+     * document out rather than while writing in it. Going *above* the built-ins is possible
+     * -- anything below -100 -- but it is not what that family wanted.
+     *
+     * Ties keep registration order, so plugins that do not set this are unaffected.
+     */
+    order?: number
 }
+
+/**
+ * The rank `InsertDropDown` gives its own rows (Image, Table, Container, Row (flex)).
+ *
+ * Exported because it is the only fixed point on the `order` scale: a plugin that means
+ * "just under the built-ins" has to know where they are, and a plugin that means "above
+ * them" has to be able to say so without guessing how negative is negative enough.
+ */
+export const BUILT_IN_ORDER = -100
 
 // Internal type for insert menu items (matches what InsertDropDown renders)
 export type InsertMenuItem = {
     label: string
     action: () => void
     icon: () => JSX.Child
+    /** See `EditorPlugin.order`. Absent means `0`. */
+    order?: number
 }
 
 /** Global plugin registry observable */
@@ -464,9 +498,13 @@ export const constrainResize = (
  * @returns Array of insert menu items
  */
 export const pluginsToInsertItems = (editorRoot: HTMLElement): ObservableMaybe<InsertMenuItem[]> => {
-    return $$(registeredPlugins).map(plugin => ({
+    // Sorted, not registration-ordered -- see `EditorPlugin.order`. `Array.prototype.sort` is
+    // required to be stable, which is what keeps every plugin that declines to set `order`
+    // exactly where it was.
+    return [...$$(registeredPlugins)].sort((a, b) => (a.order ?? 0) - (b.order ?? 0)).map(plugin => ({
         label: plugin.label,
         icon: plugin.icon ?? (() => null),
+        order: plugin.order,
         action: () => {
             // The caret when there is one, the end of the document when there is not. Never
             // `getRangeAt(0)` unguarded: on a surface that has lost focus that throws, and a

@@ -338,6 +338,7 @@ const coverProps: PluginProp[] = [
 
 registerEditorPlugin({
     name: 'cover-page',
+    order: -49,
     label: 'Cover page',
     tagName: 'wui-cover-page',
     props: coverProps,
@@ -607,6 +608,7 @@ const watermarkProps: PluginProp[] = [
 
 registerEditorPlugin({
     name: 'watermark',
+    order: -48,
     label: 'Watermark',
     tagName: 'wui-watermark',
     props: watermarkProps,
@@ -824,6 +826,7 @@ if (!customElements.get('wui-page-break')) customElements.define('wui-page-break
 
 registerEditorPlugin({
     name: 'page-break',
+    order: -47,
     label: 'Page Break',
     tagName: 'wui-page-break',
     props: [
@@ -905,7 +908,25 @@ const RULE = {
  */
 const RULE_CSS = `
 :host { display: block; margin: 0; }
-.wrap { box-sizing: border-box; }
+/* The padding is the hit box, and it is the whole reason a rule is selectable.
+   A 1px solid rule makes a 1px-tall block, and a 1px target cannot be clicked: the press
+   lands on the surface behind it, the selection walk never sees <wui-rule> in its
+   composedPath, and the property panel this plugin exists to offer is unreachable. Cover
+   page makes the same point from the other side -- every pixel of a block that is not a
+   word has to belong to the block, or the block cannot be selected at all.
+   It also restores the breathing room the built-in 'Horizontal Rule' menu item used to
+   insert as my-4. That item is gone now, so this is the only rule an author can get.
+
+   On .wrap and not on :host, which is where it was written first and does not work. A
+   :host rule carries a normal declaration from the *inner* tree, and for normal
+   declarations the outer tree always wins regardless of specificity -- the editor adopts
+   Tailwind's preflight, whose "*, ::after, ::before { padding: 0 }" is an outer-tree rule
+   that matches this host and silently zeroed it. The same cascade rule is why cover page
+   needs !important on ::slotted(*). .wrap is inside this shadow tree, where a star selector in the
+   outer tree cannot reach it, so no !important is needed and an author's own CSS still
+   wins on the host.
+   box-sizing so a width of 100% stays 100% once the padding is on it. */
+.wrap { box-sizing: border-box; padding: 0.5rem 0; }
 hr.line { border: 0 none; margin: 0; padding: 0; width: 100%; }
 .grad { width: 100%; }
 .orn { display: flex; align-items: center; gap: 0.75rem; }
@@ -1059,6 +1080,7 @@ const ruleProps: PluginProp[] = [
 
 registerEditorPlugin({
     name: 'rule',
+    order: -46,
     label: 'Rule',
     tagName: 'wui-rule',
     props: ruleProps,
