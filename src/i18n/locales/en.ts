@@ -157,6 +157,12 @@ export const en: LocalePack = {
         'editor.property.empty': 'Select an element to view properties',
         'editor.property.remove': 'Remove this property',
         'editor.property.asTailwind': 'Write this property as a Tailwind class',
+        // Selection kind, beside the tag name in the panel header.
+        'editor.property.kind.image': 'Image',
+        'editor.property.kind.text': 'Text',
+        'editor.property.kind.element': 'Element',
+        'editor.property.kind.none': 'No Selection',
+        'editor.property.commit': 'Commit Changes',
 
         // -- Style groups (StyleEditor) --------------------------------------
         'style.group.Layout': 'Layout',
@@ -179,6 +185,13 @@ export const en: LocalePack = {
         'style.removeToken': 'Remove {token}',
         'style.classes': 'Classes',
         'style.searchProperties': 'Search properties',
+        'style.section': 'Styles',
+        'style.nSet': '{count} set',
+        'style.empty': 'Select an element to edit its styles.',
+        'style.noMatch': 'No property matches that name.',
+        'style.moreResults': '{count} more — narrow the search to see them.',
+        'style.setOnElement': 'Set on this element',
+        'style.noneSet': 'Nothing set for this state. Open a group below, or search.',
 
         // -- Layout switch ---------------------------------------------------
         'editor.layout.flow': 'Flow',

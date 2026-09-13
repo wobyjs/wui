@@ -1085,11 +1085,13 @@ const MIN_W = 240
                         </span>
                         <span class="shrink-0 text-[10px] font-bold uppercase tracking-widest text-slate-400">
                             {() => {
-                                const t = $$(selectionType)
-                                return t === 'image' ? 'Image'
-                                    : t === 'text' ? 'Text'
-                                        : t === 'custom' ? 'Element'
-                                            : 'No Selection'
+                                // `kind`, not `t`: the imported `t` is the message lookup, and
+                                // the old local shadowed it right where it is needed.
+                                const kind = $$(selectionType)
+                                return kind === 'image' ? t('editor.property.kind.image')
+                                    : kind === 'text' ? t('editor.property.kind.text')
+                                        : kind === 'custom' ? t('editor.property.kind.element')
+                                            : t('editor.property.kind.none')
                             }}
                         </span>
                     </h3>

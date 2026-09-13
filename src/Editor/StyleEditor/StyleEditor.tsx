@@ -224,14 +224,14 @@ export const StyleEditor = ({ target, onEdit, open }: StyleEditorProps) => {
                 const found = $$(matches)
                 if (!found) return null
                 if (!found.length)
-                    return <div class="px-3 py-3 text-[11px] text-gray-400">No property matches that name.</div>
+                    return <div class="px-3 py-3 text-[11px] text-gray-400">{t('style.noMatch')}</div>
                 const shown = found.slice(0, MAX_SEARCH_RESULTS)
                 return (
                     <div>
                         {shown.map(rowFor)}
                         {found.length > shown.length
                             ? <div class="px-3 py-1.5 text-[10px] text-gray-400">
-                                {found.length - shown.length} more — narrow the search to see them.
+                                {t('style.moreResults', { count: found.length - shown.length })}
                             </div>
                             : null}
                     </div>
@@ -244,13 +244,13 @@ export const StyleEditor = ({ target, onEdit, open }: StyleEditorProps) => {
                 return (
                     <div>
                         <div class="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-500 bg-gray-50/60 border-b border-gray-200">
-                            Set on this element
+                            {t('style.setOnElement')}
                             <span class="ml-1 font-normal text-gray-400">({props.length})</span>
                         </div>
                         {props.length
                             ? props.map(rowFor)
                             : <div class="px-3 py-2 text-[11px] text-gray-400">
-                                Nothing set for this state. Open a group below, or search.
+                                {t('style.noneSet')}
                             </div>}
                     </div>
                 )
@@ -384,12 +384,12 @@ export const StyleEditor = ({ target, onEdit, open }: StyleEditorProps) => {
                 <span class="w-2 text-[10px] text-gray-500">
                     {() => $$(expanded) ? '\u25be' : '\u25b8'}
                 </span>
-                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-600">Styles</span>
+                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-600">{() => t('style.section')}</span>
                 <span class="ml-auto text-[10px] text-gray-400 font-mono">
                     {() => {
                         const el = $$(target)
                         if (!el) return ''
-                        return `${$$(setProps).length} set`
+                        return t('style.nSet', { count: $$(setProps).length })
                     }}
                 </span>
             </button>
@@ -397,7 +397,7 @@ export const StyleEditor = ({ target, onEdit, open }: StyleEditorProps) => {
             {() => {
                 if (!$$(expanded)) return null
                 if (!$$(target))
-                    return <div class="px-3 py-3 text-[11px] text-gray-400">Select an element to edit its styles.</div>
+                    return <div class="px-3 py-3 text-[11px] text-gray-400">{t('style.empty')}</div>
                 return <>{body()}{classBar()}</>
             }}
         </div>

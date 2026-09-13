@@ -4,6 +4,7 @@ import { $, $$, type JSX, type ObservableMaybe, defaults, customElement, type El
 import { Button } from "../Button"
 import { changeEnumerable } from "./PropertyForm"
 import { Editors } from "./Editors"
+import { t } from "../i18n"
 
 type PropertyRowProps = {
 	obj: any
@@ -100,7 +101,7 @@ export const PropertyRows = defaults(() => ({
 								commit()
 							}}
 						>
-							Commit Changes
+							{() => t('editor.property.commit')}
 						</Button>
 					)
 				}}

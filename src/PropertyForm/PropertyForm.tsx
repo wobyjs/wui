@@ -3,7 +3,7 @@
 import { $, $$, ObservableMaybe, Observable, type JSX, defaults, customElement, type ElementAttributes } from "woby"
 import { Button } from "../Button"
 import { Editors, UIProps, skippedProperties, indent } from "./Editors"
-import { tx } from "../i18n"
+import { t, tx } from "../i18n"
 
 type PropertyFormProps = {
 	obj: any
@@ -211,12 +211,13 @@ export const PropertyForm: Defaulted<typeof def> = defaults(def, (props: Propert
 				]}
 			>
 				{() => {
-					const t = $$(props.heading)
-					if (!t) return null
+					const heading = $$(props.heading)
+					if (!heading) return null
 					return (
 						<div class="px-4 py-2 bg-gray-50 border-b border-gray-200">
 							<h3 class="text-[11px] font-bold uppercase tracking-widest text-slate-400">
-								{t}
+								{/* Host-authored English -- the text catalogue, same as a row label. */}
+								{typeof heading === 'string' ? tx(heading) : heading}
 							</h3>
 						</div>
 					)
@@ -243,7 +244,7 @@ export const PropertyForm: Defaulted<typeof def> = defaults(def, (props: Propert
 								commit()
 							}}
 						>
-							Commit Changes
+							{() => t('editor.property.commit')}
 						</Button>
 					)
 				}}
