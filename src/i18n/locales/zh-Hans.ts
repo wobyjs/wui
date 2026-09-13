@@ -189,6 +189,34 @@ export const zhHans: LocalePack = {
 
         'editor.language': '语言',
         'editor.language.choose': '选择语言',
+
+        'editor.readonly.toEdit': '切换到编辑模式',
+        'editor.readonly.toReadonly': '切换到只读模式',
+
+        'editor.property.delete': '删除元素',
+        'editor.property.deleteNothing': '未选中任何元素',
+        'editor.property.deleteTable': '请使用表格菜单删除行或列',
+        'editor.property.deleteRoot': '文档本身无法删除',
+        'editor.property.deleteInternal': '这是组件内部元素 — 请改为选中该组件',
+
+        'editor.table.pickSize': '选择尺寸',
+        'editor.table.dims': '{cols} 列 × {rows} 行',
+
+        'style.addClasses': '添加类',
+        'style.value.fromBase': '继承自基础样式 — 输入值即可为此状态单独设置',
+        'style.value.fromCascade': '来自层叠 — 输入值即可在此元素上设置',
+        'style.value.inline': 'style 属性',
+        'style.toInline': '将此属性写入 style 属性',
+        'style.toInlineBlocked': 'style 属性无法表达伪状态',
+        'style.warn.blocked': '{tokens} 也设置了此属性，且它还会设置其他属性 — 已保留。',
+        'style.warn.inlineOverrides': 'style 属性覆盖了 {tokens}。',
+
+        'editor.page.endsHere': '本页到此结束',
+        'editor.page.breakChip': '↩ 分页',
+        'editor.page.breakHint': '点击以选中此分页符',
+        'editor.page.breakHintNamed': '{label} — 点击以选中此分页符',
+        'editor.watermark.label': '💧 水印',
+        'editor.watermark.hint': '选中此水印，然后打开属性面板',
     },
     text: {
         // -- Plugin property labels ------------------------------------------

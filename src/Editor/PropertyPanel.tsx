@@ -1109,11 +1109,11 @@ const MIN_W = 240
                         }}
                         title={() => {
                             switch (deleteRefusalReason($$(propertyTarget), editorRootEl())) {
-                                case 'table': return 'Use the table menu to delete rows or columns'
-                                case 'editor-root': return 'The document itself cannot be deleted'
-                                case 'component-internal': return 'This is a component internal — select the component instead'
-                                case null: return 'Delete element'
-                                default: return 'Nothing selected'
+                                case 'table': return t('editor.property.deleteTable')
+                                case 'editor-root': return t('editor.property.deleteRoot')
+                                case 'component-internal': return t('editor.property.deleteInternal')
+                                case null: return t('editor.property.delete')
+                                default: return t('editor.property.deleteNothing')
                             }
                         }}
                         class={() => [

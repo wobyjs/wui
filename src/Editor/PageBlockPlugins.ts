@@ -37,6 +37,7 @@ import { registerEditorPlugin, type PluginProp } from './EditorPlugin'
 import { PAGE_H_VAR } from './PageLayout'
 import { rgbTriple } from './colorUtils'
 import { insertAsBlock, editImageAttr } from './BlockInsert'
+import { onLocaleChange, t } from '../i18n'
 
 /**
  * The sheet height, as a CSS length.
@@ -475,6 +476,7 @@ class WuiWatermark extends HTMLElement {
     private word!: HTMLElement
     private tag!: HTMLElement
     private watching?: MutationObserver
+    private offLocale?: () => void
 
     constructor() {
         super()
@@ -485,11 +487,14 @@ class WuiWatermark extends HTMLElement {
         if (!this.shadowRoot!.childElementCount) this.build()
         this.sync()
         this.watchEditable()
+        this.offLocale = onLocaleChange(() => this.sync())
     }
 
     disconnectedCallback() {
         this.watching?.disconnect()
         this.watching = undefined
+        this.offLocale?.()
+        this.offLocale = undefined
     }
 
     attributeChangedCallback() {
@@ -535,8 +540,6 @@ class WuiWatermark extends HTMLElement {
 
         this.tag = div('tag')
         this.tag.setAttribute('part', 'handle')
-        this.tag.title = 'Select this watermark, then open Properties'
-        this.tag.append('\u{1F4A7} Watermark')
         // No click handler of its own: a press anywhere on the chip puts this host in the
         // event's composedPath, and the editor's own selection walk does the rest -- the
         // same path a click on any other plugin element takes. Stopping the default keeps
@@ -547,6 +550,11 @@ class WuiWatermark extends HTMLElement {
     }
 
     private sync() {
+        // The chip's wording lives here, not in `build()`, so a locale change is just
+        // another `sync()` -- a hand-built shadow tree has no binding to re-evaluate.
+        this.tag.title = t('editor.watermark.hint')
+        this.tag.textContent = t('editor.watermark.label')
+
         const attr = (n: string, d: string) => this.getAttribute(n) ?? d
         const num = (n: string, d: number) => {
             const v = Number(attr(n, String(d)))
@@ -736,6 +744,7 @@ class WuiPageBreak extends HTMLElement {
     private tag!: HTMLElement
     private chip!: HTMLElement
     private watching?: MutationObserver
+    private offLocale?: () => void
 
     constructor() {
         super()
@@ -746,11 +755,14 @@ class WuiPageBreak extends HTMLElement {
         if (!this.shadowRoot!.childElementCount) this.build()
         this.sync()
         this.watchSurface()
+        this.offLocale = onLocaleChange(() => this.sync())
     }
 
     disconnectedCallback() {
         this.watching?.disconnect()
         this.watching = undefined
+        this.offLocale?.()
+        this.offLocale = undefined
     }
 
     attributeChangedCallback() {
@@ -767,7 +779,6 @@ class WuiPageBreak extends HTMLElement {
 
         this.chip = div('chip')
         this.chip.setAttribute('part', 'handle')
-        this.chip.append('↩ Break')
 
         // No click handlers. A press anywhere in this shadow root puts the host in the
         // event's composedPath and the editor's own selection walk does the rest; all that
@@ -782,10 +793,11 @@ class WuiPageBreak extends HTMLElement {
     private sync() {
         const label = this.getAttribute('label') || BREAK_LABEL
         const where = this.getAttribute('where') === 'after' ? 'after' : BREAK_WHERE
-        this.tag.textContent = label || (where === 'after' ? 'Page ends here' : 'Page break')
+        this.tag.textContent = label || (where === 'after' ? t('editor.page.endsHere') : t('editor.page.break'))
+        this.chip.textContent = t('editor.page.breakChip')
         this.chip.title = label
-            ? label + ' — click to select this page break'
-            : 'Click to select this page break'
+            ? t('editor.page.breakHintNamed', { label })
+            : t('editor.page.breakHint')
     }
 
     /**

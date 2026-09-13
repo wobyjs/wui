@@ -357,7 +357,7 @@ export const StyleEditor = ({ target, onEdit, open }: StyleEditorProps) => {
             <div class="px-2 pb-2">
                 <input
                     type="text"
-                    placeholder="Add classes"
+                    placeholder={() => t('style.addClasses')}
                     spellCheck={false}
                     class="w-full px-2 py-1 text-[11px] font-mono rounded border border-gray-200 bg-white outline-none focus:border-[#1976d2]"
                     ref={(e: HTMLInputElement) => {

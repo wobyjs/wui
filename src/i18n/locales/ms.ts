@@ -186,6 +186,34 @@ export const ms: LocalePack = {
 
         'editor.language': 'Bahasa',
         'editor.language.choose': 'Pilih bahasa',
+
+        'editor.readonly.toEdit': 'Tukar ke mod Edit',
+        'editor.readonly.toReadonly': 'Tukar ke mod Baca sahaja',
+
+        'editor.property.delete': 'Padam elemen',
+        'editor.property.deleteNothing': 'Tiada pilihan',
+        'editor.property.deleteTable': 'Guna menu jadual untuk memadam baris atau lajur',
+        'editor.property.deleteRoot': 'Dokumen itu sendiri tidak boleh dipadam',
+        'editor.property.deleteInternal': 'Ini elemen dalaman komponen — pilih komponen itu sebaliknya',
+
+        'editor.table.pickSize': 'Pilih saiz',
+        'editor.table.dims': '{cols} lajur × {rows} baris',
+
+        'style.addClasses': 'Tambah kelas',
+        'style.value.fromBase': 'Diwarisi daripada asas — taip nilai untuk menetapkannya bagi keadaan ini',
+        'style.value.fromCascade': 'Daripada lata — taip nilai untuk menetapkannya pada elemen ini',
+        'style.value.inline': 'atribut style',
+        'style.toInline': 'Tulis ciri ini ke atribut style',
+        'style.toInlineBlocked': 'Atribut style tidak boleh menyatakan keadaan pseudo',
+        'style.warn.blocked': 'Turut ditetapkan oleh {tokens}, yang turut menetapkan ciri lain — dibiarkan.',
+        'style.warn.inlineOverrides': 'Atribut style mengatasi {tokens}.',
+
+        'editor.page.endsHere': 'Halaman tamat di sini',
+        'editor.page.breakChip': '↩ Pisah',
+        'editor.page.breakHint': 'Klik untuk memilih pemisah halaman ini',
+        'editor.page.breakHintNamed': '{label} — klik untuk memilih pemisah halaman ini',
+        'editor.watermark.label': '💧 Tera air',
+        'editor.watermark.hint': 'Pilih tera air ini, kemudian buka Ciri',
     },
     text: {
         // -- Label ciri pemalam ----------------------------------------------

@@ -186,8 +186,8 @@ export const StyleRow = ({ prop, el, variant, root, version, onEdit }: StyleRowP
     const warning = () => {
         const s = $$(state)
         const stuck = $$(blocked)
-        if (stuck.length) return `Also set by ${stuck.join(' ')}, which sets other properties too — left in place.`
-        if (s?.conflict) return `The style attribute overrides ${s.classTokens.join(' ')}.`
+        if (stuck.length) return t('style.warn.blocked', { tokens: stuck.join(' ') })
+        if (s?.conflict) return t('style.warn.inlineOverrides', { tokens: s.classTokens.join(' ') })
         return ''
     }
 
@@ -221,9 +221,9 @@ export const StyleRow = ({ prop, el, variant, root, version, onEdit }: StyleRowP
                     title={() => {
                         const s = $$(state)
                         if (!s) return ''
-                        if (s.fromBase) return 'Inherited from base — type a value to set it for this state'
-                        if (s.origin === 'computed') return 'From the cascade — type a value to set it on this element'
-                        return `${s.origin === 'inline' ? 'style attribute' : s.classTokens.join(' ')}`
+                        if (s.fromBase) return t('style.value.fromBase')
+                        if (s.origin === 'computed') return t('style.value.fromCascade')
+                        return s.origin === 'inline' ? t('style.value.inline') : s.classTokens.join(' ')
                     }}
                     ref={(e: HTMLInputElement) => {
                         if (!e) return
@@ -270,8 +270,8 @@ export const StyleRow = ({ prop, el, variant, root, version, onEdit }: StyleRowP
                     type="button"
                     class={toggleClass('css')}
                     title={() => $$(variant) === 'base'
-                        ? 'Write this property to the style attribute'
-                        : 'The style attribute cannot express a pseudo-state'}
+                        ? t('style.toInline')
+                        : t('style.toInlineBlocked')}
                     ref={(e: HTMLButtonElement) => {
                         if (e) e.onclick = () => { if ($$(variant) === 'base') target('css') }
                     }}

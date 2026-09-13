@@ -209,6 +209,43 @@ export const en: LocalePack = {
         // -- Language picker -------------------------------------------------
         'editor.language': 'Language',
         'editor.language.choose': 'Choose a language',
+
+        // -- Read-only toggle ------------------------------------------------
+        'editor.readonly.toEdit': 'Switch to Edit mode',
+        'editor.readonly.toReadonly': 'Switch to Read-only mode',
+
+        // -- Delete control (property panel header) --------------------------
+        // Only one of these ever shows: the button's tooltip *is* the reason it is
+        // disabled, so the refusal wordings live beside the affirmative label.
+        'editor.property.delete': 'Delete element',
+        'editor.property.deleteNothing': 'Nothing selected',
+        'editor.property.deleteTable': 'Use the table menu to delete rows or columns',
+        'editor.property.deleteRoot': 'The document itself cannot be deleted',
+        'editor.property.deleteInternal': 'This is a component internal — select the component instead',
+
+        // -- Table size picker -----------------------------------------------
+        'editor.table.pickSize': 'Pick a size',
+        'editor.table.dims': '{cols} cols × {rows} rows',
+
+        // -- Style row tooltips ----------------------------------------------
+        'style.addClasses': 'Add classes',
+        'style.value.fromBase': 'Inherited from base — type a value to set it for this state',
+        'style.value.fromCascade': 'From the cascade — type a value to set it on this element',
+        'style.value.inline': 'style attribute',
+        'style.toInline': 'Write this property to the style attribute',
+        'style.toInlineBlocked': 'The style attribute cannot express a pseudo-state',
+        'style.warn.blocked': 'Also set by {tokens}, which sets other properties too — left in place.',
+        'style.warn.inlineOverrides': 'The style attribute overrides {tokens}.',
+
+        // -- Page-block plugin chrome ----------------------------------------
+        // These land in a custom element's shadow root by hand, not through a binding,
+        // so PageBlockPlugins re-reads them from `onLocaleChange` rather than re-running.
+        'editor.page.endsHere': 'Page ends here',
+        'editor.page.breakChip': '↩ Break',
+        'editor.page.breakHint': 'Click to select this page break',
+        'editor.page.breakHintNamed': '{label} — click to select this page break',
+        'editor.watermark.label': '💧 Watermark',
+        'editor.watermark.hint': 'Select this watermark, then open Properties',
     },
 }
 

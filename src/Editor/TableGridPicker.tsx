@@ -202,19 +202,19 @@ export const TableGridPicker = ({ onPick, onCancel }: TableGridPickerProps) => {
                     class="text-sm text-gray-600 hover:text-gray-900 cursor-pointer bg-transparent border-0 p-0"
                     title={() => t('editor.backToInsertMenu')}
                 >
-                    &lsaquo; Insert
+                    {() => '\u2039 ' + t('common.insert')}
                 </button>
                 <span class="text-xs text-gray-500">
                     {() => $$(hoverCols)
-                        ? `${$$(hoverCols)} cols × ${$$(hoverRows)} rows`
-                        : 'Pick a size'}
+                        ? t('editor.table.dims', { cols: $$(hoverCols), rows: $$(hoverRows) })
+                        : t('editor.table.pickSize')}
                 </span>
             </div>
 
             <div
                 ref={gridRef}
                 role="grid"
-                aria-label="Table size"
+                aria-label={() => t('editor.table.size')}
                 style={() => ({
                     display: 'grid',
                     gridTemplateColumns: `repeat(${$$(visCols)}, ${CELL}px)`,

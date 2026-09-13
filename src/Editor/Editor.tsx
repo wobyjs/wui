@@ -42,6 +42,7 @@ import { arrowDirection, insertLineAfter, navigableBoxes, navigateFrom, placeCar
 
 // StyleEngine imports for keyboard shortcuts
 import { applyBold, applyItalic, applyUnderline } from './StyleEngine'
+import { t } from '../i18n'
 
 
 interface EditorProps {
@@ -1382,7 +1383,7 @@ const Editor = defaults(def, (props) => {
                                     if (el) el.blur()
                                 }
                             }}
-                            title={() => $$(isReadonly) ? 'Switch to Edit mode' : 'Switch to Read-only mode'}
+                            title={() => $$(isReadonly) ? t('editor.readonly.toEdit') : t('editor.readonly.toReadonly')}
                         >
                             {/* Edit icon (pencil) when readonly, eye icon when editing */}
                             {() => $$(isReadonly) ? (

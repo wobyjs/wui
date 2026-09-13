@@ -184,6 +184,34 @@ export const zhHant: LocalePack = {
 
         'editor.language': '語言',
         'editor.language.choose': '選擇語言',
+
+        'editor.readonly.toEdit': '切換到編輯模式',
+        'editor.readonly.toReadonly': '切換到唯讀模式',
+
+        'editor.property.delete': '刪除元素',
+        'editor.property.deleteNothing': '未選取任何元素',
+        'editor.property.deleteTable': '請使用表格選單刪除列或欄',
+        'editor.property.deleteRoot': '文件本身無法刪除',
+        'editor.property.deleteInternal': '這是元件內部元素 — 請改為選取該元件',
+
+        'editor.table.pickSize': '選擇大小',
+        'editor.table.dims': '{cols} 欄 × {rows} 列',
+
+        'style.addClasses': '新增類別',
+        'style.value.fromBase': '繼承自基礎樣式 — 輸入值即可為此狀態單獨設定',
+        'style.value.fromCascade': '來自層疊 — 輸入值即可在此元素上設定',
+        'style.value.inline': 'style 屬性',
+        'style.toInline': '將此屬性寫入 style 屬性',
+        'style.toInlineBlocked': 'style 屬性無法表達偽狀態',
+        'style.warn.blocked': '{tokens} 也設定了此屬性，且它還會設定其他屬性 — 已保留。',
+        'style.warn.inlineOverrides': 'style 屬性覆寫了 {tokens}。',
+
+        'editor.page.endsHere': '本頁到此結束',
+        'editor.page.breakChip': '↩ 分頁',
+        'editor.page.breakHint': '點擊以選取此分頁符號',
+        'editor.page.breakHintNamed': '{label} — 點擊以選取此分頁符號',
+        'editor.watermark.label': '💧 浮水印',
+        'editor.watermark.hint': '選取此浮水印，然後開啟屬性面板',
     },
     text: {
         // -- Plugin property labels ------------------------------------------
