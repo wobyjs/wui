@@ -7,14 +7,15 @@ import { applyBlockCommandToSelectedImage } from './ImageActions'
 import ListBulleted from '../icons/list_bulleted'
 import ListNumbered from '../icons/list_numbered'
 import ListCheckbox from '../icons/list_checkbox'
+import { t } from '../i18n'
 
 // #region Types & Configuration
 type ListMode = "bullet" | "number" | "checkbox"
 
 const LIST_CONFIG = {
-    bullet: { tag: 'ul', id: 'bullet-wrapper', classToAdd: 'list-inside list-disc', classToRemove: 'list-decimal list-none', title: "Bulleted List", icon: <ListBulleted class="size-5" /> },
-    number: { tag: 'ol', id: 'number-wrapper', classToAdd: 'list-inside list-decimal', classToRemove: 'list-disc list-none', title: "Numbered List", icon: <ListNumbered class="size-5" /> },
-    checkbox: { tag: 'ul', id: 'checkbox-wrapper', classToAdd: 'list-inside list-none', classToRemove: 'list-disc list-decimal', title: "Checkbox List", icon: <ListCheckbox class="size-5" /> }
+    bullet: { tag: 'ul', id: 'bullet-wrapper', classToAdd: 'list-inside list-disc', classToRemove: 'list-decimal list-none', titleKey: 'editor.bulletedList', icon: <ListBulleted class="size-5" /> },
+    number: { tag: 'ol', id: 'number-wrapper', classToAdd: 'list-inside list-decimal', classToRemove: 'list-disc list-none', titleKey: 'editor.numberedList', icon: <ListNumbered class="size-5" /> },
+    checkbox: { tag: 'ul', id: 'checkbox-wrapper', classToAdd: 'list-inside list-none', classToRemove: 'list-disc list-decimal', titleKey: 'editor.checkboxList', icon: <ListCheckbox class="size-5" /> }
 } as const;
 
 // const DEFAULT_CLASSES = "list-outside text-wrap pl-6";
@@ -31,11 +32,12 @@ const def = () => ({
     class: $('', HtmlClass) as ObservableMaybe<string>,
     buttonType: $("outlined", HtmlString) as ObservableMaybe<ButtonStyles>,
     mode: $("bullet", HtmlString) as ObservableMaybe<ListMode>,
+    title: $("", HtmlString) as ObservableMaybe<string>,
 })
 // #endregion
 
 const List = defaults(def, (props) => {
-    const { class: cn, cls, mode, buttonType: btnType, ...otherProps } = props
+    const { class: cn, cls, mode, buttonType: btnType, title, ...otherProps } = props
 
     const editor = useEditor()
     const undoRedoContext = useUndoRedo()
@@ -51,7 +53,8 @@ const List = defaults(def, (props) => {
             classToAdd: LIST_CONFIG[list].classToAdd,
             classToRemove: LIST_CONFIG[list].classToRemove,
             icon: LIST_CONFIG[list].icon,
-            title: LIST_CONFIG[list].title,
+            // `t` reads the locale observable, so this recomputes on setLocale()
+            title: $$(title) || t(LIST_CONFIG[list].titleKey),
         }
     }
 
