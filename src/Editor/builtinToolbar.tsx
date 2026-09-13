@@ -15,7 +15,6 @@ import { ZoomControl } from './ZoomControl'
 import { ScrollerToggle } from './DocScroller'
 import { PrintButton } from './PrintButton'
 import { InsertDropDown } from './InsertDropDown'
-import { Blockquote } from './Blockquote'
 import { InfoButton } from './InfoButton'
 import { LanguageSwitch } from './LanguageSwitch'
 import { pluginGroups } from './EditorPlugin'
@@ -153,7 +152,21 @@ registerToolbarItem({
     render: () => () => pluginGroups().map(g => <InsertDropDown group={g.name} />),
 })
 
-registerToolbarItem({ name: 'blockquote', group: 'insert', order: step(2), render: () => <Blockquote /> })
+// No `blockquote` button here. Quote is a paragraph style, and the block-type dropdown
+// already carries it: `TextFormatDropDown`'s options list has
+//     { label: 'Quote', tag: QUOTE_TAG, hotkey: 'Ctrl+Alt+Q', class: QUOTE_CLASSES }
+// alongside Normal / Heading 1-3 / Code Block, and that is where a reader looks for it.
+// A second, standalone button for the same style was the toolbar saying it twice --
+// worse, saying it two different ways: the dropdown RETAGS each selected block through
+// StyleEngine (<p> becomes <blockquote>, and picking Normal turns it back), while the
+// button WRAPPED them (the <p> survives inside a new <blockquote>), so using both on one
+// passage nested one inside the other.
+//
+// The verb itself is not gone: `toggleBlockquoteIn` is still exported, the `blockquote`
+// command is still registered in ./builtinCommands, and <Blockquote /> is still exported
+// for anyone who wants the toggle back --
+//     registerToolbarItem({ name: 'blockquote', group: 'insert', order: -80, render: () => <Blockquote /> })
+// puts it back exactly where it used to sit.
 registerToolbarItem({ name: 'info', group: 'insert', order: step(3), render: () => <InfoButton /> })
 // Last in the row: it relabels the whole toolbar, so it reads as a property of the editor
 // rather than of any one group above it.
