@@ -21,6 +21,9 @@ Everything below is exported from the package root:
 import { registerEditorCommand, registerToolbarItem, registerEditorKeys } from '@woby/wui'
 ```
 
+> Full signatures, every field, and the list of built-in names a plugin can hide or replace are
+> in the [EditorToolbar API reference](../api/EditorToolbar.md). This page is the why.
+
 ---
 
 ## Quick start: a button that does something
@@ -294,6 +297,19 @@ is for wui's own message ids; `label` goes through `tx()`, which is English-as-k
 identity fallback, and is for your strings. `labelKey` wins when both are set. Do not invent a
 third channel.
 
+**The standard button refreshes on `selectionchange` only.** `CommandButton` evaluates
+`isActive` and `isEnabled` once at setup and then on every `selectionchange`. That covers every
+built-in, because all of them depend on the selection — but a command whose enablement depends on
+something *else* (a network flag, a document mode, a licence check) renders stale until the caret
+moves. Until that is addressed, drive such a button from a `render:` widget with its own reactive
+binding rather than from `command:`.
+
+**`undo` and `redo` are `render:` items.** They predate the command registry and still render
+`UndoRedoButton`, which binds `disabled` to a reactive thunk of its own. They work, and
+`hideToolbarItem('undo')` and `replaces: 'undo'` behave exactly as documented — but they are
+outside the standard button path and so carry no `aria-pressed`. Do not copy them as the pattern
+for a new button; use `command:`.
+
 **The toolbar wraps.** It carries `flex-wrap`, so enough registered items will push it onto a
 second row and shove the writing surface down the page. Past about 32 items the editor warns
 on the console. There is no overflow policy yet — budget your buttons.
@@ -317,6 +333,8 @@ registerToolbarItem({
 
 ## See also
 
+- [EditorToolbar API](../api/EditorToolbar.md) — the reference: every field of `EditorCommand`,
+  `ToolbarItem` and `KeyBinding`, and the built-in command / item / chord names
 - [Editor Plugin System](./editor-plugins.md) — registering custom elements that appear in
   the Insert menu and render inline, with typed `props` for the property panel.
 - [Styling Components](./styling.md) — `cls` (replace) vs `class` (extend).

@@ -36,6 +36,14 @@ inside a shadow root, and the reason most of the rest of this list exists.
   property panel and `PluginProp` rows that render their hints.
 - Property panel and style editor, with base-class publication and a left-edge resize.
 - Arrow and Enter navigation between components, without stealing focus from them.
+- **Three registries behind the toolbar**, so a third party can extend it without editing
+  wui: `EditorCommand` (what the editor can do), `EditorToolbarItem` (what it shows, and
+  where) and `EditorKeymap` (how a command is reached from the keyboard). Deliberately not
+  one registry: hiding a button must not take its chord away with it. `runEditorCommand`
+  performs the four steps around a command's `run` — cache the selection, resolve the range
+  through the shadow root, restore the caret, save one undo step — so a registrant writes
+  only the verb. `hideToolbarItem`, `replaces` and `unregisterEditorCommand` are three
+  different verbs and each leaves the other two alone.
 
 **i18n.** A pluggable multilingual layer covering `en`, `zh-Hans`, `zh-Hant` and `ms`.
 English is eager because it is the fallback; the rest are code-split behind loaders, so a
@@ -51,8 +59,10 @@ content. Plus a run of new icons.
 **Tests.** An SSR suite across all 20 components, a Wheeler suite, and a two-suite test story
 with on-page actual/expect logs.
 
-**Docs.** `docs/api/` — a page per component, plus `I18n`, `EditorPlugin`, `NodeNavigation`,
-`PageLayout` and `EditorProps`.
+**Docs.** `docs/api/` — a page per component, plus `I18n`, `EditorPlugin`, `EditorToolbar`,
+`NodeNavigation`, `PageLayout` and `EditorProps`. Two guides for extending the editor:
+[editor-plugins](docs/guides/editor-plugins.md) and
+[editor-toolbar](docs/guides/editor-toolbar.md).
 
 ### Changed
 
