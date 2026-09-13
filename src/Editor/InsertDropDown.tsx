@@ -5,7 +5,7 @@ import { useDropdownDismiss } from './useDropdownDismiss'
 import { range, getCurrentRange } from './utils' // Import getCurrentRange
 import KeyboardDownArrow from '../icons/keyboard_down_arrow'
 import Plus from '../icons/plus'
-import { getEditorPlugins, pluginsToInsertItems, InsertMenuItem, BUILT_IN_ORDER } from './EditorPlugin'
+import { getEditorPlugins, pluginsToInsertItems, pluginGroups, InsertMenuItem, BUILT_IN_ORDER } from './EditorPlugin'
 import { INSERT_IMAGE_EVENT, type InsertImageDetail } from './ImageDialog'
 import { TableGridPicker } from './TableGridPicker'
 import { insertionRange } from './BlockInsert'
@@ -247,8 +247,13 @@ const execInsertRow = (from?: HTMLElement | null) => insertContainer(ROW_STYLE, 
  * @param self The menu's own node, which every action resolves its surface from. A thunk
  *   and not the node: the menu is built as it opens and its actions run on a click after
  *   that, so the ref is read at the moment it is needed rather than captured early.
+ * @param group Which menu this is. Omitted is wui's own -- the four built-in rows plus
+ *   every ungrouped plugin. A string is a plugin family's own dropdown, which gets its
+ *   members and *nothing* else: Image and Table are wui's blocks, not the family's, and
+ *   repeating them under every group button would be four more rows per family to scroll
+ *   past rather than fewer.
  */
-const getInsertOptions = (openTableGrid: () => void, self: () => HTMLElement | null): InsertMenuItem[] => {
+const getInsertOptions = (openTableGrid: () => void, self: () => HTMLElement | null, group?: string): InsertMenuItem[] => {
     // No 'Horizontal Rule' here: the `rule` plugin is the same insert with a property
     // panel behind it, so the built-in row was two menu entries for one idea. See the
     // note above <wui-rule> in PageBlockPlugins.ts.
@@ -264,6 +269,13 @@ const getInsertOptions = (openTableGrid: () => void, self: () => HTMLElement | n
         { label: 'Row (flex)', key: 'editor.insert.row', action: () => execInsertRow(self()), icon: RowIcon, order: BUILT_IN_ORDER },
     ]
 
+    // A group's dropdown is its members and nothing more, so the built-ins drop out and
+    // there is nothing left to merge them with.
+    if (group) {
+        const surface = editorSurface(self())
+        return surface ? pluginsToInsertItems(surface, group) as InsertMenuItem[] : []
+    }
+
     // Merge registered plugin items
     const plugins = $$(getEditorPlugins())
     if (plugins.length === 0) return builtIn
@@ -273,7 +285,7 @@ const getInsertOptions = (openTableGrid: () => void, self: () => HTMLElement | n
     const surface = editorSurface(self())
     if (!surface) return builtIn
 
-    const pluginItems = pluginsToInsertItems(surface) as InsertMenuItem[]
+    const pluginItems = pluginsToInsertItems(surface, undefined) as InsertMenuItem[]
 
     // One sort over the whole menu rather than `[...builtIn, ...pluginItems]`, so that a
     // plugin's `order` can place it anywhere in the list and not merely among its peers --
@@ -290,12 +302,21 @@ const def = () => ({
     // every other wui component.
     cls: $("", HtmlClass) as JSX.Class,
     class: $("", HtmlClass) as JSX.Class,
-    disabled: $(false, HtmlBoolean) as ObservableMaybe<boolean>
+    disabled: $(false, HtmlBoolean) as ObservableMaybe<boolean>,
+    /**
+     * Render this plugin group's menu instead of wui's own "Insert content".
+     *
+     * Empty -- the default -- is wui's menu. A group name is a family's dropdown: its
+     * members only, captioned and iconed from `pluginGroups()`, with no Table row and so
+     * no size grid. The editor renders one of these per group reported by `pluginGroups()`;
+     * a host embedding `<wui-insert-dropdown group="...">` by hand gets the same thing.
+     */
+    group: $("", HtmlString) as ObservableMaybe<string>
 })
 
 const InsertDropDown = defaults(def, (props) => {
 
-    const { cls, class: className, disabled, ...otherProps } = props
+    const { cls, class: className, disabled, group, ...otherProps } = props
 
     const editor = $(EditorContext)
     // const { undos, saveDo } = useUndoRedo() // Removed as saveDo is handled by MutationObserver
@@ -354,7 +375,7 @@ const InsertDropDown = defaults(def, (props) => {
     const OptionList = () => {
         return (
             <div class="py-1" role="none">
-                {getInsertOptions(() => showGrid(true), () => $$(dropdownRef) ?? null).map(opt => (
+                {getInsertOptions(() => showGrid(true), () => $$(dropdownRef) ?? null, $$(group)).map(opt => (
                     <Button
                         type='outlined'
                         cls="w-full flex items-center text-gray-700 px-4 py-2 text-sm hover:bg-gray-100 hover:text-gray-900"
@@ -374,6 +395,14 @@ const InsertDropDown = defaults(def, (props) => {
             </div>
         )
     }
+    /**
+     * The group descriptor behind `group`, or undefined for wui's own menu.
+     *
+     * A thunk rather than a value: `pluginGroups()` reads the registry observable, and a
+     * plugin registered after this menu was built still has to be able to caption it.
+     */
+    const groupInfo = () => { const g = $$(group); return g ? pluginGroups().find(x => x.name === g) : undefined }
+
     const BASE_BTN = "size-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-black hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500"
 
     return (
@@ -383,12 +412,14 @@ const InsertDropDown = defaults(def, (props) => {
                     type='outlined'
                     cls={() => [BASE_BTN]}
                     onClick={toggleDropdown}
-                    title={() => t('editor.insertContent')}
+                    title={() => { const g = groupInfo(); return g ? tx(g.label) : t('editor.insertContent') }}
                     disabled={disabled}
                     onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation() }}
                 >
                     <span class="text-center truncate">
-                        <Plus class="size-5" />
+                        {/* A family's own glyph when it offered one; the plus that means
+                            "insert" when it did not, which is still truer than nothing. */}
+                        {() => { const icon = groupInfo()?.icon; return icon ? icon() : <Plus class="size-5" /> }}
                     </span>
                 </Button>
                 <Button

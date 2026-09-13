@@ -15,6 +15,7 @@ This section contains guides and tutorials for using @woby/wui effectively.
 ## Advanced Topics
 
 - [Editor Plugin System](./editor-plugins.md) - Registering custom elements with the wui-editor, and declaring typed `props` so the property panel renders real editors
+- [Extending the Editor Toolbar](./editor-toolbar.md) - The three registries behind the toolbar: commands, toolbar items and keyboard chords, and how a third party adds, hides or replaces any of them
 
 ## Contributing
 

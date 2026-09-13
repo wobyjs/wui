@@ -339,6 +339,53 @@ export interface EditorPlugin {
      * Ties keep registration order, so plugins that do not set this are unaffected.
      */
     order?: number
+
+    /**
+     * Put this plugin in an insert menu of its **own**, named by this string.
+     *
+     * Absent -- the default -- means wui's "Insert content" menu: Image, Table,
+     * Container, Row (flex) and every plugin that did not ask otherwise, in one sorted
+     * list. That list is the right home for a handful of blocks and the wrong one for a
+     * *family*. Eight luopan plates appended under twenty built-ins make a menu the
+     * author has to scroll past everyone else's tools to reach, and they bury the thing
+     * that is actually true about them -- that they are one idea with eight presets.
+     *
+     * Set it and those rows leave the built-in menu entirely for a dropdown of their
+     * own, one per distinct value, placed in the toolbar in the order the groups first
+     * registered. Nothing else changes: `props`, `resizable`, `anchor`, `pageBreak` and
+     * the property panel are all resolved by {@link tagName} and never look at this.
+     *
+     * {@link order} still sorts within the group. `BUILT_IN_ORDER` means nothing there --
+     * a group has no built-ins to sit above.
+     *
+     * The value doubles as the group's caption, run through `tx()` like any other
+     * plugin-authored English, so a locale pack can translate it. Use
+     * {@link groupLabel} when the caption should differ from the identity.
+     */
+    group?: string
+
+    /** Caption for the group's dropdown, when {@link group} itself is not the right word. */
+    groupLabel?: string
+
+    /**
+     * Icon for the group's dropdown button.
+     *
+     * Declared per plugin because a group has no descriptor of its own -- it exists only
+     * because some plugin named it. The first member to offer one wins, so a family
+     * registered in a loop can hand the same thunk to all of them.
+     */
+    groupIcon?: () => JSX.Child
+}
+
+/**
+ * One insert dropdown other than wui's own, as {@link pluginGroups} reports it.
+ */
+export interface PluginGroup {
+    /** The {@link EditorPlugin.group} value that named it. */
+    name: string
+    /** Caption, resolved from `groupLabel ?? name` -- but not yet run through `tx()`. */
+    label: string
+    icon?: () => JSX.Child
 }
 
 /**
@@ -409,6 +456,39 @@ export const getEditorPlugins = (): Observable<EditorPlugin[]> => registeredPlug
  */
 export const getPluginForElement = (el: HTMLElement): EditorPlugin | undefined =>
     $$(registeredPlugins).find(p => p.tagName.toUpperCase() === el.tagName.toUpperCase())
+
+/**
+ * The insert dropdowns that registered plugins have asked for, beyond wui's own.
+ *
+ * One entry per distinct {@link EditorPlugin.group}, in the order the group was first
+ * named -- not the order of {@link EditorPlugin.order}, which sorts *within* a group and
+ * has nothing to say about where the group's button sits in the toolbar. A family that
+ * registers in a loop therefore lands wherever its first member did, which is the only
+ * position the author can predict.
+ *
+ * `label` is `groupLabel ?? name` and is **not** run through `tx()` here: this is a
+ * registry read, and the caller renders. `icon` is the first `groupIcon` any member
+ * offered, or undefined if none did.
+ *
+ * Reads the registry observable, so calling it inside a reactive context re-runs when a
+ * plugin registers.
+ */
+export const pluginGroups = (): PluginGroup[] => {
+    const out: PluginGroup[] = []
+    for (const p of $$(registeredPlugins)) {
+        if (!p.group) continue
+        const existing = out.find(g => g.name === p.group)
+        if (!existing) {
+            out.push({ name: p.group, label: p.groupLabel ?? p.group, icon: p.groupIcon })
+            continue
+        }
+        // First member to offer one wins -- for the icon *and* for the label, so a family
+        // where only one member bothered to spell the caption out still gets it.
+        if (!existing.icon && p.groupIcon) existing.icon = p.groupIcon
+        if (existing.label === existing.name && p.groupLabel) existing.label = p.groupLabel
+    }
+    return out
+}
 
 /**
  * How an element interrupts the flow of pages. See {@link EditorPlugin.pageBreak}.
@@ -515,13 +595,22 @@ export const constrainResize = (
  * Each plugin becomes an item with label, icon, and an action that calls onInsert.
  *
  * @param editorRoot - The editor's contenteditable element (passed from EditorSurface)
+ * @param group - Which menu is asking. Omitted means wui's own, which is every plugin
+ *   that did **not** set {@link EditorPlugin.group}; a string means that group's dropdown
+ *   and only its members. The two cases partition the registry, so a grouped plugin
+ *   leaves the built-in menu entirely rather than appearing twice.
  * @returns Array of insert menu items
  */
-export const pluginsToInsertItems = (editorRoot: HTMLElement): ObservableMaybe<InsertMenuItem[]> => {
+export const pluginsToInsertItems = (editorRoot: HTMLElement, group?: string): ObservableMaybe<InsertMenuItem[]> => {
+    // `|| undefined` on both sides so that `group: ''` reads as "no group" rather than as a
+    // group whose name is the empty string -- a plugin that spreads a config object with an
+    // unset field would otherwise vanish from every menu.
+    const want = group || undefined
+
     // Sorted, not registration-ordered -- see `EditorPlugin.order`. `Array.prototype.sort` is
     // required to be stable, which is what keeps every plugin that declines to set `order`
     // exactly where it was.
-    return [...$$(registeredPlugins)].sort((a, b) => (a.order ?? 0) - (b.order ?? 0)).map(plugin => ({
+    return $$(registeredPlugins).filter(p => (p.group || undefined) === want).sort((a, b) => (a.order ?? 0) - (b.order ?? 0)).map(plugin => ({
         label: plugin.label,
         icon: plugin.icon ?? (() => null),
         order: plugin.order,

@@ -63,45 +63,9 @@ const List = defaults(def, (props) => {
         const currentMode = $$(mode)
 
         const updateState = () => {
-            const el = editor ?? getCurrentEditor()
-            let state = false
-
-            // 1. Get current selection
-            const { selection } = getSelection($$(el));
-            if (!selection || selection.rangeCount === 0) {
-                isActive(false)
-                return
-            }
-
-            // 2. Find the closest list parent (UL or OL)
-            let node: Node | null = selection.getRangeAt(0).commonAncestorContainer
-            if (node.nodeType === Node.TEXT_NODE) node = node.parentElement
-            const closestList = (node as HTMLElement)?.closest('ul, ol')
-
-            // 3. Logic Branching by Mode
-            if (closestList) {
-                const isOrdered = closestList.tagName === 'OL'
-                const isUnordered = closestList.tagName === 'UL'
-
-                if (currentMode === 'number' && closestList.classList.contains('list-decimal')) {
-                    // Number button is active ONLY if it's an <ol>
-                    state = isOrdered
-                }
-                else if (currentMode === 'checkbox' && closestList.classList.contains('list-none')) {
-                    // Checkbox button is active ONLY if it's a <ul> with our special class
-                    state = isUnordered
-                }
-                else if (currentMode === 'bullet' && closestList.classList.contains('list-disc')) {
-                    // Bullet button is active ONLY if it's a <ul> and NOT a checklist
-                    state = isUnordered
-                }
-
-                // Security check: ensure the list belongs to our editor
-                if (state && $$(el) && !$$(el).contains(closestList)) {
-                    state = false
-                }
-            }
-            isActive(state)
+            // Shared with the `list.*` commands, so a keyboard chord and this button can
+            // never disagree about whether the caret is in a list -- see `isListModeActive`.
+            isActive(isListModeActive($$(editor ?? getCurrentEditor()) as HTMLElement | null, currentMode))
         }
 
         document.addEventListener('selectionchange', updateState)
@@ -183,33 +147,10 @@ const List = defaults(def, (props) => {
     // #endregion
 
     const handleClick = () => {
-        // Check for image selection first - route to image handler
-        const listType = $$(mode) as 'bullet' | 'number' | 'checkbox'
-        if (applyBlockCommandToSelectedImage('list', listType)) {
-            saveDo()
-            setTimeout(() => {
-                const evt = new Event('selectionchange')
-                document.dispatchEvent(evt)
-            }, 10)
-            return
-        }
-
-        const el = editor ?? getCurrentEditor()
-        // Ensure we don't force inline styles, we want classes
-        document.execCommand('styleWithCSS', false, 'false')
-
-        // insertList($$(el), listProps().tag, listProps().classToAdd, listProps().classToRemove, $$(mode))
-        insertList($$(el), { tag: listProps().tag, classes: { add: listProps().classToAdd, remove: listProps().classToRemove }, id: listProps().id }, $$(mode))
-
+        // The whole verb lives in `applyListMode`, which the `list.*` commands call too;
+        // all this button adds is the undo step, which a command gets from `runEditorCommand`.
+        applyListMode($$(editor ?? getCurrentEditor()) as HTMLElement | null, $$(mode) as ListMode)
         saveDo()
-
-        // Force update UI state immediately
-        // (Short timeout allows the DOM to update first)
-        setTimeout(() => {
-            // Manually trigger a check
-            const evt = new Event('selectionchange')
-            document.dispatchEvent(evt)
-        }, 10)
     }
 
     return (
@@ -233,6 +174,66 @@ const List = defaults(def, (props) => {
 
 export { List }
 export default List
+
+// #region Shared verbs -- used by the button above and by the `list.*` editor commands
+/**
+ * Is the caret inside a list of this mode?
+ *
+ * Mode-specific on purpose: three buttons share one DOM shape, and only the class on the
+ * container tells `bullet` from `checkbox` (both `<ul>`). The final containment check keeps
+ * a list in *another* editor on the page from lighting this one's button up.
+ */
+export const isListModeActive = (editor: HTMLElement | null | undefined, mode: ListMode): boolean => {
+    const el = editor ?? ($$(getCurrentEditor()) as HTMLElement | null)
+    const { selection } = getSelection(el as any)
+    if (!selection || selection.rangeCount === 0) return false
+
+    let node: Node | null = selection.getRangeAt(0).commonAncestorContainer
+    if (node.nodeType === Node.TEXT_NODE) node = node.parentElement
+    const closestList = (node as HTMLElement)?.closest('ul, ol')
+    if (!closestList) return false
+
+    const isOrdered = closestList.tagName === 'OL'
+    const isUnordered = closestList.tagName === 'UL'
+
+    let state = false
+    if (mode === 'number' && closestList.classList.contains('list-decimal')) state = isOrdered
+    else if (mode === 'checkbox' && closestList.classList.contains('list-none')) state = isUnordered
+    else if (mode === 'bullet' && closestList.classList.contains('list-disc')) state = isUnordered
+
+    if (state && el && !el.contains(closestList)) state = false
+    return state
+}
+
+/**
+ * Turn the selection into a list of this mode, or back out of one.
+ *
+ * Everything the toolbar button used to do inline, minus the undo step -- the button calls
+ * `saveDo()` itself and a command gets one from `runEditorCommand`, so putting it here would
+ * double it.
+ *
+ * The trailing synthetic `selectionchange` is not decoration: nothing the browser fires
+ * tells a toolbar that the *shape* of the block under a stationary caret changed, so without
+ * it the three list buttons keep their old pressed state until the user next moves the caret.
+ * The 10ms lets the DOM settle first.
+ */
+export const applyListMode = (editor: HTMLElement | null | undefined, mode: ListMode): void => {
+    const refresh = () => setTimeout(() => document.dispatchEvent(new Event('selectionchange')), 10)
+
+    // An image selection is a block command of its own; it never reaches `insertList`.
+    if (applyBlockCommandToSelectedImage('list', mode)) { refresh(); return }
+
+    const el = editor ?? ($$(getCurrentEditor()) as HTMLElement | null)
+    if (!el) { console.warn('[List] no editor found.'); return }
+
+    // Classes, not inline styles -- the rest of the editor styles lists by class.
+    document.execCommand('styleWithCSS', false, 'false')
+
+    const cfg = LIST_CONFIG[mode]
+    insertList(el as HTMLDivElement, { tag: cfg.tag, classes: { add: cfg.classToAdd, remove: cfg.classToRemove }, id: cfg.id }, mode)
+    refresh()
+}
+// #endregion
 
 customElement('wui-list', List)
 

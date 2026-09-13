@@ -25,18 +25,12 @@ const Blockquote = defaults(def, (props) => {
     const isActive = $(false)
 
     const toggleBlockquote = () => {
-        isActive(!$$(isActive))
-
-        const editorDiv = $$(editor) ?? $$(getCurrentEditor())
-
-        if (!editorDiv) { console.warn("[Blockquote] no editor found."); return; }
-
-        if (!$$(isActive)) {
-            unwrapBlockquote(editorDiv)
-        } else {
-            applyFormatBlock(editorDiv, QUOTE_TAG, QUOTE_CLASSES)
-        }
-        $$(editorDiv).focus({ preventScroll: true })
+        // The verb lives in `toggleBlockquoteIn`, shared with the `blockquote` command. It
+        // reads the state off the DOM rather than off this component's `isActive` flag: the
+        // flag is a *view* of the caret's surroundings, and a command fired from the keyboard
+        // has no view to flip.
+        toggleBlockquoteIn($$(editor) ?? ($$(getCurrentEditor()) as HTMLElement | null))
+        updateActiveStatus()
     }
 
     /**
@@ -104,6 +98,22 @@ declare module 'woby' {
 
 export default Blockquote
 
+
+/**
+ * Wrap the selected blocks in a blockquote, or unwrap the one they are already in.
+ *
+ * Exported so the `blockquote` command and the toolbar button run the same code. Does not
+ * touch history -- the caller owns the undo step.
+ */
+export const toggleBlockquoteIn = (editor: HTMLElement | null | undefined): void => {
+    const editorDiv = (editor ?? ($$(getCurrentEditor()) as HTMLElement | null)) as HTMLDivElement | null
+    if (!editorDiv) { console.warn('[Blockquote] no editor found.'); return }
+
+    if (isSelectionInside(editorDiv, QUOTE_TAG)) unwrapBlockquote(editorDiv)
+    else applyFormatBlock(editorDiv, QUOTE_TAG, QUOTE_CLASSES)
+
+    editorDiv.focus({ preventScroll: true })
+}
 
 // #region Helper Functions
 const applyFormatBlock = (editor: HTMLDivElement, tag: string, className: string) => {

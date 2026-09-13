@@ -41,60 +41,11 @@ const Indent: Defaulted<typeof def> = defaults(def, (props) => {
         return $$(isDecrease) ? t('editor.decreaseIndent') : t('editor.increaseIndent')
     }
 
-    const handleClick = (e: any) => {
-        // Check for image selection first - route to image handler
-        const isDecreaseMode = $$(mode) === 'decrease'
-        if (applyBlockCommandToSelectedImage(isDecreaseMode ? 'outdent' : 'indent')) {
-            saveDo()
-            return
-        }
-
-        const stepVal = $$(step)
-        const pxVal = $$(identPx)
-        const amount = pxVal * stepVal
-
-        // Check if selection is inside a list (UL/OL)
-        const editorEl = document.querySelector('wui-editor')
-        const shadow = editorEl?.shadowRoot
-        let sel: Selection | null = null
-        let range: Range | null = null
-        if (shadow) {
-            sel = shadow.getSelection()
-            range = sel?.getRangeAt(0) ?? null
-        } else {
-            sel = window.getSelection()
-            range = sel?.getRangeAt(0) ?? null
-        }
-
-        if (range) {
-            const commonAncestor = range.commonAncestorContainer
-            // Check if we're inside a list
-            let node: Node | null = commonAncestor
-            while (node && (!shadow || node.getRootNode() === shadow)) {
-                if (node instanceof HTMLElement) {
-                    const tag = node.tagName.toUpperCase()
-                    if (tag === 'LI' || tag === 'UL' || tag === 'OL') {
-                        // Use StyleEngine's applyListIndent for list items (ml-* classes)
-                        try {
-                            applyListIndent(isDecreaseMode, amount)
-                            saveDo()
-                        } catch (e) {
-                            console.warn('List indent failed:', e)
-                        }
-                        return
-                    }
-                }
-                node = node.parentNode
-            }
-        }
-
-        // Use StyleEngine's applyIndent for non-list blocks (paragraphs, headings)
-        try {
-            applyIndentStyle(isDecreaseMode, amount)
-            saveDo()
-        } catch (e) {
-            console.warn('Indent style application failed:', e)
-        }
+    const handleClick = () => {
+        // The verb lives in `applyIndentMode`, shared with the `indent.*` commands and with
+        // the Tab/Shift+Tab handler, so all three indent by the same rules.
+        applyIndentMode($$(mode) === 'decrease', $$(identPx) * $$(step), $$(editor ?? getCurrentEditor()) as HTMLElement | null)
+        saveDo()
     }
 
     return (
@@ -115,6 +66,46 @@ const Indent: Defaulted<typeof def> = defaults(def, (props) => {
 }) as typeof Indent
 
 export { Indent }
+
+/**
+ * Indent or outdent the selection by `amount` pixels.
+ *
+ * Two engines, not one: a list item indents by swapping its `ml-*` class, because changing
+ * `padding-left` on an `<li>` moves the text away from its own bullet instead of moving the
+ * bullet. Everything else -- paragraphs, headings -- indents as a block. Which one applies is
+ * decided by walking up from the caret, not by asking the editor what mode it is in.
+ *
+ * Exported so the `indent.*` commands and the Tab/Shift+Tab handler share it with the button.
+ * Does not touch history; the caller owns the undo step.
+ */
+export const applyIndentMode = (isDecrease: boolean, amount: number, editor?: HTMLElement | null): void => {
+    // An image selection is its own block command and never reaches the style engines.
+    if (applyBlockCommandToSelectedImage(isDecrease ? 'outdent' : 'indent')) return
+
+    const el = editor ?? ($$(getCurrentEditor()) as HTMLElement | null)
+    const root = el?.getRootNode()
+    const shadow = root instanceof ShadowRoot ? root : undefined
+    const sel = shadow ? (shadow as any).getSelection?.() : window.getSelection()
+    const range: Range | null = sel && sel.rangeCount > 0 ? sel.getRangeAt(0) : null
+
+    if (range) {
+        let node: Node | null = range.commonAncestorContainer
+        while (node && (!shadow || node.getRootNode() === shadow)) {
+            if (node instanceof HTMLElement) {
+                const tag = node.tagName.toUpperCase()
+                if (tag === 'LI' || tag === 'UL' || tag === 'OL') {
+                    try { applyListIndent(isDecrease, amount) }
+                    catch (e) { console.warn('List indent failed:', e) }
+                    return
+                }
+            }
+            node = node.parentNode
+        }
+    }
+
+    try { applyIndentStyle(isDecrease, amount) }
+    catch (e) { console.warn('Indent style application failed:', e) }
+}
 
 // Register Custom Element
 customElement('wui-indent', Indent)

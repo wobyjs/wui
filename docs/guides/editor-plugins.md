@@ -19,6 +19,11 @@ The `wui-editor` supports a plugin system for registering custom elements that a
 
 Plugins are registered via `registerEditorPlugin()` and automatically appear in the Insert dropdown menu below the built-in items.
 
+> This page covers the **Insert menu**: custom elements a plugin drops into the document.
+> A toolbar button, a formatting command or a keyboard chord is a different registry --
+> see [Extending the Editor Toolbar](./editor-toolbar.md). The two compose: register the
+> element here, and a toolbar item there if it deserves a button of its own.
+
 ## API Reference
 
 ### `registerEditorPlugin(plugin)`
@@ -262,3 +267,8 @@ menu and the property panel falls back to blind attribute rows.
 - **Custom element insertion**: Use `document.createElement()` + `range.insertNode()` — `execCommand('insertHTML')` strips unknown custom element tags in some browsers.
 - **Shadow DOM selection**: Always use `editorRoot.getRootNode().getSelection()` inside `onInsert` to get the correct selection (shadow root vs light DOM).
 - **Plugin deduplication**: Registering a plugin with the same `name` twice is a no-op (warning logged).
+
+## See also
+
+- [Extending the Editor Toolbar](./editor-toolbar.md) - commands, toolbar items and keyboard
+  chords, and the three different verbs for taking a built-in off the bar.

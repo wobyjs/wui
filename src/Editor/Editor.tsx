@@ -1,47 +1,31 @@
 import { useOnClickOutside } from '@woby/use'
 import { $, $$, type CustomElementChildren, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlClass, HtmlString, JSX, Observable, ObservableMaybe, untrack, useContext, useEffect, useMemo } from 'woby' // Added useEffect
-import { Button } from '../Button'
-import UndoIcon from '../icons/undo'
-import RedoIcon from '../icons/redo'
 import { getCurrentRange, expandRange, getElementsInRange, getSelectedTableCells, focusNextTableCell, convertToSemanticElement, findBlockParent, getCurrentEditor, useBlockEnforcer } from './utils'
-import { BoldButton } from './BoldButton'
-import { ItalicButton } from './ItalicButton'
-import { UnderlineButton } from './UnderlineButton' // Added UnderlineButton
 import { EditorContext, UndoRedo, useEditor, useUndoRedo, FocusManagerContext, ReadonlyContext, useReadonly } from './undoredo'
-import { FontSize } from './FontSize'
 import { List } from './List'
-import { Indent } from './Indent' // Will be part of TextAlignDropDown
 import { applyIndent as applyIndentStyle, applyListIndent } from './StyleEngine' // Import applyIndent from StyleEngine instead
-import { Blockquote } from './Blockquote'
-import { LayoutSwitch, editorLayout } from './LayoutSwitch'
-import { LanguageSwitch } from './LanguageSwitch'
-import { PrintButton } from './PrintButton'
-import { ZoomControl } from './ZoomControl'
-import { DocScroller, ScrollerToggle } from './DocScroller'
+import { editorLayout } from './LayoutSwitch'
+import { DocScroller } from './DocScroller'
 import { LAYOUT_ATTR, Layout, SELECTED_ATTR, silenceDuringLayout } from './PageLayout'
 import { FocusManager } from './FocusManager'
 
 // New Imports
-import { TextFormatDropDown, FORMAT_OPTIONS as editorFormatOptions } from './TextFormatDropDown' // Import formatOptions
-import { FontFamilyDropDown } from './FontFamilyDropDown'
-import { TextColorPicker } from './TextColorPicker'
-import { TextBackgroundColorPicker } from './TextBackgroundColorPicker' // Added TextBackgroundColorPicker
-import { TextFormatOptionsDropDown } from './TextFormatOptionsDropDown'
-import { InsertDropDown } from './InsertDropDown'
-import { TextAlignDropDown } from './TextAlignDropDown'
-import { UndoRedoButton } from './UndoRedoButton'
 import { ImageResizer, SELECT_IMAGE_EVENT, type SelectImageDetail } from './ImageResizer' // Image resize handles + align/indent mini-toolbar
 import { NodeMover } from './NodeMover' // Drag handle that repositions the node selection
 import { TablePopupMenu } from './TablePopupMenu' // Table cell popup menu
 import { ImageDialog, INSERT_IMAGE_EVENT, type InsertImageDetail } from './ImageDialog' // Insert-image modal (URL / file / drop / paste)
-import { InfoButton } from './InfoButton' // Info button for property panel
 import { PropertyPanel, PropertyPanelContext } from './PropertyPanel' // Property panel for selected element
 import { SelectionType, deleteSelectedElement, deleteRefusalReason, classifyElement } from './PropertyExtractor' // Selection type enum + node-selection delete + its guard
 import { editableContentTagNames, getEditorPlugins, resolveResizable } from './EditorPlugin' // For plugin tag name detection
+import { ToolbarSlot } from './EditorToolbarSlot'
+// Side effect: registers wui's own commands and its seven toolbar groups. Every
+// built-in button is a registration now, so this import is what puts them on screen.
+import './builtinToolbar'
+import { handleEditorKeyDown } from './EditorKeymap'
+import { EditorRuntimeBridge } from './EditorRuntimeBridge'
 import { arrowDirection, insertLineAfter, navigableBoxes, navigateFrom, placeCaretIn } from './NodeNavigation' // Arrow/Enter handling while a component is selected
 
 // StyleEngine imports for keyboard shortcuts
-import { applyBold, applyItalic, applyUnderline } from './StyleEngine'
 import { t } from '../i18n'
 
 
@@ -977,32 +961,15 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, height, maxHe
             // Don't preventDefault - let browser handle the deletion natively
         }
 
-        if (e.ctrlKey) {
-            // e.preventDefault(); e.stopPropagation();
-            switch (e.key.toLowerCase()) {
-                // Ctrl+Shift+Z is the Windows/Linux redo shortcut. Without the shift test
-                // it fell through to undo, so a user reaching for redo walked backwards
-                // through history and burned a redo entry on every press.
-                case 'z': e.shiftKey ? redo() : undo(); break;
-                case 'y': redo(); break;
-                case 'b':
-                    e.preventDefault();
-                    applyBold();
-                    saveDo();
-                    break;
-                case 'i':
-                    e.preventDefault();
-                    applyItalic();
-                    saveDo();
-                    break;
-                case 'u':
-                    e.preventDefault();
-                    applyUnderline();
-                    saveDo();
-                    break;
-                // case 'a': break;
-            }
-        }
+        // Every chord the editor answers to, from one table -- see `EditorKeymap.ts`. What
+        // stood here was a `switch (e.key)` over Ctrl+B/I/U/Z/Y, duplicated in the toolbar
+        // handler below with a subtly different key test; the lookup cannot drift from
+        // itself, and it routes through `runEditorCommand`, so a chord and a click produce
+        // one undo entry by the same path rather than by two hand-written `saveDo()` calls.
+        //
+        // The surface is passed explicitly: the keystroke happened in *this* editor, and
+        // resolving "whichever editor has the caret" would be a guess where there is a fact.
+        if (handleEditorKeyDown(e, $$(activeEditor))) return
     }
 
     /**
@@ -1099,127 +1066,67 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, height, maxHe
 // `toolbarRef` starts out empty (`$<HTMLDivElement>(null as any)`) and is only filled once the
 // toolbar element mounts, so the observable's value type includes `undefined`.
 const EditorToolbar = ({ toolbarRef }: { toolbarRef: Observable<HTMLDivElement | undefined> }) => {
-    const { redo, undo } = useUndoRedo()
-
-    // Helper for vertical dividers
-    const Divider = () => <div class="w-[1px] h-6 bg-gray-200 mx-1" />
-
     const BASE_CLASS = "sticky top-0 z-10 bg-white border border-gray-200 rounded-t-lg p-1.5 flex items-center flex-wrap gap-1 shadow-sm mb-0"
 
+    /**
+     * The toolbar has its own keydown handler because it is focusable: a user who tabs into
+     * it and presses Ctrl+Z means undo, and the surface's handler never sees that keystroke.
+     *
+     * It used to carry a second copy of the Ctrl+Z/Ctrl+Y switch, which is how the two
+     * drifted -- this one lowercased `e.key` and the surface's did not. Both now ask the
+     * same table. No editor element is passed: the caret is not in the event's target, so
+     * the command resolves the surface the user was last typing in, exactly as a toolbar
+     * button does.
+     */
     const handleToolbarKeyDown = (e: KeyboardEvent) => {
         e.preventDefault(); e.stopPropagation();
 
-        if (e.ctrlKey)
-            switch (e.key.toLowerCase()) {
-                // Same shift rule as the editor handler above. Lowercased too: with shift
-                // held, `e.key` is 'Z', which this switch never matched at all.
-                case 'z': e.shiftKey ? redo() : undo(); break
-                case 'y': redo(); break
-            }
-        else
-            switch (e.key) {
-                case 'Tab':
-                    // Tab in toolbar - delegate to editor's indent logic
-                    {
-                        // Editor surface lives inside wui-editor's shadow DOM
-                        const editor = document.querySelector('wui-editor') as HTMLElement | null
-                        const editorEl = editor?.shadowRoot?.querySelector('[data-editor-root]') as HTMLElement | null
-                        const shadow = editorEl?.getRootNode() as ShadowRoot | null
-                        const sel = (shadow as any)?.getSelection?.() ?? document.getSelection()
-                        const range = sel?.getRangeAt(0)
-                        if (range) {
-                            let node: Node | null = range.commonAncestorContainer
-                            while (node && (!shadow || node.getRootNode() === shadow)) {
-                                if (node instanceof HTMLElement) {
-                                    const tag = node.tagName.toUpperCase()
-                                    if (tag === 'LI' || tag === 'UL' || tag === 'OL') {
-                                        applyListIndent(e.shiftKey, 20)
-                                        return true
-                                    }
+        if (handleEditorKeyDown(e)) return true
+
+        switch (e.key) {
+            case 'Tab':
+                // Tab in toolbar - delegate to editor's indent logic
+                {
+                    // Editor surface lives inside wui-editor's shadow DOM
+                    const editor = document.querySelector('wui-editor') as HTMLElement | null
+                    const editorEl = editor?.shadowRoot?.querySelector('[data-editor-root]') as HTMLElement | null
+                    const shadow = editorEl?.getRootNode() as ShadowRoot | null
+                    const sel = (shadow as any)?.getSelection?.() ?? document.getSelection()
+                    const range = sel?.getRangeAt(0)
+                    if (range) {
+                        let node: Node | null = range.commonAncestorContainer
+                        while (node && (!shadow || node.getRootNode() === shadow)) {
+                            if (node instanceof HTMLElement) {
+                                const tag = node.tagName.toUpperCase()
+                                if (tag === 'LI' || tag === 'UL' || tag === 'OL') {
+                                    applyListIndent(e.shiftKey, 20)
+                                    return true
                                 }
-                                node = node.parentNode
                             }
+                            node = node.parentNode
                         }
-                        applyIndentStyle(e.shiftKey, 20)
                     }
-                    return true
-            }
+                    applyIndentStyle(e.shiftKey, 20)
+                }
+                return true
+        }
     }
 
-    const FullToolbar = () => {
-        return <>
-            {/* Group 1: History */}
-            <div class="flex items-center gap-0.5">
-                <UndoRedoButton mode="undo" />
-                <UndoRedoButton mode="redo" />
-            </div>
-
-            <Divider />
-
-            {/* Group 2: Text Structure */}
-            <div class="flex items-center gap-1">
-                <TextFormatDropDown />
-                <FontFamilyDropDown />
-                <FontSize />
-            </div>
-
-            <Divider />
-
-            {/* Group 3: Inline Styles */}
-            <div class="flex items-center gap-0.5">
-                <BoldButton />
-                <ItalicButton />
-                <UnderlineButton />
-            </div>
-
-            <Divider />
-
-            {/* Group 4: Colors */}
-            <div class="flex items-center gap-1">
-                <TextColorPicker />
-                <TextBackgroundColorPicker />
-                <TextFormatOptionsDropDown />
-            </div>
-
-            <Divider />
-
-            {/* Group 5: Lists & Alignment */}
-            <div class="flex items-center gap-0.5">
-                <List mode="bullet" />
-                <List mode="number" />
-                <List mode="checkbox" />
-                <TextAlignDropDown />
-                <Indent mode="decrease" />
-                <Indent mode="increase" />
-            </div>
-
-            <Divider />
-
-            {/* Group 6: Layout -- authoring / proofing / reading, and the paper it ends on.
-                Print sits with the switch and not with the inserts because it is the same
-                subject: it puts the editor into `page` and prints exactly what that mode
-                shows. */}
-            <div class="flex items-center gap-1">
-                <LayoutSwitch />
-                <ZoomControl />
-                <ScrollerToggle />
-                <PrintButton />
-            </div>
-
-            <Divider />
-
-            {/* Group 7: Advanced Inserts */}
-            <div class="flex items-center gap-1">
-                <InsertDropDown />
-                <Blockquote />
-                <InfoButton />
-                {/* Last in the row: it relabels the whole toolbar, so it reads as a
-                    property of the editor rather than of any one group above it. */}
-                <LanguageSwitch />
-            </div>
-        </>
-    }
-
+    /**
+     * wui's own seven groups, now drawn by the registry that third-party items go through.
+     *
+     * The JSX that used to live here moved verbatim into `builtinToolbar.tsx`, one
+     * `registerToolbarItem` per widget, with the band classes carried on the group
+     * registrations. `ToolbarSlot` renders them all in `order`, and built-ins sit at
+     * negative orders so an item registered with the documented default of `0` lands at
+     * the end of its band -- exactly where the appended `<ToolbarSlot />` used to put it.
+     *
+     * The DOM this produces is the DOM the hand-written version produced. That is the
+     * point: "plugin ready" means a plugin can insert between two built-ins, hide one, or
+     * replace it, and none of that is possible while the built-ins are hardcoded JSX and
+     * the extension point is a slot tacked on the end.
+     */
+    const FullToolbar = () => <ToolbarSlot />
 
     const DebugToolbar = () => {
         return <>
@@ -1312,6 +1219,7 @@ const Editor = defaults(def, (props) => {
             <ReadonlyContext.Provider value={isReadonly}>
                 <EditorContext.Provider value={editor}>
                     <UndoRedo>
+                        <EditorRuntimeBridge />
                         <EditorSurface
                             isEditing={isEditing}
                             handleEditorClick={handleEditorClick}
@@ -1332,6 +1240,7 @@ const Editor = defaults(def, (props) => {
             <ReadonlyContext.Provider value={isReadonly}>
                 <EditorContext.Provider value={editor}>
                     <UndoRedo>
+                        <EditorRuntimeBridge />
                         {() => !$$(isReadonly) && $$(isEditing) && $$(enableToolbar) && <EditorToolbar toolbarRef={toolbarRef} />}
                         <EditorSurface
                             isEditing={isEditing}
@@ -1355,6 +1264,11 @@ const Editor = defaults(def, (props) => {
                     <ReadonlyContext.Provider value={isReadonly}>
                         <EditorContext.Provider value={editor}>
                             <UndoRedo>
+                                {/* Publishes this editor's history + focus manager for
+                                    `runEditorCommand`. Inside `<UndoRedo>` because that is
+                                    where the context lives; not inside the toolbar, because
+                                    the toolbar is absent in readonly mode. */}
+                                <EditorRuntimeBridge />
                                 {() => !$$(isReadonly) && $$(enableToolbar) && <EditorToolbar toolbarRef={toolbarRef} />}
                                 <EditorSurface
                                     isEditing={isEditing}

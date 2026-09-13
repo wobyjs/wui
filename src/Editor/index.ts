@@ -24,8 +24,40 @@ export { applyStyle as applyStyleLegacy } from './utils'
 export { FocusManager } from './FocusManager'
 
 // Editor Plugin System
-export { BUILT_IN_ORDER, registerEditorPlugin, unregisterEditorPlugin, getEditorPlugins, getPluginForElement, pluginsToInsertItems, serializeEditorContent, deserializeEditorContent, resolveResizable, resolveAnchor, applyResize, constrainResize, resolvePageBreak, pageBreakTagNames } from './EditorPlugin'
-export type { EditorPlugin, InsertMenuItem, PluginProp, PluginPropType, PluginAction, ResizableSpec, ResizeWrite, PageBreakKind } from './EditorPlugin'
+export { BUILT_IN_ORDER, registerEditorPlugin, unregisterEditorPlugin, getEditorPlugins, getPluginForElement, pluginsToInsertItems, pluginGroups, serializeEditorContent, deserializeEditorContent, resolveResizable, resolveAnchor, applyResize, constrainResize, resolvePageBreak, pageBreakTagNames } from './EditorPlugin'
+export type { EditorPlugin, PluginGroup, InsertMenuItem, PluginProp, PluginPropType, PluginAction, ResizableSpec, ResizeWrite, PageBreakKind } from './EditorPlugin'
+
+// Editor Command System -- what the editor can *do*.
+//
+// `registerEditorCommand` + `runEditorCommand` is the whole surface for a third party that
+// wants a new formatting verb: the selection caching, shadow-root range resolution, focus
+// restore and undo step are handled, and the registrant writes only `run`.
+export { registerEditorCommand, unregisterEditorCommand, getEditorCommand, getEditorCommands, buildCommandContext, runEditorCommand, attachEditorRuntime, getEditorRuntime } from './EditorCommand'
+export type { EditorCommand, CommandContext, EditorRuntime, RunCommandOptions } from './EditorCommand'
+
+// Editor Toolbar System -- what the editor *shows*.
+//
+// Split from the commands because the relationship is not one to one: a command can have no
+// button, a button can drive six commands, and hiding a button must not remove the verb.
+export { TOOLBAR_GROUPS, registerToolbarItem, unregisterToolbarItem, getToolbarItems, registerToolbarGroup, getToolbarGroups, hideToolbarItem, showToolbarItem, isToolbarItemHidden, resolveToolbarItems } from './EditorToolbarItem'
+export type { ToolbarItem, ToolbarGroup, ResolvedToolbarGroup } from './EditorToolbarItem'
+export { ToolbarSlot } from './EditorToolbarSlot'
+export { CommandButton } from './CommandButton'
+
+// The dismissal a third-party dropdown needs. Not a convenience: `@woby/use`'s
+// `useEventListener` memoises by (target, event), so a hand-rolled outside-click listener on
+// `window` is silently never registered once anything else has claimed that pair -- and the
+// editor lives in a shadow root, where `contains(e.target)` answers "outside" for every click
+// including the ones on the menu itself. Both traps are already sprung in here.
+export { useDropdownDismiss } from './useDropdownDismiss'
+
+// Editor Keymap -- how a command is *reached* from the keyboard.
+//
+// The third registry, and the one that makes the split above pay off: a chord names a
+// command, so binding a key needs no widget and hiding a widget does not lose the key.
+// Write `Mod` for Cmd-on-macOS / Ctrl-elsewhere.
+export { registerEditorKeys, unregisterEditorKeys, getEditorKeys, getChordFor, handleEditorKeyDown } from './EditorKeymap'
+export type { KeyBinding } from './EditorKeymap'
 
 // Page layout -- flow / page / screen.
 //
