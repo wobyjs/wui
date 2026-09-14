@@ -353,8 +353,8 @@ const InsertDropDown = defaults(def, (props) => {
                 // to its full 16×16 is both wider and taller than those limits, and the limits
                 // would clip it rather than scroll it usefully, so they come off while it is up.
                 class={() => $$(showGrid)
-                    ? "origin-top-left absolute left-0 mt-2 w-auto rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10"
-                    : "origin-top-left absolute left-0 mt-2 w-64 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10 max-h-80 overflow-y-auto"}
+                    ? "origin-top-left absolute left-0 top-full mt-2 w-auto rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10"
+                    : "origin-top-left absolute left-0 top-full mt-2 w-64 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10 max-h-80 overflow-y-auto"}
                 role="menu"
                 aria-orientation="vertical"
                 aria-labelledby="insert-menu-button"

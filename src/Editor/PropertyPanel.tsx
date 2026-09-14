@@ -1026,7 +1026,7 @@ const MIN_W = 240
                 // which is where the docked panel used to live.
                 const pos = p
                     ? { left: `${p.x}px`, top: `${p.y}px`, right: 'auto' }
-                    : { right: '24px', top: '96px', left: 'auto' }
+                    : { right: '24px', top: '208px', left: 'auto' }
                 // Keys stay identical across both branches so clearing a resize actually
                 // hands the sizing back to the classes instead of leaving stale inline px.
                 return s
