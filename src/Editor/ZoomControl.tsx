@@ -38,6 +38,7 @@ import { useDropdownDismiss } from './useDropdownDismiss'
 import { setLayoutZoom, resolvedZoom, onZoomApplied, ZOOM_MIN, ZOOM_MAX, type ZoomLevel } from './PageLayout'
 import { editorLayout } from './LayoutSwitch'
 import { t } from '../i18n'
+import { TOOLBAR_CONTROL, TOOLBAR_CONTROL_WRAP } from './toolbarControl'
 
 /** The stops `−` and `+` walk between. Coarse at the ends, fine around 100%. */
 const STEPS = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 2, 3, 4]
@@ -194,9 +195,10 @@ const ZoomControl = defaults(def, (props) => {
     // collapses the selection, and the author's place is the thing a zoom must not cost.
     const hold = (e: any) => { e.preventDefault(); e.stopPropagation() }
 
-    return <div class={() => ['relative inline-flex items-center gap-0.5', () => $$(cls) ? $$(cls) : $$(cn)]} ref={dropdownRef}>
+    return <div class={() => [TOOLBAR_CONTROL_WRAP, 'relative inline-flex items-center gap-0.5', () => $$(cls) ? $$(cls) : $$(cn)]} ref={dropdownRef}>
         <Button
             type={buttonType}
+            class={TOOLBAR_CONTROL}
             title={() => zoomStr('outTitle')}
             onClick={step(-1)}
             onMouseDown={hold}
@@ -206,6 +208,7 @@ const ZoomControl = defaults(def, (props) => {
 
         <Button
             type={buttonType}
+            class={TOOLBAR_CONTROL}
             title={() => zoomStr('menuTitle')}
             onClick={() => isOpen(!$$(isOpen))}
             onMouseDown={hold}
@@ -217,6 +220,7 @@ const ZoomControl = defaults(def, (props) => {
 
         <Button
             type={buttonType}
+            class={TOOLBAR_CONTROL}
             title={() => zoomStr('inTitle')}
             onClick={step(1)}
             onMouseDown={hold}

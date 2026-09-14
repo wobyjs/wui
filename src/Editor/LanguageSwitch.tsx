@@ -21,6 +21,7 @@ import { useDropdownDismiss } from './useDropdownDismiss'
 import { availableLocales, locale, setLocale, t, type LocaleInfo } from '../i18n'
 import LanguageIcon from '../icons/language'
 import KeyboardDownArrow from '../icons/keyboard_down_arrow'
+import { TOOLBAR_CONTROL, TOOLBAR_CONTROL_WRAP } from './toolbarControl'
 
 const def = () => ({
     cls: $('', HtmlClass) as JSX.Class,
@@ -98,12 +99,12 @@ const LanguageSwitch = defaults(def, (props) => {
 
     return (
         <div
-            class={() => [() => $$(cls) ? $$(cls) : 'relative inline-block text-left', cn]}
+            class={() => [TOOLBAR_CONTROL_WRAP, () => $$(cls) ? $$(cls) : 'relative inline-block text-left', cn]}
             ref={dropdownRef}
         >
             <Button
                 type={buttonType}
-                cls={[BASE_BTN]}
+                cls={[BASE_BTN, TOOLBAR_CONTROL]}
                 title={() => t('editor.language.choose')}
                 aria-label={() => t('editor.language')}
                 onClick={(e) => { e.preventDefault(); e.stopPropagation(); isOpen(!$$(isOpen)) }}

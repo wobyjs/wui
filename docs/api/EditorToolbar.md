@@ -264,6 +264,41 @@ than throwing.
 
 ---
 
+## Your widget must wear `TOOLBAR_CONTROL`
+
+The toolbar does **not** size what you render. It is a `flex items-center` band, so a widget that
+is taller than the rest pushes nothing around — it just sits on a different baseline, and the
+whole row looks crooked. The heights are stated once, in `toolbarControl.ts`:
+
+| Export | Value | Use it on |
+| --- | --- | --- |
+| **TOOLBAR_CONTROL** | `!h-8 !box-border !py-0 !inline-flex !items-center` | the control itself — a button, a dropdown trigger, a stepper key |
+| **TOOLBAR_CONTROL_WRAP** | `!h-8 !box-border !inline-flex !items-center` | the `relative` wrapper a dropdown puts around its trigger and its panel |
+| **TOOLBAR_CONTROL_BOX** | `!h-8 !box-border` | a wrapper that already lays its children out correctly |
+| **TOOLBAR_CONTROL_HEIGHT** | `32` | when you need the number rather than the class |
+
+```tsx
+import { TOOLBAR_CONTROL } from '@woby/wui/Editor/toolbarControl'
+
+registerToolbarItem({
+    name: 'acme.stamp',
+    group: 'insert',
+    render: () => <Button class={TOOLBAR_CONTROL} onClick={…}>Stamp</Button>,
+})
+```
+
+Every utility is `!`-important on purpose. The string is appended to a class list that already
+contains `py-2` or `p-1.5`, and Tailwind emits utilities in its own order rather than the order
+they appear in the attribute — a plain `py-0` would silently lose to the `py-2` in `Button`'s
+variant table. Only vertical padding is zeroed; horizontal padding, colours, hover states and
+rounding are untouched, so widths and the design stay as they were.
+
+A wrapper needs `TOOLBAR_CONTROL_WRAP` rather than the plain box because an `inline-block` that
+contains an inline-level child also contains a *line box*, and the line box reserves room for
+descenders — worth half a pixel, which is enough to break the row.
+
+---
+
 # 3. Keymap
 
 ## Interface: `KeyBinding`
@@ -509,5 +544,6 @@ dispatch through actual key events — is not covered by these and is verified a
 - [Extending the Editor Toolbar](../guides/editor-toolbar.md) — the narrative guide
 - [EditorPlugin](./EditorPlugin.md) — registering custom elements that appear in the Insert menu
   and render inline, with typed `props` for the property panel
+- [EditorHelp](./EditorHelp.md) — the fourth registry: coachmark steps anchored to these items
 - [Editor](./Editor.md) — the component these registries drive
 - [I18n](./I18n.md) — `t()` vs `tx()`, and writing a locale pack

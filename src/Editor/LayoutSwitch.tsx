@@ -25,6 +25,7 @@ import { useEditor } from './undoredo'
 import { getCurrentEditor } from './utils'
 import { applyLayout, flushLayoutSilenced, Layout, type LayoutMode } from './PageLayout'
 import { t } from '../i18n'
+import { TOOLBAR_CONTROL } from './toolbarControl'
 
 /**
  * The mode the editor is in, as an observable, so anything else in the editor can react
@@ -127,6 +128,7 @@ const LayoutSwitch = defaults(def, (props) => {
             type={buttonType}
             title={title}
             class={() => [
+                TOOLBAR_CONTROL,
                 () => $$(cls) ? $$(cls) : $$(cn),
                 () => $$(editorLayout) === mode ? '!bg-slate-200' : '',
             ]}

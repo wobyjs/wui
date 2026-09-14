@@ -6,6 +6,7 @@ import { useFocusManager, useUndoRedo } from './undoredo'
 import { usePropertyPanel } from './PropertyPanel'
 import { detectSelectionType } from './PropertyExtractor'
 import { localized } from '../i18n'
+import { TOOLBAR_CONTROL } from './toolbarControl'
 
 const def = () => ({
     buttonType: $("outlined", HtmlString) as ObservableMaybe<ButtonStyles>,
@@ -83,6 +84,7 @@ const InfoButton: Defaulted<typeof def> = defaults(def, (props) => {
             type={btnType}
             title={localized(title, 'editor.properties')}
             class={() => [
+                TOOLBAR_CONTROL,
                 () => $$(cls) ? $$(cls) : $$(cn),
                 "border-none hover:bg-gray-100 p-1.5"
             ]}

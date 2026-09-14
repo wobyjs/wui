@@ -8,6 +8,7 @@ import ListBulleted from '../icons/list_bulleted'
 import ListNumbered from '../icons/list_numbered'
 import ListCheckbox from '../icons/list_checkbox'
 import { t } from '../i18n'
+import { TOOLBAR_CONTROL } from './toolbarControl'
 
 // #region Types & Configuration
 type ListMode = "bullet" | "number" | "checkbox"
@@ -160,6 +161,7 @@ const List = defaults(def, (props) => {
             onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation(); }}
             title={() => listProps().title}
             class={() => [
+                TOOLBAR_CONTROL,
                 () => $$(cls) ? $$(cls) : $$(cn),
                 () => $$(isActive) ? '!bg-slate-200' : ''
             ]}

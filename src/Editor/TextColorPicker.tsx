@@ -5,6 +5,7 @@ import A from '../icons/a'
 import KeyboardDownArrow from '../icons/keyboard_down_arrow'
 import { applyTextColor } from './StyleEngine'
 import { t } from '../i18n'
+import { TOOLBAR_CONTROL, TOOLBAR_CONTROL_WRAP } from './toolbarControl'
 
 const def = () => ({
     cls: $('', HtmlClass) as JSX.Class,
@@ -69,13 +70,14 @@ const TextColorPicker = defaults(def, (props) => {
         if (input) input.onclick = (e: MouseEvent) => e.stopPropagation()
     })
 
-    const icons = () => { return <A class="w-7 h-6" fill={selectedColor} /> }
+    const icons = () => { return <A class="w-7 h-5" fill={selectedColor} /> }
 
     return (
-        <div class="relative inline-block text-left">
+        <div class={[TOOLBAR_CONTROL_WRAP, "relative inline-block text-left"]}>
             <Button
                 type={btnType}
                 class={() => [
+                    TOOLBAR_CONTROL,
                     () => $$(cls) ? $$(cls) : BASE_BTN, cn,
                 ]}
                 title={() => t('editor.textColor')}
@@ -90,7 +92,7 @@ const TextColorPicker = defaults(def, (props) => {
                         type="color"
                         value={selectedColor}
                         onInput={handleNativeColorInputChange}
-                        class="w-full h-3 p-0 border-0"
+                        class="w-full h-2 p-0 border-0"
                     />
                 </div>
 

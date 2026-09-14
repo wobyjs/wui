@@ -50,6 +50,7 @@ import { Button } from '../Button'
 import { editorLayout } from './LayoutSwitch'
 import { Layout, PAGE_ATTR, PAGE_CHROME_ATTR, pageMetrics } from './PageLayout'
 import { t } from '../i18n'
+import { TOOLBAR_CONTROL } from './toolbarControl'
 
 /**
  * Whether the rail is showing. Module-level for the same reason {@link editorLayout} is:
@@ -511,6 +512,7 @@ const ScrollerToggle = defaults(toggleDef, (props) => {
         type="text"
         title={() => $$(editorLayout) === Layout.page ? t('editor.scroller.thumbnails') : t('editor.scroller.map')}
         class={() => [
+            TOOLBAR_CONTROL,
             () => $$(cls) ? $$(cls) : $$(cn),
             () => $$(scrollerOpen) ? '!bg-slate-200' : '',
         ]}

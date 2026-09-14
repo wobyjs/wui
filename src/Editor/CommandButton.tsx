@@ -4,6 +4,7 @@ import { useEditor, useFocusManager } from './undoredo'
 import { getCurrentEditor } from './utils'
 import { buildCommandContext, getEditorCommand, runEditorCommand } from './EditorCommand'
 import { t, tx } from '../i18n'
+import { TOOLBAR_CONTROL } from './toolbarControl'
 
 /**
  * # The standard button for a registered command
@@ -140,6 +141,7 @@ const CommandButton: Defaulted<typeof def> = defaults(def, (props) => {
             type={btnType}
             title={caption}
             class={() => [
+                TOOLBAR_CONTROL,
                 () => $$(cls) ? $$(cls) : $$(cn),
                 () => $$(isActive) ? '!bg-slate-200' : '',
                 () => $$(isMixed) ? '!bg-slate-100 opacity-60' : ''

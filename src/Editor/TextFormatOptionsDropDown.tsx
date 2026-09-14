@@ -8,6 +8,7 @@ import { applyStyle, applyBackgroundColor, removeFormat, saveSelectionAsOffsets,
 
 import StrikethroughIcon from '../icons/strikethrough'
 import { localized, t } from '../i18n'
+import { TOOLBAR_CONTROL, TOOLBAR_CONTROL_WRAP } from './toolbarControl'
 
 // Icons (placeholders, replace with actual icons)
 const Strikethrough = () => <span class="font-bold">S</span>
@@ -281,11 +282,12 @@ const TextFormatOptionsDropDown = defaults(def, (props) => {
 
 
     return (
-        <div class={() => ["relative inline-block text-left", cls]} ref={dropdownRef}>
+        <div class={() => [TOOLBAR_CONTROL_WRAP, "relative inline-block text-left", cls]} ref={dropdownRef}>
             <div>
                 <Button
                     type={btnType}
                     class={() => [
+                        TOOLBAR_CONTROL,
                         () => $$(cls) ? $$(cls) : BASE_BTN, cn,
                     ]}
                     onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation(); }}

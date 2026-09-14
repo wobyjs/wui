@@ -10,6 +10,7 @@ import { INSERT_IMAGE_EVENT, type InsertImageDetail } from './ImageDialog'
 import { TableGridPicker } from './TableGridPicker'
 import { insertionRange } from './BlockInsert'
 import { t, tx } from '../i18n'
+import { TOOLBAR_CONTROL, TOOLBAR_CONTROL_WRAP } from './toolbarControl'
 
 // Emoji, to match every registered plugin's icon. The built-in rows used to be the three
 // letters of their own label ("Img", "Tbl"), which made the top of a sorted menu read as
@@ -406,11 +407,19 @@ const InsertDropDown = defaults(def, (props) => {
     const BASE_BTN = "size-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-black hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500"
 
     return (
-        <div class="relative inline-block text-left" ref={dropdownRef}>
+        <div
+            // `data-plugin-group` is how the help tour anchors a step at a specific
+            // family: the registry's `{at:'pluginGroup',group:...}` target resolves
+            // against this attribute. Only stamped when a group is actually
+            // supplied, so wui's own menu does not match the attribute query.
+            class={[TOOLBAR_CONTROL_WRAP, "relative inline-block text-left"]}
+            ref={dropdownRef}
+            {...($$(group) ? { 'data-plugin-group': $$(group) } : {})}
+        >
             <div class="flex">
                 <Button
                     type='outlined'
-                    cls={() => [BASE_BTN]}
+                    cls={() => [BASE_BTN, TOOLBAR_CONTROL]}
                     onClick={toggleDropdown}
                     title={() => { const g = groupInfo(); return g ? tx(g.label) : t('editor.insertContent') }}
                     disabled={disabled}
@@ -424,7 +433,7 @@ const InsertDropDown = defaults(def, (props) => {
                 </Button>
                 <Button
                     type='outlined'
-                    class="size-full inline-flex justify-center items-center rounded-md border border-gray-300 shadow-sm bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500 cursor-pointer px-2"
+                    class={[TOOLBAR_CONTROL, "size-full inline-flex justify-center items-center rounded-md border border-gray-300 shadow-sm bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500 cursor-pointer px-2"]}
                     onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleDropdown(); }}
                     onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation(); }}
                     title={() => t('editor.chooseWhatToInsert')}

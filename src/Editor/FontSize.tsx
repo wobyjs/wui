@@ -7,6 +7,7 @@ import { getCurrentEditor } from './utils'
 import { applyFontSize as applyFontSizeStyle } from './StyleEngine'
 import { safeGetSelection, safeGetRange } from './BrowserCompat'
 import { t } from '../i18n'
+import { TOOLBAR_CONTROL, TOOLBAR_CONTROL_BOX } from './toolbarControl'
 
 const def = () => ({
     cls: $('', HtmlClass) as JSX.Class,
@@ -134,7 +135,7 @@ const FontSize: Defaulted<typeof def> = defaults(def, (props) => {
     const StepButton = ({ type, delta, icon: Icon, rounded }: any) => (
         <Button
             type="outlined"
-            cls={[BASE_BTN, rounded]}
+            cls={[BASE_BTN, TOOLBAR_CONTROL, rounded]}
             title={() => t(type === 'decrease' ? 'editor.decreaseFontSize' : 'editor.increaseFontSize')}
             onClick={onStepClick(delta)}
             onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation(); }}
@@ -159,7 +160,7 @@ const FontSize: Defaulted<typeof def> = defaults(def, (props) => {
     // #endregion
 
     return (
-        <div class={[cls, "inline-flex items-stretch rounded-md shadow-sm", cn]}>
+        <div class={[cls, TOOLBAR_CONTROL_BOX, "inline-flex items-stretch rounded-md shadow-sm", cn]}>
             <StepButton type="decrease" delta={-$$(step)} icon={TextDecrease} rounded="rounded-r-none" />
             <SizeInput />
             <StepButton type="increase" delta={$$(step)} icon={TextIncrease} rounded="rounded-l-none" />

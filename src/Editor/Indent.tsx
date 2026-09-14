@@ -7,6 +7,7 @@ import { getCurrentEditor } from "./utils"
 import { applyIndent as applyIndentStyle, applyListIndent } from './StyleEngine'
 import { applyBlockCommandToSelectedImage } from './ImageActions'
 import { t } from '../i18n'
+import { TOOLBAR_CONTROL } from './toolbarControl'
 
 type IndentMode = "increase" | "decrease"
 
@@ -53,6 +54,7 @@ const Indent: Defaulted<typeof def> = defaults(def, (props) => {
             type={buttonType}
             title={displayTitle}
             class={() => [
+                TOOLBAR_CONTROL,
                 () => $$(cls) ? $$(cls) : $$(cn)
             ]}
             disabled={disabled}

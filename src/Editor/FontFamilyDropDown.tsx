@@ -6,6 +6,7 @@ import { getCurrentRange } from './utils'
 import { applyFontFamily as applyFontFamilyStyle } from './StyleEngine'
 import KeyboardDownArrow from '../icons/keyboard_down_arrow'
 import { t } from '../i18n'
+import { TOOLBAR_CONTROL, TOOLBAR_CONTROL_WRAP } from './toolbarControl'
 
 const FONT_FAMILY = [
     { label: 'Arial', value: 'Arial, Helvetica, sans-serif' },
@@ -171,12 +172,13 @@ const FontFamilyDropDown = defaults(def, (props) => {
     return (
         <div
             class={() => [
+                TOOLBAR_CONTROL_WRAP,
                 () => $$(cls) ? $$(cls) : "relative inline-block text-left", cn,
             ]} ref={dropdownRef}>
             <div class="flex">
                 <Button
                     type='outlined'
-                    cls={() => [BASE_BTN]}
+                    cls={() => [BASE_BTN, TOOLBAR_CONTROL]}
                     onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation() }}
                     onClick={handleApplyCurrent}
                     title={() => t('editor.fontFamily')}
@@ -188,7 +190,7 @@ const FontFamilyDropDown = defaults(def, (props) => {
                 </Button>
                 <Button
                     type='outlined'
-                    class="size-full inline-flex justify-center items-center rounded-md border border-gray-300 shadow-sm bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500 cursor-pointer px-2"
+                    class={[TOOLBAR_CONTROL, "size-full inline-flex justify-center items-center rounded-md border border-gray-300 shadow-sm bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500 cursor-pointer px-2"]}
                     onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleDropdown(); }}
                     onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation(); }}
                     title={() => t('editor.chooseFontFamily')}

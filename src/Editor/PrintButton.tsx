@@ -19,6 +19,7 @@ import { getCurrentEditor } from './utils'
 import { setEditorLayout } from './LayoutSwitch'
 import { printEditor } from './Print'
 import { localized } from '../i18n'
+import { TOOLBAR_CONTROL } from './toolbarControl'
 
 const def = () => ({
     type: $('outlined', HtmlString) as ObservableMaybe<ButtonStyles>,
@@ -54,6 +55,7 @@ const PrintButton = defaults(def, (props) => {
             // given, so losing it here would lose the author's place.
             onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation() }}
             cls={() => [
+                TOOLBAR_CONTROL,
                 'border-none p-1.5 transition-all',
                 'text-gray-700 hover:bg-gray-100 cursor-pointer',
                 () => $$(cls) ? $$(cls) : $$(cn),

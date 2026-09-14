@@ -5,6 +5,7 @@ import FormatInkHighlighter from '../icons/format_ink_highlighter' // Import the
 import KeyboardDownArrow from '../icons/keyboard_down_arrow'
 import { applyBackgroundColor } from './StyleEngine'
 import { t } from '../i18n'
+import { TOOLBAR_CONTROL, TOOLBAR_CONTROL_WRAP } from './toolbarControl'
 
 const def = () => ({
     cls: $('', HtmlClass) as JSX.Class,
@@ -74,13 +75,14 @@ const TextBackgroundColorPicker = defaults(def, (props) => {
         if (input) input.onclick = (e: MouseEvent) => e.stopPropagation()
     })
 
-    const icons = () => { return <FormatInkHighlighter class="w-7 h-6" fill={selectedBgColor} /> }
+    const icons = () => { return <FormatInkHighlighter class="w-7 h-5" fill={selectedBgColor} /> }
 
     return (
-        <div class="relative inline-block text-left">
+        <div class={[TOOLBAR_CONTROL_WRAP, "relative inline-block text-left"]}>
             <Button
                 type={btnType}
                 class={() => [
+                    TOOLBAR_CONTROL,
                     () => $$(cls) ? $$(cls) : BASE_BTN,
                     cn,
                 ]}
@@ -96,7 +98,7 @@ const TextBackgroundColorPicker = defaults(def, (props) => {
                         type="color"
                         value={selectedBgColor}
                         onInput={handleNativeBgColorInputChange}
-                        class="w-full h-3 p-0 border-0"
+                        class="w-full h-2 p-0 border-0"
                     />
                 </div>
 

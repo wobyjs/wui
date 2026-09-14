@@ -7,6 +7,7 @@ import { getCurrentEditor, getSelection } from './utils'
 import { QUOTE_TAG, QUOTE_CLASSES } from './Blockquote'
 import { applyFormatBlock as applyFormatBlockStyle } from './StyleEngine'
 import { t } from '../i18n'
+import { TOOLBAR_CONTROL, TOOLBAR_CONTROL_WRAP } from './toolbarControl'
 
 // Dropdown items configuration.
 //
@@ -209,11 +210,12 @@ const TextFormatDropDown = defaults(def, (props) => {
 
 
     return (
-        <div class={() => ["relative inline-block text-left", cls]} ref={dropdownRef}>
+        <div class={() => [TOOLBAR_CONTROL_WRAP, "relative inline-block text-left", cls]} ref={dropdownRef}>
             <div class="flex">
                 <Button
                     type={btnType}
                     class={() => [
+                        TOOLBAR_CONTROL,
                         () => $$(cls) ? $$(cls) : BASE_BTN, cn,
                     ]}
                     onClick={handleApplyCurrent}
@@ -227,7 +229,7 @@ const TextFormatDropDown = defaults(def, (props) => {
                 </Button>
                 <Button
                     type={btnType}
-                    class="size-full inline-flex justify-center items-center rounded-md border border-gray-300 shadow-sm bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500 cursor-pointer px-2"
+                    class={[TOOLBAR_CONTROL, "size-full inline-flex justify-center items-center rounded-md border border-gray-300 shadow-sm bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500 cursor-pointer px-2"]}
                     onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleDropdown(); }}
                     onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation(); }}
                     title={() => t('editor.paragraphStyle')}
