@@ -17,7 +17,7 @@ export const BooleanEditor = () => {
 		const { value, reactive, editorName } = props
 
 		return skippedProperties.includes(editorName) ? null : (
-			<TableRow optionName={() => rowLabel(editorName)} action={(value as any)?.action} hint={(value as any)?.hint}>
+			<TableRow optionName={() => rowLabel(editorName)} prop={editorName} action={(value as any)?.action} hint={(value as any)?.hint}>
 				<BoolEditor
 					value={value}
 					reactive={reactive}

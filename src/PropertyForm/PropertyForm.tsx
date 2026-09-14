@@ -72,8 +72,8 @@ export type RowAction = {
 	run: () => void
 }
 
-export const TableRow = (props: { optionName?: JSX.Child, children?: JSX.Child, indentLvl?: number, action?: RowAction, hint?: string }) => {
-	const { optionName, children, indentLvl, action, hint } = props
+export const TableRow = (props: { optionName?: JSX.Child, children?: JSX.Child, indentLvl?: number, action?: RowAction, hint?: string, prop?: string }) => {
+	const { optionName, children, indentLvl, action, hint, prop } = props
 
 	// Read once into a thunk so both the tooltip and the cursor affordance see the same
 	// value, and so `tx` -- which reads the `locale` observable -- is only ever called
@@ -85,7 +85,7 @@ export const TableRow = (props: { optionName?: JSX.Child, children?: JSX.Child, 
 	}
 
 	return (
-		<tr class="flex w-full items-stretch border-x border-b border-gray-200 bg-white first:border-t transition-colors hover:bg-gray-50/30">
+		<tr data-prop-row={prop} class="flex w-full items-stretch border-x border-b border-gray-200 bg-white first:border-t transition-colors hover:bg-gray-50/30">
 			{/*
 			  * `title` sits on the cell, not on the <span> inside it: that span carries
 			  * `pointer-events-none`, and an element the pointer cannot reach never shows a
