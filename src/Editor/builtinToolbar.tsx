@@ -18,7 +18,9 @@ import { InsertDropDown } from './InsertDropDown'
 import { InfoButton } from './InfoButton'
 import { LanguageSwitch } from './LanguageSwitch'
 import { pluginGroups } from './EditorPlugin'
+import { HelpButton } from './HelpButton'
 import './builtinCommands'
+import { TOOLBAR_CONTROL } from './toolbarControl'
 
 /**
  * # wui's own toolbar, as registrations
@@ -171,6 +173,12 @@ registerToolbarItem({ name: 'info', group: 'insert', order: step(3), render: () 
 // Last in the row: it relabels the whole toolbar, so it reads as a property of the editor
 // rather than of any one group above it.
 registerToolbarItem({ name: 'language', group: 'insert', order: step(4), render: () => <LanguageSwitch /> })
+
+// After language, on the same "property of the editor as a whole" reasoning: the help
+// tour is editor-scoped rather than group-scoped, so it belongs at the very end of the
+// bar. A host that does not want a button can hide it with `hideToolbarItem('help')` —
+// `startHelpTour()` still runs.
+registerToolbarItem({ name: 'help', group: 'insert', order: step(5), render: () => <HelpButton class={TOOLBAR_CONTROL} /> })
 // #endregion
 
 /** Re-exported so `Editor.tsx` has something to import besides a bare side effect. */

@@ -15,12 +15,17 @@ import { NodeMover } from './NodeMover' // Drag handle that repositions the node
 import { TablePopupMenu } from './TablePopupMenu' // Table cell popup menu
 import { ImageDialog, INSERT_IMAGE_EVENT, type InsertImageDetail } from './ImageDialog' // Insert-image modal (URL / file / drop / paste)
 import { PropertyPanel, PropertyPanelContext } from './PropertyPanel' // Property panel for selected element
+import { HelpTour } from './HelpTour' // In-place help tour — mounted once per editor, gated on `helpTourActive`.
+import { helpTourActive } from './EditorHelpStep' // The observable the help-tour gate below reads
 import { SelectionType, deleteSelectedElement, deleteRefusalReason, classifyElement } from './PropertyExtractor' // Selection type enum + node-selection delete + its guard
 import { editableContentTagNames, getEditorPlugins, resolveResizable } from './EditorPlugin' // For plugin tag name detection
 import { ToolbarSlot } from './EditorToolbarSlot'
 // Side effect: registers wui's own commands and its seven toolbar groups. Every
 // built-in button is a registration now, so this import is what puts them on screen.
 import './builtinToolbar'
+// Side effect: registers wui's own help steps (welcome, type, format, insert, etc.) and
+// the `help` toolbar item. Hosts add their own steps via `registerHelpSteps()`.
+import './builtinHelp'
 import { handleEditorKeyDown } from './EditorKeymap'
 import { EditorRuntimeBridge } from './EditorRuntimeBridge'
 import { arrowDirection, insertLineAfter, navigableBoxes, navigateFrom, placeCaretIn } from './NodeNavigation' // Arrow/Enter handling while a component is selected
@@ -1047,6 +1052,14 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, height, maxHe
             <DocScroller />
             </div>
             <ImageResizer />
+            {/* Help tour overlay — sits inside the same `relative` parent so the
+                balloon's surface-relative offsets work. The gate must be a direct
+                child of this container (same shape as the toolbar's gate above):
+                a gate returned from inside a component is flattened once,
+                untracked, and never re-runs. While no tour runs the subtree and
+                its listeners are absent; HelpTour resolves the surface itself, so
+                it does not wait for `activeEditor` to land before mounting. */}
+            {() => $$(helpTourActive) !== null ? <HelpTour /> : null}
             <NodeMover />
             <TablePopupMenu />
             <PropertyPanel />

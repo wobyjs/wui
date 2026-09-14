@@ -375,7 +375,11 @@ export const StyleEditor = ({ target, onEdit, open }: StyleEditorProps) => {
     )
 
     return (
-        <div class="border-t border-gray-200">
+        // `data-panel-part` is the help tour's anchor vocabulary (see
+        // `EditorHelpStep.ts`). Stamped here rather than on a wrapper in
+        // PropertyPanel so the section's own box is what gets spotlit --
+        // a wrapper would include the margin collapse above it.
+        <div data-panel-part="style" class="border-t border-gray-200">
             <button
                 type="button"
                 class="flex w-full items-center gap-2 px-3 py-2 text-left bg-gray-100 hover:bg-gray-200 border-b border-gray-200"

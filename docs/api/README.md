@@ -77,6 +77,7 @@ One or more examples showing how to use the API in TSX and HTML.
 - `DocScroller.md`
 - `DropdownEditor.md`
 - `Editor.md`
+- `EditorHelp.md`
 - `EditorPlugin.md`
 - `EditorProps.md`
 - `EditorToolbar.md`

@@ -28,6 +28,8 @@ import { openImageEditor } from './ImageEditor'
 import { ORIGIN_ATTR, readImageOrigin } from './ImageSource'
 import { useEditor, useUndoRedo } from './undoredo'
 import { t, tx } from '../i18n'
+import { startHelpTour } from './EditorHelpStep'
+import './builtinHelpProperties' // Side-effect: registers the `properties` tour
 import { StyleEditor } from './StyleEditor'
 import ArrowUpward from '../icons/arrow_upward'
 import DeleteOutline from '../icons/delete_outline'
@@ -1005,6 +1007,12 @@ const MIN_W = 240
     return (
         <div
             data-property-panel
+            // Opt the panel into the help balloon's keep-clear rule: a step
+            // pointing at a control near the panel's right edge gets its card
+            // placed beside the *panel*, not beside the button — otherwise the
+            // card lands on top of the panel it is describing. See `computeGeom`
+            // in `HelpBalloon.tsx`.
+            data-help-clear
             ref={(el) => { panelEl = el as HTMLElement }}
             class={() => [
                 "fixed flex flex-col w-[300px] max-h-[70vh] overflow-hidden z-[1100]",
@@ -1041,6 +1049,7 @@ const MIN_W = 240
         >
             {/* Header — doubles as the drag handle */}
             <div
+                data-panel-part="header"
                 ref={(el) => { if (el) (el as HTMLElement).onpointerdown = startDrag }}
                 class={() => [
                     "px-3 py-2 bg-gray-50 border-b border-gray-200 flex items-center justify-between select-none",
@@ -1051,6 +1060,7 @@ const MIN_W = 240
                 {/* Left cluster: climb-to-parent, then what is currently targeted. */}
                 <div class="flex items-center gap-2 min-w-0">
                     <button
+                        data-panel-part="parent"
                         ref={(el) => {
                             // Ref-based onclick, matching the close button: woby's synthetic
                             // onClick delegation does not reach inside a shadow root, which is
@@ -1076,7 +1086,7 @@ const MIN_W = 240
                     {/* Tag name first, kind second. The tag is the part that changes as the
                         user climbs (td -> tr -> table), so it carries the information; the
                         kind only says which extractor is in use. */}
-                    <h3 class="flex items-baseline gap-1.5 min-w-0">
+                    <h3 data-panel-part="identity" class="flex items-baseline gap-1.5 min-w-0">
                         <span class="font-mono text-[11px] text-slate-700 truncate">
                             {() => {
                                 const el = $$(propertyTarget)
@@ -1102,7 +1112,32 @@ const MIN_W = 240
                     irreversible-looking action under that same pointer path invites
                     misclicks. */}
                 <div class="flex items-center gap-1 shrink-0">
+                    {/* The panel's own tour. Separate from the editor tour behind the
+                        toolbar's "?" because the two answer different questions -- that
+                        one is "how do I write", this one is "what is this dialog". It
+                        lives here rather than in the toolbar so it is reachable at the
+                        moment the question arises, with the panel already open on the
+                        element the user is asking about.
+
+                        Ref-based onclick like every other button in this panel, and no
+                        pointerdown handler: the panel root lets mousedown through for
+                        interactive elements, so the press focuses the panel and
+                        `panelFocused` keeps selectionchange from dropping the target
+                        out from under the tour. */}
                     <button
+                        data-panel-part="help"
+                        ref={(el) => { if (el) el.onclick = () => startHelpTour('properties') }}
+                        title={() => t('editor.help.properties.tour')}
+                        class="shrink-0 w-6 h-6 flex items-center justify-center rounded leading-none cursor-pointer text-gray-400 hover:text-blue-600 hover:bg-blue-50"
+                    >
+                        <svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <circle cx="12" cy="12" r="9" />
+                            <path d="M9.5 9a2.5 2.5 0 1 1 3.2 2.4c-.7.2-1.2.9-1.2 1.6v.5" />
+                            <path d="M12 17h.01" />
+                        </svg>
+                    </button>
+                    <button
+                        data-panel-part="delete"
                         ref={(el) => {
                             // Ref-based onclick like the other header buttons: woby's
                             // synthetic onClick delegation does not reach into a shadow
@@ -1130,6 +1165,7 @@ const MIN_W = 240
                         <DeleteOutline class="w-4 h-4" />
                     </button>
                     <button
+                        data-panel-part="close"
                         ref={(el) => { if (el) el.onclick = () => { panelOpen(false) } }}
                         class="text-gray-400 hover:text-gray-600 text-lg leading-none cursor-pointer w-6 h-6 flex items-center justify-center"
                     >×</button>
@@ -1145,7 +1181,7 @@ const MIN_W = 240
                 `overflow-hidden` flex item) shrink below its rows and clip them with no
                 scrollbar. Auto height puts the rows back at natural size so this
                 container scrolls them, exactly as the panel did before it was sizable. */}
-            <div class="flex-1 min-h-0 overflow-auto [&>div]:h-auto">
+            <div data-panel-part="form" class="flex-1 min-h-0 overflow-auto [&>div]:h-auto">
                 {() => {
                     const obj = $$(propsObj)
                     return obj ? (
@@ -1173,7 +1209,7 @@ const MIN_W = 240
                     if (!actions?.length) return <></>
 
                     return (
-                        <div class="flex flex-wrap gap-1.5 px-3 py-2 border-t border-gray-200">
+                        <div data-panel-part="actions" class="flex flex-wrap gap-1.5 px-3 py-2 border-t border-gray-200">
                             {actions.map(a => (
                                 <button
                                     // Ref-based onclick, like every other button in this
@@ -1224,7 +1260,7 @@ const MIN_W = 240
 
                     const btn = 'flex items-center gap-1 px-2 py-1 rounded border border-gray-300 bg-white text-xs text-gray-700 cursor-pointer hover:bg-gray-50 hover:border-gray-400 active:bg-gray-100'
                     return (
-                        <div class="flex flex-wrap gap-1.5 px-3 py-2 border-t border-gray-200">
+                        <div data-panel-part="actions" class="flex flex-wrap gap-1.5 px-3 py-2 border-t border-gray-200">
                             <button
                                 ref={b => { if (b) b.onclick = () => openImageEditor(img) }}
                                 title={() => t('editor.image.cropZoomResize')}
@@ -1279,6 +1315,7 @@ const MIN_W = 240
                 class="absolute top-0 left-0 w-1.5 h-full cursor-ew-resize"
             />
             <div
+                data-panel-part="resize"
                 ref={(el) => { if (el) (el as HTMLElement).onpointerdown = startResize('se') }}
                 class="absolute bottom-0 right-0 w-4 h-4 cursor-nwse-resize"
             >

@@ -227,6 +227,62 @@ export const en: LocalePack = {
         'editor.readonly.toEdit': 'Switch to Edit mode',
         'editor.readonly.toReadonly': 'Switch to Read-only mode',
 
+        // -- Help tour -------------------------------------------------------
+        // Two buttons on the balloon footer (Back/Next/Skip/Done) and one
+        // counter ("{n} of {total}"). Then ten built-in steps — one per editor
+        // landmark. Hosts can register their own steps with `registerHelpSteps`
+        // and look up strings through `t()` themselves; the only keys wui owns
+        // are these.
+        'editor.help': 'Help',
+        'editor.help.back': 'Back',
+        'editor.help.next': 'Next',
+        'editor.help.skip': 'Skip',
+        'editor.help.done': 'Done',
+        'editor.help.stepOf': '{n} of {total}',
+        'editor.help.welcome.title': 'Welcome',
+        'editor.help.welcome.body': 'A short tour of the editor. Use Next to step through, or Skip to dismiss.',
+        'editor.help.type.title': 'Type to begin',
+        'editor.help.type.body': 'Click anywhere in this area and start typing. The caret belongs to you.',
+        'editor.help.format.title': 'Paragraph formats',
+        'editor.help.format.body': 'This dropdown changes what kind of block the current line is — heading, quote, code, list.',
+        'editor.help.inline.title': 'Bold, italic, underline',
+        'editor.help.inline.body': 'The classic three, both here and on the keyboard (Ctrl+B / Ctrl+I / Ctrl+U).',
+        'editor.help.insert.title': 'Insert content',
+        'editor.help.insert.body': 'Pictures, tables, containers, and any plugins you have registered.',
+        'editor.help.groups.title': 'Plugin families',
+        'editor.help.groups.body': 'Each family — every plugin that belongs together — gets its own button. Click any of them to see what they offer.',
+        'editor.help.select.title': 'Select something',
+        'editor.help.select.body': 'Click any element in the document. The property panel on the right shows what can be changed about it.',
+        'editor.help.properties.title': 'Properties panel',
+        'editor.help.properties.body': 'Open it from the i button to edit margins, alignment, colour, and other block-level settings.',
+        'editor.help.panel.title': 'Properties panel',
+        'editor.help.panel.body': 'Now that something is selected, the panel is open. Edit a value to see the change live.',
+        'editor.help.language.title': 'Language',
+        'editor.help.language.body': 'Switches the editor between locales. The buttons, menus and tooltips follow.',
+
+        // --- The property panel's own tour (`builtinHelpProperties.tsx`) ---
+        'editor.help.properties.tour': 'Tour this panel',
+        'editor.help.props.welcome.title': 'The property panel',
+        'editor.help.props.welcome.body': 'Everything about the selected element lives here. Use Next to step through it, or Skip to dismiss.',
+        'editor.help.props.header.title': 'Move it anywhere',
+        'editor.help.props.header.body': 'Drag this bar to reposition the panel. It floats, so it never has to cover what you are editing.',
+        'editor.help.props.identity.title': 'What is selected',
+        'editor.help.props.identity.body': 'The tag name, then the kind of editor in use. This is how you tell a table cell from the row that contains it.',
+        'editor.help.props.parent.title': 'Climb to the parent',
+        'editor.help.props.parent.body': 'Selects the element containing this one — cell to row to table. Greyed out once you reach the top.',
+        'editor.help.props.form.title': 'Properties',
+        'editor.help.props.form.body': 'The element\u2019s own settings. Edits apply as you make them and each one becomes an undo step.',
+        'editor.help.props.actions.title': 'Actions',
+        'editor.help.props.actions.body': 'Things to do to the element rather than values to type — cropping an image, or whatever the plugin offers.',
+        'editor.help.props.style.title': 'Style',
+        'editor.help.props.style.body': 'Every CSS property, on the style attribute or as a Tailwind class. Open it and start with “Set on this element”, or search by name.',
+        'editor.help.props.delete.title': 'Delete',
+        'editor.help.props.delete.body': 'Removes the selected element. Greyed out when it cannot go — the editor itself, or a part that belongs to a component.',
+        'editor.help.props.resize.title': 'Resize',
+        'editor.help.props.resize.body': 'Drag any edge or corner to resize the panel. Useful when the style list is open.',
+        'editor.help.props.close.title': 'Close',
+        'editor.help.props.close.body': 'Hides the panel. Reopen it from the i button in the toolbar, or by selecting an element.',
+
         // -- Delete control (property panel header) --------------------------
         // Only one of these ever shows: the button's tooltip *is* the reason it is
         // disabled, so the refusal wordings live beside the affirmative label.
