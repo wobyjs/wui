@@ -64,12 +64,14 @@ export const PropertyRows = defaults(() => ({
 
 									return (
 										renderCon && (
-											<UI
-												data={propertyData}
-												editorName={key}
-												value={value}
-												indentLvl={indentLvl}
-											/>
+											<span data-prop-row={key} class="contents">
+												<UI
+													data={propertyData}
+													editorName={key}
+													value={value}
+													indentLvl={indentLvl}
+												/>
+											</span>
 										)
 									)
 								})}

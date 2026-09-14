@@ -38,7 +38,9 @@ const TOOLBAR_ITEM_WARN_AT = 32
 
 /** A registered item, as a node: its own widget, or the standard button for its command. */
 const renderItem = (item: ToolbarItem) =>
-    item.render ? item.render() : <CommandButton command={item.command!} />
+    <span data-toolbar-item={item.name} class="contents">
+        {item.render ? item.render() : <CommandButton command={item.command!} />}
+    </span>
 
 /**
  * The divider that separates toolbar bands, matching the one `EditorToolbar` uses for its
