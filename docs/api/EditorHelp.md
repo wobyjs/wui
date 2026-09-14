@@ -49,6 +49,10 @@ import type {
 } from '@woby/wui/Editor/EditorHelpStep'
 ```
 
+The package barrel re-exports all of it, so `import { startHelpTour } from '@woby/wui'` works
+too, along with `HelpButton` for hosts assembling their own toolbar. The deep
+`@woby/wui/Editor/...` paths above keep working.
+
 ---
 
 # The shape of a step
@@ -89,7 +93,7 @@ tour's anchor resolver only knows these shapes.
 | `'toolbar'` | `item: string` | `<span data-toolbar-item={item}>` — the wrapper `EditorToolbarSlot` stamps around every registered item |
 | `'panel'` | — | The `[data-property-panel]` element |
 | `'panelPart'` | `part: string` | `[data-panel-part={part}]` — one named region inside the property panel |
-| `'prop'` | `prop: string` | `<span data-prop-row={prop}>` — the wrapper `PropertyRows` stamps around each property row |
+| `'prop'` | `prop: string` | `[data-prop-row={prop}]` — the property row itself. See the `prop` section below. |
 | `'element'` | `tag: string` | The first `<tag>` inside the surface. `tag: '*'` matches any descendant. |
 | `'pluginGroup'` | `group: string` | `<div data-plugin-group={group}>` — the wrapper `InsertDropDown` stamps when it is rendered for a plugin family |
 | `'selector'` | `css: string` | A literal CSS selector run against the editor's root |
@@ -117,6 +121,17 @@ Light-DOM editors never hit the fallback — `root` already is `document`.
 
 A step naming a part that does not exist simply fails to resolve and is skipped, exactly like any
 other unresolved target — there is no error.
+
+## `prop` — one property row
+
+`prop` is the property's **untranslated** name — the same `editorName` the row editors receive
+(`Background`, not `背景`). Translation happens in the row's label cell; the identity never moves.
+
+The attribute is stamped twice per row, on purpose. `PropertyRows` wraps each row editor in a
+`<span data-prop-row={key} class="contents">`, and `TableRow` stamps the `<tr>` itself with the
+`prop` its editor passes. The span is `display: contents` — it owns no box — so the resolver's
+box-bearing descent falls through it onto the `<tr>`, which is the rect the balloon measures and
+the spotlight outlines.
 
 ## Anchors that live inside an overlay: `data-help-clear`
 
@@ -282,7 +297,7 @@ no steps, and the tour exits without painting anything.
 
 - [EditorToolbar](./EditorToolbar.md) — the three registries whose `data-toolbar-item` anchors most
   of these steps point at
-- [EditorPlugin](./EditorPlugin.md) — `data-plugin-group` and `data-prop-row`, the other two anchor
-  attributes
+- [EditorPlugin](./EditorPlugin.md) — the plugin registry; its families are what the
+  `plugin-groups` toolbar item and the `'pluginGroup'` anchor point at
 - [Editor](./Editor.md) — the component the tour mounts inside
 - [I18n](./I18n.md) — the `t()` thunks behind every built-in title and body

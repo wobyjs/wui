@@ -54,7 +54,13 @@ inside a shadow root, and the reason most of the rest of this list exists.
   are the anchors the registry resolves against. The balloon is a registry consumer just like the toolbar slot — built-ins
   register at import time, hosts extend the same list. An empty registry is the acceptance
   criterion: an editor with no help registered renders identically to one with the
-  built-ins loaded.
+  built-ins loaded. The registry and its driver calls, the `HelpStep` type vocabulary and
+  `HelpButton` itself are re-exported from the package barrel —
+  `import { startHelpTour } from '@woby/wui'` — so hosts no longer need the deep
+  `@woby/wui/Editor/...` paths. For `{ at: 'prop' }` the row `<tr>` now carries
+  `data-prop-row` too (stamped by `TableRow` from the editors' untranslated `editorName`);
+  the `PropertyRows` wrapper is `display: contents` and owns no box, so the resolver's
+  box-bearing descent lands on the `<tr>` and the anchor finally has a rect.
 - **A second tour for the property panel**, registered as `'properties'` by
   `builtinHelpProperties.tsx` and launched from a "?" in the panel header rather than the
   toolbar. Ten steps over the header, the identity line, the parent hop, the property rows,
@@ -106,6 +112,11 @@ editor: [editor-plugins](docs/guides/editor-plugins.md) and
 
 ### Fixed
 
+- **Property panel vs. toolbar** — at its default park the panel's box covered the toolbar's
+  right end, putting the ? / ⓘ / language buttons under it while the panel was open; the
+  default park is now `top: 208px`, clear of the two-row toolbar. The insert and text-format
+  dropdown menus opened upward over the toolbar (computed top ≈ −136px, first entries
+  unclickable); both now open `top-full` below their buttons (≈ +32px).
 - **Selection and shadow DOM** — `shadowRoot.getSelection()` and `getComposedRanges`
   throughout, hybrid restoration with an offset hint, cross-paragraph and cross-cell ranges,
   caret expand-to-word, and the selection cached on `mousedown` before focus shifts away.
