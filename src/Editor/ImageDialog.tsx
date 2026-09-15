@@ -440,7 +440,12 @@ export const ImageDialog = (): JSX.Element => {
     const primaryBtn = 'h-8 px-3 text-xs rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 whitespace-nowrap'
 
     return (
+        // `role="dialog"` + `aria-modal="true"` are the a11y fix a modal backdrop
+        // owes the accessibility tree — and the exact signal useOcclusionAvoidance
+        // reads to tell a modal mask from dodgeable chrome and hold still under it.
         <div
+            role="dialog"
+            aria-modal="true"
             ref={el => {
                 rootEl = el as HTMLElement
                 if (!el) return

@@ -83,6 +83,35 @@ inside a shadow root, and the reason most of the rest of this list exists.
   the union of the surface and the keep-clear box, intersected with the window, so a step
   anchored to a fixed overlay outside the surface still lands fully on screen.
 
+**Occlusion-aware Fab.** A FAB that detects it has been painted over and steps out from
+under, within limits — off by default (`avoid`), because a FAB that moves on its own is a
+surprise nobody asked for.
+
+- Detection is by **hit-test, not z-index arithmetic** — the effective z-index of elements
+  in different stacking contexts is undecidable from JavaScript. The FAB probes its rect at
+  four inset corners plus the centre with `elementFromPoint`, piercing open shadow roots
+  (`deepElementFromPoint`, now exported); a hit that is neither the FAB nor its descendant
+  is a cover, kept as `by`. Re-probes fire on resize, capture-phase scroll, a
+  ResizeObserver on the FAB and its container, and a body MutationObserver (style/class
+  flips, node churn) — rAF-coalesced with a settle burst at 120/240/400 ms.
+- A **modal mask is a cover it must not dodge**: `aria-modal="true"`, `role="dialog"`, an
+  open `<dialog>`, or a fixed full-viewport painted layer freeze the FAB at its current
+  offset (`maskUp`) until the mask closes. The two image dialogs now carry
+  `role="dialog"` + `aria-modal="true"` — an accessibility fix in its own right that also
+  gives the detector its exact signal.
+- The dodge itself is **bounded and gives up rather than teleports**: candidates down,
+  left, down-left, up, right, up-left at `avoid-margin` clearance; `avoid-max` is a ceiling
+  and out-of-budget candidates are not generated; if nothing in budget is clear the FAB
+  stays put and reports `blocked` until the next re-probe. Applied as
+  `transform: translate(dx, dy)` — home survives; clamped to `avoid-within` / the offset
+  parent's padding box / the viewport before testing; animated back to `translate(0,0)`
+  when the cover clears, with nothing persisted across remount.
+- Props on `wui-fab`: `avoid`, `avoid-margin` (8), `avoid-max` (96), `avoid-within`,
+  `avoid-ignore`, and `onAvoid` (TSX-only, like every function prop) reporting
+  `{ covered, by, dx, dy, blocked, maskUp }`.
+- The machinery is exported headless as `useOcclusionAvoidance(ref, opts)` — Fab is only
+  its first caller. Documented in [docs/api/Fab.md](docs/api/Fab.md).
+
 **i18n.** A pluggable multilingual layer covering `en`, `zh-Hans`, `zh-Hant` and `ms`.
 English is eager because it is the fallback; the rest are code-split behind loaders, so a
 build that never asks for Malay ships none of it. `t` / `tx` / `tn` / `localized`, `Intl`

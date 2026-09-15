@@ -1,5 +1,6 @@
-import { type CustomElementChildren, $, $$, isObservable, type JSX, defaults, customElement, ElementAttributes, HtmlBoolean, HtmlClass, ObservableMaybe, HtmlStyle, HtmlString } from 'woby'
+import { type CustomElementChildren, $, $$, isObservable, type JSX, defaults, customElement, ElementAttributes, HtmlBoolean, HtmlClass, HtmlNumber, ObservableMaybe, HtmlStyle, HtmlString } from 'woby'
 import { registerBaseCls } from './helper/baseCls'
+import { useOcclusionAvoidance, type OcclusionState } from './useOcclusionAvoidance'
 
 const def = () => ({
       /** 
@@ -19,6 +20,19 @@ const def = () => ({
       children: $("") as CustomElementChildren,
       type: $("pill", HtmlString) as ObservableMaybe<string>,
       disabled: $(false, HtmlBoolean) as ObservableMaybe<boolean>,
+      /** Step clear of whatever paints over the FAB. Off by default — a FAB that
+       *  moves on its own is a surprise nobody asked for. See useOcclusionAvoidance. */
+      avoid: $(false, HtmlBoolean) as ObservableMaybe<boolean>,
+      /** Clearance kept between the FAB and the cover, px. Default 8. */
+      avoidMargin: $(8, HtmlNumber) as ObservableMaybe<number>,
+      /** Total offset budget, px — never exceeded, however much would be needed. Default 96. */
+      avoidMax: $(96, HtmlNumber) as ObservableMaybe<number>,
+      /** Stay-inside container selector; defaults to the offset parent's padding box. */
+      avoidWithin: $("", HtmlString) as ObservableMaybe<string>,
+      /** Elements matching this selector are never counted as covers. */
+      avoidIgnore: $("", HtmlString) as ObservableMaybe<string>,
+      /** Fires whenever the avoidance state changes. Like every function prop, TSX-only. */
+      onAvoid: $<(((s: OcclusionState) => void) | null)>(null),
 })
 
 // `disabled` reached the <button> but nothing else: a disabled FAB kept the full blue
@@ -47,13 +61,24 @@ const variantStyle: Record<string, string> = {
 const baseCls = (type: string | null | undefined) => variantStyle[type || 'pill'] ?? ''
 
 const Fab: Defaulted<typeof def> = defaults(def, (props) => {
-      const { class: cn, cls, children, type: variant, disabled, ...otherProps } = props
+      const { class: cn, cls, children, type: variant, disabled, avoid, avoidMargin, avoidMax, avoidWithin, avoidIgnore, onAvoid, ...otherProps } = props
+
+      // The probe's shell climb starts at the <button> and walks out through the
+      // <wui-fab> host, so a hit anywhere on the widget counts as "self".
+      const btnRef = $<HTMLElement | null>(null)
+      // defaults() wraps a null callback default into an observable, so unwrap before
+      // calling — the same $(…, false) unwrap PropertyForm uses for onCommit.
+      useOcclusionAvoidance(btnRef, {
+            enabled: avoid, margin: avoidMargin, max: avoidMax, within: avoidWithin, ignore: avoidIgnore,
+            onAvoid: s => { const cb = $$(onAvoid, false); if (typeof cb === 'function') cb(s) },
+      })
 
       return (
             <button
                   class={[() => $$(cls) ? $$(cls) : baseCls($$(variant)), disabledStyle, cn]}
                   disabled={disabled}
                   {...otherProps}
+                  ref={btnRef}
             >
                   <div class="flex items-center">
                         {children}

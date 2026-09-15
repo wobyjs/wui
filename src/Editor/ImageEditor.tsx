@@ -537,7 +537,12 @@ export const ImageEditor = defaults(def, (): JSX.Element => {
     const primaryBtn = 'h-8 px-3 text-xs rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 whitespace-nowrap'
 
     return (
+        // `role="dialog"` + `aria-modal="true"`: a modal backdrop owes the
+        // accessibility tree these, and they are the exact signal
+        // useOcclusionAvoidance reads to hold still under a mask instead of dodging.
         <div
+            role="dialog"
+            aria-modal="true"
             ref={el => {
                 rootEl = el as HTMLElement
                 if (!el) return

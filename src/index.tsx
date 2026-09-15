@@ -14,6 +14,10 @@ export * from './Badge'
 export * from './Appbar'
 export * from './Toolbar'
 export * from './Fab'
+/* The occlusion-avoidance hook Fab's `avoid` prop family is built on, and the
+   shadow-piercing hit-test it probes with — headless, usable on any element. */
+export * from './useOcclusionAvoidance'
+export * from './helper/deepElementFromPoint'
 export * from './SideBar'
 export * from './NumberField'
 export * from './Paper'

@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fab occlusion avoidance — CR-8 demo</title>
+<style>
+  /* Plain CSS chrome: the FAB variants are Tailwind (RuntimeTailwind compiles
+     them), but the *covers* must be laid out and sized before Tailwind runs, so
+     the first probe already sees the real geometry. */
+  body { margin: 0; font: 14px/1.4 system-ui, sans-serif; }
+  .stage { position: relative; width: 640px; height: 420px; margin: 20px auto; border: 2px solid #999; overflow: hidden; background: #fafafa; }
+  /* The compass back-link stand-in: pinned chrome hanging over the stage's
+     top-right corner, at max z-index. Deterministic box (top 34, height 29,
+     right edge 50%+310, min-width 120 → left edge 50%+190) so the overlap with
+     both FAB homes is a constant, not a font metric. */
+  .back { position: fixed; top: 34px; right: calc(50% - 310px); min-width: 120px; height: 29px; line-height: 29px; text-align: center; padding: 0 12px; box-sizing: border-box; background: #333; color: #fff; z-index: 2147483647; }
+  /* The ImageDialog-backdrop stand-in: fixed, full-viewport, z-[1200], and
+     marked role=dialog + aria-modal — the exact signals the image dialogs now
+     carry, which tell the FAB to freeze rather than dodge. */
+  .mask { position: fixed; inset: 0; z-index: 1200; display: none; background: rgba(0,0,0,.3); }
+  .mask.on { display: flex; }
+  .bar { max-width: 644px; margin: 12px auto; display: flex; gap: 8px; align-items: center; }
+  .bar button { padding: 4px 10px; }
+  #log { white-space: pre-wrap; font: 12px/1.5 ui-monospace, monospace; max-width: 644px; margin: 8px auto; background: #f0f0f0; padding: 8px 10px; min-height: 3em; }
+</style>
+</head>
+<body>
+  <div class="stage" id="stage"></div>
+  <div class="bar">
+    <button id="backBtn">toggle back link</button>
+    <button id="maskBtn">toggle modal mask</button>
+  </div>
+  <pre id="log"></pre>
+  <div class="back" id="back" onclick="return false">← 返回</div>
+  <div class="mask" id="mask" role="dialog" aria-modal="true"></div>
+  <script type="module" src="/@vite/client"></script>
+  <script type="module" src="./fab-avoid-demo-script.tsx"></script>
+</body>
+</html>
