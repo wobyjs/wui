@@ -88,15 +88,23 @@ under, within limits — off by default (`avoid`), because a FAB that moves on i
 surprise nobody asked for.
 
 - Detection is by **hit-test, not z-index arithmetic** — the effective z-index of elements
-  in different stacking contexts is undecidable from JavaScript. The FAB probes its rect at
-  four inset corners plus the centre with `elementFromPoint`, piercing open shadow roots
-  (`deepElementFromPoint`, now exported); a hit that is neither the FAB nor its descendant
-  is a cover, kept as `by`. Re-probes fire on resize, capture-phase scroll, a
-  ResizeObserver on the FAB and its container, and a body MutationObserver (style/class
-  flips, node churn) — rAF-coalesced with a settle burst at 120/240/400 ms.
+  in different stacking contexts is undecidable from JavaScript. Every position, home
+  included, is tested by **parking** the FAB there for a synchronous moment (transform
+  write, transitions zeroed, restored before anything paints): a probe of a *virtual*
+  rect from home reads everything sitting *beneath* the candidate as a phantom cover no
+  dodge could clear. The parked shape is probed at four corners plus the centre with
+  `elementFromPoint`, piercing open shadow roots (`deepElementFromPoint`, now exported);
+  corners are pulled inside by the FAB's own border radius (a rounded corner lies outside
+  its hit shape and would fall through to the floor), and a hit that is neither the FAB
+  nor a hollow custom-element shell is a cover, kept as `by`. Re-probes fire on resize,
+  capture-phase scroll, a ResizeObserver on the FAB and its container, and a body
+  MutationObserver (style/class flips, node churn — the FAB's own park/apply writes
+  excluded) — rAF-coalesced with a settle burst at 120/240/400 ms.
 - A **modal mask is a cover it must not dodge**: `aria-modal="true"`, `role="dialog"`, an
   open `<dialog>`, or a fixed full-viewport painted layer freeze the FAB at its current
-  offset (`maskUp`) until the mask closes. The two image dialogs now carry
+  offset (`maskUp`) until the mask closes. A mask hit at any probe point outranks a plain
+  cover found earlier — chrome above the mask still wins the hit-test, but the FAB is in
+  a modal session either way. The two image dialogs now carry
   `role="dialog"` + `aria-modal="true"` — an accessibility fix in its own right that also
   gives the detector its exact signal.
 - The dodge itself is **bounded and gives up rather than teleports**: candidates down,
@@ -107,7 +115,8 @@ surprise nobody asked for.
   parent's padding box / the viewport before testing; animated back to `translate(0,0)`
   when the cover clears, with nothing persisted across remount.
 - Props on `wui-fab`: `avoid`, `avoid-margin` (8), `avoid-max` (96), `avoid-within`,
-  `avoid-ignore`, and `onAvoid` (TSX-only, like every function prop) reporting
+  `avoid-ignore`, and `onAvoid` (TSX-only, like every function prop; a plain function or
+  the observable a `defaults()` prop wraps — the hook unwraps at call time) reporting
   `{ covered, by, dx, dy, blocked, maskUp }`.
 - The machinery is exported headless as `useOcclusionAvoidance(ref, opts)` — Fab is only
   its first caller. Documented in [docs/api/Fab.md](docs/api/Fab.md).

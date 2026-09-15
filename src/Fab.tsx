@@ -31,8 +31,11 @@ const def = () => ({
       avoidWithin: $("", HtmlString) as ObservableMaybe<string>,
       /** Elements matching this selector are never counted as covers. */
       avoidIgnore: $("", HtmlString) as ObservableMaybe<string>,
-      /** Fires whenever the avoidance state changes. Like every function prop, TSX-only. */
-      onAvoid: $<(((s: OcclusionState) => void) | null)>(null),
+      /** Fires whenever the avoidance state changes. Like every function prop, TSX-only.
+       *  Observable default like every other entry: the custom-element prop pipeline only
+       *  wires props whose defaults are `$()` — a plain `null` default silently drops the
+       *  incoming host property, so the callback never arrives on `<wui-fab>`. */
+      onAvoid: $(null as ((s: OcclusionState) => void) | null),
 })
 
 // `disabled` reached the <button> but nothing else: a disabled FAB kept the full blue
@@ -66,11 +69,8 @@ const Fab: Defaulted<typeof def> = defaults(def, (props) => {
       // The probe's shell climb starts at the <button> and walks out through the
       // <wui-fab> host, so a hit anywhere on the widget counts as "self".
       const btnRef = $<HTMLElement | null>(null)
-      // defaults() wraps a null callback default into an observable, so unwrap before
-      // calling — the same $(…, false) unwrap PropertyForm uses for onCommit.
       useOcclusionAvoidance(btnRef, {
-            enabled: avoid, margin: avoidMargin, max: avoidMax, within: avoidWithin, ignore: avoidIgnore,
-            onAvoid: s => { const cb = $$(onAvoid, false); if (typeof cb === 'function') cb(s) },
+            enabled: avoid, margin: avoidMargin, max: avoidMax, within: avoidWithin, ignore: avoidIgnore, onAvoid,
       })
 
       return (

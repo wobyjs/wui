@@ -8,10 +8,18 @@ import { deepElementFromPoint } from './helper/deepElementFromPoint'
  * Detection is a paint-order hit-test, not z-index arithmetic: z-index only
  * compares within one stacking context, so "is anything over me" is undecidable
  * from styles alone. `elementFromPoint` answers it directly, and piercing open
- * shadow roots keeps the answer honest for shadow-DOM chrome. Displacement is a
- * `transform: translate(dx, dy)`, never `top`/`left` — it composes with whatever
- * position the host already authored, it is reversible, and it animates on the
- * compositor.
+ * shadow roots keeps the answer honest for shadow-DOM chrome. But it can only
+ * answer for positions the element actually occupies: probing a *virtual* rect
+ * from home lets everything beneath the candidate — the canvas under a FAB, the
+ * container's own background — masquerade as a cover, because the prober is
+ * still sitting at home and not there to outrank them. So every position,
+ * home included, is tested by parking the element there for a synchronous
+ * moment and asking the hit-test what is on top now. Nothing paints between
+ * the park and the restore, so the page never flickers.
+ *
+ * Displacement is a `transform: translate(dx, dy)`, never `top`/`left` — it
+ * composes with whatever position the host already authored, it is reversible,
+ * and it animates on the compositor.
  *
  * The state is an offset from home, never a new home; nothing persists across a
  * remount. `wui-fab` is the first caller (its `avoid` family of props); the hook
@@ -42,8 +50,10 @@ export interface OcclusionAvoidanceOptions {
     within?: ObservableMaybe<string>
     /** Elements matching this selector are never counted as covers. */
     ignore?: ObservableMaybe<string>
-    /** Called whenever the reported state changes. */
-    onAvoid?: (s: OcclusionState) => void
+    /** Called whenever the reported state changes. A plain function or the
+     *  observable a `defaults()` prop wraps — unwrapped at call time, like every
+     *  other option. */
+    onAvoid?: ObservableMaybe<((s: OcclusionState) => void) | null>
 }
 
 /** Candidate directions in preference order: down first — chrome hangs from the top. */
@@ -113,17 +123,6 @@ export const useOcclusionAvoidance = (
             return false
         }
 
-        // An ancestor of the shell is the ground the FAB stands on, not a cover:
-        // once the FAB has dodged away, the topmost thing at home is the container's
-        // own background, and reporting *that* as a cover would strand the FAB off
-        // home forever. Ancestors paint beneath their descendants (the FAB sits at a
-        // healthy z-index); the covers that matter — pinned chrome, masks, dropdowns
-        // — are siblings or strangers, never ancestors.
-        const isAncestor = (hit: Element): boolean => {
-            for (let n = composedParent(base); n; n = composedParent(n)) if (n === hit) return true
-            return false
-        }
-
         /** A custom-element host that paints nothing of its own — no background,
          *  border or shadow. Its visible content lives in children, and those paint
          *  above the host's own box (a widget button sits at a healthy z-index), so
@@ -143,27 +142,83 @@ export const useOcclusionAvoidance = (
                 && cs.boxShadow === 'none'
         }
 
-        // undefined = clear; an Element = that cover; null = covered by something we
-        // cannot name (probe point off-viewport — a probe we cannot see cannot vouch).
-        const coverAt = (r: Rect): Element | null | undefined => {
-            // Four corners inset 2px (a quarter of the box for very small elements)
-            // plus the centre.
-            const ix = Math.min(2, (r.right - r.left) / 4)
-            const iy = Math.min(2, (r.bottom - r.top) / 4)
-            const pts = [
-                [r.left + ix, r.top + iy], [r.right - ix, r.top + iy],
-                [r.left + ix, r.bottom - iy], [r.right - ix, r.bottom - iy],
-                [(r.left + r.right) / 2, (r.top + r.bottom) / 2],
-            ]
-            for (const [x, y] of pts) {
-                if (x < 0 || y < 0 || x > innerWidth || y > innerHeight) return null
-                const hit = deepElementFromPoint(x, y)
-                if (!hit) return null
-                if (isSelf(hit) || isAncestor(hit) || isShell(hit)) continue
-                if (composedClosest(hit, ignoreSel)) continue
-                return hit
+        /**
+         * Park the element at an offset from home, hit-test its real on-page
+         * shape, and restore. This is the truth-teller: probed from home, a
+         * candidate position reports everything that merely sits *under* it (in
+         * the wild: the compass canvas, a sibling painting below the FAB) as a
+         * phantom cover no dodge could ever clear; parked there, the element
+         * outranks its own ground and `elementFromPoint` returns it — self, clear.
+         * The park is synchronous and nothing paints in between, so the page
+         * never flickers. The transition is zeroed for the moment so the park
+         * lands immediately rather than starting an animation.
+         *
+         * undefined = clear; an Element = that cover; null = covered by something
+         * we cannot name (probe point off-viewport — a probe we cannot see cannot
+         * vouch).
+         */
+        const coverWhenAt = (dx: number, dy: number): Element | null | undefined => {
+            const prevT = el.style.transition
+            const prevX = el.style.transform
+            el.style.transition = 'none'
+            el.style.transform = dx || dy ? `translate(${dx}px, ${dy}px)` : ''
+            try {
+                const r = el.getBoundingClientRect()
+                // Four corners plus the centre. A rounded element's border-box
+                // corners lie OUTSIDE its own hit shape — at `rounded-[50%]` the
+                // corner is a full radius away from any painted pixel, so a probe
+                // there falls through to whatever sits under the element and
+                // reads as a phantom cover. Each corner is therefore pulled
+                // inside along the diagonal by its own border radius: for a
+                // circle that is the inscribed square, scaled a little further
+                // in to stay off the tangent; a square corner (radius 0) keeps
+                // the plain 2px inset.
+                const w = r.right - r.left, h = r.bottom - r.top
+                // The radius belongs to the element whose rect is being probed, not
+                // to its host: the shell climb's `base` carries no rounding of its
+                // own, and a 0 read there puts the corner probes outside a rounded
+                // element's hit shape — the floor beneath then reads as a cover at
+                // every candidate, and the dodge reports `blocked` no matter what.
+                const cs = getComputedStyle(el)
+                // 1 − 0.9/√2: the inscribed square of a radius-r corner sits r·k in
+                // from each edge; the 0.9 keeps the probe strictly inside the arc.
+                const k = 1 - 0.9 / Math.SQRT2
+                const rad = (v: string): [number, number] => {
+                    const [a, b] = v.trim().split(/\s+/)
+                    const rx = a.endsWith('%') ? parseFloat(a) / 100 * w : parseFloat(a) || 0
+                    const bv = b ?? a
+                    const ry = bv.endsWith('%') ? parseFloat(bv) / 100 * h : parseFloat(bv) || 0
+                    return [Math.min(w / 2, rx), Math.min(h / 2, ry)]
+                }
+                const tl = rad(cs.borderTopLeftRadius), tr = rad(cs.borderTopRightRadius)
+                const bl = rad(cs.borderBottomLeftRadius), br = rad(cs.borderBottomRightRadius)
+                const cx = (n: number) => Math.min(Math.max(2, k * n), Math.max(1, w / 2 - 1))
+                const cy = (n: number) => Math.min(Math.max(2, k * n), Math.max(1, h / 2 - 1))
+                const pts = [
+                    [r.left + cx(tl[0]), r.top + cy(tl[1])], [r.right - cx(tr[0]), r.top + cy(tr[1])],
+                    [r.left + cx(bl[0]), r.bottom - cy(bl[1])], [r.right - cx(br[0]), r.bottom - cy(br[1])],
+                    [(r.left + r.right) / 2, (r.top + r.bottom) / 2],
+                ]
+                // A modal mask outranks whatever else paints over the element: chrome
+                // above the mask (a z-max back link) wins the early probe points, but
+                // the element is still inside a modal session and must freeze, not
+                // dodge. Scan every point; a mask hit anywhere wins over a plain cover
+                // found earlier.
+                let first: Element | null = null
+                for (const [x, y] of pts) {
+                    if (x < 0 || y < 0 || x > innerWidth || y > innerHeight) return null
+                    const hit = deepElementFromPoint(x, y)
+                    if (!hit) return null
+                    if (isSelf(hit) || isShell(hit)) continue
+                    if (composedClosest(hit, ignoreSel)) continue
+                    if (isMask(hit)) return hit
+                    if (!first) first = hit
+                }
+                return first ?? undefined
+            } finally {
+                el.style.transition = prevT
+                el.style.transform = prevX
             }
-            return undefined
         }
 
         /** The cover's background actually paints (Tailwind's `bg-black/30` does). */
@@ -268,7 +323,8 @@ export const useOcclusionAvoidance = (
                 && prev.blocked === blocked && prev.maskUp === maskUp) return
             const next: OcclusionState = { covered, by, dx: curDx, dy: curDy, blocked, maskUp }
             state(next)
-            opts.onAvoid?.(next)
+            const cb = $$(opts.onAvoid, false)
+            if (typeof cb === 'function') cb(next)
         }
 
         /** The first in-budget, boundary-clamped, probe-verified clear position —
@@ -289,13 +345,13 @@ export const useOcclusionAvoidance = (
                 let dy = uy > 0 ? dyDown : uy < 0 ? dyUp : 0
                 if (Math.max(Math.abs(dx), Math.abs(dy)) > max) continue    // beyond budget: not generated
                 // Clamp inside the boundary, then let the probe judge: a candidate
-                // clamped into a still-covered spot fails `coverAt` like any other.
+                // clamped into a still-covered spot fails `coverWhenAt` like any other.
                 dx = Math.round(xLo <= xHi ? Math.min(Math.max(dx, xLo), xHi) : (xLo + xHi) / 2)
                 dy = Math.round(yLo <= yHi ? Math.min(Math.max(dy, yLo), yHi) : (yLo + yHi) / 2)
                 const key = dx + ',' + dy
                 if (seen.has(key)) continue
                 seen.add(key)
-                if (coverAt({ left: home.left + dx, top: home.top + dy, right: home.right + dx, bottom: home.bottom + dy }) === undefined)
+                if (coverWhenAt(dx, dy) === undefined)
                     return [dx, dy]
             }
             return null
@@ -309,7 +365,7 @@ export const useOcclusionAvoidance = (
             // Home is where the host placed us: the current rect with our own
             // displacement removed.
             const home: Rect = { left: r.left - curDx, top: r.top - curDy, right: r.right - curDx, bottom: r.bottom - curDy }
-            const cover = coverAt(home)
+            const cover = coverWhenAt(0, 0)
             if (cover === undefined) {
                 if (curDx || curDy) apply(0, 0)  // clear — animate back home
                 commit(false, null, false, false)
@@ -358,7 +414,10 @@ export const useOcclusionAvoidance = (
         // mount, `style`/`class` the flip — the gating pattern wui's own dialogs use.
         // (A MutationObserver does not cross shadow boundaries; shadow-internal
         // changes are covered by the resize/scroll observers and the settle burst.)
-        const mo = new MutationObserver(schedule)
+        // Records on the element itself are the probe's own park/restore and the
+        // applied dodge — feeding those back would make every probe schedule the
+        // next, forever.
+        const mo = new MutationObserver(muts => { if (muts.some(m => m.target !== el)) schedule() })
         mo.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['style', 'class'] })
 
         schedule()

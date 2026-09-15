@@ -106,10 +106,22 @@ FAB watches what paints over it and steps out from under, within limits.
 ### How it detects
 
 Occlusion is decided by **hit-testing, not z-index arithmetic** — the effective z-index of two
-elements in different stacking contexts is undecidable from JavaScript. The FAB probes its own rect
-at four corners (inset a couple of px) plus the centre with `document.elementFromPoint`, descending
-into open shadow roots (the `deepElementFromPoint` helper). If the topmost hit at any probe point is
-neither the FAB itself nor its descendant, the FAB is covered; the hit is kept as the cover (`by`).
+elements in different stacking contexts is undecidable from JavaScript. But a hit-test can only
+answer truthfully for positions the element actually occupies: probing a *virtual* candidate rect
+from home lets everything sitting *beneath* the candidate (a canvas, the container floor) masquerade
+as a cover, because the FAB is not there to outrank them. So every position — home included — is
+tested by **parking** the FAB there for a synchronous moment (transform write with transitions
+zeroed), hit-testing its real on-page shape, and restoring; nothing paints in between, so the page
+never flickers.
+
+The parked shape is probed at four corners plus the centre with `document.elementFromPoint`,
+descending into open shadow roots (the `deepElementFromPoint` helper). A rounded FAB's border-box
+corners lie outside its own hit shape (at `rounded-[50%]` a corner is a full radius from any painted
+pixel and would fall through to the floor), so each corner is pulled inside along the diagonal by
+the FAB's own border radius — the inscribed square, scaled slightly further in. A hit that is not
+the FAB (or a hollow custom-element shell) is the cover (`by`); a **modal mask hit at any probe
+point outranks a plain cover found earlier** — chrome can legitimately paint above a mask, but the
+FAB is still inside a modal session and must freeze.
 
 Re-probes fire on `resize`, on `scroll` (capture), on a `ResizeObserver` covering the FAB and its
 container, and on a `MutationObserver` watching `document.body` for style/class flips and added or
@@ -158,7 +170,9 @@ interface OcclusionState {
 }
 ```
 
-`onAvoid` is a **function prop: TSX-only** (attribute reflection stringifies functions).
+`onAvoid` is a **function prop: TSX-only** (attribute reflection stringifies functions). Like every
+hook option it may be a plain function **or** the observable a `defaults()` prop wraps — the hook
+unwraps it at call time.
 
 ### The headless hook
 
@@ -174,7 +188,8 @@ const state = useOcclusionAvoidance(ref, {
   max: 96, // total offset budget px
   within: ".stage", // stay-inside selector, optional
   ignore: ".no-dodge", // never-count-as-cover selector, optional
-  onAvoid: (s) => console.log(s),
+  onAvoid: cb, // plain function, or the observable a defaults() prop wraps
+});
 });
 // state is an Observable<OcclusionState>
 ```
