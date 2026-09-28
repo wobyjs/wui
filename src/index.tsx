@@ -18,6 +18,8 @@ export * from './Fab'
    shadow-piercing hit-test it probes with — headless, usable on any element. */
 export * from './useOcclusionAvoidance'
 export * from './helper/deepElementFromPoint'
+export * from './helper/composedParent'
+export * from './helper/escalateAboveOcclusion'
 export * from './SideBar'
 export * from './NumberField'
 export * from './Paper'

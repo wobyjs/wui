@@ -16,6 +16,7 @@ import {
     resolveImageSource,
 } from './ImageSource'
 import { t } from '../i18n'
+import { escalateAboveOcclusion } from '../helper/escalateAboveOcclusion'
 
 /**
  * `<wui-image-editor>`: pan / zoom / resize / crop, pointed at an `<img>` that already
@@ -64,8 +65,8 @@ import { t } from '../i18n'
  * Same constraint as `ImageCropper` and `ImageDialog`: woby's reactive expressions do not
  * re-run for observables written from `addEventListener` callbacks, and everything here
  * starts in a pointer or keyboard event. State is closure variables, the DOM is written
- * directly, handlers are bound through refs because synthetic click delegation does not
- * cross the shadow boundary this lives behind.
+ * directly, handlers are bound through refs -- see {@link bindClick} for why delegation
+ * cannot be used here.
  */
 
 /** Dispatched on a `<wui-image-editor>` element to open it. See {@link openImageEditor}. */
@@ -109,6 +110,8 @@ const def = () => ({
 
 export const ImageEditor = defaults(def, (): JSX.Element => {
     let rootEl: HTMLElement | null = null
+    /** Undoes the open-time stacking escalation; see {@link escalateAboveOcclusion}. */
+    let unescalate: (() => void) | null = null
     let noteEl: HTMLElement | null = null
     let applyBtn: HTMLButtonElement | null = null
     let restoreBtn: HTMLButtonElement | null = null
@@ -302,7 +305,12 @@ export const ImageEditor = defaults(def, (): JSX.Element => {
 
         cropper?.clear()
         recentre()
-        if (rootEl) rootEl.style.display = 'flex'
+        if (rootEl) {
+            rootEl.style.display = 'flex'
+            // A reopen while already open re-probes from a clean slate.
+            unescalate?.()
+            unescalate = escalateAboveOcclusion(rootEl)
+        }
         // Restore is only meaningful while an origin is on record; a local file never has
         // one, and applying Restore clears it because the image is then the original.
         if (restoreBtn) restoreBtn.style.display = origin ? '' : 'none'
@@ -340,6 +348,8 @@ export const ImageEditor = defaults(def, (): JSX.Element => {
         setField('')
         cropper?.clear()
         if (rootEl) rootEl.style.display = 'none'
+        unescalate?.()
+        unescalate = null
     }
 
     // --- writing back ------------------------------------------------------------
@@ -483,10 +493,30 @@ export const ImageEditor = defaults(def, (): JSX.Element => {
             el.removeEventListener('pointerdown', onRootPointerDown, true)
             host.removeEventListener(EDIT_IMAGE_EVENT, onOpen)
             document.removeEventListener('keydown', onKeyDown, true)
+            unescalate?.()
+            unescalate = null
         }
     })
 
-    /** Ref-bound clicks: woby's synthetic delegation does not cross a shadow boundary. */
+    /**
+     * Ref-bound clicks, because a delegated `onClick` would never fire in here.
+     *
+     * Not for the reason this comment used to give. woby delegates the ~24 event names on
+     * its allow-list (`onclick` among them) through ONE `document` listener that walks
+     * `event.composedPath()` and calls each node's `_onclick`. That path is complete
+     * across a shadow boundary -- woby attaches its roots as `mode: 'open'` -- so the
+     * boundary is not what breaks delegation.
+     *
+     * What breaks it is that this dialog stops clicks inside its own tree: the panel
+     * swallows them so a press on the panel is not mistaken for a press on the
+     * dismiss-on-click backdrop, and each button below does the same. The document
+     * listener also `break`s on `event.cancelBubble`. An event that never reaches
+     * `document` is never delegated, so the handler must be bound to the element itself.
+     *
+     * `el.onclick` is that direct binding. In JSX the declarative equivalent is
+     * `onClickCapture` -- woby lowercases the prop, sees the `capture` suffix and calls
+     * `addEventListener` on the element instead of delegating.
+     */
     const bindClick = (fn: () => void) => (el: HTMLElement | null) => {
         if (!el) return
         el.onclick = (e: MouseEvent) => { e.preventDefault(); e.stopPropagation(); fn() }

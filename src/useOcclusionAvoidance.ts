@@ -1,5 +1,6 @@
 import { $, $$, useEffect, type Observable, type ObservableMaybe } from 'woby'
 import { deepElementFromPoint } from './helper/deepElementFromPoint'
+import { composedParent, composedClosest } from './helper/composedParent'
 
 /**
  * Occlusion avoidance — "the FAB knows when it is covered, and steps out from
@@ -68,24 +69,6 @@ interface Rect { left: number; top: number; right: number; bottom: number }
 const finite = (v: unknown, fallback: number): number => {
     const n = Number(v)
     return Number.isFinite(n) ? n : fallback
-}
-
-/** The composed (shadow-crossing) parent of a node, or null at the document. */
-const composedParent = (n: Node): Element | null => {
-    const p: Node | null = n instanceof ShadowRoot ? n.host : n.parentNode
-    if (p instanceof ShadowRoot) return p.host
-    return p instanceof Element ? p : null
-}
-
-/** `closest` that walks out of open shadow roots, matching anywhere on the composed chain. */
-const composedClosest = (start: Element, selector: string): Element | null => {
-    if (!selector) return null
-    let n: Node | null = start
-    while (n) {
-        if (n instanceof Element && n.matches(selector)) return n
-        n = n instanceof ShadowRoot ? n.host : n.parentNode
-    }
-    return null
 }
 
 /**

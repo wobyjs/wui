@@ -12,6 +12,7 @@ import {
 } from './ImageSource'
 import { useUndoRedo } from './undoredo'
 import { t } from '../i18n'
+import { escalateAboveOcclusion } from '../helper/escalateAboveOcclusion'
 
 /**
  * ImageDialog: the one way an image gets into the editor.
@@ -64,6 +65,8 @@ export const ImageDialog = (): JSX.Element => {
     const saveDo = undoRedo?.saveDo ?? (() => { })
 
     let rootEl: HTMLElement | null = null
+    /** Undoes the open-time stacking escalation; see {@link escalateAboveOcclusion}. */
+    let unescalate: (() => void) | null = null
     /** Whether the gesture in progress began on the backdrop. See the root's wiring. */
     let pressedBackdrop = false
     let srcInput: HTMLInputElement | null = null
@@ -224,7 +227,12 @@ export const ImageDialog = (): JSX.Element => {
         if (altInput) altInput.value = ''
         if (embedInput) { embedInput.checked = true; embedInput.disabled = false }
         setNote('')
-        if (rootEl) rootEl.style.display = 'flex'
+        if (rootEl) {
+            rootEl.style.display = 'flex'
+            // A reopen while already open re-probes from a clean slate.
+            unescalate?.()
+            unescalate = escalateAboveOcclusion(rootEl)
+        }
         if (detail.file) void takeFile(detail.file)
         else srcInput?.focus()
     }
@@ -237,6 +245,8 @@ export const ImageDialog = (): JSX.Element => {
         savedRange = null
         cropper?.clear()
         if (rootEl) rootEl.style.display = 'none'
+        unescalate?.()
+        unescalate = null
     }
 
     /**
@@ -386,12 +396,17 @@ export const ImageDialog = (): JSX.Element => {
         return () => {
             document.removeEventListener(INSERT_IMAGE_EVENT, onOpen)
             document.removeEventListener('keydown', onKeyDown, true)
+            unescalate?.()
+            unescalate = null
         }
     })
 
     /**
-     * Ref-based DOM handlers throughout: woby's synthetic event delegation does not cross
-     * the shadow boundary this dialog lives behind.
+     * Ref-based DOM handlers throughout, because delegation cannot reach in here: this
+     * dialog stops clicks inside its own tree, and woby's delegated `onclick` runs from a
+     * single `document` listener that never sees a stopped event. Not a shadow-boundary
+     * limitation -- woby walks `event.composedPath()` and its roots are `mode: 'open'`.
+     * Full account in `ImageEditor.tsx`'s `bindClick`.
      */
     const bindClick = (fn: () => void) => (el: HTMLElement | null) => {
         if (!el) return
