@@ -164,6 +164,14 @@ export interface ResizableSpec {
      * pointerup.
      */
     live?: boolean
+    /**
+     * Render the center drag-handle (repositions the element by dragging its
+     * middle). Default `true`, matching the `<img>` behaviour this system was
+     * built for. Set `false` for an element that owns its own pointer/wheel
+     * input over its full area (e.g. an embedded interactive canvas) — the 8
+     * resize handles still render, only the center overlay is omitted.
+     */
+    dragHandle?: boolean
 }
 
 /**

@@ -307,8 +307,14 @@ export const ImageCropper = ({ onHandle }: { onHandle?: (handle: CropperHandle) 
     }
 
     /**
-     * Ref-based onclick throughout: woby's synthetic click delegation does not cross the
-     * shadow boundary this dialog lives behind, so the buttons wire themselves.
+     * Ref-based onclick throughout, so the buttons wire themselves.
+     *
+     * Delegation is unusable here because this dialog stops clicks inside its own tree
+     * (the panel swallows them, and the handler below does too), and woby's delegated
+     * `onclick` runs from a single `document` listener that never sees an event stopped
+     * on the way up. The shadow boundary is NOT the obstacle -- woby walks
+     * `event.composedPath()` and its roots are `mode: 'open'`. Full account in
+     * `ImageEditor.tsx`'s `bindClick`.
      */
     const bindClick = (fn: () => void) => (el: HTMLElement | null) => {
         if (!el) return

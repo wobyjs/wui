@@ -458,6 +458,15 @@ registerEditorPlugin({
 // ── wui-icon-button ──
 
 const iconButtonProps: PluginProp[] = [
+    {
+        name: 'src', type: 'string', label: 'Icon', default: '',
+        hint: 'Image or SVG -- any URL or data URI. Replaces the icon the button was inserted with. "Edit..." opens the pick/crop dialog; SVGs are inlined as vectors rather than rasterised.',
+        action: {
+            label: 'Edit...',
+            title: 'Pick, drop or crop the icon image',
+            run: el => editImageAttr(el, 'src'),
+        },
+    },
     { name: 'disabled', type: 'boolean', label: 'Disabled', default: false },
 ]
 

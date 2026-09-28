@@ -1,5 +1,5 @@
 import { tw } from '@woby/styled'
-import { type CustomElementChildren, $, $$, isObservable, type JSX, defaults, customElement, ElementAttributes, HtmlBoolean, type ObservableMaybe, HtmlClass } from 'woby'
+import { type CustomElementChildren, $, $$, isObservable, type JSX, defaults, customElement, ElementAttributes, HtmlBoolean, type ObservableMaybe, HtmlClass, HtmlString } from 'woby'
 import { registerBaseCls } from './helper/baseCls'
 
 /** color: [&_svg]:fill-current */
@@ -43,6 +43,21 @@ const def = () => ({
     class: $('', HtmlClass) as JSX.Class,
     children: $(null as JSX.Child) as CustomElementChildren,
     disabled: $(false, HtmlBoolean) as ObservableMaybe<boolean>,
+    /**
+     * The icon to show, as an image URL, a `data:` URI or an inline SVG data URI.
+     *
+     * Takes precedence over `children`: woby's `customElement()` always hands the
+     * component a `<slot>` as `children`, so on a `<wui-icon-button>` a
+     * children-first test would always win and `src` would never render. Children
+     * remain the fallback, so `<wui-icon-button><svg/></wui-icon-button>` keeps
+     * working and setting `src` replaces that icon. Clearing the attribute
+     * restores the slotted icon.
+     *
+     * This is what the rich text editor's property panel writes: its **Icon** row
+     * opens `<wui-image-editor>`, which embeds SVG and GIF as-is rather than
+     * rasterising them through a canvas.
+     */
+    src: $('', HtmlString) as ObservableMaybe<string>,
 })
 
 /**
@@ -65,13 +80,7 @@ const baseClass = "inline-flex items-center justify-center relative box-border b
     "disabled:[&_svg]:fill-[rgba(0,0,0,0.26)]"
 
 const IconButton: Defaulted<typeof def> = defaults(def, (props) => {
-    const { class: cn, cls, children, disabled, ...otherProps } = props
-
-    // const baseClass = "inline-flex items-center justify-center relative box-border bg-transparent cursor-pointer select-none align-middle appearance-none no-underline text-center flex-[0_0_auto] text-2xl overflow-visible text-[rgba(0,0,0,0.54)] transition-[background-color] duration ease-in-out delay-[0ms] m-0 p-2 rounded-[50%] border-0 " +
-    //             "[outline:0px] " +
-    //             "duration-[0.3s] hover:bg-[#dde0dd] " +
-    //             "[&_svg]:w-[1em] [&_svg]:h-[1em] [&_svg]:fill-current " +
-    //             "disabled:bg-transparent disabled:text-[rgba(0,0,0,0.26)] disabled:[&_svg]:fill-[rgba(0,0,0,0.26)] disabled:pointer-events-none disabled:cursor-default "
+    const { class: cn, cls, children, disabled, src, ...otherProps } = props
 
     return (
         <button
@@ -79,7 +88,18 @@ const IconButton: Defaulted<typeof def> = defaults(def, (props) => {
             class={[() => $$(cls) ? $$(cls) : baseClass, cn]}
             {...otherProps}
         >
-            {children}
+            {() => {
+                // `src` wins over children, the same way `Avatar` resolves the two. Not a
+                // preference: woby's customElement() always hands the component a <slot> as
+                // `children`, so a children-first test is *always* taken on a
+                // <wui-icon-button> and an `src` set from the property panel would never
+                // render. Children stay the fallback, which is what every existing
+                // `<wui-icon-button><svg/></wui-icon-button>` needs, and setting `src`
+                // replaces that icon -- including the SVG the editor inserts.
+                const s = $$(src)
+                if (s) return <img src={s} class="w-[1em] h-[1em] object-contain pointer-events-none" alt="icon" />
+                return children
+            }}
         </button>
     )
 }) as typeof IconButton

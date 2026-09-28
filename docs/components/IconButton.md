@@ -12,6 +12,7 @@ It supports **SVG**, **IMG**, **OBJECT**, custom classes, hover states, disabled
 <IconButton
     disabled={false}
     cls=""
+    src=""
 >
     <svg>...</svg>
 </IconButton>
@@ -22,6 +23,7 @@ It supports **SVG**, **IMG**, **OBJECT**, custom classes, hover states, disabled
 <wui-icon-button
     disabled="false"
     cls=""
+    src=""
 >
     <svg>...</svg>
 </wui-icon-button>
@@ -37,6 +39,7 @@ It supports **SVG**, **IMG**, **OBJECT**, custom classes, hover states, disabled
   - `<img>`
   - `<object>`
   - Any icon element
+  - An `src` prop (URL, `data:` URI or inline SVG) instead of a child
 - Hover ripple/background effect  
 - Disabled styling with reduced opacity & removed events  
 - Full style override via `cls`  
@@ -86,6 +89,50 @@ Disabled state:
     <object data="/svg/info.svg" width="24" height="24"></object>
 </IconButton>
 ```
+
+## Icon from `src`
+
+Instead of slotting a child, point `src` at an image. It accepts a URL, a `data:`
+URI, or an inline SVG data URI, and it is reactive — writing the attribute swaps
+the icon in place.
+
+```tsx
+<IconButton src="/icons/info.svg" />
+```
+
+```html
+<wui-icon-button src="/icons/info.svg"></wui-icon-button>
+```
+
+`src` wins over children, so it can replace an icon that is already slotted:
+
+```html
+<!-- shows check.svg; remove the attribute and the <svg> returns -->
+<wui-icon-button src="/icons/check.svg">
+    <svg viewBox="0 0 24 24">...</svg>
+</wui-icon-button>
+```
+
+This ordering is required rather than preferred: woby's `customElement()` always
+supplies a `<slot>` as `children`, so a children-first check would always match
+and `src` would never render on `<wui-icon-button>`.
+
+---
+
+# ✏️ Changing the icon in the rich text editor
+
+Select a `<wui-icon-button>` in the editor, open the property panel, and use the
+**Icon** row's `Edit…` button. That opens the image editor, where the icon can be
+replaced by URL, by browsing for a file, or by dropping an image on the panel —
+and cropped or zoomed before applying. Apply writes the result to the element's
+`src`.
+
+SVG and animated GIF go in untouched instead of being rasterised, so an SVG icon
+stays a clean vector at any size.
+
+The same path works for the `<wui-icon-button>` inside a `<wui-badge>` — click the
+inner button to bind the panel to it; the badge's content and position are left
+alone.
 
 ---
 
@@ -169,6 +216,7 @@ Disabled removes interactions and applies muted icon styling.
 # 🧠 Notes
 
 - IconButton renders a native `<button>` for accessibility.  
+- An `src` icon renders as an `<img>` with `pointer-events-none`, so clicks always reach the button.  
 - Icon scaling is automatic via CSS selector rules (`&_svg`, `&_img`).  
 - Disabled state blocks pointer events and keyboard activation.  
 - Default styling mimics Material UI icon buttons.  

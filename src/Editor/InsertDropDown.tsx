@@ -1,6 +1,5 @@
 import { $, $$, customElement, defaults, ElementAttributes, HtmlBoolean, HtmlClass, HtmlString, JSX, Observable, ObservableMaybe } from 'woby'
 import { Button } from '../Button'
-import { EditorContext, useUndoRedo } from './undoredo'
 import { useDropdownDismiss } from './useDropdownDismiss'
 import { range, getCurrentRange } from './utils' // Import getCurrentRange
 import KeyboardDownArrow from '../icons/keyboard_down_arrow'
@@ -319,8 +318,6 @@ const InsertDropDown = defaults(def, (props) => {
 
     const { cls, class: className, disabled, group, ...otherProps } = props
 
-    const editor = $(EditorContext)
-    // const { undos, saveDo } = useUndoRedo() // Removed as saveDo is handled by MutationObserver
     const isOpen = $(false)
     // The menu has two faces: the list of things to insert, and the table size grid. The
     // grid replaces the list in place instead of flying out beside it, because this menu is
@@ -336,11 +333,13 @@ const InsertDropDown = defaults(def, (props) => {
     const toggleDropdown = () => { if ($$(isOpen)) closeDropdown(); else isOpen(true) }
 
     const handleSelectOption = (action: () => void) => {
-        if ($$(editor)) {
-            // saveDo(undos) // Removed: MutationObserver in Editor.tsx should now handle this
-            action()
-            // $$(editor)?.focus() // Re-focus editor
-        }
+        // This used to run behind `if ($$(editor))`, where `editor` came from
+        // `$(EditorContext)` -- the observable *constructor*, so the guard held a fresh
+        // observable wrapping the context object and was true forever. The two statements
+        // it was there to gate (an undo push, a re-focus) are both gone: undo is handled
+        // by the MutationObserver in Editor.tsx, and every action resolves its own editor
+        // surface. Nothing left to guard.
+        action()
         // Every other item has inserted by now and the menu is done. Table has not: it just
         // asked for the grid, so leave the menu up for it.
         if (!$$(showGrid)) isOpen(false)

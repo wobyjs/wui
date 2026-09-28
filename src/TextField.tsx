@@ -133,40 +133,53 @@ const TextField: Defaulted<typeof def> = defaults(def, (props) => {
 	// from shadow DOM correctly (keyup reaches the document but Woby's
 	// handler throws), so we attach native handlers directly on the
 	// input element as a fallback.
+	//
+	// These are also the ONLY place the consumer callbacks fire. The JSX handlers
+	// used to forward `onChange`/`onKeyUp` as well, which notified twice in live
+	// mode (native `input` per keystroke *and* the DOM `change` event at blur) while
+	// leaving `assignOnEnter` mode notified from the JSX side alone. One site each,
+	// fired after the observable write, so a consumer reading `value` inside the
+	// callback always sees the new value.
 	useEffect(() => {
 		const input = $$(inputRef)
 		if (!input) return
 
-		const handleKeyUp = (e: KeyboardEvent) => {
+		/**
+		 * The one DOM -> observable write, and the one `onChange` notification.
+		 *
+		 * The unchanged-value bail is what keeps the notification single: `input` and
+		 * `keyup` both fire for one typed character, and blur arrives on top of that.
+		 * The observable itself would dedupe the write (soby compares with `Object.is`
+		 * before waking subscribers) but `onChange` is a bare call and would not, so
+		 * the guard lives here rather than being left to the observable.
+		 */
+		const commit = (e: Event) => {
 			if (!isObservable(value)) return
-			const targetVal = (e.target as HTMLInputElement).value
+			const next = (e.target as HTMLInputElement).value
+			if ($$(value) === next) return
+			value(next)
+			onChange?.(e as any)
+		}
 
-			if ($$(assignOnEnter)) {
-				if (e.key === "Enter") {
-					value(targetVal)
-					onKeyUp?.(e as any)
-				}
-			} else {
-				value(targetVal)
-				onKeyUp?.(e as any)
-			}
+		const handleKeyUp = (e: KeyboardEvent) => {
+			// A raw passthrough: every keyup, in either mode. It used to be reported
+			// only when this handler also wrote the value, with the JSX handler
+			// covering the rest -- so a plain keystroke in live mode arrived twice.
+			onKeyUp?.(e as any)
+			if (!$$(assignOnEnter) || e.key === "Enter") commit(e)
 		}
 
 		const handleInput = (e: Event) => {
-			if (!$$(assignOnEnter) && isObservable(value)) {
-				value((e.target as HTMLInputElement).value)
-				onChange?.(e as any)
-			}
+			if (!$$(assignOnEnter)) commit(e)
 		}
 
 		// `assignOnEnter` used to write the observable on Enter and NOWHERE else, so
 		// typing a value and then clicking away — including clicking the property
 		// editor's "Commit Changes" button — silently threw the edit away. Leaving the
 		// field is a commit too; Escape-to-discard was never implemented here anyway.
-		const handleBlur = (e: FocusEvent) => {
-			if (!$$(assignOnEnter) || !isObservable(value)) return
-			value((e.target as HTMLInputElement).value)
-		}
+		// Unconditional now: in live mode `input` has already committed, so `commit`
+		// finds the value unchanged and does nothing.
+		const handleBlur = (e: FocusEvent) => commit(e)
 
 		input.addEventListener('keyup', handleKeyUp)
 		input.addEventListener('input', handleInput)
@@ -292,17 +305,10 @@ const TextField: Defaulted<typeof def> = defaults(def, (props) => {
 
 							{...otherProps}
 
-							onChange={(e: any) => {
-								// NOTE: Native handler (attached via addEventListener in useEffect) handles all value-setting.
-								// JSX handler's value() call would use retargeted e.target (shadow host), causing value(undefined).
-								onChange?.(e)
-							}}
-							onKeyUp={(e: any) => {
-								// NOTE: Native handler (attached via addEventListener in useEffect) handles all value-setting.
-								// JSX handler's value() call would use retargeted e.target (shadow host), causing value(undefined).
-								// Only invoke the callback here — native handler already set the observable.
-								onKeyUp?.(e)
-							}}
+							/* No onChange/onKeyUp here. The native handlers above own both the
+							   value-setting and the consumer callbacks: a JSX handler's `e.target`
+							   is the retargeted shadow host, and forwarding the callback from here
+							   as well made every notification arrive twice. */
 						/>
 						<span class="focus-border focus-bg pointer-events-none"><i></i></span>
 

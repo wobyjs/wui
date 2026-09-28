@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ImageEditor / ImageDialog Occlusion Test</title>
+    <link href="/node_modules/@woby/chk/dist/index.css" rel="stylesheet">
+    <script type="module" src="../../src/Editor/ImageEditor.tsx"></script>
+</head>
+<body>
+    <link href="../../dist/wui.css" rel="stylesheet">
+    <h2 class="text-[1.2em] pl-4 font-bold">ImageEditor / ImageDialog Occlusion Test Suite</h2>
+
+    <woby-chk name="ImageEditor-Occlusion">
+        <div snapshot-name="ImageEditor-escapes-a-covering-overlay" class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm relative">
+            <p class="m-2">
+                Opens the real <code>wui-image-editor</code> custom element and adds a high
+                z-index (5000) covering overlay. The dialog should escalate above it via
+                <code>escalateAboveOcclusion</code>.
+            </p>
+            <div class="flex gap-4 items-center my-2">
+                <button id="open-editor-btn" style="position: relative; z-index: 6000;" class="px-3 py-1.5 bg-blue-600 text-white rounded cursor-pointer">Open Image Editor</button>
+                <button id="toggle-cover-btn-1" style="position: relative; z-index: 6000;" class="px-3 py-1.5 bg-red-600 text-white rounded cursor-pointer">Add Cover (z-index 5000)</button>
+            </div>
+            <img id="test-img" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" width="1" height="1" class="hidden" />
+            <div id="occlusion-cover-1" data-cover style="z-index: 5000; background: rgba(239,68,68,.4);" class="fixed inset-0 hidden items-center justify-center text-white font-bold text-xl">
+                Covering overlay (z-index: 5000)
+            </div>
+        </div>
+    </woby-chk>
+
+    <woby-chk name="ImageDialog-Occlusion">
+        <div snapshot-name="ImageDialog-escapes-a-covering-overlay" class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm relative">
+            <p class="m-2">
+                Dispatches the real <code>editor-insert-image</code> event on
+                <code>document</code> (as the editor's toolbar does) and adds a high z-index
+                (5000) covering overlay. The dialog should escalate above it via
+                <code>escalateAboveOcclusion</code>.
+            </p>
+            <div class="flex gap-4 items-center my-2">
+                <button id="open-dialog-btn" style="position: relative; z-index: 6000;" class="px-3 py-1.5 bg-blue-600 text-white rounded cursor-pointer">Open Image Dialog</button>
+                <button id="toggle-cover-btn-2" style="position: relative; z-index: 6000;" class="px-3 py-1.5 bg-red-600 text-white rounded cursor-pointer">Add Cover (z-index 5000)</button>
+            </div>
+            <div id="occlusion-cover-2" data-cover style="z-index: 5000; background: rgba(239,68,68,.4);" class="fixed inset-0 hidden items-center justify-center text-white font-bold text-xl">
+                Covering overlay (z-index: 5000)
+            </div>
+            <div id="dialog-host"></div>
+        </div>
+    </woby-chk>
+
+    <script type="module">
+        import { render } from 'woby'
+        import { openImageEditor } from '../../src/Editor/ImageEditor.tsx'
+        import { ImageDialog, INSERT_IMAGE_EVENT } from '../../src/Editor/ImageDialog.tsx'
+
+        const img = document.getElementById('test-img')
+        document.getElementById('open-editor-btn').onclick = () => openImageEditor(img)
+
+        const bindCoverToggle = (btnId, coverId) => {
+            const btn = document.getElementById(btnId)
+            const cover = document.getElementById(coverId)
+            btn.onclick = () => {
+                const on = cover.classList.toggle('flex')
+                cover.classList.toggle('hidden', !on)
+                btn.textContent = on ? 'Remove Cover (z-index 5000)' : 'Add Cover (z-index 5000)'
+            }
+        }
+        bindCoverToggle('toggle-cover-btn-1', 'occlusion-cover-1')
+        bindCoverToggle('toggle-cover-btn-2', 'occlusion-cover-2')
+
+        // Editor.tsx renders <ImageDialog /> straight into the editor's own shadow
+        // root, so a shadow host normally sits between the dialog and the document --
+        // give it one here too (as escalateAboveOcclusion.test.ts's imageDialogIn
+        // fixture does), instead of a plain light-DOM div, or there is no shadow
+        // boundary left for escalateAboveOcclusion to lift.
+        const dialogHost = document.getElementById('dialog-host')
+        dialogHost.attachShadow({ mode: 'open' })
+        render(ImageDialog, dialogHost.shadowRoot)
+        document.getElementById('open-dialog-btn').onclick = () =>
+            dialogHost.dispatchEvent(new CustomEvent(INSERT_IMAGE_EVENT, { bubbles: true, composed: true, detail: {} }))
+    </script>
+</body>
+</html>

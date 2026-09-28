@@ -132,6 +132,16 @@ than a prop.
 (multi-touch zoom and pan), `NumberField`, and `Banner`, a page header with editable slotted
 content. Plus a run of new icons.
 
+**A replaceable icon on `IconButton`.** A reactive `src` prop — image URL, `data:` URI or
+inline SVG — that takes precedence over slotted children, with the children kept as the
+fallback so existing `<wui-icon-button><svg/></wui-icon-button>` markup is unaffected and
+clearing the attribute restores the slotted icon. `src` has to win rather than lose, because
+woby's `customElement()` always supplies a `<slot>` as `children`, which would otherwise make
+`src` unreachable. In the editor, `<wui-icon-button>` gains an **Icon** property row whose
+`Edit…` action opens `wui-image-editor` on the attribute, so the icon can be replaced by URL,
+file or drop and then cropped; SVG and animated GIF are embedded as-is rather than rasterised.
+Works on a bare `<wui-icon-button>` and on one nested inside `<wui-badge>`.
+
 **Tests.** An SSR suite across all 20 components, a Wheeler suite, and a two-suite test story
 with on-page actual/expect logs.
 

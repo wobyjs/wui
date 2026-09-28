@@ -51194,6 +51194,283 @@ init_index_es();
 // src/Fab.tsx
 init_ssr_shim();
 init_index_es();
+
+// src/useOcclusionAvoidance.ts
+init_ssr_shim();
+init_index_es();
+
+// src/helper/deepElementFromPoint.ts
+init_ssr_shim();
+var deepElementFromPoint = (x2, y2) => {
+  let el = document.elementFromPoint(x2, y2);
+  const seen = /* @__PURE__ */ new Set();
+  while (el && el.shadowRoot && !seen.has(el)) {
+    seen.add(el);
+    el = el.shadowRoot.elementFromPoint(x2, y2) ?? el;
+  }
+  return el;
+};
+
+// src/helper/composedParent.ts
+init_ssr_shim();
+var composedParent = (n3) => {
+  const p = n3 instanceof ShadowRoot ? n3.host : n3.parentNode;
+  if (p instanceof ShadowRoot) return p.host;
+  return p instanceof Element ? p : null;
+};
+var composedClosest = (start, selector2) => {
+  if (!selector2) return null;
+  let n3 = start;
+  while (n3) {
+    if (n3 instanceof Element && n3.matches(selector2)) return n3;
+    n3 = n3 instanceof ShadowRoot ? n3.host : n3.parentNode;
+  }
+  return null;
+};
+
+// src/useOcclusionAvoidance.ts
+var DIRS = [
+  [0, 1],
+  [-1, 0],
+  [-1, 1],
+  [0, -1],
+  [1, 0],
+  [-1, -1]
+];
+var finite = (v2, fallback) => {
+  const n3 = Number(v2);
+  return Number.isFinite(n3) ? n3 : fallback;
+};
+var useOcclusionAvoidance = (ref, opts = {}) => {
+  const state = observable({ covered: false, by: null, dx: 0, dy: 0, blocked: false, maskUp: false });
+  effect(() => {
+    const enabled = get(opts.enabled) ?? true;
+    const margin = finite(get(opts.margin), 8);
+    const max = finite(get(opts.max), 96);
+    const withinSel = get(opts.within) ?? "";
+    const ignoreSel = get(opts.ignore) ?? "";
+    const el = get(ref);
+    if (!enabled || !el) return;
+    let base = el;
+    for (let p = composedParent(base); p && p.tagName.includes("-"); p = composedParent(base)) base = p;
+    const isSelf = (hit) => {
+      for (let n3 = hit; n3; n3 = n3 instanceof ShadowRoot ? n3.host : n3.parentNode)
+        if (n3 === base || n3 === el) return true;
+      return false;
+    };
+    const isShell = (hit) => {
+      if (!hit.tagName.includes("-")) return false;
+      const cs = getComputedStyle(hit);
+      return cs.backgroundColor === "rgba(0, 0, 0, 0)" && (cs.backgroundImage === "none" || cs.backgroundImage === "") && cs.borderTopWidth === "0px" && cs.borderRightWidth === "0px" && cs.borderBottomWidth === "0px" && cs.borderLeftWidth === "0px" && cs.boxShadow === "none";
+    };
+    const coverWhenAt = (dx, dy) => {
+      const prevT = el.style.transition;
+      const prevX = el.style.transform;
+      el.style.transition = "none";
+      el.style.transform = dx || dy ? `translate(${dx}px, ${dy}px)` : "";
+      try {
+        const r = el.getBoundingClientRect();
+        const w2 = r.right - r.left, h = r.bottom - r.top;
+        const cs = getComputedStyle(el);
+        const k2 = 1 - 0.9 / Math.SQRT2;
+        const rad = (v2) => {
+          const [a, b2] = v2.trim().split(/\s+/);
+          const rx = a.endsWith("%") ? parseFloat(a) / 100 * w2 : parseFloat(a) || 0;
+          const bv = b2 ?? a;
+          const ry = bv.endsWith("%") ? parseFloat(bv) / 100 * h : parseFloat(bv) || 0;
+          return [Math.min(w2 / 2, rx), Math.min(h / 2, ry)];
+        };
+        const tl = rad(cs.borderTopLeftRadius), tr2 = rad(cs.borderTopRightRadius);
+        const bl = rad(cs.borderBottomLeftRadius), br2 = rad(cs.borderBottomRightRadius);
+        const cx = (n3) => Math.min(Math.max(2, k2 * n3), Math.max(1, w2 / 2 - 1));
+        const cy = (n3) => Math.min(Math.max(2, k2 * n3), Math.max(1, h / 2 - 1));
+        const pts = [
+          [r.left + cx(tl[0]), r.top + cy(tl[1])],
+          [r.right - cx(tr2[0]), r.top + cy(tr2[1])],
+          [r.left + cx(bl[0]), r.bottom - cy(bl[1])],
+          [r.right - cx(br2[0]), r.bottom - cy(br2[1])],
+          [(r.left + r.right) / 2, (r.top + r.bottom) / 2]
+        ];
+        let first = null;
+        for (const [x2, y2] of pts) {
+          if (x2 < 0 || y2 < 0 || x2 > innerWidth || y2 > innerHeight) return null;
+          const hit = deepElementFromPoint(x2, y2);
+          if (!hit) return null;
+          if (isSelf(hit) || isShell(hit)) continue;
+          if (composedClosest(hit, ignoreSel)) continue;
+          if (isMask(hit)) return hit;
+          if (!first) first = hit;
+        }
+        return first ?? void 0;
+      } finally {
+        el.style.transition = prevT;
+        el.style.transform = prevX;
+      }
+    };
+    const paints = (cs) => {
+      const m = cs.backgroundColor.match(/rgba?\(([^)]*)\)/);
+      if (!m) return cs.backgroundColor !== "" && cs.backgroundColor !== "transparent";
+      const parts = m[1].split(/[,/ ]+/).map(parseFloat).filter((n3) => !isNaN(n3));
+      return (parts.length >= 4 ? parts[3] : 1) > 0;
+    };
+    const isMask = (cover) => {
+      for (let n3 = cover; n3; n3 = n3 instanceof ShadowRoot ? n3.host : n3.parentNode) {
+        if (!(n3 instanceof Element)) continue;
+        if (n3.getAttribute("aria-modal") === "true" || n3.getAttribute("role") === "dialog") return true;
+        if (n3.tagName === "DIALOG" && n3.hasAttribute("open")) return true;
+      }
+      const cs = getComputedStyle(cover);
+      if (cs.position !== "fixed" && cs.position !== "absolute") return false;
+      const r = cover.getBoundingClientRect();
+      return r.width >= innerWidth * 0.9 && r.height >= innerHeight * 0.9 && paints(cs);
+    };
+    const paddingBox = (e3) => {
+      const r = e3.getBoundingClientRect();
+      const cs = getComputedStyle(e3);
+      return {
+        left: r.left + (parseFloat(cs.borderLeftWidth) || 0),
+        top: r.top + (parseFloat(cs.borderTopWidth) || 0),
+        right: r.right - (parseFloat(cs.borderRightWidth) || 0),
+        bottom: r.bottom - (parseFloat(cs.borderBottomWidth) || 0)
+      };
+    };
+    const boundary = () => {
+      const w2 = composedClosest(base, withinSel);
+      if (w2) return paddingBox(w2);
+      const op = base.offsetParent;
+      if (op) return paddingBox(op);
+      return { left: 0, top: 0, right: innerWidth, bottom: innerHeight };
+    };
+    let curDx = 0;
+    let curDy = 0;
+    let patched = false;
+    let savedTransition = "";
+    let savedTransform = "";
+    const apply = (dx, dy) => {
+      if (dx === curDx && dy === curDy) return;
+      curDx = dx;
+      curDy = dy;
+      if (!patched) {
+        patched = true;
+        savedTransition = el.style.transition;
+        savedTransform = el.style.transform;
+        if (el.style.transition !== "none") {
+          const t3 = getComputedStyle(el).transition;
+          if (t3 && t3 !== "none") {
+            const animates = t3.split(",").map((g2) => g2.trim()).filter(Boolean).some((g2) => {
+              const toks = g2.split(/\s+/);
+              return (toks[0] === "all" || toks[0] === "transform") && toks.some((tok) => /^[\d.]+m?s$/.test(tok) && parseFloat(tok) > 0);
+            });
+            if (!animates) el.style.transition = t3 + ", transform 0.25s ease";
+          } else if (t3 !== "none") {
+            el.style.transition = "transform 0.25s ease";
+          }
+        }
+      }
+      el.style.transform = dx || dy ? `translate(${dx}px, ${dy}px)` : "";
+    };
+    const inFlight = () => {
+      const t3 = getComputedStyle(el).transform;
+      if (!t3 || t3 === "none") return false;
+      const nums = t3.match(/-?[\d.]+/g)?.map(Number) ?? [];
+      if (nums.length < 6) return false;
+      const [px, py] = nums.length >= 16 ? [nums[12], nums[13]] : [nums[4], nums[5]];
+      return Math.abs(px - curDx) > 1 || Math.abs(py - curDy) > 1;
+    };
+    const commit = (covered, by, blocked, maskUp) => {
+      const prev = state();
+      if (prev.covered === covered && prev.by === by && prev.dx === curDx && prev.dy === curDy && prev.blocked === blocked && prev.maskUp === maskUp) return;
+      const next = { covered, by, dx: curDx, dy: curDy, blocked, maskUp };
+      state(next);
+      const cb = get(opts.onAvoid, false);
+      if (typeof cb === "function") cb(next);
+    };
+    const findDodge = (home, cover) => {
+      const b2 = boundary();
+      const dyDown = Math.ceil(cover.bottom + margin - home.top);
+      const dyUp = -Math.ceil(home.bottom - (cover.top - margin));
+      const dxLeft = -Math.ceil(home.right - (cover.left - margin));
+      const dxRight = Math.ceil(cover.right + margin - home.left);
+      const xLo = b2.left - home.left, xHi = b2.right - home.right;
+      const yLo = b2.top - home.top, yHi = b2.bottom - home.bottom;
+      const seen = /* @__PURE__ */ new Set();
+      for (const [ux, uy] of DIRS) {
+        let dx = ux > 0 ? dxRight : ux < 0 ? dxLeft : 0;
+        let dy = uy > 0 ? dyDown : uy < 0 ? dyUp : 0;
+        if (Math.max(Math.abs(dx), Math.abs(dy)) > max) continue;
+        dx = Math.round(xLo <= xHi ? Math.min(Math.max(dx, xLo), xHi) : (xLo + xHi) / 2);
+        dy = Math.round(yLo <= yHi ? Math.min(Math.max(dy, yLo), yHi) : (yLo + yHi) / 2);
+        const key = dx + "," + dy;
+        if (seen.has(key)) continue;
+        seen.add(key);
+        if (coverWhenAt(dx, dy) === void 0)
+          return [dx, dy];
+      }
+      return null;
+    };
+    const probe = () => {
+      if (!el.isConnected) return;
+      if (inFlight()) return;
+      const r = el.getBoundingClientRect();
+      if (r.width === 0 && r.height === 0) return;
+      const home = { left: r.left - curDx, top: r.top - curDy, right: r.right - curDx, bottom: r.bottom - curDy };
+      const cover = coverWhenAt(0, 0);
+      if (cover === void 0) {
+        if (curDx || curDy) apply(0, 0);
+        commit(false, null, false, false);
+        return;
+      }
+      if (cover && isMask(cover)) {
+        commit(true, cover, false, true);
+        return;
+      }
+      const dodge = cover ? findDodge(home, cover.getBoundingClientRect()) : null;
+      if (dodge) {
+        apply(dodge[0], dodge[1]);
+        commit(true, cover, false, false);
+      } else {
+        commit(true, cover, true, false);
+      }
+    };
+    let raf = 0;
+    let settle = [];
+    const schedule = () => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        probe();
+        settle.forEach(clearTimeout);
+        settle = [120, 240, 400].map((ms) => setTimeout(probe, ms));
+      });
+    };
+    window.addEventListener("resize", schedule, { passive: true });
+    document.addEventListener("scroll", schedule, { capture: true, passive: true });
+    const ro2 = new ResizeObserver(schedule);
+    ro2.observe(el);
+    const boundEl = composedClosest(base, withinSel) ?? base.offsetParent;
+    if (boundEl) ro2.observe(boundEl);
+    const mo2 = new MutationObserver((muts) => {
+      if (muts.some((m) => m.target !== el)) schedule();
+    });
+    mo2.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ["style", "class"] });
+    schedule();
+    return () => {
+      if (raf) cancelAnimationFrame(raf);
+      settle.forEach(clearTimeout);
+      window.removeEventListener("resize", schedule);
+      document.removeEventListener("scroll", schedule, { capture: true });
+      ro2.disconnect();
+      mo2.disconnect();
+      if (patched) {
+        el.style.transition = savedTransition;
+        el.style.transform = savedTransform;
+      }
+    };
+  });
+  return state;
+};
+
+// src/Fab.tsx
 init_runtime_es();
 var def8 = () => ({
   /** 
@@ -51212,7 +51489,23 @@ var def8 = () => ({
   class: observable("", HtmlClass),
   children: observable(""),
   type: observable("pill", HtmlString),
-  disabled: observable(false, HtmlBoolean)
+  disabled: observable(false, HtmlBoolean),
+  /** Step clear of whatever paints over the FAB. Off by default — a FAB that
+   *  moves on its own is a surprise nobody asked for. See useOcclusionAvoidance. */
+  avoid: observable(false, HtmlBoolean),
+  /** Clearance kept between the FAB and the cover, px. Default 8. */
+  avoidMargin: observable(8, HtmlNumber),
+  /** Total offset budget, px — never exceeded, however much would be needed. Default 96. */
+  avoidMax: observable(96, HtmlNumber),
+  /** Stay-inside container selector; defaults to the offset parent's padding box. */
+  avoidWithin: observable("", HtmlString),
+  /** Elements matching this selector are never counted as covers. */
+  avoidIgnore: observable("", HtmlString),
+  /** Fires whenever the avoidance state changes. Like every function prop, TSX-only.
+   *  Observable default like every other entry: the custom-element prop pipeline only
+   *  wires props whose defaults are `$()` — a plain `null` default silently drops the
+   *  incoming host property, so the callback never arrives on `<wui-fab>`. */
+  onAvoid: observable(null)
 });
 var disabledStyle = "disabled:!bg-[rgba(0,0,0,0.12)] disabled:!text-[rgba(0,0,0,0.26)] disabled:!shadow-none disabled:!cursor-default";
 var variantStyle3 = {
@@ -51227,13 +51520,23 @@ var variantStyle3 = {
 };
 var baseCls2 = (type2) => variantStyle3[type2 || "pill"] ?? "";
 var Fab = defaults(def8, (props) => {
-  const { class: cn2, cls, children, type: variant2, disabled, ...otherProps } = props;
+  const { class: cn2, cls, children, type: variant2, disabled, avoid, avoidMargin, avoidMax, avoidWithin, avoidIgnore, onAvoid, ...otherProps } = props;
+  const btnRef = observable(null);
+  useOcclusionAvoidance(btnRef, {
+    enabled: avoid,
+    margin: avoidMargin,
+    max: avoidMax,
+    within: avoidWithin,
+    ignore: avoidIgnore,
+    onAvoid
+  });
   return /* @__PURE__ */ jsx(
     "button",
     {
       class: [() => get(cls) ? get(cls) : baseCls2(get(variant2)), disabledStyle, cn2],
       disabled,
       ...otherProps,
+      ref: btnRef,
       children: /* @__PURE__ */ jsx("div", { class: "flex items-center", children })
     }
   );
@@ -51344,18 +51647,37 @@ var def9 = () => ({
   cls: observable("", HtmlClass),
   class: observable("", HtmlClass),
   children: observable(null),
-  disabled: observable(false, HtmlBoolean)
+  disabled: observable(false, HtmlBoolean),
+  /**
+   * The icon to show, as an image URL, a `data:` URI or an inline SVG data URI.
+   *
+   * Takes precedence over `children`: woby's `customElement()` always hands the
+   * component a `<slot>` as `children`, so on a `<wui-icon-button>` a
+   * children-first test would always win and `src` would never render. Children
+   * remain the fallback, so `<wui-icon-button><svg/></wui-icon-button>` keeps
+   * working and setting `src` replaces that icon. Clearing the attribute
+   * restores the slotted icon.
+   *
+   * This is what the rich text editor's property panel writes: its **Icon** row
+   * opens `<wui-image-editor>`, which embeds SVG and GIF as-is rather than
+   * rasterising them through a canvas.
+   */
+  src: observable("", HtmlString)
 });
 var baseClass = "inline-flex items-center justify-center relative box-border bg-transparent cursor-pointer select-none align-middle appearance-none no-underline text-center flex-[0_0_auto] text-2xl overflow-visible text-[rgba(0,0,0,0.54)] transition-[background-color] duration ease-in-out delay-[0ms] m-0 p-2 rounded-[50%] border-0 [outline:0px] duration-[0.3s] hover:bg-[#dde0dd] [&_svg]:w-[1em] [&_svg]:h-[1em] [&_svg]:fill-current [&_img]:w-[1em] [&_img]:h-[1em] disabled:bg-transparent disabled:text-[rgba(0,0,0,0.26)] disabled:pointer-events-none disabled:cursor-default disabled:[&_svg]:fill-[rgba(0,0,0,0.26)]";
 var IconButton = defaults(def9, (props) => {
-  const { class: cn2, cls, children, disabled, ...otherProps } = props;
+  const { class: cn2, cls, children, disabled, src, ...otherProps } = props;
   return /* @__PURE__ */ jsx(
     "button",
     {
       disabled,
       class: [() => get(cls) ? get(cls) : baseClass, cn2],
       ...otherProps,
-      children
+      children: () => {
+        const s = get(src);
+        if (s) return /* @__PURE__ */ jsx("img", { src: s, class: "w-[1em] h-[1em] object-contain pointer-events-none", alt: "icon" });
+        return children;
+      }
     }
   );
 });
@@ -55288,29 +55610,21 @@ var TextField = defaults(def14, (props) => {
   effect(() => {
     const input = get(inputRef);
     if (!input) return;
-    const handleKeyUp = (e3) => {
+    const commit = (e3) => {
       if (!isObservable(value)) return;
-      const targetVal = e3.target.value;
-      if (get(assignOnEnter)) {
-        if (e3.key === "Enter") {
-          value(targetVal);
-          onKeyUp?.(e3);
-        }
-      } else {
-        value(targetVal);
-        onKeyUp?.(e3);
-      }
+      const next = e3.target.value;
+      if (get(value) === next) return;
+      value(next);
+      onChange?.(e3);
+    };
+    const handleKeyUp = (e3) => {
+      onKeyUp?.(e3);
+      if (!get(assignOnEnter) || e3.key === "Enter") commit(e3);
     };
     const handleInput = (e3) => {
-      if (!get(assignOnEnter) && isObservable(value)) {
-        value(e3.target.value);
-        onChange?.(e3);
-      }
+      if (!get(assignOnEnter)) commit(e3);
     };
-    const handleBlur = (e3) => {
-      if (!get(assignOnEnter) || !isObservable(value)) return;
-      value(e3.target.value);
-    };
+    const handleBlur = (e3) => commit(e3);
     input.addEventListener("keyup", handleKeyUp);
     input.addEventListener("input", handleInput);
     input.addEventListener("blur", handleBlur);
@@ -55387,13 +55701,7 @@ var TextField = defaults(def14, (props) => {
               disabled,
               type: inputType,
               placeholder: placeholderValue,
-              ...otherProps,
-              onChange: (e3) => {
-                onChange?.(e3);
-              },
-              onKeyUp: (e3) => {
-                onKeyUp?.(e3);
-              }
+              ...otherProps
             }
           ),
           /* @__PURE__ */ jsx("span", { class: "focus-border focus-bg pointer-events-none", children: /* @__PURE__ */ jsx("i", {}) }),

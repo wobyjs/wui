@@ -510,7 +510,10 @@ const ImageResizer = () => {
                     allResizeAttached = false
                 }
             })
-            if (!dragHandleEl || !allResizeAttached || handleInnerEls.length !== 8) {
+            const img = $$(activeImage)
+            const spec = img ? resolveResizable(img) : null
+            const expectsDragHandle = spec?.dragHandle !== false
+            if ((expectsDragHandle && !dragHandleEl) || !allResizeAttached || handleInnerEls.length !== 8) {
                 setTimeout(attachDragHandlers, 50)
             }
         }
@@ -848,22 +851,27 @@ const ImageResizer = () => {
                 })}
             >
                 {/* Drag handle - allows repositioning by dragging center */}
-                <div
-                    ref={(el: HTMLDivElement) => { dragHandleEl = el }}
-                    data-image-drag-handle
-                    style={{
-                        position: 'absolute',
-                        left: '20%',
-                        top: '20%',
-                        width: '60%',
-                        height: '60%',
-                        cursor: 'move',
-                        pointerEvents: 'auto',
-                        ...DRAG_HANDLE_STYLE,
-                        background: 'transparent',
-                        zIndex: 6,
-                    }}
-                />
+                {() => {
+                    const img = $$(activeImage)
+                    return (!img || resolveResizable(img)?.dragHandle !== false) && (
+                        <div
+                            ref={(el: HTMLDivElement) => { dragHandleEl = el }}
+                            data-image-drag-handle
+                            style={{
+                                position: 'absolute',
+                                left: '20%',
+                                top: '20%',
+                                width: '60%',
+                                height: '60%',
+                                cursor: 'move',
+                                pointerEvents: 'auto',
+                                ...DRAG_HANDLE_STYLE,
+                                background: 'transparent',
+                                zIndex: 6,
+                            }}
+                        />
+                    )
+                }}
                 {handles.map((dir, i) => (
                     <div
                         ref={(el: HTMLDivElement) => { handleEls[i] = el }}
