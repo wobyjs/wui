@@ -122,7 +122,7 @@ Each inner Wheeler operates independently with its own options, value, and gestu
 <div style={() => $$(isVisible) ? null : { display: 'none' }}>
   {mask overlay}
   <div class="fixed inset-x-0 bottom-0 z-[100] ...">
-    <div class="bg-white rounded-lg ...">
+    <div class="bg-[var(--wui-white)] rounded-lg ...">
       <WheelerContent />
     </div>
   </div>

@@ -178,12 +178,12 @@ const Card: Defaulted<typeof defCard> = defaults(defCard, (props) => {
     // const kids = () => children
 
     // const base = "bg-white text-[rgba(0,0,0,0.87)] transition-shadow duration-300 ease-in-out  rounded overflow-hidden [transition-delay:0ms]"
-    const base = "bg-white text-[rgba(0,0,0,0.87)] rounded overflow-hidden transition-[box-shadow,transform] duration-300 ease-in-out [transition-delay:0ms]"
+    const base = "bg-[var(--wui-white)] text-[rgba(0,0,0,0.87)] rounded overflow-hidden transition-[box-shadow,transform] duration-300 ease-in-out [transition-delay:0ms]"
 
     const variantCls = () =>
         variant() === "outlined"
             ? "border border-[rgba(0,0,0,0.12)] shadow-none" : variant() === "filled"
-                ? "!bg-gray-50 " + elevationCls(elevation() as Elevation) : elevationCls(elevation() as Elevation)
+                ? "!bg-[var(--wui-gray-50)] " + elevationCls(elevation() as Elevation) : elevationCls(elevation() as Elevation)
 
     const interactiveCls = () =>
         interactive == true ? "cursor-pointer hover:shadow-[rgba(0,0,0,0.2)_0px_4px_5px_-2px,rgba(0,0,0,0.14)_0px_7px_10px_1px,rgba(0,0,0,0.12)_0px_2px_16px_1px]" : ""

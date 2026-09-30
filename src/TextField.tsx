@@ -85,23 +85,23 @@ const def = () => ({
  *
  * To change Line color, patch the following class into effect
  *
- * top line: [&~span]:before:bg-[#4caf50]
+ * top line: [&~span]:before:bg-[var(--wui-mui-green)]
  *
- * bottom line: [&~span]:after:bg-[#4caf50]
+ * bottom line: [&~span]:after:bg-[var(--wui-mui-green)]
  *
- * left line: [&~span_i]:before:bg-[#4caf50]
+ * left line: [&~span_i]:before:bg-[var(--wui-mui-green)]
  *
- * right line: [&~span_i]:after:bg-[#4caf50]
+ * right line: [&~span_i]:after:bg-[var(--wui-mui-green)]
  *
  * Placeholder text: text-[color] text-*
  *
  * With content text: [&:not(:placeholder-shown)]:text-[red]
  *
- * box: border-[#ccc]
+ * box: border-[var(--wui-gray-300)]
  *
- * Fill color: [&~span]:bg-[#ededed]
+ * Fill color: [&~span]:bg-[var(--wui-mui-fill)]
  *
- * Fill color (focused) : [&:focus~span]:bg-[#ededed]
+ * Fill color (focused) : [&:focus~span]:bg-[var(--wui-mui-fill)]
  *
  * label text: [&~label]:text-[red] [&:focus~label]:text-[red] [&:not(:placeholder-shown)~label]:text-[red]
  */
@@ -118,7 +118,7 @@ const TextField: Defaulted<typeof def> = defaults(def, (props) => {
 
 	const { cls, class: cn, children, effect, assignOnEnter, value, inputType, placeholder, disabled, onChange, onKeyUp, label, ref, ...otherProps } = props
 
-	const defaultStyle = "block w-full py-1.5 px-2 text-base text-gray-900 placeholder:text-gray-400 focus:border-blue-500 sm:text-sm/6 truncate"
+	const defaultStyle = "block w-full py-1.5 px-2 text-base text-[var(--wui-gray-900)] placeholder:text-[var(--wui-gray-400)] focus:border-[var(--wui-blue-500)] sm:text-sm/6 truncate"
 
 	const inputRef = $<HTMLInputElement | null>(null)
 
@@ -216,12 +216,12 @@ const TextField: Defaulted<typeof def> = defaults(def, (props) => {
 		return p ? p : ' '
 	})
 	const labelPlaceholderClass = useMemo(() =>
-		$$(label) ? "placeholder:text-transparent focus:placeholder:text-gray-400" : "")
+		$$(label) ? "placeholder:text-transparent focus:placeholder:text-[var(--wui-gray-400)]" : "")
 
 	// `disabled` only reached the DOM attribute — text, border and cursor were
 	// unchanged, so a disabled field looked identical to an editable one. Match
 	// the greys Button already uses for its disabled state.
-	const disabledClass = "disabled:cursor-not-allowed disabled:text-[#00000061] disabled:border-[#0000001f] disabled:bg-[#0000000a] [&:disabled~label]:text-[#00000061]"
+	const disabledClass = "disabled:cursor-not-allowed disabled:text-[var(--wui-disabled-text)] disabled:border-[var(--wui-disabled-border)] disabled:bg-[var(--wui-disabled-bg)] [&:disabled~label]:text-[var(--wui-disabled-text)]"
 
 	const handleFocus = () => {
 		if (inputRef()) {

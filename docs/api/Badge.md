@@ -84,7 +84,7 @@ The visibility class toggles between `hidden` (empty) and the sized pill `min-w-
 <div>
   <span class={[() => ($$(cls) ? $$(cls) : "relative inline-flex align-middle shrink-0 m-4"), cn]} {...otherProps}>
     <span class={[
-        "flex place-content-center items-center absolute box-border font-medium text-xs leading-none z-[1] text-white scale-100 [flex-flow:wrap] [transition:transform_225ms_cubic-bezier(0.4,0,0.2,1)0ms]",
+        "flex place-content-center items-center absolute box-border font-medium text-xs leading-none z-[1] text-[var(--wui-white)] scale-100 [flex-flow:wrap] [transition:transform_225ms_cubic-bezier(0.4,0,0.2,1)0ms]",
         visibilityClass(),
         transformOriginClass(),
         positionClasses(),

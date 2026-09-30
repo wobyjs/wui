@@ -8,7 +8,7 @@ const wrapperStyles = "absolute top-0 left-0 w-full h-full origin-top-left will-
 // Indexed by the `type`/`variant`/`size` prop, which is a free-form string on the custom
 // element (attributes carry no enum), so the table needs a string index signature.
 const zoomableStyles: Record<string, string> = {
-    default: "relative overflow-hidden touch-none border border-gray-300 rounded-lg"
+    default: "relative overflow-hidden touch-none border border-[var(--wui-gray-300)] rounded-lg"
 }
 
 

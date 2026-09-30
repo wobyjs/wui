@@ -230,7 +230,7 @@ const ZoomControl = defaults(def, (props) => {
 
         <div
             ref={menuRef}
-            class="origin-top-left absolute left-0 top-full mt-1 w-28 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-20 py-1"
+            class="origin-top-left absolute left-0 top-full mt-1 w-28 rounded-md shadow-lg bg-[var(--wui-white)] ring-1 ring-black ring-opacity-5 z-20 py-1"
             onMouseDown={hold}
         >
             {PRESETS.map(z =>
@@ -238,7 +238,7 @@ const ZoomControl = defaults(def, (props) => {
                     type="text"
                     class={() => [
                         'w-full !justify-start !px-3 !py-1 text-xs',
-                        () => $$(editorZoom) === z ? '!bg-slate-200' : '',
+                        () => $$(editorZoom) === z ? '!bg-[var(--wui-slate-200)]' : '',
                     ]}
                     onClick={pickPreset(z)}
                     onMouseDown={hold}

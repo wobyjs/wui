@@ -40,7 +40,7 @@ const def = () => ({
 const LanguageSwitch = defaults(def, (props) => {
     const { class: cn, cls, buttonType, showName, ...otherProps } = props
 
-    const BASE_BTN = 'size-full inline-flex items-center justify-center gap-1 rounded-md border border-gray-300 shadow-sm px-2 py-2 bg-white text-sm font-medium text-black hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500 cursor-pointer'
+    const BASE_BTN = 'size-full inline-flex items-center justify-center gap-1 rounded-md border border-[var(--wui-gray-300)] shadow-sm px-2 py-2 bg-[var(--wui-white)] text-sm font-medium text-[var(--wui-black)] hover:bg-[var(--wui-gray-50)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-[var(--wui-indigo-500)] cursor-pointer'
 
     const isOpen = $(false) as Observable<boolean>
     const dropdownRef = $<HTMLElement>(null as any)
@@ -68,7 +68,7 @@ const LanguageSwitch = defaults(def, (props) => {
     const Menu = () => (
         <div
             ref={menuRef}
-            class="origin-top-left absolute left-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10"
+            class="origin-top-left absolute left-0 mt-2 w-56 rounded-md shadow-lg bg-[var(--wui-white)] ring-1 ring-black ring-opacity-5 focus:outline-none z-10"
             role="menu"
             aria-orientation="vertical"
             onMouseDown={(e: any) => { e.stopPropagation(); e.preventDefault() }}
@@ -81,8 +81,8 @@ const LanguageSwitch = defaults(def, (props) => {
                     <Button
                         type="outlined"
                         cls={[
-                            'w-full flex items-center justify-between gap-3 px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer',
-                            () => info.code === $$(locale) ? '!bg-slate-200' : '',
+                            'w-full flex items-center justify-between gap-3 px-4 py-2 text-sm text-left text-[var(--wui-gray-700)] hover:bg-[var(--wui-gray-100)] hover:text-[var(--wui-gray-900)] cursor-pointer',
+                            () => info.code === $$(locale) ? '!bg-[var(--wui-slate-200)]' : '',
                         ]}
                         role="menuitem"
                         onClick={(e) => { e.preventDefault(); pick(info) }}
@@ -90,7 +90,7 @@ const LanguageSwitch = defaults(def, (props) => {
                         <span class="truncate">{info.name}</span>
                         {/* The tag, not the English name: it is what `setLocale` takes and
                             what disambiguates two packs whose endonyms look alike. */}
-                        <span class="text-xs text-gray-400 shrink-0">{info.code}</span>
+                        <span class="text-xs text-[var(--wui-gray-400)] shrink-0">{info.code}</span>
                     </Button>
                 ))}
             </div>

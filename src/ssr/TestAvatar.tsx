@@ -36,7 +36,7 @@ const TestAvatar = (): JSX.Element => {
 if (typeof globalThis.__isSSRTest__ !== 'undefined') {
     TestAvatar()
 
-    const BASE_CLASS = "relative flex items-center justify-center align-middle select-none leading-none overflow-hidden shrink-0 m-0 bg-[rgb(189,189,189)] text-white"
+    const BASE_CLASS = "relative flex items-center justify-center align-middle select-none leading-none overflow-hidden shrink-0 m-0 bg-[rgb(189,189,189)] text-[var(--wui-white)]"
 
     const fullElements = [
         `<h3>Avatar</h3><div class="rounded-full w-6 h-6 text-xs ${BASE_CLASS}"></div>`,
@@ -74,7 +74,7 @@ TestAvatar.test = {
     compareActualValues: true,
     expect: () => {
         const idx = $$(testObservables[name])
-        const BASE_CLASS = "relative flex items-center justify-center align-middle select-none leading-none overflow-hidden shrink-0 m-0 bg-[rgb(189,189,189)] text-white"
+        const BASE_CLASS = "relative flex items-center justify-center align-middle select-none leading-none overflow-hidden shrink-0 m-0 bg-[rgb(189,189,189)] text-[var(--wui-white)]"
         const elements: (string | string[])[] = [
             `<div class="rounded-full w-6 h-6 text-xs ${BASE_CLASS}"></div>`,
             [

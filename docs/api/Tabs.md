@@ -73,7 +73,7 @@ Tabs render:
 
 ```tsx
 <div class={[() => $$(cls) ? $$(cls) : "", cn]} {...otherProps} ref={mainRef}>
-  <div class="flex justify-center flex-wrap gap-2 my-4 border-2 border-gray-200 py-2 rounded-lg">
+  <div class="flex justify-center flex-wrap gap-2 my-4 border-2 border-[var(--wui-gray-200)] py-2 rounded-lg">
     {titles.map(t => (
       <Button type="custom" buttonFunction="button" cls={[...]} onClick={e => currentTab(t)}>
         {t}
@@ -81,7 +81,7 @@ Tabs render:
     ))}
   </div>
 
-  <div ref={contentRef} class="p-4 border border-gray-200 rounded-b-lg shadow-sm bg-white min-h-[50px]">
+  <div ref={contentRef} class="p-4 border border-[var(--wui-gray-200)] rounded-b-lg shadow-sm bg-[var(--wui-white)] min-h-[50px]">
     {children}
   </div>
 </div>

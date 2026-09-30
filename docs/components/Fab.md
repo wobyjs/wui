@@ -113,7 +113,7 @@ Disabled FABs cannot be interacted with and will not fire click events.
 
 ### Customize background & text
 ```tsx
-<Fab type="circular" cls="!bg-green-500 !text-white">
+<Fab type="circular" cls="!bg-[var(--wui-green-500)] !text-[var(--wui-white)]">
     👍
 </Fab>
 ```
@@ -122,7 +122,7 @@ Disabled FABs cannot be interacted with and will not fire click events.
 ```tsx
 <Fab
     type="pill"
-    cls="!px-8 !py-4 !bg-purple-600 !rounded-full !shadow-lg hover:!bg-purple-700"
+    cls="!px-8 !py-4 !bg-[var(--wui-purple-600)] !rounded-full !shadow-lg hover:!bg-purple-700"
 >
     Custom Pill
 </Fab>

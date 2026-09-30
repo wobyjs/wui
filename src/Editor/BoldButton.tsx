@@ -69,8 +69,8 @@ const BoldButton: Defaulted<typeof def> = defaults(def, (props) => {
             title={localized(title, 'editor.bold')}
             class={() => [
                 () => $$(cls) ? $$(cls) : $$(cn),
-                () => $$(isActive) ? '!bg-slate-200' : '',
-                () => $$(isMixed) ? '!bg-slate-100 opacity-60' : ''
+                () => $$(isActive) ? '!bg-[var(--wui-slate-200)]' : '',
+                () => $$(isMixed) ? '!bg-[var(--wui-slate-100)] opacity-60' : ''
             ]}
             aria-pressed={() => $$(isActive) ? "true" : $$(isMixed) ? "mixed" : "false"}
             disabled={disabled}

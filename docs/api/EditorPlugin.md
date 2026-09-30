@@ -592,7 +592,7 @@ side-effect import rule as above.
 | `rule` | `wui-rule` | — | No |
 
 `rule` replaced the menu's old built-in **Horizontal Rule** row, which ran
-`execCommand('insertHTML', '<hr class="my-4 mx-auto border-gray-400" />')`. Both insert a
+`execCommand('insertHTML', '<hr class="my-4 mx-auto border-[var(--wui-gray-400)]" />')`. Both insert a
 horizontal line and only one of them is editable afterwards: a bare `<hr>` has no plugin, so
 clicking it opens no property panel and its appearance is frozen in a class string, while
 `<wui-rule>` carries `variant` / `weight` / `color` / `width` / `align` / `glyph` and can draw a

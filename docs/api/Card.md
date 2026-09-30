@@ -47,7 +47,7 @@ variant === "outlined"
     → "border border-[rgba(0,0,0,0.12)] shadow-none"
 
 variant === "filled"
-    → "!bg-gray-50" + elevation shadow
+    → "!bg-[var(--wui-gray-50)]" + elevation shadow
 
 variant === "elevated"
     → elevation shadow only

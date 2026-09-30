@@ -22,7 +22,7 @@ const def = () => ({
 const FontSize: Defaulted<typeof def> = defaults(def, (props) => {
     const { cls, class: cn, buttonType, editable, fontSize, step, ...otherProps } = props as any
     const editor = useEditor()
-    const BASE_BTN = "w-1/5 justify-center px-2 py-1 border border-gray-300";
+    const BASE_BTN = "w-1/5 justify-center px-2 py-1 border border-[var(--wui-gray-300)]";
 
     // #region Synchronization (Hooks)
     /**
@@ -140,7 +140,7 @@ const FontSize: Defaulted<typeof def> = defaults(def, (props) => {
             onClick={onStepClick(delta)}
             onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation(); }}
         >
-            <Icon class="w-full h-full text-gray-500" />
+            <Icon class="w-full h-full text-[var(--wui-gray-500)]" />
         </Button>
     );
 
@@ -152,8 +152,8 @@ const FontSize: Defaulted<typeof def> = defaults(def, (props) => {
             onFocus={onInputChange}
             onBlur={(e: any) => e.currentTarget.value = $$(fontSize).toString()}
             class={[
-                "text-center text-sm h-auto w-3/5 border-y border-gray-300",
-                () => $$(editable) ? "bg-white" : "bg-gray-50 cursor-not-allowed",
+                "text-center text-sm h-auto w-3/5 border-y border-[var(--wui-gray-300)]",
+                () => $$(editable) ? "bg-[var(--wui-white)]" : "bg-[var(--wui-gray-50)] cursor-not-allowed",
             ]}
         />
     );

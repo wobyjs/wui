@@ -65,10 +65,10 @@ const baseCls = (effect: string | null | undefined) => styleMap[effect || ''] ||
  * 
  * background color
  * 
- * [&>div]:before:bg-[#03a9f4] 
- * [&>div]:after:bg-[#f44336]
- * 
- * [&>input:checked~span]:bg-[#fcebeb]
+ * [&>div]:before:bg-[var(--wui-mui-lightblue)]
+ * [&>div]:after:bg-[var(--wui-mui-red)]
+ *
+ * [&>input:checked~span]:bg-[var(--wui-mui-red-pale)]
  *
  * 
  * Some special case may need to see the output html tree node and modify classes as needed

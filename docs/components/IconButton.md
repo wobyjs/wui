@@ -53,7 +53,7 @@ IconButton comes with:
 
 - Circular dimensions  
 - Medium padding (`p-2`)  
-- Subtle hover background (`hover:bg-[#dde0dd]`)  
+- Subtle hover background (`hover:bg-[var(--wui-hover-gray)]`)  
 - Icon auto-scaling via CSS:
   - `svg` → `1em` size + `fill-current`
   - `img` → `1em`
@@ -182,7 +182,7 @@ Disabled removes interactions and applies muted icon styling.
 
 ### Blue Background
 ```tsx
-<IconButton cls="!bg-blue-500 !text-white hover:!bg-blue-600">
+<IconButton cls="!bg-[var(--wui-blue-500)] !text-[var(--wui-white)] hover:!bg-[var(--wui-blue-600)]">
     <svg>...</svg>
 </IconButton>
 ```
@@ -196,7 +196,7 @@ Disabled removes interactions and applies muted icon styling.
 
 ### HTML Example
 ```html
-<wui-icon-button cls="m-2 p-2 bg-blue-500 text-white rounded-full">
+<wui-icon-button cls="m-2 p-2 bg-[var(--wui-blue-500)] text-[var(--wui-white)] rounded-full">
     <svg>...</svg>
 </wui-icon-button>
 ```

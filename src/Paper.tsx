@@ -1,6 +1,6 @@
 import { type CustomElementChildren, $, $$, customElement, defaults, ElementAttributes, HtmlClass, HtmlNumber, ObservableMaybe, useMemo } from "woby"
 
-const baseClass = "bg-white transition-shadow duration-300 ease-in-out rounded-lg "
+const baseClass = "bg-[var(--wui-white)] transition-shadow duration-300 ease-in-out rounded-lg "
 
 // Indexed by the `type`/`variant`/`size` prop, which is a free-form string on the custom
 // element (attributes carry no enum), so the table needs a string index signature.

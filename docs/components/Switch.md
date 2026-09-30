@@ -174,13 +174,13 @@ restyle the element from scratch. To *add* utilities on top of the base, use
 ### Example
 
 ```tsx
-<Switch effect="ios" class="!scale-125 ![&>div]:bg-blue-500"></Switch>
+<Switch effect="ios" class="!scale-125 ![&>div]:bg-[var(--wui-blue-500)]"></Switch>
 ```
 
 ### HTML
 
 ```html
-<wui-switch effect="ios" class="!scale-125 ![&>div]:bg-blue-500"></wui-switch>
+<wui-switch effect="ios" class="!scale-125 ![&>div]:bg-[var(--wui-blue-500)]"></wui-switch>
 ```
 
 ---

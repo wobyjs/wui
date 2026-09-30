@@ -88,16 +88,16 @@ const MultiWheeler = defaults(def, (props) => {
     };
 
     // --- Render (unchanged) ---
-    const dateTimeWheelerCls = 'multi-Wheeler flex w-full bg-white p-1 border justify-center border-gray-300 rounded-md shadow-sm '
+    const dateTimeWheelerCls = 'multi-Wheeler flex w-full bg-[var(--wui-white)] p-1 border justify-center border-[var(--wui-gray-300)] rounded-md shadow-sm '
     const wheelWrapperCls = 'wheel-wrapper flex-1'
 
-    const br = useMemo(() => $$(divider) ? 'border-l border-gray-300 dark:border-gray-600' : null)
+    const br = useMemo(() => $$(divider) ? 'border-l border-[var(--wui-gray-300)]' : null)
 
     const ref = $<HTMLDivElement>()
 
     // #region Multi Wheeler Component
     const WheelerContent = () => (
-        <div class="multi-wheeler-content flex flex-col w-full bg-white">
+        <div class="multi-wheeler-content flex flex-col w-full bg-[var(--wui-white)]">
             {/* Header with Title and Buttons */}
             <div class="flex items-center justify-between px-4 py-2 border-b">
                 <div class="w-[80px] flex justify-start">
@@ -184,7 +184,7 @@ const MultiWheeler = defaults(def, (props) => {
                     class="fixed inset-x-0 bottom-0 z-[100] flex justify-center items-end p-4 pointer-events-none"
                     {...otherProps}
                 >
-                    <div class={() => ["bg-white rounded-lg overflow-hidden shadow-xl w-full pointer-events-auto", $$(cls), $$(cn)]}>
+                    <div class={() => ["bg-[var(--wui-white)] rounded-lg overflow-hidden shadow-xl w-full pointer-events-auto", $$(cls), $$(cn)]}>
                         <WheelerContent />
                     </div>
                 </div>

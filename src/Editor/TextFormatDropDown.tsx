@@ -20,7 +20,7 @@ export const FORMAT_OPTIONS = [
     { label: 'Heading 2', key: 'editor.heading2', tag: 'h2', hotkey: 'Ctrl+Alt+2', class: 'text-2xl font-semibold mb-3' },
     { label: 'Heading 3', key: 'editor.heading3', tag: 'h3', hotkey: 'Ctrl+Alt+3', class: 'text-xl font-medium mb-2' },
     { label: 'Quote', key: 'editor.quote', tag: QUOTE_TAG, hotkey: 'Ctrl+Alt+Q', class: QUOTE_CLASSES },
-    { label: 'Code Block', key: 'editor.codeBlock', tag: 'pre', hotkey: 'Ctrl+Alt+C', class: 'bg-gray-100 p-2 rounded font-mono text-sm overflow-x-auto' },
+    { label: 'Code Block', key: 'editor.codeBlock', tag: 'pre', hotkey: 'Ctrl+Alt+C', class: 'bg-[var(--wui-gray-100)] p-2 rounded font-mono text-sm overflow-x-auto' },
 ]
 
 /** The translated caption for one of the English identities above. */
@@ -41,7 +41,7 @@ const def = () => ({
 const TextFormatDropDown = defaults(def, (props) => {
     const { cls, class: cn, disabled, selectedFormat, buttonType: btnType, ...otherProps } = props
 
-    const BASE_BTN = "size-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-black hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500 cursor-pointer"
+    const BASE_BTN = "size-full inline-flex justify-center rounded-md border border-[var(--wui-gray-300)] shadow-sm px-4 py-2 bg-[var(--wui-white)] text-sm font-medium text-[var(--wui-black)] hover:bg-[var(--wui-gray-50)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-[var(--wui-indigo-500)] cursor-pointer"
 
     const editor = useEditor()
 
@@ -176,7 +176,7 @@ const TextFormatDropDown = defaults(def, (props) => {
     const DropDownMenu = () => {
         return (
             <div
-                class="origin-top-left absolute left-0 top-full mt-2 w-64 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10 max-h-80 overflow-y-auto"
+                class="origin-top-left absolute left-0 top-full mt-2 w-64 rounded-md shadow-lg bg-[var(--wui-white)] ring-1 ring-black ring-opacity-5 focus:outline-none z-10 max-h-80 overflow-y-auto"
                 role="menu"
                 aria-orientation="vertical"
                 aria-labelledby="menu-button"
@@ -187,7 +187,7 @@ const TextFormatDropDown = defaults(def, (props) => {
                         <Button
                             type='outlined'
                             // Button handles click and basic hover styles
-                            cls="w-full block text-gray-700 px-4 py-2 text-sm hover:bg-gray-100 hover:text-gray-900 cursor-pointer"
+                            cls="w-full block text-[var(--wui-gray-700)] px-4 py-2 text-sm hover:bg-[var(--wui-gray-100)] hover:text-[var(--wui-gray-900)] cursor-pointer"
                             role="menuitem"
                             onClick={(e) => { e.preventDefault(); handleSelectFormat(opt.tag, opt.label as TextFormatOptions, opt.class) }}
                         >
@@ -196,7 +196,7 @@ const TextFormatDropDown = defaults(def, (props) => {
                                     {() => formatLabel(opt.label)}
                                 </span>
 
-                                <span class="text-xs text-right text-gray-500 shrink-0 ml-4">
+                                <span class="text-xs text-right text-[var(--wui-gray-500)] shrink-0 ml-4">
                                     {opt.hotkey}
                                 </span>
                             </div>
@@ -229,7 +229,7 @@ const TextFormatDropDown = defaults(def, (props) => {
                 </Button>
                 <Button
                     type={btnType}
-                    class={[TOOLBAR_CONTROL, "size-full inline-flex justify-center items-center rounded-md border border-gray-300 shadow-sm bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500 cursor-pointer px-2"]}
+                    class={[TOOLBAR_CONTROL, "size-full inline-flex justify-center items-center rounded-md border border-[var(--wui-gray-300)] shadow-sm bg-[var(--wui-white)] hover:bg-[var(--wui-gray-50)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-[var(--wui-indigo-500)] cursor-pointer px-2"]}
                     onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleDropdown(); }}
                     onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation(); }}
                     title={() => t('editor.paragraphStyle')}

@@ -57,7 +57,7 @@ const PrintButton = defaults(def, (props) => {
             cls={() => [
                 TOOLBAR_CONTROL,
                 'border-none p-1.5 transition-all',
-                'text-gray-700 hover:bg-gray-100 cursor-pointer',
+                'text-[var(--wui-gray-700)] hover:bg-[var(--wui-gray-100)] cursor-pointer',
                 () => $$(cls) ? $$(cls) : $$(cn),
             ]}
             {...otherProps}

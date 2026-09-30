@@ -179,7 +179,7 @@ Use the `cls` prop to add or override classes on the appbar.
 
 ```tsx
 <Appbar
-    cls="bg-black/80 text-white"
+    cls="bg-[var(--wui-black)]/80 text-[var(--wui-white)]"
 >
     <div class="flex items-center h-12 px-4">
         <span class="font-medium">Custom Appbar</span>
@@ -191,7 +191,7 @@ Use the `cls` prop to add or override classes on the appbar.
 
 ```html
 <wui-appbar
-    cls="bg-black/80 text-white"
+    cls="bg-[var(--wui-black)]/80 text-[var(--wui-white)]"
 >
     <div class="flex items-center h-12 px-4">
         <span class="font-medium">Custom Appbar</span>

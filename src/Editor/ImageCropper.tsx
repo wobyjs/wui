@@ -321,7 +321,7 @@ export const ImageCropper = ({ onHandle }: { onHandle?: (handle: CropperHandle) 
         el.onclick = (e: MouseEvent) => { e.preventDefault(); e.stopPropagation(); fn() }
     }
 
-    const toolBtn = 'px-2 h-6 min-w-[26px] text-xs leading-none rounded border border-gray-300 bg-white text-gray-700 hover:bg-gray-100'
+    const toolBtn = 'px-2 h-6 min-w-[26px] text-xs leading-none rounded border border-[var(--wui-gray-300)] bg-[var(--wui-white)] text-[var(--wui-gray-700)] hover:bg-[var(--wui-gray-100)]'
 
     return (
         <div class="flex flex-col gap-1.5">
@@ -329,12 +329,12 @@ export const ImageCropper = ({ onHandle }: { onHandle?: (handle: CropperHandle) 
                 <button type="button" class={toolBtn} title={() => msg('editor.zoom.out')} ref={bindClick(() => zoomCentre(1 / ZOOM_STEP))}>&minus;</button>
                 <button type="button" class={toolBtn} title={() => msg('editor.zoom.in')} ref={bindClick(() => zoomCentre(ZOOM_STEP))}>+</button>
                 <button type="button" class={toolBtn} title={() => msg('editor.image.fitWhole')} ref={bindClick(fit)}>{() => msg('editor.zoom.fit')}</button>
-                <span class="ml-auto text-[11px] text-gray-500 select-none">drag to pan &middot; ctrl+wheel to zoom</span>
+                <span class="ml-auto text-[11px] text-[var(--wui-gray-500)] select-none">drag to pan &middot; ctrl+wheel to zoom</span>
             </div>
 
             <div
                 ref={el => { frameEl = el as HTMLDivElement }}
-                class="relative overflow-hidden rounded border border-gray-300 cursor-grab touch-none select-none"
+                class="relative overflow-hidden rounded border border-[var(--wui-gray-300)] cursor-grab touch-none select-none"
                 style={{
                     // A checkerboard, so the transparent margin left by zooming out past
                     // the image edge reads as "nothing here" rather than "white here".
@@ -351,7 +351,7 @@ export const ImageCropper = ({ onHandle }: { onHandle?: (handle: CropperHandle) 
 
                 <div
                     ref={el => { placeholderEl = el as HTMLElement }}
-                    class="absolute inset-0 grid place-items-center text-xs text-gray-400 pointer-events-none"
+                    class="absolute inset-0 grid place-items-center text-xs text-[var(--wui-gray-400)] pointer-events-none"
                 >
                     No image yet
                 </div>
@@ -359,12 +359,12 @@ export const ImageCropper = ({ onHandle }: { onHandle?: (handle: CropperHandle) 
                 <div
                     data-crop-resize
                     title={() => msg('editor.image.dragToResizeCrop')}
-                    class="absolute right-0 bottom-0 w-3.5 h-3.5 bg-blue-600 rounded-tl-sm cursor-se-resize touch-none"
+                    class="absolute right-0 bottom-0 w-3.5 h-3.5 bg-[var(--wui-blue-600)] rounded-tl-sm cursor-se-resize touch-none"
                     ref={el => { if (el) (el as HTMLElement).onpointerdown = startResize }}
                 />
             </div>
 
-            <span ref={el => { readoutEl = el as HTMLElement }} class="text-[11px] text-gray-500 select-none" />
+            <span ref={el => { readoutEl = el as HTMLElement }} class="text-[11px] text-[var(--wui-gray-500)] select-none" />
         </div>
     )
 }

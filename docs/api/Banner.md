@@ -104,7 +104,7 @@ Two details that are not cosmetic:
 
 ```ts
 const BASE_CLASS  = 'relative flex flex-row items-center overflow-hidden box-border'
-const PRINT_CLASS = 'w-[209mm] mx-auto mb-[10px] border border-solid border-black text-[200%] font-bold'
+const PRINT_CLASS = 'w-[209mm] mx-auto mb-[10px] border border-solid border-[var(--wui-black)] text-[200%] font-bold'
 ```
 
 `BASE_CLASS` deliberately carries **no width**. Width follows `print`, and two width utilities in

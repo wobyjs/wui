@@ -31,7 +31,7 @@ const TestCollapse = (): JSX.Element => {
     return ret
 }
 
-const COLLAPSE_BASE = "overflow-hidden transition-height duration-200 ease-in-out bg-[#ccc]"
+const COLLAPSE_BASE = "overflow-hidden transition-height duration-200 ease-in-out bg-[var(--wui-gray-300)]"
 
 // SSR test (Node.js)
 if (typeof globalThis.__isSSRTest__ !== 'undefined') {

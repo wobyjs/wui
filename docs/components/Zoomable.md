@@ -218,7 +218,7 @@ const scale = $(1)
 # 🎨 Styling with `cls`
 
 ```tsx
-<Zoomable cls="bg-gray-100 border rounded-xl">
+<Zoomable cls="bg-[var(--wui-gray-100)] border rounded-xl">
     <img src="/images/map.jpg" />
 </Zoomable>
 ```

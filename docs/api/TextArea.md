@@ -228,12 +228,12 @@ Effect colours can be overridden via Tailwind arbitrary selectors targeting the 
 
 | Element               | Selector                                    |
 | --------------------- | ------------------------------------------- |
-| Top line              | `[&\~span]:before:bg-[#4caf50]`             |
-| Bottom line           | `[&\~span]:after:bg-[#4caf50]`              |
-| Left line             | `[&\~span_i]:before:bg-[#4caf50]`           |
-| Right line            | `[&\~span_i]:after:bg-[#4caf50]`            |
-| Fill colour           | `[&\~span]:bg-[#ededed]`                    |
-| Fill colour (focused) | `[&:focus\~span]:bg-[#ededed]`              |
+| Top line              | `[&\~span]:before:bg-[var(--wui-mui-green)]`             |
+| Bottom line           | `[&\~span]:after:bg-[var(--wui-mui-green)]`              |
+| Left line             | `[&\~span_i]:before:bg-[var(--wui-mui-green)]`           |
+| Right line            | `[&\~span_i]:after:bg-[var(--wui-mui-green)]`            |
+| Fill colour           | `[&\~span]:bg-[var(--wui-mui-fill)]`                    |
+| Fill colour (focused) | `[&:focus\~span]:bg-[var(--wui-mui-fill)]`              |
 | Label text            | `[&\~label]:text-[red]`                     |
 | Label text (focused)  | `[&:focus\~label]:text-[red]`               |
 | Label text (filled)   | `[&:not(:placeholder-shown)~label]:text-[red]` |

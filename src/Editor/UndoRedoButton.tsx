@@ -60,8 +60,8 @@ const UndoRedoButton = defaults(def, (props) => {
             cls={() => [
                 TOOLBAR_CONTROL,
                 "border-none p-1.5 transition-all",
-                "text-gray-700 hover:bg-gray-100 cursor-pointer",
-                "disabled:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+                "text-[var(--wui-gray-700)] hover:bg-[var(--wui-gray-100)] cursor-pointer",
+                "disabled:text-[var(--wui-gray-300)] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent"
             ]}
             {...otherProps}
         >

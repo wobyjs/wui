@@ -146,7 +146,7 @@ const tabs = $([
 ### Tabs-level styling
 
 ```tsx
-<Tabs cls="p-4 border-b border-gray-300">
+<Tabs cls="p-4 border-b border-[var(--wui-gray-300)]">
     <Tab title="A">A</Tab>
     <Tab title="B">B</Tab>
 </Tabs>
@@ -155,7 +155,7 @@ const tabs = $([
 ### Tab-level styling
 
 ```tsx
-<Tab title="Styled" cls="text-blue-500 font-bold">
+<Tab title="Styled" cls="text-[var(--wui-blue-500)] font-bold">
     Content...
 </Tab>
 ```
@@ -164,9 +164,9 @@ const tabs = $([
 
 ```tsx
 <Tabs
-    navCls="flex gap-2 bg-gray-100 p-2 rounded-xl"
-    activeButtonCls="!bg-blue-600 !text-white"
-    inactiveButtonCls="!bg-gray-200 !text-gray-700"
+    navCls="flex gap-2 bg-[var(--wui-gray-100)] p-2 rounded-xl"
+    activeButtonCls="!bg-[var(--wui-blue-600)] !text-[var(--wui-white)]"
+    inactiveButtonCls="!bg-[var(--wui-gray-200)] !text-[var(--wui-gray-700)]"
 >
     <Tab title="Home">...</Tab>
     <Tab title="Profile">...</Tab>

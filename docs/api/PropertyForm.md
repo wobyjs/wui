@@ -69,8 +69,8 @@ The first matching editor's `UI` is rendered for each property key. Editors are 
 
 ```
 <div class="flex flex-col h-full">
-  <div class="rounded-lg border border-gray-200 overflow-hidden shadow-sm bg-white">
-    <div class="px-4 py-2 bg-gray-50 border-b border-gray-200">
+  <div class="rounded-lg border border-[var(--wui-gray-200)] overflow-hidden shadow-sm bg-[var(--wui-white)]">
+    <div class="px-4 py-2 bg-[var(--wui-gray-50)] border-b border-[var(--wui-gray-200)]">
       <h3>Component Properties</h3>
     </div>
     <table class="w-full border-collapse table-sm">
@@ -97,13 +97,13 @@ The first matching editor's `UI` is rendered for each property key. Editors are 
 Each property row is rendered by the `TableRow` helper:
 
 ```tsx
-<tr class="flex w-full items-stretch border-x border-b border-gray-200 bg-white first:border-t">
-  <th class="flex w-[150px] shrink-0 items-center px-4 py-2 bg-gray-50/50 border-r border-gray-200 select-none">
-    <span class="text-[10px] uppercase tracking-wider font-bold text-slate-500 truncate pointer-events-none">
+<tr class="flex w-full items-stretch border-x border-b border-[var(--wui-gray-200)] bg-[var(--wui-white)] first:border-t">
+  <th class="flex w-[150px] shrink-0 items-center px-4 py-2 bg-[var(--wui-gray-50)]/50 border-r border-[var(--wui-gray-200)] select-none">
+    <span class="text-[10px] uppercase tracking-wider font-bold text-[var(--wui-slate-500)] truncate pointer-events-none">
       {optionName}
     </span>
   </th>
-  <td class="flex flex-1 items-center px-4 py-1.5 min-h-[38px] text-sm text-slate-700">
+  <td class="flex flex-1 items-center px-4 py-1.5 min-h-[38px] text-sm text-[var(--wui-slate-700)]">
     <div class="w-full h-full flex items-center">
       {children}  <!-- editor control -->
     </div>

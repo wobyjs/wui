@@ -199,12 +199,12 @@ export const TableGridPicker = ({ onPick, onCancel }: TableGridPickerProps) => {
                 <button
                     ref={backRef}
                     type="button"
-                    class="text-sm text-gray-600 hover:text-gray-900 cursor-pointer bg-transparent border-0 p-0"
+                    class="text-sm text-[var(--wui-gray-600)] hover:text-[var(--wui-gray-900)] cursor-pointer bg-transparent border-0 p-0"
                     title={() => t('editor.backToInsertMenu')}
                 >
                     {() => '\u2039 ' + t('common.insert')}
                 </button>
-                <span class="text-xs text-gray-500">
+                <span class="text-xs text-[var(--wui-gray-500)]">
                     {() => $$(hoverCols)
                         ? t('editor.table.dims', { cols: $$(hoverCols), rows: $$(hoverRows) })
                         : t('editor.table.pickSize')}

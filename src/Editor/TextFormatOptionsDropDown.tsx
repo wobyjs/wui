@@ -190,7 +190,7 @@ const TextFormatOptionsDropDown = defaults(def, (props) => {
 
     const { class: cn, cls, buttonType: btnType, disabled, ...otherProps } = props
 
-    const BASE_BTN = "size-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-black hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500"
+    const BASE_BTN = "size-full inline-flex justify-center rounded-md border border-[var(--wui-gray-300)] shadow-sm px-4 py-2 bg-[var(--wui-white)] text-sm font-medium text-[var(--wui-black)] hover:bg-[var(--wui-gray-50)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-[var(--wui-indigo-500)]"
 
     const editor = useEditor()
     const isOpen = $(false)
@@ -255,7 +255,7 @@ const TextFormatOptionsDropDown = defaults(def, (props) => {
         return (
             <div
                 ref={menuRef}
-                class="origin-top-left absolute left-0 mt-2 w-64 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10"
+                class="origin-top-left absolute left-0 mt-2 w-64 rounded-md shadow-lg bg-[var(--wui-white)] ring-1 ring-black ring-opacity-5 focus:outline-none z-10"
                 role="menu"
                 aria-orientation="vertical"
                 aria-labelledby="format-options-menu-button"
@@ -265,14 +265,14 @@ const TextFormatOptionsDropDown = defaults(def, (props) => {
                     {FORMAT_OPTIONS.map(opt => (
                         <Button
                             type="outlined"
-                            cls="w-full text-gray-700 group flex items-center px-4 py-2 text-sm hover:bg-gray-100 hover:text-gray-900"
+                            cls="w-full text-[var(--wui-gray-700)] group flex items-center px-4 py-2 text-sm hover:bg-[var(--wui-gray-100)] hover:text-[var(--wui-gray-900)]"
                             role="menuitem"
                             onClick={(e) => { e.preventDefault(); handleSelectOption(opt.action) }}
                             title={opt.hotkey}
                         >
                             <opt.icon />
                             <span class="ml-3">{() => t(opt.key)}</span>
-                            {opt.hotkey && <span class="ml-auto text-xs text-gray-500">{opt.hotkey}</span>}
+                            {opt.hotkey && <span class="ml-auto text-xs text-[var(--wui-gray-500)]">{opt.hotkey}</span>}
                         </Button>
                     ))}
                 </div>
@@ -613,7 +613,7 @@ function formatButton(btnType: ObservableMaybe<ButtonStyles>, title: ObservableM
             title={title}
             class={() => [
                 () => $$(cls) ? $$(cls) : $$(cn),
-                () => $$(isActive) ? '!bg-slate-200' : ''
+                () => $$(isActive) ? '!bg-[var(--wui-slate-200)]' : ''
             ]}
             aria-pressed={() => $$(isActive) ? "true" : "false"}
             disabled={disabled}

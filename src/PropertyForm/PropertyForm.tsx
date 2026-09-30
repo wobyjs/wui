@@ -85,7 +85,7 @@ export const TableRow = (props: { optionName?: JSX.Child, children?: JSX.Child, 
 	}
 
 	return (
-		<tr data-prop-row={prop} class="flex w-full items-stretch border-x border-b border-gray-200 bg-white first:border-t transition-colors hover:bg-gray-50/30">
+		<tr data-prop-row={prop} class="flex w-full items-stretch border-x border-b border-[var(--wui-gray-200)] bg-[var(--wui-white)] first:border-t transition-colors hover:bg-[var(--wui-gray-50)]/30">
 			{/*
 			  * `title` sits on the cell, not on the <span> inside it: that span carries
 			  * `pointer-events-none`, and an element the pointer cannot reach never shows a
@@ -95,19 +95,19 @@ export const TableRow = (props: { optionName?: JSX.Child, children?: JSX.Child, 
 			<th
 				title={hintText}
 				class={[
-					"flex w-[150px] shrink-0 items-center px-4 py-2 bg-gray-50/50 border-r border-gray-200 select-none",
+					"flex w-[150px] shrink-0 items-center px-4 py-2 bg-[var(--wui-gray-50)]/50 border-r border-[var(--wui-gray-200)] select-none",
 					() => hintText() ? "cursor-help" : "",
 				]}>
 				<span class={[
 					indent[indentLvl!] ?? '',
-					"text-[10px] uppercase tracking-wider font-bold text-slate-500",
+					"text-[10px] uppercase tracking-wider font-bold text-[var(--wui-slate-500)]",
 					"truncate pointer-events-none"
 				]}>
 					{optionName}
 				</span>
 			</th>
 
-			<td class="flex flex-1 items-center px-4 py-1.5 min-h-[38px] text-sm text-slate-700">
+			<td class="flex flex-1 items-center px-4 py-1.5 min-h-[38px] text-sm text-[var(--wui-slate-700)]">
 				<div class="w-full h-full flex items-center gap-1.5">
 					{children}
 					{() => {
@@ -129,7 +129,7 @@ export const TableRow = (props: { optionName?: JSX.Child, children?: JSX.Child, 
 								title={() => a.title ? tx(a.title) : undefined}
 								// shrink-0 so the field keeps the space: the editor beside it is
 								// w-full, and without this the button is the one that collapses.
-								class="shrink-0 flex items-center gap-1 px-2 py-1 rounded border border-gray-300 bg-white text-xs text-gray-700 cursor-pointer hover:bg-gray-50 hover:border-gray-400 active:bg-gray-100"
+								class="shrink-0 flex items-center gap-1 px-2 py-1 rounded border border-[var(--wui-gray-300)] bg-[var(--wui-white)] text-xs text-[var(--wui-gray-700)] cursor-pointer hover:bg-[var(--wui-gray-50)] hover:border-[var(--wui-gray-400)] active:bg-[var(--wui-gray-100)]"
 							>
 								{a.icon ? a.icon() : null}
 								{() => typeof a.label === 'string' ? tx(a.label) : a.label}
@@ -206,7 +206,7 @@ export const PropertyForm: Defaulted<typeof def> = defaults(def, (props: Propert
 			<div
 				onClick={(e: Event) => e.stopPropagation()}
 				class={() => [
-					"rounded-lg border border-gray-200 overflow-hidden shadow-sm bg-white",
+					"rounded-lg border border-[var(--wui-gray-200)] overflow-hidden shadow-sm bg-[var(--wui-white)]",
 					($$(className) || "m-3")
 				]}
 			>
@@ -214,8 +214,8 @@ export const PropertyForm: Defaulted<typeof def> = defaults(def, (props: Propert
 					const heading = $$(props.heading)
 					if (!heading) return null
 					return (
-						<div class="px-4 py-2 bg-gray-50 border-b border-gray-200">
-							<h3 class="text-[11px] font-bold uppercase tracking-widest text-slate-400">
+						<div class="px-4 py-2 bg-[var(--wui-gray-50)] border-b border-[var(--wui-gray-200)]">
+							<h3 class="text-[11px] font-bold uppercase tracking-widest text-[var(--wui-slate-400)]">
 								{/* Host-authored English -- the text catalogue, same as a row label. */}
 								{typeof heading === 'string' ? tx(heading) : heading}
 							</h3>

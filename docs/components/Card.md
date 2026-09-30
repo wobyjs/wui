@@ -181,7 +181,7 @@ Supports horizontal alignment:
     />
     <CardContent cls="px-5 pb-4">
         <h3 class="text-lg font-semibold text-center">Taylor</h3>
-        <p class="text-sm text-gray-600 mt-1 text-justify">
+        <p class="text-sm text-[var(--wui-gray-600)] mt-1 text-justify">
             Front-end engineer focused on accessible components.
         </p>
     </CardContent>

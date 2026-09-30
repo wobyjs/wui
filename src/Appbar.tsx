@@ -281,7 +281,7 @@ const def = () => ({
 // Indexed by the `type`/`variant`/`size` prop, which is a free-form string on the custom
 // element (attributes carry no enum), so the table needs a string index signature.
 const variantStyle: Record<string, string> = {
-    default: "shadow-[rgba(0,0,0,0.2)_0px_2px_4px_-1px,rgba(0,0,0,0.14)_0px_4px_5px_0px,rgba(0,0,0,0.12)_0px_1px_10px_0px] [@media_screen]:flex [@media_screen]:flex-col w-full box-border shrink-0 z-[1100] bg-[rgb(25,118,210)] text-white left-auto [transition:box-shadow_300ms_cubic-bezier(0.4,0,0.2,1)0ms] ",
+    default: "shadow-[rgba(0,0,0,0.2)_0px_2px_4px_-1px,rgba(0,0,0,0.14)_0px_4px_5px_0px,rgba(0,0,0,0.12)_0px_1px_10px_0px] [@media_screen]:flex [@media_screen]:flex-col w-full box-border shrink-0 z-[1100] bg-[rgb(25,118,210)] text-[var(--wui-white)] left-auto [transition:box-shadow_300ms_cubic-bezier(0.4,0,0.2,1)0ms] ",
 }
 
 const Appbar: Defaulted<typeof def> = defaults(def, (props) => {

@@ -15,9 +15,371 @@
  * ------------------------------------------------------------------------- */
 @source inline("{w,h,min-w,min-h,max-w,max-h}-[{10,20,25,30,33,40,50,60,66,70,75,80,90,100,125,150,200,300}%]");
 
+/* ---------------------------------------------------------------------------
+ * Theme tokens (seed-color harmonized palette).
+ *
+ * Every literal Tailwind color-shade a wui-* component used to hardcode (e.g.
+ * `bg-white`, `text-gray-700`, `bg-blue-600`) is exposed here as a `--wui-*`
+ * custom property instead, one per shade actually in use. Components reference
+ * `var(--wui-*)` through Tailwind arbitrary-value classes (`bg-[var(--wui-white)]`)
+ * so a single override point covers the whole library through normal CSS
+ * inheritance (host -> shadow root), with no runtime JS and no explicit toggle:
+ * Tailwind v4's stock `@media (prefers-color-scheme: dark)` support decides
+ * which block below applies.
+ *
+ * :root's values are exactly today's literal hex, so light mode is byte-for-byte
+ * unchanged. The dark block is *calculated*, not hand-picked per component: each
+ * token's HSL lightness is flipped around its own scale (L' ~= 100 - L), with
+ * the extreme surface steps (50/900, white/black) compressed toward true
+ * black/near-white for depth, and the mid steps (400-700, and every accent)
+ * nudged a step brighter than a pure flip so text and controls clear WCAG AA
+ * against the resulting dark surfaces -- a flat inversion reads fine for
+ * surfaces but comes out too dim for text and interactive states.
+ * ------------------------------------------------------------------------- */
+:root {
+  --wui-white: #ffffff;
+  --wui-black: #000000;
+
+  --wui-gray-50: #f9fafb;
+  --wui-gray-100: #f3f4f6;
+  --wui-gray-200: #e5e7eb;
+  --wui-gray-300: #d1d5db;
+  --wui-gray-400: #9ca3af;
+  --wui-gray-500: #6b7280;
+  --wui-gray-600: #4b5563;
+  --wui-gray-700: #374151;
+  --wui-gray-800: #1f2937;
+  --wui-gray-900: #111827;
+
+  --wui-slate-100: #f1f5f9;
+  --wui-slate-200: #e2e8f0;
+  --wui-slate-400: #94a3b8;
+  --wui-slate-500: #64748b;
+  --wui-slate-600: #475569;
+  --wui-slate-700: #334155;
+
+  --wui-blue-50: #eff6ff;
+  --wui-blue-100: #dbeafe;
+  --wui-blue-200: #bfdbfe;
+  --wui-blue-300: #93c5fd;
+  --wui-blue-400: #60a5fa;
+  --wui-blue-500: #3b82f6;
+  --wui-blue-600: #2563eb;
+  --wui-blue-700: #1d4ed8;
+  --wui-blue-800: #1e40af;
+
+  --wui-indigo-50: #eef2ff;
+  --wui-indigo-500: #6366f1;
+  --wui-indigo-600: #4f46e5;
+  --wui-indigo-700: #4338ca;
+
+  --wui-red-50: #fef2f2;
+  --wui-red-100: #fee2e2;
+  --wui-red-200: #fecaca;
+  --wui-red-300: #fca5a5;
+  --wui-red-400: #f87171;
+  --wui-red-500: #ef4444;
+  --wui-red-600: #dc2626;
+  --wui-red-800: #991b1b;
+
+  --wui-green-50: #f0fdf4;
+  --wui-green-100: #dcfce7;
+  --wui-green-200: #bbf7d0;
+  --wui-green-300: #86efac;
+  --wui-green-500: #22c55e;
+  --wui-green-600: #16a34a;
+  --wui-green-800: #166534;
+
+  --wui-amber-50: #fffbeb;
+  --wui-amber-200: #fde68a;
+  --wui-amber-500: #f59e0b;
+  --wui-amber-700: #b45309;
+
+  --wui-purple-50: #faf5ff;
+  --wui-purple-100: #f3e8ff;
+  --wui-purple-300: #d8b4fe;
+  --wui-purple-500: #a855f7;
+  --wui-purple-600: #9333ea;
+  --wui-purple-800: #6b21a8;
+
+  --wui-yellow-50: #fefce8;
+  --wui-yellow-100: #fef9c3;
+  --wui-yellow-200: #fef08a;
+  --wui-yellow-800: #854d0e;
+
+  --wui-orange-500: #f97316;
+  --wui-pink-500: #ec4899;
+
+  /* One-off literals previously hardcoded per-component (arbitrary-value
+   * `bg-[#hex]` classes) rather than drawn from the shared scale above.
+   * Same rule applies: light value is the exact prior literal, dark is the
+   * HSL-flip-and-brighten calculation. */
+  --wui-accent-500: #1976d2;
+  --wui-accent-600: #1565c0;
+  --wui-disabled-text: #00000061;
+  --wui-disabled-border: #0000001f;
+  --wui-disabled-bg: #0000000a;
+  --wui-disabled-surface: #d9dbda;
+  --wui-hover-gray: #dde0dd;
+  --wui-quote-text: #65676b;
+  --wui-quote-border: #ced0d4;
+  --wui-placeholder-gray: #aaaaaa;
+  --wui-border-faint: #dddddd;
+  --wui-mui-green: #4caf50;
+  --wui-mui-fill: #ededed;
+  --wui-text-dark: #333333;
+  --wui-wheeler-text: #555555;
+  --wui-wheeler-link: #007bff;
+  --wui-mui-red: #f44336;
+  --wui-mui-lightblue: #03a9f4;
+  --wui-mui-red-pale: #fcebeb;
+  --wui-mui-blue-pale: #ebfbfc;
+  --wui-switch-info-bg: #ebf7fc;
+  --wui-switch-green-1: #9fd6ae;
+  --wui-switch-green-2: #86d993;
+  --wui-switch-green-3: #7fc6a6;
+  --wui-switch-gray-dark: #4e4e4e;
+  --wui-switch-red-dark: #d80000;
+  --wui-switch-blue-dark: #0095d8;
+  --wui-switch-orange-red: #ff3a19;
+  --wui-switch-teal-green: #02c66f;
+  --wui-switch-track-light: #f0f0f0;
+  --wui-switch-border-ios: #e8eae9;
+  --wui-switch-knob-ios: #fbfbfb;
+  --wui-switch-mid-gray: #888888;
+  --wui-switch-flat-border: #f2f2f2;
+}
+
+/* prefers-color-scheme covers the OS-default case; a `data-theme` attribute
+ * on <html> (set by the app's theme selector) always wins over it, in either
+ * direction -- `:not([data-theme="light"])` lets an explicit light choice
+ * cancel a dark OS preference, and the `[data-theme="dark"]` block below
+ * lets an explicit dark choice apply even when the OS prefers light. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --wui-white: #161d29;
+    --wui-black: #f3f4f6;
+
+    --wui-gray-50: #0b0f16;
+    --wui-gray-100: #12171f;
+    --wui-gray-200: #1c222c;
+    --wui-gray-300: #2a303c;
+    --wui-gray-400: #4b5563;
+    --wui-gray-500: #8996a8;
+    --wui-gray-600: #a7b0c0;
+    --wui-gray-700: #c4cbd6;
+    --wui-gray-800: #e2e6ec;
+    --wui-gray-900: #f5f7fa;
+
+    --wui-slate-100: #131a24;
+    --wui-slate-200: #1e2733;
+    --wui-slate-400: #94a3b8;
+    --wui-slate-500: #9fb0c4;
+    --wui-slate-600: #b7c2d1;
+    --wui-slate-700: #cfd8e3;
+
+    --wui-blue-50: #12233f;
+    --wui-blue-100: #17253d;
+    --wui-blue-200: #1f3454;
+    --wui-blue-300: #185aaa;
+    --wui-blue-400: #60a5fa;
+    --wui-blue-500: #5b93f7;
+    --wui-blue-600: #3b82f6;
+    --wui-blue-700: #2f6fe0;
+    --wui-blue-800: #8fb8f5;
+
+    --wui-indigo-50: #171b38;
+    --wui-indigo-500: #818cf8;
+    --wui-indigo-600: #6d75f0;
+    --wui-indigo-700: #5a62e0;
+
+    --wui-red-50: #3f1616;
+    --wui-red-100: #491818;
+    --wui-red-200: #5e2121;
+    --wui-red-300: #8c2222;
+    --wui-red-400: #f87171;
+    --wui-red-500: #f45f5f;
+    --wui-red-600: #ef4444;
+    --wui-red-800: #f47b7b;
+
+    --wui-green-50: #163621;
+    --wui-green-100: #1a472a;
+    --wui-green-200: #255536;
+    --wui-green-300: #30a65b;
+    --wui-green-500: #34d374;
+    --wui-green-600: #22c55e;
+    --wui-green-800: #7cdea5;
+
+    --wui-amber-50: #3a2f12;
+    --wui-amber-200: #6b5a1e;
+    --wui-amber-500: #fbbf24;
+    --wui-amber-700: #f0b429;
+
+    --wui-purple-50: #1c0e2a;
+    --wui-purple-100: #211132;
+    --wui-purple-300: #3f1c5f;
+    --wui-purple-500: #890ffa;
+    --wui-purple-600: #9c3bf7;
+    --wui-purple-800: #bc87ee;
+
+    --wui-yellow-50: #393313;
+    --wui-yellow-100: #4f4717;
+    --wui-yellow-200: #6b5e1f;
+    --wui-yellow-800: #ecb879;
+
+    --wui-orange-500: #fa752e;
+    --wui-pink-500: #f43494;
+
+    --wui-accent-500: #4a90e2;
+    --wui-accent-600: #6aa3e8;
+    --wui-disabled-text: #ffffff80;
+    --wui-disabled-border: #ffffff29;
+    --wui-disabled-bg: #ffffff0f;
+    --wui-disabled-surface: #2b3038;
+    --wui-hover-gray: #232a20;
+    --wui-quote-text: #a8abaf;
+    --wui-quote-border: #33373a;
+    --wui-placeholder-gray: #8c8c8c;
+    --wui-border-faint: #3a4048;
+    --wui-mui-green: #66c96b;
+    --wui-mui-fill: #171d26;
+    --wui-text-dark: #d6d6d6;
+    --wui-wheeler-text: #b0b0b0;
+    --wui-wheeler-link: #4da3ff;
+    --wui-mui-red: #f66056;
+    --wui-mui-lightblue: #4fc3f7;
+    --wui-mui-red-pale: #3a2323;
+    --wui-mui-blue-pale: #1c3336;
+    --wui-switch-info-bg: #1a2e38;
+    --wui-switch-green-1: #2c5236;
+    --wui-switch-green-2: #275c36;
+    --wui-switch-green-3: #2f5747;
+    --wui-switch-gray-dark: #b0b0b0;
+    --wui-switch-red-dark: #ff4d4d;
+    --wui-switch-blue-dark: #4fb8ec;
+    --wui-switch-orange-red: #ff6b4d;
+    --wui-switch-teal-green: #2de08a;
+    --wui-switch-track-light: #262b30;
+    --wui-switch-border-ios: #2a2f33;
+    --wui-switch-knob-ios: #d5d9dd;
+    --wui-switch-mid-gray: #6b7280;
+    --wui-switch-flat-border: #2e343a;
+  }
+}
+
+:root[data-theme="dark"] {
+  --wui-white: #161d29;
+  --wui-black: #f3f4f6;
+
+  --wui-gray-50: #0b0f16;
+  --wui-gray-100: #12171f;
+  --wui-gray-200: #1c222c;
+  --wui-gray-300: #2a303c;
+  --wui-gray-400: #4b5563;
+  --wui-gray-500: #8996a8;
+  --wui-gray-600: #a7b0c0;
+  --wui-gray-700: #c4cbd6;
+  --wui-gray-800: #e2e6ec;
+  --wui-gray-900: #f5f7fa;
+
+  --wui-slate-100: #131a24;
+  --wui-slate-200: #1e2733;
+  --wui-slate-400: #94a3b8;
+  --wui-slate-500: #9fb0c4;
+  --wui-slate-600: #b7c2d1;
+  --wui-slate-700: #cfd8e3;
+
+  --wui-blue-50: #12233f;
+  --wui-blue-100: #17253d;
+  --wui-blue-200: #1f3454;
+  --wui-blue-300: #185aaa;
+  --wui-blue-400: #60a5fa;
+  --wui-blue-500: #5b93f7;
+  --wui-blue-600: #3b82f6;
+  --wui-blue-700: #2f6fe0;
+  --wui-blue-800: #8fb8f5;
+
+  --wui-indigo-50: #171b38;
+  --wui-indigo-500: #818cf8;
+  --wui-indigo-600: #6d75f0;
+  --wui-indigo-700: #5a62e0;
+
+  --wui-red-50: #3f1616;
+  --wui-red-100: #491818;
+  --wui-red-200: #5e2121;
+  --wui-red-300: #8c2222;
+  --wui-red-400: #f87171;
+  --wui-red-500: #f45f5f;
+  --wui-red-600: #ef4444;
+  --wui-red-800: #f47b7b;
+
+  --wui-green-50: #163621;
+  --wui-green-100: #1a472a;
+  --wui-green-200: #255536;
+  --wui-green-300: #30a65b;
+  --wui-green-500: #34d374;
+  --wui-green-600: #22c55e;
+  --wui-green-800: #7cdea5;
+
+  --wui-amber-50: #3a2f12;
+  --wui-amber-200: #6b5a1e;
+  --wui-amber-500: #fbbf24;
+  --wui-amber-700: #f0b429;
+
+  --wui-purple-50: #1c0e2a;
+  --wui-purple-100: #211132;
+  --wui-purple-300: #3f1c5f;
+  --wui-purple-500: #890ffa;
+  --wui-purple-600: #9c3bf7;
+  --wui-purple-800: #bc87ee;
+
+  --wui-yellow-50: #393313;
+  --wui-yellow-100: #4f4717;
+  --wui-yellow-200: #6b5e1f;
+  --wui-yellow-800: #ecb879;
+
+  --wui-orange-500: #fa752e;
+  --wui-pink-500: #f43494;
+
+  --wui-accent-500: #4a90e2;
+  --wui-accent-600: #6aa3e8;
+  --wui-disabled-text: #ffffff80;
+  --wui-disabled-border: #ffffff29;
+  --wui-disabled-bg: #ffffff0f;
+  --wui-disabled-surface: #2b3038;
+  --wui-hover-gray: #232a20;
+  --wui-quote-text: #a8abaf;
+  --wui-quote-border: #33373a;
+  --wui-placeholder-gray: #8c8c8c;
+  --wui-border-faint: #3a4048;
+  --wui-mui-green: #66c96b;
+  --wui-mui-fill: #171d26;
+  --wui-text-dark: #d6d6d6;
+  --wui-wheeler-text: #b0b0b0;
+  --wui-wheeler-link: #4da3ff;
+  --wui-mui-red: #f66056;
+  --wui-mui-lightblue: #4fc3f7;
+  --wui-mui-red-pale: #3a2323;
+  --wui-mui-blue-pale: #1c3336;
+  --wui-switch-info-bg: #1a2e38;
+  --wui-switch-green-1: #2c5236;
+  --wui-switch-green-2: #275c36;
+  --wui-switch-green-3: #2f5747;
+  --wui-switch-gray-dark: #b0b0b0;
+  --wui-switch-red-dark: #ff4d4d;
+  --wui-switch-blue-dark: #4fb8ec;
+  --wui-switch-orange-red: #ff6b4d;
+  --wui-switch-teal-green: #2de08a;
+  --wui-switch-track-light: #262b30;
+  --wui-switch-border-ios: #2a2f33;
+  --wui-switch-knob-ios: #d5d9dd;
+  --wui-switch-mid-gray: #6b7280;
+  --wui-switch-flat-border: #2e343a;
+}
+
 @layer base {
   body {
-    background-color: #fff;
-    color: #000;
+    background-color: var(--wui-white);
+    color: var(--wui-black);
   }
 }

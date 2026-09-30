@@ -44,7 +44,7 @@ export const EnumEditor = () => {
 
         return (
             <select
-                class="w-full px-2 py-1.5 text-sm border border-gray-300 rounded bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
+                class="w-full px-2 py-1.5 text-sm border border-[var(--wui-gray-300)] rounded bg-[var(--wui-white)] focus:border-[var(--wui-blue-500)] focus:ring-1 focus:ring-[var(--wui-blue-500)] outline-none"
                 value={$$(value)}
                 disabled={isLocked(value)}
                 onChange={(e: any) => {

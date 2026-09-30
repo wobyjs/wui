@@ -37,7 +37,7 @@ const Collapse: Defaulted<typeof def> = defaults(def, (props) => {
 	const baseClass = "overflow-hidden transition-height duration-200 ease-in-out "
 
 	const isBackground = () => {
-		return $$(background) === true ? "bg-[#ccc]" : ""
+		return $$(background) === true ? "bg-[var(--wui-gray-300)]" : ""
 	}
 
 	function renderCollapse() {

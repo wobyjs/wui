@@ -18,8 +18,8 @@ const BASE_CLASS = "inline-flex items-center justify-center px-2 py-1 rounded te
 const def = () => ({
     children: $("" as JSX.Child) as CustomElementChildren,
     // 2. Updated Default Colors (Material UI / Tailwind style)
-    onClass: $("text-[#1976d2] bg-[#1976d2]/10 border-[#1976d2]/50 hover:bg-[#1976d2]/20"),
-    offClass: $("text-gray-600 bg-transparent border-transparent hover:bg-gray-100"),
+    onClass: $("text-[var(--wui-accent-500)] bg-[var(--wui-accent-500)]/10 border-[var(--wui-accent-500)]/50 hover:bg-[var(--wui-accent-500)]/20"),
+    offClass: $("text-[var(--wui-gray-600)] bg-transparent border-transparent hover:bg-[var(--wui-gray-100)]"),
 
     checked: $(false, HtmlBoolean) as ObservableMaybe<boolean>,
     cls: $('', HtmlClass) as JSX.Class,

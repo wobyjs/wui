@@ -29,7 +29,7 @@ const TestZoomable = (): JSX.Element => {
     return ret
 }
 
-const ZOOMABLE = "relative overflow-hidden touch-none border border-gray-300 rounded-lg"
+const ZOOMABLE = "relative overflow-hidden touch-none border border-[var(--wui-gray-300)] rounded-lg"
 const WRAPPER = "absolute top-0 left-0 w-full h-full origin-top-left will-change-transform"
 
 // SSR test (Node.js)

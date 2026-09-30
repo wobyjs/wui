@@ -159,7 +159,7 @@ restyle the element from scratch. To *add* utilities on top of the base, use
 ```tsx
 <Checkbox
     labelPosition="right"
-    class="!text-blue-500 !font-bold"
+    class="!text-[var(--wui-blue-500)] !font-bold"
 >
     Custom styled checkbox
 </Checkbox>
@@ -169,7 +169,7 @@ restyle the element from scratch. To *add* utilities on top of the base, use
 ```html
 <wui-checkbox
     label-position="right"
-    class="!text-blue-500 !font-bold"
+    class="!text-[var(--wui-blue-500)] !font-bold"
 >
     Custom styled checkbox
 </wui-checkbox>

@@ -91,7 +91,7 @@ The `handleWheel` handler captures mouse wheel events with debouncing:
 
 ## Item Style Management
 
-The `updateItemStyles` function dynamically highlights the item nearest the viewport center. It uses `getBoundingClientRect()` to measure each item's position relative to the viewport and applies/removes CSS classes (`is-near-center`, `opacity-100`, `font-bold`, `text-[#007bff]`, `scale-100`) based on proximity.
+The `updateItemStyles` function dynamically highlights the item nearest the viewport center. It uses `getBoundingClientRect()` to measure each item's position relative to the viewport and applies/removes CSS classes (`is-near-center`, `opacity-100`, `font-bold`, `text-[var(--wui-wheeler-link)]`, `scale-100`) based on proximity.
 
 ## Multi-Select Mode
 

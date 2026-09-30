@@ -168,8 +168,8 @@ export const ImageEditor = defaults(def, (): JSX.Element => {
         noteEl.textContent = text
         noteEl.style.display = text ? 'block' : 'none'
         noteEl.className = text && tone === 'warn'
-            ? 'text-[11px] leading-snug text-amber-700 bg-amber-50 border border-amber-200 rounded px-2 py-1'
-            : 'text-[11px] leading-snug text-gray-500'
+            ? 'text-[11px] leading-snug text-[var(--wui-amber-700)] bg-[var(--wui-amber-50)] border border-[var(--wui-amber-200)] rounded px-2 py-1'
+            : 'text-[11px] leading-snug text-[var(--wui-gray-500)]'
     }
 
     /** Put `value` in the source field. A summary is text about the image, not a URL. */
@@ -262,13 +262,13 @@ export const ImageEditor = defaults(def, (): JSX.Element => {
             e.preventDefault()
             e.stopPropagation()
             if (e.dataTransfer) e.dataTransfer.dropEffect = 'copy'
-            el.classList.add('ring-2', 'ring-blue-400')
+            el.classList.add('ring-2', 'ring-[var(--wui-blue-400)]')
         }
-        el.ondragleave = () => el.classList.remove('ring-2', 'ring-blue-400')
+        el.ondragleave = () => el.classList.remove('ring-2', 'ring-[var(--wui-blue-400)]')
         el.ondrop = (e: DragEvent) => {
             e.preventDefault()
             e.stopPropagation()
-            el.classList.remove('ring-2', 'ring-blue-400')
+            el.classList.remove('ring-2', 'ring-[var(--wui-blue-400)]')
             const dt = e.dataTransfer
             if (!dt) return
             const file = Array.from(dt.files).find(f => f.type.startsWith('image/'))
@@ -562,9 +562,9 @@ export const ImageEditor = defaults(def, (): JSX.Element => {
         if (panelEl) panelEl.style.transform = ''
     }
 
-    const field = 'w-full h-8 px-2 text-xs rounded border border-gray-300 bg-white text-gray-800 focus:outline-none focus:border-blue-500'
-    const btn = 'h-8 px-3 text-xs rounded border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 disabled:opacity-50 whitespace-nowrap'
-    const primaryBtn = 'h-8 px-3 text-xs rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 whitespace-nowrap'
+    const field = 'w-full h-8 px-2 text-xs rounded border border-[var(--wui-gray-300)] bg-[var(--wui-white)] text-[var(--wui-gray-800)] focus:outline-none focus:border-[var(--wui-blue-500)]'
+    const btn = 'h-8 px-3 text-xs rounded border border-[var(--wui-gray-300)] bg-[var(--wui-white)] text-[var(--wui-gray-700)] hover:bg-[var(--wui-gray-100)] disabled:opacity-50 whitespace-nowrap'
+    const primaryBtn = 'h-8 px-3 text-xs rounded bg-[var(--wui-blue-600)] text-[var(--wui-white)] hover:bg-[var(--wui-blue-700)] disabled:opacity-50 whitespace-nowrap'
 
     return (
         // `role="dialog"` + `aria-modal="true"`: a modal backdrop owes the
@@ -592,7 +592,7 @@ export const ImageEditor = defaults(def, (): JSX.Element => {
             style={{ display: 'none' } as JSX.CSSProperties}
         >
             <div
-                class="flex flex-col gap-2.5 w-[520px] max-w-[92vw] max-h-[88vh] overflow-auto p-3 bg-white border border-gray-200 rounded-md shadow-xl"
+                class="flex flex-col gap-2.5 w-[520px] max-w-[92vw] max-h-[88vh] overflow-auto p-3 bg-[var(--wui-white)] border border-[var(--wui-gray-200)] rounded-md shadow-xl"
                 ref={el => {
                     if (!el) return
                     const panel = el as HTMLElement
@@ -605,17 +605,17 @@ export const ImageEditor = defaults(def, (): JSX.Element => {
             >
                 <div
                     ref={el => { if (el) (el as HTMLElement).onpointerdown = startDrag }}
-                    class="-m-3 mb-0 px-3 py-2 flex items-center gap-2 text-sm font-medium text-gray-800 bg-gray-50 border-b border-gray-200 rounded-t-md cursor-move select-none"
+                    class="-m-3 mb-0 px-3 py-2 flex items-center gap-2 text-sm font-medium text-[var(--wui-gray-800)] bg-[var(--wui-gray-50)] border-b border-[var(--wui-gray-200)] rounded-t-md cursor-move select-none"
                     title={() => t('editor.dragToMoveDialog')}
                 >
-                    <span class="text-gray-400">&#x2725;</span>
+                    <span class="text-[var(--wui-gray-400)]">&#x2725;</span>
                     Edit image
                 </div>
 
                 <ImageCropper onHandle={h => { cropper = h }} />
 
                 <div class="flex flex-col gap-1.5">
-                    <label class="text-[11px] text-gray-600">{() => t('editor.image.sourceEdit')}</label>
+                    <label class="text-[11px] text-[var(--wui-gray-600)]">{() => t('editor.image.sourceEdit')}</label>
                     <div class="flex items-center gap-2">
                         <input
                             ref={el => {
@@ -660,7 +660,7 @@ export const ImageEditor = defaults(def, (): JSX.Element => {
 
                 <div
                     ref={el => { noteEl = el as HTMLElement }}
-                    class="text-[11px] leading-snug text-gray-500"
+                    class="text-[11px] leading-snug text-[var(--wui-gray-500)]"
                     style={{ display: 'none' } as JSX.CSSProperties}
                 />
 

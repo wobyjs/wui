@@ -11,12 +11,12 @@ import { registerBaseCls } from './helper/baseCls'
  * bottom agree on one string.
  */
 const BASE_CLASS = [
-    "number-input inline-flex items-center bg-white border border-gray-300 rounded-lg transition-all duration-200",
-    "focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500", // Nice focus state
-    "divide-x divide-gray-200", // Subtle dividers between elements
+    "number-input inline-flex items-center bg-[var(--wui-white)] border border-[var(--wui-gray-300)] rounded-lg transition-all duration-200",
+    "focus-within:ring-2 focus-within:ring-[var(--wui-blue-500)] focus-within:border-[var(--wui-blue-500)]", // Nice focus state
+    "divide-x divide-[var(--wui-gray-200)]", // Subtle dividers between elements
 ].join(' ')
 
-const btnCls = `bg-transparent items-center justify-center cursor-pointer relative m-0 border-[none] [outline:none] [-webkit-appearance:none] disabled:bg-[#d9dbda]`
+const btnCls = `bg-transparent items-center justify-center cursor-pointer relative m-0 border-[none] [outline:none] [-webkit-appearance:none] disabled:bg-[var(--wui-disabled-surface)]`
 
 const def = () => ({
     /** Child elements to be rendered inside the number field */
@@ -179,14 +179,14 @@ const NumberField: Defaulted<typeof def> = defaults(def, (props) => {
         }
     })
 
-    // return <div class={["number-input inline-flex border-2 border-solid border-[#ddd] box-border [&_*]:box-border", cls]}>
+    // return <div class={["number-input inline-flex border-2 border-solid border-[var(--wui-border-faint)] box-border [&_*]:box-border", cls]}>
     return (
         <div class={[
             () => $$(cls) ? $$(cls) : BASE_CLASS,
             // `bg-gray-100` alone never won: it sits at the same specificity as the
             // `bg-white` above and Tailwind emits bg-white later, so a disabled field
             // stayed pure white and only `opacity-70` showed. Force it.
-            () => $$(disabled) ? "!bg-gray-100 opacity-70 cursor-not-allowed" : "", // Style for disabled state
+            () => $$(disabled) ? "!bg-[var(--wui-gray-100)] opacity-70 cursor-not-allowed" : "", // Style for disabled state
             cn
         ]}>
             <Button
@@ -199,7 +199,7 @@ const NumberField: Defaulted<typeof def> = defaults(def, (props) => {
                 // 40px step button stood taller than the text fields beside it and read as
                 // the loudest thing in the row. 36px matches their height, and a stepper
                 // wants less width than height anyway.
-                type="icon" cls="!rounded-none !rounded-l-md !w-8 !h-9 !border-r !border-gray-200 !bg-transparent disabled:!bg-[#d9dbda] disabled:!text-[#00000061] disabled:!cursor-not-allowed"
+                type="icon" cls="!rounded-none !rounded-l-md !w-8 !h-9 !border-r !border-[var(--wui-gray-200)] !bg-transparent disabled:!bg-[var(--wui-disabled-surface)] disabled:!text-[var(--wui-disabled-text)] disabled:!cursor-not-allowed"
                 buttonFunction="button"
                 onPointerDown={() => { startContinuousUpdate(false); }}
                 onPointerUp={stopUpdate}
@@ -214,10 +214,10 @@ const NumberField: Defaulted<typeof def> = defaults(def, (props) => {
                     // row, and with a fixed-width input the two step buttons huddled at the left
                     // edge with a third of the box empty behind the `+`. Basis stays `auto`, so the
                     // 4rem below is still the intrinsic size wherever the field is left to size itself.
-                    "w-16 flex-auto min-w-0 text-center border-none bg-transparent focus:outline-none focus:ring-0 text-base font-semibold text-gray-700",
-                    "disabled:text-[#00000061] disabled:cursor-not-allowed",
+                    "w-16 flex-auto min-w-0 text-center border-none bg-transparent focus:outline-none focus:ring-0 text-base font-semibold text-[var(--wui-gray-700)]",
+                    "disabled:text-[var(--wui-disabled-text)] disabled:cursor-not-allowed",
                     "[-moz-appearance:textfield] [&::-webkit-inner-spin-button]:hidden [&::-webkit-outer-spin-button]:hidden",
-                    () => $$(error) ? "text-red-500" : ""
+                    () => $$(error) ? "text-[var(--wui-red-500)]" : ""
                 ]}
                 type="number"
                 value={value}
@@ -248,7 +248,7 @@ const NumberField: Defaulted<typeof def> = defaults(def, (props) => {
             <Button
                 // class={[btnCls, "plus"]}
                 // cls="plus"
-                type="icon" cls="!rounded-none !rounded-r-md !w-8 !h-9 !border-l !border-gray-200 !bg-transparent disabled:!bg-[#d9dbda] disabled:!text-[#00000061] disabled:!cursor-not-allowed"
+                type="icon" cls="!rounded-none !rounded-r-md !w-8 !h-9 !border-l !border-[var(--wui-gray-200)] !bg-transparent disabled:!bg-[var(--wui-disabled-surface)] disabled:!text-[var(--wui-disabled-text)] disabled:!cursor-not-allowed"
                 onPointerDown={() => { startContinuousUpdate(true); }}
                 onPointerUp={stopUpdate}
                 onPointerLeave={stopUpdate}

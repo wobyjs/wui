@@ -1016,7 +1016,7 @@ const MIN_W = 240
             ref={(el) => { panelEl = el as HTMLElement }}
             class={() => [
                 "fixed flex flex-col w-[300px] max-h-[70vh] overflow-hidden z-[1100]",
-                "bg-white border border-gray-200 rounded-md shadow-xl",
+                "bg-[var(--wui-white)] border border-[var(--wui-gray-200)] rounded-md shadow-xl",
                 $$(panelOpen) ? '' : 'hidden'
             ]}
             style={() => {
@@ -1052,7 +1052,7 @@ const MIN_W = 240
                 data-panel-part="header"
                 ref={(el) => { if (el) (el as HTMLElement).onpointerdown = startDrag }}
                 class={() => [
-                    "px-3 py-2 bg-gray-50 border-b border-gray-200 flex items-center justify-between select-none",
+                    "px-3 py-2 bg-[var(--wui-gray-50)] border-b border-[var(--wui-gray-200)] flex items-center justify-between select-none",
                     "shrink-0",
                     $$(dragging) ? 'cursor-grabbing' : 'cursor-grab'
                 ]}
@@ -1073,7 +1073,7 @@ const MIN_W = 240
                         title={() => t('editor.selectParent')}
                         class={() => [
                             "shrink-0 w-6 h-6 flex items-center justify-center rounded leading-none",
-                            "cursor-pointer text-gray-400 hover:text-gray-700 hover:bg-gray-200",
+                            "cursor-pointer text-[var(--wui-gray-400)] hover:text-[var(--wui-gray-700)] hover:bg-[var(--wui-gray-200)]",
                             // Disabled rather than hidden. A control that disappears at the top
                             // of the tree makes the header reflow and slides the close button
                             // under a pointer that was aimed at the arrow.
@@ -1087,13 +1087,13 @@ const MIN_W = 240
                         user climbs (td -> tr -> table), so it carries the information; the
                         kind only says which extractor is in use. */}
                     <h3 data-panel-part="identity" class="flex items-baseline gap-1.5 min-w-0">
-                        <span class="font-mono text-[11px] text-slate-700 truncate">
+                        <span class="font-mono text-[11px] text-[var(--wui-slate-700)] truncate">
                             {() => {
                                 const el = $$(propertyTarget)
                                 return el ? el.tagName.toLowerCase() : ''
                             }}
                         </span>
-                        <span class="shrink-0 text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                        <span class="shrink-0 text-[10px] font-bold uppercase tracking-widest text-[var(--wui-slate-400)]">
                             {() => {
                                 // `kind`, not `t`: the imported `t` is the message lookup, and
                                 // the old local shadowed it right where it is needed.
@@ -1128,7 +1128,7 @@ const MIN_W = 240
                         data-panel-part="help"
                         ref={(el) => { if (el) el.onclick = () => startHelpTour('properties') }}
                         title={() => t('editor.help.properties.tour')}
-                        class="shrink-0 w-6 h-6 flex items-center justify-center rounded leading-none cursor-pointer text-gray-400 hover:text-blue-600 hover:bg-blue-50"
+                        class="shrink-0 w-6 h-6 flex items-center justify-center rounded leading-none cursor-pointer text-[var(--wui-gray-400)] hover:text-[var(--wui-blue-600)] hover:bg-[var(--wui-blue-50)]"
                     >
                         <svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                             <circle cx="12" cy="12" r="9" />
@@ -1155,7 +1155,7 @@ const MIN_W = 240
                         }}
                         class={() => [
                             'shrink-0 w-6 h-6 flex items-center justify-center rounded leading-none',
-                            'cursor-pointer text-gray-400 hover:text-red-600 hover:bg-red-50',
+                            'cursor-pointer text-[var(--wui-gray-400)] hover:text-[var(--wui-red-600)] hover:bg-[var(--wui-red-50)]',
                             // Disabled, not hidden, for the same reason as the up arrow:
                             // a control that vanishes reflows the header and slides the
                             // close button under a pointer that was aimed elsewhere.
@@ -1167,7 +1167,7 @@ const MIN_W = 240
                     <button
                         data-panel-part="close"
                         ref={(el) => { if (el) el.onclick = () => { panelOpen(false) } }}
-                        class="text-gray-400 hover:text-gray-600 text-lg leading-none cursor-pointer w-6 h-6 flex items-center justify-center"
+                        class="text-[var(--wui-gray-400)] hover:text-[var(--wui-gray-600)] text-lg leading-none cursor-pointer w-6 h-6 flex items-center justify-center"
                     >×</button>
                 </div>
             </div>
@@ -1187,7 +1187,7 @@ const MIN_W = 240
                     return obj ? (
                         <PropertyForm obj={obj} class="m-0" heading="" onCommit={commitPending} />
                     ) : (
-                        <div class="p-4 text-sm text-gray-400">{() => t('editor.property.empty')}</div>
+                        <div class="p-4 text-sm text-[var(--wui-gray-400)]">{() => t('editor.property.empty')}</div>
                     )
                 }}
 
@@ -1209,7 +1209,7 @@ const MIN_W = 240
                     if (!actions?.length) return <></>
 
                     return (
-                        <div data-panel-part="actions" class="flex flex-wrap gap-1.5 px-3 py-2 border-t border-gray-200">
+                        <div data-panel-part="actions" class="flex flex-wrap gap-1.5 px-3 py-2 border-t border-[var(--wui-gray-200)]">
                             {actions.map(a => (
                                 <button
                                     // Ref-based onclick, like every other button in this
@@ -1233,7 +1233,7 @@ const MIN_W = 240
                                         }
                                     }}
                                     title={() => tx(a.title ?? a.label)}
-                                    class="flex items-center gap-1 px-2 py-1 rounded border border-gray-300 bg-white text-xs text-gray-700 cursor-pointer hover:bg-gray-50 hover:border-gray-400 active:bg-gray-100"
+                                    class="flex items-center gap-1 px-2 py-1 rounded border border-[var(--wui-gray-300)] bg-[var(--wui-white)] text-xs text-[var(--wui-gray-700)] cursor-pointer hover:bg-[var(--wui-gray-50)] hover:border-[var(--wui-gray-400)] active:bg-[var(--wui-gray-100)]"
                                 >
                                     {a.icon ? a.icon() : null}
                                     <span>{() => tx(a.label)}</span>
@@ -1258,9 +1258,9 @@ const MIN_W = 240
                     const img = el as HTMLImageElement
                     const origin = readImageOrigin(img)
 
-                    const btn = 'flex items-center gap-1 px-2 py-1 rounded border border-gray-300 bg-white text-xs text-gray-700 cursor-pointer hover:bg-gray-50 hover:border-gray-400 active:bg-gray-100'
+                    const btn = 'flex items-center gap-1 px-2 py-1 rounded border border-[var(--wui-gray-300)] bg-[var(--wui-white)] text-xs text-[var(--wui-gray-700)] cursor-pointer hover:bg-[var(--wui-gray-50)] hover:border-[var(--wui-gray-400)] active:bg-[var(--wui-gray-100)]'
                     return (
-                        <div data-panel-part="actions" class="flex flex-wrap gap-1.5 px-3 py-2 border-t border-gray-200">
+                        <div data-panel-part="actions" class="flex flex-wrap gap-1.5 px-3 py-2 border-t border-[var(--wui-gray-200)]">
                             <button
                                 ref={b => { if (b) b.onclick = () => openImageEditor(img) }}
                                 title={() => t('editor.image.cropZoomResize')}
@@ -1321,7 +1321,7 @@ const MIN_W = 240
             >
                 <div class={() => [
                     "absolute bottom-[3px] right-[3px] w-2 h-2 border-r-2 border-b-2 pointer-events-none",
-                    $$(resizing) ? 'border-blue-400' : 'border-gray-300'
+                    $$(resizing) ? 'border-[var(--wui-blue-400)]' : 'border-[var(--wui-gray-300)]'
                 ]} />
             </div>
             <div
@@ -1330,7 +1330,7 @@ const MIN_W = 240
             >
                 <div class={() => [
                     "absolute bottom-[3px] left-[3px] w-2 h-2 border-l-2 border-b-2 pointer-events-none",
-                    $$(resizing) ? 'border-blue-400' : 'border-gray-300'
+                    $$(resizing) ? 'border-[var(--wui-blue-400)]' : 'border-[var(--wui-gray-300)]'
                 ]} />
             </div>
         </div>

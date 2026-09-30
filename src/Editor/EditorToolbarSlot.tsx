@@ -47,7 +47,7 @@ const renderItem = (item: ToolbarItem) =>
  * own seven groups -- copied rather than shared because `Editor.tsx` declares it inside the
  * toolbar component, and hoisting it out would be a bigger edit than it is worth.
  */
-const Divider = () => <div class="w-[1px] h-6 bg-gray-200 mx-1" />
+const Divider = () => <div class="w-[1px] h-6 bg-[var(--wui-gray-200)] mx-1" />
 
 /** The band a group gets when it does not name its own. See {@link ToolbarGroup.cls}. */
 const DEFAULT_BAND_CLASS = 'flex items-center gap-1'

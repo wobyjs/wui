@@ -130,7 +130,7 @@ const LayoutSwitch = defaults(def, (props) => {
             class={() => [
                 TOOLBAR_CONTROL,
                 () => $$(cls) ? $$(cls) : $$(cn),
-                () => $$(editorLayout) === mode ? '!bg-slate-200' : '',
+                () => $$(editorLayout) === mode ? '!bg-[var(--wui-slate-200)]' : '',
             ]}
             onClick={go(mode)}
             // Same guard the rest of the toolbar uses: a mousedown that reaches the

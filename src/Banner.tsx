@@ -128,7 +128,7 @@ const BASE_CLASS = 'relative flex flex-row items-center overflow-hidden box-bord
  * Outside the `cls` slot because it follows the `print` prop, so an override cannot freeze a
  * banner at 209mm on a document that is never going to a printer.
  */
-const PRINT_CLASS = 'w-[209mm] mx-auto mb-[10px] border border-solid border-black text-[200%] font-bold'
+const PRINT_CLASS = 'w-[209mm] mx-auto mb-[10px] border border-solid border-[var(--wui-black)] text-[200%] font-bold'
 
 /**
  * The shadow sheet. Every rule here has to be here rather than in a class.

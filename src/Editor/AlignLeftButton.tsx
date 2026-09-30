@@ -80,7 +80,7 @@ const AlignLeftButton: Defaulted<typeof def> = defaults(def, (props) => {
             class={[
                 () => $$(cls) ? $$(cls) : "",
                 cn,
-                () => $$(isActive) ? '!bg-slate-200' : '',
+                () => $$(isActive) ? '!bg-[var(--wui-slate-200)]' : '',
             ]}
             disabled={disabled}
             onClick={handleClick}

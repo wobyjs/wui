@@ -36,10 +36,10 @@ export const ObjectEditor = () => {
 							class={"w-5 h-5 cursor-pointer"}
 							ref={el => { if (el) el.onclick = () => { open(v => !v) } }}
 						>
-							{() => $$(open) ? <svg xmlns="http://www.w3.org/2000/svg" class="h-full w-full text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+							{() => $$(open) ? <svg xmlns="http://www.w3.org/2000/svg" class="h-full w-full text-[var(--wui-gray-500)]" viewBox="0 0 20 20" fill="currentColor">
 								<path fill-rule="evenodd" d="M4 10a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1z" clip-rule="evenodd" />
 							</svg> :
-								<svg xmlns="http://www.w3.org/2000/svg" class="h-full w-full text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+								<svg xmlns="http://www.w3.org/2000/svg" class="h-full w-full text-[var(--wui-gray-500)]" viewBox="0 0 20 20" fill="currentColor">
 									<path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
 								</svg>}
 						</button>}
@@ -52,11 +52,11 @@ export const ObjectEditor = () => {
 					</th>
 				</tr>
 				{() => $$(open) ? (
-					<tr class="flex w-full items-stretch border-x border-b border-gray-200 bg-white">
+					<tr class="flex w-full items-stretch border-x border-b border-[var(--wui-gray-200)] bg-[var(--wui-white)]">
 						<td class="w-full" colSpan={2}>
 							<PropertyRows
 								obj={$$(value)}
-								className={["h-fit bg-white"] as any}
+								className={["h-fit bg-[var(--wui-white)]"] as any}
 								indentLvl={indentLvl + 1}
 							/>
 						</td>

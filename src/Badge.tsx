@@ -116,7 +116,7 @@ const Badge: Defaulted<typeof def> = defaults(def, (props) => {
                     class={() => {
                         const classes = [
                             // Core badge styling
-                            'flex place-content-center items-center absolute box-border font-medium text-xs leading-none z-[1] text-white scale-100 [flex-flow:wrap] [transition:transform_225ms_cubic-bezier(0.4,0,0.2,1)0ms]',
+                            'flex place-content-center items-center absolute box-border font-medium text-xs leading-none z-[1] text-[var(--wui-white)] scale-100 [flex-flow:wrap] [transition:transform_225ms_cubic-bezier(0.4,0,0.2,1)0ms]',
                             visibilityClass(),
                             transformOriginClass(),
                             positionClasses(),

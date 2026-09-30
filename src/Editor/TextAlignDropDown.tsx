@@ -135,7 +135,7 @@ const TextAlignDropDown = defaults(def, (props) => {
     const isOpen = $(false)
     const dropdownRef = $<HTMLElement>(null as any)
 
-    const BASE_BTN = "size-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-black hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500 cursor-pointer"
+    const BASE_BTN = "size-full inline-flex justify-center rounded-md border border-[var(--wui-gray-300)] shadow-sm px-4 py-2 bg-[var(--wui-white)] text-sm font-medium text-[var(--wui-black)] hover:bg-[var(--wui-gray-50)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-[var(--wui-indigo-500)] cursor-pointer"
 
     useDropdownDismiss(dropdownRef as any, () => isOpen(false))
 
@@ -168,7 +168,7 @@ const TextAlignDropDown = defaults(def, (props) => {
     const DropDownMenu = () => {
         return (
             <div
-                class="origin-top-left absolute left-0 mt-2 w-60 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10"
+                class="origin-top-left absolute left-0 mt-2 w-60 rounded-md shadow-lg bg-[var(--wui-white)] ring-1 ring-black ring-opacity-5 focus:outline-none z-10"
                 role="menu"
                 aria-orientation="vertical"
                 aria-labelledby="alignment-menu-button"
@@ -176,14 +176,14 @@ const TextAlignDropDown = defaults(def, (props) => {
                 <div class="py-1" role="none">
                     {alignmentOptions.map((opt, index) => {
                         if (opt.type === 'divider') {
-                            return <div key={`divider-${index}`} class="border-t border-gray-200 my-1 mx-2" />
+                            return <div key={`divider-${index}`} class="border-t border-[var(--wui-gray-200)] my-1 mx-2" />
                         }
                         // TypeScript should infer opt as AlignmentOptionItem here due to the check above
                         const item = opt as AlignmentOptionItem
                         return (
                             <Button
                                 type="outlined"
-                                cls="w-full text-gray-700 group flex items-center px-4 py-2 text-sm hover:bg-gray-100 hover:text-gray-900"
+                                cls="w-full text-[var(--wui-gray-700)] group flex items-center px-4 py-2 text-sm hover:bg-[var(--wui-gray-100)] hover:text-[var(--wui-gray-900)]"
                                 key={item.label}
                                 role="menuitem"
                                 onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation(); }}
@@ -192,7 +192,7 @@ const TextAlignDropDown = defaults(def, (props) => {
                             >
                                 <item.icon />
                                 <span class="ml-3">{() => alignLabel(item.label)}</span>
-                                {item.hotkey && <span class="ml-auto text-xs text-gray-500">{item.hotkey}</span>}
+                                {item.hotkey && <span class="ml-auto text-xs text-[var(--wui-gray-500)]">{item.hotkey}</span>}
                             </Button>
                         )
                     })}
@@ -228,7 +228,7 @@ const TextAlignDropDown = defaults(def, (props) => {
                 </Button>
                 <Button
                     type={btnType}
-                    class={[TOOLBAR_CONTROL, "size-full inline-flex justify-center items-center rounded-md border border-gray-300 shadow-sm bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500 cursor-pointer px-2"]}
+                    class={[TOOLBAR_CONTROL, "size-full inline-flex justify-center items-center rounded-md border border-[var(--wui-gray-300)] shadow-sm bg-[var(--wui-white)] hover:bg-[var(--wui-gray-50)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-[var(--wui-indigo-500)] cursor-pointer px-2"]}
                     onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleDropdown(); }}
                     onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation(); }}
                     title={() => t('editor.chooseAlignOrIndent')}

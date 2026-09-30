@@ -47,7 +47,7 @@ const TestCard = (): JSX.Element => {
     return ret
 }
 
-const CARD_BASE = "bg-white text-[rgba(0,0,0,0.87)] rounded overflow-hidden transition-[box-shadow,transform] duration-300 ease-in-out [transition-delay:0ms]"
+const CARD_BASE = "bg-[var(--wui-white)] text-[rgba(0,0,0,0.87)] rounded overflow-hidden transition-[box-shadow,transform] duration-300 ease-in-out [transition-delay:0ms]"
 
 // SSR test (Node.js)
 if (typeof globalThis.__isSSRTest__ !== 'undefined') {
@@ -56,7 +56,7 @@ if (typeof globalThis.__isSSRTest__ !== 'undefined') {
     const fullElements = [
         `<h3>Card</h3><div class="${CARD_BASE} shadow-md "><div class="p-4">Body</div></div>`,
         `<h3>Card</h3><div class="${CARD_BASE} border border-[rgba(0,0,0,0.12)] shadow-none "><div class="flex items-center justify-end p-2">Act</div></div>`,
-        `<h3>Card</h3><div class="${CARD_BASE} !bg-gray-50 shadow-lg "><div role="img" title="Img" aria-label="Img" class="block bg-no-repeat" style="height: 100px; background-image: url(i.png); background-position: center center; background-size: cover;"></div></div>`,
+        `<h3>Card</h3><div class="${CARD_BASE} !bg-[var(--wui-gray-50)] shadow-lg "><div role="img" title="Img" aria-label="Img" class="block bg-no-repeat" style="height: 100px; background-image: url(i.png); background-position: center center; background-size: cover;"></div></div>`,
     ]
 
     console.log(`\n📝 Test: ${name}`)
@@ -91,7 +91,7 @@ TestCard.test = {
         const variants = [
             `${CARD_BASE} shadow-md`,
             `${CARD_BASE} border border-[rgba(0,0,0,0.12)] shadow-none`,
-            `${CARD_BASE} !bg-gray-50 shadow-lg`,
+            `${CARD_BASE} !bg-[var(--wui-gray-50)] shadow-lg`,
         ]
         const inners = [
             `<div class="p-4">Body</div>`,
@@ -106,7 +106,7 @@ TestCard.test = {
         const fullElements = [
             `<h3>Card</h3><div class="${CARD_BASE} shadow-md "><div class="p-4">Body</div></div>`,
             `<h3>Card</h3><div class="${CARD_BASE} border border-[rgba(0,0,0,0.12)] shadow-none "><div class="flex items-center justify-end p-2">Act</div></div>`,
-            `<h3>Card</h3><div class="${CARD_BASE} !bg-gray-50 shadow-lg "><div role="img" title="Img" aria-label="Img" class="block bg-no-repeat" style="height: 100px; background-image: url(i.png); background-position: center center; background-size: cover;"></div></div>`,
+            `<h3>Card</h3><div class="${CARD_BASE} !bg-[var(--wui-gray-50)] shadow-lg "><div role="img" title="Img" aria-label="Img" class="block bg-no-repeat" style="height: 100px; background-image: url(i.png); background-position: center center; background-size: cover;"></div></div>`,
         ]
         const expectedFull = fullElements[idx]
         if (ssrResult !== expectedFull) {

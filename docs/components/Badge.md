@@ -181,7 +181,7 @@ You may override or expand styles with the `cls` prop.
 ### TSX
 ```tsx
 <Avatar
-    cls="w-6 h-6 bg-purple-500 text-white font-bold"
+    cls="w-6 h-6 bg-[var(--wui-purple-500)] text-[var(--wui-white)] font-bold"
 >
     CU
 </Avatar>
@@ -190,7 +190,7 @@ You may override or expand styles with the `cls` prop.
 ### HTML
 ```html
 <wui-avatar
-    cls="w-6 h-6 bg-purple-500 text-white font-bold"
+    cls="w-6 h-6 bg-[var(--wui-purple-500)] text-[var(--wui-white)] font-bold"
 >
     CU
 </wui-avatar>

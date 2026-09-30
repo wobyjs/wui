@@ -167,7 +167,7 @@ const Wheeler = defaults(def, (props) => {
             // --- Inject the Checkbox Renderer ---
             // Assign a `component` function to each option that will render an `<li>` with a checkbox.
             base.forEach((o, index) => o.component = o.hasComponent ? o.component as any : (props: { itemHeight: number, value: WheelerItem, index: number }) =>
-                <li class={['wheeler-item', 'text-black']} data-index={index} data-value={o.value}
+                <li class={['wheeler-item', 'text-[var(--wui-black)]']} data-index={index} data-value={o.value}
                     style={{ height: () => `${$$(itemHeight)}px` }}>
                     {() => {
                         // This component will reactively read the checked state for its label.
@@ -197,7 +197,7 @@ const Wheeler = defaults(def, (props) => {
             // Assign a `component` function to each option that renders a simple text `<li>`.
             // The `pickerItemCls` contains styles to make non-selected items appear faded and smaller.
             base.forEach((o, index) => o.component = o.hasComponent ? o.component as any : (() =>
-                <li class={['wheeler-item', pickerItemCls, 'text-[#555] opacity-60']} data-index={index} data-value={o.value}
+                <li class={['wheeler-item', pickerItemCls, 'text-[var(--wui-wheeler-text)] opacity-60']} data-index={index} data-value={o.value}
                     style={{ height: () => `${$$(itemHeight)}px` }}>
                     {o.label}
                 </li>
@@ -1079,11 +1079,11 @@ const Wheeler = defaults(def, (props) => {
             // an item's height) around the viewport's center.
             if (distanceFromCenter < $$(itemHeight) * 0.6) {
                 // If it's in the target zone, apply all the "selected" styles.
-                item.classList.add('is-near-center', 'opacity-100', 'font-bold', 'text-[#007bff]', 'scale-100')
+                item.classList.add('is-near-center', 'opacity-100', 'font-bold', 'text-[var(--wui-wheeler-link)]', 'scale-100')
             } else {
                 // If it's *not* in the target zone, ensure all "selected" styles are removed.
                 // This is crucial for making sure only one item is highlighted at a time.
-                item.classList.remove('is-near-center', 'opacity-100', 'font-bold', 'text-[#007bff]', 'scale-100')
+                item.classList.remove('is-near-center', 'opacity-100', 'font-bold', 'text-[var(--wui-wheeler-link)]', 'scale-100')
             }
         })
     }
@@ -1891,7 +1891,7 @@ const Wheeler = defaults(def, (props) => {
                         <input
                             type="text"
                             placeholder={placeholderText} // This now uses our new logic
-                            class="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 ease-in-out w-64"
+                            class="px-4 py-2 border border-[var(--wui-gray-300)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--wui-blue-500)] focus:border-transparent transition duration-200 ease-in-out w-64"
                             onInput={(e: any) => {
                                 const value = e.target.value
                                 search(value)
@@ -1900,7 +1900,7 @@ const Wheeler = defaults(def, (props) => {
                     </div>
                 ) : null}
 
-                <div class="my-1 h-px w-full bg-gray-300 dark:bg-gray-600"></div>
+                <div class="my-1 h-px w-full bg-[var(--wui-gray-300)]"></div>
             </div>
         )
     }
@@ -1925,7 +1925,7 @@ const Wheeler = defaults(def, (props) => {
                 {/* The selection indicator is only shown for single-select mode */}
                 {/* {!$$(multiple) &&
                     <div
-                        class='wheeler-indicator absolute box-border pointer-events-none bg-[rgba(0,123,255,0.05)] border-y-[#007bff] border-t border-solid border-b inset-x-0'
+                        class='wheeler-indicator absolute box-border pointer-events-none bg-[rgba(0,123,255,0.05)] border-y-[var(--wui-wheeler-link)] border-t border-solid border-b inset-x-0'
                         style={{
                             height: () => `${$$(itemHeight)}px`,
                             top: () => `${$$(indicatorTop)}px`,
@@ -1935,7 +1935,7 @@ const Wheeler = defaults(def, (props) => {
                 {
                     () => $$(multiple) ? null
                         :
-                        <div class='wheeler-indicator absolute h-9 box-border pointer-events-none bg-[rgba(0,123,255,0.05)] border-y-[#007bff] border-t border-solid border-b inset-x-0' style={{
+                        <div class='wheeler-indicator absolute h-9 box-border pointer-events-none bg-[rgba(0,123,255,0.05)] border-y-[var(--wui-wheeler-link)] border-t border-solid border-b inset-x-0' style={{
                             height: () => `${$$(itemHeight)}px`,
                             top: () => `${$$(indicatorTop) + $$(itemHeight) / 2}px`, // Center line of indicator
                             transform: `translateY(-50%)`,
@@ -1967,7 +1967,7 @@ const Wheeler = defaults(def, (props) => {
     const renderAsPopup = () => <>
         <BackgroundOverlay />
         <Portal mount={document.body}>
-            <div ref={wheeler} class={() => ['wheeler-widget z-[150]', $$(cls), "fixed inset-x-0 bottom-0 w-full z-200 bg-white", $$(cn)]}>
+            <div ref={wheeler} class={() => ['wheeler-widget z-[150]', $$(cls), "fixed inset-x-0 bottom-0 w-full z-200 bg-[var(--wui-white)]", $$(cn)]}>
                 <WheelerContent />
             </div>
         </Portal>

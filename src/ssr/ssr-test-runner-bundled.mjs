@@ -49686,7 +49686,7 @@ var def = () => ({
   edge: observable("top")
 });
 var variantStyle = {
-  default: "shadow-[rgba(0,0,0,0.2)_0px_2px_4px_-1px,rgba(0,0,0,0.14)_0px_4px_5px_0px,rgba(0,0,0,0.12)_0px_1px_10px_0px] [@media_screen]:flex [@media_screen]:flex-col w-full box-border shrink-0 z-[1100] bg-[rgb(25,118,210)] text-white left-auto [transition:box-shadow_300ms_cubic-bezier(0.4,0,0.2,1)0ms] "
+  default: "shadow-[rgba(0,0,0,0.2)_0px_2px_4px_-1px,rgba(0,0,0,0.14)_0px_4px_5px_0px,rgba(0,0,0,0.12)_0px_1px_10px_0px] [@media_screen]:flex [@media_screen]:flex-col w-full box-border shrink-0 z-[1100] bg-[rgb(25,118,210)] text-[var(--wui-white)] left-auto [transition:box-shadow_300ms_cubic-bezier(0.4,0,0.2,1)0ms] "
 };
 var Appbar = defaults(def, (props) => {
   const { class: cn2, cls, type: variant2, position, edge, children, ...otherProps } = props;
@@ -49782,7 +49782,7 @@ var TestAppbar = () => {
   registerTestObservable(`${name}_ssr`, ret);
   return ret;
 };
-var VARIANT = "shadow-[rgba(0,0,0,0.2)_0px_2px_4px_-1px,rgba(0,0,0,0.14)_0px_4px_5px_0px,rgba(0,0,0,0.12)_0px_1px_10px_0px] [@media_screen]:flex [@media_screen]:flex-col w-full box-border shrink-0 z-[1100] bg-[rgb(25,118,210)] text-white left-auto [transition:box-shadow_300ms_cubic-bezier(0.4,0,0.2,1)0ms]";
+var VARIANT = "shadow-[rgba(0,0,0,0.2)_0px_2px_4px_-1px,rgba(0,0,0,0.14)_0px_4px_5px_0px,rgba(0,0,0,0.12)_0px_1px_10px_0px] [@media_screen]:flex [@media_screen]:flex-col w-full box-border shrink-0 z-[1100] bg-[rgb(25,118,210)] text-[var(--wui-white)] left-auto [transition:box-shadow_300ms_cubic-bezier(0.4,0,0.2,1)0ms]";
 if (typeof globalThis.__isSSRTest__ !== "undefined") {
   TestAppbar();
   const fullElements = [
@@ -49871,7 +49871,7 @@ var def2 = () => ({
   // xs | sm | md | lg
   type: observable("circular")
 });
-var BASE_CLASS = "relative flex items-center justify-center align-middle select-none leading-none overflow-hidden shrink-0 m-0 bg-[rgb(189,189,189)] text-white";
+var BASE_CLASS = "relative flex items-center justify-center align-middle select-none leading-none overflow-hidden shrink-0 m-0 bg-[rgb(189,189,189)] text-[var(--wui-white)]";
 var variantStyle2 = {
   circular: "rounded-full",
   rounded: "rounded-xl",
@@ -49941,7 +49941,7 @@ var TestAvatar = () => {
 };
 if (typeof globalThis.__isSSRTest__ !== "undefined") {
   TestAvatar();
-  const BASE_CLASS10 = "relative flex items-center justify-center align-middle select-none leading-none overflow-hidden shrink-0 m-0 bg-[rgb(189,189,189)] text-white";
+  const BASE_CLASS10 = "relative flex items-center justify-center align-middle select-none leading-none overflow-hidden shrink-0 m-0 bg-[rgb(189,189,189)] text-[var(--wui-white)]";
   const fullElements = [
     `<h3>Avatar</h3><div class="rounded-full w-6 h-6 text-xs ${BASE_CLASS10}"></div>`,
     `<h3>Avatar</h3><div class="rounded-xl w-8 h-8 text-sm ${BASE_CLASS10}"><img src="x.png" alt="Avatar" class="w-full h-full object-cover" /></div>`,
@@ -49975,7 +49975,7 @@ TestAvatar.test = {
   compareActualValues: true,
   expect: () => {
     const idx = get(testObservables[name2]);
-    const BASE_CLASS10 = "relative flex items-center justify-center align-middle select-none leading-none overflow-hidden shrink-0 m-0 bg-[rgb(189,189,189)] text-white";
+    const BASE_CLASS10 = "relative flex items-center justify-center align-middle select-none leading-none overflow-hidden shrink-0 m-0 bg-[rgb(189,189,189)] text-[var(--wui-white)]";
     const elements = [
       `<div class="rounded-full w-6 h-6 text-xs ${BASE_CLASS10}"></div>`,
       [
@@ -50084,7 +50084,7 @@ var Badge = defaults(def3, (props) => {
         class: () => {
           const classes = [
             // Core badge styling
-            "flex place-content-center items-center absolute box-border font-medium text-xs leading-none z-[1] text-white scale-100 [flex-flow:wrap] [transition:transform_225ms_cubic-bezier(0.4,0,0.2,1)0ms]",
+            "flex place-content-center items-center absolute box-border font-medium text-xs leading-none z-[1] text-[var(--wui-white)] scale-100 [flex-flow:wrap] [transition:transform_225ms_cubic-bezier(0.4,0,0.2,1)0ms]",
             visibilityClass(),
             transformOriginClass(),
             positionClasses(),
@@ -50129,7 +50129,7 @@ var TestBadge = () => {
   return ret;
 };
 var BADGE_CLASS = "relative inline-flex align-middle shrink-0 m-4";
-var BADGE_INNER = "flex place-content-center items-center absolute box-border font-medium text-xs leading-none z-[1] text-white scale-100 [flex-flow:wrap] [transition:transform_225ms_cubic-bezier(0.4,0,0.2,1)0ms]";
+var BADGE_INNER = "flex place-content-center items-center absolute box-border font-medium text-xs leading-none z-[1] text-[var(--wui-white)] scale-100 [flex-flow:wrap] [transition:transform_225ms_cubic-bezier(0.4,0,0.2,1)0ms]";
 var BADGE_COLOR = "bg-[rgb(156,39,176)]";
 if (typeof globalThis.__isSSRTest__ !== "undefined") {
   TestBadge();
@@ -50202,7 +50202,7 @@ init_runtime_es();
 var variant = {
   text: [
     "inline-flex items-center justify-center relative box-border bg-transparent cursor-pointer select-none align-middle no-underline",
-    "font-medium text-sm leading-[1.75] tracking-[0.02857em] uppercase rounded text-[#1976d2]",
+    "font-medium text-sm leading-[1.75] tracking-[0.02857em] uppercase rounded text-[var(--wui-accent-500)]",
     "rounded-[4px] border-0 outline-0 font-sans px-4 py-2",
     "[transition:background-color_250ms_cubic-bezier(0.4,0,0.2,1)0ms,box-shadow_250ms_cubic-bezier(0.4,0,0.2,1)0ms,border-color_250ms_cubic-bezier(0.4,0,0.2,1)0ms,color_250ms_cubic-bezier(0.4,0,0.2,1)0ms]",
     // hover
@@ -50215,13 +50215,13 @@ var variant = {
   ].join(" "),
   contained: [
     "inline-flex items-center justify-center relative box-border cursor-pointer select-none align-middle no-underline",
-    "font-medium text-sm leading-[1.75] tracking-[0.02857em] uppercase rounded text-white bg-[#1976d2]",
+    "font-medium text-sm leading-[1.75] tracking-[0.02857em] uppercase rounded text-[var(--wui-white)] bg-[var(--wui-accent-500)]",
     "rounded-[4px] border-0 outline-0 font-sans px-4 py-2",
     "shadow-[0px_3px_1px_-2px_rgba(0,0,0,0.2),0px_2px_2px_0px_rgba(0,0,0,0.14),0px_1px_5px_0px_rgba(0,0,0,0.12)]",
     "[transition:background-color_250ms_cubic-bezier(0.4,0,0.2,1)0ms,box-shadow_250ms_cubic-bezier(0.4,0,0.2,1)0ms,border-color_250ms_cubic-bezier(0.4,0,0.2,1)0ms,color_250ms_cubic-bezier(0.4,0,0.2,1)0ms]",
     // hover
     "hover:no-underline",
-    "hover:bg-[#1565c0]",
+    "hover:bg-[var(--wui-accent-600)]",
     "hover:shadow-[0px_2px_4px_-1px_rgba(0,0,0,0.2),0px_4px_5px_0px_rgba(0,0,0,0.14),0px_1px_10px_0px_rgba(0,0,0,0.12)]",
     // active
     "active:shadow-[0px_5px_5px_-3px_rgba(0,0,0,0.2),0px_8px_10px_1px_rgba(0,0,0,0.14),0px_3px_14px_2px_rgba(0,0,0,0.12)]",
@@ -50234,7 +50234,7 @@ var variant = {
   ].join(" "),
   outlined: [
     "inline-flex items-center justify-center relative box-border bg-transparent cursor-pointer select-none align-middle no-underline font-medium",
-    "text-sm leading-[1.75] tracking-[0.02857em] uppercase rounded border text-[#1976d2] rounded-[4px]",
+    "text-sm leading-[1.75] tracking-[0.02857em] uppercase rounded border text-[var(--wui-accent-500)] rounded-[4px]",
     "border-solid font-sans px-4 py-2",
     "[transition:background-color_250ms_cubic-bezier(0.4,0,0.2,1)0ms,box-shadow_250ms_cubic-bezier(0.4,0,0.2,1)0ms,border-color_250ms_cubic-bezier(0.4,0,0.2,1)0ms,color_250ms_cubic-bezier(0.4,0,0.2,1)0ms]",
     // hover
@@ -50242,7 +50242,7 @@ var variant = {
     "hover:bg-[rgba(25,118,210,0.04)]",
     "hover:border",
     "hover:border-solid",
-    "hover:border-[#1976d2]",
+    "hover:border-[var(--wui-accent-500)]",
     // disabled
     "disabled:text-[rgba(0,0,0,0.26)]",
     "disabled:border",
@@ -50369,12 +50369,12 @@ var TestButton = () => {
 };
 var CONTAINED = [
   "inline-flex items-center justify-center relative box-border cursor-pointer select-none align-middle no-underline",
-  "font-medium text-sm leading-[1.75] tracking-[0.02857em] uppercase rounded text-white bg-[#1976d2]",
+  "font-medium text-sm leading-[1.75] tracking-[0.02857em] uppercase rounded text-[var(--wui-white)] bg-[var(--wui-accent-500)]",
   "rounded-[4px] border-0 outline-0 font-sans px-4 py-2",
   "shadow-[0px_3px_1px_-2px_rgba(0,0,0,0.2),0px_2px_2px_0px_rgba(0,0,0,0.14),0px_1px_5px_0px_rgba(0,0,0,0.12)]",
   "[transition:background-color_250ms_cubic-bezier(0.4,0,0.2,1)0ms,box-shadow_250ms_cubic-bezier(0.4,0,0.2,1)0ms,border-color_250ms_cubic-bezier(0.4,0,0.2,1)0ms,color_250ms_cubic-bezier(0.4,0,0.2,1)0ms]",
   "hover:no-underline",
-  "hover:bg-[#1565c0]",
+  "hover:bg-[var(--wui-accent-600)]",
   "hover:shadow-[0px_2px_4px_-1px_rgba(0,0,0,0.2),0px_4px_5px_0px_rgba(0,0,0,0.14),0px_1px_10px_0px_rgba(0,0,0,0.12)]",
   "active:shadow-[0px_5px_5px_-3px_rgba(0,0,0,0.2),0px_8px_10px_1px_rgba(0,0,0,0.14),0px_3px_14px_2px_rgba(0,0,0,0.12)]",
   "disabled:text-[rgba(0,0,0,0.26)]",
@@ -50385,14 +50385,14 @@ var CONTAINED = [
 ].join(" ");
 var OUTLINED = [
   "inline-flex items-center justify-center relative box-border bg-transparent cursor-pointer select-none align-middle no-underline font-medium",
-  "text-sm leading-[1.75] tracking-[0.02857em] uppercase rounded border text-[#1976d2] rounded-[4px]",
+  "text-sm leading-[1.75] tracking-[0.02857em] uppercase rounded border text-[var(--wui-accent-500)] rounded-[4px]",
   "border-solid font-sans px-4 py-2",
   "[transition:background-color_250ms_cubic-bezier(0.4,0,0.2,1)0ms,box-shadow_250ms_cubic-bezier(0.4,0,0.2,1)0ms,border-color_250ms_cubic-bezier(0.4,0,0.2,1)0ms,color_250ms_cubic-bezier(0.4,0,0.2,1)0ms]",
   "hover:no-underline",
   "hover:bg-[rgba(25,118,210,0.04)]",
   "hover:border",
   "hover:border-solid",
-  "hover:border-[#1976d2]",
+  "hover:border-[var(--wui-accent-500)]",
   "disabled:text-[rgba(0,0,0,0.26)]",
   "disabled:border",
   "disabled:border-solid",
@@ -50402,7 +50402,7 @@ var OUTLINED = [
 ].join(" ");
 var TEXT = [
   "inline-flex items-center justify-center relative box-border bg-transparent cursor-pointer select-none align-middle no-underline",
-  "font-medium text-sm leading-[1.75] tracking-[0.02857em] uppercase rounded text-[#1976d2]",
+  "font-medium text-sm leading-[1.75] tracking-[0.02857em] uppercase rounded text-[var(--wui-accent-500)]",
   "rounded-[4px] border-0 outline-0 font-sans px-4 py-2",
   "[transition:background-color_250ms_cubic-bezier(0.4,0,0.2,1)0ms,box-shadow_250ms_cubic-bezier(0.4,0,0.2,1)0ms,border-color_250ms_cubic-bezier(0.4,0,0.2,1)0ms,color_250ms_cubic-bezier(0.4,0,0.2,1)0ms]",
   "hover:no-underline",
@@ -50573,8 +50573,8 @@ var elevationCls = (e3) => {
 };
 var Card = defaults(defCard, (props) => {
   const { class: cn2, cls, children, variant: variant2, elevation, interactive, ...otherProps } = props;
-  const base = "bg-white text-[rgba(0,0,0,0.87)] rounded overflow-hidden transition-[box-shadow,transform] duration-300 ease-in-out [transition-delay:0ms]";
-  const variantCls = () => variant2() === "outlined" ? "border border-[rgba(0,0,0,0.12)] shadow-none" : variant2() === "filled" ? "!bg-gray-50 " + elevationCls(elevation()) : elevationCls(elevation());
+  const base = "bg-[var(--wui-white)] text-[rgba(0,0,0,0.87)] rounded overflow-hidden transition-[box-shadow,transform] duration-300 ease-in-out [transition-delay:0ms]";
+  const variantCls = () => variant2() === "outlined" ? "border border-[rgba(0,0,0,0.12)] shadow-none" : variant2() === "filled" ? "!bg-[var(--wui-gray-50)] " + elevationCls(elevation()) : elevationCls(elevation());
   const interactiveCls = () => interactive == true ? "cursor-pointer hover:shadow-[rgba(0,0,0,0.2)_0px_4px_5px_-2px,rgba(0,0,0,0.14)_0px_7px_10px_1px,rgba(0,0,0,0.12)_0px_2px_16px_1px]" : "";
   return /* @__PURE__ */ jsx(
     "div",
@@ -50661,13 +50661,13 @@ var TestCard = () => {
   registerTestObservable(`${name5}_ssr`, ret);
   return ret;
 };
-var CARD_BASE = "bg-white text-[rgba(0,0,0,0.87)] rounded overflow-hidden transition-[box-shadow,transform] duration-300 ease-in-out [transition-delay:0ms]";
+var CARD_BASE = "bg-[var(--wui-white)] text-[rgba(0,0,0,0.87)] rounded overflow-hidden transition-[box-shadow,transform] duration-300 ease-in-out [transition-delay:0ms]";
 if (typeof globalThis.__isSSRTest__ !== "undefined") {
   TestCard();
   const fullElements = [
     `<h3>Card</h3><div class="${CARD_BASE} shadow-md "><div class="p-4">Body</div></div>`,
     `<h3>Card</h3><div class="${CARD_BASE} border border-[rgba(0,0,0,0.12)] shadow-none "><div class="flex items-center justify-end p-2">Act</div></div>`,
-    `<h3>Card</h3><div class="${CARD_BASE} !bg-gray-50 shadow-lg "><div role="img" title="Img" aria-label="Img" class="block bg-no-repeat" style="height: 100px; background-image: url(i.png); background-position: center center; background-size: cover;"></div></div>`
+    `<h3>Card</h3><div class="${CARD_BASE} !bg-[var(--wui-gray-50)] shadow-lg "><div role="img" title="Img" aria-label="Img" class="block bg-no-repeat" style="height: 100px; background-image: url(i.png); background-position: center center; background-size: cover;"></div></div>`
   ];
   console.log(`
 \u{1F4DD} Test: ${name5}`);
@@ -50699,7 +50699,7 @@ TestCard.test = {
     const variants = [
       `${CARD_BASE} shadow-md`,
       `${CARD_BASE} border border-[rgba(0,0,0,0.12)] shadow-none`,
-      `${CARD_BASE} !bg-gray-50 shadow-lg`
+      `${CARD_BASE} !bg-[var(--wui-gray-50)] shadow-lg`
     ];
     const inners = [
       `<div class="p-4">Body</div>`,
@@ -50712,7 +50712,7 @@ TestCard.test = {
     const fullElements = [
       `<h3>Card</h3><div class="${CARD_BASE} shadow-md "><div class="p-4">Body</div></div>`,
       `<h3>Card</h3><div class="${CARD_BASE} border border-[rgba(0,0,0,0.12)] shadow-none "><div class="flex items-center justify-end p-2">Act</div></div>`,
-      `<h3>Card</h3><div class="${CARD_BASE} !bg-gray-50 shadow-lg "><div role="img" title="Img" aria-label="Img" class="block bg-no-repeat" style="height: 100px; background-image: url(i.png); background-position: center center; background-size: cover;"></div></div>`
+      `<h3>Card</h3><div class="${CARD_BASE} !bg-[var(--wui-gray-50)] shadow-lg "><div role="img" title="Img" aria-label="Img" class="block bg-no-repeat" style="height: 100px; background-image: url(i.png); background-position: center center; background-size: cover;"></div></div>`
     ];
     const expectedFull = fullElements[idx];
     if (ssrResult !== expectedFull) {
@@ -51088,7 +51088,7 @@ var Collapse = defaults(def7, (props) => {
   const internalOpen = isObservable(open) ? open : observable(open ?? true);
   const baseClass3 = "overflow-hidden transition-height duration-200 ease-in-out ";
   const isBackground = () => {
-    return get(background) === true ? "bg-[#ccc]" : "";
+    return get(background) === true ? "bg-[var(--wui-gray-300)]" : "";
   };
   function renderCollapse() {
     return /* @__PURE__ */ jsx(
@@ -51130,7 +51130,7 @@ var TestCollapse = () => {
   registerTestObservable(`${name8}_ssr`, ret);
   return ret;
 };
-var COLLAPSE_BASE = "overflow-hidden transition-height duration-200 ease-in-out bg-[#ccc]";
+var COLLAPSE_BASE = "overflow-hidden transition-height duration-200 ease-in-out bg-[var(--wui-gray-300)]";
 if (typeof globalThis.__isSSRTest__ !== "undefined") {
   TestCollapse();
   const fullElements = [
@@ -51509,7 +51509,7 @@ var def8 = () => ({
 });
 var disabledStyle = "disabled:!bg-[rgba(0,0,0,0.12)] disabled:!text-[rgba(0,0,0,0.26)] disabled:!shadow-none disabled:!cursor-default";
 var variantStyle3 = {
-  circular: "inline-flex items-center justify-center relative box-border cursor-pointer select-none align-middle appearance-none no-underline font-medium text-lg z-[1050] shadow-[rgba(0,0,0,0.2)_0px_3px_5px_-1px,rgba(0,0,0,0.14)_0px_6px_10px_0px,rgba(0,0,0,0.12)_0px_1px_18px_0px] text-white m-2 p-0 rounded-[50%] border-0 [transition:background-color_250ms_cubic-bezier(0.4,0,0.2,1)0ms,box-shadow_250ms_cubic-bezier(0.4,0,0.2,1)0ms,border-color_250ms_cubic-bezier(0.4,0,0.2,1)0ms] outline-none w-14 h-14 bg-[rgb(25,118,210)] hover:bg-[rgb(21,101,192)]",
+  circular: "inline-flex items-center justify-center relative box-border cursor-pointer select-none align-middle appearance-none no-underline font-medium text-lg z-[1050] shadow-[rgba(0,0,0,0.2)_0px_3px_5px_-1px,rgba(0,0,0,0.14)_0px_6px_10px_0px,rgba(0,0,0,0.12)_0px_1px_18px_0px] text-[var(--wui-white)] m-2 p-0 rounded-[50%] border-0 [transition:background-color_250ms_cubic-bezier(0.4,0,0.2,1)0ms,box-shadow_250ms_cubic-bezier(0.4,0,0.2,1)0ms,border-color_250ms_cubic-bezier(0.4,0,0.2,1)0ms] outline-none w-14 h-14 bg-[rgb(25,118,210)] hover:bg-[rgb(21,101,192)]",
   // `absolute` used to live here. It made the variant unusable anywhere in normal
   // flow — the <wui-fab> host collapsed to 0x0 and the button floated over whatever
   // followed it, which is exactly what the docs' own inline `<Fab type="pill">`
@@ -51568,7 +51568,7 @@ var TestFab = () => {
   return ret;
 };
 var PILL = "inline-flex items-center justify-center align-middle bg-[rgb(25,118,210)] text-[white] text-4xl font-black cursor-pointer shadow-[0px_4px_8px_rgba(0,0,0,0.3)] transition-[background-color] duration-[0.3s] px-5 py-[15px] rounded-[50px] border-[none] [transition:top_0.3s_ease,left_0.3s_ease] z-[1050] disabled:!bg-[rgba(0,0,0,0.12)] disabled:!text-[rgba(0,0,0,0.26)] disabled:!shadow-none disabled:!cursor-default";
-var CIRCULAR = "inline-flex items-center justify-center relative box-border cursor-pointer select-none align-middle appearance-none no-underline font-medium text-lg z-[1050] shadow-[rgba(0,0,0,0.2)_0px_3px_5px_-1px,rgba(0,0,0,0.14)_0px_6px_10px_0px,rgba(0,0,0,0.12)_0px_1px_18px_0px] text-white m-2 p-0 rounded-[50%] border-0 [transition:background-color_250ms_cubic-bezier(0.4,0,0.2,1)0ms,box-shadow_250ms_cubic-bezier(0.4,0,0.2,1)0ms,border-color_250ms_cubic-bezier(0.4,0,0.2,1)0ms] outline-none w-14 h-14 bg-[rgb(25,118,210)] hover:bg-[rgb(21,101,192)] disabled:!bg-[rgba(0,0,0,0.12)] disabled:!text-[rgba(0,0,0,0.26)] disabled:!shadow-none disabled:!cursor-default";
+var CIRCULAR = "inline-flex items-center justify-center relative box-border cursor-pointer select-none align-middle appearance-none no-underline font-medium text-lg z-[1050] shadow-[rgba(0,0,0,0.2)_0px_3px_5px_-1px,rgba(0,0,0,0.14)_0px_6px_10px_0px,rgba(0,0,0,0.12)_0px_1px_18px_0px] text-[var(--wui-white)] m-2 p-0 rounded-[50%] border-0 [transition:background-color_250ms_cubic-bezier(0.4,0,0.2,1)0ms,box-shadow_250ms_cubic-bezier(0.4,0,0.2,1)0ms,border-color_250ms_cubic-bezier(0.4,0,0.2,1)0ms] outline-none w-14 h-14 bg-[rgb(25,118,210)] hover:bg-[rgb(21,101,192)] disabled:!bg-[rgba(0,0,0,0.12)] disabled:!text-[rgba(0,0,0,0.26)] disabled:!shadow-none disabled:!cursor-default";
 if (typeof globalThis.__isSSRTest__ !== "undefined") {
   TestFab();
   const fullElements = [
@@ -51664,7 +51664,7 @@ var def9 = () => ({
    */
   src: observable("", HtmlString)
 });
-var baseClass = "inline-flex items-center justify-center relative box-border bg-transparent cursor-pointer select-none align-middle appearance-none no-underline text-center flex-[0_0_auto] text-2xl overflow-visible text-[rgba(0,0,0,0.54)] transition-[background-color] duration ease-in-out delay-[0ms] m-0 p-2 rounded-[50%] border-0 [outline:0px] duration-[0.3s] hover:bg-[#dde0dd] [&_svg]:w-[1em] [&_svg]:h-[1em] [&_svg]:fill-current [&_img]:w-[1em] [&_img]:h-[1em] disabled:bg-transparent disabled:text-[rgba(0,0,0,0.26)] disabled:pointer-events-none disabled:cursor-default disabled:[&_svg]:fill-[rgba(0,0,0,0.26)]";
+var baseClass = "inline-flex items-center justify-center relative box-border bg-transparent cursor-pointer select-none align-middle appearance-none no-underline text-center flex-[0_0_auto] text-2xl overflow-visible text-[rgba(0,0,0,0.54)] transition-[background-color] duration ease-in-out delay-[0ms] m-0 p-2 rounded-[50%] border-0 [outline:0px] duration-[0.3s] hover:bg-[var(--wui-hover-gray)] [&_svg]:w-[1em] [&_svg]:h-[1em] [&_svg]:fill-current [&_img]:w-[1em] [&_img]:h-[1em] disabled:bg-transparent disabled:text-[rgba(0,0,0,0.26)] disabled:pointer-events-none disabled:cursor-default disabled:[&_svg]:fill-[rgba(0,0,0,0.26)]";
 var IconButton = defaults(def9, (props) => {
   const { class: cn2, cls, children, disabled, src, ...otherProps } = props;
   return /* @__PURE__ */ jsx(
@@ -51707,7 +51707,7 @@ var TestIconButton = () => {
   registerTestObservable(`${name10}_ssr`, ret);
   return ret;
 };
-var BASE = "inline-flex items-center justify-center relative box-border bg-transparent cursor-pointer select-none align-middle appearance-none no-underline text-center flex-[0_0_auto] text-2xl overflow-visible text-[rgba(0,0,0,0.54)] transition-[background-color] duration ease-in-out delay-[0ms] m-0 p-2 rounded-[50%] border-0 [outline:0px] duration-[0.3s] hover:bg-[#dde0dd] [&_svg]:w-[1em] [&_svg]:h-[1em] [&_svg]:fill-current [&_img]:w-[1em] [&_img]:h-[1em] disabled:bg-transparent disabled:text-[rgba(0,0,0,0.26)] disabled:pointer-events-none disabled:cursor-default disabled:[&_svg]:fill-[rgba(0,0,0,0.26)]";
+var BASE = "inline-flex items-center justify-center relative box-border bg-transparent cursor-pointer select-none align-middle appearance-none no-underline text-center flex-[0_0_auto] text-2xl overflow-visible text-[rgba(0,0,0,0.54)] transition-[background-color] duration ease-in-out delay-[0ms] m-0 p-2 rounded-[50%] border-0 [outline:0px] duration-[0.3s] hover:bg-[var(--wui-hover-gray)] [&_svg]:w-[1em] [&_svg]:h-[1em] [&_svg]:fill-current [&_img]:w-[1em] [&_img]:h-[1em] disabled:bg-transparent disabled:text-[rgba(0,0,0,0.26)] disabled:pointer-events-none disabled:cursor-default disabled:[&_svg]:fill-[rgba(0,0,0,0.26)]";
 if (typeof globalThis.__isSSRTest__ !== "undefined") {
   TestIconButton();
   const fullElements = [
@@ -51771,10 +51771,10 @@ init_ssr_shim();
 init_index_es();
 init_runtime_es();
 var BASE_CLASS4 = [
-  "number-input inline-flex items-center bg-white border border-gray-300 rounded-lg transition-all duration-200",
-  "focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500",
+  "number-input inline-flex items-center bg-[var(--wui-white)] border border-[var(--wui-gray-300)] rounded-lg transition-all duration-200",
+  "focus-within:ring-2 focus-within:ring-[var(--wui-blue-500)] focus-within:border-[var(--wui-blue-500)]",
   // Nice focus state
-  "divide-x divide-gray-200"
+  "divide-x divide-[var(--wui-gray-200)]"
   // Subtle dividers between elements
 ].join(" ");
 var def10 = () => ({
@@ -51901,7 +51901,7 @@ var NumberField = defaults(def10, (props) => {
     // `bg-gray-100` alone never won: it sits at the same specificity as the
     // `bg-white` above and Tailwind emits bg-white later, so a disabled field
     // stayed pure white and only `opacity-70` showed. Force it.
-    () => get(disabled) ? "!bg-gray-100 opacity-70 cursor-not-allowed" : "",
+    () => get(disabled) ? "!bg-[var(--wui-gray-100)] opacity-70 cursor-not-allowed" : "",
     // Style for disabled state
     cn2
   ], children: [
@@ -51909,7 +51909,7 @@ var NumberField = defaults(def10, (props) => {
       Button,
       {
         type: "icon",
-        cls: "!rounded-none !rounded-l-md !w-8 !h-9 !border-r !border-gray-200 !bg-transparent disabled:!bg-[#d9dbda] disabled:!text-[#00000061] disabled:!cursor-not-allowed",
+        cls: "!rounded-none !rounded-l-md !w-8 !h-9 !border-r !border-[var(--wui-gray-200)] !bg-transparent disabled:!bg-[var(--wui-disabled-surface)] disabled:!text-[var(--wui-disabled-text)] disabled:!cursor-not-allowed",
         buttonFunction: "button",
         onPointerDown: () => {
           startContinuousUpdate(false);
@@ -51929,10 +51929,10 @@ var NumberField = defaults(def10, (props) => {
           // row, and with a fixed-width input the two step buttons huddled at the left
           // edge with a third of the box empty behind the `+`. Basis stays `auto`, so the
           // 4rem below is still the intrinsic size wherever the field is left to size itself.
-          "w-16 flex-auto min-w-0 text-center border-none bg-transparent focus:outline-none focus:ring-0 text-base font-semibold text-gray-700",
-          "disabled:text-[#00000061] disabled:cursor-not-allowed",
+          "w-16 flex-auto min-w-0 text-center border-none bg-transparent focus:outline-none focus:ring-0 text-base font-semibold text-[var(--wui-gray-700)]",
+          "disabled:text-[var(--wui-disabled-text)] disabled:cursor-not-allowed",
           "[-moz-appearance:textfield] [&::-webkit-inner-spin-button]:hidden [&::-webkit-outer-spin-button]:hidden",
-          () => get(error) ? "text-red-500" : ""
+          () => get(error) ? "text-[var(--wui-red-500)]" : ""
         ],
         type: "number",
         value,
@@ -51960,7 +51960,7 @@ var NumberField = defaults(def10, (props) => {
       Button,
       {
         type: "icon",
-        cls: "!rounded-none !rounded-r-md !w-8 !h-9 !border-l !border-gray-200 !bg-transparent disabled:!bg-[#d9dbda] disabled:!text-[#00000061] disabled:!cursor-not-allowed",
+        cls: "!rounded-none !rounded-r-md !w-8 !h-9 !border-l !border-[var(--wui-gray-200)] !bg-transparent disabled:!bg-[var(--wui-disabled-surface)] disabled:!text-[var(--wui-disabled-text)] disabled:!cursor-not-allowed",
         onPointerDown: () => {
           startContinuousUpdate(true);
         },
@@ -51999,10 +51999,10 @@ var TestNumberField = () => {
   registerTestObservable(`${name11}_ssr`, ret);
   return ret;
 };
-var NUM_INPUT = "number-input inline-flex items-center bg-white border border-gray-300 rounded-lg transition-all duration-200 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 divide-x divide-gray-200";
-var INPUT_CLS = "w-16 flex-auto min-w-0 text-center border-none bg-transparent focus:outline-none focus:ring-0 text-base font-semibold text-gray-700 disabled:text-[#00000061] disabled:cursor-not-allowed [-moz-appearance:textfield] [&::-webkit-inner-spin-button]:hidden [&::-webkit-outer-spin-button]:hidden";
-var BTN_DEC_CLS = "!rounded-none !rounded-l-md !w-8 !h-9 !border-r !border-gray-200 !bg-transparent disabled:!bg-[#d9dbda] disabled:!text-[#00000061] disabled:!cursor-not-allowed";
-var BTN_INC_CLS = "!rounded-none !rounded-r-md !w-8 !h-9 !border-l !border-gray-200 !bg-transparent disabled:!bg-[#d9dbda] disabled:!text-[#00000061] disabled:!cursor-not-allowed";
+var NUM_INPUT = "number-input inline-flex items-center bg-[var(--wui-white)] border border-[var(--wui-gray-300)] rounded-lg transition-all duration-200 focus-within:ring-2 focus-within:ring-[var(--wui-blue-500)] focus-within:border-[var(--wui-blue-500)] divide-x divide-[var(--wui-gray-200)]";
+var INPUT_CLS = "w-16 flex-auto min-w-0 text-center border-none bg-transparent focus:outline-none focus:ring-0 text-base font-semibold text-[var(--wui-gray-700)] disabled:text-[var(--wui-disabled-text)] disabled:cursor-not-allowed [-moz-appearance:textfield] [&::-webkit-inner-spin-button]:hidden [&::-webkit-outer-spin-button]:hidden";
+var BTN_DEC_CLS = "!rounded-none !rounded-l-md !w-8 !h-9 !border-r !border-[var(--wui-gray-200)] !bg-transparent disabled:!bg-[var(--wui-disabled-surface)] disabled:!text-[var(--wui-disabled-text)] disabled:!cursor-not-allowed";
+var BTN_INC_CLS = "!rounded-none !rounded-r-md !w-8 !h-9 !border-l !border-[var(--wui-gray-200)] !bg-transparent disabled:!bg-[var(--wui-disabled-surface)] disabled:!text-[var(--wui-disabled-text)] disabled:!cursor-not-allowed";
 var SPAN_CLS = "text-base leading-none font-semibold select-none";
 if (typeof globalThis.__isSSRTest__ !== "undefined") {
   TestNumberField();
@@ -52063,7 +52063,7 @@ init_index_es();
 init_ssr_shim();
 init_index_es();
 init_runtime_es();
-var baseClass2 = "bg-white transition-shadow duration-300 ease-in-out rounded-lg ";
+var baseClass2 = "bg-[var(--wui-white)] transition-shadow duration-300 ease-in-out rounded-lg ";
 var preset = {
   0: `shadow-none `,
   1: `shadow-sm `,
@@ -52128,7 +52128,7 @@ var TestPaper = () => {
   registerTestObservable(`${name12}_ssr`, ret);
   return ret;
 };
-var BASE2 = "bg-white transition-shadow duration-300 ease-in-out rounded-lg";
+var BASE2 = "bg-[var(--wui-white)] transition-shadow duration-300 ease-in-out rounded-lg";
 var SHADOWS = ["shadow-none", "shadow-sm", "shadow-md"];
 if (typeof globalThis.__isSSRTest__ !== "undefined") {
   TestPaper();
@@ -52455,7 +52455,7 @@ var divSpanDim = [
 ].join(" ");
 var layer = [
   "[&>span]:w-full ",
-  "[&>span]:bg-[#ebf7fc] ",
+  "[&>span]:bg-[var(--wui-switch-info-bg)] ",
   "[&>span]:[transition:0.3s_ease_all] ",
   "[&>span]:z-[1]"
 ].join(" ");
@@ -52541,12 +52541,12 @@ var effect1 = [
   yesKnot,
   "[&>div]:before:content-[attr(data-tg-off)]",
   "[&>div]:before:absolute",
-  "[&>div]:before:text-white",
+  "[&>div]:before:text-[var(--wui-white)]",
   "[&>div]:before:text-[10px]",
   "[&>div]:before:font-bold",
   "[&>div]:before:text-center",
   "[&>div]:before:leading-none",
-  "[&>div]:before:bg-[#f44336]",
+  "[&>div]:before:bg-[var(--wui-mui-red)]",
   "[&>div]:before:[transition:0.3s_cubic-bezier(0.18,0.89,0.35,1.15)_all]",
   "[&>div]:before:px-1",
   "[&>div]:before:py-[9px]",
@@ -52554,10 +52554,10 @@ var effect1 = [
   "[&>div]:before:left-1",
   "[&>div]:before:top-[2px]",
   "[&>input:checked+div]:before:content-[attr(data-tg-on)]",
-  "[&>input:checked+div]:before:bg-[#03a9f4]",
+  "[&>input:checked+div]:before:bg-[var(--wui-mui-lightblue)]",
   "[&>input:checked+div]:before:left-[42px]",
-  "[&>input~div]:bg-[#fcebeb]",
-  "[&>input:checked~div]:bg-[#ebfbfc]",
+  "[&>input~div]:bg-[var(--wui-mui-red-pale)]",
+  "[&>input:checked~div]:bg-[var(--wui-mui-blue-pale)]",
   "[&>div]:[transition:0.3s_ease_all]",
   "[&>span]:[transition:0.3s_ease_all]"
 ].join(" ");
@@ -52568,12 +52568,12 @@ var effect2 = [
   noKnot,
   "[&>div]:before:content-[attr(data-tg-off)]",
   "[&>div]:before:absolute",
-  "[&>div]:before:text-white",
+  "[&>div]:before:text-[var(--wui-white)]",
   "[&>div]:before:text-[10px]",
   "[&>div]:before:font-bold",
   "[&>div]:before:text-center",
   "[&>div]:before:leading-none",
-  "[&>div]:before:bg-[#f44336]",
+  "[&>div]:before:bg-[var(--wui-mui-red)]",
   "[&>div]:before:[transition:0.3s_ease_all]",
   "[&>div]:before:px-1",
   "[&>div]:before:py-[9px]",
@@ -52582,7 +52582,7 @@ var effect2 = [
   "[&>div]:before:top-[2px]",
   "[&>div]:after:content-[attr(data-tg-on)]",
   "[&>div]:after:absolute",
-  "[&>div]:after:text-white",
+  "[&>div]:after:text-[var(--wui-white)]",
   "[&>div]:after:text-[10px]",
   "[&>div]:after:font-bold",
   "[&>div]:after:text-center",
@@ -52594,13 +52594,13 @@ var effect2 = [
   "[&>div]:after:left-1",
   "[&>div]:after:top-[2px]",
   "[&>div]:before:content-[attr(data-tg-off)]",
-  "[&>div]:after:bg-[#03a9f4]",
+  "[&>div]:after:bg-[var(--wui-mui-lightblue)]",
   "[&>div]:after:left-auto",
   "[&>div]:after:-right-8",
   "[&>input:checked+div]:before:-left-8",
   "[&>input:checked+div]:after:right-1",
-  "[&>input~span]:bg-[#fcebeb]",
-  "[&>input:checked~span]:bg-[#ebfbfc]"
+  "[&>input~span]:bg-[var(--wui-mui-red-pale)]",
+  "[&>input:checked~span]:bg-[var(--wui-mui-blue-pale)]"
 ].join(" ");
 var effect3 = [
   buttonr,
@@ -52610,12 +52610,12 @@ var effect3 = [
   // Base Styles (Off State)
   "[&>div]:before:content-[attr(data-tg-off)]",
   "[&>div]:before:absolute",
-  "[&>div]:before:text-white",
+  "[&>div]:before:text-[var(--wui-white)]",
   "[&>div]:before:text-[10px]",
   "[&>div]:before:font-bold",
   "[&>div]:before:text-center",
   "[&>div]:before:leading-none",
-  "[&>div]:before:bg-[#f44336]",
+  "[&>div]:before:bg-[var(--wui-mui-red)]",
   "[&>div]:before:px-1",
   "[&>div]:before:py-[9px]",
   "[&>div]:before:rounded-[50%]",
@@ -52629,11 +52629,11 @@ var effect3 = [
   "[&>input:checked:active+div]:before:ml-[-26px]",
   // Checked State (On State)
   "[&>input:checked+div]:before:content-[attr(data-tg-on)]",
-  "[&>input:checked+div]:before:bg-[#03a9f4]",
+  "[&>input:checked+div]:before:bg-[var(--wui-mui-lightblue)]",
   "[&>input:checked+div]:before:left-[42px]",
   // Background Colors
-  "[&>input~span]:bg-[#fcebeb]",
-  "[&>input:checked~span]:bg-[#ebfbfc]"
+  "[&>input~span]:bg-[var(--wui-mui-red-pale)]",
+  "[&>input:checked~span]:bg-[var(--wui-mui-blue-pale)]"
 ].join(" ");
 var effect4 = [
   buttonr,
@@ -52642,12 +52642,12 @@ var effect4 = [
   noKnot,
   // Base Knob (Before - Red/Off)
   "[&>div]:before:absolute",
-  "[&>div]:before:text-white",
+  "[&>div]:before:text-[var(--wui-white)]",
   "[&>div]:before:text-[10px]",
   "[&>div]:before:font-bold",
   "[&>div]:before:text-center",
   "[&>div]:before:leading-none",
-  "[&>div]:before:bg-[#f44336]",
+  "[&>div]:before:bg-[var(--wui-mui-red)]",
   "[&>div]:before:[transition:0.3s_cubic-bezier(0.18,0.89,0.35,1.15)_all]",
   "[&>div]:before:px-1",
   "[&>div]:before:py-[9px]",
@@ -52657,12 +52657,12 @@ var effect4 = [
   "[&>div]:[transition:0.3s_ease_all]",
   // Second Knob (After - Blue/On - Hidden initially)
   "[&>div]:after:absolute",
-  "[&>div]:after:text-white",
+  "[&>div]:after:text-[var(--wui-white)]",
   "[&>div]:after:text-[10px]",
   "[&>div]:after:font-bold",
   "[&>div]:after:text-center",
   "[&>div]:after:leading-none",
-  "[&>div]:after:bg-[#03a9f4]",
+  "[&>div]:after:bg-[var(--wui-mui-lightblue)]",
   "[&>div]:after:[transition:0.3s_cubic-bezier(0.18,0.89,0.35,1.15)_all]",
   "[&>div]:after:py-[9px]",
   "[&>div]:after:rounded-[50%]",
@@ -52670,7 +52670,7 @@ var effect4 = [
   // Content & Positioning Logic
   "[&>div]:before:content-[attr(data-tg-off)]",
   "[&>div]:after:content-[attr(data-tg-on)]",
-  "[&>div]:after:bg-[#03a9f4]",
+  "[&>div]:after:bg-[var(--wui-mui-lightblue)]",
   "[&>div]:after:left-auto",
   "[&>div]:after:right-1",
   "[&>div]:after:-top-8",
@@ -52682,8 +52682,8 @@ var effect4 = [
   // Slide Blue Down
   "[&>input:checked+div]:div:-top-1",
   // Backgrounds
-  "[&>input~span]:bg-[#fcebeb]",
-  "[&>input:checked~span]:bg-[#ebfbfc]"
+  "[&>input~span]:bg-[var(--wui-mui-red-pale)]",
+  "[&>input:checked~span]:bg-[var(--wui-mui-blue-pale)]"
 ].join(" ");
 var effect5 = [
   buttonr,
@@ -52696,7 +52696,7 @@ var effect5 = [
   // Base Knob Construction
   "[&>div]:before:content-['']",
   "[&>div]:before:absolute",
-  "[&>div]:before:text-white",
+  "[&>div]:before:text-[var(--wui-white)]",
   "[&>div]:before:text-[10px]",
   "[&>div]:before:font-bold",
   "[&>div]:before:text-center",
@@ -52712,7 +52712,7 @@ var effect5 = [
   "[&>div>span]:absolute",
   "[&>div>span]:w-[2rem]",
   "[&>div>span]:h-[2rem]",
-  "[&>div>span]:text-white",
+  "[&>div>span]:text-[var(--wui-white)]",
   "[&>div>span]:text-[10px]",
   "[&>div>span]:font-bold",
   "[&>div>span]:text-center",
@@ -52724,7 +52724,7 @@ var effect5 = [
   "[&>div>span]:left-1",
   "[&>div>span]:top-[2px]",
   // Initial State (Off)
-  "[&>div]:before:bg-[#f44336]",
+  "[&>div]:before:bg-[var(--wui-mui-red)]",
   "[&>div>span]:before:content-[attr(data-tg-off)]",
   "[&>div]:before:origin-center",
   "[&>div]:before:[transform:rotateY(0)]",
@@ -52733,14 +52733,14 @@ var effect5 = [
   // Checked State (On/Flip)
   "[&>input:checked+div]:before:left-[42px]",
   "[&>input:checked+div>span]:left-[42px]",
-  "[&>input:checked+div]:before:bg-[#03a9f4]",
+  "[&>input:checked+div]:before:bg-[var(--wui-mui-lightblue)]",
   "[&>input:checked+div]:before:[transform:rotateY(180deg)]",
   "[&>input:checked+div>span]:before:content-[attr(data-tg-on)]",
   "[&>input:checked+div>span]:before:left-[42px]",
   "[&>input:checked+div>span]:before:pl-[5px]",
   // Background & Rotation
-  "[&>input~span]:bg-[#fcebeb]",
-  "[&>input:checked~span]:bg-[#ebfbfc]",
+  "[&>input~span]:bg-[var(--wui-mui-red-pale)]",
+  "[&>input:checked~span]:bg-[var(--wui-mui-blue-pale)]",
   "[&>input:checked~span]:[transform:rotateY(-180deg)]",
   // Global Transitions
   "[&>div]:[transition:0.3s_ease_all]",
@@ -52756,12 +52756,12 @@ var effect6 = [
   // Base Knob
   "[&>div]:before:content-[attr(data-tg-off)]",
   "[&>div]:before:absolute",
-  "[&>div]:before:text-white",
+  "[&>div]:before:text-[var(--wui-white)]",
   "[&>div]:before:text-[10px]",
   "[&>div]:before:font-bold",
   "[&>div]:before:text-center",
   "[&>div]:before:leading-none",
-  "[&>div]:before:bg-[#f44336]",
+  "[&>div]:before:bg-[var(--wui-mui-red)]",
   "[&>div]:before:px-1",
   "[&>div]:before:py-[9px]",
   "[&>div]:before:rounded-[50%]",
@@ -52777,12 +52777,12 @@ var effect6 = [
   // Checked State (Spin 180deg)
   "[&>input:checked+div]:[transform:rotateZ(-180deg)]",
   "[&>input:checked+div]:before:content-[attr(data-tg-on)]",
-  "[&>input:checked+div]:before:bg-[#03a9f4]",
+  "[&>input:checked+div]:before:bg-[var(--wui-mui-lightblue)]",
   "[&>input:checked+div]:before:[transform:rotateZ(180deg)]",
   // Counter-rotate text so it stays upright
   // Background Colors & Spin
-  "[&>input~span]:bg-[#fcebeb]",
-  "[&>input:checked~span]:bg-[#ebfbfc]",
+  "[&>input~span]:bg-[var(--wui-mui-red-pale)]",
+  "[&>input:checked~span]:bg-[var(--wui-mui-blue-pale)]",
   "[&>input:checked~span]:[transform:rotateZ(180deg)]"
 ].join(" ");
 var effect7 = [
@@ -52824,20 +52824,20 @@ var effect7 = [
   "[&>div>span]:top-[2px]",
   // Content & Colors (Off State)
   "[&>div]:before:content-[attr(data-tg-off)]",
-  "[&>div]:before:text-white",
+  "[&>div]:before:text-[var(--wui-white)]",
   "[&>div]:before:opacity-100",
   "[&>div]:before:left-1",
   "[&>div]:before:[transition:0.3s_ease_all]",
   "[&>div]:before:z-[2]",
-  "[&>div>span]:bg-[#f44336]",
+  "[&>div>span]:bg-[var(--wui-mui-red)]",
   "[&>div>span]:[transition:0.2s_ease_all]",
   "[&>div>span]:z-[1]",
   "[&>div>span]:left-1",
   // Content & Colors (On State - Hidden initially)
   "[&>div]:after:content-[attr(data-tg-on)]",
-  "[&>div]:after:text-white",
+  "[&>div]:after:text-[var(--wui-white)]",
   "[&>div]:after:text-left",
-  "[&>div]:after:bg-[#03a9f4]",
+  "[&>div]:after:bg-[var(--wui-mui-lightblue)]",
   "[&>div]:after:opacity-0",
   "[&>div]:after:px-[7px]",
   "[&>div]:after:py-[9px]",
@@ -52850,13 +52850,13 @@ var effect7 = [
   // The Implosion Effect (Shrinks span to a dot)
   "[&>input:checked+div>span]:w-0.5",
   "[&>input:checked+div>span]:h-0.5",
-  "[&>input:checked+div>span]:bg-white",
+  "[&>input:checked+div>span]:bg-[var(--wui-white)]",
   "[&>input:checked+div>span]:p-[3px]",
   "[&>input:checked+div>span]:left-14",
   "[&>input:checked+div>span]:top-3.5",
   // Backgrounds
-  "[&>input~span]:bg-[#fcebeb]",
-  "[&>input:checked~span]:bg-[#ebfbfc]"
+  "[&>input~span]:bg-[var(--wui-mui-red-pale)]",
+  "[&>input:checked~span]:bg-[var(--wui-mui-blue-pale)]"
 ].join(" ");
 var effect8 = [
   buttonr,
@@ -52900,32 +52900,32 @@ var effect8 = [
   "[&>div>span]:top-[2px]",
   // Off State Content
   "[&>div]:before:content-[attr(data-tg-off)]",
-  "[&>div]:before:text-white",
+  "[&>div]:before:text-[var(--wui-white)]",
   "[&>div]:before:left-1",
   "[&>div]:before:z-[2]",
   // On State Content (Hidden)
   "[&>div]:after:content-[attr(data-tg-on)]",
-  "[&>div]:after:text-white",
-  "[&>div]:after:bg-[#03a9f4]",
+  "[&>div]:after:text-[var(--wui-white)]",
+  "[&>div]:after:bg-[var(--wui-mui-lightblue)]",
   "[&>div]:after:opacity-0",
   "[&>div]:after:left-[42px]",
   "[&>div]:after:z-[2]",
   // Knob Colors
-  "[&>div>span]:bg-[#f44336]",
+  "[&>div>span]:bg-[var(--wui-mui-red)]",
   "[&>div>span]:z-[1]",
   "[&>div>span]:left-1",
   // Checked State Logic
   "[&>input:checked+div]:before:opacity-0",
   "[&>input:checked+div]:after:opacity-100",
   // The Ripple Effect (Scale Up)
-  "[&>input+div>span]:bg-[#f44336]",
-  "[&>input:checked+div>span]:bg-[#ebfbfc]",
+  "[&>input+div>span]:bg-[var(--wui-mui-red)]",
+  "[&>input:checked+div>span]:bg-[var(--wui-mui-blue-pale)]",
   "[&>input:checked+div>span]:scale-[4]",
   // --- FIX ADDED BELOW ---
   // This forces the background track to be pinkish when OFF, 
   // overriding the default blue from 'layer'
-  "[&>input~span]:bg-[#fcebeb]",
-  "[&>input:checked~span]:bg-[#ebfbfc]"
+  "[&>input~span]:bg-[var(--wui-mui-red-pale)]",
+  "[&>input:checked~span]:bg-[var(--wui-mui-blue-pale)]"
 ].join(" ");
 var effect9 = [
   buttonr,
@@ -52946,7 +52946,7 @@ var effect9 = [
   "[&>div]:before:top-[2px]",
   "[&>div]:before:content-[attr(data-tg-off)]",
   "[&>div]:before:left-1",
-  "[&>div]:before:text-white",
+  "[&>div]:before:text-[var(--wui-white)]",
   "[&>div]:before:z-[2]",
   // Base Text (On - After)
   "[&>div]:after:absolute",
@@ -52962,7 +52962,7 @@ var effect9 = [
   "[&>div]:after:content-[attr(data-tg-on)]",
   "[&>div]:after:-right-6",
   // Positioned off-screen right
-  "[&>div]:after:text-white",
+  "[&>div]:after:text-[var(--wui-white)]",
   "[&>div]:after:z-[2]",
   // Moving Knob (Span)
   "[&>div>span]:absolute",
@@ -52977,7 +52977,7 @@ var effect9 = [
   "[&>div>span]:py-[9px]",
   "[&>div>span]:rounded-[50%]",
   "[&>div>span]:top-[2px]",
-  "[&>div>span]:bg-[#f44336]",
+  "[&>div>span]:bg-[var(--wui-mui-red)]",
   "[&>div>span]:z-[1]",
   "[&>div>span]:left-1",
   // Checked State (Slide Animations)
@@ -52985,12 +52985,12 @@ var effect9 = [
   // Slide Off text out left
   "[&>input:checked+div]:after:right-1",
   // Slide On text in
-  "[&>input:checked+div>span]:bg-[#03a9f4]",
+  "[&>input:checked+div>span]:bg-[var(--wui-mui-lightblue)]",
   "[&>input:checked+div>span]:left-[42px]",
   // Slide knob right
   // Background Colors
-  "[&>input~span]:bg-[#fcebeb]",
-  "[&>input:checked~span]:bg-[#ebfbfc]"
+  "[&>input~span]:bg-[var(--wui-mui-red-pale)]",
+  "[&>input:checked~span]:bg-[var(--wui-mui-blue-pale)]"
 ].join(" ");
 var effect10 = [
   button_,
@@ -53033,30 +53033,30 @@ var effect10 = [
   "[&>div>span]:top-[2px]",
   // Initial State (Off)
   "[&>div]:before:content-[attr(data-tg-off)]",
-  "[&>div]:before:bg-[#f44336]",
+  "[&>div]:before:bg-[var(--wui-mui-red)]",
   "[&>div]:before:left-1",
-  "[&>div]:before:text-white",
+  "[&>div]:before:text-[var(--wui-white)]",
   "[&>div]:before:z-[10]",
   // High z-index to sit on top
   "[&>div]:after:content-[attr(data-tg-on)]",
-  "[&>div]:after:text-[#4e4e4e]",
+  "[&>div]:after:text-[var(--wui-switch-gray-dark)]",
   "[&>div]:after:right-1",
   "[&>div>span]:inline-block",
-  "[&>div>span]:text-white",
+  "[&>div>span]:text-[var(--wui-white)]",
   "[&>div>span]:z-[1]",
   "[&>div>span]:left-1",
   "[&>div>span]:before:content-[attr(data-tg-off)]",
   // Checked State (On)
-  "[&>input:checked+div>span]:text-[#4e4e4e]",
+  "[&>input:checked+div>span]:text-[var(--wui-switch-gray-dark)]",
   // Text turns gray
-  "[&>input:checked+div]:before:bg-[#03a9f4]",
+  "[&>input:checked+div]:before:bg-[var(--wui-mui-lightblue)]",
   "[&>input:checked+div]:before:left-[42px]",
   "[&>input:checked+div]:before:content-[attr(data-tg-on)]",
   "[&>input:checked+div>span]:before:relative",
-  "[&>input:checked+div]:after:text-white",
+  "[&>input:checked+div]:after:text-[var(--wui-white)]",
   // Backgrounds
-  "[&>input~span]:bg-[#fcebeb]",
-  "[&>input:checked~span]:bg-[#ebfbfc]"
+  "[&>input~span]:bg-[var(--wui-mui-red-pale)]",
+  "[&>input:checked~span]:bg-[var(--wui-mui-blue-pale)]"
 ].join(" ");
 var effect11 = [
   button_,
@@ -53068,7 +53068,7 @@ var effect11 = [
   "[&>div]:before:absolute",
   "[&>div]:before:rounded-sm",
   "[&>div]:before:top-[2px]",
-  "[&>div]:before:text-[#4e4e4e]",
+  "[&>div]:before:text-[var(--wui-switch-gray-dark)]",
   "[&>div]:before:text-[10px]",
   "[&>div]:before:font-bold",
   "[&>div]:before:text-center",
@@ -53080,7 +53080,7 @@ var effect11 = [
   "[&>div]:after:absolute",
   "[&>div]:after:rounded-sm",
   "[&>div]:after:top-[2px]",
-  "[&>div]:after:text-[#4e4e4e]",
+  "[&>div]:after:text-[var(--wui-switch-gray-dark)]",
   "[&>div]:after:text-[10px]",
   "[&>div]:after:font-bold",
   "[&>div]:after:text-center",
@@ -53095,7 +53095,7 @@ var effect11 = [
   "[&>div>span]:top-[2px]",
   "[&>div>span]:w-[2rem]",
   "[&>div>span]:h-[2rem]",
-  "[&>div>span]:bg-[#f44336]",
+  "[&>div>span]:bg-[var(--wui-mui-red)]",
   // Red initially
   "[&>div>span]:origin-[0%_50%]",
   // Hinges on the left edge
@@ -53105,13 +53105,13 @@ var effect11 = [
   // Starts on the right side
   "[&>div>span]:[transform:rotateY(0)]",
   // Checked State (Flip)
-  "[&>input:checked+div>span]:bg-[#03a9f4]",
+  "[&>input:checked+div>span]:bg-[var(--wui-mui-lightblue)]",
   // Turns Blue
   "[&>input:checked+div>span]:[transform:rotateY(-180deg)]",
   // Flips over
   // Backgrounds
-  "[&>input~span]:bg-[#fcebeb]",
-  "[&>input:checked~span]:bg-[#ebfbfc]"
+  "[&>input~span]:bg-[var(--wui-mui-red-pale)]",
+  "[&>input:checked~span]:bg-[var(--wui-mui-blue-pale)]"
 ].join(" ");
 var effect12 = [
   button_,
@@ -53128,7 +53128,7 @@ var effect12 = [
   "[&>div]:before:content-[attr(data-tg-off)]",
   "[&>div]:before:left-1",
   "[&>div]:before:w-[27px]",
-  "[&>div]:before:text-[#4e4e4e]",
+  "[&>div]:before:text-[var(--wui-switch-gray-dark)]",
   "[&>div]:before:z-[1]",
   "[&>div]:before:px-[3px]",
   "[&>div]:before:py-[9px]",
@@ -53143,7 +53143,7 @@ var effect12 = [
   "[&>div]:after:content-[attr(data-tg-on)]",
   "[&>div]:after:right-1",
   "[&>div]:after:w-[27px]",
-  "[&>div]:after:text-[#4e4e4e]",
+  "[&>div]:after:text-[var(--wui-switch-gray-dark)]",
   "[&>div]:after:z-[1]",
   "[&>div]:after:px-[3px]",
   "[&>div]:after:py-[9px]",
@@ -53176,7 +53176,7 @@ var effect12 = [
   "[&>div>span]:before:h-[2rem]",
   "[&>div>span]:before:px-1",
   "[&>div>span]:before:py-[9px]",
-  "[&>div>span]:before:bg-[#03a9f4]",
+  "[&>div>span]:before:bg-[var(--wui-mui-lightblue)]",
   // Blue Panel
   "[&>div>span]:before:-left-7",
   // Hidden Left initially
@@ -53193,7 +53193,7 @@ var effect12 = [
   "[&>div>span]:after:h-[2rem]",
   "[&>div>span]:after:px-1",
   "[&>div>span]:after:py-[9px]",
-  "[&>div>span]:after:bg-[#f44336]",
+  "[&>div>span]:after:bg-[var(--wui-mui-red)]",
   // Red Panel
   "[&>div>span]:after:right-[-42px]",
   // Why -42px? It positions it over the active area
@@ -53204,8 +53204,8 @@ var effect12 = [
   "[&>input:checked+div>span]:after:right-[-74px]",
   // Red Slides Out
   // Backgrounds
-  "[&>input~span]:bg-[#fcebeb]",
-  "[&>input:checked~span]:bg-[#ebfbfc]"
+  "[&>input~span]:bg-[var(--wui-mui-red-pale)]",
+  "[&>input:checked~span]:bg-[var(--wui-mui-blue-pale)]"
 ].join(" ");
 var effect13 = [
   button_,
@@ -53245,9 +53245,9 @@ var effect13 = [
   "[&>div>span]:rounded-sm",
   "[&>div>span]:top-[2px]",
   // Label Positioning & Colors
-  "[&>div]:before:text-[#4e4e4e]",
+  "[&>div]:before:text-[var(--wui-switch-gray-dark)]",
   "[&>div]:before:z-[1]",
-  "[&>div]:after:text-[#4e4e4e]",
+  "[&>div]:after:text-[var(--wui-switch-gray-dark)]",
   "[&>div]:after:z-[1]",
   "[&>div]:before:content-[attr(data-tg-off)]",
   "[&>div]:before:left-1",
@@ -53255,15 +53255,15 @@ var effect13 = [
   "[&>div]:after:right-1",
   // Knob Initial State (Red, Right Side)
   "[&>div>span]:w-[2rem]",
-  "[&>div>span]:bg-[#f44336]",
+  "[&>div>span]:bg-[var(--wui-mui-red)]",
   "[&>div>span]:z-[2]",
   "[&>div>span]:left-[37px]",
   // Checked State (Blue, Left Side)
-  "[&>input:checked+div>span]:bg-[#03a9f4]",
+  "[&>input:checked+div>span]:bg-[var(--wui-mui-lightblue)]",
   "[&>input:checked+div>span]:left-1",
   // Backgrounds
-  "[&>input~span]:bg-[#fcebeb]",
-  "[&>input:checked~span]:bg-[#ebfbfc]"
+  "[&>input~span]:bg-[var(--wui-mui-red-pale)]",
+  "[&>input:checked~span]:bg-[var(--wui-mui-blue-pale)]"
 ].join(" ");
 var effect14 = [
   button_,
@@ -53314,9 +53314,9 @@ var effect14 = [
   "[&>div>span]:after:rounded-sm",
   "[&>div>span]:after:top-[2px]",
   // Label Content & Position
-  "[&>div]:before:text-[#4e4e4e]",
+  "[&>div]:before:text-[var(--wui-switch-gray-dark)]",
   "[&>div]:before:z-[1]",
-  "[&>div]:after:text-[#4e4e4e]",
+  "[&>div]:after:text-[var(--wui-switch-gray-dark)]",
   "[&>div]:after:z-[1]",
   "[&>div]:before:content-[attr(data-tg-off)]",
   "[&>div]:before:left-1",
@@ -53329,7 +53329,7 @@ var effect14 = [
   "[&>div>span]:left-0",
   "[&>div>span]:top-0",
   // Blue Knob (Hidden Above)
-  "[&>div>span]:before:bg-[#03a9f4]",
+  "[&>div>span]:before:bg-[var(--wui-mui-lightblue)]",
   "[&>div>span]:before:left-1",
   "[&>div>span]:before:-top-7",
   // Hidden
@@ -53337,7 +53337,7 @@ var effect14 = [
   "[&>div>span]:before:w-[2rem]",
   "[&>div>span]:before:z-[2]",
   // Red Knob (Visible Right)
-  "[&>div>span]:after:bg-[#f44336]",
+  "[&>div>span]:after:bg-[var(--wui-mui-red)]",
   "[&>div>span]:after:left-[39px]",
   "[&>div>span]:after:top-[2px]",
   "[&>div>span]:after:content-['']",
@@ -53351,8 +53351,8 @@ var effect14 = [
   "[&>input:checked+div>span]:after:-top-8",
   // Red flies up
   // Backgrounds
-  "[&>input~span]:bg-[#fcebeb]",
-  "[&>input:checked~span]:bg-[#ebfbfc]"
+  "[&>input~span]:bg-[var(--wui-mui-red-pale)]",
+  "[&>input:checked~span]:bg-[var(--wui-mui-blue-pale)]"
 ].join(" ");
 var effect15 = [
   button_,
@@ -53361,7 +53361,7 @@ var effect15 = [
   noKnot,
   // Base Styles (Shared)
   "[&>div]:before:absolute",
-  "[&>div]:before:text-white",
+  "[&>div]:before:text-[var(--wui-white)]",
   "[&>div]:before:text-[10px]",
   "[&>div]:before:font-bold",
   "[&>div]:before:text-center",
@@ -53374,7 +53374,7 @@ var effect15 = [
   "[&>div]:before:scale-100",
   "[&>div]:before:top-[2px]",
   "[&>div]:after:absolute",
-  "[&>div]:after:text-white",
+  "[&>div]:after:text-[var(--wui-white)]",
   "[&>div]:after:text-[10px]",
   "[&>div]:after:font-bold",
   "[&>div]:after:text-center",
@@ -53388,12 +53388,12 @@ var effect15 = [
   "[&>div]:after:top-[2px]",
   // Off State (Red)
   "[&>div]:before:content-[attr(data-tg-off)]",
-  "[&>div]:before:bg-[#f44336]",
+  "[&>div]:before:bg-[var(--wui-mui-red)]",
   "[&>div]:before:left-1",
   // On State (Blue - Initially Hidden & Big)
   "[&>div]:after:content-[attr(data-tg-on)]",
   "[&>div]:after:opacity-0",
-  "[&>div]:after:bg-[#03a9f4]",
+  "[&>div]:after:bg-[var(--wui-mui-lightblue)]",
   "[&>div]:after:scale-[4]",
   "[&>div]:after:right-1",
   // Checked Animations
@@ -53404,8 +53404,8 @@ var effect15 = [
   "[&>input:checked+div]:after:scale-100",
   // Blue implodes
   // Backgrounds
-  "[&>input~span]:bg-[#fcebeb]",
-  "[&>input:checked~span]:bg-[#ebfbfc]"
+  "[&>input~span]:bg-[var(--wui-mui-red-pale)]",
+  "[&>input:checked~span]:bg-[var(--wui-mui-blue-pale)]"
 ].join(" ");
 var effect16 = [
   button_,
@@ -53414,12 +53414,12 @@ var effect16 = [
   // Base Knob Styles (Off)
   "[&>div]:before:content-[attr(data-tg-off)]",
   "[&>div]:before:absolute",
-  "[&>div]:before:text-white",
+  "[&>div]:before:text-[var(--wui-white)]",
   "[&>div]:before:text-[10px]",
   "[&>div]:before:font-bold",
   "[&>div]:before:text-center",
   "[&>div]:before:leading-none",
-  "[&>div]:before:bg-[#f44336]",
+  "[&>div]:before:bg-[var(--wui-mui-red)]",
   "[&>div]:before:px-1",
   "[&>div]:before:py-[9px]",
   "[&>div]:before:rounded-sm",
@@ -53434,11 +53434,11 @@ var effect16 = [
   "[&>input:checked:active+div]:before:ml-[-26px]",
   // Pull back when stretching on right side
   "[&>input:checked+div]:before:content-[attr(data-tg-on)]",
-  "[&>input:checked+div]:before:bg-[#03a9f4]",
+  "[&>input:checked+div]:before:bg-[var(--wui-mui-lightblue)]",
   "[&>input:checked+div]:before:left-[42px]",
   // Backgrounds
-  "[&>input~span]:bg-[#fcebeb]",
-  "[&>input:checked~span]:bg-[#ebfbfc]"
+  "[&>input~span]:bg-[var(--wui-mui-red-pale)]",
+  "[&>input:checked~span]:bg-[var(--wui-mui-blue-pale)]"
 ].join(" ");
 var effect17 = [
   button_,
@@ -53447,7 +53447,7 @@ var effect17 = [
   // Text Label (Before) - Moves Slower (0.5s)
   "[&>div]:before:content-[attr(data-tg-off)]",
   "[&>div]:before:absolute",
-  "[&>div]:before:text-white",
+  "[&>div]:before:text-[var(--wui-white)]",
   "[&>div]:before:text-[10px]",
   "[&>div]:before:font-bold",
   "[&>div]:before:text-center",
@@ -53465,7 +53465,7 @@ var effect17 = [
   "[&>div>span]:absolute",
   "[&>div>span]:w-[2rem]",
   "[&>div>span]:h-[2rem]",
-  "[&>div>span]:text-white",
+  "[&>div>span]:text-[var(--wui-white)]",
   "[&>div>span]:text-[10px]",
   "[&>div>span]:font-bold",
   "[&>div>span]:text-center",
@@ -53474,7 +53474,7 @@ var effect17 = [
   "[&>div>span]:py-[9px]",
   "[&>div>span]:left-1",
   "[&>div>span]:top-[2px]",
-  "[&>div>span]:bg-[#f44336]",
+  "[&>div>span]:bg-[var(--wui-mui-red)]",
   "[&>div>span]:z-[1]",
   "[&>div>span]:rounded-sm",
   "[&>div>span]:[transition:0.3s_ease_all,left_0.3s_cubic-bezier(0.18,0.89,0.35,1.15)]",
@@ -53482,11 +53482,11 @@ var effect17 = [
   // Checked State (On)
   "[&>input:checked+div]:before:content-[attr(data-tg-on)]",
   "[&>input:checked+div]:before:left-[42px]",
-  "[&>input:checked+div>span]:bg-[#03a9f4]",
+  "[&>input:checked+div>span]:bg-[var(--wui-mui-lightblue)]",
   "[&>input:checked+div>span]:left-[42px]",
   // Backgrounds
-  "[&>input~span]:bg-[#fcebeb]",
-  "[&>input:checked~span]:bg-[#ebfbfc]"
+  "[&>input~span]:bg-[var(--wui-mui-red-pale)]",
+  "[&>input:checked~span]:bg-[var(--wui-mui-blue-pale)]"
 ].join(" ");
 var effect18 = [
   button_,
@@ -53494,7 +53494,7 @@ var effect18 = [
   // Text Label (Before)
   "[&>div]:before:content-[attr(data-tg-off)]",
   "[&>div]:before:absolute",
-  "[&>div]:before:text-white",
+  "[&>div]:before:text-[var(--wui-white)]",
   "[&>div]:before:text-[10px]",
   "[&>div]:before:font-bold",
   "[&>div]:before:text-center",
@@ -53509,12 +53509,12 @@ var effect18 = [
   "[&>div>span]:content-[attr(data-tg-off)]",
   // Ignored by span usually
   "[&>div>span]:absolute",
-  "[&>div>span]:text-white",
+  "[&>div>span]:text-[var(--wui-white)]",
   "[&>div>span]:text-[10px]",
   "[&>div>span]:font-bold",
   "[&>div>span]:text-center",
   "[&>div>span]:leading-none",
-  "[&>div>span]:bg-[#f44336]",
+  "[&>div>span]:bg-[var(--wui-mui-red)]",
   "[&>div>span]:rounded-sm",
   "[&>div>span]:left-1",
   "[&>div>span]:top-[2px]",
@@ -53530,7 +53530,7 @@ var effect18 = [
   "[&>input:active+div]:before:h-1",
   "[&>input:active+div]:before:text-transparent",
   // Hide text
-  "[&>input:active+div]:before:bg-[#d80000]",
+  "[&>input:active+div]:before:bg-[var(--wui-switch-red-dark)]",
   // Darker red line
   "[&>input:active+div]:before:[transition:0.3s_ease_all]",
   "[&>input:active+div]:before:overflow-hidden",
@@ -53539,7 +53539,7 @@ var effect18 = [
   "[&>input:active+div>span]:w-[68px]",
   // Stretch background
   // Active + Checked State (Pressing Down while On)
-  "[&>input:checked:active+div]:before:bg-[#0095d8]",
+  "[&>input:checked:active+div]:before:bg-[var(--wui-switch-blue-dark)]",
   // Darker blue line
   "[&>input:checked:active+div]:before:left-auto",
   "[&>input:checked:active+div]:before:right-2.5",
@@ -53548,11 +53548,11 @@ var effect18 = [
   // Checked State (On - Release)
   "[&>input:checked+div]:before:content-[attr(data-tg-on)]",
   "[&>input:checked+div]:before:left-[47px]",
-  "[&>input:checked+div>span]:bg-[#03a9f4]",
+  "[&>input:checked+div>span]:bg-[var(--wui-mui-lightblue)]",
   "[&>input:checked+div>span]:left-[42px]",
   // Backgrounds
-  "[&>input~span]:bg-[#fcebeb]",
-  "[&>input:checked~span]:bg-[#ebfbfc]"
+  "[&>input~span]:bg-[var(--wui-mui-red-pale)]",
+  "[&>input:checked~span]:bg-[var(--wui-mui-blue-pale)]"
 ].join(" ");
 var light = [
   "mx-[2em]",
@@ -53562,13 +53562,13 @@ var light = [
   "[&>label]:[transition:all_0.4s_ease]",
   "[&>label]:p-0.5",
   "[&>label]:rounded-[2em]",
-  "[&>label]:bg-[#f0f0f0]",
+  "[&>label]:bg-[var(--wui-switch-track-light)]",
   // The Knob (After)
   "[&>label]:after:[transition:all_0.2s_ease]",
   "[&>label]:after:rounded-[50%]",
-  "[&>label]:after:bg-[#fff]",
+  "[&>label]:after:bg-[var(--wui-white)]",
   // Checked State
-  "[&>input:checked~label]:bg-[#9fd6ae]",
+  "[&>input:checked~label]:bg-[var(--wui-switch-green-1)]",
   ilabel
 ].join(" ");
 var ios = [
@@ -53581,18 +53581,18 @@ var ios = [
   "[&>label]:p-0.5",
   "[&>label]:rounded-[2em]",
   "[&>label]:border-solid",
-  "[&>label]:border-[#e8eae9]",
+  "[&>label]:border-[var(--wui-switch-border-ios)]",
   // Knob Styles & Shadows
   "[&>label]:after:shadow-[0_0_0_1px_rgba(0,0,0,0.1),0_4px_0_rgba(0,0,0,0.08)]",
   "[&>label]:after:rounded-[2em]",
-  "[&>label]:after:bg-[#fbfbfb]",
+  "[&>label]:after:bg-[var(--wui-switch-knob-ios)]",
   "[&>label]:after:[transition:left_0.3s_cubic-bezier(0.175,0.885,0.32,1.275),padding_0.3s_ease,margin_0.3s_ease]",
   // Hover & Active States (The Squeeze Effect)
   "[&>label]:hover:after:will-change-[padding]",
-  "[&>label]:active:shadow-[inset_0_0_0_2em_#e8eae9]",
+  "[&>label]:active:shadow-[inset_0_0_0_2em_var(--wui-switch-border-ios)]",
   "[&>label]:active:after:pr-[0.8em]",
   // Checked State
-  "[&>input:checked~label]:bg-[#86d993]",
+  "[&>input:checked~label]:bg-[var(--wui-switch-green-2)]",
   "[&>input:checked~label]:active:shadow-none",
   "[&>input:checked~label]:active:after:ml-[-0.8em]",
   // Pull knob back when active on right side
@@ -53627,8 +53627,8 @@ var skewed = [
   "[&>label]:[transition:all_0.2s_ease]",
   "[&>label]:[backface-visibility:hidden]",
   "[&>label]:font-sans",
-  "[&>label]:bg-[#888]",
-  "[&>label]:active:bg-[#888]",
+  "[&>label]:bg-[var(--wui-switch-mid-gray)]",
+  "[&>label]:active:bg-[var(--wui-switch-mid-gray)]",
   // BEFORE: The "ON" State (Hidden Left initially)
   "[&>label]:before:content-[attr(data-tg-on)]",
   "[&>label]:before:left-0",
@@ -53641,7 +53641,7 @@ var skewed = [
   "[&>label]:before:absolute",
   "[&>label]:before:leading-[2em]",
   "[&>label]:before:font-bold",
-  "[&>label]:before:text-white",
+  "[&>label]:before:text-[var(--wui-white)]",
   "[&>label]:before:text-shadow:[0_1px_0_rgba(0,0,0,0.4)]",
   // AFTER: The "OFF" State (Visible initially)
   "[&>label]:after:left-full",
@@ -53654,12 +53654,12 @@ var skewed = [
   "[&>label]:after:absolute",
   "[&>label]:after:leading-[2em]",
   "[&>label]:after:font-bold",
-  "[&>label]:after:text-white",
+  "[&>label]:after:text-[var(--wui-white)]",
   "[&>label]:after:text-shadow:[0_1px_0_rgba(0,0,0,0.4)]",
   // Active State (Pressing down)
   "[&>label]:active:before:left-[-10%]",
   // Checked State Logic
-  "[&>input:checked~label]:bg-[#86d993]",
+  "[&>input:checked~label]:bg-[var(--wui-switch-green-2)]",
   // Slide animations
   "[&>input:checked~label]:before:left-full",
   // Slide ON text out right
@@ -53678,22 +53678,22 @@ var flat = [
   "[&>label]:rounded-[2em]",
   "[&>label]:border-4",
   "[&>label]:border-solid",
-  "[&>label]:border-[#f2f2f2]",
+  "[&>label]:border-[var(--wui-switch-flat-border)]",
   // The Knob
   "[&>label]:after:[transition:all_0.2s_ease]",
   "[&>label]:after:content-['']",
   "[&>label]:after:rounded-[1em]",
-  "[&>label]:after:bg-[#f2f2f2]",
+  "[&>label]:after:bg-[var(--wui-switch-flat-border)]",
   // Knob color matches border
-  "[&>label]:bg-[#fff]",
+  "[&>label]:bg-[var(--wui-white)]",
   // Inner track white
   // Checked State
   "[&>input:checked~label]:border-4",
   "[&>input:checked~label]:border-solid",
-  "[&>input:checked~label]:border-[#7fc6a6]",
+  "[&>input:checked~label]:border-[var(--wui-switch-green-3)]",
   // Green border
   "[&>input:checked~label]:after:left-2/4",
-  "[&>input:checked~label]:after:bg-[#7fc6a6]",
+  "[&>input:checked~label]:after:bg-[var(--wui-switch-green-3)]",
   // Green knob
   ilabel,
   // Text Size Adjustments
@@ -53733,13 +53733,13 @@ var flip = [
   "[&>label]:before:text-center",
   "[&>label]:before:leading-[2em]",
   "[&>label]:before:font-bold",
-  "[&>label]:before:text-white",
+  "[&>label]:before:text-[var(--wui-white)]",
   "[&>label]:before:absolute",
   "[&>label]:before:rounded",
   "[&>label]:before:left-0",
   "[&>label]:before:top-0",
   "[&>label]:before:[backface-visibility:hidden]",
-  "[&>label]:before:bg-[#ff3a19]",
+  "[&>label]:before:bg-[var(--wui-switch-orange-red)]",
   // BACK SIDE (After - Green/On)
   "[&>label]:after:h-full",
   "[&>label]:after:content-[attr(data-tg-off)]",
@@ -53749,13 +53749,13 @@ var flip = [
   "[&>label]:after:text-center",
   "[&>label]:after:leading-[2em]",
   "[&>label]:after:font-bold",
-  "[&>label]:after:text-white",
+  "[&>label]:after:text-[var(--wui-white)]",
   "[&>label]:after:absolute",
   "[&>label]:after:rounded",
   "[&>label]:after:left-0",
   "[&>label]:after:top-0",
   "[&>label]:after:[backface-visibility:hidden]",
-  "[&>label]:after:bg-[#02c66f]",
+  "[&>label]:after:bg-[var(--wui-switch-teal-green)]",
   "[&>label]:after:[transform:rotateY(-180deg)]",
   // Hidden initially
   // Active State (Tilt effect)
@@ -53766,7 +53766,7 @@ var flip = [
   "[&>input:checked~label]:after:left-0",
   "[&>input:checked~label]:after:[transform:rotateY(0)]",
   // Show back
-  "[&>input:checked~label]:after:bg-[#7fc6a6]",
+  "[&>input:checked~label]:after:bg-[var(--wui-switch-green-3)]",
   // Checked + Active Tilt
   "[&>input:checked~label]:active:after:[transform:rotateY(20deg)]"
 ].join(" ");
@@ -53990,7 +53990,7 @@ var Tabs = defaults(defTabs, (props) => {
       ...otherProps,
       ref: mainRef,
       children: [
-        /* @__PURE__ */ jsx("div", { class: "flex justify-center flex-wrap gap-2 my-4 border-2 border-gray-200 py-2 rounded-lg", children: () => get(titles).map((t3) => {
+        /* @__PURE__ */ jsx("div", { class: "flex justify-center flex-wrap gap-2 my-4 border-2 border-[var(--wui-gray-200)] py-2 rounded-lg", children: () => get(titles).map((t3) => {
           const isActive = get(currentTab) === t3;
           return /* @__PURE__ */ jsx(
             Button,
@@ -53999,7 +53999,7 @@ var Tabs = defaults(defTabs, (props) => {
               buttonFunction: "button",
               cls: [
                 "px-4 py-2 rounded-lg font-bold transition-colors duration-200 cursor-pointer select-none",
-                isActive ? "bg-black text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                isActive ? "bg-[var(--wui-black)] text-[var(--wui-white)]" : "bg-[var(--wui-gray-100)] text-[var(--wui-gray-600)] hover:bg-[var(--wui-gray-200)]"
               ],
               onClick: (e3) => {
                 e3.preventDefault();
@@ -54014,7 +54014,7 @@ var Tabs = defaults(defTabs, (props) => {
           "div",
           {
             ref: contentRef,
-            class: "p-4 border border-gray-200 rounded-b-lg shadow-sm bg-white min-h-[50px]",
+            class: "p-4 border border-[var(--wui-gray-200)] rounded-b-lg shadow-sm bg-[var(--wui-white)] min-h-[50px]",
             children
           }
         )
@@ -54063,7 +54063,7 @@ var TestTabs = () => {
 if (typeof globalThis.__isSSRTest__ !== "undefined") {
   TestTabs();
   const fullElements = [
-    `<h3>Tabs</h3><div><div class="flex justify-center flex-wrap gap-2 my-4 border-2 border-gray-200 py-2 rounded-lg"></div><div class="p-4 border border-gray-200 rounded-b-lg shadow-sm bg-white min-h-[50px]"><div data-tab-title="Tab 1" title="Tab 1">Content 1</div><div data-tab-title="Tab 2" title="Tab 2">Content 2</div></div></div>`
+    `<h3>Tabs</h3><div><div class="flex justify-center flex-wrap gap-2 my-4 border-2 border-[var(--wui-gray-200)] py-2 rounded-lg"></div><div class="p-4 border border-[var(--wui-gray-200)] rounded-b-lg shadow-sm bg-[var(--wui-white)] min-h-[50px]"><div data-tab-title="Tab 1" title="Tab 1">Content 1</div><div data-tab-title="Tab 2" title="Tab 2">Content 2</div></div></div>`
   ];
   console.log(`
 \u{1F4DD} Test: ${name15}`);
@@ -54092,10 +54092,10 @@ TestTabs.test = {
   compareActualValues: true,
   expect: () => {
     const idx = get(testObservables[name15]);
-    const expected = `<div><div class="flex justify-center flex-wrap gap-2 my-4 border-2 border-gray-200 py-2 rounded-lg"><button type="button" class="px-4 py-2 rounded-lg font-bold transition-colors duration-200 cursor-pointer select-none bg-black text-white">Tab 1</button><button type="button" class="px-4 py-2 rounded-lg font-bold transition-colors duration-200 cursor-pointer select-none bg-gray-100 text-gray-600 hover:bg-gray-200">Tab 2</button></div><div class="p-4 border border-gray-200 rounded-b-lg shadow-sm bg-white min-h-[50px]"><div data-tab-title="Tab 1" title="Tab 1" style="display: block;">Content 1</div><div data-tab-title="Tab 2" title="Tab 2" hidden="" style="display: none;">Content 2</div></div></div>`;
+    const expected = `<div><div class="flex justify-center flex-wrap gap-2 my-4 border-2 border-[var(--wui-gray-200)] py-2 rounded-lg"><button type="button" class="px-4 py-2 rounded-lg font-bold transition-colors duration-200 cursor-pointer select-none bg-[var(--wui-black)] text-[var(--wui-white)]">Tab 1</button><button type="button" class="px-4 py-2 rounded-lg font-bold transition-colors duration-200 cursor-pointer select-none bg-[var(--wui-gray-100)] text-[var(--wui-gray-600)] hover:bg-[var(--wui-gray-200)]">Tab 2</button></div><div class="p-4 border border-[var(--wui-gray-200)] rounded-b-lg shadow-sm bg-[var(--wui-white)] min-h-[50px]"><div data-tab-title="Tab 1" title="Tab 1" style="display: block;">Content 1</div><div data-tab-title="Tab 2" title="Tab 2" hidden="" style="display: none;">Content 2</div></div></div>`;
     const ssrComponent = testObservables[`${name15}_ssr`];
     const ssrResult = renderToString(ssrComponent);
-    const expectedFull = `<h3>Tabs</h3><div><div class="flex justify-center flex-wrap gap-2 my-4 border-2 border-gray-200 py-2 rounded-lg"></div><div class="p-4 border border-gray-200 rounded-b-lg shadow-sm bg-white min-h-[50px]"><div data-tab-title="Tab 1" title="Tab 1">Content 1</div><div data-tab-title="Tab 2" title="Tab 2">Content 2</div></div></div>`;
+    const expectedFull = `<h3>Tabs</h3><div><div class="flex justify-center flex-wrap gap-2 my-4 border-2 border-[var(--wui-gray-200)] py-2 rounded-lg"></div><div class="p-4 border border-[var(--wui-gray-200)] rounded-b-lg shadow-sm bg-[var(--wui-white)] min-h-[50px]"><div data-tab-title="Tab 1" title="Tab 1">Content 1</div><div data-tab-title="Tab 2" title="Tab 2">Content 2</div></div></div>`;
     if (ssrResult !== expectedFull) {
       assert(false, `[${name15}] SSR mismatch: got 
 ${ssrResult}, expected 
@@ -54117,7 +54117,7 @@ init_ssr_shim();
 
 // src/TextField.effect.tsx
 init_ssr_shim();
-var underline = "focus:[outline:none] border-0 px-0 py-[7px] border-b border-solid border-b-[#ccc] w-full";
+var underline = "focus:[outline:none] border-0 px-0 py-[7px] border-b border-solid border-b-[var(--wui-gray-300)] w-full";
 var effect19 = [
   underline,
   /* ---------- span (base) ---------- */
@@ -54126,7 +54126,7 @@ var effect19 = [
   "[&~span]:left-0",
   "[&~span]:w-0",
   "[&~span]:h-0.5",
-  "[&~span]:bg-[#4caf50]",
+  "[&~span]:bg-[var(--wui-mui-green)]",
   "[&~span]:duration-[0.4s]",
   /* ---------- span (focus) ---------- */
   "[&:focus~span]:w-full",
@@ -54140,7 +54140,7 @@ var effect22 = [
   "[&~span]:left-2/4",
   "[&~span]:w-0",
   "[&~span]:h-0.5",
-  "[&~span]:bg-[#4caf50]",
+  "[&~span]:bg-[var(--wui-mui-green)]",
   "[&~span]:duration-[0.4s]",
   /* ---------- span (focus) ---------- */
   "[&:focus~span]:w-full",
@@ -54163,7 +54163,7 @@ var effect32 = [
   "[&~span]:before:left-0",
   "[&~span]:before:w-0",
   "[&~span]:before:h-full",
-  "[&~span]:before:bg-[#4caf50]",
+  "[&~span]:before:bg-[var(--wui-mui-green)]",
   "[&~span]:before:duration-[0.4s]",
   "[&~span]:after:content-['']",
   "[&~span]:after:absolute",
@@ -54171,7 +54171,7 @@ var effect32 = [
   "[&~span]:after:left-0",
   "[&~span]:after:w-0",
   "[&~span]:after:h-full",
-  "[&~span]:after:bg-[#4caf50]",
+  "[&~span]:after:bg-[var(--wui-mui-green)]",
   "[&~span]:after:duration-[0.4s]",
   /* ---------- span ::after ---------- */
   "[&~span]:after:left-auto",
@@ -54182,7 +54182,7 @@ var effect32 = [
   "[&:focus~span]:after:w-1/2",
   "[&:focus~span]:after:duration-[0.4s]"
 ].join(" ");
-var box = "focus:[outline:none] pt-[5px] px-0 pb-[7px] border-0 border-b border-b-solid border-transparent border-b-[#ccc] duration-[0.4s] w-full h-full";
+var box = "focus:[outline:none] pt-[5px] px-0 pb-[7px] border-0 border-b border-b-solid border-transparent border-b-[var(--wui-gray-300)] duration-[0.4s] w-full h-full";
 var focusBox = "focus:w-full focus:pt-[5px] focus:px-3.5 focus:pb-[7px] focus:duration-[0.4s]";
 var effect42 = [
   box,
@@ -54200,7 +54200,7 @@ var effect42 = [
   "[&:focus~span]:h-full",
   "[&:focus~span]:border-2",
   "[&:focus~span]:border-solid",
-  "[&:focus~span]:border-[#4caf50]",
+  "[&:focus~span]:border-[var(--wui-mui-green)]",
   "[&:focus~span]:z-[1]"
 ].join(" ");
 var effect52 = [
@@ -54218,7 +54218,7 @@ var effect52 = [
   "[&:focus~span]:duration-[0.4s]",
   "[&:focus~span]:border-2",
   "[&:focus~span]:border-solid",
-  "[&:focus~span]:border-[#4caf50]"
+  "[&:focus~span]:border-[var(--wui-mui-green)]"
 ].join(" ");
 var effect62 = [
   box,
@@ -54235,9 +54235,9 @@ var effect62 = [
   "[&:focus~span]:duration-[0.4s]",
   "[&:focus~span]:border-2",
   "[&:focus~span]:border-solid",
-  "[&:focus~span]:border-[#4caf50]"
+  "[&:focus~span]:border-[var(--wui-mui-green)]"
 ].join(" ");
-var outline = "focus:[outline:none] border border-solid border-[#ccc] px-3.5 py-2 duration-[0.4s] w-full";
+var outline = "focus:[outline:none] border border-solid border-[var(--wui-gray-300)] px-3.5 py-2 duration-[0.4s] w-full";
 var effect72 = [
   outline,
   /* ---------- span ::before / ::after (base) ---------- */
@@ -54247,7 +54247,7 @@ var effect72 = [
   "[&~span]:before:left-2/4",
   "[&~span]:before:w-0",
   "[&~span]:before:h-0.5",
-  "[&~span]:before:bg-[#4caf50]",
+  "[&~span]:before:bg-[var(--wui-mui-green)]",
   "[&~span]:before:duration-[0.4s]",
   "[&~span]:after:content-['']",
   "[&~span]:after:absolute",
@@ -54255,7 +54255,7 @@ var effect72 = [
   "[&~span]:after:left-2/4",
   "[&~span]:after:w-0",
   "[&~span]:after:h-0.5",
-  "[&~span]:after:bg-[#4caf50]",
+  "[&~span]:after:bg-[var(--wui-mui-green)]",
   "[&~span]:after:duration-[0.4s]",
   "[&~span]:after:top-auto",
   "[&~span]:after:bottom-0",
@@ -54266,7 +54266,7 @@ var effect72 = [
   "[&~span_i]:before:left-0",
   "[&~span_i]:before:w-0.5",
   "[&~span_i]:before:h-0",
-  "[&~span_i]:before:bg-[#4caf50]",
+  "[&~span_i]:before:bg-[var(--wui-mui-green)]",
   "[&~span_i]:before:duration-[0.6s]",
   "[&~span_i]:after:content-['']",
   "[&~span_i]:after:absolute",
@@ -54274,7 +54274,7 @@ var effect72 = [
   "[&~span_i]:after:left-0",
   "[&~span_i]:after:w-0.5",
   "[&~span_i]:after:h-0",
-  "[&~span_i]:after:bg-[#4caf50]",
+  "[&~span_i]:after:bg-[var(--wui-mui-green)]",
   "[&~span_i]:after:duration-[0.6s]",
   "[&~span_i]:after:left-auto",
   "[&~span_i]:after:right-0",
@@ -54302,7 +54302,7 @@ var effect82 = [
   "[&~span]:before:left-0",
   "[&~span]:before:w-0",
   "[&~span]:before:h-0.5",
-  "[&~span]:before:bg-[#4caf50]",
+  "[&~span]:before:bg-[var(--wui-mui-green)]",
   "[&~span]:before:duration-[0.3s]",
   "[&~span]:after:content-['']",
   "[&~span]:after:absolute",
@@ -54310,7 +54310,7 @@ var effect82 = [
   "[&~span]:after:left-0",
   "[&~span]:after:w-0",
   "[&~span]:after:h-0.5",
-  "[&~span]:after:bg-[#4caf50]",
+  "[&~span]:after:bg-[var(--wui-mui-green)]",
   "[&~span]:after:duration-[0.3s]",
   /*----------.focus-border ::after ----------*/
   "[&~span]:after:left-auto",
@@ -54322,13 +54322,13 @@ var effect82 = [
   "[&~span_i]:before:absolute",
   "[&~span_i]:before:w-0.5",
   "[&~span_i]:before:h-0",
-  "[&~span_i]:before:bg-[#4caf50]",
+  "[&~span_i]:before:bg-[var(--wui-mui-green)]",
   "[&~span_i]:before:duration-[0.4s]",
   "[&~span_i]:after:content-['']",
   "[&~span_i]:after:absolute",
   "[&~span_i]:after:w-0.5",
   "[&~span_i]:after:h-0",
-  "[&~span_i]:after:bg-[#4caf50]",
+  "[&~span_i]:after:bg-[var(--wui-mui-green)]",
   "[&~span_i]:after:duration-[0.4s]",
   /*---------- span i ::before ----------*/
   "[&~span_i]:before:top-0",
@@ -54356,7 +54356,7 @@ var effect92 = [
   "[&~span]:before:absolute",
   "[&~span]:before:w-0",
   "[&~span]:before:h-0.5",
-  "[&~span]:before:bg-[#4caf50]",
+  "[&~span]:before:bg-[var(--wui-mui-green)]",
   "[&~span]:before:duration-[0.2s]",
   "[&~span]:before:delay-[0.2s]",
   "[&~span]:before:right-0",
@@ -54365,7 +54365,7 @@ var effect92 = [
   "[&~span]:after:absolute",
   "[&~span]:after:w-0",
   "[&~span]:after:h-0.5",
-  "[&~span]:after:bg-[#4caf50]",
+  "[&~span]:after:bg-[var(--wui-mui-green)]",
   "[&~span]:after:duration-[0.2s]",
   "[&~span]:after:right-0",
   "[&~span]:after:top-0",
@@ -54379,7 +54379,7 @@ var effect92 = [
   "[&~span_i]:before:absolute",
   "[&~span_i]:before:w-0.5",
   "[&~span_i]:before:h-0",
-  "[&~span_i]:before:bg-[#4caf50]",
+  "[&~span_i]:before:bg-[var(--wui-mui-green)]",
   "[&~span_i]:before:duration-[0.2s]",
   "[&~span_i]:before:left-0",
   "[&~span_i]:before:top-0",
@@ -54388,7 +54388,7 @@ var effect92 = [
   "[&~span_i]:after:absolute",
   "[&~span_i]:after:w-0.5",
   "[&~span_i]:after:h-0",
-  "[&~span_i]:after:bg-[#4caf50]",
+  "[&~span_i]:after:bg-[var(--wui-mui-green)]",
   "[&~span_i]:after:duration-[0.2s]",
   "[&~span_i]:after:top-0",
   "[&~span_i]:after:delay-[0.4s]",
@@ -54411,18 +54411,18 @@ var effect92 = [
   "[&:focus~span_i]:after:duration-[0.2s]"
 ].join(" ");
 var effect7__ = `${outline}
-[&~span]:before:content-[''] [&~span]:before:absolute [&~span]:before:w-0 [&~span]:before:h-0.5 [&~span]:before:bg-[#4caf50] [&~span]:before:duration-[0.4s] [&~span]:before:left-2/4 [&~span]:before:top-0
-[&~span]:after:content-[''] [&~span]:after:absolute [&~span]:after:w-0 [&~span]:after:h-0.5 [&~span]:after:bg-[#4caf50] [&~span]:after:duration-[0.4s] [&~span]:after:left-2/4 [&~span]:after:top-0
+[&~span]:before:content-[''] [&~span]:before:absolute [&~span]:before:w-0 [&~span]:before:h-0.5 [&~span]:before:bg-[var(--wui-mui-green)] [&~span]:before:duration-[0.4s] [&~span]:before:left-2/4 [&~span]:before:top-0
+[&~span]:after:content-[''] [&~span]:after:absolute [&~span]:after:w-0 [&~span]:after:h-0.5 [&~span]:after:bg-[var(--wui-mui-green)] [&~span]:after:duration-[0.4s] [&~span]:after:left-2/4 [&~span]:after:top-0
 [&~span]:after:top-auto [&~span]:after:bottom-0
-[&~span_i]:before:content-[''] [&~span_i]:before:absolute [&~span_i]:before:w-0.5 [&~span_i]:before:h-0 [&~span_i]:before:bg-[#4caf50] [&~span_i]:before:duration-[0.6s] [&~span_i]:before:left-0 [&~span_i]:before:top-2/4
-[&~span_i]:after:content-[''] [&~span_i]:after:absolute [&~span_i]:after:w-0.5 [&~span_i]:after:h-0 [&~span_i]:after:bg-[#4caf50] [&~span_i]:after:duration-[0.6s]  [&~span_i]:after:top-2/4
+[&~span_i]:before:content-[''] [&~span_i]:before:absolute [&~span_i]:before:w-0.5 [&~span_i]:before:h-0 [&~span_i]:before:bg-[var(--wui-mui-green)] [&~span_i]:before:duration-[0.6s] [&~span_i]:before:left-0 [&~span_i]:before:top-2/4
+[&~span_i]:after:content-[''] [&~span_i]:after:absolute [&~span_i]:after:w-0.5 [&~span_i]:after:h-0 [&~span_i]:after:bg-[var(--wui-mui-green)] [&~span_i]:after:duration-[0.6s]  [&~span_i]:after:top-2/4
 [&~span_i]:after:left-auto [&~span_i]:after:right-0
 [&:focus~span]:before:w-full [&:focus~span]:before:duration-[0.4s] [&:focus~span]:before:left-0
 [&:focus~span]:after:w-full [&:focus~span]:after:duration-[0.4s] [&:focus~span]:after:left-0
 [&:focus~span_i]:before:h-full [&:focus~span_i]:before:duration-[0.6s] [&:focus~span_i]:before:top-0
 [&:focus~span_i]:after:h-full [&:focus~span_i]:after:duration-[0.6s] [&:focus~span_i]:after:top-0
 `;
-var fill = "focus:[outline:none] border border-solid border-[#ccc] px-[15px] py-[7px] bg-transparent relative w-full z-10";
+var fill = "focus:[outline:none] border border-solid border-[var(--wui-gray-300)] px-[15px] py-[7px] bg-transparent relative w-full z-10";
 var effect102 = [
   fill,
   /* ---------- span (base) ---------- */
@@ -54431,7 +54431,7 @@ var effect102 = [
   "[&~span]:top-0",
   "[&~span]:w-full",
   "[&~span]:h-full",
-  "[&~span]:bg-[#ededed]",
+  "[&~span]:bg-[var(--wui-mui-fill)]",
   "[&~span]:opacity-0",
   "[&~span]:duration-[0.5s]",
   "[&~span]:z-0",
@@ -54447,7 +54447,7 @@ var effect112 = [
   "[&~span]:top-0",
   "[&~span]:w-0",
   "[&~span]:h-full",
-  "[&~span]:bg-[#ededed]",
+  "[&~span]:bg-[var(--wui-mui-fill)]",
   "[&~span]:duration-[0.3s]",
   "[&~span]:z-0",
   /* ---------- span (focus) ---------- */
@@ -54462,7 +54462,7 @@ var effect122 = [
   "[&~span]:top-0",
   "[&~span]:w-0",
   "[&~span]:h-full",
-  "[&~span]:bg-[#ededed]",
+  "[&~span]:bg-[var(--wui-mui-fill)]",
   "[&~span]:duration-[0.3s]",
   "[&~span]:z-0",
   /* ---------- span (focus) ---------- */
@@ -54479,7 +54479,7 @@ var effect132 = [
   "[&~span]:before:top-0",
   "[&~span]:before:w-0",
   "[&~span]:before:h-full",
-  "[&~span]:before:bg-[#ededed]",
+  "[&~span]:before:bg-[var(--wui-mui-fill)]",
   "[&~span]:before:duration-[0.3s]",
   "[&~span]:before:z-0",
   "[&~span]:after:content-['']",
@@ -54488,7 +54488,7 @@ var effect132 = [
   "[&~span]:after:top-0",
   "[&~span]:after:w-0",
   "[&~span]:after:h-full",
-  "[&~span]:after:bg-[#ededed]",
+  "[&~span]:after:bg-[var(--wui-mui-fill)]",
   "[&~span]:after:duration-[0.3s]",
   "[&~span]:after:z-0",
   "[&~span]:after:left-auto",
@@ -54508,7 +54508,7 @@ var effect142 = [
   "[&~span]:before:top-0",
   "[&~span]:before:w-0",
   "[&~span]:before:h-0",
-  "[&~span]:before:bg-[#ededed]",
+  "[&~span]:before:bg-[var(--wui-mui-fill)]",
   "[&~span]:before:duration-[0.3s]",
   "[&~span]:before:z-0",
   "[&~span]:after:content-['']",
@@ -54517,7 +54517,7 @@ var effect142 = [
   "[&~span]:after:top-0",
   "[&~span]:after:w-0",
   "[&~span]:after:h-0",
-  "[&~span]:after:bg-[#ededed]",
+  "[&~span]:after:bg-[var(--wui-mui-fill)]",
   "[&~span]:after:duration-[0.3s]",
   "[&~span]:after:z-0",
   "[&~span]:after:left-auto",
@@ -54541,7 +54541,7 @@ var effect152 = [
   "[&~span]:before:top-2/4",
   "[&~span]:before:w-0",
   "[&~span]:before:h-0",
-  "[&~span]:before:bg-[#ededed]",
+  "[&~span]:before:bg-[var(--wui-mui-fill)]",
   "[&~span]:before:duration-[0.3s]",
   "[&~span]:before:z-0",
   "[&~span]:after:content-['']",
@@ -54550,7 +54550,7 @@ var effect152 = [
   "[&~span]:after:top-2/4",
   "[&~span]:after:w-0",
   "[&~span]:after:h-0",
-  "[&~span]:after:bg-[#ededed]",
+  "[&~span]:after:bg-[var(--wui-mui-fill)]",
   "[&~span]:after:duration-[0.3s]",
   "[&~span]:after:z-0",
   "[&~span]:after:left-auto",
@@ -54569,14 +54569,14 @@ var effect152 = [
   "[&:focus~span]:after:bottom-0",
   "[&:focus~span]:after:right-0"
 ].join(" ");
-var underlineWithLabel = "focus:[outline:none] border-0 px-0 py-2 border-b border-solid border-[#ccc] bg-transparent z-10 w-full";
+var underlineWithLabel = "focus:[outline:none] border-0 px-0 py-2 border-b border-solid border-[var(--wui-gray-300)] bg-transparent z-10 w-full";
 var underlineLabel = [
   /* ---------- label (base) ---------- */
   "[&~label]:absolute",
   "[&~label]:left-0",
   "[&~label]:w-full",
   "[&~label]:top-[9px]",
-  "[&~label]:text-[#aaa]",
+  "[&~label]:text-[var(--wui-placeholder-gray)]",
   "[&~label]:duration-[0.3s]",
   "[&~label]:z-0",
   "[&~label]:tracking-[0.5px]",
@@ -54584,13 +54584,13 @@ var underlineLabel = [
   "[&:focus~label]:text-xs",
   "[&:focus~label]:-top-4",
   "[&:focus~label]:text-[12px]",
-  "[&:focus~label]:text-[#4caf50]",
+  "[&:focus~label]:text-[var(--wui-mui-green)]",
   "[&:focus~label]:duration-[0.3s]",
   /* ---------- label (has-content) ---------- */
   "[&:not(:placeholder-shown)~label]:text-xs",
   "[&:not(:placeholder-shown)~label]:-top-4",
   "[&:not(:placeholder-shown)~label]:text-[12px]",
-  "[&:not(:placeholder-shown)~label]:text-[#4caf50]",
+  "[&:not(:placeholder-shown)~label]:text-[var(--wui-mui-green)]",
   "[&:not(:placeholder-shown)~label]:duration-[0.3s]",
   "[&:focus~label]:cursor-default"
 ].join(" ");
@@ -54603,7 +54603,7 @@ var effect162 = [
   "[&~span]:left-0",
   "[&~span]:w-0",
   "[&~span]:h-0.5",
-  "[&~span]:bg-[#4caf50]",
+  "[&~span]:bg-[var(--wui-mui-green)]",
   "[&~span]:duration-[0.4s]",
   /* ---------- span (focus + has-content) ---------- */
   "[&:focus~span]:w-full",
@@ -54620,7 +54620,7 @@ var effect172 = [
   "[&~span]:left-2/4",
   "[&~span]:w-0",
   "[&~span]:h-0.5",
-  "[&~span]:bg-[#4caf50]",
+  "[&~span]:bg-[var(--wui-mui-green)]",
   "[&~span]:duration-[0.4s]",
   /* ---------- span (focus + has-content) ---------- */
   "[&:focus~span]:w-full",
@@ -54647,7 +54647,7 @@ var effect182 = [
   "[&~span]:before:left-0",
   "[&~span]:before:w-0",
   "[&~span]:before:h-full",
-  "[&~span]:before:bg-[#4caf50]",
+  "[&~span]:before:bg-[var(--wui-mui-green)]",
   "[&~span]:before:duration-[0.4s]",
   /* ---------- span ::after (base) ---------- */
   "[&~span]:after:content-['']",
@@ -54656,7 +54656,7 @@ var effect182 = [
   "[&~span]:after:left-0",
   "[&~span]:after:w-0",
   "[&~span]:after:h-full",
-  "[&~span]:after:bg-[#4caf50]",
+  "[&~span]:after:bg-[var(--wui-mui-green)]",
   "[&~span]:after:duration-[0.4s]",
   "[&~span]:after:left-auto",
   "[&~span]:after:right-0",
@@ -54670,14 +54670,14 @@ var effect182 = [
   "[&:not(:placeholder-shown)~span]:after:w-1/2",
   "[&:not(:placeholder-shown)~span]:after:duration-[0.4s]"
 ].join(" ");
-var boxWithLabel = "focus:[outline:none] border border-solid border-[#ccc] px-3.5 py-2 duration-[0.4s] bg-transparent z-10 w-full";
+var boxWithLabel = "focus:[outline:none] border border-solid border-[var(--wui-gray-300)] px-3.5 py-2 duration-[0.4s] bg-transparent z-10 w-full";
 var boxLabel = [
   /* ---------- label (base) ---------- */
   "[&~label]:absolute",
   "[&~label]:left-3.5",
   "[&~label]:w-full",
   "[&~label]:top-2.5",
-  "[&~label]:text-[#aaa]",
+  "[&~label]:text-[var(--wui-placeholder-gray)]",
   "[&~label]:duration-[0.3s]",
   "[&~label]:z-0",
   "[&~label]:tracking-[0.5px]",
@@ -54685,12 +54685,12 @@ var boxLabel = [
   "[&:focus~label]:text-xs",
   "[&:focus~label]:top-[-18px]",
   "[&:focus~label]:left-0",
-  "[&:focus~label]:text-[#4caf50]",
+  "[&:focus~label]:text-[var(--wui-mui-green)]",
   "[&:focus~label]:duration-[0.3s]",
   "[&:not(:placeholder-shown)~label]:text-xs",
   "[&:not(:placeholder-shown)~label]:top-[-18px]",
   "[&:not(:placeholder-shown)~label]:left-0",
-  "[&:not(:placeholder-shown)~label]:text-[#4caf50]",
+  "[&:not(:placeholder-shown)~label]:text-[var(--wui-mui-green)]",
   "[&:not(:placeholder-shown)~label]:duration-[0.3s]",
   "[&:focus~label]:cursor-default"
 ].join(" ");
@@ -54704,7 +54704,7 @@ var effect192 = [
   "[&~span]:before:left-2/4",
   "[&~span]:before:w-0",
   "[&~span]:before:h-0.5",
-  "[&~span]:before:bg-[#4caf50]",
+  "[&~span]:before:bg-[var(--wui-mui-green)]",
   "[&~span]:before:duration-[0.4s]",
   "[&~span]:after:content-['']",
   "[&~span]:after:absolute",
@@ -54712,7 +54712,7 @@ var effect192 = [
   "[&~span]:after:left-2/4",
   "[&~span]:after:w-0",
   "[&~span]:after:h-0.5",
-  "[&~span]:after:bg-[#4caf50]",
+  "[&~span]:after:bg-[var(--wui-mui-green)]",
   "[&~span]:after:duration-[0.4s]",
   /* ---------- span ::after ---------- */
   "[&~span]:after:top-auto",
@@ -54724,7 +54724,7 @@ var effect192 = [
   "[&~span_i]:before:left-0",
   "[&~span_i]:before:w-0.5",
   "[&~span_i]:before:h-0",
-  "[&~span_i]:before:bg-[#4caf50]",
+  "[&~span_i]:before:bg-[var(--wui-mui-green)]",
   "[&~span_i]:before:duration-[0.6s]",
   "[&~span_i]:after:content-['']",
   "[&~span_i]:after:absolute",
@@ -54732,7 +54732,7 @@ var effect192 = [
   "[&~span_i]:after:left-0",
   "[&~span_i]:after:w-0.5",
   "[&~span_i]:after:h-0",
-  "[&~span_i]:after:bg-[#4caf50]",
+  "[&~span_i]:after:bg-[var(--wui-mui-green)]",
   "[&~span_i]:after:duration-[0.6s]",
   /* ---------- span i ::after ---------- */
   "[&~span_i]:after:left-auto",
@@ -54774,7 +54774,7 @@ var effect20 = [
   "[&~span]:before:left-0",
   "[&~span]:before:w-0",
   "[&~span]:before:h-0.5",
-  "[&~span]:before:bg-[#4caf50]",
+  "[&~span]:before:bg-[var(--wui-mui-green)]",
   "[&~span]:before:duration-[0.3s]",
   "[&~span]:after:content-['']",
   "[&~span]:after:absolute",
@@ -54782,7 +54782,7 @@ var effect20 = [
   "[&~span]:after:left-0",
   "[&~span]:after:w-0",
   "[&~span]:after:h-0.5",
-  "[&~span]:after:bg-[#4caf50]",
+  "[&~span]:after:bg-[var(--wui-mui-green)]",
   "[&~span]:after:duration-[0.3s]",
   /* ---------- span ::after ---------- */
   "[&~span]:after:top-auto",
@@ -54796,7 +54796,7 @@ var effect20 = [
   "[&~span_i]:before:left-0",
   "[&~span_i]:before:w-0.5",
   "[&~span_i]:before:h-0",
-  "[&~span_i]:before:bg-[#4caf50]",
+  "[&~span_i]:before:bg-[var(--wui-mui-green)]",
   "[&~span_i]:before:duration-[0.4s]",
   "[&~span_i]:after:content-['']",
   "[&~span_i]:after:absolute",
@@ -54804,7 +54804,7 @@ var effect20 = [
   "[&~span_i]:after:left-0",
   "[&~span_i]:after:w-0.5",
   "[&~span_i]:after:h-0",
-  "[&~span_i]:after:bg-[#4caf50]",
+  "[&~span_i]:after:bg-[var(--wui-mui-green)]",
   "[&~span_i]:after:duration-[0.4s]",
   /* ---------- span > i ::after ---------- */
   "[&~span_i]:after:left-auto",
@@ -54840,7 +54840,7 @@ var effect21 = [
   "[&~span]:before:right-0",
   "[&~span]:before:w-0",
   "[&~span]:before:h-0.5",
-  "[&~span]:before:bg-[#4caf50]",
+  "[&~span]:before:bg-[var(--wui-mui-green)]",
   "[&~span]:before:duration-[0.2s]",
   "[&~span]:before:delay-[0.2s]",
   "[&~span]:after:content-['']",
@@ -54849,7 +54849,7 @@ var effect21 = [
   "[&~span]:after:right-0",
   "[&~span]:after:w-0",
   "[&~span]:after:h-0.5",
-  "[&~span]:after:bg-[#4caf50]",
+  "[&~span]:after:bg-[var(--wui-mui-green)]",
   "[&~span]:after:duration-[0.2s]",
   "[&~span]:after:delay-[0.2s]",
   /* ---------- span ::after ---------- */
@@ -54865,7 +54865,7 @@ var effect21 = [
   "[&~span_i]:before:left-0",
   "[&~span_i]:before:w-0.5",
   "[&~span_i]:before:h-0",
-  "[&~span_i]:before:bg-[#4caf50]",
+  "[&~span_i]:before:bg-[var(--wui-mui-green)]",
   "[&~span_i]:before:duration-[0.2s]",
   "[&~span_i]:after:content-['']",
   "[&~span_i]:after:absolute",
@@ -54873,7 +54873,7 @@ var effect21 = [
   "[&~span_i]:after:left-0",
   "[&~span_i]:after:w-0.5",
   "[&~span_i]:after:h-0",
-  "[&~span_i]:after:bg-[#4caf50]",
+  "[&~span_i]:after:bg-[var(--wui-mui-green)]",
   "[&~span_i]:after:duration-[0.2s]",
   /* ---------- span ::after ---------- */
   "[&~span_i]:after:left-auto",
@@ -54907,14 +54907,14 @@ var effect21 = [
   "[&:not(:placeholder-shown)~span_i]:after:h-full",
   "[&:not(:placeholder-shown)~span_i]:after:duration-[0.2s]"
 ].join(" ");
-var fillWithLabel = "focus:[outline:none] px-3.5 py-2 border border-solid border-[#ccc] relative bg-transparent z-10 w-full";
+var fillWithLabel = "focus:[outline:none] px-3.5 py-2 border border-solid border-[var(--wui-gray-300)] relative bg-transparent z-10 w-full";
 var fillLabel = [
   /* ---------- label (base) ---------- */
   "[&~label]:absolute",
   "[&~label]:left-3.5",
   "[&~label]:w-full",
   "[&~label]:top-2.5",
-  "[&~label]:text-[#aaa]",
+  "[&~label]:text-[var(--wui-placeholder-gray)]",
   "[&~label]:duration-[0.3s]",
   "[&~label]:z-0",
   "[&~label]:tracking-[0.5px]",
@@ -54922,12 +54922,12 @@ var fillLabel = [
   "[&:focus~label]:text-xs",
   "[&:focus~label]:top-[-18px]",
   "[&:focus~label]:left-0",
-  "[&:focus~label]:text-[#333]",
+  "[&:focus~label]:text-[var(--wui-text-dark)]",
   "[&:focus~label]:duration-[0.3s]",
   "[&:not(:placeholder-shown)~label]:text-xs",
   "[&:not(:placeholder-shown)~label]:top-[-18px]",
   "[&:not(:placeholder-shown)~label]:left-0",
-  "[&:not(:placeholder-shown)~label]:text-[#333]",
+  "[&:not(:placeholder-shown)~label]:text-[var(--wui-text-dark)]",
   "[&:not(:placeholder-shown)~label]:duration-[0.3s]",
   "[&:focus~label]:cursor-default"
 ].join(" ");
@@ -54946,10 +54946,10 @@ var effect222 = [
   /* ---------- span (focus + has-content) ---------- */
   "[&:focus~span]:duration-[0.4s]",
   "[&:focus~span]:w-full",
-  "[&:focus~span]:bg-[#ededed]",
+  "[&:focus~span]:bg-[var(--wui-mui-fill)]",
   "[&:not(:placeholder-shown)~span]:duration-[0.4s]",
   "[&:not(:placeholder-shown)~span]:w-full",
-  "[&:not(:placeholder-shown)~span]:bg-[#ededed]"
+  "[&:not(:placeholder-shown)~span]:bg-[var(--wui-mui-fill)]"
 ].join(" ");
 var effect23 = [
   fillWithLabel,
@@ -54961,7 +54961,7 @@ var effect23 = [
   "[&~span]:before:top-0",
   "[&~span]:before:w-0",
   "[&~span]:before:h-0",
-  "[&~span]:before:bg-[#ededed]",
+  "[&~span]:before:bg-[var(--wui-mui-fill)]",
   "[&~span]:before:duration-[0.3s]",
   "[&~span]:before:z-0",
   "[&~span]:after:content-['']",
@@ -54970,7 +54970,7 @@ var effect23 = [
   "[&~span]:after:top-0",
   "[&~span]:after:w-0",
   "[&~span]:after:h-0",
-  "[&~span]:after:bg-[#ededed]",
+  "[&~span]:after:bg-[var(--wui-mui-fill)]",
   "[&~span]:after:duration-[0.3s]",
   "[&~span]:after:z-0",
   "[&~span]:after:left-auto",
@@ -55001,7 +55001,7 @@ var effect24 = [
   "[&~span]:before:top-2/4",
   "[&~span]:before:w-0",
   "[&~span]:before:h-0",
-  "[&~span]:before:bg-[#ededed]",
+  "[&~span]:before:bg-[var(--wui-mui-fill)]",
   "[&~span]:before:duration-[0.3s]",
   "[&~span]:before:z-0",
   "[&~span]:after:content-['']",
@@ -55010,7 +55010,7 @@ var effect24 = [
   "[&~span]:after:top-2/4",
   "[&~span]:after:w-0",
   "[&~span]:after:h-0",
-  "[&~span]:after:bg-[#ededed]",
+  "[&~span]:after:bg-[var(--wui-mui-fill)]",
   "[&~span]:after:duration-[0.3s]",
   "[&~span]:after:z-0",
   "[&~span]:after:left-auto",
@@ -55043,7 +55043,7 @@ var chipLabelBase = [
   /* ---------- label (base) ---------- */
   "[&~label]:absolute",
   "[&~label]:w-full",
-  "[&~label]:text-[#aaa]",
+  "[&~label]:text-[var(--wui-placeholder-gray)]",
   "[&~label]:duration-[0.3s]",
   "[&~label]:z-0",
   "[&~label]:tracking-[0.5px]",
@@ -55052,20 +55052,20 @@ var chipLabelBase = [
   /* ---------- label (focus + has-content) ---------- */
   "[&:focus~label]:top-[-12px]",
   "[&:focus~label]:text-xs",
-  "[&:focus~label]:text-[#4caf50]",
+  "[&:focus~label]:text-[var(--wui-mui-green)]",
   "[&:focus~label]:duration-[0.3s]",
   "[&:focus~label]:left-[7px]",
-  "[&:focus~label]:bg-[white]",
+  "[&:focus~label]:bg-[var(--wui-white)]",
   "[&:focus~label]:w-fit",
   "[&:focus~label]:z-10",
   "[&:focus~label]:py-1",
   "[&:focus~label]:px-1",
   "[&:not(:placeholder-shown)~label]:top-[-12px]",
   "[&:not(:placeholder-shown)~label]:text-xs",
-  "[&:not(:placeholder-shown)~label]:text-[#4caf50]",
+  "[&:not(:placeholder-shown)~label]:text-[var(--wui-mui-green)]",
   "[&:not(:placeholder-shown)~label]:duration-[0.3s]",
   "[&:not(:placeholder-shown)~label]:left-[7px]",
-  "[&:not(:placeholder-shown)~label]:bg-[white]",
+  "[&:not(:placeholder-shown)~label]:bg-[var(--wui-white)]",
   "[&:not(:placeholder-shown)~label]:w-fit",
   "[&:not(:placeholder-shown)~label]:z-10",
   "[&:not(:placeholder-shown)~label]:py-1",
@@ -55081,7 +55081,7 @@ var effect19a = [
   "[&~span]:before:left-2/4",
   "[&~span]:before:w-0",
   "[&~span]:before:h-0.5",
-  "[&~span]:before:bg-[#4caf50]",
+  "[&~span]:before:bg-[var(--wui-mui-green)]",
   "[&~span]:before:duration-[0.4s]",
   "[&~span]:after:content-['']",
   "[&~span]:after:absolute",
@@ -55089,7 +55089,7 @@ var effect19a = [
   "[&~span]:after:left-2/4",
   "[&~span]:after:w-0",
   "[&~span]:after:h-0.5",
-  "[&~span]:after:bg-[#4caf50]",
+  "[&~span]:after:bg-[var(--wui-mui-green)]",
   "[&~span]:after:duration-[0.4s]",
   "[&~span]:after:top-auto",
   "[&~span]:after:bottom-0",
@@ -55100,7 +55100,7 @@ var effect19a = [
   "[&~span_i]:before:left-0",
   "[&~span_i]:before:w-0.5",
   "[&~span_i]:before:h-0",
-  "[&~span_i]:before:bg-[#4caf50]",
+  "[&~span_i]:before:bg-[var(--wui-mui-green)]",
   "[&~span_i]:before:duration-[0.6s]",
   "[&~span_i]:after:content-['']",
   "[&~span_i]:after:absolute",
@@ -55108,7 +55108,7 @@ var effect19a = [
   "[&~span_i]:after:left-0",
   "[&~span_i]:after:w-0.5",
   "[&~span_i]:after:h-0",
-  "[&~span_i]:after:bg-[#4caf50]",
+  "[&~span_i]:after:bg-[var(--wui-mui-green)]",
   "[&~span_i]:after:duration-[0.6s]",
   "[&~span_i]:after:left-auto",
   "[&~span_i]:after:right-0",
@@ -55149,7 +55149,7 @@ var effect20a = [
   "[&~span]:before:left-0",
   "[&~span]:before:w-0",
   "[&~span]:before:h-0.5",
-  "[&~span]:before:bg-[#4caf50]",
+  "[&~span]:before:bg-[var(--wui-mui-green)]",
   "[&~span]:before:duration-[0.3s]",
   "[&~span]:after:content-['']",
   "[&~span]:after:absolute",
@@ -55157,7 +55157,7 @@ var effect20a = [
   "[&~span]:after:left-0",
   "[&~span]:after:w-0",
   "[&~span]:after:h-0.5",
-  "[&~span]:after:bg-[#4caf50]",
+  "[&~span]:after:bg-[var(--wui-mui-green)]",
   "[&~span]:after:duration-[0.3s]",
   "[&~span]:after:top-auto",
   "[&~span]:after:bottom-0",
@@ -55170,7 +55170,7 @@ var effect20a = [
   "[&~span_i]:before:left-0",
   "[&~span_i]:before:w-0.5",
   "[&~span_i]:before:h-0",
-  "[&~span_i]:before:bg-[#4caf50]",
+  "[&~span_i]:before:bg-[var(--wui-mui-green)]",
   "[&~span_i]:before:duration-[0.4s]",
   "[&~span_i]:after:content-['']",
   "[&~span_i]:after:absolute",
@@ -55178,7 +55178,7 @@ var effect20a = [
   "[&~span_i]:after:left-0",
   "[&~span_i]:after:w-0.5",
   "[&~span_i]:after:h-0",
-  "[&~span_i]:after:bg-[#4caf50]",
+  "[&~span_i]:after:bg-[var(--wui-mui-green)]",
   "[&~span_i]:after:duration-[0.4s]",
   "[&~span_i]:after:left-auto",
   "[&~span_i]:after:right-0",
@@ -55213,7 +55213,7 @@ var effect21a = [
   "[&~span]:before:right-0",
   "[&~span]:before:w-0",
   "[&~span]:before:h-0.5",
-  "[&~span]:before:bg-[#4caf50]",
+  "[&~span]:before:bg-[var(--wui-mui-green)]",
   "[&~span]:before:duration-[0.2s]",
   "[&~span]:before:delay-[0.2s]",
   "[&~span]:after:content-['']",
@@ -55222,7 +55222,7 @@ var effect21a = [
   "[&~span]:after:right-0",
   "[&~span]:after:w-0",
   "[&~span]:after:h-0.5",
-  "[&~span]:after:bg-[#4caf50]",
+  "[&~span]:after:bg-[var(--wui-mui-green)]",
   "[&~span]:after:duration-[0.2s]",
   "[&~span]:after:delay-[0.2s]",
   "[&~span]:after:top-auto",
@@ -55237,7 +55237,7 @@ var effect21a = [
   "[&~span_i]:before:left-0",
   "[&~span_i]:before:w-0.5",
   "[&~span_i]:before:h-0",
-  "[&~span_i]:before:bg-[#4caf50]",
+  "[&~span_i]:before:bg-[var(--wui-mui-green)]",
   "[&~span_i]:before:duration-[0.2s]",
   "[&~span_i]:after:content-['']",
   "[&~span_i]:after:absolute",
@@ -55245,7 +55245,7 @@ var effect21a = [
   "[&~span_i]:after:left-0",
   "[&~span_i]:after:w-0.5",
   "[&~span_i]:after:h-0",
-  "[&~span_i]:after:bg-[#4caf50]",
+  "[&~span_i]:after:bg-[var(--wui-mui-green)]",
   "[&~span_i]:after:duration-[0.2s]",
   "[&~span_i]:after:left-auto",
   "[&~span_i]:after:right-0",
@@ -55384,7 +55384,7 @@ var TextArea = defaults(def13, (props) => {
     if (!get(label)) return p;
     return p ? p : " ";
   });
-  const labelPlaceholderClass = memo(() => get(label) ? "placeholder:text-transparent focus:placeholder:text-[#aaa]" : "");
+  const labelPlaceholderClass = memo(() => get(label) ? "placeholder:text-transparent focus:placeholder:text-[var(--wui-placeholder-gray)]" : "");
   const commitValue = (e3) => {
     if (isObservable(value)) {
       value(e3.target.value);
@@ -55458,7 +55458,7 @@ var TestTextArea = () => {
   registerTestObservable(`${name16}_ssr`, ret);
   return ret;
 };
-var TEXTAREA_CLS = "focus:[outline:none] border border-solid border-[#ccc] px-3.5 py-2 duration-[0.4s] bg-transparent z-10 w-full [&~label]:absolute [&~label]:w-full [&~label]:text-[#aaa] [&~label]:duration-[0.3s] [&~label]:z-0 [&~label]:tracking-[0.5px] [&~label]:left-3.5 [&~label]:top-2.5 [&:focus~label]:top-[-12px] [&:focus~label]:text-xs [&:focus~label]:text-[#4caf50] [&:focus~label]:duration-[0.3s] [&:focus~label]:left-[7px] [&:focus~label]:bg-[white] [&:focus~label]:w-fit [&:focus~label]:z-10 [&:focus~label]:py-1 [&:focus~label]:px-1 [&:not(:placeholder-shown)~label]:top-[-12px] [&:not(:placeholder-shown)~label]:text-xs [&:not(:placeholder-shown)~label]:text-[#4caf50] [&:not(:placeholder-shown)~label]:duration-[0.3s] [&:not(:placeholder-shown)~label]:left-[7px] [&:not(:placeholder-shown)~label]:bg-[white] [&:not(:placeholder-shown)~label]:w-fit [&:not(:placeholder-shown)~label]:z-10 [&:not(:placeholder-shown)~label]:py-1 [&:not(:placeholder-shown)~label]:px-1 [&~span]:before:content-[''] [&~span]:before:absolute [&~span]:before:-top-px [&~span]:before:left-2/4 [&~span]:before:w-0 [&~span]:before:h-0.5 [&~span]:before:bg-[#4caf50] [&~span]:before:duration-[0.4s] [&~span]:after:content-[''] [&~span]:after:absolute [&~span]:after:-top-px [&~span]:after:left-2/4 [&~span]:after:w-0 [&~span]:after:h-0.5 [&~span]:after:bg-[#4caf50] [&~span]:after:duration-[0.4s] [&~span]:after:top-auto [&~span]:after:bottom-0 [&~span_i]:before:content-[''] [&~span_i]:before:absolute [&~span_i]:before:top-2/4 [&~span_i]:before:left-0 [&~span_i]:before:w-0.5 [&~span_i]:before:h-0 [&~span_i]:before:bg-[#4caf50] [&~span_i]:before:duration-[0.6s] [&~span_i]:after:content-[''] [&~span_i]:after:absolute [&~span_i]:after:top-2/4 [&~span_i]:after:left-0 [&~span_i]:after:w-0.5 [&~span_i]:after:h-0 [&~span_i]:after:bg-[#4caf50] [&~span_i]:after:duration-[0.6s] [&~span_i]:after:left-auto [&~span_i]:after:right-0 [&:focus~span]:before:left-0 [&:focus~span]:before:w-full [&:focus~span]:before:duration-[0.4s] [&:focus~span]:after:left-0 [&:focus~span]:after:w-full [&:focus~span]:after:duration-[0.4s] [&:not(:placeholder-shown)~span]:before:left-0 [&:not(:placeholder-shown)~span]:before:w-full [&:not(:placeholder-shown)~span]:before:duration-[0.4s] [&:not(:placeholder-shown)~span]:after:left-0 [&:not(:placeholder-shown)~span]:after:w-full [&:not(:placeholder-shown)~span]:after:duration-[0.4s] [&:focus~span_i]:before:-top-px [&:focus~span_i]:before:h-full [&:focus~span_i]:before:duration-[0.6s] [&:focus~span_i]:after:-top-px [&:focus~span_i]:after:h-full [&:focus~span_i]:after:duration-[0.6s] [&:not(:placeholder-shown)~span_i]:before:-top-px [&:not(:placeholder-shown)~span_i]:before:h-full [&:not(:placeholder-shown)~span_i]:before:duration-[0.6s] [&:not(:placeholder-shown)~span_i]:after:-top-px [&:not(:placeholder-shown)~span_i]:after:h-full [&:not(:placeholder-shown)~span_i]:after:duration-[0.6s] resize-none block size-full";
+var TEXTAREA_CLS = "focus:[outline:none] border border-solid border-[var(--wui-gray-300)] px-3.5 py-2 duration-[0.4s] bg-transparent z-10 w-full [&~label]:absolute [&~label]:w-full [&~label]:text-[var(--wui-placeholder-gray)] [&~label]:duration-[0.3s] [&~label]:z-0 [&~label]:tracking-[0.5px] [&~label]:left-3.5 [&~label]:top-2.5 [&:focus~label]:top-[-12px] [&:focus~label]:text-xs [&:focus~label]:text-[var(--wui-mui-green)] [&:focus~label]:duration-[0.3s] [&:focus~label]:left-[7px] [&:focus~label]:bg-[var(--wui-white)] [&:focus~label]:w-fit [&:focus~label]:z-10 [&:focus~label]:py-1 [&:focus~label]:px-1 [&:not(:placeholder-shown)~label]:top-[-12px] [&:not(:placeholder-shown)~label]:text-xs [&:not(:placeholder-shown)~label]:text-[var(--wui-mui-green)] [&:not(:placeholder-shown)~label]:duration-[0.3s] [&:not(:placeholder-shown)~label]:left-[7px] [&:not(:placeholder-shown)~label]:bg-[var(--wui-white)] [&:not(:placeholder-shown)~label]:w-fit [&:not(:placeholder-shown)~label]:z-10 [&:not(:placeholder-shown)~label]:py-1 [&:not(:placeholder-shown)~label]:px-1 [&~span]:before:content-[''] [&~span]:before:absolute [&~span]:before:-top-px [&~span]:before:left-2/4 [&~span]:before:w-0 [&~span]:before:h-0.5 [&~span]:before:bg-[var(--wui-mui-green)] [&~span]:before:duration-[0.4s] [&~span]:after:content-[''] [&~span]:after:absolute [&~span]:after:-top-px [&~span]:after:left-2/4 [&~span]:after:w-0 [&~span]:after:h-0.5 [&~span]:after:bg-[var(--wui-mui-green)] [&~span]:after:duration-[0.4s] [&~span]:after:top-auto [&~span]:after:bottom-0 [&~span_i]:before:content-[''] [&~span_i]:before:absolute [&~span_i]:before:top-2/4 [&~span_i]:before:left-0 [&~span_i]:before:w-0.5 [&~span_i]:before:h-0 [&~span_i]:before:bg-[var(--wui-mui-green)] [&~span_i]:before:duration-[0.6s] [&~span_i]:after:content-[''] [&~span_i]:after:absolute [&~span_i]:after:top-2/4 [&~span_i]:after:left-0 [&~span_i]:after:w-0.5 [&~span_i]:after:h-0 [&~span_i]:after:bg-[var(--wui-mui-green)] [&~span_i]:after:duration-[0.6s] [&~span_i]:after:left-auto [&~span_i]:after:right-0 [&:focus~span]:before:left-0 [&:focus~span]:before:w-full [&:focus~span]:before:duration-[0.4s] [&:focus~span]:after:left-0 [&:focus~span]:after:w-full [&:focus~span]:after:duration-[0.4s] [&:not(:placeholder-shown)~span]:before:left-0 [&:not(:placeholder-shown)~span]:before:w-full [&:not(:placeholder-shown)~span]:before:duration-[0.4s] [&:not(:placeholder-shown)~span]:after:left-0 [&:not(:placeholder-shown)~span]:after:w-full [&:not(:placeholder-shown)~span]:after:duration-[0.4s] [&:focus~span_i]:before:-top-px [&:focus~span_i]:before:h-full [&:focus~span_i]:before:duration-[0.6s] [&:focus~span_i]:after:-top-px [&:focus~span_i]:after:h-full [&:focus~span_i]:after:duration-[0.6s] [&:not(:placeholder-shown)~span_i]:before:-top-px [&:not(:placeholder-shown)~span_i]:before:h-full [&:not(:placeholder-shown)~span_i]:before:duration-[0.6s] [&:not(:placeholder-shown)~span_i]:after:-top-px [&:not(:placeholder-shown)~span_i]:after:h-full [&:not(:placeholder-shown)~span_i]:after:duration-[0.6s] resize-none block size-full";
 if (typeof globalThis.__isSSRTest__ !== "undefined") {
   TestTextArea();
   const fullElements = [
@@ -55600,7 +55600,7 @@ var def14 = () => ({
 var BASE_CLASS7 = "relative z-0 flex items-center";
 var TextField = defaults(def14, (props) => {
   const { cls, class: cn2, children, effect: effect25, assignOnEnter, value, inputType, placeholder, disabled, onChange, onKeyUp, label, ref, ...otherProps } = props;
-  const defaultStyle = "block w-full py-1.5 px-2 text-base text-gray-900 placeholder:text-gray-400 focus:border-blue-500 sm:text-sm/6 truncate";
+  const defaultStyle = "block w-full py-1.5 px-2 text-base text-[var(--wui-gray-900)] placeholder:text-[var(--wui-gray-400)] focus:border-[var(--wui-blue-500)] sm:text-sm/6 truncate";
   const inputRef = observable(null);
   effect(() => {
     if (ref && get(inputRef)) {
@@ -55644,8 +55644,8 @@ var TextField = defaults(def14, (props) => {
     if (!get(label)) return p;
     return p ? p : " ";
   });
-  const labelPlaceholderClass = memo(() => get(label) ? "placeholder:text-transparent focus:placeholder:text-gray-400" : "");
-  const disabledClass = "disabled:cursor-not-allowed disabled:text-[#00000061] disabled:border-[#0000001f] disabled:bg-[#0000000a] [&:disabled~label]:text-[#00000061]";
+  const labelPlaceholderClass = memo(() => get(label) ? "placeholder:text-transparent focus:placeholder:text-[var(--wui-gray-400)]" : "");
+  const disabledClass = "disabled:cursor-not-allowed disabled:text-[var(--wui-disabled-text)] disabled:border-[var(--wui-disabled-border)] disabled:bg-[var(--wui-disabled-bg)] [&:disabled~label]:text-[var(--wui-disabled-text)]";
   const handleFocus = () => {
     if (inputRef()) {
       inputRef().focus();
@@ -55762,7 +55762,7 @@ var TestTextField = () => {
   registerTestObservable(`${name17}_ssr`, ret);
   return ret;
 };
-var DEFAULT_STYLE = "block w-full py-1.5 px-2 text-base text-gray-900 placeholder:text-gray-400 focus:border-blue-500 sm:text-sm/6 truncate disabled:cursor-not-allowed disabled:text-[#00000061] disabled:border-[#0000001f] disabled:bg-[#0000000a] [&:disabled~label]:text-[#00000061]";
+var DEFAULT_STYLE = "block w-full py-1.5 px-2 text-base text-[var(--wui-gray-900)] placeholder:text-[var(--wui-gray-400)] focus:border-[var(--wui-blue-500)] sm:text-sm/6 truncate disabled:cursor-not-allowed disabled:text-[var(--wui-disabled-text)] disabled:border-[var(--wui-disabled-border)] disabled:bg-[var(--wui-disabled-bg)] [&:disabled~label]:text-[var(--wui-disabled-text)]";
 var BASE_CLASS8 = "relative z-0 flex items-center";
 if (typeof globalThis.__isSSRTest__ !== "undefined") {
   TestTextField();
@@ -55827,8 +55827,8 @@ var BASE_CLASS9 = "inline-flex items-center justify-center px-2 py-1 rounded tex
 var def15 = () => ({
   children: observable(""),
   // 2. Updated Default Colors (Material UI / Tailwind style)
-  onClass: observable("text-[#1976d2] bg-[#1976d2]/10 border-[#1976d2]/50 hover:bg-[#1976d2]/20"),
-  offClass: observable("text-gray-600 bg-transparent border-transparent hover:bg-gray-100"),
+  onClass: observable("text-[var(--wui-accent-500)] bg-[var(--wui-accent-500)]/10 border-[var(--wui-accent-500)]/50 hover:bg-[var(--wui-accent-500)]/20"),
+  offClass: observable("text-[var(--wui-gray-600)] bg-transparent border-transparent hover:bg-[var(--wui-gray-100)]"),
   checked: observable(false, HtmlBoolean),
   cls: observable("", HtmlClass),
   class: observable("", HtmlClass),
@@ -55897,8 +55897,8 @@ var TestToggleButton = () => {
   return ret;
 };
 var BASE3 = "inline-flex items-center justify-center px-2 py-1 rounded text-sm cursor-pointer select-none transition-colors duration-150 border border-transparent";
-var OFF = "text-gray-600 bg-transparent hover:bg-gray-100";
-var ON = "text-[#1976d2] bg-[#1976d2]/10 border-[#1976d2]/50 hover:bg-[#1976d2]/20";
+var OFF = "text-[var(--wui-gray-600)] bg-transparent hover:bg-[var(--wui-gray-100)]";
+var ON = "text-[var(--wui-accent-500)] bg-[var(--wui-accent-500)]/10 border-[var(--wui-accent-500)]/50 hover:bg-[var(--wui-accent-500)]/20";
 if (typeof globalThis.__isSSRTest__ !== "undefined") {
   TestToggleButton();
   const fullElements = [
@@ -56136,7 +56136,7 @@ init_index_es();
 init_runtime_es();
 var wrapperStyles = "absolute top-0 left-0 w-full h-full origin-top-left will-change-transform";
 var zoomableStyles = {
-  default: "relative overflow-hidden touch-none border border-gray-300 rounded-lg"
+  default: "relative overflow-hidden touch-none border border-[var(--wui-gray-300)] rounded-lg"
 };
 var imgStyles = {
   default: "absolute w-full h-full object-contain origin-top-left cursor-grab select-none pointer-events-none rounded-lg"
@@ -56328,7 +56328,7 @@ var TestZoomable = () => {
   registerTestObservable(`${name20}_ssr`, ret);
   return ret;
 };
-var ZOOMABLE = "relative overflow-hidden touch-none border border-gray-300 rounded-lg";
+var ZOOMABLE = "relative overflow-hidden touch-none border border-[var(--wui-gray-300)] rounded-lg";
 var WRAPPER = "absolute top-0 left-0 w-full h-full origin-top-left will-change-transform";
 if (typeof globalThis.__isSSRTest__ !== "undefined") {
   TestZoomable();

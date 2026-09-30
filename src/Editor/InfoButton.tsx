@@ -86,7 +86,7 @@ const InfoButton: Defaulted<typeof def> = defaults(def, (props) => {
             class={() => [
                 TOOLBAR_CONTROL,
                 () => $$(cls) ? $$(cls) : $$(cn),
-                "border-none hover:bg-gray-100 p-1.5"
+                "border-none hover:bg-[var(--wui-gray-100)] p-1.5"
             ]}
             disabled={disabled}
             onMouseDown={handleMouseDown}

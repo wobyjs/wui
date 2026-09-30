@@ -163,7 +163,7 @@ const List = defaults(def, (props) => {
             class={() => [
                 TOOLBAR_CONTROL,
                 () => $$(cls) ? $$(cls) : $$(cn),
-                () => $$(isActive) ? '!bg-slate-200' : ''
+                () => $$(isActive) ? '!bg-[var(--wui-slate-200)]' : ''
             ]}
 
             aria-pressed={() => $$(isActive) ? "true" : "false"}

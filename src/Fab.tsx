@@ -46,7 +46,7 @@ const disabledStyle = "disabled:!bg-[rgba(0,0,0,0.12)] disabled:!text-[rgba(0,0,
 // Indexed by the `type`/`variant`/`size` prop, which is a free-form string on the custom
 // element (attributes carry no enum), so the table needs a string index signature.
 const variantStyle: Record<string, string> = {
-      circular: "inline-flex items-center justify-center relative box-border cursor-pointer select-none align-middle appearance-none no-underline font-medium text-lg z-[1050] shadow-[rgba(0,0,0,0.2)_0px_3px_5px_-1px,rgba(0,0,0,0.14)_0px_6px_10px_0px,rgba(0,0,0,0.12)_0px_1px_18px_0px] text-white m-2 p-0 rounded-[50%] border-0 [transition:background-color_250ms_cubic-bezier(0.4,0,0.2,1)0ms,box-shadow_250ms_cubic-bezier(0.4,0,0.2,1)0ms,border-color_250ms_cubic-bezier(0.4,0,0.2,1)0ms] outline-none w-14 h-14 bg-[rgb(25,118,210)] hover:bg-[rgb(21,101,192)]",
+      circular: "inline-flex items-center justify-center relative box-border cursor-pointer select-none align-middle appearance-none no-underline font-medium text-lg z-[1050] shadow-[rgba(0,0,0,0.2)_0px_3px_5px_-1px,rgba(0,0,0,0.14)_0px_6px_10px_0px,rgba(0,0,0,0.12)_0px_1px_18px_0px] text-[var(--wui-white)] m-2 p-0 rounded-[50%] border-0 [transition:background-color_250ms_cubic-bezier(0.4,0,0.2,1)0ms,box-shadow_250ms_cubic-bezier(0.4,0,0.2,1)0ms,border-color_250ms_cubic-bezier(0.4,0,0.2,1)0ms] outline-none w-14 h-14 bg-[rgb(25,118,210)] hover:bg-[rgb(21,101,192)]",
       // `absolute` used to live here. It made the variant unusable anywhere in normal
       // flow — the <wui-fab> host collapsed to 0x0 and the button floated over whatever
       // followed it, which is exactly what the docs' own inline `<Fab type="pill">`

@@ -5,7 +5,7 @@ import { getCurrentEditor, getSelection, BLOCK_TAGS, isSelectionInside } from '.
 import { localized } from '../i18n'
 
 // change 'inline-block' to 'block'
-export const QUOTE_CLASSES = "text-[15px] text-[#65676b] ml-10 mr-0 mt-0 mb-2.5 pl-2 border-l-[#ced0d4] border-l-4 border-solid block italic"
+export const QUOTE_CLASSES = "text-[15px] text-[var(--wui-quote-text)] ml-10 mr-0 mt-0 mb-2.5 pl-2 border-l-[var(--wui-quote-border)] border-l-4 border-solid block italic"
 export const QUOTE_TAG = "blockquote"
 
 const def = () => ({
@@ -71,7 +71,7 @@ const Blockquote = defaults(def, (props) => {
             title={localized(buttonTitle, 'editor.blockquote')}
             class={() => [
                 () => $$(cls) ? $$(cls) : $$(cn),
-                () => $$(isActive) ? '!bg-slate-200' : ''
+                () => $$(isActive) ? '!bg-[var(--wui-slate-200)]' : ''
             ]}
             onClick={toggleBlockquote}
             onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation() }}

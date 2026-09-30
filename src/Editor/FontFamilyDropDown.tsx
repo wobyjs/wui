@@ -29,7 +29,7 @@ const FontFamilyDropDown = defaults(def, (props) => {
 
     const { class: cn, cls, defaultIndex, ...otherProps } = props
 
-    const BASE_BTN = "size-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-black hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500 cursor-pointer"
+    const BASE_BTN = "size-full inline-flex justify-center rounded-md border border-[var(--wui-gray-300)] shadow-sm px-4 py-2 bg-[var(--wui-white)] text-sm font-medium text-[var(--wui-black)] hover:bg-[var(--wui-gray-50)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-[var(--wui-indigo-500)] cursor-pointer"
 
     const editor = useEditor()
     const isOpen = $(false) as Observable<boolean>
@@ -129,7 +129,7 @@ const FontFamilyDropDown = defaults(def, (props) => {
         return (
             <div
                 ref={menuRef}
-                class="origin-top-left absolute left-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10"
+                class="origin-top-left absolute left-0 mt-2 w-56 rounded-md shadow-lg bg-[var(--wui-white)] ring-1 ring-black ring-opacity-5 focus:outline-none z-10"
                 role="menu"
                 aria-orientation="vertical"
                 aria-labelledby="menu-button"
@@ -143,7 +143,7 @@ const FontFamilyDropDown = defaults(def, (props) => {
                     {FONT_FAMILY.map(font => (
                         <Button
                             type="outlined"
-                            cls="w-full text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100 hover:text-gray-900 cursor-pointer"
+                            cls="w-full text-[var(--wui-gray-700)] block px-4 py-2 text-sm hover:bg-[var(--wui-gray-100)] hover:text-[var(--wui-gray-900)] cursor-pointer"
                             role="menuitem"
                             onClick={(e) => { e.preventDefault(); handleSelectFont(font.value, font.label) }}
                             style={{ fontFamily: font.value }}
@@ -190,7 +190,7 @@ const FontFamilyDropDown = defaults(def, (props) => {
                 </Button>
                 <Button
                     type='outlined'
-                    class={[TOOLBAR_CONTROL, "size-full inline-flex justify-center items-center rounded-md border border-gray-300 shadow-sm bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500 cursor-pointer px-2"]}
+                    class={[TOOLBAR_CONTROL, "size-full inline-flex justify-center items-center rounded-md border border-[var(--wui-gray-300)] shadow-sm bg-[var(--wui-white)] hover:bg-[var(--wui-gray-50)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-[var(--wui-indigo-500)] cursor-pointer px-2"]}
                     onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleDropdown(); }}
                     onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation(); }}
                     title={() => t('editor.chooseFontFamily')}

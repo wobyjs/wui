@@ -149,12 +149,12 @@ const insertTable = (rows: number, cols: number, from?: HTMLElement | null) => {
     seatCaret(surface)
 
     // Build HTML String
-    let tableHTML = '<table class="w-full border-collapse border border-gray-400 my-2"><tbody>'
+    let tableHTML = '<table class="w-full border-collapse border border-[var(--wui-gray-400)] my-2"><tbody>'
 
     for (let i = 0; i < rows; i++) {
         tableHTML += '<tr>'
         for (let j = 0; j < cols; j++) {
-            tableHTML += '<td class="border border-gray-300 p-2 min-w-[50px]">&nbsp;</td>'
+            tableHTML += '<td class="border border-[var(--wui-gray-300)] p-2 min-w-[50px]">&nbsp;</td>'
         }
         tableHTML += '</tr>'
     }
@@ -352,8 +352,8 @@ const InsertDropDown = defaults(def, (props) => {
                 // to its full 16×16 is both wider and taller than those limits, and the limits
                 // would clip it rather than scroll it usefully, so they come off while it is up.
                 class={() => $$(showGrid)
-                    ? "origin-top-left absolute left-0 top-full mt-2 w-auto rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10"
-                    : "origin-top-left absolute left-0 top-full mt-2 w-64 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10 max-h-80 overflow-y-auto"}
+                    ? "origin-top-left absolute left-0 top-full mt-2 w-auto rounded-md shadow-lg bg-[var(--wui-white)] ring-1 ring-black ring-opacity-5 focus:outline-none z-10"
+                    : "origin-top-left absolute left-0 top-full mt-2 w-64 rounded-md shadow-lg bg-[var(--wui-white)] ring-1 ring-black ring-opacity-5 focus:outline-none z-10 max-h-80 overflow-y-auto"}
                 role="menu"
                 aria-orientation="vertical"
                 aria-labelledby="insert-menu-button"
@@ -378,7 +378,7 @@ const InsertDropDown = defaults(def, (props) => {
                 {getInsertOptions(() => showGrid(true), () => $$(dropdownRef) ?? null, $$(group)).map(opt => (
                     <Button
                         type='outlined'
-                        cls="w-full flex items-center text-gray-700 px-4 py-2 text-sm hover:bg-gray-100 hover:text-gray-900"
+                        cls="w-full flex items-center text-[var(--wui-gray-700)] px-4 py-2 text-sm hover:bg-[var(--wui-gray-100)] hover:text-[var(--wui-gray-900)]"
                         role="menuitem"
                         onClick={(e) => { e.preventDefault(); handleSelectOption(opt.action) }}
                     >
@@ -403,7 +403,7 @@ const InsertDropDown = defaults(def, (props) => {
      */
     const groupInfo = () => { const g = $$(group); return g ? pluginGroups().find(x => x.name === g) : undefined }
 
-    const BASE_BTN = "size-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-black hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500"
+    const BASE_BTN = "size-full inline-flex justify-center rounded-md border border-[var(--wui-gray-300)] shadow-sm px-4 py-2 bg-[var(--wui-white)] text-sm font-medium text-[var(--wui-black)] hover:bg-[var(--wui-gray-50)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-[var(--wui-indigo-500)]"
 
     return (
         <div
@@ -432,7 +432,7 @@ const InsertDropDown = defaults(def, (props) => {
                 </Button>
                 <Button
                     type='outlined'
-                    class={[TOOLBAR_CONTROL, "size-full inline-flex justify-center items-center rounded-md border border-gray-300 shadow-sm bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500 cursor-pointer px-2"]}
+                    class={[TOOLBAR_CONTROL, "size-full inline-flex justify-center items-center rounded-md border border-[var(--wui-gray-300)] shadow-sm bg-[var(--wui-white)] hover:bg-[var(--wui-gray-50)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-[var(--wui-indigo-500)] cursor-pointer px-2"]}
                     onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleDropdown(); }}
                     onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation(); }}
                     title={() => t('editor.chooseWhatToInsert')}

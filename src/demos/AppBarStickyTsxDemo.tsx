@@ -17,14 +17,14 @@ import CodeBlock from '../helper/CodeBlock'
 
 const App = () => (
     <div>
-        <Appbar position="sticky" cls="px-4 mt-2">
+        <Appbar position="sticky" class="px-4 mt-2">
             <div class="flex items-center h-12 pl-4">Stiky Appbar</div>
         </Appbar>
         <div class="p-4 text-sm text-gray-500 space-y-4 h-[600px]">
             <p>This demo shows an <span class="font-bold">Stiky Appbar</span> with <code class="font-bold">position="sticky"</code> rendered via the TSX <code class="font-bold">&lt;Appbar&gt;</code> component.</p>
             <p>Scroll down…</p>
-            <div class="bg-gray-100 rounded border p-4">
-                <CodeBlock code={`<Appbar position="sticky" cls="px-4 mt-2">\n\t<div class="flex items-center h-12 pl-4">Stiky Appbar</div>\n</Appbar>`} language="tsx" />
+            <div class="bg-[var(--wui-gray-100)] rounded border p-4">
+                <CodeBlock code={`<Appbar position="sticky" class="px-4 mt-2">\n\t<div class="flex items-center h-12 pl-4">Stiky Appbar</div>\n</Appbar>`} language="tsx" />
             </div>
         </div>
     </div>

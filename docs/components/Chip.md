@@ -137,7 +137,7 @@ This overrides the default hide behavior *after* your handler is executed.
 ### TSX
 ```tsx
 <Chip>
-    <Avatar cls="!w-6 !h-6 bg-blue-500 text-white mx-1">S</Avatar>
+    <Avatar cls="!w-6 !h-6 bg-[var(--wui-blue-500)] text-[var(--wui-white)] mx-1">S</Avatar>
     <span>Chip with Avatar</span>
 </Chip>
 ```
@@ -145,7 +145,7 @@ This overrides the default hide behavior *after* your handler is executed.
 ### HTML
 ```html
 <wui-chip>
-    <wui-avatar cls="!w-6 !h-6 bg-blue-500 text-white mx-1">S</wui-avatar>
+    <wui-avatar cls="!w-6 !h-6 bg-[var(--wui-blue-500)] text-[var(--wui-white)] mx-1">S</wui-avatar>
     <span>Chip with Avatar</span>
 </wui-chip>
 ```
@@ -156,7 +156,7 @@ This overrides the default hide behavior *after* your handler is executed.
 
 ```tsx
 <Chip deletable>
-    <Avatar cls="!w-6 !h-6 bg-purple-500 text-white mx-1">A</Avatar>
+    <Avatar cls="!w-6 !h-6 bg-[var(--wui-purple-500)] text-[var(--wui-white)] mx-1">A</Avatar>
     <span>Avatar & Delete</span>
 </Chip>
 ```
@@ -166,14 +166,14 @@ This overrides the default hide behavior *after* your handler is executed.
 # 🎨 Custom Styling with `cls`
 
 ```tsx
-<Chip cls="!bg-red-100 !text-blue-800">
+<Chip cls="!bg-[var(--wui-red-100)] !text-[var(--wui-blue-800)]">
     Custom Styled Chip
 </Chip>
 ```
 
 HTML:
 ```html
-<wui-chip cls="!bg-red-100 !text-blue-800">
+<wui-chip cls="!bg-[var(--wui-red-100)] !text-[var(--wui-blue-800)]">
     Custom Styled Chip
 </wui-chip>
 ```
@@ -183,10 +183,10 @@ HTML:
 # 🎨 Colored Chips (Examples)
 
 ```tsx
-<Chip cls="bg-green-100 text-green-800">Success</Chip>
-<Chip cls="bg-red-100 text-red-800">Error</Chip>
-<Chip cls="bg-yellow-100 text-yellow-800">Warning</Chip>
-<Chip cls="bg-blue-100 text-blue-800">Info</Chip>
+<Chip cls="bg-[var(--wui-green-100)] text-[var(--wui-green-800)]">Success</Chip>
+<Chip cls="bg-[var(--wui-red-100)] text-[var(--wui-red-800)]">Error</Chip>
+<Chip cls="bg-[var(--wui-yellow-100)] text-[var(--wui-yellow-800)]">Warning</Chip>
+<Chip cls="bg-[var(--wui-blue-100)] text-[var(--wui-blue-800)]">Info</Chip>
 ```
 
 ---

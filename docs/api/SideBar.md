@@ -64,7 +64,7 @@ This runs after every render, keeping the layout in sync with the sidebar state.
 
 ### Background Overlay
 
-When `mask` is `true` and the sidebar is open, a semi-transparent overlay (`fixed inset-0 bg-black/50`) appears above the main content. Clicking it toggles `open` to `false` (only if `open` is an observable).
+When `mask` is `true` and the sidebar is open, a semi-transparent overlay (`fixed inset-0 bg-[var(--wui-black)]/50`) appears above the main content. Clicking it toggles `open` to `false` (only if `open` is an observable).
 
 ---
 

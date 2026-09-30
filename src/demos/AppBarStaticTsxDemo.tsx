@@ -17,15 +17,15 @@ import CodeBlock from '../helper/CodeBlock'
 
 const App = () => (
     <div>
-        <Appbar position="static" cls="px-4 mt-2">
+        <Appbar position="static" class="px-4 mt-2">
             <div class="flex items-center h-12 pl-4">Static Appbar</div>
         </Appbar>
 
         <div class="p-4 text-sm text-gray-500 space-y-4 h-[600px] ">
             <p>This demo shows a <span class="font-bold">Static Appbar</span> with <code class="font-bold">position="static"</code> rendered via the TSX <code class="font-bold">&lt;Appbar&gt;</code> component.</p>
             <p>Scroll down…</p>
-            <div class="bg-gray-100 rounded border p-4">
-                <CodeBlock code={`<Appbar position="static" cls="px-4 mt-2">\n\t<div class="flex items-center h-12 pl-4">Static Appbar</div>\n</Appbar>`} language="tsx" />
+            <div class="bg-[var(--wui-gray-100)] rounded border p-4">
+                <CodeBlock code={`<Appbar position="static" class="px-4 mt-2">\n\t<div class="flex items-center h-12 pl-4">Static Appbar</div>\n</Appbar>`} language="tsx" />
             </div>
         </div>
     </div>

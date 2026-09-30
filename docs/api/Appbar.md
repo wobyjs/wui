@@ -88,12 +88,12 @@ const variantStyle = {
     default:
         "shadow-[rgba(0,0,0,0.2)_0px_2px_4px_-1px,rgba(0,0,0,0.14)_0px_4px_5px_0px,rgba(0,0,0,0.12)_0px_1px_10px_0px] " +
         "[@media_screen]:flex [@media_screen]:flex-col w-full box-border shrink-0 " +
-        "z-[1100] bg-[rgb(25,118,210)] text-white left-auto " +
+        "z-[1100] bg-[rgb(25,118,210)] text-[var(--wui-white)] left-auto " +
         "[transition:box-shadow_300ms_cubic-bezier(0.4,0,0.2,1)0ms] ",
 }
 ```
 
-The default preset paints the appbar as a **full-width, solid blue** bar (`bg-[rgb(25,118,210)] text-white`, `z-[1100]`). When working with the demos, a common pattern is to override it via `cls` to a custom color, e.g. `cls="bg-orange-500 z-[1100] w-full px-4"` for an orange full-width appbar (as used in both the Default and Fixed demos).
+The default preset paints the appbar as a **full-width, solid blue** bar (`bg-[rgb(25,118,210)] text-[var(--wui-white)]`, `z-[1100]`). When working with the demos, a common pattern is to override it via `cls` to a custom color, e.g. `cls="bg-[var(--wui-orange-500)] z-[1100] w-full px-4"` for an orange full-width appbar (as used in both the Default and Fixed demos).
 
 ## Fixed-Offset Effect (ResizeObserver)
 
@@ -149,11 +149,11 @@ and typed under `wui-appbar` in `JSX.IntrinsicElements`.
 ## TSX — Orange full-width override (used in the Default and Fixed demos)
 
 ```tsx
-<Appbar cls="bg-orange-500 z-[1100] w-full px-4">
+<Appbar cls="bg-[var(--wui-orange-500)] z-[1100] w-full px-4">
     <div class="flex items-center h-12 pl-4">Default Appbar</div>
 </Appbar>
 
-<Appbar position="fixed" cls="bg-orange-500 z-[1100] w-full px-4">
+<Appbar position="fixed" cls="bg-[var(--wui-orange-500)] z-[1100] w-full px-4">
     <div class="flex items-center h-12 pl-4">Fixed Appbar</div>
 </Appbar>
 ```

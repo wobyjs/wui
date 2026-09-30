@@ -184,13 +184,13 @@ export const StyleEditor = ({ target, onEdit, open }: StyleEditorProps) => {
     const variantClass = (v: Variant) => () => [
         'px-2 py-0.5 text-[10px] font-medium rounded border leading-none',
         $$(variant) === v
-            ? 'text-[#1976d2] bg-[#1976d2]/10 border-[#1976d2]/50'
-            : 'text-gray-500 bg-transparent border-transparent hover:bg-gray-100',
+            ? 'text-[var(--wui-accent-500)] bg-[var(--wui-accent-500)]/10 border-[var(--wui-accent-500)]/50'
+            : 'text-[var(--wui-gray-500)] bg-transparent border-transparent hover:bg-[var(--wui-gray-100)]',
     ].join(' ')
 
     const body = () => (
-        <div class="bg-white">
-            <div class="flex items-center gap-1 px-2 py-1.5 border-b border-gray-200 bg-gray-50/60">
+        <div class="bg-[var(--wui-white)]">
+            <div class="flex items-center gap-1 px-2 py-1.5 border-b border-[var(--wui-gray-200)] bg-[var(--wui-gray-50)]/60">
                 {VARIANTS.map(v => (
                     <button
                         type="button"
@@ -199,17 +199,17 @@ export const StyleEditor = ({ target, onEdit, open }: StyleEditorProps) => {
                         ref={(e: HTMLButtonElement) => { if (e) e.onclick = () => variant(v) }}
                     >{v}</button>
                 ))}
-                <span class="ml-auto text-[9px] text-gray-400 select-none">
+                <span class="ml-auto text-[9px] text-[var(--wui-gray-400)] select-none">
                     {() => $$(variant) === 'base' ? '' : 'tw only'}
                 </span>
             </div>
 
-            <div class="px-2 py-1.5 border-b border-gray-200">
+            <div class="px-2 py-1.5 border-b border-[var(--wui-gray-200)]">
                 <input
                     type="text"
                     placeholder={() => t('style.searchProperties')}
                     spellCheck={false}
-                    class="w-full px-2 py-1 text-[11px] rounded border border-gray-200 bg-white outline-none focus:border-[#1976d2]"
+                    class="w-full px-2 py-1 text-[11px] rounded border border-[var(--wui-gray-200)] bg-[var(--wui-white)] outline-none focus:border-[var(--wui-accent-500)]"
                     ref={(e: HTMLInputElement) => {
                         if (!e) return
                         // `input` is a delegated event in woby and this panel lives
@@ -224,13 +224,13 @@ export const StyleEditor = ({ target, onEdit, open }: StyleEditorProps) => {
                 const found = $$(matches)
                 if (!found) return null
                 if (!found.length)
-                    return <div class="px-3 py-3 text-[11px] text-gray-400">{t('style.noMatch')}</div>
+                    return <div class="px-3 py-3 text-[11px] text-[var(--wui-gray-400)]">{t('style.noMatch')}</div>
                 const shown = found.slice(0, MAX_SEARCH_RESULTS)
                 return (
                     <div>
                         {shown.map(rowFor)}
                         {found.length > shown.length
-                            ? <div class="px-3 py-1.5 text-[10px] text-gray-400">
+                            ? <div class="px-3 py-1.5 text-[10px] text-[var(--wui-gray-400)]">
                                 {t('style.moreResults', { count: found.length - shown.length })}
                             </div>
                             : null}
@@ -243,13 +243,13 @@ export const StyleEditor = ({ target, onEdit, open }: StyleEditorProps) => {
                 const props = $$(setProps)
                 return (
                     <div>
-                        <div class="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-500 bg-gray-50/60 border-b border-gray-200">
+                        <div class="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[var(--wui-slate-500)] bg-[var(--wui-gray-50)]/60 border-b border-[var(--wui-gray-200)]">
                             {t('style.setOnElement')}
-                            <span class="ml-1 font-normal text-gray-400">({props.length})</span>
+                            <span class="ml-1 font-normal text-[var(--wui-gray-400)]">({props.length})</span>
                         </div>
                         {props.length
                             ? props.map(rowFor)
-                            : <div class="px-3 py-2 text-[11px] text-gray-400">
+                            : <div class="px-3 py-2 text-[11px] text-[var(--wui-gray-400)]">
                                 {t('style.noneSet')}
                             </div>}
                     </div>
@@ -262,17 +262,17 @@ export const StyleEditor = ({ target, onEdit, open }: StyleEditorProps) => {
                     <div>
                         <button
                             type="button"
-                            class="flex w-full items-center gap-1.5 px-3 py-1 text-left bg-gray-50/60 hover:bg-gray-100 border-b border-gray-200"
+                            class="flex w-full items-center gap-1.5 px-3 py-1 text-left bg-[var(--wui-gray-50)]/60 hover:bg-[var(--wui-gray-100)] border-b border-[var(--wui-gray-200)]"
                             ref={(e: HTMLButtonElement) => { if (e) e.onclick = () => toggleGroup(group.name) }}
                         >
-                            <span class="w-2 text-[9px] text-gray-400">
+                            <span class="w-2 text-[9px] text-[var(--wui-gray-400)]">
                                 {() => $$(openGroups)[group.name] ? '\u25be' : '\u25b8'}
                             </span>
-                            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-[var(--wui-slate-500)]">
                                 {/* A thunk: `groupLabel` reads the locale observable. */}
                                 {() => groupLabel(group.name)}
                             </span>
-                            <span class="ml-auto text-[10px] text-gray-400 font-mono">{group.props.length}</span>
+                            <span class="ml-auto text-[10px] text-[var(--wui-gray-400)] font-mono">{group.props.length}</span>
                         </button>
                         {/* Rows exist only while the group is open — this is what
                             keeps a 350-property catalogue cheap. */}
@@ -307,20 +307,20 @@ export const StyleEditor = ({ target, onEdit, open }: StyleEditorProps) => {
      * The element's own classes come last, and those are plain classList edits.
      */
     const classBar = () => (
-        <div class="border-t border-gray-200 bg-gray-50/60">
-            <div class="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+        <div class="border-t border-[var(--wui-gray-200)] bg-[var(--wui-gray-50)]/60">
+            <div class="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[var(--wui-slate-500)]">
                 {() => t('style.classes')}
             </div>
             <div class="flex flex-wrap gap-1 px-2 pb-1.5">
                 {() => $$(slot).map(token => (
                     <span
-                        class="flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono border border-gray-300 bg-gray-100 text-gray-500"
+                        class="flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono border border-[var(--wui-gray-300)] bg-[var(--wui-gray-100)] text-[var(--wui-gray-500)]"
                         title={() => t('style.fromBase')}
                     >
                         {token}
                         <button
                             type="button"
-                            class="text-gray-400 hover:text-red-500 leading-none"
+                            class="text-[var(--wui-gray-400)] hover:text-[var(--wui-red-500)] leading-none"
                             title={() => t('style.removeToken', { token })}
                             ref={(e: HTMLButtonElement) => { if (e) e.onclick = () => removeSlotClass(token) }}
                         >&times;</button>
@@ -328,7 +328,7 @@ export const StyleEditor = ({ target, onEdit, open }: StyleEditorProps) => {
                 ))}
                 {() => $$(inherited).map(token => (
                     <span
-                        class="flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono border border-dashed border-gray-300 bg-gray-100 text-gray-400"
+                        class="flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono border border-dashed border-[var(--wui-gray-300)] bg-[var(--wui-gray-100)] text-[var(--wui-gray-400)]"
                         title={() => t('style.fromVariant')}
                     >
                         {token}
@@ -340,13 +340,13 @@ export const StyleEditor = ({ target, onEdit, open }: StyleEditorProps) => {
                         <span class={[
                             'flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono border',
                             v === 'base'
-                                ? 'bg-white border-gray-200 text-slate-600'
-                                : 'bg-[#1976d2]/5 border-[#1976d2]/30 text-[#1976d2]',
+                                ? 'bg-[var(--wui-white)] border-[var(--wui-gray-200)] text-[var(--wui-slate-600)]'
+                                : 'bg-[var(--wui-accent-500)]/5 border-[var(--wui-accent-500)]/30 text-[var(--wui-accent-500)]',
                         ].join(' ')}>
                             {token}
                             <button
                                 type="button"
-                                class="text-gray-400 hover:text-red-500 leading-none"
+                                class="text-[var(--wui-gray-400)] hover:text-[var(--wui-red-500)] leading-none"
                                 title={() => t('style.removeToken', { token })}
                                 ref={(e: HTMLButtonElement) => { if (e) e.onclick = () => removeClass(token) }}
                             >&times;</button>
@@ -359,7 +359,7 @@ export const StyleEditor = ({ target, onEdit, open }: StyleEditorProps) => {
                     type="text"
                     placeholder={() => t('style.addClasses')}
                     spellCheck={false}
-                    class="w-full px-2 py-1 text-[11px] font-mono rounded border border-gray-200 bg-white outline-none focus:border-[#1976d2]"
+                    class="w-full px-2 py-1 text-[11px] font-mono rounded border border-[var(--wui-gray-200)] bg-[var(--wui-white)] outline-none focus:border-[var(--wui-accent-500)]"
                     ref={(e: HTMLInputElement) => {
                         if (!e) return
                         e.onkeydown = (ev: KeyboardEvent) => {
@@ -379,17 +379,17 @@ export const StyleEditor = ({ target, onEdit, open }: StyleEditorProps) => {
         // `EditorHelpStep.ts`). Stamped here rather than on a wrapper in
         // PropertyPanel so the section's own box is what gets spotlit --
         // a wrapper would include the margin collapse above it.
-        <div data-panel-part="style" class="border-t border-gray-200">
+        <div data-panel-part="style" class="border-t border-[var(--wui-gray-200)]">
             <button
                 type="button"
-                class="flex w-full items-center gap-2 px-3 py-2 text-left bg-gray-100 hover:bg-gray-200 border-b border-gray-200"
+                class="flex w-full items-center gap-2 px-3 py-2 text-left bg-[var(--wui-gray-100)] hover:bg-[var(--wui-gray-200)] border-b border-[var(--wui-gray-200)]"
                 ref={(e: HTMLButtonElement) => { if (e) e.onclick = () => expanded(!$$(expanded)) }}
             >
-                <span class="w-2 text-[10px] text-gray-500">
+                <span class="w-2 text-[10px] text-[var(--wui-gray-500)]">
                     {() => $$(expanded) ? '\u25be' : '\u25b8'}
                 </span>
-                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-600">{() => t('style.section')}</span>
-                <span class="ml-auto text-[10px] text-gray-400 font-mono">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-[var(--wui-slate-600)]">{() => t('style.section')}</span>
+                <span class="ml-auto text-[10px] text-[var(--wui-gray-400)] font-mono">
                     {() => {
                         const el = $$(target)
                         if (!el) return ''
@@ -401,7 +401,7 @@ export const StyleEditor = ({ target, onEdit, open }: StyleEditorProps) => {
             {() => {
                 if (!$$(expanded)) return null
                 if (!$$(target))
-                    return <div class="px-3 py-3 text-[11px] text-gray-400">{t('style.empty')}</div>
+                    return <div class="px-3 py-3 text-[11px] text-[var(--wui-gray-400)]">{t('style.empty')}</div>
                 return <>{body()}{classBar()}</>
             }}
         </div>

@@ -58,7 +58,7 @@ The content **does not render**, improving performance.
 const isOpen = $(true)
 
 <Collapse open={isOpen}>
-    <div class="p-4 bg-green-100">
+    <div class="p-4 bg-[var(--wui-green-100)]">
         Reactive content
     </div>
 </Collapse>
@@ -80,7 +80,7 @@ The `background` prop controls whether the collapse wrapper shows a grey backgro
 ### Example
 ```tsx
 <Collapse background={false}>
-    <div class="p-4 border border-gray-300">No BG</div>
+    <div class="p-4 border border-[var(--wui-gray-300)]">No BG</div>
 </Collapse>
 ```
 
@@ -107,7 +107,7 @@ This gives it:
 ## Default (open)
 ```tsx
 <Collapse>
-    <div class="p-4 bg-gray-100">
+    <div class="p-4 bg-[var(--wui-gray-100)]">
         Default open collapse content.
     </div>
 </Collapse>
@@ -116,7 +116,7 @@ This gives it:
 ### HTML
 ```html
 <wui-collapse>
-    <div class="p-4 bg-gray-100">Default open collapse content.</div>
+    <div class="p-4 bg-[var(--wui-gray-100)]">Default open collapse content.</div>
 </wui-collapse>
 ```
 
@@ -125,7 +125,7 @@ This gives it:
 ## Explicitly Open
 ```tsx
 <Collapse open={true}>
-    <div class="p-4 bg-blue-100">Content is visible.</div>
+    <div class="p-4 bg-[var(--wui-blue-100)]">Content is visible.</div>
 </Collapse>
 ```
 
@@ -134,7 +134,7 @@ This gives it:
 ## Explicitly Closed
 ```tsx
 <Collapse open={false}>
-    <div class="p-4 bg-red-100">This will not render.</div>
+    <div class="p-4 bg-[var(--wui-red-100)]">This will not render.</div>
 </Collapse>
 ```
 
@@ -151,7 +151,7 @@ const isOpen = $(true)
     </Button>
 
     <Collapse open={isOpen}>
-        <div class="p-4 bg-green-100">
+        <div class="p-4 bg-[var(--wui-green-100)]">
             This collapse toggles when you click the button.
         </div>
     </Collapse>
@@ -167,7 +167,7 @@ You can override or extend background, borders, spacing, colors:
 ### TSX
 ```tsx
 <Collapse
-    cls="!bg-yellow-100 !border-2 !border-purple-500"
+    cls="!bg-[var(--wui-yellow-100)] !border-2 !border-[var(--wui-purple-500)]"
     open={true}
 >
     <div class="p-4">
@@ -179,7 +179,7 @@ You can override or extend background, borders, spacing, colors:
 ### HTML
 ```html
 <wui-collapse
-    cls="!bg-yellow-100 !border-2 !border-purple-500"
+    cls="!bg-[var(--wui-yellow-100)] !border-2 !border-[var(--wui-purple-500)]"
     open="true"
 >
     <div class="p-4">Custom styled collapse</div>
@@ -192,7 +192,7 @@ You can override or extend background, borders, spacing, colors:
 
 ```tsx
 <Collapse open={true}>
-    <div class="p-4 bg-green-100">
+    <div class="p-4 bg-[var(--wui-green-100)]">
         <h4 class="font-bold">Complex Content</h4>
         <p>This collapse contains rich structured content:</p>
         <ul class="list-disc pl-5">

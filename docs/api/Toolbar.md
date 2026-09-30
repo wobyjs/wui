@@ -98,14 +98,14 @@ This means:
 
 ### Custom Style
 ```tsx
-<Toolbar cls="bg-blue-600 text-white shadow-lg">
+<Toolbar cls="bg-[var(--wui-blue-600)] text-[var(--wui-white)] shadow-lg">
     ...
 </Toolbar>
 ```
 
 ### HTML Usage
 ```html
-<wui-toolbar cls="bg-gray-200">
+<wui-toolbar cls="bg-[var(--wui-gray-200)]">
     <div>Toolbar Content</div>
 </wui-toolbar>
 ```

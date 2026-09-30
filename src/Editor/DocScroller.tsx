@@ -514,7 +514,7 @@ const ScrollerToggle = defaults(toggleDef, (props) => {
         class={() => [
             TOOLBAR_CONTROL,
             () => $$(cls) ? $$(cls) : $$(cn),
-            () => $$(scrollerOpen) ? '!bg-slate-200' : '',
+            () => $$(scrollerOpen) ? '!bg-[var(--wui-slate-200)]' : '',
         ]}
         onClick={() => toggleScroller()}
         onMouseDown={(e: any) => { e.preventDefault(); e.stopPropagation() }}

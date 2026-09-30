@@ -34,7 +34,7 @@ const TestBadge = (): JSX.Element => {
 }
 
 const BADGE_CLASS = "relative inline-flex align-middle shrink-0 m-4"
-const BADGE_INNER = "flex place-content-center items-center absolute box-border font-medium text-xs leading-none z-[1] text-white scale-100 [flex-flow:wrap] [transition:transform_225ms_cubic-bezier(0.4,0,0.2,1)0ms]"
+const BADGE_INNER = "flex place-content-center items-center absolute box-border font-medium text-xs leading-none z-[1] text-[var(--wui-white)] scale-100 [flex-flow:wrap] [transition:transform_225ms_cubic-bezier(0.4,0,0.2,1)0ms]"
 const BADGE_COLOR = "bg-[rgb(156,39,176)]"
 // NOTE: vertical/horizontal comparison uses observable ref, so transform/position always
 // resolves to the bottom/left branch — capturing actual output, not intended.

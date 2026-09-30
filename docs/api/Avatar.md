@@ -71,7 +71,7 @@ When an image fails to load, the `onerror` handler hides the broken image elemen
 
 ```ts
 const BASE_CLASS =
-    "relative flex items-center justify-center align-middle select-none leading-none overflow-hidden shrink-0 m-0 bg-[rgb(189,189,189)] text-white"
+    "relative flex items-center justify-center align-middle select-none leading-none overflow-hidden shrink-0 m-0 bg-[rgb(189,189,189)] text-[var(--wui-white)]"
 ```
 
 ## Variant Classes

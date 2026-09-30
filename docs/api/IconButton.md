@@ -44,7 +44,7 @@ bg-transparent cursor-pointer select-none align-middle appearance-none
 no-underline text-center flex-[0_0_auto] text-2xl overflow-visible
 text-[rgba(0,0,0,0.54)] transition-[background-color] duration ease-in-out
 delay-[0ms] m-0 p-2 rounded-[50%] border-0 [outline:0px] duration-[0.3s]
-hover:bg-[#dde0dd]
+hover:bg-[var(--wui-hover-gray)]
 ```
 
 ### Icon Handling

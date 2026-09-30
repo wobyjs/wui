@@ -35,7 +35,7 @@ import './Paper'   // registers <wui-paper>
 
 ### Base styling
 ```txt
-bg-white
+bg-[var(--wui-white)]
 rounded-lg
 transition-shadow duration-300 ease-in-out
 ```
@@ -77,7 +77,7 @@ Invalid numbers (e.g., 5, 7, 15, etc.) automatically fallback to elevation 0.
 Where:
 
 ```
-baseClass = "bg-white transition-shadow duration-300 ease-in-out rounded-lg "
+baseClass = "bg-[var(--wui-white)] transition-shadow duration-300 ease-in-out rounded-lg "
 ```
 
 `cls` overrides `baseClass` entirely when set, while `class` (aliased as `cn`) appends on top.

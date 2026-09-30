@@ -222,7 +222,7 @@ walks open shadow roots at the given coordinates.
 ### Custom
 
 ```tsx
-<Fab type="circular" cls="!bg-green-500 !text-white">
+<Fab type="circular" cls="!bg-[var(--wui-green-500)] !text-[var(--wui-white)]">
   👍
 </Fab>
 ```

@@ -31,8 +31,8 @@ const TestToggleButton = (): JSX.Element => {
 }
 
 const BASE = "inline-flex items-center justify-center px-2 py-1 rounded text-sm cursor-pointer select-none transition-colors duration-150 border border-transparent"
-const OFF = "text-gray-600 bg-transparent hover:bg-gray-100"
-const ON = "text-[#1976d2] bg-[#1976d2]/10 border-[#1976d2]/50 hover:bg-[#1976d2]/20"
+const OFF = "text-[var(--wui-gray-600)] bg-transparent hover:bg-[var(--wui-gray-100)]"
+const ON = "text-[var(--wui-accent-500)] bg-[var(--wui-accent-500)]/10 border-[var(--wui-accent-500)]/50 hover:bg-[var(--wui-accent-500)]/20"
 
 // SSR test (Node.js)
 if (typeof globalThis.__isSSRTest__ !== 'undefined') {

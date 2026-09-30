@@ -143,8 +143,8 @@ const CommandButton: Defaulted<typeof def> = defaults(def, (props) => {
             class={() => [
                 TOOLBAR_CONTROL,
                 () => $$(cls) ? $$(cls) : $$(cn),
-                () => $$(isActive) ? '!bg-slate-200' : '',
-                () => $$(isMixed) ? '!bg-slate-100 opacity-60' : ''
+                () => $$(isActive) ? '!bg-[var(--wui-slate-200)]' : '',
+                () => $$(isMixed) ? '!bg-[var(--wui-slate-100)] opacity-60' : ''
             ]}
             aria-pressed={() => $$(isActive) ? "true" : $$(isMixed) ? "mixed" : "false"}
             disabled={() => $$(disabled) || !$$(enabled)}

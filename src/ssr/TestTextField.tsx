@@ -30,7 +30,7 @@ const TestTextField = (): JSX.Element => {
     return ret
 }
 
-const DEFAULT_STYLE = "block w-full py-1.5 px-2 text-base text-gray-900 placeholder:text-gray-400 focus:border-blue-500 sm:text-sm/6 truncate disabled:cursor-not-allowed disabled:text-[#00000061] disabled:border-[#0000001f] disabled:bg-[#0000000a] [&:disabled~label]:text-[#00000061]"
+const DEFAULT_STYLE = "block w-full py-1.5 px-2 text-base text-[var(--wui-gray-900)] placeholder:text-[var(--wui-gray-400)] focus:border-[var(--wui-blue-500)] sm:text-sm/6 truncate disabled:cursor-not-allowed disabled:text-[var(--wui-disabled-text)] disabled:border-[var(--wui-disabled-border)] disabled:bg-[var(--wui-disabled-bg)] [&:disabled~label]:text-[var(--wui-disabled-text)]"
 const BASE_CLASS = "relative z-0 flex items-center"
 
 // SSR test (Node.js)

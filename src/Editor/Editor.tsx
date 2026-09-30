@@ -1024,7 +1024,7 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, height, maxHe
                 onBlur={handleBlur}
                 onKeyDown={handleKeyDown}
                 class={() => [
-                    'border-blue-500 ring-2',
+                    'border-[var(--wui-blue-500)] ring-2',
                     "p-6 my-4 rounded-xl border min-h-[250px] shadow-sm"
                 ]}
                 style={() => ({
@@ -1079,7 +1079,7 @@ const EditorSurface = ({ isEditing, handleEditorClick, handleBlur, height, maxHe
 // `toolbarRef` starts out empty (`$<HTMLDivElement>(null as any)`) and is only filled once the
 // toolbar element mounts, so the observable's value type includes `undefined`.
 const EditorToolbar = ({ toolbarRef }: { toolbarRef: Observable<HTMLDivElement | undefined> }) => {
-    const BASE_CLASS = "sticky top-0 z-10 bg-white border border-gray-200 rounded-t-lg p-1.5 flex items-center flex-wrap gap-1 shadow-sm mb-0"
+    const BASE_CLASS = "sticky top-0 z-10 bg-[var(--wui-white)] border border-[var(--wui-gray-200)] rounded-t-lg p-1.5 flex items-center flex-wrap gap-1 shadow-sm mb-0"
 
     /**
      * The toolbar has its own keydown handler because it is focusable: a user who tabs into
@@ -1298,7 +1298,7 @@ const Editor = defaults(def, (props) => {
                         <button
                             class={() => [
                                 'fixed bottom-6 right-6 z-50 w-12 h-12 rounded-full shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95',
-                                $$(isReadonly) ? 'bg-blue-500 hover:bg-blue-600' : 'bg-green-500 hover:bg-green-600'
+                                $$(isReadonly) ? 'bg-[var(--wui-blue-500)] hover:bg-[var(--wui-blue-600)]' : 'bg-[var(--wui-green-500)] hover:bg-[var(--wui-green-600)]'
                             ]}
                             onClick={() => {
                                 const newVal = !$$(isReadonly)
@@ -1314,11 +1314,11 @@ const Editor = defaults(def, (props) => {
                         >
                             {/* Edit icon (pencil) when readonly, eye icon when editing */}
                             {() => $$(isReadonly) ? (
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-[var(--wui-white)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                                 </svg>
                             ) : (
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-[var(--wui-white)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                 </svg>

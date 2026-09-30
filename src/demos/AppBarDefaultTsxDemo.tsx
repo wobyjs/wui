@@ -24,7 +24,7 @@ const App = () => (
         <div class="p-4 text-sm text-gray-500 space-y-4 pt-14 mt-2 h-[600px] ">
             <p>This demo shows the <span class="font-bold">Default Appbar</span> rendered with the TSX component <code class="font-bold">&lt;Appbar&gt;</code>.</p>
             <p>Scroll down…</p>
-            <div class="bg-gray-100 rounded border p-4">
+            <div class="bg-[var(--wui-gray-100)] rounded border p-4">
                 <CodeBlock code={`<Appbar cls="bg-orange-500 px-4 mt-2">\n\t<div class="flex items-center h-12 pl-4">Default Appbar</div>\n</Appbar>`} language="tsx" />
             </div>
         </div>

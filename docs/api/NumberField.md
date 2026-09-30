@@ -131,8 +131,8 @@ Wheel is prevented when disabled.
 
 ```tsx
 <div class={[
-  "number-input inline-flex items-center bg-white border border-gray-300 rounded-lg ...",
-  () => $$(disabled) ? "bg-gray-100 opacity-70" : "",
+  "number-input inline-flex items-center bg-[var(--wui-white)] border border-[var(--wui-gray-300)] rounded-lg ...",
+  () => $$(disabled) ? "bg-[var(--wui-gray-100)] opacity-70" : "",
   () => $$(cls) ? $$(cls) : "",
   cn
 ]}>

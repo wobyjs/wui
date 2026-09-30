@@ -26,8 +26,8 @@ import "./ToggleButton"; // registers <wui-toggle-button>
 | ------------- | -------------------------- | ------- | -------------------------------------------------------- |
 | **children**  | `JSX.Child`                | `""`    | Content rendered inside the button                       |
 | **checked**   | `boolean` (observable)     | `false` | Toggle state; observable for two-way binding             |
-| **onClass**   | `string`                   | `"text-[#1976d2] bg-[#1976d2]/10 border-[#1976d2]/50 hover:bg-[#1976d2]/20"` | Classes applied when checked |
-| **offClass**  | `string`                   | `"text-gray-600 bg-transparent border-transparent hover:bg-gray-100"` | Classes applied when unchecked |
+| **onClass**   | `string`                   | `"text-[var(--wui-accent-500)] bg-[var(--wui-accent-500)]/10 border-[var(--wui-accent-500)]/50 hover:bg-[var(--wui-accent-500)]/20"` | Classes applied when checked |
+| **offClass**  | `string`                   | `"text-[var(--wui-gray-600)] bg-transparent border-transparent hover:bg-[var(--wui-gray-100)]"` | Classes applied when unchecked |
 | **disabled**  | `boolean` (observable)     | `false` | Disables interaction                                     |
 | **cls**       | `string`                   | `""`    | Override default classes                                 |
 | **class**     | `string`                   | `""`    | Additional classes appended to the default               |
@@ -130,8 +130,8 @@ const isSelected = $(false);
 ```tsx
 <ToggleButton
     checked={isSelected}
-    onClass="text-green-600 bg-green-100 border-green-300"
-    offClass="text-gray-400 bg-white border-gray-200"
+    onClass="text-[var(--wui-green-600)] bg-[var(--wui-green-100)] border-[var(--wui-green-300)]"
+    offClass="text-[var(--wui-gray-400)] bg-[var(--wui-white)] border-[var(--wui-gray-200)]"
 >
     Active
 </ToggleButton>
@@ -145,8 +145,8 @@ const isSelected = $(false);
 <script>
     const tog = document.getElementById("tog");
     tog.props.checked = true;
-    tog.props.onClass = "text-green-600 bg-green-100 border-green-300";
-    tog.props.offClass = "text-gray-400 bg-transparent border-transparent";
+    tog.props.onClass = "text-[var(--wui-green-600)] bg-[var(--wui-green-100)] border-[var(--wui-green-300)]";
+    tog.props.offClass = "text-[var(--wui-gray-400)] bg-transparent border-transparent";
 </script>
 ```
 

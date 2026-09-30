@@ -113,7 +113,7 @@ const Tabs: Defaulted<typeof defTabs> = defaults(defTabs, (props) => {
 			ref={mainRef}
 		>
 			{/* Navigation Buttons */}
-			<div class="flex justify-center flex-wrap gap-2 my-4 border-2 border-gray-200 py-2 rounded-lg">
+			<div class="flex justify-center flex-wrap gap-2 my-4 border-2 border-[var(--wui-gray-200)] py-2 rounded-lg">
 				{() =>
 					$$(titles).map(t => {
 						const isActive = $$(currentTab) === t
@@ -124,8 +124,8 @@ const Tabs: Defaulted<typeof defTabs> = defaults(defTabs, (props) => {
 								cls={[
 									"px-4 py-2 rounded-lg font-bold transition-colors duration-200 cursor-pointer select-none",
 									isActive
-										? "bg-black text-white"
-										: "bg-gray-100 text-gray-600 hover:bg-gray-200"
+										? "bg-[var(--wui-black)] text-[var(--wui-white)]"
+										: "bg-[var(--wui-gray-100)] text-[var(--wui-gray-600)] hover:bg-[var(--wui-gray-200)]"
 								]}
 								onClick={(e: MouseEvent) => {
 									e.preventDefault()
@@ -143,7 +143,7 @@ const Tabs: Defaulted<typeof defTabs> = defaults(defTabs, (props) => {
 			{/* Content Container */}
 			<div
 				ref={contentRef}
-				class="p-4 border border-gray-200 rounded-b-lg shadow-sm bg-white min-h-[50px]"
+				class="p-4 border border-[var(--wui-gray-200)] rounded-b-lg shadow-sm bg-[var(--wui-white)] min-h-[50px]"
 			>
 				{children}
 			</div>

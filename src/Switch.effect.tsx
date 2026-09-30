@@ -24,7 +24,7 @@ const divSpanDim = [
 
 const layer = [
     "[&>span]:w-full ",
-    "[&>span]:bg-[#ebf7fc] ",
+    "[&>span]:bg-[var(--wui-switch-info-bg)] ",
     "[&>span]:[transition:0.3s_ease_all] ",
     "[&>span]:z-[1]",
 ].join(" ");
@@ -129,14 +129,14 @@ export const effect1 = [
 
     "[&>div]:before:content-[attr(data-tg-off)]",
     "[&>div]:before:absolute",
-    "[&>div]:before:text-white",
+    "[&>div]:before:text-[var(--wui-white)]",
     "[&>div]:before:text-[10px]",
     "[&>div]:before:font-bold",
     "[&>div]:before:text-center",
 
 
     "[&>div]:before:leading-none",
-    "[&>div]:before:bg-[#f44336]",
+    "[&>div]:before:bg-[var(--wui-mui-red)]",
     "[&>div]:before:[transition:0.3s_cubic-bezier(0.18,0.89,0.35,1.15)_all]",
     "[&>div]:before:px-1",
 
@@ -148,11 +148,11 @@ export const effect1 = [
 
 
     "[&>input:checked+div]:before:content-[attr(data-tg-on)]",
-    "[&>input:checked+div]:before:bg-[#03a9f4]",
+    "[&>input:checked+div]:before:bg-[var(--wui-mui-lightblue)]",
     "[&>input:checked+div]:before:left-[42px]",
 
-    "[&>input~div]:bg-[#fcebeb]",
-    "[&>input:checked~div]:bg-[#ebfbfc]",
+    "[&>input~div]:bg-[var(--wui-mui-red-pale)]",
+    "[&>input:checked~div]:bg-[var(--wui-mui-blue-pale)]",
     "[&>div]:[transition:0.3s_ease_all]",
     "[&>span]:[transition:0.3s_ease_all]",
 
@@ -167,12 +167,12 @@ export const effect2 = [
 
     "[&>div]:before:content-[attr(data-tg-off)]",
     "[&>div]:before:absolute",
-    "[&>div]:before:text-white",
+    "[&>div]:before:text-[var(--wui-white)]",
     "[&>div]:before:text-[10px]",
     "[&>div]:before:font-bold",
     "[&>div]:before:text-center",
     "[&>div]:before:leading-none",
-    "[&>div]:before:bg-[#f44336]",
+    "[&>div]:before:bg-[var(--wui-mui-red)]",
     "[&>div]:before:[transition:0.3s_ease_all]",
     "[&>div]:before:px-1",
     "[&>div]:before:py-[9px]",
@@ -182,7 +182,7 @@ export const effect2 = [
 
     "[&>div]:after:content-[attr(data-tg-on)]",
     "[&>div]:after:absolute",
-    "[&>div]:after:text-white",
+    "[&>div]:after:text-[var(--wui-white)]",
     "[&>div]:after:text-[10px]",
     "[&>div]:after:font-bold",
     "[&>div]:after:text-center",
@@ -196,14 +196,14 @@ export const effect2 = [
 
 
     "[&>div]:before:content-[attr(data-tg-off)]",
-    "[&>div]:after:bg-[#03a9f4]",
+    "[&>div]:after:bg-[var(--wui-mui-lightblue)]",
     "[&>div]:after:left-auto",
     "[&>div]:after:-right-8",
 
     "[&>input:checked+div]:before:-left-8",
     "[&>input:checked+div]:after:right-1",
-    "[&>input~span]:bg-[#fcebeb]",
-    "[&>input:checked~span]:bg-[#ebfbfc]",
+    "[&>input~span]:bg-[var(--wui-mui-red-pale)]",
+    "[&>input:checked~span]:bg-[var(--wui-mui-blue-pale)]",
 ].join(" ");
 // #endregion
 
@@ -215,12 +215,12 @@ export const effect3 = [
     // Base Styles (Off State)
     "[&>div]:before:content-[attr(data-tg-off)]",
     "[&>div]:before:absolute",
-    "[&>div]:before:text-white",
+    "[&>div]:before:text-[var(--wui-white)]",
     "[&>div]:before:text-[10px]",
     "[&>div]:before:font-bold",
     "[&>div]:before:text-center",
     "[&>div]:before:leading-none",
-    "[&>div]:before:bg-[#f44336]",
+    "[&>div]:before:bg-[var(--wui-mui-red)]",
     "[&>div]:before:px-1",
     "[&>div]:before:py-[9px]",
     "[&>div]:before:rounded-[50%]",
@@ -237,12 +237,12 @@ export const effect3 = [
 
     // Checked State (On State)
     "[&>input:checked+div]:before:content-[attr(data-tg-on)]",
-    "[&>input:checked+div]:before:bg-[#03a9f4]",
+    "[&>input:checked+div]:before:bg-[var(--wui-mui-lightblue)]",
     "[&>input:checked+div]:before:left-[42px]",
 
     // Background Colors
-    "[&>input~span]:bg-[#fcebeb]",
-    "[&>input:checked~span]:bg-[#ebfbfc]",
+    "[&>input~span]:bg-[var(--wui-mui-red-pale)]",
+    "[&>input:checked~span]:bg-[var(--wui-mui-blue-pale)]",
 ].join(" ");
 // #endregion
 
@@ -253,12 +253,12 @@ export const effect4 = [
 
     // Base Knob (Before - Red/Off)
     "[&>div]:before:absolute",
-    "[&>div]:before:text-white",
+    "[&>div]:before:text-[var(--wui-white)]",
     "[&>div]:before:text-[10px]",
     "[&>div]:before:font-bold",
     "[&>div]:before:text-center",
     "[&>div]:before:leading-none",
-    "[&>div]:before:bg-[#f44336]",
+    "[&>div]:before:bg-[var(--wui-mui-red)]",
     "[&>div]:before:[transition:0.3s_cubic-bezier(0.18,0.89,0.35,1.15)_all]",
     "[&>div]:before:px-1",
     "[&>div]:before:py-[9px]",
@@ -270,12 +270,12 @@ export const effect4 = [
 
     // Second Knob (After - Blue/On - Hidden initially)
     "[&>div]:after:absolute",
-    "[&>div]:after:text-white",
+    "[&>div]:after:text-[var(--wui-white)]",
     "[&>div]:after:text-[10px]",
     "[&>div]:after:font-bold",
     "[&>div]:after:text-center",
     "[&>div]:after:leading-none",
-    "[&>div]:after:bg-[#03a9f4]",
+    "[&>div]:after:bg-[var(--wui-mui-lightblue)]",
     "[&>div]:after:[transition:0.3s_cubic-bezier(0.18,0.89,0.35,1.15)_all]",
     "[&>div]:after:py-[9px]",
     "[&>div]:after:rounded-[50%]",
@@ -285,7 +285,7 @@ export const effect4 = [
     // Content & Positioning Logic
     "[&>div]:before:content-[attr(data-tg-off)]",
     "[&>div]:after:content-[attr(data-tg-on)]",
-    "[&>div]:after:bg-[#03a9f4]",
+    "[&>div]:after:bg-[var(--wui-mui-lightblue)]",
     "[&>div]:after:left-auto",
     "[&>div]:after:right-1",
     "[&>div]:after:-top-8", // Hidden above
@@ -296,8 +296,8 @@ export const effect4 = [
     "[&>input:checked+div]:div:-top-1",
 
     // Backgrounds
-    "[&>input~span]:bg-[#fcebeb]",
-    "[&>input:checked~span]:bg-[#ebfbfc]",
+    "[&>input~span]:bg-[var(--wui-mui-red-pale)]",
+    "[&>input:checked~span]:bg-[var(--wui-mui-blue-pale)]",
 ].join(" ");
 // #endregion
 
@@ -313,7 +313,7 @@ export const effect5 = [
     // Base Knob Construction
     "[&>div]:before:content-['']",
     "[&>div]:before:absolute",
-    "[&>div]:before:text-white",
+    "[&>div]:before:text-[var(--wui-white)]",
     "[&>div]:before:text-[10px]",
     "[&>div]:before:font-bold",
     "[&>div]:before:text-center",
@@ -330,7 +330,7 @@ export const effect5 = [
     "[&>div>span]:absolute",
     "[&>div>span]:w-[2rem]",
     "[&>div>span]:h-[2rem]",
-    "[&>div>span]:text-white",
+    "[&>div>span]:text-[var(--wui-white)]",
     "[&>div>span]:text-[10px]",
     "[&>div>span]:font-bold",
     "[&>div>span]:text-center",
@@ -343,7 +343,7 @@ export const effect5 = [
     "[&>div>span]:top-[2px]",
 
     // Initial State (Off)
-    "[&>div]:before:bg-[#f44336]",
+    "[&>div]:before:bg-[var(--wui-mui-red)]",
     "[&>div>span]:before:content-[attr(data-tg-off)]",
     "[&>div]:before:origin-center",
     "[&>div]:before:[transform:rotateY(0)]",
@@ -354,7 +354,7 @@ export const effect5 = [
     "[&>input:checked+div]:before:left-[42px]",
     "[&>input:checked+div>span]:left-[42px]",
 
-    "[&>input:checked+div]:before:bg-[#03a9f4]",
+    "[&>input:checked+div]:before:bg-[var(--wui-mui-lightblue)]",
     "[&>input:checked+div]:before:[transform:rotateY(180deg)]",
 
     "[&>input:checked+div>span]:before:content-[attr(data-tg-on)]",
@@ -362,8 +362,8 @@ export const effect5 = [
     "[&>input:checked+div>span]:before:pl-[5px]",
 
     // Background & Rotation
-    "[&>input~span]:bg-[#fcebeb]",
-    "[&>input:checked~span]:bg-[#ebfbfc]",
+    "[&>input~span]:bg-[var(--wui-mui-red-pale)]",
+    "[&>input:checked~span]:bg-[var(--wui-mui-blue-pale)]",
     "[&>input:checked~span]:[transform:rotateY(-180deg)]",
 
     // Global Transitions
@@ -383,12 +383,12 @@ export const effect6 = [
     // Base Knob
     "[&>div]:before:content-[attr(data-tg-off)]",
     "[&>div]:before:absolute",
-    "[&>div]:before:text-white",
+    "[&>div]:before:text-[var(--wui-white)]",
     "[&>div]:before:text-[10px]",
     "[&>div]:before:font-bold",
     "[&>div]:before:text-center",
     "[&>div]:before:leading-none",
-    "[&>div]:before:bg-[#f44336]",
+    "[&>div]:before:bg-[var(--wui-mui-red)]",
     "[&>div]:before:px-1",
     "[&>div]:before:py-[9px]",
     "[&>div]:before:rounded-[50%]",
@@ -408,12 +408,12 @@ export const effect6 = [
     // Checked State (Spin 180deg)
     "[&>input:checked+div]:[transform:rotateZ(-180deg)]",
     "[&>input:checked+div]:before:content-[attr(data-tg-on)]",
-    "[&>input:checked+div]:before:bg-[#03a9f4]",
+    "[&>input:checked+div]:before:bg-[var(--wui-mui-lightblue)]",
     "[&>input:checked+div]:before:[transform:rotateZ(180deg)]", // Counter-rotate text so it stays upright
 
     // Background Colors & Spin
-    "[&>input~span]:bg-[#fcebeb]",
-    "[&>input:checked~span]:bg-[#ebfbfc]",
+    "[&>input~span]:bg-[var(--wui-mui-red-pale)]",
+    "[&>input:checked~span]:bg-[var(--wui-mui-blue-pale)]",
     "[&>input:checked~span]:[transform:rotateZ(180deg)]",
 ].join(" ");
 // #endregion
@@ -458,22 +458,22 @@ export const effect7 = [
 
     // Content & Colors (Off State)
     "[&>div]:before:content-[attr(data-tg-off)]",
-    "[&>div]:before:text-white",
+    "[&>div]:before:text-[var(--wui-white)]",
     "[&>div]:before:opacity-100",
     "[&>div]:before:left-1",
     "[&>div]:before:[transition:0.3s_ease_all]",
     "[&>div]:before:z-[2]",
 
-    "[&>div>span]:bg-[#f44336]",
+    "[&>div>span]:bg-[var(--wui-mui-red)]",
     "[&>div>span]:[transition:0.2s_ease_all]",
     "[&>div>span]:z-[1]",
     "[&>div>span]:left-1",
 
     // Content & Colors (On State - Hidden initially)
     "[&>div]:after:content-[attr(data-tg-on)]",
-    "[&>div]:after:text-white",
+    "[&>div]:after:text-[var(--wui-white)]",
     "[&>div]:after:text-left",
-    "[&>div]:after:bg-[#03a9f4]",
+    "[&>div]:after:bg-[var(--wui-mui-lightblue)]",
     "[&>div]:after:opacity-0",
     "[&>div]:after:px-[7px]",
     "[&>div]:after:py-[9px]",
@@ -488,14 +488,14 @@ export const effect7 = [
     // The Implosion Effect (Shrinks span to a dot)
     "[&>input:checked+div>span]:w-0.5",
     "[&>input:checked+div>span]:h-0.5",
-    "[&>input:checked+div>span]:bg-white",
+    "[&>input:checked+div>span]:bg-[var(--wui-white)]",
     "[&>input:checked+div>span]:p-[3px]",
     "[&>input:checked+div>span]:left-14",
     "[&>input:checked+div>span]:top-3.5",
 
     // Backgrounds
-    "[&>input~span]:bg-[#fcebeb]",
-    "[&>input:checked~span]:bg-[#ebfbfc]",
+    "[&>input~span]:bg-[var(--wui-mui-red-pale)]",
+    "[&>input:checked~span]:bg-[var(--wui-mui-blue-pale)]",
 ].join(" ");
 // #endregion
 
@@ -543,20 +543,20 @@ export const effect8 = [
 
     // Off State Content
     "[&>div]:before:content-[attr(data-tg-off)]",
-    "[&>div]:before:text-white",
+    "[&>div]:before:text-[var(--wui-white)]",
     "[&>div]:before:left-1",
     "[&>div]:before:z-[2]",
 
     // On State Content (Hidden)
     "[&>div]:after:content-[attr(data-tg-on)]",
-    "[&>div]:after:text-white",
-    "[&>div]:after:bg-[#03a9f4]",
+    "[&>div]:after:text-[var(--wui-white)]",
+    "[&>div]:after:bg-[var(--wui-mui-lightblue)]",
     "[&>div]:after:opacity-0",
     "[&>div]:after:left-[42px]",
     "[&>div]:after:z-[2]",
 
     // Knob Colors
-    "[&>div>span]:bg-[#f44336]",
+    "[&>div>span]:bg-[var(--wui-mui-red)]",
     "[&>div>span]:z-[1]",
     "[&>div>span]:left-1",
 
@@ -565,15 +565,15 @@ export const effect8 = [
     "[&>input:checked+div]:after:opacity-100",
 
     // The Ripple Effect (Scale Up)
-    "[&>input+div>span]:bg-[#f44336]",
-    "[&>input:checked+div>span]:bg-[#ebfbfc]",
+    "[&>input+div>span]:bg-[var(--wui-mui-red)]",
+    "[&>input:checked+div>span]:bg-[var(--wui-mui-blue-pale)]",
     "[&>input:checked+div>span]:scale-[4]",
 
     // --- FIX ADDED BELOW ---
     // This forces the background track to be pinkish when OFF, 
     // overriding the default blue from 'layer'
-    "[&>input~span]:bg-[#fcebeb]",
-    "[&>input:checked~span]:bg-[#ebfbfc]",
+    "[&>input~span]:bg-[var(--wui-mui-red-pale)]",
+    "[&>input:checked~span]:bg-[var(--wui-mui-blue-pale)]",
 ].join(" ");
 // #endregion
 
@@ -595,7 +595,7 @@ export const effect9 = [
     "[&>div]:before:top-[2px]",
     "[&>div]:before:content-[attr(data-tg-off)]",
     "[&>div]:before:left-1",
-    "[&>div]:before:text-white",
+    "[&>div]:before:text-[var(--wui-white)]",
     "[&>div]:before:z-[2]",
 
     // Base Text (On - After)
@@ -611,7 +611,7 @@ export const effect9 = [
     "[&>div]:after:top-[2px]",
     "[&>div]:after:content-[attr(data-tg-on)]",
     "[&>div]:after:-right-6", // Positioned off-screen right
-    "[&>div]:after:text-white",
+    "[&>div]:after:text-[var(--wui-white)]",
     "[&>div]:after:z-[2]",
 
     // Moving Knob (Span)
@@ -627,7 +627,7 @@ export const effect9 = [
     "[&>div>span]:py-[9px]",
     "[&>div>span]:rounded-[50%]",
     "[&>div>span]:top-[2px]",
-    "[&>div>span]:bg-[#f44336]",
+    "[&>div>span]:bg-[var(--wui-mui-red)]",
     "[&>div>span]:z-[1]",
     "[&>div>span]:left-1",
 
@@ -635,12 +635,12 @@ export const effect9 = [
     "[&>input:checked+div]:before:-left-6", // Slide Off text out left
     "[&>input:checked+div]:after:right-1", // Slide On text in
 
-    "[&>input:checked+div>span]:bg-[#03a9f4]",
+    "[&>input:checked+div>span]:bg-[var(--wui-mui-lightblue)]",
     "[&>input:checked+div>span]:left-[42px]", // Slide knob right
 
     // Background Colors
-    "[&>input~span]:bg-[#fcebeb]",
-    "[&>input:checked~span]:bg-[#ebfbfc]",
+    "[&>input~span]:bg-[var(--wui-mui-red-pale)]",
+    "[&>input:checked~span]:bg-[var(--wui-mui-blue-pale)]",
 ].join(" ");
 // #endregion
 
@@ -688,34 +688,34 @@ export const effect10 = [
 
     // Initial State (Off)
     "[&>div]:before:content-[attr(data-tg-off)]",
-    "[&>div]:before:bg-[#f44336]",
+    "[&>div]:before:bg-[var(--wui-mui-red)]",
     "[&>div]:before:left-1",
-    "[&>div]:before:text-white",
+    "[&>div]:before:text-[var(--wui-white)]",
     "[&>div]:before:z-[10]", // High z-index to sit on top
 
     "[&>div]:after:content-[attr(data-tg-on)]",
-    "[&>div]:after:text-[#4e4e4e]",
+    "[&>div]:after:text-[var(--wui-switch-gray-dark)]",
     "[&>div]:after:right-1",
 
     "[&>div>span]:inline-block",
-    "[&>div>span]:text-white",
+    "[&>div>span]:text-[var(--wui-white)]",
     "[&>div>span]:z-[1]",
     "[&>div>span]:left-1",
     "[&>div>span]:before:content-[attr(data-tg-off)]",
 
     // Checked State (On)
-    "[&>input:checked+div>span]:text-[#4e4e4e]", // Text turns gray
+    "[&>input:checked+div>span]:text-[var(--wui-switch-gray-dark)]", // Text turns gray
 
-    "[&>input:checked+div]:before:bg-[#03a9f4]",
+    "[&>input:checked+div]:before:bg-[var(--wui-mui-lightblue)]",
     "[&>input:checked+div]:before:left-[42px]",
     "[&>input:checked+div]:before:content-[attr(data-tg-on)]",
 
     "[&>input:checked+div>span]:before:relative",
-    "[&>input:checked+div]:after:text-white",
+    "[&>input:checked+div]:after:text-[var(--wui-white)]",
 
     // Backgrounds
-    "[&>input~span]:bg-[#fcebeb]",
-    "[&>input:checked~span]:bg-[#ebfbfc]",
+    "[&>input~span]:bg-[var(--wui-mui-red-pale)]",
+    "[&>input:checked~span]:bg-[var(--wui-mui-blue-pale)]",
 ].join(" ");
 // #endregion
 
@@ -732,7 +732,7 @@ export const effect11 = [
     "[&>div]:before:absolute",
     "[&>div]:before:rounded-sm",
     "[&>div]:before:top-[2px]",
-    "[&>div]:before:text-[#4e4e4e]",
+    "[&>div]:before:text-[var(--wui-switch-gray-dark)]",
     "[&>div]:before:text-[10px]",
     "[&>div]:before:font-bold",
     "[&>div]:before:text-center",
@@ -745,7 +745,7 @@ export const effect11 = [
     "[&>div]:after:absolute",
     "[&>div]:after:rounded-sm",
     "[&>div]:after:top-[2px]",
-    "[&>div]:after:text-[#4e4e4e]",
+    "[&>div]:after:text-[var(--wui-switch-gray-dark)]",
     "[&>div]:after:text-[10px]",
     "[&>div]:after:font-bold",
     "[&>div]:after:text-center",
@@ -761,7 +761,7 @@ export const effect11 = [
     "[&>div>span]:top-[2px]",
     "[&>div>span]:w-[2rem]",
     "[&>div>span]:h-[2rem]",
-    "[&>div>span]:bg-[#f44336]", // Red initially
+    "[&>div>span]:bg-[var(--wui-mui-red)]", // Red initially
     "[&>div>span]:origin-[0%_50%]", // Hinges on the left edge
     "[&>div>span]:[transition:0.6s_ease_all]",
     "[&>div>span]:z-[1]",
@@ -769,12 +769,12 @@ export const effect11 = [
     "[&>div>span]:[transform:rotateY(0)]",
 
     // Checked State (Flip)
-    "[&>input:checked+div>span]:bg-[#03a9f4]", // Turns Blue
+    "[&>input:checked+div>span]:bg-[var(--wui-mui-lightblue)]", // Turns Blue
     "[&>input:checked+div>span]:[transform:rotateY(-180deg)]", // Flips over
 
     // Backgrounds
-    "[&>input~span]:bg-[#fcebeb]",
-    "[&>input:checked~span]:bg-[#ebfbfc]",
+    "[&>input~span]:bg-[var(--wui-mui-red-pale)]",
+    "[&>input:checked~span]:bg-[var(--wui-mui-blue-pale)]",
 ].join(" ");
 // #endregion
 
@@ -795,7 +795,7 @@ export const effect12 = [
     "[&>div]:before:content-[attr(data-tg-off)]",
     "[&>div]:before:left-1",
     "[&>div]:before:w-[27px]",
-    "[&>div]:before:text-[#4e4e4e]",
+    "[&>div]:before:text-[var(--wui-switch-gray-dark)]",
     "[&>div]:before:z-[1]",
     "[&>div]:before:px-[3px]",
     "[&>div]:before:py-[9px]",
@@ -811,7 +811,7 @@ export const effect12 = [
     "[&>div]:after:content-[attr(data-tg-on)]",
     "[&>div]:after:right-1",
     "[&>div]:after:w-[27px]",
-    "[&>div]:after:text-[#4e4e4e]",
+    "[&>div]:after:text-[var(--wui-switch-gray-dark)]",
     "[&>div]:after:z-[1]",
     "[&>div]:after:px-[3px]",
     "[&>div]:after:py-[9px]",
@@ -846,7 +846,7 @@ export const effect12 = [
     "[&>div>span]:before:h-[2rem]",
     "[&>div>span]:before:px-1",
     "[&>div>span]:before:py-[9px]",
-    "[&>div>span]:before:bg-[#03a9f4]", // Blue Panel
+    "[&>div>span]:before:bg-[var(--wui-mui-lightblue)]", // Blue Panel
     "[&>div>span]:before:-left-7", // Hidden Left initially
 
     "[&>div>span]:after:absolute",
@@ -862,7 +862,7 @@ export const effect12 = [
     "[&>div>span]:after:h-[2rem]",
     "[&>div>span]:after:px-1",
     "[&>div>span]:after:py-[9px]",
-    "[&>div>span]:after:bg-[#f44336]", // Red Panel
+    "[&>div>span]:after:bg-[var(--wui-mui-red)]", // Red Panel
     "[&>div>span]:after:right-[-42px]", // Why -42px? It positions it over the active area
 
     // Checked State Animations
@@ -871,8 +871,8 @@ export const effect12 = [
     "[&>input:checked+div>span]:after:right-[-74px]", // Red Slides Out
 
     // Backgrounds
-    "[&>input~span]:bg-[#fcebeb]",
-    "[&>input:checked~span]:bg-[#ebfbfc]",
+    "[&>input~span]:bg-[var(--wui-mui-red-pale)]",
+    "[&>input:checked~span]:bg-[var(--wui-mui-blue-pale)]",
 ].join(" ");
 // #endregion
 
@@ -919,9 +919,9 @@ export const effect13 = [
     "[&>div>span]:top-[2px]",
 
     // Label Positioning & Colors
-    "[&>div]:before:text-[#4e4e4e]",
+    "[&>div]:before:text-[var(--wui-switch-gray-dark)]",
     "[&>div]:before:z-[1]",
-    "[&>div]:after:text-[#4e4e4e]",
+    "[&>div]:after:text-[var(--wui-switch-gray-dark)]",
     "[&>div]:after:z-[1]",
 
     "[&>div]:before:content-[attr(data-tg-off)]",
@@ -932,17 +932,17 @@ export const effect13 = [
 
     // Knob Initial State (Red, Right Side)
     "[&>div>span]:w-[2rem]",
-    "[&>div>span]:bg-[#f44336]",
+    "[&>div>span]:bg-[var(--wui-mui-red)]",
     "[&>div>span]:z-[2]",
     "[&>div>span]:left-[37px]",
 
     // Checked State (Blue, Left Side)
-    "[&>input:checked+div>span]:bg-[#03a9f4]",
+    "[&>input:checked+div>span]:bg-[var(--wui-mui-lightblue)]",
     "[&>input:checked+div>span]:left-1",
 
     // Backgrounds
-    "[&>input~span]:bg-[#fcebeb]",
-    "[&>input:checked~span]:bg-[#ebfbfc]",
+    "[&>input~span]:bg-[var(--wui-mui-red-pale)]",
+    "[&>input:checked~span]:bg-[var(--wui-mui-blue-pale)]",
 ].join(" ");
 // #endregion
 
@@ -1001,9 +1001,9 @@ export const effect14 = [
     "[&>div>span]:after:top-[2px]",
 
     // Label Content & Position
-    "[&>div]:before:text-[#4e4e4e]",
+    "[&>div]:before:text-[var(--wui-switch-gray-dark)]",
     "[&>div]:before:z-[1]",
-    "[&>div]:after:text-[#4e4e4e]",
+    "[&>div]:after:text-[var(--wui-switch-gray-dark)]",
     "[&>div]:after:z-[1]",
     "[&>div]:before:content-[attr(data-tg-off)]",
     "[&>div]:before:left-1",
@@ -1018,7 +1018,7 @@ export const effect14 = [
     "[&>div>span]:top-0",
 
     // Blue Knob (Hidden Above)
-    "[&>div>span]:before:bg-[#03a9f4]",
+    "[&>div>span]:before:bg-[var(--wui-mui-lightblue)]",
     "[&>div>span]:before:left-1",
     "[&>div>span]:before:-top-7", // Hidden
     "[&>div>span]:before:content-['']",
@@ -1026,7 +1026,7 @@ export const effect14 = [
     "[&>div>span]:before:z-[2]",
 
     // Red Knob (Visible Right)
-    "[&>div>span]:after:bg-[#f44336]",
+    "[&>div>span]:after:bg-[var(--wui-mui-red)]",
     "[&>div>span]:after:left-[39px]",
     "[&>div>span]:after:top-[2px]",
     "[&>div>span]:after:content-['']",
@@ -1041,8 +1041,8 @@ export const effect14 = [
     "[&>input:checked+div>span]:after:-top-8", // Red flies up
 
     // Backgrounds
-    "[&>input~span]:bg-[#fcebeb]",
-    "[&>input:checked~span]:bg-[#ebfbfc]",
+    "[&>input~span]:bg-[var(--wui-mui-red-pale)]",
+    "[&>input:checked~span]:bg-[var(--wui-mui-blue-pale)]",
 ].join(" ");
 // #endregion
 
@@ -1053,7 +1053,7 @@ export const effect15 = [
 
     // Base Styles (Shared)
     "[&>div]:before:absolute",
-    "[&>div]:before:text-white",
+    "[&>div]:before:text-[var(--wui-white)]",
     "[&>div]:before:text-[10px]",
     "[&>div]:before:font-bold",
     "[&>div]:before:text-center",
@@ -1067,7 +1067,7 @@ export const effect15 = [
     "[&>div]:before:top-[2px]",
 
     "[&>div]:after:absolute",
-    "[&>div]:after:text-white",
+    "[&>div]:after:text-[var(--wui-white)]",
     "[&>div]:after:text-[10px]",
     "[&>div]:after:font-bold",
     "[&>div]:after:text-center",
@@ -1082,13 +1082,13 @@ export const effect15 = [
 
     // Off State (Red)
     "[&>div]:before:content-[attr(data-tg-off)]",
-    "[&>div]:before:bg-[#f44336]",
+    "[&>div]:before:bg-[var(--wui-mui-red)]",
     "[&>div]:before:left-1",
 
     // On State (Blue - Initially Hidden & Big)
     "[&>div]:after:content-[attr(data-tg-on)]",
     "[&>div]:after:opacity-0",
-    "[&>div]:after:bg-[#03a9f4]",
+    "[&>div]:after:bg-[var(--wui-mui-lightblue)]",
     "[&>div]:after:scale-[4]",
     "[&>div]:after:right-1",
 
@@ -1100,8 +1100,8 @@ export const effect15 = [
     "[&>input:checked+div]:after:scale-100", // Blue implodes
 
     // Backgrounds
-    "[&>input~span]:bg-[#fcebeb]",
-    "[&>input:checked~span]:bg-[#ebfbfc]",
+    "[&>input~span]:bg-[var(--wui-mui-red-pale)]",
+    "[&>input:checked~span]:bg-[var(--wui-mui-blue-pale)]",
 ].join(" ");
 // #endregion
 
@@ -1113,12 +1113,12 @@ export const effect16 = [
     // Base Knob Styles (Off)
     "[&>div]:before:content-[attr(data-tg-off)]",
     "[&>div]:before:absolute",
-    "[&>div]:before:text-white",
+    "[&>div]:before:text-[var(--wui-white)]",
     "[&>div]:before:text-[10px]",
     "[&>div]:before:font-bold",
     "[&>div]:before:text-center",
     "[&>div]:before:leading-none",
-    "[&>div]:before:bg-[#f44336]",
+    "[&>div]:before:bg-[var(--wui-mui-red)]",
     "[&>div]:before:px-1",
     "[&>div]:before:py-[9px]",
     "[&>div]:before:rounded-sm", // Square corners
@@ -1134,12 +1134,12 @@ export const effect16 = [
     // Checked State (On)
     "[&>input:checked:active+div]:before:ml-[-26px]", // Pull back when stretching on right side
     "[&>input:checked+div]:before:content-[attr(data-tg-on)]",
-    "[&>input:checked+div]:before:bg-[#03a9f4]",
+    "[&>input:checked+div]:before:bg-[var(--wui-mui-lightblue)]",
     "[&>input:checked+div]:before:left-[42px]",
 
     // Backgrounds
-    "[&>input~span]:bg-[#fcebeb]",
-    "[&>input:checked~span]:bg-[#ebfbfc]",
+    "[&>input~span]:bg-[var(--wui-mui-red-pale)]",
+    "[&>input:checked~span]:bg-[var(--wui-mui-blue-pale)]",
 ].join(" ");
 // #endregion
 
@@ -1151,7 +1151,7 @@ export const effect17 = [
     // Text Label (Before) - Moves Slower (0.5s)
     "[&>div]:before:content-[attr(data-tg-off)]",
     "[&>div]:before:absolute",
-    "[&>div]:before:text-white",
+    "[&>div]:before:text-[var(--wui-white)]",
     "[&>div]:before:text-[10px]",
     "[&>div]:before:font-bold",
     "[&>div]:before:text-center",
@@ -1168,7 +1168,7 @@ export const effect17 = [
     "[&>div>span]:absolute",
     "[&>div>span]:w-[2rem]",
     "[&>div>span]:h-[2rem]",
-    "[&>div>span]:text-white",
+    "[&>div>span]:text-[var(--wui-white)]",
     "[&>div>span]:text-[10px]",
     "[&>div>span]:font-bold",
     "[&>div>span]:text-center",
@@ -1177,7 +1177,7 @@ export const effect17 = [
     "[&>div>span]:py-[9px]",
     "[&>div>span]:left-1",
     "[&>div>span]:top-[2px]",
-    "[&>div>span]:bg-[#f44336]",
+    "[&>div>span]:bg-[var(--wui-mui-red)]",
     "[&>div>span]:z-[1]",
     "[&>div>span]:rounded-sm",
     "[&>div>span]:[transition:0.3s_ease_all,left_0.3s_cubic-bezier(0.18,0.89,0.35,1.15)]", // Faster transition
@@ -1186,12 +1186,12 @@ export const effect17 = [
     "[&>input:checked+div]:before:content-[attr(data-tg-on)]",
     "[&>input:checked+div]:before:left-[42px]",
 
-    "[&>input:checked+div>span]:bg-[#03a9f4]",
+    "[&>input:checked+div>span]:bg-[var(--wui-mui-lightblue)]",
     "[&>input:checked+div>span]:left-[42px]",
 
     // Backgrounds
-    "[&>input~span]:bg-[#fcebeb]",
-    "[&>input:checked~span]:bg-[#ebfbfc]",
+    "[&>input~span]:bg-[var(--wui-mui-red-pale)]",
+    "[&>input:checked~span]:bg-[var(--wui-mui-blue-pale)]",
 ].join(" ");
 // #endregion
 
@@ -1203,7 +1203,7 @@ export const effect18 = [
     // Text Label (Before)
     "[&>div]:before:content-[attr(data-tg-off)]",
     "[&>div]:before:absolute",
-    "[&>div]:before:text-white",
+    "[&>div]:before:text-[var(--wui-white)]",
     "[&>div]:before:text-[10px]",
     "[&>div]:before:font-bold",
     "[&>div]:before:text-center",
@@ -1218,12 +1218,12 @@ export const effect18 = [
     // Colored Box (Span)
     "[&>div>span]:content-[attr(data-tg-off)]", // Ignored by span usually
     "[&>div>span]:absolute",
-    "[&>div>span]:text-white",
+    "[&>div>span]:text-[var(--wui-white)]",
     "[&>div>span]:text-[10px]",
     "[&>div>span]:font-bold",
     "[&>div>span]:text-center",
     "[&>div>span]:leading-none",
-    "[&>div>span]:bg-[#f44336]",
+    "[&>div>span]:bg-[var(--wui-mui-red)]",
     "[&>div>span]:rounded-sm",
     "[&>div>span]:left-1",
     "[&>div>span]:top-[2px]", // Added top to fix vertical alignment
@@ -1238,7 +1238,7 @@ export const effect18 = [
     "[&>input:active+div]:before:w-[46px]",
     "[&>input:active+div]:before:h-1",
     "[&>input:active+div]:before:text-transparent", // Hide text
-    "[&>input:active+div]:before:bg-[#d80000]", // Darker red line
+    "[&>input:active+div]:before:bg-[var(--wui-switch-red-dark)]", // Darker red line
     "[&>input:active+div]:before:[transition:0.3s_ease_all]",
     "[&>input:active+div]:before:overflow-hidden",
     "[&>input:active+div]:before:-mt-0.5",
@@ -1247,7 +1247,7 @@ export const effect18 = [
     "[&>input:active+div>span]:w-[68px]", // Stretch background
 
     // Active + Checked State (Pressing Down while On)
-    "[&>input:checked:active+div]:before:bg-[#0095d8]", // Darker blue line
+    "[&>input:checked:active+div]:before:bg-[var(--wui-switch-blue-dark)]", // Darker blue line
     "[&>input:checked:active+div]:before:left-auto",
     "[&>input:checked:active+div]:before:right-2.5",
 
@@ -1257,12 +1257,12 @@ export const effect18 = [
     "[&>input:checked+div]:before:content-[attr(data-tg-on)]",
     "[&>input:checked+div]:before:left-[47px]",
 
-    "[&>input:checked+div>span]:bg-[#03a9f4]",
+    "[&>input:checked+div>span]:bg-[var(--wui-mui-lightblue)]",
     "[&>input:checked+div>span]:left-[42px]",
 
     // Backgrounds
-    "[&>input~span]:bg-[#fcebeb]",
-    "[&>input:checked~span]:bg-[#ebfbfc]",
+    "[&>input~span]:bg-[var(--wui-mui-red-pale)]",
+    "[&>input:checked~span]:bg-[var(--wui-mui-blue-pale)]",
 ].join(" ");
 // #endregion
 
@@ -1291,15 +1291,15 @@ export const light = [
     "[&>label]:[transition:all_0.4s_ease]",
     "[&>label]:p-0.5",
     "[&>label]:rounded-[2em]",
-    "[&>label]:bg-[#f0f0f0]",
+    "[&>label]:bg-[var(--wui-switch-track-light)]",
 
     // The Knob (After)
     "[&>label]:after:[transition:all_0.2s_ease]",
     "[&>label]:after:rounded-[50%]",
-    "[&>label]:after:bg-[#fff]",
+    "[&>label]:after:bg-[var(--wui-white)]",
 
     // Checked State
-    "[&>input:checked~label]:bg-[#9fd6ae]",
+    "[&>input:checked~label]:bg-[var(--wui-switch-green-1)]",
 
     ilabel
 ].join(" ");
@@ -1318,21 +1318,21 @@ export const ios = [
     "[&>label]:p-0.5",
     "[&>label]:rounded-[2em]",
     "[&>label]:border-solid",
-    "[&>label]:border-[#e8eae9]",
+    "[&>label]:border-[var(--wui-switch-border-ios)]",
 
     // Knob Styles & Shadows
     "[&>label]:after:shadow-[0_0_0_1px_rgba(0,0,0,0.1),0_4px_0_rgba(0,0,0,0.08)]",
     "[&>label]:after:rounded-[2em]",
-    "[&>label]:after:bg-[#fbfbfb]",
+    "[&>label]:after:bg-[var(--wui-switch-knob-ios)]",
     "[&>label]:after:[transition:left_0.3s_cubic-bezier(0.175,0.885,0.32,1.275),padding_0.3s_ease,margin_0.3s_ease]",
 
     // Hover & Active States (The Squeeze Effect)
     "[&>label]:hover:after:will-change-[padding]",
-    "[&>label]:active:shadow-[inset_0_0_0_2em_#e8eae9]",
+    "[&>label]:active:shadow-[inset_0_0_0_2em_var(--wui-switch-border-ios)]",
     "[&>label]:active:after:pr-[0.8em]",
 
     // Checked State
-    "[&>input:checked~label]:bg-[#86d993]",
+    "[&>input:checked~label]:bg-[var(--wui-switch-green-2)]",
     "[&>input:checked~label]:active:shadow-none",
     "[&>input:checked~label]:active:after:ml-[-0.8em]", // Pull knob back when active on right side
 
@@ -1374,8 +1374,8 @@ export const skewed = [
     "[&>label]:[transition:all_0.2s_ease]",
     "[&>label]:[backface-visibility:hidden]",
     "[&>label]:font-sans",
-    "[&>label]:bg-[#888]",
-    "[&>label]:active:bg-[#888]",
+    "[&>label]:bg-[var(--wui-switch-mid-gray)]",
+    "[&>label]:active:bg-[var(--wui-switch-mid-gray)]",
 
     // BEFORE: The "ON" State (Hidden Left initially)
     "[&>label]:before:content-[attr(data-tg-on)]",
@@ -1388,7 +1388,7 @@ export const skewed = [
     "[&>label]:before:absolute",
     "[&>label]:before:leading-[2em]",
     "[&>label]:before:font-bold",
-    "[&>label]:before:text-white",
+    "[&>label]:before:text-[var(--wui-white)]",
     "[&>label]:before:text-shadow:[0_1px_0_rgba(0,0,0,0.4)]",
 
     // AFTER: The "OFF" State (Visible initially)
@@ -1401,14 +1401,14 @@ export const skewed = [
     "[&>label]:after:absolute",
     "[&>label]:after:leading-[2em]",
     "[&>label]:after:font-bold",
-    "[&>label]:after:text-white",
+    "[&>label]:after:text-[var(--wui-white)]",
     "[&>label]:after:text-shadow:[0_1px_0_rgba(0,0,0,0.4)]",
 
     // Active State (Pressing down)
     "[&>label]:active:before:left-[-10%]",
 
     // Checked State Logic
-    "[&>input:checked~label]:bg-[#86d993]",
+    "[&>input:checked~label]:bg-[var(--wui-switch-green-2)]",
 
     // Slide animations
     "[&>input:checked~label]:before:left-full", // Slide ON text out right
@@ -1432,21 +1432,21 @@ export const flat = [
     "[&>label]:rounded-[2em]",
     "[&>label]:border-4",
     "[&>label]:border-solid",
-    "[&>label]:border-[#f2f2f2]",
+    "[&>label]:border-[var(--wui-switch-flat-border)]",
 
     // The Knob
     "[&>label]:after:[transition:all_0.2s_ease]",
     "[&>label]:after:content-['']",
     "[&>label]:after:rounded-[1em]",
-    "[&>label]:after:bg-[#f2f2f2]", // Knob color matches border
-    "[&>label]:bg-[#fff]", // Inner track white
+    "[&>label]:after:bg-[var(--wui-switch-flat-border)]", // Knob color matches border
+    "[&>label]:bg-[var(--wui-white)]", // Inner track white
 
     // Checked State
     "[&>input:checked~label]:border-4",
     "[&>input:checked~label]:border-solid",
-    "[&>input:checked~label]:border-[#7fc6a6]", // Green border
+    "[&>input:checked~label]:border-[var(--wui-switch-green-3)]", // Green border
     "[&>input:checked~label]:after:left-2/4",
-    "[&>input:checked~label]:after:bg-[#7fc6a6]", // Green knob
+    "[&>input:checked~label]:after:bg-[var(--wui-switch-green-3)]", // Green knob
 
     ilabel,
 
@@ -1493,13 +1493,13 @@ export const flip = [
     "[&>label]:before:text-center",
     "[&>label]:before:leading-[2em]",
     "[&>label]:before:font-bold",
-    "[&>label]:before:text-white",
+    "[&>label]:before:text-[var(--wui-white)]",
     "[&>label]:before:absolute",
     "[&>label]:before:rounded",
     "[&>label]:before:left-0",
     "[&>label]:before:top-0",
     "[&>label]:before:[backface-visibility:hidden]",
-    "[&>label]:before:bg-[#ff3a19]",
+    "[&>label]:before:bg-[var(--wui-switch-orange-red)]",
 
     // BACK SIDE (After - Green/On)
     "[&>label]:after:h-full",
@@ -1510,13 +1510,13 @@ export const flip = [
     "[&>label]:after:text-center",
     "[&>label]:after:leading-[2em]",
     "[&>label]:after:font-bold",
-    "[&>label]:after:text-white",
+    "[&>label]:after:text-[var(--wui-white)]",
     "[&>label]:after:absolute",
     "[&>label]:after:rounded",
     "[&>label]:after:left-0",
     "[&>label]:after:top-0",
     "[&>label]:after:[backface-visibility:hidden]",
-    "[&>label]:after:bg-[#02c66f]",
+    "[&>label]:after:bg-[var(--wui-switch-teal-green)]",
     "[&>label]:after:[transform:rotateY(-180deg)]", // Hidden initially
 
     // Active State (Tilt effect)
@@ -1527,7 +1527,7 @@ export const flip = [
 
     "[&>input:checked~label]:after:left-0",
     "[&>input:checked~label]:after:[transform:rotateY(0)]", // Show back
-    "[&>input:checked~label]:after:bg-[#7fc6a6]",
+    "[&>input:checked~label]:after:bg-[var(--wui-switch-green-3)]",
 
     // Checked + Active Tilt
     "[&>input:checked~label]:active:after:[transform:rotateY(20deg)]",

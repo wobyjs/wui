@@ -242,7 +242,7 @@ const date = $(new Date())
 <DateTimeWheeler
   value={date}
   header={({ ok, cancel }) => (
-    <div class="flex justify-between p-2 bg-blue-100">
+    <div class="flex justify-between p-2 bg-[var(--wui-blue-100)]">
       <button onClick={cancel}>Cancel</button>
       <span>Pick a Date</span>
       <button onClick={ok}>Confirm</button>

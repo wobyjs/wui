@@ -252,7 +252,7 @@ restyle the element from scratch. To *add* utilities on top of the base, use
 ```tsx
 <TextField
     label="Name"
-    class="!bg-gray-50 !rounded-xl !p-3"
+    class="!bg-[var(--wui-gray-50)] !rounded-xl !p-3"
     effect="filled"
 />
 ```

@@ -162,10 +162,10 @@ export const StyleRow = ({ prop, el, variant, root, version, onEdit }: StyleRowP
         const s = $$(state)
         const muted = !s || s.fromBase || s.origin === 'computed'
         return [
-            'flex-1 min-w-0 px-1.5 py-0.5 text-[11px] font-mono rounded border bg-white',
-            'outline-none focus:border-[#1976d2]',
-            $$(invalid) ? 'border-red-400 text-red-600' : 'border-gray-200',
-            muted && !$$(invalid) ? 'text-gray-400 italic' : 'text-slate-700',
+            'flex-1 min-w-0 px-1.5 py-0.5 text-[11px] font-mono rounded border bg-[var(--wui-white)]',
+            'outline-none focus:border-[var(--wui-accent-500)]',
+            $$(invalid) ? 'border-[var(--wui-red-400)] text-[var(--wui-red-600)]' : 'border-[var(--wui-gray-200)]',
+            muted && !$$(invalid) ? 'text-[var(--wui-gray-400)] italic' : 'text-[var(--wui-slate-700)]',
         ].join(' ')
     }
 
@@ -175,10 +175,10 @@ export const StyleRow = ({ prop, el, variant, root, version, onEdit }: StyleRowP
         return [
             'px-1 py-0.5 text-[9px] font-bold uppercase rounded border leading-none',
             disabled
-                ? 'text-gray-300 border-transparent cursor-not-allowed'
+                ? 'text-[var(--wui-gray-300)] border-transparent cursor-not-allowed'
                 : active
-                    ? 'text-[#1976d2] bg-[#1976d2]/10 border-[#1976d2]/50'
-                    : 'text-gray-500 bg-transparent border-transparent hover:bg-gray-100',
+                    ? 'text-[var(--wui-accent-500)] bg-[var(--wui-accent-500)]/10 border-[var(--wui-accent-500)]/50'
+                    : 'text-[var(--wui-gray-500)] bg-transparent border-transparent hover:bg-[var(--wui-gray-100)]',
         ].join(' ')
     }
 
@@ -192,9 +192,9 @@ export const StyleRow = ({ prop, el, variant, root, version, onEdit }: StyleRowP
     }
 
     return (
-        <div class="flex items-center gap-1 px-2 py-[3px] border-b border-gray-100 last:border-b-0 hover:bg-gray-50/60">
+        <div class="flex items-center gap-1 px-2 py-[3px] border-b border-[var(--wui-gray-100)] last:border-b-0 hover:bg-[var(--wui-gray-50)]/60">
             <span
-                class="w-[124px] shrink-0 truncate text-[10px] font-mono text-slate-500 select-none"
+                class="w-[124px] shrink-0 truncate text-[10px] font-mono text-[var(--wui-slate-500)] select-none"
                 title={prop}
             >
                 {prop}
@@ -204,7 +204,7 @@ export const StyleRow = ({ prop, el, variant, root, version, onEdit }: StyleRowP
                 {kind === 'color'
                     ? <input
                         type="color"
-                        class="w-5 h-5 shrink-0 rounded border border-gray-200 bg-white p-0 cursor-pointer"
+                        class="w-5 h-5 shrink-0 rounded border border-[var(--wui-gray-200)] bg-[var(--wui-white)] p-0 cursor-pointer"
                         ref={(e: HTMLInputElement) => {
                             if (!e) return
                             swatch(e)
@@ -253,7 +253,7 @@ export const StyleRow = ({ prop, el, variant, root, version, onEdit }: StyleRowP
 
             <div class="flex shrink-0 items-center gap-0.5">
                 <span
-                    class="w-3 text-[10px] text-amber-500 cursor-help select-none"
+                    class="w-3 text-[10px] text-[var(--wui-amber-500)] cursor-help select-none"
                     title={warning}
                 >
                     {() => (warning() ? '\u26a0' : '')}
@@ -285,7 +285,7 @@ export const StyleRow = ({ prop, el, variant, root, version, onEdit }: StyleRowP
                         return [
                             'w-4 h-4 text-[11px] leading-none rounded',
                             settable
-                                ? 'text-gray-400 hover:text-red-500 hover:bg-red-50'
+                                ? 'text-[var(--wui-gray-400)] hover:text-[var(--wui-red-500)] hover:bg-[var(--wui-red-50)]'
                                 : 'text-transparent pointer-events-none',
                         ].join(' ')
                     }}

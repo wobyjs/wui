@@ -30,10 +30,10 @@ const TestNumberField = (): JSX.Element => {
     return ret
 }
 
-const NUM_INPUT = "number-input inline-flex items-center bg-white border border-gray-300 rounded-lg transition-all duration-200 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 divide-x divide-gray-200"
-const INPUT_CLS = "w-16 flex-auto min-w-0 text-center border-none bg-transparent focus:outline-none focus:ring-0 text-base font-semibold text-gray-700 disabled:text-[#00000061] disabled:cursor-not-allowed [-moz-appearance:textfield] [&::-webkit-inner-spin-button]:hidden [&::-webkit-outer-spin-button]:hidden"
-const BTN_DEC_CLS = "!rounded-none !rounded-l-md !w-8 !h-9 !border-r !border-gray-200 !bg-transparent disabled:!bg-[#d9dbda] disabled:!text-[#00000061] disabled:!cursor-not-allowed"
-const BTN_INC_CLS = "!rounded-none !rounded-r-md !w-8 !h-9 !border-l !border-gray-200 !bg-transparent disabled:!bg-[#d9dbda] disabled:!text-[#00000061] disabled:!cursor-not-allowed"
+const NUM_INPUT = "number-input inline-flex items-center bg-[var(--wui-white)] border border-[var(--wui-gray-300)] rounded-lg transition-all duration-200 focus-within:ring-2 focus-within:ring-[var(--wui-blue-500)] focus-within:border-[var(--wui-blue-500)] divide-x divide-[var(--wui-gray-200)]"
+const INPUT_CLS = "w-16 flex-auto min-w-0 text-center border-none bg-transparent focus:outline-none focus:ring-0 text-base font-semibold text-[var(--wui-gray-700)] disabled:text-[var(--wui-disabled-text)] disabled:cursor-not-allowed [-moz-appearance:textfield] [&::-webkit-inner-spin-button]:hidden [&::-webkit-outer-spin-button]:hidden"
+const BTN_DEC_CLS = "!rounded-none !rounded-l-md !w-8 !h-9 !border-r !border-[var(--wui-gray-200)] !bg-transparent disabled:!bg-[var(--wui-disabled-surface)] disabled:!text-[var(--wui-disabled-text)] disabled:!cursor-not-allowed"
+const BTN_INC_CLS = "!rounded-none !rounded-r-md !w-8 !h-9 !border-l !border-[var(--wui-gray-200)] !bg-transparent disabled:!bg-[var(--wui-disabled-surface)] disabled:!text-[var(--wui-disabled-text)] disabled:!cursor-not-allowed"
 const SPAN_CLS = "text-base leading-none font-semibold select-none"
 
 // SSR test (Node.js)

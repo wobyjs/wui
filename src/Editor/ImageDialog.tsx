@@ -107,8 +107,8 @@ export const ImageDialog = (): JSX.Element => {
         noteEl.textContent = text
         noteEl.style.display = text ? 'block' : 'none'
         noteEl.className = text && tone === 'warn'
-            ? 'text-[11px] leading-snug text-amber-700 bg-amber-50 border border-amber-200 rounded px-2 py-1'
-            : 'text-[11px] leading-snug text-gray-500'
+            ? 'text-[11px] leading-snug text-[var(--wui-amber-700)] bg-[var(--wui-amber-50)] border border-[var(--wui-amber-200)] rounded px-2 py-1'
+            : 'text-[11px] leading-snug text-[var(--wui-gray-500)]'
     }
 
     /**
@@ -427,13 +427,13 @@ export const ImageDialog = (): JSX.Element => {
             e.preventDefault()
             e.stopPropagation()
             if (e.dataTransfer) e.dataTransfer.dropEffect = 'copy'
-            el.classList.add('ring-2', 'ring-blue-400')
+            el.classList.add('ring-2', 'ring-[var(--wui-blue-400)]')
         }
-        el.ondragleave = () => el.classList.remove('ring-2', 'ring-blue-400')
+        el.ondragleave = () => el.classList.remove('ring-2', 'ring-[var(--wui-blue-400)]')
         el.ondrop = (e: DragEvent) => {
             e.preventDefault()
             e.stopPropagation()
-            el.classList.remove('ring-2', 'ring-blue-400')
+            el.classList.remove('ring-2', 'ring-[var(--wui-blue-400)]')
             const dt = e.dataTransfer
             if (!dt) return
             const file = Array.from(dt.files).find(f => f.type.startsWith('image/'))
@@ -450,9 +450,9 @@ export const ImageDialog = (): JSX.Element => {
         }
     }
 
-    const field = 'w-full h-8 px-2 text-xs rounded border border-gray-300 bg-white text-gray-800 focus:outline-none focus:border-blue-500'
-    const btn = 'h-8 px-3 text-xs rounded border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 whitespace-nowrap'
-    const primaryBtn = 'h-8 px-3 text-xs rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 whitespace-nowrap'
+    const field = 'w-full h-8 px-2 text-xs rounded border border-[var(--wui-gray-300)] bg-[var(--wui-white)] text-[var(--wui-gray-800)] focus:outline-none focus:border-[var(--wui-blue-500)]'
+    const btn = 'h-8 px-3 text-xs rounded border border-[var(--wui-gray-300)] bg-[var(--wui-white)] text-[var(--wui-gray-700)] hover:bg-[var(--wui-gray-100)] whitespace-nowrap'
+    const primaryBtn = 'h-8 px-3 text-xs rounded bg-[var(--wui-blue-600)] text-[var(--wui-white)] hover:bg-[var(--wui-blue-700)] disabled:opacity-50 whitespace-nowrap'
 
     return (
         // `role="dialog"` + `aria-modal="true"` are the a11y fix a modal backdrop
@@ -481,13 +481,13 @@ export const ImageDialog = (): JSX.Element => {
             style={{ display: 'none' } as JSX.CSSProperties}
         >
             <div
-                class="flex flex-col gap-2.5 w-[520px] max-w-[92vw] max-h-[88vh] overflow-auto p-3 bg-white border border-gray-200 rounded-md shadow-xl"
+                class="flex flex-col gap-2.5 w-[520px] max-w-[92vw] max-h-[88vh] overflow-auto p-3 bg-[var(--wui-white)] border border-[var(--wui-gray-200)] rounded-md shadow-xl"
                 ref={el => {
                     // Clicks inside the dialog must not reach the backdrop's close handler.
                     if (el) (el as HTMLElement).onclick = (e: MouseEvent) => e.stopPropagation()
                 }}
             >
-                <div class="text-sm font-medium text-gray-800">{() => t('editor.image.insert')}</div>
+                <div class="text-sm font-medium text-[var(--wui-gray-800)]">{() => t('editor.image.insert')}</div>
 
                 <div ref={bindDropZone} class="flex flex-col gap-2 rounded p-2 -m-2">
                     {/* `for`/`id` rather than a wrapping label, because the row below holds the Browse
@@ -496,7 +496,7 @@ export const ImageDialog = (): JSX.Element => {
                         placeholder stops being announced the moment the user types, leaving a text box
                         with no name at all. The ids need no prefix: this subtree lives in the editor's
                         shadow root, where an id cannot collide with the host page's. */}
-                    <label class="text-[11px] text-gray-600" for="wui-img-src">{() => t('editor.image.source')}</label>
+                    <label class="text-[11px] text-[var(--wui-gray-600)]" for="wui-img-src">{() => t('editor.image.source')}</label>
                     <div class="flex items-center gap-2">
                         <input
                             ref={el => {
@@ -541,14 +541,14 @@ export const ImageDialog = (): JSX.Element => {
                     <ImageCropper onHandle={h => { cropper = h }} />
                 </div>
 
-                <div ref={el => { noteEl = el as HTMLElement }} class="text-[11px] leading-snug text-gray-500" style={{ display: 'none' } as JSX.CSSProperties} />
+                <div ref={el => { noteEl = el as HTMLElement }} class="text-[11px] leading-snug text-[var(--wui-gray-500)]" style={{ display: 'none' } as JSX.CSSProperties} />
 
                 <div class="flex items-center gap-2">
-                    <label class="text-[11px] text-gray-600 w-16 shrink-0" for="wui-img-alt">{() => t('editor.image.altText')}</label>
+                    <label class="text-[11px] text-[var(--wui-gray-600)] w-16 shrink-0" for="wui-img-alt">{() => t('editor.image.altText')}</label>
                     <input ref={el => { altInput = el as HTMLInputElement }} id="wui-img-alt" type="text" class={field} placeholder={() => t('editor.image.altPlaceholder')} />
                 </div>
 
-                <label class="flex items-center gap-2 text-[11px] text-gray-700 select-none">
+                <label class="flex items-center gap-2 text-[11px] text-[var(--wui-gray-700)] select-none">
                     <input
                         ref={el => {
                             embedInput = el as HTMLInputElement

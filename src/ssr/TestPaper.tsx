@@ -31,7 +31,7 @@ const TestPaper = (): JSX.Element => {
     return ret
 }
 
-const BASE = "bg-white transition-shadow duration-300 ease-in-out rounded-lg"
+const BASE = "bg-[var(--wui-white)] transition-shadow duration-300 ease-in-out rounded-lg"
 const SHADOWS = ['shadow-none', 'shadow-sm', 'shadow-md']
 
 // SSR test (Node.js)

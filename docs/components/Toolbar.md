@@ -96,13 +96,13 @@ This gives:
 # 🎨 Custom Styling with `cls`
 
 ```tsx
-<Toolbar cls="bg-blue-600 text-white shadow-lg">
+<Toolbar cls="bg-[var(--wui-blue-600)] text-[var(--wui-white)] shadow-lg">
     <div class="flex items-center justify-between w-full">
         <div class="text-xl font-bold">My Application</div>
         <div class="flex space-x-4">
-            <Button type="outlined" cls="px-4 py-2 !border-white">Home</Button>
-            <Button type="outlined" cls="px-4 py-2 !border-white">Profile</Button>
-            <Button type="outlined" cls="px-4 py-2 !border-white">Settings</Button>
+            <Button type="outlined" cls="px-4 py-2 !border-[var(--wui-white)]">Home</Button>
+            <Button type="outlined" cls="px-4 py-2 !border-[var(--wui-white)]">Profile</Button>
+            <Button type="outlined" cls="px-4 py-2 !border-[var(--wui-white)]">Settings</Button>
         </div>
     </div>
 </Toolbar>
@@ -110,7 +110,7 @@ This gives:
 
 ### HTML
 ```html
-<wui-toolbar cls="bg-blue-600 text-white shadow-lg">
+<wui-toolbar cls="bg-[var(--wui-blue-600)] text-[var(--wui-white)] shadow-lg">
     ...
 </wui-toolbar>
 ```
@@ -120,15 +120,15 @@ This gives:
 # 🧩 Toolbar with Icons
 
 ```tsx
-<Toolbar cls="bg-gray-800 text-white">
+<Toolbar cls="bg-[var(--wui-gray-800)] text-[var(--wui-white)]">
     <div class="flex items-center space-x-4">
-        <button class="p-2 hover:bg-gray-700 rounded-full">
+        <button class="p-2 hover:bg-[var(--wui-gray-700)] rounded-full">
             <svg ...></svg>
         </button>
-        <button class="p-2 hover:bg-gray-700 rounded-full">
+        <button class="p-2 hover:bg-[var(--wui-gray-700)] rounded-full">
             <svg ...></svg>
         </button>
-        <button class="p-2 hover:bg-gray-700 rounded-full">
+        <button class="p-2 hover:bg-[var(--wui-gray-700)] rounded-full">
             <svg ...></svg>
         </button>
     </div>
@@ -142,14 +142,14 @@ Great for action panels, media editors, or dashboards.
 # 🧭 Navigation Toolbar Example
 
 ```tsx
-<Toolbar cls="bg-white border-b border-gray-200">
+<Toolbar cls="bg-[var(--wui-white)] border-b border-[var(--wui-gray-200)]">
     <div class="flex items-center justify-between w-full">
         <div class="flex space-x-8">
-            <a class="py-4 px-1 border-b-2 border-blue-500 text-blue-600 font-medium">Dashboard</a>
-            <a class="py-4 px-1 text-gray-500 hover:text-gray-700">Team</a>
-            <a class="py-4 px-1 text-gray-500 hover:text-gray-700">Projects</a>
+            <a class="py-4 px-1 border-b-2 border-[var(--wui-blue-500)] text-[var(--wui-blue-600)] font-medium">Dashboard</a>
+            <a class="py-4 px-1 text-[var(--wui-gray-500)] hover:text-[var(--wui-gray-700)]">Team</a>
+            <a class="py-4 px-1 text-[var(--wui-gray-500)] hover:text-[var(--wui-gray-700)]">Projects</a>
         </div>
-        <button class="bg-blue-500 text-white px-4 py-2 rounded">New Item</button>
+        <button class="bg-[var(--wui-blue-500)] text-[var(--wui-white)] px-4 py-2 rounded">New Item</button>
     </div>
 </Toolbar>
 ```
@@ -159,13 +159,13 @@ Great for action panels, media editors, or dashboards.
 # 🧩 Compact Toolbar
 
 ```tsx
-<Toolbar cls="bg-gray-100 p-2">
+<Toolbar cls="bg-[var(--wui-gray-100)] p-2">
     <div class="flex items-center justify-between">
         <div class="text-sm font-medium">Document Editor</div>
         <div class="flex space-x-1 px-2">
-            <Button cls="!px-2 !py-1 text-xs bg-white border rounded">Save</Button>
-            <Button cls="!px-2 !py-1 text-xs bg-white border rounded">Undo</Button>
-            <Button cls="!px-2 !py-1 text-xs bg-white border rounded">Redo</Button>
+            <Button cls="!px-2 !py-1 text-xs bg-[var(--wui-white)] border rounded">Save</Button>
+            <Button cls="!px-2 !py-1 text-xs bg-[var(--wui-white)] border rounded">Undo</Button>
+            <Button cls="!px-2 !py-1 text-xs bg-[var(--wui-white)] border rounded">Redo</Button>
         </div>
     </div>
 </Toolbar>

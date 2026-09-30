@@ -17,7 +17,7 @@ const def = () => ({
 const TextColorPicker = defaults(def, (props) => {
     const { class: cn, cls, color: selectedColor, buttonType: btnType, ...otherProps } = props
 
-    const BASE_BTN = "size-full inline-flex items-center justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-black hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500 cursor-pointer"
+    const BASE_BTN = "size-full inline-flex items-center justify-center rounded-md border border-[var(--wui-gray-300)] shadow-sm px-4 py-2 bg-[var(--wui-white)] text-sm font-medium text-[var(--wui-black)] hover:bg-[var(--wui-gray-50)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-[var(--wui-indigo-500)] cursor-pointer"
 
     const editor = useEditor() // Editor context, likely the contentEditable div
     const undoRedoContext = useUndoRedo() // Undo/redo context

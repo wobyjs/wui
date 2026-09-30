@@ -138,7 +138,7 @@ Use `cls` for both TSX and HTML.
 ```tsx
 <Button
     type="contained"
-    cls="m-2 px-3 py-2 !rounded-md !text-red-500 !bg-green-200"
+    cls="m-2 px-3 py-2 !rounded-md !text-[var(--wui-red-500)] !bg-[var(--wui-green-200)]"
 >
     Custom Style
 </Button>
@@ -148,7 +148,7 @@ Use `cls` for both TSX and HTML.
 ```html
 <wui-button
     type="contained"
-    cls="!px-3 !py-2 !rounded-md !text-red-500 !bg-green-200"
+    cls="!px-3 !py-2 !rounded-md !text-[var(--wui-red-500)] !bg-[var(--wui-green-200)]"
     children="Custom Button"
 ></wui-button>
 ```

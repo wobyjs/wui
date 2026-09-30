@@ -27,7 +27,7 @@ const CURRENT_DATE = new Date()
 const MIN_YEAR = 1900
 const MAX_YEAR = CURRENT_DATE.getFullYear() + 20
 
-const DATETIME_WHEELER_CLS = 'date-time-Wheeler flex w-full bg-white p-1 border border-gray-300 rounded-md shadow-sm '
+const DATETIME_WHEELER_CLS = 'date-time-Wheeler flex w-full bg-[var(--wui-white)] p-1 border border-[var(--wui-gray-300)] rounded-md shadow-sm '
 const WHEELER_WRAPPER_CLS = 'wheel-wrapper flex-1'
 
 
@@ -320,7 +320,7 @@ const DateTimeWheeler = defaults(def, (props) => {
     const showMinute = () => ['minute', 'time', 'datetime'].includes($$(type).toString())
     const showSecond = () => ['second', 'time', 'datetime'].includes($$(type).toString())
 
-    const br = useMemo(() => $$(divider) ? 'border-l border-gray-300 dark:border-gray-600' : null)
+    const br = useMemo(() => $$(divider) ? 'border-l border-[var(--wui-gray-300)]' : null)
 
     const { height: vh, width: vw, offsetLeft: ol, offsetTop: ot, pageTop: pt, pageLeft: pl } = useViewportSize()
 
@@ -362,7 +362,7 @@ const DateTimeWheeler = defaults(def, (props) => {
                     <button
                         type="button"
                         id="dtw-cancel-btn"
-                        class="px-2 inline-flex items-center justify-center relative box-border cursor-pointer select-none align-middle no-underline font-medium text-sm leading-[1.75] tracking-[0.02857em] uppercase rounded text-white bg-[#1976d2] rounded-[4px] border-0 outline-0 font-sans px-4 py-2 shadow-[0px_3px_1px_-2px_rgba(0,0,0,0.2),0px_2px_2px_0px_rgba(0,0,0,0.14),0px_1px_5px_0px_rgba(0,0,0,0.12)] hover:bg-[#1565c0]"
+                        class="px-2 inline-flex items-center justify-center relative box-border cursor-pointer select-none align-middle no-underline font-medium text-sm leading-[1.75] tracking-[0.02857em] uppercase rounded text-[var(--wui-white)] bg-[var(--wui-accent-500)] rounded-[4px] border-0 outline-0 font-sans px-4 py-2 shadow-[0px_3px_1px_-2px_rgba(0,0,0,0.2),0px_2px_2px_0px_rgba(0,0,0,0.14),0px_1px_5px_0px_rgba(0,0,0,0.12)] hover:bg-[var(--wui-accent-600)]"
                         ref={el => { if (el) el.onclick = (e) => { handleCancelClick() } }}
                     > Cancel </button>
                 </div>
@@ -381,7 +381,7 @@ const DateTimeWheeler = defaults(def, (props) => {
                     <button
                         type="button"
                         id="dtw-ok-btn"
-                        class="px-2 inline-flex items-center justify-center relative box-border cursor-pointer select-none align-middle no-underline font-medium text-sm leading-[1.75] tracking-[0.02857em] uppercase rounded text-white bg-[#1976d2] rounded-[4px] border-0 outline-0 font-sans px-4 py-2 shadow-[0px_3px_1px_-2px_rgba(0,0,0,0.2),0px_2px_2px_0px_rgba(0,0,0,0.14),0px_1px_5px_0px_rgba(0,0,0,0.12)] hover:bg-[#1565c0]"
+                        class="px-2 inline-flex items-center justify-center relative box-border cursor-pointer select-none align-middle no-underline font-medium text-sm leading-[1.75] tracking-[0.02857em] uppercase rounded text-[var(--wui-white)] bg-[var(--wui-accent-500)] rounded-[4px] border-0 outline-0 font-sans px-4 py-2 shadow-[0px_3px_1px_-2px_rgba(0,0,0,0.2),0px_2px_2px_0px_rgba(0,0,0,0.14),0px_1px_5px_0px_rgba(0,0,0,0.12)] hover:bg-[var(--wui-accent-600)]"
                         ref={el => { if (el) el.onclick = (e) => { handleOkClick() } }}
                     > OK </button>
                 </div>
@@ -457,7 +457,7 @@ const DateTimeWheeler = defaults(def, (props) => {
             ref={ref}
             class={[
                 DATETIME_WHEELER_CLS,
-                'flex-col w-full bg-white shadow-lg z-10 h-fit'
+                'flex-col w-full bg-[var(--wui-white)] shadow-lg z-10 h-fit'
             ]}
         >
             {renderHeaderBar()}
@@ -503,7 +503,7 @@ const DateTimeWheeler = defaults(def, (props) => {
                     ) : null,
                     <div
                         ref={cont}
-                        class={[DATETIME_WHEELER_CLS, 'fixed inset-x-0 bottom-0 bg-white shadow-lg z-200 w-full']}
+                        class={[DATETIME_WHEELER_CLS, 'fixed inset-x-0 bottom-0 bg-[var(--wui-white)] shadow-lg z-200 w-full']}
                     >
                         {component}
                     </div>

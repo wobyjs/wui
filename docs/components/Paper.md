@@ -106,9 +106,9 @@ You may override background, border, padding, etc.
 ```tsx
 <Paper
     elevation={4}
-    cls="p-6 bg-yellow-50 border-2 border-yellow-200"
+    cls="p-6 bg-[var(--wui-yellow-50)] border-2 border-[var(--wui-yellow-200)]"
 >
-    <h3 class="font-bold text-yellow-800">Custom Styled Paper</h3>
+    <h3 class="font-bold text-[var(--wui-yellow-800)]">Custom Styled Paper</h3>
     <p class="text-sm">Mix elevation with custom colors.</p>
 </Paper>
 ```

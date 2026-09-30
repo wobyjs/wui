@@ -41,7 +41,7 @@ const def = () => ({
 })
 
 const BASE_CLASS =
-    "relative flex items-center justify-center align-middle select-none leading-none overflow-hidden shrink-0 m-0 bg-[rgb(189,189,189)] text-white"
+    "relative flex items-center justify-center align-middle select-none leading-none overflow-hidden shrink-0 m-0 bg-[rgb(189,189,189)] text-[var(--wui-white)]"
 
 // Indexed by the `type`/`variant`/`size` prop, which is a free-form string on the custom
 // element (attributes carry no enum), so the table needs a string index signature.
