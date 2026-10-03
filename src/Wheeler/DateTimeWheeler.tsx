@@ -1,5 +1,5 @@
 /* @jsxImportSource woby */
-import { $, $$, Observable, ObservableMaybe, useEffect, useMemo, untrack, Portal, type JSX, isObservable, defaults, customElement, ElementAttributes, HtmlBoolean, HtmlClass } from 'woby'
+import { $, $$, Observable, ObservableMaybe, useEffect, useMemo, untrack, Portal, type JSX, isObservable, defaults, customElement, ElementAttributes, HtmlBoolean, HtmlClass, HtmlDate } from 'woby'
 import { useClickAway, useViewportSize } from '@woby/use'
 import { use } from '../use'
 import { Wheeler, def as wheelerDef } from './Wheeler' // Adjust path
@@ -45,10 +45,15 @@ const def = () => {
     const inheritedDefaults = pick(baseDefaults, inheritedKeys)
 
     return {
-        value: $(CURRENT_DATE) as ObservableMaybe<Date>,
+        // Date props are HtmlDate, never a bare $(Date): as a custom element the value is
+        // reflected to an attribute and replayed back on connect. A bare Date reflects via
+        // toUTCString (drops ms) and returns as a new, non-identical Date, so every replay
+        // counts as a change. HtmlDate reflects as ISO and compares by time, making the
+        // round-trip a no-op, and lets `min-date="..."` attributes parse to Dates.
+        value: $(CURRENT_DATE, HtmlDate) as ObservableMaybe<Date>,
         mode: $("datetime" as DateTimeWheelerType) as ObservableMaybe<DateTimeWheelerType>,
-        minDate: $(new Date(1900, 0, 1)) as ObservableMaybe<Date | string>, // January 1, 1900
-        maxDate: $(new Date(2100, 11, 31)) as ObservableMaybe<Date | string>, // December 31, 2100,
+        minDate: $(new Date(1900, 0, 1), HtmlDate) as ObservableMaybe<Date | string>, // January 1, 1900
+        maxDate: $(new Date(2100, 11, 31), HtmlDate) as ObservableMaybe<Date | string>, // December 31, 2100,
         yearRange: $({ start: MIN_YEAR, end: MAX_YEAR }) as ObservableMaybe<{ start: number, end: number }>,
         divider: $(true) as ObservableMaybe<boolean>,
         // title: (d: Date) => <div>{d.toISOString()}</div> as ObservableMaybe<(d: Date) => JSX.Element>,
