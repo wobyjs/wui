@@ -9,8 +9,8 @@ var __esm = (fn2, res, err) => function __init() {
   }
 };
 var __export = (target2, all) => {
-  for (var name21 in all)
-    __defProp(target2, name21, { get: all[name21], enumerable: true });
+  for (var name22 in all)
+    __defProp(target2, name22, { get: all[name22], enumerable: true });
 };
 
 // src/ssr/ssr-shim.js
@@ -66,17 +66,17 @@ var init_ssr_shim = __esm({
         this.classList = /* @__PURE__ */ new Set();
         this.style = {};
       }
-      setAttribute(name21, value) {
-        this.attributes[name21] = value;
+      setAttribute(name22, value) {
+        this.attributes[name22] = value;
       }
-      getAttribute(name21) {
-        return this.attributes[name21] ?? null;
+      getAttribute(name22) {
+        return this.attributes[name22] ?? null;
       }
-      hasAttribute(name21) {
-        return name21 in this.attributes;
+      hasAttribute(name22) {
+        return name22 in this.attributes;
       }
-      removeAttribute(name21) {
-        delete this.attributes[name21];
+      removeAttribute(name22) {
+        delete this.attributes[name22];
       }
       get tagName() {
         return this.constructor.name?.toUpperCase() ?? "DIV";
@@ -132,11 +132,11 @@ var init_ssr_shim = __esm({
         this._shadowRoot = this;
         return this._shadowRoot;
       }
-      getAttribute(name21) {
-        return this.attributes[name21] ?? null;
+      getAttribute(name22) {
+        return this.attributes[name22] ?? null;
       }
-      setAttribute(name21, value) {
-        this.attributes[name21] = value;
+      setAttribute(name22, value) {
+        this.attributes[name22] = value;
       }
       click() {
       }
@@ -283,7 +283,7 @@ var init_ssr_shim = __esm({
   }
 });
 
-// ../woby/dist/setters-Bw8p6kfU.js
+// ../woby/dist/setters-CUbJIjIx.js
 function deepResolve(value, returnFunction = false) {
   if (isFunction$1(value)) {
     if (isObservable(value)) return deepResolve(value(), returnFunction);
@@ -424,7 +424,7 @@ function getCreators() {
     return {
       createComment: document3.createComment,
       createHTMLNode: document3.createElement,
-      createSVGNode: ((name21) => document3.createElementNS("http://www.w3.org/2000/svg", name21)),
+      createSVGNode: ((name22) => document3.createElementNS("http://www.w3.org/2000/svg", name22)),
       createText: document3.createTextNode,
       createDocumentFragment: document3.createDocumentFragment
     };
@@ -448,9 +448,9 @@ function getCreators() {
     };
   }
 }
-var DEBUGGER, Stack, callStack, BATCH, OBSERVER, setBatch, setObserver, castArray$1, castError$1, is, isArray$1, isEqual, isFunction$1, isObject$1, isSymbol, noop$1, nope, counter, resolve$1, batch, SYMBOL_CACHED, SYMBOL_OBSERVABLE, SYMBOL_OBSERVABLE_BOOLEAN, SYMBOL_OBSERVABLE_FROZEN, SYMBOL_OBSERVABLE_READABLE, SYMBOL_OBSERVABLE_WRITABLE, SYMBOL_STORE, SYMBOL_STORE_KEYS, SYMBOL_STORE_OBSERVABLE, SYMBOL_STORE_TARGET, SYMBOL_STORE_VALUES, SYMBOL_STORE_UNTRACKED, SYMBOL_SUSPENSE$1, SYMBOL_UNCACHED, SYMBOL_UNTRACKED, SYMBOL_UNTRACKED_UNWRAPPED, isObservableBoolean, isObservableFrozen, isUntracked$1, isObservable, frozen, readable, writable, OBSERVABLE_FALSE, OBSERVABLE_TRUE, UNAVAILABLE, UNINITIALIZED, Scheduler$1, scheduler_sync_default, Observable, lazyArrayEach, lazyArrayEachRight, lazyArrayPush, lazySetAdd, lazySetDelete, lazySetEach, onCleanup, onDispose, Owner, SuperRoot, SUPER_OWNER, OWNER, setOwner, ObservablesArray, ObservablesSet, Observer, Memo, memo, boolean, cleanup, Context, disposed, Scheduler, scheduler_async_default, Effect, effect, Root, DUMMY_INDEX$1, MappedRoot$1, CacheKeyed, Suspense, suspense, DUMMY_INDEX, MappedRoot, CacheUnkeyed, isStore, warmup, match, ternary, isBatching, owner, isObservableWritable, target, readonly, root, isEqualForSelector, DisposableMap, SelectedObservable, selector, StoreMap, StoreCleanable, StoreKeys, StoreValues, StoreHas, StoreProperty, StoreListenersRegular, StoreListenersRoots, StoreScheduler, NODES, SPECIAL_SYMBOLS, UNREACTIVE_KEYS, STORE_TRAPS, STORE_UNTRACK_TRAPS, getNode, getNodeExisting, getNodeFromStore, getNodeKeys, getNodeValues, getNodeHas, getNodeObservable, getNodeProperty, getGettersAndSetters, getStore, getTarget, getUntracked, isEqualDescriptor, isFrozenLike, isListenable, isProxiable, isUntracked, throwNoSetterError, store, suspended, tick, tryCatch, _with, dist_default, CONTEXTS_DATA, DIRECTIVES, SYMBOL_TEMPLATE_ACCESSOR, SYMBOLS_DIRECTIVES, SYMBOL_CLONE, SYMBOL_CONTEXT, SYMBOL_ISSLOT, SYMBOL_JSX, SYMBOL_DEFAULT, SYMBOL_CONTEXT_WRAP, SimpleNodeList, IDENT, SPACE, \u8BED\u6CD5\u9519\u8BEF, readIdent, readAttr, cache, parseSelector, \u662F\u5143\u7D20, \u7C7B\u5217\u8868, matchSimple, matchCompound, matchFrom, matchAny, matchesSelector, closestSelector, querySelectorAll, querySelector, getElementById, BaseNode, Comment2, Style, Element3, createComment$1, createElement, createHTMLNode$1, SVGNode, createSVGNode$1, createText$1, createDocumentFragment$1, createDocument, document$1, isNodeEnvironment, createComment, createHTMLNode, createSVGNode, createText, createDocumentFragment, NOOP_CHILDREN, Node3, FragmentUtils, useCheapDisposed, useMicrotask, options, useRenderEffect, assign, castArray, flatten, indexOf, isArray, isBoolean, isFunction, isClass, isFunctionReactive, isNil, isNode, isObject, isPrimitive, isPromise, isString, isSVG, isSVGElement, isTemplateAccessor, isVoidChild, isPureFunction, classesToggle, \u8282\u70B9\u7C7B, dummyNode, beforeDummyWrapper, afterDummyWrapper, diff, EnvironmentToken, DocumentToken, EnvironmentContext, useEnvironment, DocumentContext, resolveChild, resolveClass, resolveStyle, resolveArraysAndStatics, kebabToCamelCase, camelToKebabCase, normalizePropertyPath, setNestedAttribute, SYMBOL_SELF_REMOVED_ATTRIBUTES, trackSelfRemovedAttributes, markSelfRemovedAttribute, consumeSelfRemovedAttribute, setAttributeStatic, setAttribute, setChildStatic, setChild, setClassStatic, setClass, setClassBooleanStatic, setClassBoolean, setClassesStatic, setClasses, setDirective, setEventStatic, setEvent, setHTMLStatic, setHTML, setPropertyStatic, setProperty, setRef, propertyNonDimensionalRe, setStyleStatic, setStyle, setStylesStatic, setStyles, setTemplateAccessor, setProp, setProps;
-var init_setters_Bw8p6kfU = __esm({
-  "../woby/dist/setters-Bw8p6kfU.js"() {
+var DEBUGGER, Stack, callStack, BATCH, OBSERVER, setBatch, setObserver, castArray$1, castError$1, is, isArray$1, isEqual, isFunction$1, isObject$1, isSymbol, noop$1, nope, counter, resolve$1, batch, SYMBOL_CACHED, SYMBOL_OBSERVABLE, SYMBOL_OBSERVABLE_BOOLEAN, SYMBOL_OBSERVABLE_FROZEN, SYMBOL_OBSERVABLE_READABLE, SYMBOL_OBSERVABLE_WRITABLE, SYMBOL_STORE, SYMBOL_STORE_KEYS, SYMBOL_STORE_OBSERVABLE, SYMBOL_STORE_TARGET, SYMBOL_STORE_VALUES, SYMBOL_STORE_UNTRACKED, SYMBOL_SUSPENSE$1, SYMBOL_UNCACHED, SYMBOL_UNTRACKED, SYMBOL_UNTRACKED_UNWRAPPED, isObservableBoolean, isObservableFrozen, isUntracked$1, isObservable, frozen, readable, writable, OBSERVABLE_FALSE, OBSERVABLE_TRUE, UNAVAILABLE, UNINITIALIZED, Scheduler$1, scheduler_sync_default, Observable, lazyArrayEach, lazyArrayEachRight, lazyArrayPush, lazySetAdd, lazySetDelete, lazySetEach, onCleanup, onDispose, Owner, SuperRoot, SUPER_OWNER, OWNER, setOwner, ObservablesArray, ObservablesSet, Observer, Memo, memo, boolean, cleanup, Context, disposed, Scheduler, scheduler_async_default, Effect, effect, Root, DUMMY_INDEX$1, MappedRoot$1, CacheKeyed, Suspense, suspense, DUMMY_INDEX, MappedRoot, CacheUnkeyed, isStore, warmup, match, ternary, isBatching, owner, isObservableWritable, target, readonly, root, isEqualForSelector, DisposableMap, SelectedObservable, selector, StoreMap, StoreCleanable, StoreKeys, StoreValues, StoreHas, StoreProperty, StoreListenersRegular, StoreListenersRoots, StoreScheduler, NODES, SPECIAL_SYMBOLS, UNREACTIVE_KEYS, STORE_TRAPS, STORE_UNTRACK_TRAPS, getNode, getNodeExisting, getNodeFromStore, getNodeKeys, getNodeValues, getNodeHas, getNodeObservable, getNodeProperty, getGettersAndSetters, getStore, getTarget, getUntracked, isEqualDescriptor, isFrozenLike, isListenable, isProxiable, isUntracked, throwNoSetterError, store, suspended, tick, tryCatch, _with, dist_default, CONTEXTS_DATA, DIRECTIVES, SYMBOL_TEMPLATE_ACCESSOR, SYMBOLS_DIRECTIVES, SYMBOL_CLONE, SYMBOL_CONTEXT, SYMBOL_ISSLOT, SYMBOL_JSX, SYMBOL_DEFAULT, SYMBOL_CONTEXT_WRAP, SimpleNodeList, IDENT, SPACE, \u8BED\u6CD5\u9519\u8BEF, readIdent, readAttr, cache, parseSelector, \u662F\u5143\u7D20, \u7C7B\u5217\u8868, matchSimple, matchCompound, matchFrom, matchAny, matchesSelector, closestSelector, querySelectorAll, querySelector, getElementById, BaseNode, Comment2, Style, Element3, createComment$1, createElement, createHTMLNode$1, SVGNode, createSVGNode$1, createText$1, createDocumentFragment$1, createDocument, document$1, isNodeEnvironment, createComment, createHTMLNode, createSVGNode, createText, createDocumentFragment, NOOP_CHILDREN, Node3, FragmentUtils, useCheapDisposed, useMicrotask, options, useRenderEffect, assign, castArray, flatten, indexOf, isArray, isBoolean, isFunction, isClass, isFunctionReactive, isNil, isNode, isObject, isPrimitive, isPromise, isString, isSVG, isSVGElement, isTemplateAccessor, isVoidChild, isPureFunction, classesToggle, \u8282\u70B9\u7C7B, dummyNode, beforeDummyWrapper, afterDummyWrapper, diff, EnvironmentToken, DocumentToken, EnvironmentContext, useEnvironment, DocumentContext, useDocument, resolveChild, resolveClass, resolveStyle, resolveArraysAndStatics, kebabToCamelCase, camelToKebabCase, normalizePropertyPath, setNestedAttribute, SYMBOL_SELF_REMOVED_ATTRIBUTES, trackSelfRemovedAttributes, markSelfRemovedAttribute, consumeSelfRemovedAttribute, setAttributeStatic, setAttribute, setChildStatic, setChild, setClassStatic, setClass, setClassBooleanStatic, setClassBoolean, setClassesStatic, setClasses, setDirective, setEventStatic, setEvent, setHTMLStatic, setHTML, setPropertyStatic, setProperty, setRef, propertyNonDimensionalRe, setStyleStatic, setStyle, setStylesStatic, setStyles, setTemplateAccessor, setProp, setProps;
+var init_setters_CUbJIjIx = __esm({
+  "../woby/dist/setters-CUbJIjIx.js"() {
     "use strict";
     init_ssr_shim();
     DEBUGGER = {
@@ -2135,13 +2135,13 @@ var init_setters_Bw8p6kfU = __esm({
     };
     readAttr = (sel, i) => {
       while (i < sel.length && SPACE.test(sel[i])) i++;
-      const [name21, afterName] = readIdent(sel, i);
-      if (!name21) return \u8BED\u6CD5\u9519\u8BEF(sel, i, "empty attribute name");
+      const [name22, afterName] = readIdent(sel, i);
+      if (!name22) return \u8BED\u6CD5\u9519\u8BEF(sel, i, "empty attribute name");
       i = afterName;
       while (i < sel.length && SPACE.test(sel[i])) i++;
       if (sel[i] === "]") return [{
         t: "attr",
-        name: name21
+        name: name22
       }, i + 1];
       let op = "";
       if (i < sel.length && "~|^$*".includes(sel[i])) {
@@ -2176,7 +2176,7 @@ var init_setters_Bw8p6kfU = __esm({
       if (sel[i] !== "]") return \u8BED\u6CD5\u9519\u8BEF(sel, i, 'expected "]"');
       return [{
         t: "attr",
-        name: name21,
+        name: name22,
         op,
         value
       }, i + 1];
@@ -2505,10 +2505,10 @@ var init_setters_Bw8p6kfU = __esm({
           });
         }
       }
-      setAttribute(name21, value) {
-        const oldValue = this.attributes[name21];
+      setAttribute(name22, value) {
+        const oldValue = this.attributes[name22];
         const newValue = String(value);
-        this.attributes[name21] = newValue;
+        this.attributes[name22] = newValue;
         this._notifyMutation({
           type: "attributes",
           target: this,
@@ -2516,15 +2516,15 @@ var init_setters_Bw8p6kfU = __esm({
           removedNodes: new SimpleNodeList([]),
           previousSibling: null,
           nextSibling: null,
-          attributeName: name21,
+          attributeName: name22,
           attributeNamespace: null,
           oldValue: oldValue !== void 0 ? oldValue : null
         });
       }
-      removeAttribute(name21) {
-        const oldValue = this.attributes[name21];
+      removeAttribute(name22) {
+        const oldValue = this.attributes[name22];
         if (oldValue !== void 0) {
-          delete this.attributes[name21];
+          delete this.attributes[name22];
           this._notifyMutation({
             type: "attributes",
             target: this,
@@ -2532,7 +2532,7 @@ var init_setters_Bw8p6kfU = __esm({
             removedNodes: new SimpleNodeList([]),
             previousSibling: null,
             nextSibling: null,
-            attributeName: name21,
+            attributeName: name22,
             attributeNamespace: null,
             oldValue
           });
@@ -2730,15 +2730,15 @@ var init_setters_Bw8p6kfU = __esm({
     };
     Style = class {
       constructor() {
-        this.setProperty = (name21, value) => {
-          this[name21] = value;
+        this.setProperty = (name22, value) => {
+          this[name22] = value;
         };
       }
-      setProperty(name21, value) {
-        this[name21] = value;
+      setProperty(name22, value) {
+        this[name22] = value;
       }
-      removeProperty(name21) {
-        delete this[name21];
+      removeProperty(name22) {
+        delete this[name22];
       }
     };
     Element3 = class Element4 extends BaseNode {
@@ -2780,23 +2780,23 @@ var init_setters_Bw8p6kfU = __esm({
           toString: () => String(content)
         });
       }
-      getAttribute(name21) {
-        return this.attributes[name21] ?? null;
+      getAttribute(name22) {
+        return this.attributes[name22] ?? null;
       }
-      setAttribute(name21, value) {
-        if (name21 === "style") this.attributes["style"] = value;
-        else if (name21 === "class" || name21 === "className") this.className = value;
-        else if (name21 === "htmlFor") this.attributes["for"] = String(value);
-        else this.attributes[name21] = String(value);
-        super.setAttribute(name21, value);
+      setAttribute(name22, value) {
+        if (name22 === "style") this.attributes["style"] = value;
+        else if (name22 === "class" || name22 === "className") this.className = value;
+        else if (name22 === "htmlFor") this.attributes["for"] = String(value);
+        else this.attributes[name22] = String(value);
+        super.setAttribute(name22, value);
       }
-      removeAttribute(name21) {
-        delete this.attributes[name21];
-        if (name21 === "class" || name21 === "className") this.#className = "";
-        super.removeAttribute(name21);
+      removeAttribute(name22) {
+        delete this.attributes[name22];
+        if (name22 === "class" || name22 === "className") this.#className = "";
+        super.removeAttribute(name22);
       }
-      hasAttribute(name21) {
-        return name21 in this.attributes;
+      hasAttribute(name22) {
+        return name22 in this.attributes;
       }
       append(...nodes) {
         nodes.forEach((node) => {
@@ -2809,7 +2809,7 @@ var init_setters_Bw8p6kfU = __esm({
         });
       }
       get outerHTML() {
-        const attrs = Object.entries(this.attributes).map(([name21, value]) => `${name21.toLowerCase()}="${value}"`).join(" ");
+        const attrs = Object.entries(this.attributes).map(([name22, value]) => `${name22.toLowerCase()}="${value}"`).join(" ");
         const attrStr = attrs ? ` ${attrs}` : "";
         if ([
           "br",
@@ -2912,7 +2912,7 @@ var init_setters_Bw8p6kfU = __esm({
         this.isSVG = true;
       }
       get outerHTML() {
-        const attrs = Object.entries(this.attributes).map(([name21, value]) => `${name21}="${value}"`).join(" ");
+        const attrs = Object.entries(this.attributes).map(([name22, value]) => `${name22}="${value}"`).join(" ");
         const attrStr = attrs ? ` ${attrs}` : "";
         const children = this.childNodes.map((child) => {
           if (typeof child === "object" && child !== null) {
@@ -3281,6 +3281,13 @@ var init_setters_Bw8p6kfU = __esm({
     EnvironmentContext = { Provider: (env, callback) => context({ [EnvironmentToken]: env }, callback) };
     useEnvironment = () => context(EnvironmentToken);
     DocumentContext = { Provider: (doc, callback) => context({ [DocumentToken]: doc }, callback) };
+    useDocument = () => {
+      try {
+        return context(DocumentToken);
+      } catch {
+        return null;
+      }
+    };
     resolveChild = (value, setter, _dynamic = false, stack) => {
       const isSSR = useEnvironment() === "ssr";
       if (isArray(value)) {
@@ -3508,14 +3515,7 @@ var init_setters_Bw8p6kfU = __esm({
           return;
         } else if (type2 === "object" && child !== null && typeof child.nodeType === "number") {
           const node = child;
-          if (!fragmentOnly) try {
-            parent.insertBefore(node, null);
-          } catch (e3) {
-            console.error("[DEBUG insertBefore] FAILED node:", node, "typeof:", typeof node, "nodeType:", node?.nodeType, "constructor:", node?.constructor?.name, "toString:", Object.prototype.toString.call(node), "parent:", parent, "parent.tagName:", parent?.tagName);
-            console.error("[DEBUG insertBefore] child that passed nodeType check:", JSON.stringify(child?.constructor?.name), "child typeof:", typeof child, "child nodeType:", typeof child?.nodeType);
-            console.error("[DEBUG insertBefore] Error stack:", e3?.stack);
-            throw e3;
-          }
+          if (!fragmentOnly) parent.insertBefore(node, null);
           FragmentUtils.replaceWithNode(fragment, node);
           return;
         }
@@ -3525,13 +3525,10 @@ var init_setters_Bw8p6kfU = __esm({
       let resolvedChildren = children;
       if (isSSR && Array.isArray(child) && children.some((c) => typeof c === "function")) {
         const tempResolved = children.map((c, i) => {
-          if (typeof c === "function") try {
+          if (typeof c === "function") {
             let resolved = c();
             while (typeof resolved === "function") resolved = resolved();
             return resolved;
-          } catch (e3) {
-            console.error("[setChildStatic] Failed to resolve function:", e3);
-            return c;
           }
           return c;
         });
@@ -3935,7 +3932,7 @@ var init_setters_Bw8p6kfU = __esm({
   }
 });
 
-// ../woby/dist/create_element-UafkJvc0.js
+// ../woby/dist/create_element-DWEUmE10.js
 function renderToString(child, options2) {
   const ssrDoc = options2?.document ?? createDocument();
   return EnvironmentContext.Provider("ssr", () => {
@@ -4012,8 +4009,8 @@ function constructNodeHTML(node) {
     return `<!---->`;
   } else if (node.nodeType === 1) {
     const tagName = "tagName" in node ? node.tagName.toLowerCase() : "div";
-    const attrs = Object.entries(node.attributes || {}).map(([name21, value]) => {
-      return `${name21.toLowerCase() === "htmlfor" ? "for" : name21}="${value}"`;
+    const attrs = Object.entries(node.attributes || {}).map(([name22, value]) => {
+      return `${name22.toLowerCase() === "htmlfor" ? "for" : name22}="${value}"`;
     }).join(" ");
     const attrStr = attrs ? ` ${attrs}` : "";
     if ("tagName" in node && [
@@ -4050,7 +4047,6 @@ function getProps(component, props) {
     if (ceMeta) {
       if (!ceMeta.isNative) {
         const defaultPropsFn = ceMeta.ctor.__component__?.[SYMBOL_DEFAULT];
-        if (!defaultPropsFn) console.error(`Component ${component} is missing default props. Please use the 'defaults' helper function to provide default props.`);
         if (!props) props = defaultPropsFn?.() ?? {};
       }
     }
@@ -4065,11 +4061,11 @@ function jsx(component, props, ...children) {
   return wrapCloneElement(createElement2(component, props, props?.key), component, props);
 }
 var SYMBOL_STACK, wrapElement, Fragment, customElementsRegistry, customElements2, SSRCustomElement, SSRShadowRoot, WobyCustomElementsRegistry, wobyCustomElements, wrapCloneElement, wrapJsx, isJsx, jsxs, createElement2;
-var init_create_element_UafkJvc0 = __esm({
-  "../woby/dist/create_element-UafkJvc0.js"() {
+var init_create_element_DWEUmE10 = __esm({
+  "../woby/dist/create_element-DWEUmE10.js"() {
     "use strict";
     init_ssr_shim();
-    init_setters_Bw8p6kfU();
+    init_setters_CUbJIjIx();
     SYMBOL_STACK = /* @__PURE__ */ Symbol("STACK");
     wrapElement = (element) => {
       element[SYMBOL_UNTRACKED_UNWRAPPED] = true;
@@ -4120,7 +4116,7 @@ var init_create_element_UafkJvc0 = __esm({
       * Get outerHTML including shadow DOM and slot content
       */
       get outerHTML() {
-        const attrs = Object.entries(this.attributes || {}).filter(([name21]) => name21 !== "symbol").map(([name21, value]) => `${name21.toLowerCase()}="${value ?? ""}"`).join(" ");
+        const attrs = Object.entries(this.attributes || {}).filter(([name22]) => name22 !== "symbol").map(([name22, value]) => `${name22.toLowerCase()}="${value ?? ""}"`).join(" ");
         const attrStr = attrs ? ` ${attrs}` : "";
         const children = this.childNodes.map((child) => {
           if (child && typeof child === "object" && child.nodeType === 1 && !child.parentNode) child.parentNode = this;
@@ -4283,7 +4279,7 @@ var init_create_element_UafkJvc0 = __esm({
   }
 });
 
-// ../woby/dist/htm.module-CWd03XrA.js
+// ../woby/dist/htm.module-Cv5faRgF.js
 function scheduleStylesheetUpdate() {
   if (updateScheduled) return;
   updateScheduled = true;
@@ -4482,12 +4478,12 @@ function htm_module_default(s) {
   })(s)), r), arguments, [])).length > 1 ? r : r[0];
 }
 var Switch, useScheduler, useTimeout, cachedConstructedSheets, stylesheetObserver, loggedErrors, MAX_LOGGED_ERRORS, shadowRootRegistry, updateScheduled, set, isObject2, assign2, isJsxProp, make, merge, defaults, HtmlChild, contextRefRegistry, isContextRef, collectAncestorContextWrap$1, parseContextRef, resolveContextRef, createSSRCustomElement, _pendingContextWrapGlobal, consumePendingContextWrap, peekPendingContextWrap, composePendingContextWrap, collectAncestorContextWrap, createBrowserCustomElement, emptyValueFor, setObservableValue, setNestedProperty, customElement, HtmlHidden, n, t;
-var init_htm_module_CWd03XrA = __esm({
-  "../woby/dist/htm.module-CWd03XrA.js"() {
+var init_htm_module_Cv5faRgF = __esm({
+  "../woby/dist/htm.module-Cv5faRgF.js"() {
     "use strict";
     init_ssr_shim();
-    init_setters_Bw8p6kfU();
-    init_create_element_UafkJvc0();
+    init_setters_CUbJIjIx();
+    init_create_element_DWEUmE10();
     Switch = ({ when, fallback, children }) => {
       return _switch(when, castArray(children).map((child) => child().metadata), fallback);
     };
@@ -4773,8 +4769,8 @@ var init_htm_module_CWd03XrA = __esm({
       };
     };
     createBrowserCustomElement = (tagName, component) => {
-      const defaultPropsFn = component[SYMBOL_DEFAULT];
-      if (!defaultPropsFn) console.error(`Component ${tagName} is missing default props.`);
+      const declaredDefaults = component[SYMBOL_DEFAULT];
+      const defaultPropsFn = declaredDefaults ?? (() => ({ children: observable() }));
       const C2 = class extends HTMLElement {
         static {
           this.__component__ = component;
@@ -4801,6 +4797,7 @@ var init_htm_module_CWd03XrA = __esm({
             for (const key in props) {
               if (key === "children") continue;
               if (key in defaultProps && isObservableWritable(defaultProps[key])) mergeInto(key, props[key]);
+              else if (!declaredDefaults) defaultProps[key] = props[key];
             }
             if ("children" in props && isObservableWritable(defaultProps["children"])) mergeInto("children", props.children);
             defaultProps[SYMBOL_JSX] = true;
@@ -4871,31 +4868,37 @@ var init_htm_module_CWd03XrA = __esm({
         }
         connectedCallback() {
           if (this._attrObserver) this._attrObserver.disconnect();
-          const { props: p } = this;
-          const aKeys = Object.keys(p).filter((k2) => k2 !== "children" && isObservable(p[k2]));
-          Object.keys(p).filter((k2) => isPureFunction(p[k2]) || isObject(p[k2])).forEach((k2) => this.removeAttribute(this.propDict[k2] ?? k2));
-          for (const k2 of aKeys) {
-            if (isJsx(p)) {
-              const val = get(p[k2]);
-              if (isObject(val) && !(val instanceof Date)) continue;
+          untrack(() => {
+            const { props: p } = this;
+            const aKeys = Object.keys(p).filter((k2) => k2 !== "children" && isObservable(p[k2]));
+            Object.keys(p).filter((k2) => isPureFunction(p[k2]) || isObject(p[k2])).forEach((k2) => this.removeAttribute(this.propDict[k2] ?? k2));
+            for (const k2 of aKeys) {
+              if (isJsx(p)) {
+                const val = get(p[k2]);
+                if (isObject(val) && !(val instanceof Date)) continue;
+              }
+              if (!this.attributes[this.propDict[k2]]) setProp(this, this.propDict[k2], p[k2], callStack("connectedCallback"));
             }
-            if (!this.attributes[this.propDict[k2]]) setProp(this, this.propDict[k2], p[k2], callStack("connectedCallback"));
-          }
-          for (const attr of this.attributes) {
-            if (isJsx(p) && isContextRef(attr.value)) continue;
-            this.attributeChangedCallback1(attr.name, void 0, attr.value);
-          }
+            for (const attr of this.attributes) {
+              if (isJsx(p) && isContextRef(attr.value)) continue;
+              if (isJsx(p)) {
+                const propName = kebabToCamelCase(attr.name);
+                if (propName in p && !isObservable(p[propName])) continue;
+              }
+              this.attributeChangedCallback1(attr.name, void 0, attr.value);
+            }
+          });
           this._attrObserver?.disconnect();
           this._attrObserver = new MutationObserver((mutations) => {
             mutations.forEach((m) => {
               if (m.type === "attributes") {
-                const name21 = m.attributeName;
-                const newValue = this.getAttribute(name21);
+                const name22 = m.attributeName;
+                const newValue = this.getAttribute(name22);
                 const oldValue = m.oldValue;
                 try {
-                  this.attributeChangedCallback1(name21, oldValue, newValue);
+                  this.attributeChangedCallback1(name22, oldValue, newValue);
                 } catch (e3) {
-                  console.warn(`[woby] <${tagName}> failed to sync attribute "${name21}" to its prop:`, e3);
+                  console.warn(`[woby] <${tagName}> failed to sync attribute "${name22}" to its prop:`, e3);
                 }
               }
             });
@@ -4918,20 +4921,20 @@ var init_htm_module_CWd03XrA = __esm({
           }
           if (this.shadowRoot) unregisterShadowRoot(this.shadowRoot);
         }
-        attributeChangedCallback1(name21, oldValue, newValue) {
+        attributeChangedCallback1(name22, oldValue, newValue) {
           if (oldValue === newValue) return;
           if (newValue === "[object Object]") return;
           const { props } = this;
-          const propName = kebabToCamelCase(name21);
+          const propName = kebabToCamelCase(name22);
           if (isObservable(props[propName])) {
             const currentVal = get(props[propName]);
             if (isObject(currentVal) && !(currentVal instanceof Date) && typeof newValue === "string") return;
           }
-          if (name21.includes("$") || name21.includes(".")) {
-            const normalizedPath = normalizePropertyPath(name21);
+          if (name22.includes("$") || name22.includes(".")) {
+            const normalizedPath = normalizePropertyPath(name22);
             setNestedProperty(this, normalizedPath, newValue);
           } else if (newValue === null) {
-            if (consumeSelfRemovedAttribute(this, name21)) return;
+            if (consumeSelfRemovedAttribute(this, name22)) return;
             const obs = props[propName];
             if (isObservable(obs) && isObservableWritable(obs)) {
               let restored = false;
@@ -5184,14 +5187,14 @@ var init_htm_module_CWd03XrA = __esm({
 });
 
 // ../woby/dist/index.es.js
-var IS_BROWSER, runWithSuperRoot, render, registry, h$1, register, html, is2, HtmlBoolean, toNumber, HtmlNumber, toString, HtmlString, toClassString, HtmlClass;
+var IS_BROWSER, runWithSuperRoot, render, Portal, registry, h$1, register, html, clone, is2, HtmlBoolean, toNumber, HtmlNumber, toDate, HtmlDate, toString, HtmlString, toClassString, HtmlClass;
 var init_index_es = __esm({
   "../woby/dist/index.es.js"() {
     "use strict";
     init_ssr_shim();
-    init_setters_Bw8p6kfU();
-    init_create_element_UafkJvc0();
-    init_htm_module_CWd03XrA();
+    init_setters_CUbJIjIx();
+    init_create_element_DWEUmE10();
+    init_htm_module_Cv5faRgF();
     IS_BROWSER = !!globalThis.CDATASection?.toString?.().match(/^\s*function\s+CDATASection\s*\(\s*\)\s*\{\s*\[native code\]\s*\}\s*$/);
     runWithSuperRoot = _with();
     render = (child, parent, options2) => {
@@ -5215,10 +5218,71 @@ var init_index_es = __esm({
         };
       });
     };
+    Portal = ({ when = true, mount, wrapper, children }) => {
+      const isSSR = useEnvironment() === "ssr";
+      const createHTMLNode$2 = isSSR ? createHTMLNode$1 : createHTMLNode;
+      const portal = get(wrapper) || createHTMLNode$2("div");
+      if (isSSR) {
+        if (!("appendChild" in portal)) throw new Error("Invalid wrapper node");
+      } else if (!(portal instanceof HTMLElement)) throw new Error("Invalid wrapper node");
+      const condition = boolean(when);
+      const stack = /* @__PURE__ */ new Error();
+      if (!isSSR) {
+        useRenderEffect(() => {
+          if (!get(condition)) return;
+          const parent = get(mount) || document.body;
+          if (isSSR) {
+            if (!("appendChild" in parent)) throw new Error("Invalid mount node");
+          } else if (!(parent instanceof Element)) throw new Error("Invalid mount node");
+          parent.insertBefore(portal, null);
+          return () => {
+            parent.removeChild(portal);
+          };
+        }, stack);
+        useRenderEffect(() => {
+          if (!get(condition)) return;
+          const disposeRender = render(children, portal);
+          return () => {
+            if (disposeRender) disposeRender();
+          };
+        }, stack);
+      } else {
+        const ssrDoc = useDocument();
+        let mountNode = get(mount);
+        if (ssrDoc && mountNode === globalThis.document?.body) mountNode = ssrDoc.body;
+        const parent = mountNode || (ssrDoc ?? createDocument()).body;
+        if (wrapper) {
+          let portal2 = get(wrapper);
+          while (typeof portal2 === "function") portal2 = portal2();
+          setChild(portal2, children, FragmentUtils.make(), stack);
+          parent.appendChild(portal2);
+        } else setChild(parent, children, FragmentUtils.make(), stack);
+      }
+      return assign(() => get(condition) || children, { metadata: { portal } });
+    };
     registry = {};
     h$1 = (type2, props, ...children) => createElement2(registry[type2] || type2, props, ...children);
     register = (components2) => void assign(registry, components2);
     html = assign(htm_module_default.bind(h$1), { register });
+    clone = (source, deepClone = false) => {
+      if (isPrimitive(source)) return source;
+      if (isFunction(source)) return source;
+      if (isArray(source)) if (deepClone) return source.map((item) => clone(item, deepClone));
+      else return source;
+      const newObject = {};
+      Object.keys(source).forEach((key) => {
+        if (typeof source[key] === "function" && !isObservable(source[key])) newObject[key] = source[key];
+        else if (isObservable(source[key]) && isObject(get(source[key])) && !isArray(get(source[key]))) {
+          const innerObject = clone(get(source[key]));
+          newObject[key] = innerObject;
+        } else if (isObservable(source[key])) newObject[key] = observable(get(source[key]));
+        else if (isObject(get(source[key])) && deepClone) {
+          const innerObject = clone(source[key]);
+          newObject[key] = innerObject;
+        } else newObject[key] = source[key];
+      });
+      return newObject;
+    };
     is2 = (value) => value === "" || value === "true" || value === true;
     HtmlBoolean = {
       equals: (a, b2) => is2(a) === is2(b2),
@@ -5240,6 +5304,40 @@ var init_index_es = __esm({
         return isNaN(num) ? void 0 : String(num);
       },
       fromHtml: (value) => toNumber(value)
+    };
+    toDate = (value) => {
+      if (value === void 0 || value === "") return void 0;
+      if (value instanceof Date) return isNaN(value.getTime()) ? void 0 : value;
+      if (typeof value === "number") {
+        const date2 = new Date(value);
+        return isNaN(date2.getTime()) ? void 0 : date2;
+      }
+      if (typeof value === "string") {
+        const timestamp = Date.parse(value);
+        if (!isNaN(timestamp)) return new Date(timestamp);
+        const numericTimestamp = Number(value);
+        if (!isNaN(numericTimestamp)) {
+          const date3 = new Date(numericTimestamp);
+          if (!isNaN(date3.getTime())) return date3;
+        }
+        const date2 = new Date(value);
+        return isNaN(date2.getTime()) ? void 0 : date2;
+      }
+      const date = new Date(value);
+      return isNaN(date.getTime()) ? void 0 : date;
+    };
+    HtmlDate = {
+      equals: (a, b2) => {
+        const dateA = toDate(a);
+        const dateB = toDate(b2);
+        return dateA === void 0 && dateB === void 0 || dateA !== void 0 && dateB !== void 0 && dateA.getTime() === dateB.getTime();
+      },
+      type: Date,
+      toHtml: (value) => {
+        const date = toDate(value);
+        return date ? date.toISOString() : "";
+      },
+      fromHtml: (value) => toDate(value) || /* @__PURE__ */ new Date(NaN)
     };
     toString = (value) => {
       if (value === null || value === void 0) return "";
@@ -5285,7 +5383,7 @@ var init_runtime_es = __esm({
   "../woby/dist/runtime.es.js"() {
     "use strict";
     init_ssr_shim();
-    init_create_element_UafkJvc0();
+    init_create_element_DWEUmE10();
   }
 });
 
@@ -49629,11 +49727,11 @@ var testObservables = {};
 if (typeof window !== "undefined") {
   window.testObservables = testObservables;
 }
-var registerTestObservable = (name21, observable2) => {
-  if (name21 in testObservables) {
-    throw new Error(`[registerTestObservable]: Duplicate name "${name21}" already registered.`);
+var registerTestObservable = (name22, observable2) => {
+  if (name22 in testObservables) {
+    throw new Error(`[registerTestObservable]: Duplicate name "${name22}" already registered.`);
   }
-  testObservables[name21] = observable2;
+  testObservables[name22] = observable2;
 };
 var useInterval2 = (callback, delay) => {
   let count = 0;
@@ -51187,6 +51285,1259 @@ ${expectedFull}`);
   }
 };
 
+// src/ssr/TestDateTimeWheelerDefaults.tsx
+init_ssr_shim();
+init_index_es();
+
+// src/Wheeler/DateTimeWheeler.tsx
+init_ssr_shim();
+init_index_es();
+
+// ../use/dist/browser/index.browser.es.js
+init_ssr_shim();
+init_index_es();
+function use(val, def20, options2) {
+  let value = val;
+  if (value === void 0 && def20 !== void 0) value = def20;
+  const shouldClone = options2?.clone ?? false;
+  const shouldMakeNew = options2?.makeNew ?? false;
+  if (value && isObservable(value)) {
+    if (!shouldMakeNew) {
+      const unwrappedValue2 = get(value);
+      if (shouldClone && unwrappedValue2 !== null && typeof unwrappedValue2 === "object") return observable(clone(unwrappedValue2));
+      return value;
+    }
+    const unwrappedValue = get(value);
+    if (shouldClone && unwrappedValue !== null && typeof unwrappedValue === "object") return observable(clone(unwrappedValue));
+    return observable(unwrappedValue);
+  } else {
+    if (shouldClone && value !== null && typeof value === "object") return observable(clone(value));
+    return observable(value === null ? null : value);
+  }
+}
+var useIsomorphicLayoutEffect = effect;
+var ArrayContext = createContext();
+var handlers = /* @__PURE__ */ new Map();
+function useEventListener2(element, eventName, handler, options2) {
+  return effect(() => {
+    const targetElement = get(element) ?? window;
+    if (!(targetElement && targetElement.addEventListener)) return void 0;
+    if (!handlers.has(targetElement)) handlers.set(targetElement, /* @__PURE__ */ new Map());
+    const dict = handlers.get(targetElement);
+    if (!dict.has(eventName.toLowerCase()) && dict.get(eventName) !== handler) {
+      targetElement.addEventListener(eventName.toLowerCase(), handler, options2);
+      dict.set(eventName.toLowerCase(), handler);
+      return () => {
+        targetElement.removeEventListener(eventName.toLowerCase(), handler, options2);
+      };
+    }
+    return () => {
+    };
+  });
+}
+function useClickAway(ref, clickEvent) {
+  effect(() => {
+    const handleClickOutside = (event) => {
+      const refs = [get(ref)].flat().filter(Boolean);
+      const actualTarget = event.composedPath?.()?.[0] ?? event.target;
+      if (refs.length && !refs.some((el) => el.contains(actualTarget))) clickEvent();
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  });
+}
+var width$1 = observable(0);
+var height$1 = observable(0);
+var width = observable(0);
+var height = observable(0);
+var offsetLeft = observable(0);
+var offsetTop = observable(0);
+var pageLeft = observable(0);
+var pageTop = observable(0);
+var scale = observable(0);
+var handleSize$1 = () => {
+  width(visualViewport.width);
+  height(visualViewport.height);
+  offsetLeft(visualViewport.offsetLeft);
+  offsetTop(visualViewport.offsetTop);
+  pageLeft(visualViewport.pageLeft);
+  pageTop(visualViewport.pageTop);
+  scale(visualViewport.scale);
+};
+function useViewportSize() {
+  useEventListener2(visualViewport, "resize", () => handleSize$1());
+  useEventListener2(window, "pointermove", () => handleSize$1());
+  useEventListener2(window, "pointercancel", () => handleSize$1());
+  useEventListener2(window, "pointerleave", () => handleSize$1());
+  useEventListener2(window, "pointerout", () => handleSize$1());
+  useEventListener2(window, "pointerup", () => handleSize$1());
+  useEventListener2(document, "wheel", () => handleSize$1());
+  useEventListener2(document, "scroll", () => handleSize$1());
+  useIsomorphicLayoutEffect(() => {
+    handleSize$1();
+  });
+  return {
+    width,
+    height,
+    offsetLeft,
+    offsetTop,
+    pageLeft,
+    pageTop,
+    scale
+  };
+}
+function useLocation() {
+  const location = observable(window.location);
+  effect(() => {
+    const handleLocationChange = () => location({ ...window.location });
+    window.addEventListener("popstate", handleLocationChange);
+    const originalPushState = window.history.pushState;
+    const originalReplaceState = window.history.replaceState;
+    window.history.pushState = function(...args) {
+      originalPushState.apply(window.history, args);
+      handleLocationChange();
+    };
+    window.history.replaceState = function(...args) {
+      originalReplaceState.apply(window.history, args);
+      handleLocationChange();
+    };
+    return () => {
+      window.removeEventListener("popstate", handleLocationChange);
+      window.history.pushState = originalPushState;
+      window.history.replaceState = originalReplaceState;
+    };
+  });
+  return location;
+}
+var getScreen = () => {
+  if (typeof window !== "undefined" && window.screen) return window.screen;
+};
+var screen = observable(getScreen());
+var angle = observable(0);
+var type$1 = observable();
+var selection = window.getSelection();
+var anchorNode = observable();
+var anchorOffset = observable(0);
+var focusNode = observable();
+var focusOffset = observable(0);
+var isCollapsed = observable(true);
+var rangeCount = observable(0);
+var type = observable("");
+var ranges = observable([]);
+var l = useLocation();
+var isLocalhost = memo(() => get(l).host.toLowerCase().includes("localhost"));
+
+// src/use.ts
+init_ssr_shim();
+var use2 = use;
+
+// src/Wheeler/Wheeler.tsx
+init_ssr_shim();
+init_index_es();
+init_runtime_es();
+var ActiveWheelers = observable([]);
+var def8 = () => ({
+  // options: $(null) as ObservableMaybe<WheelerItem<any>[]>,
+  options: observable([], { toHtml: (o) => JSON.stringify(o), fromHtml: (o) => JSON.parse(o) }),
+  itemHeight: observable(36, HtmlNumber),
+  itemCount: observable(5, HtmlNumber),
+  value: observable(null),
+  cls: observable("", HtmlClass),
+  /** Appended after `cls`, never replaces it — same convention as every other wui component. */
+  class: observable("", HtmlClass),
+  header: void 0,
+  /** implicit for multiple */
+  all: observable(null, HtmlString),
+  ok: observable(null, HtmlBoolean),
+  visible: observable(true, HtmlBoolean),
+  bottom: observable(true, HtmlBoolean),
+  cancelOnBlur: observable(true, HtmlBoolean),
+  commitOnBlur: observable(false, HtmlBoolean),
+  mask: observable(true, HtmlBoolean),
+  changeValueOnClickOnly: observable(false, HtmlBoolean),
+  searchable: observable(false, HtmlBoolean),
+  searchPlaceholder: observable(void 0, HtmlString)
+});
+var Wheeler = defaults(def8, (props) => {
+  const { options: options2, itemHeight: ih, itemCount: vic, value: oriValue, cls, class: cn2, header, ok: okProp, visible: visibleProp, mask, bottom, all, cancelOnBlur, commitOnBlur, searchable, searchPlaceholder, changeValueOnClickOnly, ...otherProps } = props;
+  const itemHeight = use2(ih, 36);
+  const itemCount = use2(vic, 5);
+  const value = use2(oriValue, null);
+  const isVisible = use2(visibleProp, false);
+  const ok = use2(okProp, false);
+  const hide = () => {
+    isVisible(false);
+    if (isObservable(visibleProp)) {
+      visibleProp(false);
+    }
+  };
+  const CLICK_THRESHOLD_PX = 5;
+  const checkboxes = observable({});
+  const paddingItemCount = observable(0);
+  let minTranslateY = 0;
+  let maxTranslateY = 0;
+  let currentY = 0;
+  let startY = 0;
+  let startTranslateY = 0;
+  let startTime = 0;
+  let isDragging = false;
+  let hasMoved = false;
+  const rafId = observable(0);
+  let velocity = 0;
+  let lastMoveTime = 0;
+  let lastMoveY = 0;
+  let wheelSnapTimeoutId = observable(0);
+  const viewport = observable();
+  const list = observable();
+  const eventType = observable();
+  const multiple = all;
+  const initialIndex = !get(multiple) ? get(options2).findIndex((opt) => {
+    const optValue = typeof opt === "object" && opt !== null && "value" in opt ? opt.value : opt;
+    return optValue === get(value);
+  }) : -1;
+  const selectedIndex = observable(initialIndex);
+  let preOptions, preFormattedOptions;
+  const formattedOptions = memo(() => {
+    if (preOptions === get(options2)) return preFormattedOptions;
+    const base = get(options2).map((opt) => {
+      const o = typeof opt === "object" && opt !== null && "value" in opt ? { ...opt } : { value: opt, label: String(opt) };
+      if (!("hasComponent" in o)) {
+        o.hasComponent = !!o.component;
+      }
+      return o;
+    });
+    if (get(multiple)) {
+      base.unshift({ value: get(multiple), label: get(multiple), hasComponent: false });
+      const r = {};
+      base.forEach((opt) => r[opt.label] = observable(false));
+      const vs = Array.isArray(get(value)) ? get(value) : [get(value)].flat();
+      let allInitiallyChecked = true;
+      base.forEach((opt) => {
+        const isSelected = vs.some((sv) => sv === opt.value);
+        r[opt.label](isSelected);
+        if (opt.label !== get(multiple) && !isSelected) {
+          allInitiallyChecked = false;
+        }
+      });
+      if (r[get(multiple)]) {
+        r[get(multiple)](allInitiallyChecked && base.length > 1);
+      }
+      checkboxes(r);
+      base.forEach(
+        (o, index) => o.component = o.hasComponent ? o.component : (props2) => /* @__PURE__ */ jsx(
+          "li",
+          {
+            class: ["wheeler-item", "text-[var(--wui-black)]"],
+            "data-index": index,
+            "data-value": o.value,
+            style: { height: () => `${get(itemHeight)}px` },
+            children: () => {
+              const isChecked = r[o.label];
+              return /* @__PURE__ */ jsxs("label", { class: "flex items-center gap-2 px-2 w-full h-full", children: [
+                /* @__PURE__ */ jsx(
+                  "input",
+                  {
+                    class: "pl-2",
+                    type: "checkbox",
+                    checked: get(isChecked),
+                    onClick: (e3) => {
+                      isChecked(!get(isChecked));
+                      chk2value(o.label);
+                    },
+                    readonly: true
+                  }
+                ),
+                /* @__PURE__ */ jsx("span", { class: ["pl-5 w-full"], children: o.label })
+              ] });
+            }
+          }
+        )
+      );
+    } else {
+      base.forEach((o, index) => o.component = o.hasComponent ? o.component : (() => /* @__PURE__ */ jsx(
+        "li",
+        {
+          class: ["wheeler-item", pickerItemCls, "text-[var(--wui-wheeler-text)] opacity-60"],
+          "data-index": index,
+          "data-value": o.value,
+          style: { height: () => `${get(itemHeight)}px` },
+          children: o.label
+        }
+      )));
+    }
+    preOptions = get(options2);
+    return preFormattedOptions = base;
+  });
+  const chkValues = () => {
+    const vs = new Set([get(value)].flat());
+    const os = get(formattedOptions);
+    const cb = get(checkboxes);
+    const cbv = new Set(
+      Object.entries(cb).filter(([_, active]) => get(active)).map(([label]) => label)
+      // Extract just the label.
+    );
+    const onlyInCheckbox = os.filter(
+      (opt) => get(cb[opt.label]) && // 1. Are currently checked in our internal state.
+      !vs.has(opt.value) && // 2. Are NOT present in the external `value` Set.
+      opt.label !== get(multiple)
+      // 3. Are not the "Select All" checkbox itself.
+    ).map((opt) => opt.value);
+    const onlyInValue = [...vs].filter((val) => {
+      const opt = os.find((o) => o.value === val);
+      return opt ? !cbv.has(opt.label) : true;
+    });
+    return { onlyInCheckbox, onlyInValue };
+  };
+  effect(() => {
+    if (!get(ok)) return;
+    if (get(multiple)) {
+      oriValue(get(value));
+    } else {
+      const idx = get(selectedIndex);
+      if (idx >= 0 && idx < get(formattedOptions).length) {
+        oriValue(get(formattedOptions)[idx].value);
+      }
+    }
+    ok(false);
+    isVisible(false);
+  });
+  let preValue;
+  const value2chk = () => {
+    if (!get(multiple)) return;
+    if (get(visibleProp) && preValue === get(value)) {
+      return;
+    }
+    const { onlyInCheckbox, onlyInValue } = chkValues();
+    const os = get(formattedOptions);
+    const c = get(checkboxes);
+    const allLabel = get(multiple);
+    let changed = false;
+    for (const valFromProp of onlyInValue) {
+      const opt = os.find((o) => o.value === valFromProp);
+      if (opt && opt.label !== allLabel && c[opt.label]) {
+        if (!get(c[opt.label])) {
+          c[opt.label](true);
+          changed = true;
+        }
+      }
+    }
+    for (const valFromCheckbox of onlyInCheckbox) {
+      const opt = os.find((o) => o.value === valFromCheckbox);
+      if (opt && opt.label !== allLabel && c[opt.label]) {
+        if (get(c[opt.label])) {
+          c[opt.label](false);
+          changed = true;
+        }
+      }
+    }
+    if (allLabel && c[allLabel]) {
+      const individualItemCheckboxes = Object.entries(c).filter(([key, _]) => key !== allLabel);
+      const allIndividualsAreChecked = individualItemCheckboxes.length > 0 && individualItemCheckboxes.every(([_, obs]) => get(obs));
+      if (get(c[allLabel]) !== allIndividualsAreChecked) {
+        c[allLabel](allIndividualsAreChecked);
+        changed = true;
+      }
+    }
+    if (changed) {
+      checkboxes({ ...c });
+    }
+    preValue = get(value);
+  };
+  effect(value2chk);
+  const chk2value = (clickedLabel) => {
+    if (!get(multiple)) return;
+    const checkboxesMap = get(checkboxes);
+    const allLabel = get(multiple);
+    if (clickedLabel === allLabel) {
+      const isAllCheckedNow = get(checkboxesMap[allLabel]);
+      Object.values(checkboxesMap).forEach((obs) => obs(isAllCheckedNow));
+    } else {
+      if (checkboxesMap[allLabel]) {
+        if (get(checkboxesMap[clickedLabel])) {
+          const allIndividualsAreChecked = Object.entries(checkboxesMap).filter(([key, _]) => key !== allLabel).every(([_, obs]) => get(obs));
+          if (allIndividualsAreChecked) {
+            checkboxesMap[allLabel](true);
+          }
+        } else {
+          checkboxesMap[allLabel](false);
+        }
+      }
+    }
+    const { onlyInCheckbox, onlyInValue } = chkValues();
+    if (onlyInCheckbox.length === 0 && onlyInValue.length === 0) {
+      const newSelectedValues = /* @__PURE__ */ new Set();
+      const currentFormattedOptions = get(formattedOptions);
+      Object.entries(checkboxesMap).forEach(([label, isCheckedObservable]) => {
+        if (label !== allLabel && get(isCheckedObservable)) {
+          const opt = currentFormattedOptions.find((o) => o.label === label);
+          if (opt) {
+            newSelectedValues.add(opt.value);
+          }
+        }
+      });
+      const finalNewValueArray2 = [...newSelectedValues];
+      if (JSON.stringify(get(value)) !== JSON.stringify(finalNewValueArray2)) {
+        value(finalNewValueArray2);
+        if (!get(ok) && isObservable(oriValue)) {
+          oriValue(get(value));
+        }
+      }
+      return;
+    }
+    const currentVal = get(value);
+    const currentValueFlat = Array.isArray(currentVal) ? currentVal : [currentVal];
+    const currentValueAsSet = new Set(currentValueFlat);
+    for (const v2 of onlyInValue) {
+      currentValueAsSet.delete(v2);
+    }
+    for (const v2 of onlyInCheckbox) {
+      currentValueAsSet.add(v2);
+    }
+    const finalNewValueArray = [...currentValueAsSet];
+    value(finalNewValueArray);
+    if (!get(ok)) {
+      if (isObservable(oriValue)) {
+        oriValue(finalNewValueArray);
+      }
+    }
+  };
+  const isAllSelected = memo(() => {
+    const allCheckboxes = get(checkboxes);
+    const allLabel = get(multiple);
+    const individualItemCheckboxes = Object.entries(allCheckboxes).filter(([label, _]) => label !== allLabel).map(([_, observable2]) => observable2);
+    if (individualItemCheckboxes.length === 0) {
+      return false;
+    }
+    return individualItemCheckboxes.every((obs) => get(obs));
+  });
+  function toggleAll() {
+    const newState = !get(isAllSelected);
+    const checkboxesMap = get(checkboxes);
+    Object.values(checkboxesMap).forEach((obs) => obs(newState));
+    let finalNewValueArray = [];
+    if (newState === true) {
+      finalNewValueArray = get(formattedOptions).filter((opt) => opt.label !== get(multiple)).map((opt) => opt.value);
+    }
+    value(finalNewValueArray);
+    if (!get(ok) && isObservable(oriValue)) {
+      oriValue(finalNewValueArray);
+    }
+  }
+  effect(() => {
+    if (!get(formattedOptions)) return;
+    let effectiveItemCount = get(itemCount);
+    if (typeof effectiveItemCount !== "number" || effectiveItemCount <= 0) {
+      effectiveItemCount = 3;
+    }
+    if (effectiveItemCount % 2 === 0) {
+      console.warn(`itemCount (${effectiveItemCount}) should be odd for symmetry. Adjusting to ${effectiveItemCount + 1}.`);
+      effectiveItemCount++;
+    }
+    paddingItemCount(Math.floor(effectiveItemCount / 2));
+    minTranslateY = _getTargetYForIndexUnbound(get(formattedOptions).length - 1);
+    maxTranslateY = _getTargetYForIndexUnbound(0);
+    snapToIndex(get(selectedIndex));
+  });
+  const viewportHeight = memo(() => get(itemHeight) * get(itemCount));
+  const indicatorTop = memo(() => (get(viewportHeight) - get(itemHeight)) / 2);
+  function _getTargetYForIndexUnbound(index) {
+    return get(indicatorTop) - (index + get(paddingItemCount)) * get(itemHeight);
+  }
+  function getTargetYForIndex(index) {
+    return get(indicatorTop) - (index + get(paddingItemCount)) * get(itemHeight);
+  }
+  const pickerItemCls = "apply h-9 flex items-center justify-center text-base box-border transition-opacity duration-[0.3s,transform] delay-[0.3s] select-none scale-90";
+  function* populateList() {
+    for (let i = 0; i < get(paddingItemCount); i++) {
+      yield /* @__PURE__ */ jsx("li", { class: ["wheeler-item is-padding invisible", pickerItemCls], style: { height: () => `${get(itemHeight)}px` } });
+    }
+    if (get(formattedOptions)) {
+      for (const [index, option] of get(formattedOptions).entries()) {
+        yield /* @__PURE__ */ jsx(option.component, { ...{ index, value: option, itemHeight } });
+      }
+    }
+    for (let i = 0; i < get(paddingItemCount); i++) {
+      yield /* @__PURE__ */ jsx("li", { class: ["wheeler-item is-padding invisible", pickerItemCls], style: { height: `${get(itemHeight)}px` } });
+    }
+  }
+  function setTranslateY(y2) {
+    if (!get(list)) return;
+    currentY = Math.max(minTranslateY, Math.min(maxTranslateY, y2));
+    get(list).style.transform = `translateY(${currentY}px)`;
+    updateItemStyles();
+  }
+  let snapToIndexTimeout = 0;
+  function snapToIndex(index, immediate = false) {
+    if (!get(list)) return;
+    if (get(multiple)) return;
+    const clampedIndex = Math.max(0, Math.min(index, get(formattedOptions).length - 1));
+    const targetY = getTargetYForIndex(clampedIndex);
+    if (immediate) {
+      get(list).style.transition = "none";
+    } else {
+      get(list).style.transition = "transform 0.3s ease-out";
+    }
+    setTranslateY(targetY);
+    const timeoutDuration = immediate ? 10 : 310;
+    if (snapToIndexTimeout !== 0) {
+      clearTimeout(snapToIndexTimeout);
+    }
+    snapToIndexTimeout = setTimeout(() => {
+      if (get(list).style.transition === "none") {
+        get(list).style.transition = "transform 0.3s ease-out";
+      }
+      if (get(selectedIndex) !== clampedIndex) {
+        selectedIndex(clampedIndex);
+      }
+      updateItemStyles();
+      snapToIndexTimeout = 0;
+    }, timeoutDuration);
+  }
+  function updateItemStyles() {
+    if (get(multiple)) return;
+    const centerViewportY = get(viewportHeight) / 2;
+    const listItems = get(list).querySelectorAll(".wheeler-item:not(.is-padding)");
+    listItems.forEach((item) => {
+      const itemRect = item.getBoundingClientRect();
+      const viewportRect = get(viewport).getBoundingClientRect();
+      const itemCenterRelativeToViewport = (itemRect.top + itemRect.bottom) / 2 - viewportRect.top;
+      const distanceFromCenter = Math.abs(itemCenterRelativeToViewport - centerViewportY);
+      if (distanceFromCenter < get(itemHeight) * 0.6) {
+        item.classList.add("is-near-center", "opacity-100", "font-bold", "text-[var(--wui-wheeler-link)]", "scale-100");
+      } else {
+        item.classList.remove("is-near-center", "opacity-100", "font-bold", "text-[var(--wui-wheeler-link)]", "scale-100");
+      }
+    });
+  }
+  function getClientY(e3) {
+    if (e3.type === "touchend" || e3.type === "touchcancel") {
+      return e3.changedTouches?.[0]?.clientY ?? startY;
+    }
+    if (e3.touches?.length > 0) {
+      return e3.touches[0].clientY;
+    }
+    return e3.clientY;
+  }
+  function handleStart(e3) {
+    if (get(wheelSnapTimeoutId)) {
+      clearTimeout(get(wheelSnapTimeoutId));
+      wheelSnapTimeoutId(null);
+    }
+    if (e3.type !== "touchstart") e3.preventDefault();
+    isDragging = true;
+    hasMoved = false;
+    startY = getClientY(e3);
+    startTranslateY = currentY;
+    startTime = Date.now();
+    lastMoveY = startY;
+    lastMoveTime = startTime;
+    velocity = 0;
+    eventType(e3.type);
+    if (get(list)) get(list).style.transition = "none";
+    if (get(viewport)) get(viewport).style.cursor = "grabbing";
+    if (get(rafId)) cancelAnimationFrame(get(rafId));
+  }
+  function handleMove(e3) {
+    if (!isDragging) return;
+    const currentMoveY = getClientY(e3);
+    const deltaY = currentMoveY - startY;
+    if (!hasMoved && Math.abs(deltaY) > CLICK_THRESHOLD_PX) {
+      hasMoved = true;
+    }
+    if (hasMoved && e3.cancelable) {
+      e3.preventDefault();
+    }
+    let newY = startTranslateY + deltaY;
+    if (hasMoved) {
+      if (newY > maxTranslateY) {
+        newY = maxTranslateY + (newY - maxTranslateY) * 0.3;
+      } else if (newY < minTranslateY) {
+        newY = minTranslateY + (newY - minTranslateY) * 0.3;
+      }
+    }
+    const now = Date.now();
+    const timeDiff = now - lastMoveTime;
+    if (timeDiff > 10) {
+      velocity = (currentMoveY - lastMoveY) / timeDiff;
+      lastMoveTime = now;
+      lastMoveY = currentMoveY;
+    }
+    if (get(rafId)) {
+      cancelAnimationFrame(get(rafId));
+    }
+    rafId(requestAnimationFrame(() => {
+      currentY = newY;
+      get(list).style.transform = `translateY(${currentY}px)`;
+      updateItemStyles();
+    }));
+  }
+  function handleEnd(e3) {
+    if (!isDragging) {
+      return;
+    }
+    isDragging = false;
+    if (get(viewport)) get(viewport).style.cursor = "grab";
+    if (get(rafId)) {
+      cancelAnimationFrame(get(rafId));
+    }
+    if (!hasMoved) {
+      const targetElement = e3.composedPath ? e3.composedPath()[0] : e3.target;
+      const targetItem = targetElement.closest(".wheeler-item");
+      if (targetItem && !targetItem.classList.contains("is-padding")) {
+        const clickedIndex = parseInt(targetItem.dataset.index, 10);
+        if (!isNaN(clickedIndex) && clickedIndex >= 0 && clickedIndex < get(formattedOptions).length) {
+          snapToIndex(clickedIndex);
+          return;
+        }
+      }
+      const idealIndexMiss = Math.round((get(indicatorTop) - currentY) / get(itemHeight)) - get(paddingItemCount);
+      snapToIndex(idealIndexMiss);
+      return;
+    }
+    if (currentY > maxTranslateY || currentY < minTranslateY) {
+      const boundaryIndex = currentY > maxTranslateY ? 0 : get(formattedOptions).length - 1;
+      snapToIndex(boundaryIndex);
+    } else {
+      const inertiaDist = velocity * 120;
+      const predictedY = currentY + inertiaDist;
+      const idealIndex = Math.round((get(indicatorTop) - predictedY) / get(itemHeight)) - get(paddingItemCount);
+      snapToIndex(idealIndex);
+    }
+    velocity = 0;
+  }
+  function handleWheel(event) {
+    if (isDragging) return;
+    event.preventDefault();
+    if (get(wheelSnapTimeoutId)) {
+      clearTimeout(get(wheelSnapTimeoutId));
+    }
+    if (get(list)) get(list).style.transition = "none";
+    const scrollAmount = event.deltaY * 0.5;
+    const newY = currentY - scrollAmount;
+    setTranslateY(newY);
+    eventType(event.type);
+    wheelSnapTimeoutId(setTimeout(() => {
+      const idealIndex = Math.round((get(indicatorTop) - currentY) / get(itemHeight)) - get(paddingItemCount);
+      snapToIndex(idealIndex);
+      wheelSnapTimeoutId(null);
+    }, 150));
+  }
+  effect(() => {
+    document.addEventListener("pointermove", handleMove);
+    document.addEventListener("pointerup", handleEnd);
+    return () => {
+      document.removeEventListener("pointermove", handleMove);
+      document.removeEventListener("pointerup", handleEnd);
+    };
+  });
+  effect(() => {
+    if (get(multiple)) return;
+    if (get(value) === preValue) return;
+    preValue = get(value);
+    const foundIndex = get(formattedOptions).findIndex((opt) => opt.value === get(value));
+    if (get(selectedIndex) !== foundIndex) {
+      selectedIndex(foundIndex);
+    }
+  });
+  const oriIndex = observable(-1);
+  const hasInitialSnapped = observable(false);
+  effect(() => {
+    if (get(multiple)) return;
+    if (!get(visibleProp)) {
+      hasInitialSnapped(false);
+      return;
+    }
+    if (get(hasInitialSnapped)) return;
+    const currentValue = get(value);
+    const foundIndex = get(formattedOptions).findIndex((opt) => opt.value === currentValue);
+    if (foundIndex !== -1 && foundIndex !== get(selectedIndex)) {
+      selectedIndex(foundIndex);
+    }
+    const indexToSnap = foundIndex !== -1 ? foundIndex : get(selectedIndex);
+    snapToIndex(indexToSnap, true);
+    hasInitialSnapped(true);
+  });
+  effect(() => {
+    if (get(multiple)) return;
+    if (get(oriIndex) === get(selectedIndex)) {
+      return;
+    }
+    oriIndex(get(selectedIndex));
+    if (get(selectedIndex) < 0 || get(selectedIndex) >= get(formattedOptions).length) {
+      console.warn(`Index "${get(selectedIndex)}" out of bounds during value update.`);
+    } else if (get(value) !== get(formattedOptions)[get(selectedIndex)].value) {
+      if (get(eventType) === "wheel" && get(changeValueOnClickOnly)) {
+      } else {
+        if (!isObservable(oriValue) || !get(ok)) {
+          value(get(formattedOptions)[get(selectedIndex)].value);
+        }
+      }
+    }
+    if (get(selectedIndex) >= 0 && get(selectedIndex) < get(formattedOptions).length) {
+      snapToIndex(get(selectedIndex));
+    } else {
+      console.warn(`Index "${get(selectedIndex)}" is out of bounds for snapping.`);
+    }
+  });
+  const wheeler = observable();
+  effect(() => {
+    if (!get(visibleProp)) {
+      preValue = null;
+      if (get(ActiveWheelers).some((w2) => w2 === wheeler)) {
+        ActiveWheelers(get(ActiveWheelers).filter((w2) => w2 !== wheeler));
+      }
+      return;
+    }
+    if (get(ActiveWheelers).filter((w2) => w2 === wheeler).length === 0) {
+      ActiveWheelers([...get(ActiveWheelers), wheeler]);
+    }
+    value2chk();
+  });
+  useClickAway(wheeler, () => {
+    if (get(cancelOnBlur)) {
+      hide();
+    }
+    if (get(commitOnBlur)) {
+      if (isObservable(ok)) {
+        ok(true);
+      } else if (isObservable(oriValue)) {
+        oriValue(get(value));
+      }
+      hide();
+    }
+  });
+  const search = (searchText) => {
+    if (!searchText) {
+      return;
+    }
+    const lowercasedSearchText = searchText.toLowerCase();
+    const foundOption = get(formattedOptions).find((option) => {
+      const label = String(option.label).toLowerCase();
+      return label.includes(lowercasedSearchText);
+    });
+    if (foundOption) {
+      const newValue = foundOption.value;
+      value(newValue);
+      if (isObservable(oriValue) && !get(ok)) {
+        oriValue(newValue);
+      }
+    } else {
+      console.warn(`Wheeler search: No results found for "${searchText}"`);
+    }
+  };
+  const placeholderText = memo(() => {
+    const customPlaceholder = get(searchPlaceholder);
+    if (customPlaceholder) {
+      return customPlaceholder;
+    }
+    if (header) {
+      const headerContent = get(header)(value);
+      if (typeof headerContent === "string" && headerContent.length > 0) {
+        return `Enter ${headerContent.toLowerCase()}`;
+      }
+    }
+    return "Search...";
+  });
+  const HeaderWithSearch = () => {
+    if (!header) return null;
+    return /* @__PURE__ */ jsxs("div", { children: [
+      /* @__PURE__ */ jsx("div", { class: "font-bold text-center", children: header(value) }),
+      () => get(searchable) ? /* @__PURE__ */ jsx("div", { class: "relative flex flex-col flex-wrap items-center my-2", children: /* @__PURE__ */ jsx(
+        "input",
+        {
+          type: "text",
+          placeholder: placeholderText,
+          class: "px-4 py-2 border border-[var(--wui-gray-300)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--wui-blue-500)] focus:border-transparent transition duration-200 ease-in-out w-64",
+          onInput: (e3) => {
+            const value2 = e3.target.value;
+            search(value2);
+          }
+        }
+      ) }) : null,
+      /* @__PURE__ */ jsx("div", { class: "my-1 h-px w-full bg-[var(--wui-gray-300)]" })
+    ] });
+  };
+  const WheelerContent = () => /* @__PURE__ */ jsxs(Fragment, { children: [
+    /* @__PURE__ */ jsx(HeaderWithSearch, {}),
+    /* @__PURE__ */ jsxs(
+      "div",
+      {
+        ref: viewport,
+        onPointerDown: handleStart,
+        onWheel: handleWheel,
+        class: "wheeler-viewport overflow-hidden relative touch-none cursor-grab overscroll-y-contain",
+        style: { height: () => `${get(viewportHeight)}px` },
+        children: [
+          /* @__PURE__ */ jsx("ul", { class: "wheeler-list m-0 p-0 list-none", ref: list, children: () => [...populateList()] }),
+          () => get(multiple) ? null : /* @__PURE__ */ jsx("div", { class: "wheeler-indicator absolute h-9 box-border pointer-events-none bg-[rgba(0,123,255,0.05)] border-y-[var(--wui-wheeler-link)] border-t border-solid border-b inset-x-0", style: {
+            height: () => `${get(itemHeight)}px`,
+            top: () => `${get(indicatorTop) + get(itemHeight) / 2}px`,
+            // Center line of indicator
+            transform: `translateY(-50%)`
+          } })
+        ]
+      }
+    )
+  ] });
+  const BackgroundOverlay = () => {
+    return /* @__PURE__ */ jsx(Portal, { mount: document.body, children: () => get(mask) ? /* @__PURE__ */ jsx(Fragment, { children: /* @__PURE__ */ jsx("div", { class: ["fixed inset-0 bg-black/50 h-full w-full z-[00] opacity-50"] }) }) : null });
+  };
+  const renderAsPopup = () => /* @__PURE__ */ jsxs(Fragment, { children: [
+    /* @__PURE__ */ jsx(BackgroundOverlay, {}),
+    /* @__PURE__ */ jsx(Portal, { mount: document.body, children: /* @__PURE__ */ jsx("div", { ref: wheeler, class: () => ["wheeler-widget z-[150]", get(cls), "fixed inset-x-0 bottom-0 w-full z-200 bg-[var(--wui-white)]", get(cn2)], children: /* @__PURE__ */ jsx(WheelerContent, {}) }) })
+  ] });
+  const renderAsInline = () => /* @__PURE__ */ jsx(
+    "div",
+    {
+      ref: wheeler,
+      class: () => ["wheeler-widget", get(cls), get(cn2)],
+      ...otherProps,
+      children: /* @__PURE__ */ jsx(WheelerContent, {})
+    }
+  );
+  return () => {
+    return !get(isVisible) ? null : get(bottom) ? renderAsPopup() : renderAsInline();
+  };
+});
+customElement("wui-wheeler", Wheeler);
+
+// src/helper/helper.tsx
+init_ssr_shim();
+function pick(obj, keys) {
+  const result = {};
+  keys.forEach((key) => {
+    if (key in obj) {
+      result[key] = obj[key];
+    }
+  });
+  return result;
+}
+
+// src/Wheeler/DateTimeWheeler.tsx
+init_runtime_es();
+var padZero = (num) => (num < 10 ? "0" : "") + num;
+var getDaysInMonth = (year, month) => new Date(year, month + 1, 0).getDate();
+var MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+var parseDate = (dateInput) => {
+  if (!dateInput) return null;
+  if (dateInput instanceof Date) return isNaN(dateInput.getTime()) ? null : dateInput;
+  try {
+    const p = new Date(dateInput);
+    return isNaN(p.getTime()) ? null : p;
+  } catch (e3) {
+    return null;
+  }
+};
+var CURRENT_DATE = /* @__PURE__ */ new Date();
+var MIN_YEAR = 1900;
+var MAX_YEAR = CURRENT_DATE.getFullYear() + 20;
+var DATETIME_WHEELER_CLS = "date-time-Wheeler flex w-full bg-[var(--wui-white)] p-1 border border-[var(--wui-gray-300)] rounded-md shadow-sm ";
+var WHEELER_WRAPPER_CLS = "wheel-wrapper flex-1";
+var def9 = () => {
+  const baseDefaults = def8();
+  const inheritedKeys = [
+    "cls",
+    "bottom",
+    "commitOnBlur",
+    "ok",
+    "visible",
+    "mask",
+    "cancelOnBlur",
+    "itemHeight",
+    "itemCount",
+    "changeValueOnClickOnly"
+  ];
+  const inheritedDefaults = pick(baseDefaults, inheritedKeys);
+  return {
+    // Date props are HtmlDate, never a bare $(Date): as a custom element the value is
+    // reflected to an attribute and replayed back on connect. A bare Date reflects via
+    // toUTCString (drops ms) and returns as a new, non-identical Date, so every replay
+    // counts as a change. HtmlDate reflects as ISO and compares by time, making the
+    // round-trip a no-op, and lets `min-date="..."` attributes parse to Dates.
+    value: observable(CURRENT_DATE, HtmlDate),
+    mode: observable("datetime"),
+    minDate: observable(new Date(1900, 0, 1), HtmlDate),
+    // January 1, 1900
+    maxDate: observable(new Date(2100, 11, 31), HtmlDate),
+    // December 31, 2100,
+    yearRange: observable({ start: MIN_YEAR, end: MAX_YEAR }),
+    divider: observable(true),
+    // title: (d: Date) => <div>{d.toISOString()}</div> as ObservableMaybe<(d: Date) => JSX.Element>,
+    title: void 0,
+    // `visible` is not declared here: it is one of `inheritedKeys`, so the spread below already
+    // supplies Wheeler's own `$(true, HtmlBoolean)` — which additionally parses the attribute
+    // form. Declaring it above the spread only created a value that was immediately overwritten.
+    // Alias of `cls` for JSX callers; the render below merges both.
+    class: observable("", HtmlClass),
+    header: void 0,
+    ...inheritedDefaults,
+    // `ok` truthy (default): the main `value` only updates via the OK button.
+    // `ok="false"` = "reactive" mode: every scroll/tap commits to `value`
+    // immediately; Cancel reverts to the value captured when the wheeler opened.
+    ok: observable(true, HtmlBoolean),
+    cancelOnBlur: observable(false, HtmlBoolean)
+  };
+};
+var DateTimeWheeler = defaults(def9, (props) => {
+  const { value: oriDate, mode, minDate: minDateProp, maxDate: maxDateProp, yearRange: yearRangeProp, divider, title, cls, class: className, header, bottom: bottomProp, commitOnBlur, cancelOnBlur, ok, mask, itemHeight, itemCount, changeValueOnClickOnly, visible: visibleProp, ...otherProps } = props;
+  const type2 = use2(mode);
+  const yearRange = use2(yearRangeProp, { start: MIN_YEAR, end: MAX_YEAR });
+  const minDate = memo(() => parseDate(get(use2(minDateProp))));
+  const maxDate = memo(() => parseDate(get(use2(maxDateProp))));
+  const modDate = observable(parseDate(get(oriDate)) ?? /* @__PURE__ */ new Date());
+  const selectedYear = observable(get(modDate).getFullYear());
+  const selectedMonth = observable(get(modDate).getMonth());
+  const selectedDay = observable(get(modDate).getDate());
+  const selectedHour = observable(get(modDate).getHours());
+  const selectedMinute = observable(get(modDate).getMinutes());
+  const selectedSecond = observable(get(modDate).getSeconds());
+  const isVisible = use2(visibleProp, true);
+  const hide = () => {
+    isVisible(false);
+    if (isObservable(visibleProp)) {
+      visibleProp(false);
+    }
+  };
+  const openSnapshot = observable(get(modDate));
+  effect(() => {
+    if (!get(isVisible)) return;
+    const d = untrack(() => parseDate(get(oriDate))) ?? /* @__PURE__ */ new Date();
+    openSnapshot(d);
+    modDate(d);
+  });
+  effect(() => {
+    const val = get(modDate);
+    const parsed = parseDate(val);
+    if (parsed) {
+      if (untrack(selectedYear) !== parsed.getFullYear())
+        selectedYear(parsed.getFullYear());
+      if (untrack(selectedMonth) !== parsed.getMonth())
+        selectedMonth(parsed.getMonth());
+      const daysInParsedMonth = getDaysInMonth(parsed.getFullYear(), parsed.getMonth());
+      const dayToSet = Math.min(parsed.getDate(), daysInParsedMonth);
+      if (untrack(selectedDay) !== dayToSet)
+        selectedDay(dayToSet);
+      if (untrack(selectedHour) !== parsed.getHours())
+        selectedHour(parsed.getHours());
+      if (untrack(selectedMinute) !== parsed.getMinutes())
+        selectedMinute(parsed.getMinutes());
+      if (untrack(selectedSecond) !== parsed.getSeconds())
+        selectedSecond(parsed.getSeconds());
+    }
+  });
+  effect(() => {
+    const year = get(selectedYear);
+    const month = get(selectedMonth);
+    let day = get(selectedDay);
+    const hour = get(selectedHour);
+    const minute = get(selectedMinute);
+    const second = get(selectedSecond);
+    if (year === void 0 || month === void 0 || day === void 0 || hour === void 0 || minute === void 0 || second === void 0) return;
+    const daysInCurrentMonth = getDaysInMonth(year, month);
+    if (day > daysInCurrentMonth) {
+      selectedDay(daysInCurrentMonth);
+      return;
+    }
+    let newDate = new Date(year, month, day, hour, minute, second);
+    let constrainedDate = newDate;
+    const min = get(minDate);
+    const max = get(maxDate);
+    let needsReclamp = false;
+    if (min && newDate < min) {
+      constrainedDate = min;
+      needsReclamp = true;
+    }
+    if (max && newDate > max) {
+      constrainedDate = max;
+      needsReclamp = true;
+    }
+    if (needsReclamp) {
+      if (untrack(selectedYear) !== constrainedDate.getFullYear()) selectedYear(constrainedDate.getFullYear());
+      if (untrack(selectedMonth) !== constrainedDate.getMonth()) selectedMonth(constrainedDate.getMonth());
+      if (untrack(selectedDay) !== constrainedDate.getDate()) selectedDay(constrainedDate.getDate());
+      if (untrack(selectedHour) !== constrainedDate.getHours()) selectedHour(constrainedDate.getHours());
+      if (untrack(selectedMinute) !== constrainedDate.getMinutes()) selectedMinute(constrainedDate.getMinutes());
+      if (untrack(selectedSecond) !== constrainedDate.getSeconds()) selectedSecond(constrainedDate.getSeconds());
+      return;
+    }
+    const currentPropValue = parseDate(get(modDate));
+    if (!currentPropValue || constrainedDate.getTime() !== currentPropValue.getTime()) {
+      modDate(constrainedDate);
+      if (!untrack(() => get(ok)) && isObservable(oriDate)) {
+        oriDate(constrainedDate);
+      }
+    }
+  });
+  const yearOptions = memo(() => {
+    const yearObject = get(yearRange);
+    const min = get(minDate);
+    const max = get(maxDate);
+    const baseStart = yearObject?.start ?? 1900;
+    const baseEnd = yearObject?.end ?? (/* @__PURE__ */ new Date()).getFullYear() + 20;
+    const effectiveStart = min ? Math.max(baseStart, min.getFullYear()) : baseStart;
+    const effectiveEnd = max ? Math.min(baseEnd, max.getFullYear()) : baseEnd;
+    const years = [];
+    if (effectiveStart <= effectiveEnd) {
+      for (let y2 = effectiveStart; y2 <= effectiveEnd; y2++) {
+        years.push({ value: y2, label: y2.toString() });
+      }
+    }
+    return years;
+  });
+  const monthOptions = memo(() => {
+    const year = get(selectedYear);
+    const min = get(minDate);
+    const max = get(maxDate);
+    const options2 = [];
+    if (year === void 0) return [];
+    for (let m = 0; m < 12; m++) {
+      let disabled = false;
+      if (min && year === min.getFullYear() && m < min.getMonth()) disabled = true;
+      if (max && year === max.getFullYear() && m > max.getMonth()) disabled = true;
+      if (!disabled) options2.push({ value: m, label: MONTH_NAMES[m] });
+    }
+    return options2;
+  });
+  const dayOptions = memo(() => {
+    const year = get(selectedYear);
+    const month = get(selectedMonth);
+    const min = get(minDate);
+    const max = get(maxDate);
+    const options2 = [];
+    if (year === void 0 || month === void 0) return [];
+    const daysInMonth = getDaysInMonth(year, month);
+    for (let d = 1; d <= daysInMonth; d++) {
+      let disabled = false;
+      if (min && year === min.getFullYear() && month === min.getMonth() && d < min.getDate()) disabled = true;
+      if (max && year === max.getFullYear() && month === max.getMonth() && d > max.getDate()) disabled = true;
+      if (!disabled) options2.push({ value: d, label: d });
+    }
+    return options2;
+  });
+  const hourOptions = memo(() => {
+    const options2 = Array.from({ length: 24 }, (_, h) => ({ value: h, label: padZero(h) }));
+    return options2;
+  });
+  const minuteOptions = memo(() => {
+    const options2 = Array.from({ length: 60 }, (_, m) => ({ value: m, label: padZero(m) }));
+    return options2;
+  });
+  const secondOptions = memo(() => {
+    const options2 = Array.from({ length: 60 }, (_, s) => ({ value: s, label: padZero(s) }));
+    return options2;
+  });
+  const showYear = () => ["year", "date", "datetime"].includes(get(type2).toString());
+  const showMonth = () => ["month", "date", "datetime"].includes(get(type2).toString());
+  const showDay = () => ["date", "datetime"].includes(get(type2).toString());
+  const showHour = () => ["hour", "time", "datetime"].includes(get(type2).toString());
+  const showMinute = () => ["minute", "time", "datetime"].includes(get(type2).toString());
+  const showSecond = () => ["second", "time", "datetime"].includes(get(type2).toString());
+  const br2 = memo(() => get(divider) ? "border-l border-[var(--wui-gray-300)]" : null);
+  const { height: vh, width: vw, offsetLeft: ol, offsetTop: ot2, pageTop: pt2, pageLeft: pl } = useViewportSize();
+  const ref = observable();
+  const handleOkClick = () => {
+    if (isObservable(oriDate)) {
+      oriDate(get(modDate));
+    }
+    hide();
+  };
+  const handleCancelClick = () => {
+    const d = get(openSnapshot);
+    modDate(d);
+    if (!get(ok) && isObservable(oriDate)) {
+      oriDate(d);
+    }
+    hide();
+  };
+  const renderHeaderBar = () => {
+    const headerFn = isObservable(header) ? get(header) : header;
+    if (typeof headerFn === "function") {
+      return headerFn({ ok: handleOkClick, cancel: handleCancelClick, visible: hide });
+    }
+    return /* @__PURE__ */ jsxs("div", { class: "flex items-center justify-between px-4 py-2 h-auto relative", children: [
+      /* @__PURE__ */ jsx("div", { class: "w-[80px] flex justify-start", children: /* @__PURE__ */ jsx(
+        "button",
+        {
+          type: "button",
+          id: "dtw-cancel-btn",
+          class: "px-2 inline-flex items-center justify-center relative box-border cursor-pointer select-none align-middle no-underline font-medium text-sm leading-[1.75] tracking-[0.02857em] uppercase rounded text-[var(--wui-white)] bg-[var(--wui-accent-500)] rounded-[4px] border-0 outline-0 font-sans px-4 py-2 shadow-[0px_3px_1px_-2px_rgba(0,0,0,0.2),0px_2px_2px_0px_rgba(0,0,0,0.14),0px_1px_5px_0px_rgba(0,0,0,0.12)] hover:bg-[var(--wui-accent-600)]",
+          ref: (el) => {
+            if (el) el.onclick = (e3) => {
+              handleCancelClick();
+            };
+          },
+          children: " Cancel "
+        }
+      ) }),
+      /* @__PURE__ */ jsx("div", { class: "flex-1 text-center px-2", children: /* @__PURE__ */ jsx("span", { class: "inline-block break-words", children: () => {
+        const t3 = isObservable(title) ? get(title) : title;
+        if (typeof t3 === "function") return t3(get(modDate));
+        return t3 ?? get(modDate).toString().slice(0, 24);
+      } }) }),
+      /* @__PURE__ */ jsx("div", { class: "w-[80px] flex justify-end", children: /* @__PURE__ */ jsx(
+        "button",
+        {
+          type: "button",
+          id: "dtw-ok-btn",
+          class: "px-2 inline-flex items-center justify-center relative box-border cursor-pointer select-none align-middle no-underline font-medium text-sm leading-[1.75] tracking-[0.02857em] uppercase rounded text-[var(--wui-white)] bg-[var(--wui-accent-500)] rounded-[4px] border-0 outline-0 font-sans px-4 py-2 shadow-[0px_3px_1px_-2px_rgba(0,0,0,0.2),0px_2px_2px_0px_rgba(0,0,0,0.14),0px_1px_5px_0px_rgba(0,0,0,0.12)] hover:bg-[var(--wui-accent-600)]",
+          ref: (el) => {
+            if (el) el.onclick = (e3) => {
+              handleOkClick();
+            };
+          },
+          children: " OK "
+        }
+      ) })
+    ] });
+  };
+  const wheelerConfigs = memo(() => [
+    {
+      show: showYear,
+      label: "Year",
+      options: yearOptions,
+      value: selectedYear,
+      hasBorder: false
+    },
+    {
+      show: showMonth,
+      label: "Month",
+      options: monthOptions,
+      value: selectedMonth,
+      hasBorder: true
+    },
+    {
+      show: showDay,
+      label: "Day",
+      options: dayOptions,
+      value: selectedDay,
+      hasBorder: true
+    },
+    {
+      show: showHour,
+      label: "Hour",
+      options: hourOptions,
+      value: selectedHour,
+      hasBorder: true
+    },
+    {
+      show: showMinute,
+      label: "Minute",
+      options: minuteOptions,
+      value: selectedMinute,
+      hasBorder: true
+    },
+    {
+      show: showSecond,
+      label: "Second",
+      options: secondOptions,
+      value: selectedSecond,
+      hasBorder: true
+    }
+  ]);
+  const renderWheelers = () => get(wheelerConfigs).map(
+    ({ show, label, options: options2, value, hasBorder }) => () => get(show) ? /* @__PURE__ */ jsx(
+      Wheeler,
+      {
+        header: (v2) => label,
+        options: options2,
+        value,
+        itemHeight,
+        itemCount,
+        cls: [WHEELER_WRAPPER_CLS, hasBorder ? br2 : null],
+        bottom: false,
+        cancelOnBlur: false
+      }
+    ) : null
+  );
+  const component = memo(() => /* @__PURE__ */ jsxs(
+    "div",
+    {
+      ref,
+      class: [
+        DATETIME_WHEELER_CLS,
+        "flex-col w-full bg-[var(--wui-white)] shadow-lg z-10 h-fit"
+      ],
+      children: [
+        renderHeaderBar(),
+        /* @__PURE__ */ jsx("div", { class: [DATETIME_WHEELER_CLS], children: renderWheelers() })
+      ]
+    }
+  ));
+  const cont = observable();
+  useClickAway(cont, () => {
+    if (get(cancelOnBlur))
+      handleCancelClick();
+    else if (get(commitOnBlur)) {
+      hide();
+      if (isObservable(oriDate))
+        oriDate(get(modDate));
+    }
+  });
+  const bot = get(bottomProp);
+  if (bot) {
+    return /* @__PURE__ */ jsx(Portal, { mount: document.body, when: isVisible, children: () => !get(isVisible) ? null : [
+      () => get(mask) ? /* @__PURE__ */ jsx(
+        "div",
+        {
+          class: ["fixed inset-0 bg-black/50 h-full w-full z-[10] opacity-50"]
+        }
+      ) : null,
+      /* @__PURE__ */ jsx(
+        "div",
+        {
+          ref: cont,
+          class: [DATETIME_WHEELER_CLS, "fixed inset-x-0 bottom-0 bg-[var(--wui-white)] shadow-lg z-200 w-full"],
+          children: component
+        }
+      )
+    ] });
+  }
+  return /* @__PURE__ */ jsx(
+    "div",
+    {
+      ref: cont,
+      class: () => {
+        const clsVal = get(cls);
+        const baseCls4 = clsVal !== void 0 && clsVal !== "" ? clsVal : DATETIME_WHEELER_CLS;
+        const classVal = get(className);
+        return classVal ? [baseCls4, classVal].filter(Boolean).join(" ") : baseCls4;
+      },
+      style: { display: () => get(isVisible) ? null : "none" },
+      ...otherProps,
+      children: component
+    }
+  );
+});
+customElement("wui-datetime-wheeler", DateTimeWheeler);
+
+// src/ssr/TestDateTimeWheelerDefaults.tsx
+var name9 = "TestDateTimeWheelerDefaults";
+if (typeof globalThis.__isSSRTest__ !== "undefined") {
+  console.log(`
+\u{1F4DD} Test: ${name9}`);
+  let allPassed = true;
+  const check = (ok, msg) => {
+    assert(ok, `[${name9}] ${msg}`);
+    if (!ok) allPassed = false;
+    console.log(`   ${msg} ${ok ? "\u2705" : "\u274C"}`);
+  };
+  for (const key of ["value", "minDate", "maxDate"]) {
+    const obs = def9()[key];
+    const before = obs();
+    obs(new Date(before.toISOString()));
+    check(obs() === before, `${key}: time-equal Date write is a no-op`);
+    obs(HtmlDate.fromHtml(HtmlDate.toHtml(before)));
+    check(obs() === before, `${key}: toHtml\u2192fromHtml replay write is a no-op`);
+    const other = new Date(before.getTime() + 864e5);
+    obs(other);
+    check(+obs() === +other, `${key}: different date still updates`);
+  }
+  console.log(`   Result: ${allPassed ? "\u2705 ALL PASSED" : "\u274C SOME FAILED"}
+`);
+}
+
 // src/ssr/TestFab.tsx
 init_ssr_shim();
 init_index_es();
@@ -51472,7 +52823,7 @@ var useOcclusionAvoidance = (ref, opts = {}) => {
 
 // src/Fab.tsx
 init_runtime_es();
-var def8 = () => ({
+var def10 = () => ({
   /** 
    * Custom CSS classes to apply to the fab.
    * 
@@ -51519,7 +52870,7 @@ var variantStyle3 = {
   custom: ""
 };
 var baseCls2 = (type2) => variantStyle3[type2 || "pill"] ?? "";
-var Fab = defaults(def8, (props) => {
+var Fab = defaults(def10, (props) => {
   const { class: cn2, cls, children, type: variant2, disabled, avoid, avoidMargin, avoidMax, avoidWithin, avoidIgnore, onAvoid, ...otherProps } = props;
   const btnRef = observable(null);
   useOcclusionAvoidance(btnRef, {
@@ -51546,14 +52897,14 @@ registerBaseCls("wui-fab", (el) => baseCls2(el.getAttribute("type")));
 
 // src/ssr/TestFab.tsx
 init_runtime_es();
-var name9 = "TestFab";
+var name10 = "TestFab";
 var TestFab = () => {
   const states = [
     { type: "pill", children: "+" },
     { type: "circular", children: "\u2605" }
   ];
   const index = observable(0);
-  registerTestObservable(name9, index);
+  registerTestObservable(name10, index);
   const increment = () => index((prev) => (prev + 1) % states.length);
   useInterval2(increment, TEST_INTERVAL);
   const getCurrentElement = () => {
@@ -51564,7 +52915,7 @@ var TestFab = () => {
     ] });
   };
   const ret = () => getCurrentElement();
-  registerTestObservable(`${name9}_ssr`, ret);
+  registerTestObservable(`${name10}_ssr`, ret);
   return ret;
 };
 var PILL = "inline-flex items-center justify-center align-middle bg-[rgb(25,118,210)] text-[white] text-4xl font-black cursor-pointer shadow-[0px_4px_8px_rgba(0,0,0,0.3)] transition-[background-color] duration-[0.3s] px-5 py-[15px] rounded-[50px] border-[none] [transition:top_0.3s_ease,left_0.3s_ease] z-[1050] disabled:!bg-[rgba(0,0,0,0.12)] disabled:!text-[rgba(0,0,0,0.26)] disabled:!shadow-none disabled:!cursor-default";
@@ -51576,12 +52927,12 @@ if (typeof globalThis.__isSSRTest__ !== "undefined") {
     `<h3>Fab</h3><button class="${CIRCULAR}"><div class="flex items-center">\u2605</div></button>`
   ];
   console.log(`
-\u{1F4DD} Test: ${name9}`);
+\u{1F4DD} Test: ${name10}`);
   let allPassed = true;
   for (let i = 0; i < fullElements.length; i++) {
     ;
-    testObservables[name9](i);
-    const ssrComponent = testObservables[`${name9}_ssr`];
+    testObservables[name10](i);
+    const ssrComponent = testObservables[`${name10}_ssr`];
     const ssrResult = renderToString(ssrComponent);
     const expectedFull = fullElements[i];
     const passed = ssrResult === expectedFull;
@@ -51591,9 +52942,9 @@ if (typeof globalThis.__isSSRTest__ !== "undefined") {
   console.log(`   Result: ${allPassed ? "\u2705 ALL PASSED" : "\u274C SOME FAILED"}
 `);
   if (!allPassed) {
-    console.error(`\u274C [${name9}] SSR test failed`);
+    console.error(`\u274C [${name10}] SSR test failed`);
     const g2 = globalThis;
-    (g2.__ssrFailures ??= []).push(name9);
+    (g2.__ssrFailures ??= []).push(name10);
   }
 }
 TestFab.test = {
@@ -51601,10 +52952,10 @@ TestFab.test = {
   stateCount: 2,
   compareActualValues: true,
   expect: () => {
-    const idx = get(testObservables[name9]);
+    const idx = get(testObservables[name10]);
     const variants = [PILL, CIRCULAR];
     const expected = `<button class="${variants[idx]}"><div class="flex items-center">${["+", "\u2605"][idx]}</div></button>`;
-    const ssrComponent = testObservables[`${name9}_ssr`];
+    const ssrComponent = testObservables[`${name10}_ssr`];
     const ssrResult = renderToString(ssrComponent);
     const fullElements = [
       `<h3>Fab</h3><button class="${PILL}"><div class="flex items-center">+</div></button>`,
@@ -51612,12 +52963,12 @@ TestFab.test = {
     ];
     const expectedFull = fullElements[idx];
     if (ssrResult !== expectedFull) {
-      assert(false, `[${name9}] SSR mismatch: got 
+      assert(false, `[${name10}] SSR mismatch: got 
 ${ssrResult}, expected 
 ${expectedFull}`);
     } else {
-      assert(true, `[${name9}] SSR match`);
-      console.log(`\u2705 [${name9}] SSR test passed: ${ssrResult}`);
+      assert(true, `[${name10}] SSR match`);
+      console.log(`\u2705 [${name10}] SSR test passed: ${ssrResult}`);
     }
     return expected;
   }
@@ -51631,7 +52982,7 @@ init_index_es();
 init_ssr_shim();
 init_index_es();
 init_runtime_es();
-var def9 = () => ({
+var def11 = () => ({
   /** 
    * Custom CSS classes to apply to the icon button.
    * 
@@ -51665,7 +53016,7 @@ var def9 = () => ({
   src: observable("", HtmlString)
 });
 var baseClass = "inline-flex items-center justify-center relative box-border bg-transparent cursor-pointer select-none align-middle appearance-none no-underline text-center flex-[0_0_auto] text-2xl overflow-visible text-[rgba(0,0,0,0.54)] transition-[background-color] duration ease-in-out delay-[0ms] m-0 p-2 rounded-[50%] border-0 [outline:0px] duration-[0.3s] hover:bg-[var(--wui-hover-gray)] [&_svg]:w-[1em] [&_svg]:h-[1em] [&_svg]:fill-current [&_img]:w-[1em] [&_img]:h-[1em] disabled:bg-transparent disabled:text-[rgba(0,0,0,0.26)] disabled:pointer-events-none disabled:cursor-default disabled:[&_svg]:fill-[rgba(0,0,0,0.26)]";
-var IconButton = defaults(def9, (props) => {
+var IconButton = defaults(def11, (props) => {
   const { class: cn2, cls, children, disabled, src, ...otherProps } = props;
   return /* @__PURE__ */ jsx(
     "button",
@@ -51686,14 +53037,14 @@ registerBaseCls("wui-icon-button", baseClass);
 
 // src/ssr/TestIconButton.tsx
 init_runtime_es();
-var name10 = "TestIconButton";
+var name11 = "TestIconButton";
 var TestIconButton = () => {
   const states = [
     { disabled: false, children: "\u2605" },
     { disabled: true, children: "X" }
   ];
   const index = observable(0);
-  registerTestObservable(name10, index);
+  registerTestObservable(name11, index);
   const increment = () => index((prev) => (prev + 1) % states.length);
   useInterval2(increment, TEST_INTERVAL);
   const getCurrentElement = () => {
@@ -51704,7 +53055,7 @@ var TestIconButton = () => {
     ] });
   };
   const ret = () => getCurrentElement();
-  registerTestObservable(`${name10}_ssr`, ret);
+  registerTestObservable(`${name11}_ssr`, ret);
   return ret;
 };
 var BASE = "inline-flex items-center justify-center relative box-border bg-transparent cursor-pointer select-none align-middle appearance-none no-underline text-center flex-[0_0_auto] text-2xl overflow-visible text-[rgba(0,0,0,0.54)] transition-[background-color] duration ease-in-out delay-[0ms] m-0 p-2 rounded-[50%] border-0 [outline:0px] duration-[0.3s] hover:bg-[var(--wui-hover-gray)] [&_svg]:w-[1em] [&_svg]:h-[1em] [&_svg]:fill-current [&_img]:w-[1em] [&_img]:h-[1em] disabled:bg-transparent disabled:text-[rgba(0,0,0,0.26)] disabled:pointer-events-none disabled:cursor-default disabled:[&_svg]:fill-[rgba(0,0,0,0.26)]";
@@ -51715,12 +53066,12 @@ if (typeof globalThis.__isSSRTest__ !== "undefined") {
     `<h3>IconButton</h3><button disabled="" class="${BASE}">X</button>`
   ];
   console.log(`
-\u{1F4DD} Test: ${name10}`);
+\u{1F4DD} Test: ${name11}`);
   let allPassed = true;
   for (let i = 0; i < fullElements.length; i++) {
     ;
-    testObservables[name10](i);
-    const ssrComponent = testObservables[`${name10}_ssr`];
+    testObservables[name11](i);
+    const ssrComponent = testObservables[`${name11}_ssr`];
     const ssrResult = renderToString(ssrComponent);
     const expectedFull = fullElements[i];
     const passed = ssrResult === expectedFull;
@@ -51730,9 +53081,9 @@ if (typeof globalThis.__isSSRTest__ !== "undefined") {
   console.log(`   Result: ${allPassed ? "\u2705 ALL PASSED" : "\u274C SOME FAILED"}
 `);
   if (!allPassed) {
-    console.error(`\u274C [${name10}] SSR test failed`);
+    console.error(`\u274C [${name11}] SSR test failed`);
     const g2 = globalThis;
-    (g2.__ssrFailures ??= []).push(name10);
+    (g2.__ssrFailures ??= []).push(name11);
   }
 }
 TestIconButton.test = {
@@ -51740,10 +53091,10 @@ TestIconButton.test = {
   stateCount: 2,
   compareActualValues: true,
   expect: () => {
-    const idx = get(testObservables[name10]);
+    const idx = get(testObservables[name11]);
     const disabled = idx === 1 ? ' disabled=""' : "";
     const expected = `<button${disabled} class="${BASE}">${["\u2605", "X"][idx]}</button>`;
-    const ssrComponent = testObservables[`${name10}_ssr`];
+    const ssrComponent = testObservables[`${name11}_ssr`];
     const ssrResult = renderToString(ssrComponent);
     const fullElements = [
       `<h3>IconButton</h3><button class="${BASE}">\u2605</button>`,
@@ -51751,12 +53102,12 @@ TestIconButton.test = {
     ];
     const expectedFull = fullElements[idx];
     if (ssrResult !== expectedFull) {
-      assert(false, `[${name10}] SSR mismatch: got 
+      assert(false, `[${name11}] SSR mismatch: got 
 ${ssrResult}, expected 
 ${expectedFull}`);
     } else {
-      assert(true, `[${name10}] SSR match`);
-      console.log(`\u2705 [${name10}] SSR test passed: ${ssrResult}`);
+      assert(true, `[${name11}] SSR match`);
+      console.log(`\u2705 [${name11}] SSR test passed: ${ssrResult}`);
     }
     return expected;
   }
@@ -51777,7 +53128,7 @@ var BASE_CLASS4 = [
   "divide-x divide-[var(--wui-gray-200)]"
   // Subtle dividers between elements
 ].join(" ");
-var def10 = () => ({
+var def12 = () => ({
   /** Child elements to be rendered inside the number field */
   children: observable(null),
   /** When true, the value will be updated immediately on user input rather than on blur */
@@ -51817,7 +53168,7 @@ var def10 = () => ({
   /** Callback function triggered when a key is released */
   onKeyUp: void 0
 });
-var NumberField = defaults(def10, (props) => {
+var NumberField = defaults(def12, (props) => {
   const { class: cn2, cls, children, reactive, noMinMax, noFix, noRotate, value, min, max, step, disabled, onChange, onKeyUp, ...otherProps } = props;
   const inputRef = observable();
   const error = memo(() => {
@@ -51978,14 +53329,14 @@ registerBaseCls("wui-number-field", BASE_CLASS4);
 
 // src/ssr/TestNumberField.tsx
 init_runtime_es();
-var name11 = "TestNumberField";
+var name12 = "TestNumberField";
 var TestNumberField = () => {
   const states = [
     { value: 0 },
     { value: 50 }
   ];
   const index = observable(0);
-  registerTestObservable(name11, index);
+  registerTestObservable(name12, index);
   const increment = () => index((prev) => (prev + 1) % states.length);
   useInterval2(increment, TEST_INTERVAL);
   const getCurrentElement = () => {
@@ -51996,7 +53347,7 @@ var TestNumberField = () => {
     ] });
   };
   const ret = () => getCurrentElement();
-  registerTestObservable(`${name11}_ssr`, ret);
+  registerTestObservable(`${name12}_ssr`, ret);
   return ret;
 };
 var NUM_INPUT = "number-input inline-flex items-center bg-[var(--wui-white)] border border-[var(--wui-gray-300)] rounded-lg transition-all duration-200 focus-within:ring-2 focus-within:ring-[var(--wui-blue-500)] focus-within:border-[var(--wui-blue-500)] divide-x divide-[var(--wui-gray-200)]";
@@ -52011,12 +53362,12 @@ if (typeof globalThis.__isSSRTest__ !== "undefined") {
     `<h3>NumberField</h3><div class="${NUM_INPUT}"><button type="button" class="${BTN_DEC_CLS}"><span class="${SPAN_CLS}">-</span></button><input class="${INPUT_CLS}" type="number" value="50" min="0" max="100" step="1" /><button type="button" class="${BTN_INC_CLS}"><span class="${SPAN_CLS}">+</span></button></div>`
   ];
   console.log(`
-\u{1F4DD} Test: ${name11}`);
+\u{1F4DD} Test: ${name12}`);
   let allPassed = true;
   for (let i = 0; i < fullElements.length; i++) {
     ;
-    testObservables[name11](i);
-    const ssrComponent = testObservables[`${name11}_ssr`];
+    testObservables[name12](i);
+    const ssrComponent = testObservables[`${name12}_ssr`];
     const ssrResult = renderToString(ssrComponent);
     const expectedFull = fullElements[i];
     const passed = ssrResult === expectedFull;
@@ -52026,9 +53377,9 @@ if (typeof globalThis.__isSSRTest__ !== "undefined") {
   console.log(`   Result: ${allPassed ? "\u2705 ALL PASSED" : "\u274C SOME FAILED"}
 `);
   if (!allPassed) {
-    console.error(`\u274C [${name11}] SSR test failed`);
+    console.error(`\u274C [${name12}] SSR test failed`);
     const g2 = globalThis;
-    (g2.__ssrFailures ??= []).push(name11);
+    (g2.__ssrFailures ??= []).push(name12);
   }
 }
 TestNumberField.test = {
@@ -52036,20 +53387,20 @@ TestNumberField.test = {
   stateCount: 2,
   compareActualValues: true,
   expect: () => {
-    const idx = get(testObservables[name11]);
+    const idx = get(testObservables[name12]);
     const value = [0, 50][idx];
     const expected = `<div class="${NUM_INPUT}"><button type="button" class="${BTN_DEC_CLS}"><span class="${SPAN_CLS}">-</span></button><input class="${INPUT_CLS}" type="number" min="0" max="100" step="1"><button type="button" class="${BTN_INC_CLS}"><span class="${SPAN_CLS}">+</span></button></div>`;
-    const ssrComponent = testObservables[`${name11}_ssr`];
+    const ssrComponent = testObservables[`${name12}_ssr`];
     const ssrResult = renderToString(ssrComponent);
     const fullValue = [0, 50][idx];
     const expectedFull = `<h3>NumberField</h3><div class="${NUM_INPUT}"><button type="button" class="${BTN_DEC_CLS}"><span class="${SPAN_CLS}">-</span></button><input class="${INPUT_CLS}" type="number" value="${fullValue}" min="0" max="100" step="1" /><button type="button" class="${BTN_INC_CLS}"><span class="${SPAN_CLS}">+</span></button></div>`;
     if (ssrResult !== expectedFull) {
-      assert(false, `[${name11}] SSR mismatch: got 
+      assert(false, `[${name12}] SSR mismatch: got 
 ${ssrResult}, expected 
 ${expectedFull}`);
     } else {
-      assert(true, `[${name11}] SSR match`);
-      console.log(`\u2705 [${name11}] SSR test passed: ${ssrResult}`);
+      assert(true, `[${name12}] SSR match`);
+      console.log(`\u2705 [${name12}] SSR test passed: ${ssrResult}`);
     }
     return expected;
   }
@@ -52076,7 +53427,7 @@ var preset = {
   16: `shadow-2xl `,
   24: `shadow-2xl `
 };
-var def11 = () => ({
+var def13 = () => ({
   /** 
    * Custom CSS classes to apply to the paper.
    * 
@@ -52094,7 +53445,7 @@ var def11 = () => ({
   children: observable(null),
   elevation: observable(1, HtmlNumber)
 });
-var Paper = defaults(def11, (props) => {
+var Paper = defaults(def13, (props) => {
   const { class: cn2, cls, children, elevation, ...otherProps } = props;
   const elevationClass = memo(() => {
     const elev = get(elevation);
@@ -52106,7 +53457,7 @@ customElement("wui-paper", Paper);
 
 // src/ssr/TestPaper.tsx
 init_runtime_es();
-var name12 = "TestPaper";
+var name13 = "TestPaper";
 var TestPaper = () => {
   const states = [
     { elevation: 0, content: "Content" },
@@ -52114,7 +53465,7 @@ var TestPaper = () => {
     { elevation: 3, content: "Content" }
   ];
   const index = observable(0);
-  registerTestObservable(name12, index);
+  registerTestObservable(name13, index);
   const increment = () => index((prev) => (prev + 1) % states.length);
   useInterval2(increment, TEST_INTERVAL);
   const getCurrentElement = () => {
@@ -52125,7 +53476,7 @@ var TestPaper = () => {
     ] });
   };
   const ret = () => getCurrentElement();
-  registerTestObservable(`${name12}_ssr`, ret);
+  registerTestObservable(`${name13}_ssr`, ret);
   return ret;
 };
 var BASE2 = "bg-[var(--wui-white)] transition-shadow duration-300 ease-in-out rounded-lg";
@@ -52134,12 +53485,12 @@ if (typeof globalThis.__isSSRTest__ !== "undefined") {
   TestPaper();
   const fullElements = SHADOWS.map((s) => `<h3>Paper</h3><div class="${BASE2} ${s}">Content</div>`);
   console.log(`
-\u{1F4DD} Test: ${name12}`);
+\u{1F4DD} Test: ${name13}`);
   let allPassed = true;
   for (let i = 0; i < fullElements.length; i++) {
     ;
-    testObservables[name12](i);
-    const ssrComponent = testObservables[`${name12}_ssr`];
+    testObservables[name13](i);
+    const ssrComponent = testObservables[`${name13}_ssr`];
     const ssrResult = renderToString(ssrComponent);
     const expectedFull = fullElements[i];
     const passed = ssrResult === expectedFull;
@@ -52149,9 +53500,9 @@ if (typeof globalThis.__isSSRTest__ !== "undefined") {
   console.log(`   Result: ${allPassed ? "\u2705 ALL PASSED" : "\u274C SOME FAILED"}
 `);
   if (!allPassed) {
-    console.error(`\u274C [${name12}] SSR test failed`);
+    console.error(`\u274C [${name13}] SSR test failed`);
     const g2 = globalThis;
-    (g2.__ssrFailures ??= []).push(name12);
+    (g2.__ssrFailures ??= []).push(name13);
   }
 }
 TestPaper.test = {
@@ -52159,18 +53510,18 @@ TestPaper.test = {
   stateCount: 3,
   compareActualValues: true,
   expect: () => {
-    const idx = get(testObservables[name12]);
+    const idx = get(testObservables[name13]);
     const expected = `<div class="${BASE2} ${SHADOWS[idx]}">Content</div>`;
-    const ssrComponent = testObservables[`${name12}_ssr`];
+    const ssrComponent = testObservables[`${name13}_ssr`];
     const ssrResult = renderToString(ssrComponent);
     const expectedFull = `<h3>Paper</h3><div class="${BASE2} ${SHADOWS[idx]}">Content</div>`;
     if (ssrResult !== expectedFull) {
-      assert(false, `[${name12}] SSR mismatch: got 
+      assert(false, `[${name13}] SSR mismatch: got 
 ${ssrResult}, expected 
 ${expectedFull}`);
     } else {
-      assert(true, `[${name12}] SSR match`);
-      console.log(`\u2705 [${name12}] SSR test passed: ${ssrResult}`);
+      assert(true, `[${name13}] SSR match`);
+      console.log(`\u2705 [${name13}] SSR test passed: ${ssrResult}`);
     }
     return expected;
   }
@@ -52309,14 +53660,14 @@ customElement("wui-menu-text", MenuText);
 
 // src/ssr/TestSideBar.tsx
 init_runtime_es();
-var name13 = "TestSideBar";
+var name14 = "TestSideBar";
 var TestSideBar = () => {
   const states = [
     { open: false, children: "Sidebar" },
     { open: true, children: "Sidebar" }
   ];
   const index = observable(0);
-  registerTestObservable(name13, index);
+  registerTestObservable(name14, index);
   const increment = () => index((prev) => (prev + 1) % states.length);
   useInterval2(increment, TEST_INTERVAL);
   const getCurrentElement = () => {
@@ -52327,7 +53678,7 @@ var TestSideBar = () => {
     ] });
   };
   const ret = () => getCurrentElement();
-  registerTestObservable(`${name13}_ssr`, ret);
+  registerTestObservable(`${name14}_ssr`, ret);
   return ret;
 };
 var BASE_CLASS5 = "fixed h-full left-0 overflow-x-hidden transition-all duration-500 ease-in-out flex items-start z-[10]";
@@ -52338,12 +53689,12 @@ if (typeof globalThis.__isSSRTest__ !== "undefined") {
     `<h3>SideBar</h3><div class="${BASE_CLASS5}" style="width: 250px; top: 56px;"><slot><div class="w-full h-full flex flex-col justify-end">Sidebar</div></slot></div>`
   ];
   console.log(`
-\u{1F4DD} Test: ${name13}`);
+\u{1F4DD} Test: ${name14}`);
   let allPassed = true;
   for (let i = 0; i < fullElements.length; i++) {
     ;
-    testObservables[name13](i);
-    const ssrComponent = testObservables[`${name13}_ssr`];
+    testObservables[name14](i);
+    const ssrComponent = testObservables[`${name14}_ssr`];
     const ssrResult = renderToString(ssrComponent);
     const expectedFull = fullElements[i];
     const passed = ssrResult === expectedFull;
@@ -52353,9 +53704,9 @@ if (typeof globalThis.__isSSRTest__ !== "undefined") {
   console.log(`   Result: ${allPassed ? "\u2705 ALL PASSED" : "\u274C SOME FAILED"}
 `);
   if (!allPassed) {
-    console.error(`\u274C [${name13}] SSR test failed`);
+    console.error(`\u274C [${name14}] SSR test failed`);
     const g2 = globalThis;
-    (g2.__ssrFailures ??= []).push(name13);
+    (g2.__ssrFailures ??= []).push(name14);
   }
 }
 TestSideBar.test = {
@@ -52363,10 +53714,10 @@ TestSideBar.test = {
   stateCount: 2,
   compareActualValues: true,
   expect: () => {
-    const idx = get(testObservables[name13]);
+    const idx = get(testObservables[name14]);
     const fullWidth = idx === 1 ? "250px" : "0px";
     const expected = `<div class="${BASE_CLASS5}" style="width: ${fullWidth}; top: 56px;"></div>`;
-    const ssrComponent = testObservables[`${name13}_ssr`];
+    const ssrComponent = testObservables[`${name14}_ssr`];
     const ssrResult = renderToString(ssrComponent);
     const fullElements = [
       `<h3>SideBar</h3><div class="${BASE_CLASS5}" style="width: 0px; top: 56px;"><slot><div class="w-full h-full flex flex-col justify-end">Sidebar</div></slot></div>`,
@@ -52374,12 +53725,12 @@ TestSideBar.test = {
     ];
     const expectedFull = fullElements[idx];
     if (ssrResult !== expectedFull) {
-      assert(false, `[${name13}] SSR mismatch: got 
+      assert(false, `[${name14}] SSR mismatch: got 
 ${ssrResult}, expected 
 ${expectedFull}`);
     } else {
-      assert(true, `[${name13}] SSR match`);
-      console.log(`\u2705 [${name13}] SSR test passed: ${ssrResult}`);
+      assert(true, `[${name14}] SSR match`);
+      console.log(`\u2705 [${name14}] SSR test passed: ${ssrResult}`);
     }
     return expected;
   }
@@ -53800,7 +55151,7 @@ var styleMap = {
   effect17,
   effect18
 };
-var def12 = () => {
+var def14 = () => {
   const generatedId = nanoid(8);
   return {
     off: observable("OFF"),
@@ -53814,7 +55165,7 @@ var def12 = () => {
   };
 };
 var baseCls3 = (effect25) => styleMap[effect25 || ""] || "";
-var Switch2 = defaults(def12, (props) => {
+var Switch2 = defaults(def14, (props) => {
   const { off, on: on2, checked, id, cls, class: cn2, children, effect: effect25, ...otherProps } = props;
   const activeStyle = memo(() => baseCls3(get(effect25)));
   return /* @__PURE__ */ jsxs("div", { ...otherProps, class: [() => get(cls) ? get(cls) : get(activeStyle), cn2], children: [
@@ -53837,14 +55188,14 @@ registerBaseCls("wui-switch", (el) => baseCls3(el.getAttribute("effect")));
 
 // src/ssr/TestSwitch.tsx
 init_runtime_es();
-var name14 = "TestSwitch";
+var name15 = "TestSwitch";
 var TestSwitch = () => {
   const states = [
     { checked: false },
     { checked: true }
   ];
   const index = observable(0);
-  registerTestObservable(name14, index);
+  registerTestObservable(name15, index);
   const increment = () => index((prev) => (prev + 1) % states.length);
   useInterval2(increment, TEST_INTERVAL);
   const getCurrentElement = () => {
@@ -53855,7 +55206,7 @@ var TestSwitch = () => {
     ] });
   };
   const ret = () => getCurrentElement();
-  registerTestObservable(`${name14}_ssr`, ret);
+  registerTestObservable(`${name15}_ssr`, ret);
   return ret;
 };
 if (typeof globalThis.__isSSRTest__ !== "undefined") {
@@ -53865,12 +55216,12 @@ if (typeof globalThis.__isSSRTest__ !== "undefined") {
     `<h3>Switch</h3><div><input id="test-switch" type="checkbox" checked="" /><div data-tg-on="ON" data-tg-off="OFF"><span data-tg-on="ON" data-tg-off="OFF"></span></div><span></span><label for="test-switch" data-tg-on="ON" data-tg-off="OFF"></label></div>`
   ];
   console.log(`
-\u{1F4DD} Test: ${name14}`);
+\u{1F4DD} Test: ${name15}`);
   let allPassed = true;
   for (let i = 0; i < fullElements.length; i++) {
     ;
-    testObservables[name14](i);
-    const ssrComponent = testObservables[`${name14}_ssr`];
+    testObservables[name15](i);
+    const ssrComponent = testObservables[`${name15}_ssr`];
     const ssrResult = renderToString(ssrComponent);
     const expectedFull = fullElements[i];
     const passed = ssrResult === expectedFull;
@@ -53880,9 +55231,9 @@ if (typeof globalThis.__isSSRTest__ !== "undefined") {
   console.log(`   Result: ${allPassed ? "\u2705 ALL PASSED" : "\u274C SOME FAILED"}
 `);
   if (!allPassed) {
-    console.error(`\u274C [${name14}] SSR test failed`);
+    console.error(`\u274C [${name15}] SSR test failed`);
     const g2 = globalThis;
-    (g2.__ssrFailures ??= []).push(name14);
+    (g2.__ssrFailures ??= []).push(name15);
   }
 }
 TestSwitch.test = {
@@ -53890,19 +55241,19 @@ TestSwitch.test = {
   stateCount: 2,
   compareActualValues: true,
   expect: () => {
-    const idx = get(testObservables[name14]);
+    const idx = get(testObservables[name15]);
     const expected = `<div><input id="test-switch" type="checkbox"><div data-tg-on="ON" data-tg-off="OFF"><span data-tg-on="ON" data-tg-off="OFF"></span></div><span></span><label for="test-switch" data-tg-on="ON" data-tg-off="OFF"></label></div>`;
-    const ssrComponent = testObservables[`${name14}_ssr`];
+    const ssrComponent = testObservables[`${name15}_ssr`];
     const ssrResult = renderToString(ssrComponent);
     const fullChecked = idx === 1 ? ' checked=""' : "";
     const expectedFull = `<h3>Switch</h3><div><input id="test-switch" type="checkbox"${fullChecked} /><div data-tg-on="ON" data-tg-off="OFF"><span data-tg-on="ON" data-tg-off="OFF"></span></div><span></span><label for="test-switch" data-tg-on="ON" data-tg-off="OFF"></label></div>`;
     if (ssrResult !== expectedFull) {
-      assert(false, `[${name14}] SSR mismatch: got 
+      assert(false, `[${name15}] SSR mismatch: got 
 ${ssrResult}, expected 
 ${expectedFull}`);
     } else {
-      assert(true, `[${name14}] SSR match`);
-      console.log(`\u2705 [${name14}] SSR test passed: ${ssrResult}`);
+      assert(true, `[${name15}] SSR match`);
+      console.log(`\u2705 [${name15}] SSR test passed: ${ssrResult}`);
     }
     return expected;
   }
@@ -54040,13 +55391,13 @@ customElement("wui-tabs", Tabs);
 
 // src/ssr/TestTabs.tsx
 init_runtime_es();
-var name15 = "TestTabs";
+var name16 = "TestTabs";
 var TestTabs = () => {
   const states = [
     { children: [/* @__PURE__ */ jsx(Tab, { title: "Tab 1", children: "Content 1" }), /* @__PURE__ */ jsx(Tab, { title: "Tab 2", children: "Content 2" })] }
   ];
   const index = observable(0);
-  registerTestObservable(name15, index);
+  registerTestObservable(name16, index);
   const increment = () => index((prev) => (prev + 1) % states.length);
   useInterval2(increment, TEST_INTERVAL);
   const getCurrentElement = () => {
@@ -54057,7 +55408,7 @@ var TestTabs = () => {
     ] });
   };
   const ret = () => getCurrentElement();
-  registerTestObservable(`${name15}_ssr`, ret);
+  registerTestObservable(`${name16}_ssr`, ret);
   return ret;
 };
 if (typeof globalThis.__isSSRTest__ !== "undefined") {
@@ -54066,12 +55417,12 @@ if (typeof globalThis.__isSSRTest__ !== "undefined") {
     `<h3>Tabs</h3><div><div class="flex justify-center flex-wrap gap-2 my-4 border-2 border-[var(--wui-gray-200)] py-2 rounded-lg"></div><div class="p-4 border border-[var(--wui-gray-200)] rounded-b-lg shadow-sm bg-[var(--wui-white)] min-h-[50px]"><div data-tab-title="Tab 1" title="Tab 1">Content 1</div><div data-tab-title="Tab 2" title="Tab 2">Content 2</div></div></div>`
   ];
   console.log(`
-\u{1F4DD} Test: ${name15}`);
+\u{1F4DD} Test: ${name16}`);
   let allPassed = true;
   for (let i = 0; i < fullElements.length; i++) {
     ;
-    testObservables[name15](i);
-    const ssrComponent = testObservables[`${name15}_ssr`];
+    testObservables[name16](i);
+    const ssrComponent = testObservables[`${name16}_ssr`];
     const ssrResult = renderToString(ssrComponent);
     const expectedFull = fullElements[i];
     const passed = ssrResult === expectedFull;
@@ -54081,9 +55432,9 @@ if (typeof globalThis.__isSSRTest__ !== "undefined") {
   console.log(`   Result: ${allPassed ? "\u2705 ALL PASSED" : "\u274C SOME FAILED"}
 `);
   if (!allPassed) {
-    console.error(`\u274C [${name15}] SSR test failed`);
+    console.error(`\u274C [${name16}] SSR test failed`);
     const g2 = globalThis;
-    (g2.__ssrFailures ??= []).push(name15);
+    (g2.__ssrFailures ??= []).push(name16);
   }
 }
 TestTabs.test = {
@@ -54091,18 +55442,18 @@ TestTabs.test = {
   stateCount: 1,
   compareActualValues: true,
   expect: () => {
-    const idx = get(testObservables[name15]);
+    const idx = get(testObservables[name16]);
     const expected = `<div><div class="flex justify-center flex-wrap gap-2 my-4 border-2 border-[var(--wui-gray-200)] py-2 rounded-lg"><button type="button" class="px-4 py-2 rounded-lg font-bold transition-colors duration-200 cursor-pointer select-none bg-[var(--wui-black)] text-[var(--wui-white)]">Tab 1</button><button type="button" class="px-4 py-2 rounded-lg font-bold transition-colors duration-200 cursor-pointer select-none bg-[var(--wui-gray-100)] text-[var(--wui-gray-600)] hover:bg-[var(--wui-gray-200)]">Tab 2</button></div><div class="p-4 border border-[var(--wui-gray-200)] rounded-b-lg shadow-sm bg-[var(--wui-white)] min-h-[50px]"><div data-tab-title="Tab 1" title="Tab 1" style="display: block;">Content 1</div><div data-tab-title="Tab 2" title="Tab 2" hidden="" style="display: none;">Content 2</div></div></div>`;
-    const ssrComponent = testObservables[`${name15}_ssr`];
+    const ssrComponent = testObservables[`${name16}_ssr`];
     const ssrResult = renderToString(ssrComponent);
     const expectedFull = `<h3>Tabs</h3><div><div class="flex justify-center flex-wrap gap-2 my-4 border-2 border-[var(--wui-gray-200)] py-2 rounded-lg"></div><div class="p-4 border border-[var(--wui-gray-200)] rounded-b-lg shadow-sm bg-[var(--wui-white)] min-h-[50px]"><div data-tab-title="Tab 1" title="Tab 1">Content 1</div><div data-tab-title="Tab 2" title="Tab 2">Content 2</div></div></div>`;
     if (ssrResult !== expectedFull) {
-      assert(false, `[${name15}] SSR mismatch: got 
+      assert(false, `[${name16}] SSR mismatch: got 
 ${ssrResult}, expected 
 ${expectedFull}`);
     } else {
-      assert(true, `[${name15}] SSR match`);
-      console.log(`\u2705 [${name15}] SSR test passed: ${ssrResult}`);
+      assert(true, `[${name16}] SSR match`);
+      console.log(`\u2705 [${name16}] SSR test passed: ${ssrResult}`);
     }
     return expected;
   }
@@ -55346,7 +56697,7 @@ var effectMap = {
   effect21a
   // Snake border, label cuts line
 };
-var def13 = () => ({
+var def15 = () => ({
   cls: observable("", HtmlClass),
   class: observable("", HtmlClass),
   children: observable(null),
@@ -55365,7 +56716,7 @@ var def13 = () => ({
   onKeyUp: void 0
 });
 var BASE_CLASS6 = "relative size-fit";
-var TextArea = defaults(def13, (props) => {
+var TextArea = defaults(def15, (props) => {
   const { cls, class: cn2, children, effect: effect25, assignOnEnter, value, placeholder, label, resize, onChange, onKeyUp, ...otherProps } = props;
   const resizeStyle = memo(() => {
     const r = get(resize);
@@ -55437,14 +56788,14 @@ registerBaseCls("wui-text-area", BASE_CLASS6);
 
 // src/ssr/TestTextArea.tsx
 init_runtime_es();
-var name16 = "TestTextArea";
+var name17 = "TestTextArea";
 var TestTextArea = () => {
   const states = [
     { value: "", placeholder: "Enter text" },
     { value: "Hello", placeholder: "Enter text" }
   ];
   const index = observable(0);
-  registerTestObservable(name16, index);
+  registerTestObservable(name17, index);
   const increment = () => index((prev) => (prev + 1) % states.length);
   useInterval2(increment, TEST_INTERVAL);
   const getCurrentElement = () => {
@@ -55455,7 +56806,7 @@ var TestTextArea = () => {
     ] });
   };
   const ret = () => getCurrentElement();
-  registerTestObservable(`${name16}_ssr`, ret);
+  registerTestObservable(`${name17}_ssr`, ret);
   return ret;
 };
 var TEXTAREA_CLS = "focus:[outline:none] border border-solid border-[var(--wui-gray-300)] px-3.5 py-2 duration-[0.4s] bg-transparent z-10 w-full [&~label]:absolute [&~label]:w-full [&~label]:text-[var(--wui-placeholder-gray)] [&~label]:duration-[0.3s] [&~label]:z-0 [&~label]:tracking-[0.5px] [&~label]:left-3.5 [&~label]:top-2.5 [&:focus~label]:top-[-12px] [&:focus~label]:text-xs [&:focus~label]:text-[var(--wui-mui-green)] [&:focus~label]:duration-[0.3s] [&:focus~label]:left-[7px] [&:focus~label]:bg-[var(--wui-white)] [&:focus~label]:w-fit [&:focus~label]:z-10 [&:focus~label]:py-1 [&:focus~label]:px-1 [&:not(:placeholder-shown)~label]:top-[-12px] [&:not(:placeholder-shown)~label]:text-xs [&:not(:placeholder-shown)~label]:text-[var(--wui-mui-green)] [&:not(:placeholder-shown)~label]:duration-[0.3s] [&:not(:placeholder-shown)~label]:left-[7px] [&:not(:placeholder-shown)~label]:bg-[var(--wui-white)] [&:not(:placeholder-shown)~label]:w-fit [&:not(:placeholder-shown)~label]:z-10 [&:not(:placeholder-shown)~label]:py-1 [&:not(:placeholder-shown)~label]:px-1 [&~span]:before:content-[''] [&~span]:before:absolute [&~span]:before:-top-px [&~span]:before:left-2/4 [&~span]:before:w-0 [&~span]:before:h-0.5 [&~span]:before:bg-[var(--wui-mui-green)] [&~span]:before:duration-[0.4s] [&~span]:after:content-[''] [&~span]:after:absolute [&~span]:after:-top-px [&~span]:after:left-2/4 [&~span]:after:w-0 [&~span]:after:h-0.5 [&~span]:after:bg-[var(--wui-mui-green)] [&~span]:after:duration-[0.4s] [&~span]:after:top-auto [&~span]:after:bottom-0 [&~span_i]:before:content-[''] [&~span_i]:before:absolute [&~span_i]:before:top-2/4 [&~span_i]:before:left-0 [&~span_i]:before:w-0.5 [&~span_i]:before:h-0 [&~span_i]:before:bg-[var(--wui-mui-green)] [&~span_i]:before:duration-[0.6s] [&~span_i]:after:content-[''] [&~span_i]:after:absolute [&~span_i]:after:top-2/4 [&~span_i]:after:left-0 [&~span_i]:after:w-0.5 [&~span_i]:after:h-0 [&~span_i]:after:bg-[var(--wui-mui-green)] [&~span_i]:after:duration-[0.6s] [&~span_i]:after:left-auto [&~span_i]:after:right-0 [&:focus~span]:before:left-0 [&:focus~span]:before:w-full [&:focus~span]:before:duration-[0.4s] [&:focus~span]:after:left-0 [&:focus~span]:after:w-full [&:focus~span]:after:duration-[0.4s] [&:not(:placeholder-shown)~span]:before:left-0 [&:not(:placeholder-shown)~span]:before:w-full [&:not(:placeholder-shown)~span]:before:duration-[0.4s] [&:not(:placeholder-shown)~span]:after:left-0 [&:not(:placeholder-shown)~span]:after:w-full [&:not(:placeholder-shown)~span]:after:duration-[0.4s] [&:focus~span_i]:before:-top-px [&:focus~span_i]:before:h-full [&:focus~span_i]:before:duration-[0.6s] [&:focus~span_i]:after:-top-px [&:focus~span_i]:after:h-full [&:focus~span_i]:after:duration-[0.6s] [&:not(:placeholder-shown)~span_i]:before:-top-px [&:not(:placeholder-shown)~span_i]:before:h-full [&:not(:placeholder-shown)~span_i]:before:duration-[0.6s] [&:not(:placeholder-shown)~span_i]:after:-top-px [&:not(:placeholder-shown)~span_i]:after:h-full [&:not(:placeholder-shown)~span_i]:after:duration-[0.6s] resize-none block size-full";
@@ -55466,12 +56817,12 @@ if (typeof globalThis.__isSSRTest__ !== "undefined") {
     `<h3>TextArea</h3><div class="relative size-fit"><textarea style="resize: none;" class="${TEXTAREA_CLS}" placeholder="Enter text" value="Hello"></textarea><span class="focus-border focus-bg pointer-events-none"><i></i></span></div>`
   ];
   console.log(`
-\u{1F4DD} Test: ${name16}`);
+\u{1F4DD} Test: ${name17}`);
   let allPassed = true;
   for (let i = 0; i < fullElements.length; i++) {
     ;
-    testObservables[name16](i);
-    const ssrComponent = testObservables[`${name16}_ssr`];
+    testObservables[name17](i);
+    const ssrComponent = testObservables[`${name17}_ssr`];
     const ssrResult = renderToString(ssrComponent);
     const expectedFull = fullElements[i];
     const passed = ssrResult === expectedFull;
@@ -55481,9 +56832,9 @@ if (typeof globalThis.__isSSRTest__ !== "undefined") {
   console.log(`   Result: ${allPassed ? "\u2705 ALL PASSED" : "\u274C SOME FAILED"}
 `);
   if (!allPassed) {
-    console.error(`\u274C [${name16}] SSR test failed`);
+    console.error(`\u274C [${name17}] SSR test failed`);
     const g2 = globalThis;
-    (g2.__ssrFailures ??= []).push(name16);
+    (g2.__ssrFailures ??= []).push(name17);
   }
 }
 TestTextArea.test = {
@@ -55491,20 +56842,20 @@ TestTextArea.test = {
   stateCount: 2,
   compareActualValues: true,
   expect: () => {
-    const idx = get(testObservables[name16]);
+    const idx = get(testObservables[name17]);
     const value = ["", "Hello"][idx];
     const expected = `<div class="relative size-fit"><textarea class="${TEXTAREA_CLS}" placeholder="Enter text" style="resize: none;"></textarea><span class="focus-border focus-bg pointer-events-none"><i></i></span></div>`;
-    const ssrComponent = testObservables[`${name16}_ssr`];
+    const ssrComponent = testObservables[`${name17}_ssr`];
     const ssrResult = renderToString(ssrComponent);
     const fullValue = ["", "Hello"][idx];
     const expectedFull = `<h3>TextArea</h3><div class="relative size-fit"><textarea style="resize: none;" class="${TEXTAREA_CLS}" placeholder="Enter text" value="${fullValue}"></textarea><span class="focus-border focus-bg pointer-events-none"><i></i></span></div>`;
     if (ssrResult !== expectedFull) {
-      assert(false, `[${name16}] SSR mismatch: got 
+      assert(false, `[${name17}] SSR mismatch: got 
 ${ssrResult}, expected 
 ${expectedFull}`);
     } else {
-      assert(true, `[${name16}] SSR match`);
-      console.log(`\u2705 [${name16}] SSR test passed: ${ssrResult}`);
+      assert(true, `[${name17}] SSR match`);
+      console.log(`\u2705 [${name17}] SSR test passed: ${ssrResult}`);
     }
     return expected;
   }
@@ -55582,7 +56933,7 @@ var effectMap2 = {
   effect21a
   // Snake border, label cuts line
 };
-var def14 = () => ({
+var def16 = () => ({
   class: observable("", HtmlClass),
   cls: observable("", HtmlClass),
   children: observable(null),
@@ -55598,7 +56949,7 @@ var def14 = () => ({
   ref: void 0
 });
 var BASE_CLASS7 = "relative z-0 flex items-center";
-var TextField = defaults(def14, (props) => {
+var TextField = defaults(def16, (props) => {
   const { cls, class: cn2, children, effect: effect25, assignOnEnter, value, inputType, placeholder, disabled, onChange, onKeyUp, label, ref, ...otherProps } = props;
   const defaultStyle = "block w-full py-1.5 px-2 text-base text-[var(--wui-gray-900)] placeholder:text-[var(--wui-gray-400)] focus:border-[var(--wui-blue-500)] sm:text-sm/6 truncate";
   const inputRef = observable(null);
@@ -55741,14 +57092,14 @@ customElement("wui-end-adornment", EndAdornment);
 
 // src/ssr/TestTextField.tsx
 init_runtime_es();
-var name17 = "TestTextField";
+var name18 = "TestTextField";
 var TestTextField = () => {
   const states = [
     { value: "", placeholder: "Enter text" },
     { value: "Hello", placeholder: "Enter text" }
   ];
   const index = observable(0);
-  registerTestObservable(name17, index);
+  registerTestObservable(name18, index);
   const increment = () => index((prev) => (prev + 1) % states.length);
   useInterval2(increment, TEST_INTERVAL);
   const getCurrentElement = () => {
@@ -55759,7 +57110,7 @@ var TestTextField = () => {
     ] });
   };
   const ret = () => getCurrentElement();
-  registerTestObservable(`${name17}_ssr`, ret);
+  registerTestObservable(`${name18}_ssr`, ret);
   return ret;
 };
 var DEFAULT_STYLE = "block w-full py-1.5 px-2 text-base text-[var(--wui-gray-900)] placeholder:text-[var(--wui-gray-400)] focus:border-[var(--wui-blue-500)] sm:text-sm/6 truncate disabled:cursor-not-allowed disabled:text-[var(--wui-disabled-text)] disabled:border-[var(--wui-disabled-border)] disabled:bg-[var(--wui-disabled-bg)] [&:disabled~label]:text-[var(--wui-disabled-text)]";
@@ -55771,12 +57122,12 @@ if (typeof globalThis.__isSSRTest__ !== "undefined") {
     `<h3>TextField</h3><div class="${BASE_CLASS8}" tabindex="-1"><div class="relative flex-1"><div class="relative flex items-center w-full gap-2"><div class="relative flex-1 min-w-0"><input class="${DEFAULT_STYLE}" value="Hello" type="text" placeholder="Enter text" /><span class="focus-border focus-bg pointer-events-none"><i></i></span></div></div></div></div>`
   ];
   console.log(`
-\u{1F4DD} Test: ${name17}`);
+\u{1F4DD} Test: ${name18}`);
   let allPassed = true;
   for (let i = 0; i < fullElements.length; i++) {
     ;
-    testObservables[name17](i);
-    const ssrComponent = testObservables[`${name17}_ssr`];
+    testObservables[name18](i);
+    const ssrComponent = testObservables[`${name18}_ssr`];
     const ssrResult = renderToString(ssrComponent);
     const expectedFull = fullElements[i];
     const passed = ssrResult === expectedFull;
@@ -55786,9 +57137,9 @@ if (typeof globalThis.__isSSRTest__ !== "undefined") {
   console.log(`   Result: ${allPassed ? "\u2705 ALL PASSED" : "\u274C SOME FAILED"}
 `);
   if (!allPassed) {
-    console.error(`\u274C [${name17}] SSR test failed`);
+    console.error(`\u274C [${name18}] SSR test failed`);
     const g2 = globalThis;
-    (g2.__ssrFailures ??= []).push(name17);
+    (g2.__ssrFailures ??= []).push(name18);
   }
 }
 TestTextField.test = {
@@ -55796,20 +57147,20 @@ TestTextField.test = {
   stateCount: 2,
   compareActualValues: true,
   expect: () => {
-    const idx = get(testObservables[name17]);
+    const idx = get(testObservables[name18]);
     const value = ["", "Hello"][idx];
     const expected = `<div class="${BASE_CLASS8}" tabindex="-1"><div class="relative flex-1"><div class="relative flex items-center w-full gap-2"><div class="relative flex-1 min-w-0"><input class="${DEFAULT_STYLE}" type="text" placeholder="Enter text"><span class="focus-border focus-bg pointer-events-none"><i></i></span></div></div></div></div>`;
-    const ssrComponent = testObservables[`${name17}_ssr`];
+    const ssrComponent = testObservables[`${name18}_ssr`];
     const ssrResult = renderToString(ssrComponent);
     const fullValue = ["", "Hello"][idx];
     const expectedFull = `<h3>TextField</h3><div class="${BASE_CLASS8}" tabindex="-1"><div class="relative flex-1"><div class="relative flex items-center w-full gap-2"><div class="relative flex-1 min-w-0"><input class="${DEFAULT_STYLE}" value="${fullValue}" type="text" placeholder="Enter text" /><span class="focus-border focus-bg pointer-events-none"><i></i></span></div></div></div></div>`;
     if (ssrResult !== expectedFull) {
-      assert(false, `[${name17}] SSR mismatch: got 
+      assert(false, `[${name18}] SSR mismatch: got 
 ${ssrResult}, expected 
 ${expectedFull}`);
     } else {
-      assert(true, `[${name17}] SSR match`);
-      console.log(`\u2705 [${name17}] SSR test passed: ${ssrResult}`);
+      assert(true, `[${name18}] SSR match`);
+      console.log(`\u2705 [${name18}] SSR test passed: ${ssrResult}`);
     }
     return expected;
   }
@@ -55824,7 +57175,7 @@ init_ssr_shim();
 init_index_es();
 init_runtime_es();
 var BASE_CLASS9 = "inline-flex items-center justify-center px-2 py-1 rounded text-sm cursor-pointer select-none transition-colors duration-150 border border-transparent";
-var def15 = () => ({
+var def17 = () => ({
   children: observable(""),
   // 2. Updated Default Colors (Material UI / Tailwind style)
   onClass: observable("text-[var(--wui-accent-500)] bg-[var(--wui-accent-500)]/10 border-[var(--wui-accent-500)]/50 hover:bg-[var(--wui-accent-500)]/20"),
@@ -55835,7 +57186,7 @@ var def15 = () => ({
   onClick: void 0,
   disabled: observable(false, HtmlBoolean)
 });
-var ToggleButton = defaults(def15, (props) => {
+var ToggleButton = defaults(def17, (props) => {
   const {
     children,
     onClass,
@@ -55875,14 +57226,14 @@ registerBaseCls("wui-toggle-button", BASE_CLASS9);
 
 // src/ssr/TestToggleButton.tsx
 init_runtime_es();
-var name18 = "TestToggleButton";
+var name19 = "TestToggleButton";
 var TestToggleButton = () => {
   const states = [
     { checked: false, children: "Bold" },
     { checked: true, children: "Bold" }
   ];
   const index = observable(0);
-  registerTestObservable(name18, index);
+  registerTestObservable(name19, index);
   const increment = () => index((prev) => (prev + 1) % states.length);
   useInterval2(increment, TEST_INTERVAL);
   const getCurrentElement = () => {
@@ -55893,7 +57244,7 @@ var TestToggleButton = () => {
     ] });
   };
   const ret = () => getCurrentElement();
-  registerTestObservable(`${name18}_ssr`, ret);
+  registerTestObservable(`${name19}_ssr`, ret);
   return ret;
 };
 var BASE3 = "inline-flex items-center justify-center px-2 py-1 rounded text-sm cursor-pointer select-none transition-colors duration-150 border border-transparent";
@@ -55904,109 +57255,6 @@ if (typeof globalThis.__isSSRTest__ !== "undefined") {
   const fullElements = [
     `<h3>ToggleButton</h3><button type="button" aria-pressed="false" class="${BASE3} ${OFF}">Bold</button>`,
     `<h3>ToggleButton</h3><button type="button" aria-pressed="true" class="${BASE3} ${ON}">Bold</button>`
-  ];
-  console.log(`
-\u{1F4DD} Test: ${name18}`);
-  let allPassed = true;
-  for (let i = 0; i < fullElements.length; i++) {
-    ;
-    testObservables[name18](i);
-    const ssrComponent = testObservables[`${name18}_ssr`];
-    const ssrResult = renderToString(ssrComponent);
-    const expectedFull = fullElements[i];
-    const passed = ssrResult === expectedFull;
-    if (!passed) allPassed = false;
-    console.log(`   State ${i}: ${ssrResult} ${passed ? "\u2705" : `\u274C (expected: ${expectedFull})`}`);
-  }
-  console.log(`   Result: ${allPassed ? "\u2705 ALL PASSED" : "\u274C SOME FAILED"}
-`);
-  if (!allPassed) {
-    console.error(`\u274C [${name18}] SSR test failed`);
-    const g2 = globalThis;
-    (g2.__ssrFailures ??= []).push(name18);
-  }
-}
-TestToggleButton.test = {
-  static: false,
-  stateCount: 2,
-  compareActualValues: true,
-  expect: () => {
-    const idx = get(testObservables[name18]);
-    const variants = [OFF, ON];
-    const pressed = idx === 1 ? "true" : "false";
-    const expected = `<button type="button" aria-pressed="${pressed}" class="${BASE3} ${variants[idx]}">Bold</button>`;
-    const ssrComponent = testObservables[`${name18}_ssr`];
-    const ssrResult = renderToString(ssrComponent);
-    const expectedFull = `<h3>ToggleButton</h3><button type="button" aria-pressed="${pressed}" class="${BASE3} ${variants[idx]}">Bold</button>`;
-    if (ssrResult !== expectedFull) {
-      assert(false, `[${name18}] SSR mismatch: got 
-${ssrResult}, expected 
-${expectedFull}`);
-    } else {
-      assert(true, `[${name18}] SSR match`);
-      console.log(`\u2705 [${name18}] SSR test passed: ${ssrResult}`);
-    }
-    return expected;
-  }
-};
-
-// src/ssr/TestToolbar.tsx
-init_ssr_shim();
-init_index_es();
-
-// src/Toolbar.tsx
-init_ssr_shim();
-init_index_es();
-init_runtime_es();
-var def16 = () => ({
-  cls: observable("", HtmlClass),
-  class: observable("", HtmlClass),
-  children: observable(null),
-  type: observable("default", HtmlString)
-});
-var variantStyle4 = {
-  default: "relative flex items-center px-4 h-full"
-};
-var Toolbar = defaults(def16, (props) => {
-  const { cls, class: cn2, children, type: type2, ...otherProps } = props;
-  return /* @__PURE__ */ jsx(
-    "div",
-    {
-      class: () => [variantStyle4[get(type2)], () => get(cls) ? get(cls) : "", cn2],
-      ...otherProps,
-      children
-    }
-  );
-});
-customElement("wui-toolbar", Toolbar);
-
-// src/ssr/TestToolbar.tsx
-init_runtime_es();
-var name19 = "TestToolbar";
-var TestToolbar = () => {
-  const states = [
-    { children: "Item" }
-  ];
-  const index = observable(0);
-  registerTestObservable(name19, index);
-  const increment = () => index((prev) => (prev + 1) % states.length);
-  useInterval2(increment, TEST_INTERVAL);
-  const getCurrentElement = () => {
-    const s = states[index()];
-    return /* @__PURE__ */ jsxs(Fragment, { children: [
-      /* @__PURE__ */ jsx("h3", { children: "Toolbar" }),
-      /* @__PURE__ */ jsx(Toolbar, { children: s.children })
-    ] });
-  };
-  const ret = () => getCurrentElement();
-  registerTestObservable(`${name19}_ssr`, ret);
-  return ret;
-};
-var TOOLBAR = "relative flex items-center px-4 h-full";
-if (typeof globalThis.__isSSRTest__ !== "undefined") {
-  TestToolbar();
-  const fullElements = [
-    `<h3>Toolbar</h3><div class="${TOOLBAR}">Item</div>`
   ];
   console.log(`
 \u{1F4DD} Test: ${name19}`);
@@ -56029,16 +57277,18 @@ if (typeof globalThis.__isSSRTest__ !== "undefined") {
     (g2.__ssrFailures ??= []).push(name19);
   }
 }
-TestToolbar.test = {
-  static: true,
-  stateCount: 1,
+TestToggleButton.test = {
+  static: false,
+  stateCount: 2,
   compareActualValues: true,
   expect: () => {
     const idx = get(testObservables[name19]);
-    const expected = `<div class="${TOOLBAR}">Item</div>`;
+    const variants = [OFF, ON];
+    const pressed = idx === 1 ? "true" : "false";
+    const expected = `<button type="button" aria-pressed="${pressed}" class="${BASE3} ${variants[idx]}">Bold</button>`;
     const ssrComponent = testObservables[`${name19}_ssr`];
     const ssrResult = renderToString(ssrComponent);
-    const expectedFull = `<h3>Toolbar</h3><div class="${TOOLBAR}">Item</div>`;
+    const expectedFull = `<h3>ToggleButton</h3><button type="button" aria-pressed="${pressed}" class="${BASE3} ${variants[idx]}">Bold</button>`;
     if (ssrResult !== expectedFull) {
       assert(false, `[${name19}] SSR mismatch: got 
 ${ssrResult}, expected 
@@ -56051,86 +57301,113 @@ ${expectedFull}`);
   }
 };
 
+// src/ssr/TestToolbar.tsx
+init_ssr_shim();
+init_index_es();
+
+// src/Toolbar.tsx
+init_ssr_shim();
+init_index_es();
+init_runtime_es();
+var def18 = () => ({
+  cls: observable("", HtmlClass),
+  class: observable("", HtmlClass),
+  children: observable(null),
+  type: observable("default", HtmlString)
+});
+var variantStyle4 = {
+  default: "relative flex items-center px-4 h-full"
+};
+var Toolbar = defaults(def18, (props) => {
+  const { cls, class: cn2, children, type: type2, ...otherProps } = props;
+  return /* @__PURE__ */ jsx(
+    "div",
+    {
+      class: () => [variantStyle4[get(type2)], () => get(cls) ? get(cls) : "", cn2],
+      ...otherProps,
+      children
+    }
+  );
+});
+customElement("wui-toolbar", Toolbar);
+
+// src/ssr/TestToolbar.tsx
+init_runtime_es();
+var name20 = "TestToolbar";
+var TestToolbar = () => {
+  const states = [
+    { children: "Item" }
+  ];
+  const index = observable(0);
+  registerTestObservable(name20, index);
+  const increment = () => index((prev) => (prev + 1) % states.length);
+  useInterval2(increment, TEST_INTERVAL);
+  const getCurrentElement = () => {
+    const s = states[index()];
+    return /* @__PURE__ */ jsxs(Fragment, { children: [
+      /* @__PURE__ */ jsx("h3", { children: "Toolbar" }),
+      /* @__PURE__ */ jsx(Toolbar, { children: s.children })
+    ] });
+  };
+  const ret = () => getCurrentElement();
+  registerTestObservable(`${name20}_ssr`, ret);
+  return ret;
+};
+var TOOLBAR = "relative flex items-center px-4 h-full";
+if (typeof globalThis.__isSSRTest__ !== "undefined") {
+  TestToolbar();
+  const fullElements = [
+    `<h3>Toolbar</h3><div class="${TOOLBAR}">Item</div>`
+  ];
+  console.log(`
+\u{1F4DD} Test: ${name20}`);
+  let allPassed = true;
+  for (let i = 0; i < fullElements.length; i++) {
+    ;
+    testObservables[name20](i);
+    const ssrComponent = testObservables[`${name20}_ssr`];
+    const ssrResult = renderToString(ssrComponent);
+    const expectedFull = fullElements[i];
+    const passed = ssrResult === expectedFull;
+    if (!passed) allPassed = false;
+    console.log(`   State ${i}: ${ssrResult} ${passed ? "\u2705" : `\u274C (expected: ${expectedFull})`}`);
+  }
+  console.log(`   Result: ${allPassed ? "\u2705 ALL PASSED" : "\u274C SOME FAILED"}
+`);
+  if (!allPassed) {
+    console.error(`\u274C [${name20}] SSR test failed`);
+    const g2 = globalThis;
+    (g2.__ssrFailures ??= []).push(name20);
+  }
+}
+TestToolbar.test = {
+  static: true,
+  stateCount: 1,
+  compareActualValues: true,
+  expect: () => {
+    const idx = get(testObservables[name20]);
+    const expected = `<div class="${TOOLBAR}">Item</div>`;
+    const ssrComponent = testObservables[`${name20}_ssr`];
+    const ssrResult = renderToString(ssrComponent);
+    const expectedFull = `<h3>Toolbar</h3><div class="${TOOLBAR}">Item</div>`;
+    if (ssrResult !== expectedFull) {
+      assert(false, `[${name20}] SSR mismatch: got 
+${ssrResult}, expected 
+${expectedFull}`);
+    } else {
+      assert(true, `[${name20}] SSR match`);
+      console.log(`\u2705 [${name20}] SSR test passed: ${ssrResult}`);
+    }
+    return expected;
+  }
+};
+
 // src/ssr/TestZoomable.tsx
 init_ssr_shim();
 init_index_es();
 
 // src/Zoomable.tsx
 init_ssr_shim();
-
-// ../use/dist/browser/index.browser.es.js
-init_ssr_shim();
-init_index_es();
-var ArrayContext = createContext();
-var handlers = /* @__PURE__ */ new Map();
-function useEventListener2(element, eventName, handler, options2) {
-  return effect(() => {
-    const targetElement = get(element) ?? window;
-    if (!(targetElement && targetElement.addEventListener)) return void 0;
-    if (!handlers.has(targetElement)) handlers.set(targetElement, /* @__PURE__ */ new Map());
-    const dict = handlers.get(targetElement);
-    if (!dict.has(eventName.toLowerCase()) && dict.get(eventName) !== handler) {
-      targetElement.addEventListener(eventName.toLowerCase(), handler, options2);
-      dict.set(eventName.toLowerCase(), handler);
-      return () => {
-        targetElement.removeEventListener(eventName.toLowerCase(), handler, options2);
-      };
-    }
-    return () => {
-    };
-  });
-}
-var width$1 = observable(0);
-var height$1 = observable(0);
-var width = observable(0);
-var height = observable(0);
-var offsetLeft = observable(0);
-var offsetTop = observable(0);
-var pageLeft = observable(0);
-var pageTop = observable(0);
-var scale = observable(0);
-function useLocation() {
-  const location = observable(window.location);
-  effect(() => {
-    const handleLocationChange = () => location({ ...window.location });
-    window.addEventListener("popstate", handleLocationChange);
-    const originalPushState = window.history.pushState;
-    const originalReplaceState = window.history.replaceState;
-    window.history.pushState = function(...args) {
-      originalPushState.apply(window.history, args);
-      handleLocationChange();
-    };
-    window.history.replaceState = function(...args) {
-      originalReplaceState.apply(window.history, args);
-      handleLocationChange();
-    };
-    return () => {
-      window.removeEventListener("popstate", handleLocationChange);
-      window.history.pushState = originalPushState;
-      window.history.replaceState = originalReplaceState;
-    };
-  });
-  return location;
-}
-var getScreen = () => {
-  if (typeof window !== "undefined" && window.screen) return window.screen;
-};
-var screen = observable(getScreen());
-var angle = observable(0);
-var type$1 = observable();
-var selection = window.getSelection();
-var anchorNode = observable();
-var anchorOffset = observable(0);
-var focusNode = observable();
-var focusOffset = observable(0);
-var isCollapsed = observable(true);
-var rangeCount = observable(0);
-var type = observable("");
-var ranges = observable([]);
-var l = useLocation();
-var isLocalhost = memo(() => get(l).host.toLowerCase().includes("localhost"));
-
-// src/Zoomable.tsx
 init_index_es();
 init_index_es();
 init_runtime_es();
@@ -56141,7 +57418,7 @@ var zoomableStyles = {
 var imgStyles = {
   default: "absolute w-full h-full object-contain origin-top-left cursor-grab select-none pointer-events-none rounded-lg"
 };
-var def17 = () => ({
+var def19 = () => ({
   cls: observable("", HtmlClass),
   class: observable("", HtmlClass),
   children: observable(null),
@@ -56163,7 +57440,7 @@ var defImg = () => ({
   src: observable("", HtmlString)
 });
 var ZoomableContext = createContext();
-var Zoomable = defaults(def17, (props) => {
+var Zoomable = defaults(def19, (props) => {
   const { cls, class: cn2, children, minScale, maxScale, type: type2, height: height2, width: width2, scale: scale2, x: translateX, y: translateY, ...otherProps } = props;
   const containerRef = observable(null);
   const wrapperRef = observable(null);
@@ -56308,13 +57585,13 @@ customElement("wui-zoomable-img", Img);
 
 // src/ssr/TestZoomable.tsx
 init_runtime_es();
-var name20 = "TestZoomable";
+var name21 = "TestZoomable";
 var TestZoomable = () => {
   const states = [
     { children: "Zoomable Content" }
   ];
   const index = observable(0);
-  registerTestObservable(name20, index);
+  registerTestObservable(name21, index);
   const increment = () => index((prev) => (prev + 1) % states.length);
   useInterval2(increment, TEST_INTERVAL);
   const getCurrentElement = () => {
@@ -56325,7 +57602,7 @@ var TestZoomable = () => {
     ] });
   };
   const ret = () => getCurrentElement();
-  registerTestObservable(`${name20}_ssr`, ret);
+  registerTestObservable(`${name21}_ssr`, ret);
   return ret;
 };
 var ZOOMABLE = "relative overflow-hidden touch-none border border-[var(--wui-gray-300)] rounded-lg";
@@ -56336,12 +57613,12 @@ if (typeof globalThis.__isSSRTest__ !== "undefined") {
     `<h3>Zoomable</h3><div class="${ZOOMABLE} cursor-grab" style="width: 400px; height: 400px;"><div class="${WRAPPER}" style="transform: translate(0px, 0px) scale(1);">Zoomable Content</div></div>`
   ];
   console.log(`
-\u{1F4DD} Test: ${name20}`);
+\u{1F4DD} Test: ${name21}`);
   let allPassed = true;
   for (let i = 0; i < fullElements.length; i++) {
     ;
-    testObservables[name20](i);
-    const ssrComponent = testObservables[`${name20}_ssr`];
+    testObservables[name21](i);
+    const ssrComponent = testObservables[`${name21}_ssr`];
     const ssrResult = renderToString(ssrComponent);
     const expectedFull = fullElements[i];
     const passed = ssrResult === expectedFull;
@@ -56351,9 +57628,9 @@ if (typeof globalThis.__isSSRTest__ !== "undefined") {
   console.log(`   Result: ${allPassed ? "\u2705 ALL PASSED" : "\u274C SOME FAILED"}
 `);
   if (!allPassed) {
-    console.error(`\u274C [${name20}] SSR test failed`);
+    console.error(`\u274C [${name21}] SSR test failed`);
     const g2 = globalThis;
-    (g2.__ssrFailures ??= []).push(name20);
+    (g2.__ssrFailures ??= []).push(name21);
   }
 }
 TestZoomable.test = {
@@ -56361,18 +57638,18 @@ TestZoomable.test = {
   stateCount: 1,
   compareActualValues: true,
   expect: () => {
-    const idx = get(testObservables[name20]);
+    const idx = get(testObservables[name21]);
     const expected = `<div class="${ZOOMABLE} cursor-grab" style="width: 400px; height: 400px;"><div class="${WRAPPER}" style="transform: translate(0px, 0px) scale(1);">Zoomable Content</div></div>`;
-    const ssrComponent = testObservables[`${name20}_ssr`];
+    const ssrComponent = testObservables[`${name21}_ssr`];
     const ssrResult = renderToString(ssrComponent);
     const expectedFull = `<h3>Zoomable</h3><div class="${ZOOMABLE} cursor-grab" style="width: 400px; height: 400px;"><div class="${WRAPPER}" style="transform: translate(0px, 0px) scale(1);">Zoomable Content</div></div>`;
     if (ssrResult !== expectedFull) {
-      assert(false, `[${name20}] SSR mismatch: got 
+      assert(false, `[${name21}] SSR mismatch: got 
 ${ssrResult}, expected 
 ${expectedFull}`);
     } else {
-      assert(true, `[${name20}] SSR match`);
-      console.log(`\u2705 [${name20}] SSR test passed: ${ssrResult}`);
+      assert(true, `[${name21}] SSR match`);
+      console.log(`\u2705 [${name21}] SSR test passed: ${ssrResult}`);
     }
     return expected;
   }

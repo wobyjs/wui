@@ -553,7 +553,8 @@ const DateTimeWheeler = defaults(def, (props) => {
     )
 })
 
-export { DateTimeWheeler }
+// `def` is re-exported under its own name: Wheeler's `def` already occupies it in the index barrel.
+export { DateTimeWheeler, def as dateTimeWheelerDef }
 
 // NOTE: Register the custom element
 customElement('wui-datetime-wheeler', DateTimeWheeler)
