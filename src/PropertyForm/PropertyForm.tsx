@@ -1,6 +1,6 @@
 /** @jsxImportSource woby */
 
-import { $, $$, ObservableMaybe, Observable, type JSX, defaults, customElement, type ElementAttributes } from "woby"
+import { $, $$, ObservableMaybe, Observable, type JSX, defaults, customElement, untrack, type ElementAttributes } from "woby"
 import { Button } from "../Button"
 import { Editors, UIProps, skippedProperties, indent } from "./Editors"
 import { t, tx } from "../i18n"
@@ -181,7 +181,11 @@ export const PropertyForm: Defaulted<typeof def> = defaults(def, (props: Propert
 		const filtered = sortedKeys
 			.filter((key) => !dashMatchReg.test(key) && !key.includes("Obj") && !key.startsWith("$"))
 
-		return filtered
+		// Untracked: this thunk must re-run only when the row SET changes (obj, Editors,
+		// order). Reading each row's observable here subscribed the whole tbody to every
+		// value, so one edit -- a wheel tick, a select change -- tore down and rebuilt all
+		// rows, dropping the focused field and snapping the panel's scroll back to the top.
+		return untrack(() => filtered
 			.map((key) => {
 				const value = data[key]
 				const actualValue = $$(value)
@@ -198,7 +202,7 @@ export const PropertyForm: Defaulted<typeof def> = defaults(def, (props: Propert
 						return <UI data={data} editorName={key} value={value} />
 					}
 				})
-			})
+			}))
 	}
 
 	return (

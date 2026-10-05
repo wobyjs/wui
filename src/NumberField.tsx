@@ -188,7 +188,15 @@ const NumberField: Defaulted<typeof def> = defaults(def, (props) => {
             // stayed pure white and only `opacity-70` showed. Force it.
             () => $$(disabled) ? "!bg-[var(--wui-gray-100)] opacity-70 cursor-not-allowed" : "", // Style for disabled state
             cn
-        ]}>
+        ]}
+            // On the whole field, not just the <input>: a wheel tick over the -/+ buttons
+            // used to fall through and scroll whatever panel the field sits in.
+            onWheel={(e: any) => {
+                e.preventDefault()
+                // Don't allow wheel if disabled
+                if ($$(disabled)) return
+                Math.sign(e.deltaY) > 0 ? dec() : inc()
+            }}>
             <Button
                 // class={btnCls}
                 // `!bg-transparent` outranks Button's own `disabled:bg-...`, so a disabled
@@ -231,16 +239,6 @@ const NumberField: Defaulted<typeof def> = defaults(def, (props) => {
                     isObservable(value) ? ((value as Observable)?.(e.target.valueAsNumber), onChange?.(e))
                         : undefined
                     updated()
-                }}
-                onWheel={(e: any) => {
-                    // Don't allow wheel if disabled
-                    if ($$(disabled)) {
-                        e.preventDefault()
-                        return
-                    }
-
-                    e.preventDefault()
-                    Math.sign(e.deltaY) > 0 ? dec() : inc()
                 }}
                 {...otherProps}
                 disabled={disabled}
