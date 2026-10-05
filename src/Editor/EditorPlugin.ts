@@ -28,8 +28,17 @@ export interface PluginProp {
     options?: { value: string; label?: string }[]
     /** Rendered, but not editable (e.g. values resolved at construction time). */
     readonly?: boolean
-    /** Never surfaced in the panel at all. */
-    hidden?: boolean
+    /**
+     * Never surfaced in the panel at all -- or, as a predicate, not for THIS element.
+     *
+     * The predicate form is for one tag that is several components in practice: a
+     * plugin resolves its panel by tag, so a `<sy-compass compass="八宅">` and a
+     * `<sy-compass compass="奇门风水">` get the same row list, and a row that means
+     * nothing on one of them has to be dropped per element. It is re-evaluated
+     * whenever a watched attribute changes, and a change in which rows show rebuilds
+     * the panel -- so flipping the attribute the predicate reads swaps the rows live.
+     */
+    hidden?: boolean | ((el: HTMLElement) => boolean)
     /** Tooltip / helper text for the row. */
     hint?: string
     /**
