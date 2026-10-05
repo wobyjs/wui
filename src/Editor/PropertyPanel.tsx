@@ -357,18 +357,7 @@ const MIN_W = 240
 
         const mo = new MutationObserver(() => {
             const fresh = extractCustomElementProperties(target)
-            // A predicate-hidden row (PluginProp.hidden as a function) can appear or go
-            // away with the attribute it reads -- a compass switched from 八宅 to 奇门风水
-            // gains a different set of ring rows. Syncing into the existing observables
-            // cannot add a row, so a different key set rebuilds the map. The values are
-            // the ones just read from the mutated element, so this is not the stale
-            // re-extraction `lastExtractedTarget` guards against.
-            const had = Object.keys(obj), now = Object.keys(fresh)
-            if (had.length !== now.length || now.some(k => !(k in obj))) {
-                propsObj(fresh)
-                return
-            }
-            for (const key of had) {
+            for (const key of Object.keys(obj)) {
                 // Not every entry is an observable -- `tagName` is extracted as a
                 // plain string, and calling it would throw straight out of the
                 // MutationObserver callback, where nothing is left to catch it.

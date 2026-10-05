@@ -535,10 +535,7 @@ export function customElementWatchSpec(el: HTMLElement): { attributeFilter?: str
     const names = new Set<string>()
     let text = false
     for (const p of props) {
-        // Only an unconditional hide drops the watch: a predicate-hidden row can come
-        // back when an attribute changes, and the change in its own attribute is one
-        // of the things that has to be seen.
-        if (p.hidden === true) continue
+        if (p.hidden) continue
         // A textContent prop lives in the light DOM, but still falls back to a
         // same-named attribute, so it needs watching in both places.
         if (p.textContent) text = true
@@ -562,7 +559,7 @@ export function extractCustomElementProperties(el: HTMLElement): Record<string, 
 
     for (const p of plugin?.props ?? []) {
         declared.add(p.name)
-        if (typeof p.hidden === 'function' ? p.hidden(el) : p.hidden) continue
+        if (p.hidden) continue
         // textContent props live in the light DOM; fall back to a legacy
         // same-named attribute so older serialized content still round-trips.
         const attr = attrName(p.name)
